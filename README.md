@@ -6,6 +6,6 @@ Custom component to calculate power consumption of hue lights
 ```yaml
 sensor:
   - platform: hue_power
-    entity_id: light.hanglamp_boven
-    name: "Hue lampje stroom"
+    entity_id: light.livingroom_floorlamp
+    name: "Livingroom floorlamp power"
 ```
