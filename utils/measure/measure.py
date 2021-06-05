@@ -6,9 +6,14 @@ import asyncio
 from aiohue.discovery import discover_nupnp
 import csv
 
+MODE_HS = "hs"
+MODE_COLOR_TEMP = "color_temp"
+SHELLY_IP = "192.168.178.254"
+MODE = MODE_COLOR_TEMP
+SLEEP_TIME=2
+
 async def main():
-    ip = "192.168.178.254"
-    options = aioshelly.ConnectionOptions(ip)
+    options = aioshelly.ConnectionOptions(SHELLY_IP)
 
     csvFile = open('measurements.csv', 'w')
     csvWriter = csv.writer(csvFile)
@@ -19,7 +24,7 @@ async def main():
                 aioshelly.Device.create(aiohttp_session, coap_context, options), 5
             )
         except asyncio.TimeoutError:
-            print("Timeout connecting to", ip)
+            print("Timeout connecting to", SHELLY_IP)
             return
 
         powermeter = device.blocks[0]
@@ -46,24 +51,42 @@ async def main():
         light = bridge.lights["12"]
         await light.set_state(on=True)
 
-        for bri in range(71, 254, 10):
-            for hue in range(0, 65535, 2000):
-                for sat in range(0, 254, 10):
-                    print('Setting hsl to: {}:{}:{}', hue, sat, bri)
-                    await light.set_state(bri=bri, hue=hue, sat=sat)
-                    await asyncio.sleep(2)
+        if (MODE == MODE_HS):
+            for bri in range(0, 254, 10):
+                for hue in range(0, 65535, 2000):
+                    for sat in range(0, 254, 10):
+                        print('Setting hsl to: {}:{}:{}', hue, sat, bri)
+                        await light.set_state(bri=bri, hue=hue, sat=sat)
+                        await asyncio.sleep(SLEEP_TIME)
+                        power = powermeter.current_values()["power"]
+                        print(power)
+                        print()
+                        csvWriter.writerow(
+                            [
+                                bri,
+                                hue,
+                                sat,
+                                power
+                            ]
+                        )
+                    csvFile.flush()
+        else:
+            for bri in range(0, 254, 5):
+                for mired in range(150, 500, 10):
+                    print('Setting bri:mired to: {}:{}', bri, mired)
+                    await light.set_state(bri=bri, ct=mired)
+                    await asyncio.sleep(SLEEP_TIME)
                     power = powermeter.current_values()["power"]
                     print(power)
                     print()
                     csvWriter.writerow(
                         [
                             bri,
-                            hue,
-                            sat,
+                            mired,
                             power
                         ]
                     )
-                csvFile.flush()
+                    csvFile.flush()
 
         csvFile.close()
 
