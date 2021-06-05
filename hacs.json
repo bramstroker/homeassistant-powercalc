@@ -1,4 +1,5 @@
 {
   "name": "Hue power consumption",
+  "render_readme": true,
   "domains": ["sensor"]
 }
