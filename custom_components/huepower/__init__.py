@@ -1,5 +1,7 @@
 """The HuePower integration."""
 
+import logging
+
 from collections import defaultdict
 from homeassistant.helpers.config_validation import key_dependency
 import os;
@@ -27,6 +29,8 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import HomeAssistantType
 
+_LOGGER = logging.getLogger(__name__)
+
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][DATA_CALCULATOR] = PowerCalculator(hass)
@@ -50,14 +54,14 @@ class PowerCalculator:
         manufacturer = device_entry.manufacturer
 
         attrs = light_state.attributes
-        color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)
+        #color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)
         color_mode = attrs.get(light.ATTR_COLOR_MODE)
 
         brightness = attrs[ATTR_BRIGHTNESS]
         lookup_table = await self.get_lookup_dictionary(manufacturer, model, color_mode)
         if (lookup_table == None):
-            #todo, what to do when no file exists for the given model?
-            return 0
+            _LOGGER.error("Lookup table not found")
+            return None
 
         #if light.color_supported(color_modes):
         power = 0
@@ -89,7 +93,7 @@ class PowerCalculator:
             
             manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
             if (manufacturer_directory == None):
-                #@todo log
+                _LOGGER.error("Manufacturer not supported: %s", manufacturer)
                 return None
 
             path = os.path.join(
@@ -98,7 +102,7 @@ class PowerCalculator:
             )
 
             if (not os.path.exists(path)):
-                #@todo log
+                _LOGGER.error("Data file not found: %s", path)
                 return None
 
             with open(path, 'r') as csv_file:
@@ -106,7 +110,10 @@ class PowerCalculator:
                 next(csv_reader) #skip header row
 
                 for row in csv_reader:
-                    lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
+                    if (color_mode == COLOR_MODE_HS):
+                        lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
+                    else:
+                        lookup_dict[int(row[0])][int(row[1])] = float(row[2])
 
             lookup_dict = dict(lookup_dict)
             self._lookup_dictionaries[cache_key] = lookup_dict

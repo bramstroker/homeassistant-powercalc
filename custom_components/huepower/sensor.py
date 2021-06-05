@@ -113,6 +113,11 @@ class HuePowerSensor(Entity):
         return self._power
 
     @property
+    def available(self):
+        """Return True if entity is available."""
+        return self._power is not None
+
+    @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
         return POWER_WATT
