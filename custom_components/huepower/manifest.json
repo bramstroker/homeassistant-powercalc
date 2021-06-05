@@ -1,0 +1,9 @@
+{
+  "domain": "hue_power",
+  "name": "Hue Power",
+  "documentation": "https://github.com/bramstroker/homeassistant-huepower",
+  "dependencies": [],
+  "codeowners": ["@bramstroker"],
+  "requirements": [],
+  "version": "0.1.0"
+}
