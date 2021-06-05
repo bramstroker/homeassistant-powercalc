@@ -58,6 +58,13 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     if (light is None):
         _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
         return
+
+    _LOGGER.debug(
+        "%s: (manufacturer=%s, model=%s)",
+        entity_id,
+        light.manufacturername,
+        light.modelid
+    )
         
     name = config.get(CONF_NAME)
     if (name == None):
