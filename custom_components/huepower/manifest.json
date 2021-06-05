@@ -1,0 +1,12 @@
+{
+  "domain": "hue_power",
+  "name": "Hue power consumption",
+  "documentation": "https://github.com/bramstroker/homeassistant-huepower",
+  "issue_tracker": "https://github.com/bramstroker/homeassistant-huepower/issues",
+  "dependencies": [
+    "hue"
+  ],
+  "codeowners": ["@bramstroker"],
+  "requirements": [],
+  "version": "0.1.0"
+}

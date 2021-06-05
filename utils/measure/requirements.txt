@@ -1,0 +1,3 @@
+ifaddr==0.1.7
+pyShelly==0.2.24
+zeroconf==0.31.0
