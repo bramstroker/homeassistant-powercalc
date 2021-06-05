@@ -25,8 +25,6 @@ from homeassistant.components.light import (
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS
 )
-import homeassistant.helpers.device_registry as dr
-import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import HomeAssistantType
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,16 +40,10 @@ class PowerCalculator:
         self._hass = hass
         self._lookup_dictionaries = {}
 
-    async def calculate(self, model, light_state) -> int:
+    async def calculate(self, manufacturer, model, light_state) -> int:
         """Calculate the power consumption based on brightness, mired, hsl values."""
         if (light_state.state == STATE_OFF):
             return 0
-
-        entity_registry = await er.async_get_registry(self._hass)
-        entity_entry = entity_registry.async_get(light_state.entity_id)
-        device_registry = await dr.async_get_registry(self._hass)
-        device_entry = device_registry.async_get(entity_entry.device_id)
-        manufacturer = device_entry.manufacturer
 
         attrs = light_state.attributes
         #color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)

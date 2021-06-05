@@ -1,6 +1,10 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
+
+import logging
+
+from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
     DOMAIN,
     DATA_CALCULATOR,
@@ -10,6 +14,8 @@ from . import PowerCalculator
 from homeassistant.helpers.entity import Entity
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change_event
+import homeassistant.helpers.device_registry as dr
+import homeassistant.helpers.entity_registry as er
 
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
@@ -21,8 +27,10 @@ from homeassistant.const import (
 import voluptuous as vol
 
 from homeassistant.components import light
-from homeassistant.components.light import PLATFORM_SCHEMA
+from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
+
+_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_NAME = "Hue power consumption"
 
@@ -30,7 +38,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
-        vol.Required(CONF_MODEL): cv.string
+        vol.Optional(CONF_MODEL): cv.string
     }
 )
 
@@ -38,14 +46,40 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     """Set up the sensor platform."""
 
     power_calculator = hass.data[DOMAIN][DATA_CALCULATOR]
+
+    entity_id = config[CONF_ENTITY_ID]
+
+    light = await find_hue_light(hass, entity_id)
+    if (light is None):
+        _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
+        return
+        
+    model = config.get(CONF_MODEL) or light.modelid
+
     async_add_entities([
         HuePowerSensor(
-            power_calculator,
-            config[CONF_NAME],
-            config[CONF_ENTITY_ID],
-            config[CONF_MODEL]
+            power_calculator=power_calculator,
+            name=config[CONF_NAME],
+            entity_id=config[CONF_ENTITY_ID],
+            manufacturer=light.manufacturername,
+            light_model=model
         )
     ])
+
+async def find_hue_light(hass, entity_id) -> Light | None:
+    """Find the light in the Hue bridge, we need to extract the model id."""
+    entity_registry = await er.async_get_registry(hass)
+    entity_entry = entity_registry.async_get(entity_id)
+    unique_id = entity_entry.unique_id
+
+    bridge = hass.data[HUE_DOMAIN][entity_entry.config_entry_id]
+    lights = bridge.api.lights
+    for light_id in lights:
+        light = bridge.api.lights[light_id]
+        if (light.uniqueid == unique_id):
+            return light
+    
+    return None
 
 class HuePowerSensor(Entity):
     """Representation of a Sensor."""
@@ -55,6 +89,7 @@ class HuePowerSensor(Entity):
         power_calculator: PowerCalculator,
         name: str,
         entity_id: str,
+        manufacturer: str,
         light_model: str
     ):
         """Initialize the sensor."""
@@ -63,6 +98,7 @@ class HuePowerSensor(Entity):
         self._entity_id = entity_id
         self._name = name
         self._power = None
+        self._manufacturer = manufacturer
         self._light_model = light_model
 
     async def async_added_to_hass(self):
@@ -97,7 +133,11 @@ class HuePowerSensor(Entity):
         if light_state is None and light_state.state == STATE_UNKNOWN:
            return False
 
-        self._power = await self._power_calculator.calculate(self._light_model, light_state)
+        self._power = await self._power_calculator.calculate(
+            self._manufacturer,
+            self._light_model,
+            light_state
+        )
 
         self.async_write_ha_state()
         return True
