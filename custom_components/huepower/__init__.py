@@ -1,11 +1,17 @@
 """The HuePower integration."""
 
 from collections import defaultdict
+from homeassistant.helpers.config_validation import key_dependency
 import os;
 from csv import reader
 from functools import partial
 
-from .const import DOMAIN, DATA_CALCULATOR
+from .const import (
+    DOMAIN,
+    DATA_CALCULATOR,
+    MANUFACTURER_DIRECTORY_MAPPING
+)
+
 from homeassistant.const import (
     STATE_OFF
 )
@@ -13,8 +19,7 @@ from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
-    ATTR_HS_COLOR,
-    PLATFORM_SCHEMA
+    ATTR_HS_COLOR
 )
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
@@ -31,7 +36,7 @@ class PowerCalculator:
         self._hass = hass
         self._lookup_dictionaries = {}
 
-    async def calculate(self, light_state):
+    async def calculate(self, model, light_state):
         """Calculate the power consumption based on brightness, mired, hsl values."""
         if (light_state.state == STATE_OFF):
             return 0
@@ -40,12 +45,13 @@ class PowerCalculator:
         entity_entry = entity_registry.async_get(light_state.entity_id)
         device_registry = await dr.async_get_registry(self._hass)
         device_entry = device_registry.async_get(entity_entry.device_id)
-        #@todo, calculate power consumption based on lookup tables with measurements
+        manufacturer = device_entry.manufacturer
+
         attrs = light_state.attributes
         color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)
 
         brightness = attrs[ATTR_BRIGHTNESS]
-        lookup_table = self.get_lookup_dictionary("")
+        lookup_table = self.get_lookup_dictionary(manufacturer, model)
         if light.color_supported(color_modes):
             hs = attrs[ATTR_HS_COLOR]
             hue = int(hs[0] / 360 * 65535) 
@@ -84,16 +90,18 @@ class PowerCalculator:
             }
         }
 
-    def get_lookup_dictionary(self, model: str):
+    def get_lookup_dictionary(self, manufacturer: str, model: str):
         lookup_dict = self._lookup_dictionaries.get(model)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
-            #lookup_dict = defaultdict(dict)
+            
+            manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
+            #if (manufacturer_directory == None):
 
             path = os.path.join(
                 os.path.dirname(__file__),
-                "data/test.csv"
+                f'data/{manufacturer_directory}/{model}.csv'
             )
 
             with open(path, 'r') as csv_file:

@@ -1,7 +1,11 @@
 """Platform for sensor integration."""
-from __future__ import annotations
 
-from .const import DOMAIN, DATA_CALCULATOR
+from __future__ import annotations
+from .const import (
+    DOMAIN,
+    DATA_CALCULATOR,
+    CONF_MODEL
+)
 from . import PowerCalculator
 from homeassistant.helpers.entity import Entity
 from homeassistant.core import callback
@@ -26,6 +30,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
+        vol.Required(CONF_MODEL): cv.string
     }
 )
 
@@ -37,20 +42,28 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         HuePowerSensor(
             power_calculator,
             config[CONF_NAME],
-            config[CONF_ENTITY_ID]
+            config[CONF_ENTITY_ID],
+            config[CONF_MODEL]
         )
     ])
 
 class HuePowerSensor(Entity):
     """Representation of a Sensor."""
 
-    def __init__(self, power_calculator: PowerCalculator, name: str, entity_id: str):
+    def __init__(
+        self,
+        power_calculator: PowerCalculator,
+        name: str,
+        entity_id: str,
+        light_model: str
+    ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
         self._state = None
         self._entity_id = entity_id
         self._name = name
         self._power = None
+        self._light_model = light_model
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -84,7 +97,7 @@ class HuePowerSensor(Entity):
         if light_state is None and light_state.state == STATE_UNKNOWN:
            return False
 
-        self._power = await self._power_calculator.calculate(light_state)
+        self._power = await self._power_calculator.calculate(self._light_model, light_state)
 
         self.async_write_ha_state()
         return True
