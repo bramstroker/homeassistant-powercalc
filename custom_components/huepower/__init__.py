@@ -46,7 +46,6 @@ class PowerCalculator:
 
         brightness = attrs[ATTR_BRIGHTNESS]
         lookup_table = self.get_lookup_dictionary("")
-        #lookup_table = self.get_lookup_table("", "")
         if light.color_supported(color_modes):
             hs = attrs[ATTR_HS_COLOR]
             hue = int(hs[0] / 360 * 65535) 
@@ -105,5 +104,6 @@ class PowerCalculator:
                     lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
 
             lookup_dict = dict(lookup_dict)
+            self._lookup_dictionaries[model] = lookup_dict
 
         return lookup_dict
