@@ -8,5 +8,8 @@ sensor:
   - platform: hue_power
     entity_id: light.livingroom_floorlamp
     name: "Livingroom floorlamp power"
-    model: "LCT010"
 ```
+
+## Supported models
+- Signify LCT010
+- Signify LCT012
