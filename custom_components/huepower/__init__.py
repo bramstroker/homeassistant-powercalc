@@ -81,8 +81,8 @@ class PowerCalculator:
         ]
 
     async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str):
-        key = f'{model}_{color_mode}'
-        lookup_dict = self._lookup_dictionaries.get(key)
+        cache_key = f'{manufacturer}_{model}_{color_mode}'
+        lookup_dict = self._lookup_dictionaries.get(cache_key)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
@@ -94,7 +94,7 @@ class PowerCalculator:
 
             path = os.path.join(
                 os.path.dirname(__file__),
-                f'data/{manufacturer_directory}/{key}.csv'
+                f'data/{manufacturer_directory}/{model}/{color_mode}.csv'
             )
 
             if (not os.path.exists(path)):
@@ -109,6 +109,6 @@ class PowerCalculator:
                     lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
 
             lookup_dict = dict(lookup_dict)
-            self._lookup_dictionaries[key] = lookup_dict
+            self._lookup_dictionaries[cache_key] = lookup_dict
 
         return lookup_dict
