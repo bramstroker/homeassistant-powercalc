@@ -1,8 +1,14 @@
 # homeassistant-huepower
-Custom component to calculate power consumption of hue lights
+Custom component to calculate power consumption of hue lights.
 This component uses CSV files to lookup power consumption based on brightness, hue/saturation and color temperature. 
 
-## Example configuration
+## Installation
+
+Copy `custom_components/huepower` into your Home Assistant `config` directory.
+
+HACS support is coming soon.
+
+## Configuration
 
 Add the following to your configuration.yaml:
 
