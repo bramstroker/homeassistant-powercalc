@@ -19,6 +19,7 @@ import homeassistant.helpers.entity_registry as er
 
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
+    DEVICE_CLASS_POWER,
     POWER_WATT,
     STATE_UNKNOWN,
     CONF_NAME,
@@ -32,15 +33,15 @@ import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-DEFAULT_NAME = "Hue power consumption"
-
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+        vol.Optional(CONF_NAME): cv.string,
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
         vol.Optional(CONF_MODEL): cv.string
     }
 )
+
+NAME_FORMAT = "{} power"
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
@@ -49,18 +50,27 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     entity_id = config[CONF_ENTITY_ID]
 
+    entity_registry = await er.async_get_registry(hass)
+    entity_entry = entity_registry.async_get(entity_id)
+    unique_id = entity_entry.unique_id
+
     light = await find_hue_light(hass, entity_id)
     if (light is None):
         _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
         return
         
+    name = config.get(CONF_NAME)
+    if (name == None):
+        name = NAME_FORMAT.format(light.name)
+
     model = config.get(CONF_MODEL) or light.modelid
 
     async_add_entities([
         HuePowerSensor(
             power_calculator=power_calculator,
-            name=config[CONF_NAME],
+            name=name,
             entity_id=config[CONF_ENTITY_ID],
+            unique_id=unique_id,
             manufacturer=light.manufacturername,
             light_model=model
         )
@@ -90,7 +100,8 @@ class HuePowerSensor(Entity):
         name: str,
         entity_id: str,
         manufacturer: str,
-        light_model: str
+        light_model: str,
+        unique_id: str,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -100,6 +111,7 @@ class HuePowerSensor(Entity):
         self._power = None
         self._manufacturer = manufacturer
         self._light_model = light_model
+        self._unique_id = unique_id
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -153,6 +165,11 @@ class HuePowerSensor(Entity):
         return self._power
 
     @property
+    def unique_id(self):
+        """Return a unique id."""
+        return self._unique_id
+
+    @property
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
@@ -161,3 +178,8 @@ class HuePowerSensor(Entity):
     def unit_of_measurement(self):
         """Return the unit of measurement."""
         return POWER_WATT
+    
+    @property
+    def device_class(self) -> str:
+        """Device class of the sensor."""
+        return DEVICE_CLASS_POWER
