@@ -19,7 +19,9 @@ from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
-    ATTR_HS_COLOR
+    ATTR_HS_COLOR,
+    COLOR_MODE_COLOR_TEMP,
+    COLOR_MODE_HS
 )
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
@@ -36,7 +38,7 @@ class PowerCalculator:
         self._hass = hass
         self._lookup_dictionaries = {}
 
-    async def calculate(self, model, light_state):
+    async def calculate(self, model, light_state) -> int:
         """Calculate the power consumption based on brightness, mired, hsl values."""
         if (light_state.state == STATE_OFF):
             return 0
@@ -49,17 +51,24 @@ class PowerCalculator:
 
         attrs = light_state.attributes
         color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)
+        color_mode = attrs.get(light.ATTR_COLOR_MODE)
 
         brightness = attrs[ATTR_BRIGHTNESS]
-        lookup_table = self.get_lookup_dictionary(manufacturer, model)
-        if light.color_supported(color_modes):
+        lookup_table = await self.get_lookup_dictionary(manufacturer, model, color_mode)
+        if (lookup_table == None):
+            #todo, what to do when no file exists for the given model?
+            return 0
+
+        #if light.color_supported(color_modes):
+        power = 0
+        if (color_mode == COLOR_MODE_HS):
             hs = attrs[ATTR_HS_COLOR]
             hue = int(hs[0] / 360 * 65535) 
             sat = int(hs[1] / 100 * 255)
             hue_values = self.get_closest_from_dictionary(lookup_table, brightness)
             sat_values = self.get_closest_from_dictionary(hue_values, hue)
             power = self.get_closest_from_dictionary(sat_values, sat)
-        else:
+        elif (color_mode == COLOR_MODE_COLOR_TEMP):
             mired = attrs[ATTR_COLOR_TEMP]
             mired_values = self.get_closest_from_dictionary(lookup_table, brightness)
             power = self.get_closest_from_dictionary(mired_values, mired)
@@ -71,47 +80,35 @@ class PowerCalculator:
             min(dict.keys(), key = lambda key: abs(key-search_key))
         ]
 
-    def get_lookup_table(self, manufacturer: str, model: str):
-        return {
-            10: {
-                10: 1.6,
-                20: 1.8 
-            },
-            20: {
-                10: 1.6,
-                20: 1.8
-            },
-            60: {
-                10: 1.6,
-                20: 1.8,
-                300: 2.9,
-                310: 3.4,
-                400: 5
-            }
-        }
-
-    def get_lookup_dictionary(self, manufacturer: str, model: str):
-        lookup_dict = self._lookup_dictionaries.get(model)
+    async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str):
+        key = f'{model}_{color_mode}'
+        lookup_dict = self._lookup_dictionaries.get(key)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
             
             manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
-            #if (manufacturer_directory == None):
+            if (manufacturer_directory == None):
+                #@todo log
+                return None
 
             path = os.path.join(
                 os.path.dirname(__file__),
-                f'data/{manufacturer_directory}/{model}.csv'
+                f'data/{manufacturer_directory}/{key}.csv'
             )
+
+            if (not os.path.exists(path)):
+                #@todo log
+                return None
 
             with open(path, 'r') as csv_file:
                 csv_reader = reader(csv_file)
-                next(csv_reader)
-                # Iterate over each row in the csv using reader object
+                next(csv_reader) #skip header row
+
                 for row in csv_reader:
                     lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
 
             lookup_dict = dict(lookup_dict)
-            self._lookup_dictionaries[model] = lookup_dict
+            self._lookup_dictionaries[key] = lookup_dict
 
         return lookup_dict
