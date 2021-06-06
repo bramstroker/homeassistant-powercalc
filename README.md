@@ -42,7 +42,7 @@ Depending on the supported color modes the integration expects multiple CSV file
  - hs.csv (hue/saturation, colored lamps)
  - color_temp.csv (color temperature)
 
-Some lights support both color modes, so there will be two CSV files.
+Some lights support both color modes, so there must be two CSV files.
 
 Example:
 
@@ -77,7 +77,7 @@ An example script is available `utils/measure/measure.py`.
 - Signify LCT012 (hs and color_temp). Thanks Simon Hörrle
 - Signify LTW001 (color_temp)
 
-## Debug loggin
+## Debug logging
 
 Add the following to configuration.yaml:
 
