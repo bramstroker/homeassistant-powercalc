@@ -113,7 +113,7 @@ def validate_light_support(
     entity_entry: er.RegistryEntry,
     light: Light,
     model: str
-) -> bool:
+):
     model_directory = power_calculator.get_light_model_directory(light.manufacturername, model)
     if (not os.path.exists(model_directory)):
         raise LightNotSupported("Model not found in data directory", model)
