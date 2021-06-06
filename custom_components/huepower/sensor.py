@@ -57,9 +57,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     entity_registry = await er.async_get_registry(hass)
     entity_entry = entity_registry.async_get(entity_id)
-    unique_id = entity_entry.unique_id
 
-    light = await find_hue_light(hass, entity_id)
+    light = await find_hue_light(hass, entity_entry)
     if (light is None):
         _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
         return
@@ -91,23 +90,20 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             power_calculator=power_calculator,
             name=name,
             entity_id=config[CONF_ENTITY_ID],
-            unique_id=unique_id,
+            unique_id=entity_entry.unique_id,
             manufacturer=light.manufacturername,
             light_model=model
         )
     ])
 
-async def find_hue_light(hass, entity_id) -> Light | None:
+async def find_hue_light(hass, entity_entry: er.RegistryEntry) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
-    entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(entity_id)
-    unique_id = entity_entry.unique_id
 
     bridge = hass.data[HUE_DOMAIN][entity_entry.config_entry_id]
     lights = bridge.api.lights
     for light_id in lights:
         light = bridge.api.lights[light_id]
-        if (light.uniqueid == unique_id):
+        if (light.uniqueid == entity_entry.unique_id):
             return light
     
     return None
