@@ -25,7 +25,7 @@ The `entity_id` must be a light entity provided by the `Philips Hue` integration
 The model id will be automatically detected by looking at the Hue Bridge API data.
 For auto discovery to work you MUST have the  Philips Hue integration enabled.
 
-You can force a certain manufactuer/model When you don't use the Philips HUE api (for example Zigbee stick directly). Or when the manufacturer and model cannot be discovered correctly
+You can force a certain manufactuer/model when you don't use the Philips HUE api (for example Zigbee stick directly). Or when the manufacturer and model cannot be discovered correctly
 
 ```yaml
 sensor:
@@ -63,14 +63,20 @@ Example:
 hs.csv:
 
 ```
-brightness, hue, saturation, watt
+brightness,hue,saturation,watt
 ```
 
 color_temp.csv
 
 ```
-brightness, mired, watt
+brightness,mired,watt
 ```
+
+***Ranges***:
+- brightness (0-255)
+- hue (0-65535)
+- saturation (0-255)
+- mired (0-500)  min value depending on min mired value of the light model
 
 ### Support for new light
 
