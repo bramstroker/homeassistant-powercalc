@@ -43,16 +43,16 @@ async def main():
 
         #print()
         #print('Lights:')
-        #for id in bridge.lights:
-        #    light = bridge.lights[id]
-        #    print('{}: {}: {}'.format(id, light.name, 'on' if light.state['on'] else 'off'))
-
+        for id in bridge.lights:
+            light = bridge.lights[id]
+            print('{}: {}: {}'.format(id, light.name, 'on' if light.state['on'] else 'off'))
+	
         # Change state of a light.
-        light = bridge.lights["12"]
+        light = bridge.lights["1"]
         await light.set_state(on=True)
 
         if (MODE == MODE_HS):
-            for bri in range(0, 254, 10):
+            for bri in range(1, 254, 10):
                 for hue in range(0, 65535, 2000):
                     for sat in range(0, 254, 10):
                         print('Setting hsl to: {}:{}:{}', hue, sat, bri)
@@ -71,7 +71,7 @@ async def main():
                         )
                     csvFile.flush()
         else:
-            for bri in range(0, 254, 5):
+            for bri in range(1, 254, 5):
                 for mired in range(150, 500, 10):
                     print('Setting bri:mired to: {}:{}', bri, mired)
                     await light.set_state(bri=bri, ct=mired)

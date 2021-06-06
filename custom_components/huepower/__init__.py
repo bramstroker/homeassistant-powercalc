@@ -1,9 +1,11 @@
 """The HuePower integration."""
 
+from homeassistant.core import State
 import logging
 
+from typing import Optional
 from collections import defaultdict
-from homeassistant.helpers.config_validation import key_dependency
+from homeassistant.helpers.config_validation import entity_id, key_dependency
 import os;
 from csv import reader
 from functools import partial
@@ -15,12 +17,14 @@ from .const import (
 )
 
 from homeassistant.const import (
-    STATE_OFF
+    STATE_OFF,
+    STATE_UNAVAILABLE
 )
 from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_TEMP,
+    ATTR_COLOR_MODE,
     ATTR_HS_COLOR,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS
@@ -40,38 +44,42 @@ class PowerCalculator:
         self._hass = hass
         self._lookup_dictionaries = {}
 
-    async def calculate(self, manufacturer, model, light_state) -> int:
+    async def calculate(self, manufacturer: str, model: str, light_state: State) -> Optional[int]:
         """Calculate the power consumption based on brightness, mired, hsl values."""
-        if (light_state.state == STATE_OFF):
+        if (light_state.state == STATE_OFF or light_state.state == STATE_UNAVAILABLE):
             return 0
 
         attrs = light_state.attributes
-        #color_modes = attrs.get(light.ATTR_SUPPORTED_COLOR_MODES)
-        color_mode = attrs.get(light.ATTR_COLOR_MODE)
+        color_mode = attrs.get(ATTR_COLOR_MODE)
+        brightness = attrs.get(ATTR_BRIGHTNESS)
+        if (brightness == None):
+            _LOGGER.error("No brightness for entity: %s", light_state.entity_id)
+            return None
 
-        brightness = attrs[ATTR_BRIGHTNESS]
         lookup_table = await self.get_lookup_dictionary(manufacturer, model, color_mode)
         if (lookup_table == None):
             _LOGGER.error("Lookup table not found")
             return None
 
-        #if light.color_supported(color_modes):
         power = 0
         if (color_mode == COLOR_MODE_HS):
             hs = attrs[ATTR_HS_COLOR]
             hue = int(hs[0] / 360 * 65535) 
             sat = int(hs[1] / 100 * 255)
+            _LOGGER.debug("Looking up power usage for bri:%s hue:%s sat:%s}", brightness, hue, sat)
             hue_values = self.get_closest_from_dictionary(lookup_table, brightness)
             sat_values = self.get_closest_from_dictionary(hue_values, hue)
             power = self.get_closest_from_dictionary(sat_values, sat)
         elif (color_mode == COLOR_MODE_COLOR_TEMP):
             mired = attrs[ATTR_COLOR_TEMP]
+            _LOGGER.debug("Looking up power usage for bri:%s mired:%s", brightness, mired)
             mired_values = self.get_closest_from_dictionary(lookup_table, brightness)
             power = self.get_closest_from_dictionary(mired_values, mired)
 
+        _LOGGER.debug("Power:%s", power)
         return power
 
-    def get_closest_from_dictionary(self, dict, search_key):
+    def get_closest_from_dictionary(self, dict: dict, search_key):
         return dict.get(search_key) or dict[
             min(dict.keys(), key = lambda key: abs(key-search_key))
         ]

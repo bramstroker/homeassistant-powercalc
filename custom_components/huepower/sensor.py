@@ -112,7 +112,6 @@ class HuePowerSensor(Entity):
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
-        self._state = None
         self._entity_id = entity_id
         self._name = name
         self._power = None
