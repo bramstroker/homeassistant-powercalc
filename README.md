@@ -76,6 +76,7 @@ An example script is available `utils/measure/measure.py`.
 I am using the "Shelly Plug S"
 
 ## Supported models
+- Signify LCT003 (hs and color_temp)
 - Signify LCT010 (hs and color_temp)
 - Signify LCT012 (hs and color_temp). Thanks Simon Hörrle
 - Signify LTW001 (color_temp)
