@@ -75,6 +75,7 @@ An example script is available `utils/measure/measure.py`.
 ## Supported models
 - Signify LCT010 (hs and color_temp)
 - Signify LCT012 (hs and color_temp). Thanks Simon Hörrle
+- Signify LTW001 (color_temp)
 
 ## Debug loggin
 
