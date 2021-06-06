@@ -71,6 +71,7 @@ brightness, mired, watt
 
 New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
 An example script is available `utils/measure/measure.py`.
+I am using the "Shelly Plug S"
 
 ## Supported models
 - Signify LCT010 (hs and color_temp)
