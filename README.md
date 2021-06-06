@@ -32,7 +32,7 @@ sensor:
     model: LCT010
 ```
 
-<hr
+<hr>
 
 ## CSV data files
 
@@ -90,5 +90,7 @@ logger:
   logs:
     custom_components.huepower: debug
 ```
+
+<hr>
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
