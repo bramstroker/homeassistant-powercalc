@@ -75,3 +75,14 @@ An example script is available `utils/measure/measure.py`.
 ## Supported models
 - Signify LCT010 (hs and color_temp)
 - Signify LCT012 (hs and color_temp). Thanks Simon Hörrle
+
+## Debug loggin
+
+Add the following to configuration.yaml:
+
+```yaml
+logger:
+  default: warning
+  logs:
+    custom_components.huepower: debug
+```
