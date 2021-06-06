@@ -23,12 +23,15 @@ sensor:
 The `entity_id` must be a light entity provided by the `Philips Hue` integration
 
 The model id will be automatically detected by looking at the Hue Bridge API data.
-Alternatively you can force a given model:
+For auto discovery to work you MUST have the  Philips Hue integration enabled.
+
+You can force a certain manufactuer/model When you don't use the Philips HUE api (for example Zigbee stick directly). Or when the manufacturer and model cannot be discovered correctly
 
 ```yaml
 sensor:
   - platform: huepower
     entity_id: light.livingroom_floorlamp
+    manufacturer: signify
     model: LCT010
 ```
 

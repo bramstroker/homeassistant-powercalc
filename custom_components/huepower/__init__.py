@@ -85,11 +85,7 @@ class PowerCalculator:
         ]
 
     def get_light_model_directory(self, manufacturer: str, model: str) -> str:
-        manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
-        if (manufacturer_directory == None):
-            _LOGGER.error("Manufacturer not supported: %s", manufacturer)
-            #@todo throw exception
-            return None
+        manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer) or manufacturer
 
         return os.path.join(
             os.path.dirname(__file__),

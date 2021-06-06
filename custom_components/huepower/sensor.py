@@ -9,7 +9,8 @@ from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
     DOMAIN,
     DATA_CALCULATOR,
-    CONF_MODEL
+    CONF_MODEL,
+    CONF_MANUFACTURER
 )
 from . import PowerCalculator
 from homeassistant.helpers.entity import Entity
@@ -39,7 +40,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME): cv.string,
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
-        vol.Optional(CONF_MODEL): cv.string
+        vol.Optional(CONF_MODEL): cv.string,
+        vol.Optional(CONF_MANUFACTURER): cv.string
     }
 )
 
@@ -58,26 +60,41 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     entity_registry = await er.async_get_registry(hass)
     entity_entry = entity_registry.async_get(entity_id)
 
-    light = await find_hue_light(hass, entity_entry)
-    if (light is None):
-        _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
+    manufacturer = config.get(CONF_MANUFACTURER)
+    model = config.get(CONF_MODEL)
+
+    # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
+    if (hass.data.get(HUE_DOMAIN)):
+        light = await find_hue_light(hass, entity_entry)
+        if (light is None):
+            _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
+            return
+
+        _LOGGER.debug(
+            "%s: (manufacturer=%s, model=%s)",
+            entity_id,
+            light.manufacturername,
+            light.modelid
+        )
+
+        if (manufacturer == None):
+            manufacturer = light.manufacturername
+
+        if (model == None):
+            model = light.modelid
+
+    if (manufacturer is None):
+        _LOGGER.error("Manufacturer not supplied for entity: %s", entity_id)
+
+    if (model is None):
+        _LOGGER.error("Model not supplied for entity: %s", entity_id)
         return
 
-    _LOGGER.debug(
-        "%s: (manufacturer=%s, model=%s)",
-        entity_id,
-        light.manufacturername,
-        light.modelid
-    )
-        
-    name = config.get(CONF_NAME)
-    if (name == None):
-        name = NAME_FORMAT.format(light.name)
-
-    model = config.get(CONF_MODEL) or light.modelid
+    light_name = entity_entry.name or entity_entry.original_name
+    name = config.get(CONF_NAME) or NAME_FORMAT.format(light_name)
 
     try:
-        validate_light_support(power_calculator, entity_entry, light, model)
+        validate_light_support(power_calculator, entity_entry, manufacturer, model)
     except LightNotSupported as err:
         _LOGGER.error(
             "Light not supported: %s",
@@ -91,7 +108,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             name=name,
             entity_id=config[CONF_ENTITY_ID],
             unique_id=entity_entry.unique_id,
-            manufacturer=light.manufacturername,
+            manufacturer=manufacturer,
             light_model=model
         )
     ])
@@ -111,10 +128,10 @@ async def find_hue_light(hass, entity_entry: er.RegistryEntry) -> Light | None:
 def validate_light_support(
     power_calculator: PowerCalculator,
     entity_entry: er.RegistryEntry,
-    light: Light,
+    manufacturer: str,
     model: str
 ):
-    model_directory = power_calculator.get_light_model_directory(light.manufacturername, model)
+    model_directory = power_calculator.get_light_model_directory(manufacturer, model)
     if (not os.path.exists(model_directory)):
         raise LightNotSupported("Model not found in data directory", model)
     
