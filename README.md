@@ -14,9 +14,9 @@ Add the following to your configuration.yaml:
 
 ```yaml
 sensor:
-  - platform: hue_power
+  - platform: huepower
     entity_id: light.livingroom_floorlamp
-  - platform: hue_power
+  - platform: huepower
     entity_id: light.livingroom_ceiling
 ```
 
@@ -27,7 +27,7 @@ Alternatively you can force a given model:
 
 ```yaml
 sensor:
-  - platform: hue_power
+  - platform: huepower
     entity_id: light.livingroom_floorlamp
     model: LCT010
 ```
