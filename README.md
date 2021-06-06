@@ -32,6 +32,8 @@ sensor:
     model: LCT010
 ```
 
+<hr
+
 ## CSV data files
 
 To calculate power consumtion a lookup is done into CSV data files.
@@ -88,3 +90,5 @@ logger:
   logs:
     custom_components.huepower: debug
 ```
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
