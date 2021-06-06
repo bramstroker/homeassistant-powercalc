@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os;
 
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
@@ -13,6 +14,7 @@ from .const import (
 from . import PowerCalculator
 from homeassistant.helpers.entity import Entity
 from homeassistant.core import callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
@@ -43,6 +45,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 NAME_FORMAT = "{} power"
 
+class LightNotSupported(HomeAssistantError):
+    """Raised when try to login as invalid user."""
+
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
 
@@ -72,6 +77,15 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     model = config.get(CONF_MODEL) or light.modelid
 
+    try:
+        validate_light_support(power_calculator, entity_entry, light, model)
+    except LightNotSupported as err:
+        _LOGGER.error(
+            "Light not supported: %s",
+            err
+        )
+        return
+
     async_add_entities([
         HuePowerSensor(
             power_calculator=power_calculator,
@@ -97,6 +111,25 @@ async def find_hue_light(hass, entity_id) -> Light | None:
             return light
     
     return None
+
+def validate_light_support(
+    power_calculator: PowerCalculator,
+    entity_entry: er.RegistryEntry,
+    light: Light,
+    model: str
+) -> bool:
+    model_directory = power_calculator.get_light_model_directory(light.manufacturername, model)
+    if (not os.path.exists(model_directory)):
+        raise LightNotSupported("Model not found in data directory", model)
+    
+    supported_color_modes = entity_entry.capabilities['supported_color_modes']
+    for mode in supported_color_modes:
+        lookup_file = os.path.join(
+            model_directory,
+            f'{mode}.csv'
+        )
+        if (not os.path.exists(lookup_file)):
+            raise LightNotSupported("No lookup file found for mode", mode)
 
 class HuePowerSensor(Entity):
     """Representation of a Sensor."""

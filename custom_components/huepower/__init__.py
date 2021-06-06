@@ -84,21 +84,28 @@ class PowerCalculator:
             min(dict.keys(), key = lambda key: abs(key-search_key))
         ]
 
+    def get_light_model_directory(self, manufacturer: str, model: str) -> str:
+        manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
+        if (manufacturer_directory == None):
+            _LOGGER.error("Manufacturer not supported: %s", manufacturer)
+            #@todo throw exception
+            return None
+
+        return os.path.join(
+            os.path.dirname(__file__),
+            f'data/{manufacturer_directory}/{model}'
+        )
+
     async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str):
         cache_key = f'{manufacturer}_{model}_{color_mode}'
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
-            
-            manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
-            if (manufacturer_directory == None):
-                _LOGGER.error("Manufacturer not supported: %s", manufacturer)
-                return None
 
             path = os.path.join(
-                os.path.dirname(__file__),
-                f'data/{manufacturer_directory}/{model}/{color_mode}.csv'
+                self.get_light_model_directory(manufacturer, model),
+                f'{color_mode}.csv'
             )
 
             if (not os.path.exists(path)):
