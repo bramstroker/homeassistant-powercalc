@@ -104,6 +104,8 @@ class PowerCalculator:
                 f'{color_mode}.csv'
             )
 
+            _LOGGER.debug("Loading data file: %s", path)
+
             if (not os.path.exists(path)):
                 _LOGGER.error("Data file not found: %s", path)
                 return None
