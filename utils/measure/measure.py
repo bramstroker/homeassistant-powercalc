@@ -39,9 +39,11 @@ async def main():
 	
         light_id = input("Enter light id: ")
 
-        # Change state of a light.
         light = hue_bridge.lights[light_id]
-        await light.set_state(on=True)
+        await light.set_state(on=True, bri=1)
+
+        #Initialy wait longer so the Shelly plug can settle
+        await asyncio.sleep(10) 
 
         if (MODE == MODE_HS):
             for bri in range(1, 254, 10):
