@@ -1,14 +1,16 @@
 import asyncio
 from pprint import pprint
 import aiohttp
+import aiohue
 import aioshelly
 import asyncio
-from aiohue.discovery import discover_nupnp
 import csv
 
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"
 SHELLY_IP = "192.168.178.254"
+HUE_BRIDGE_IP = "192.168.178.44"
+HUE_BRIDGE_USERNAME="huepower"
 MODE = MODE_COLOR_TEMP
 SLEEP_TIME=2
 
@@ -29,26 +31,16 @@ async def main():
 
         powermeter = device.blocks[0]
 
+        hue_bridge = await initialize_hue_bridge(aiohttp_session)
 
-        bridges = await discover_nupnp(aiohttp_session)
-
-        bridge = bridges[0]
-        await bridge.create_user('aiophue-example')
-        #print('Your username is', bridge.username)
-
-        await bridge.initialize()
-
-        #print('Name', bridge.config.name)
-        #print('Mac', bridge.config.mac)
-
-        #print()
-        #print('Lights:')
-        for id in bridge.lights:
-            light = bridge.lights[id]
+        for id in hue_bridge.lights:
+            light = hue_bridge.lights[id]
             print('{}: {}: {}'.format(id, light.name, 'on' if light.state['on'] else 'off'))
 	
+        light_id = input("Enter light id: ")
+
         # Change state of a light.
-        light = bridge.lights["1"]
+        light = hue_bridge.lights[light_id]
         await light.set_state(on=True)
 
         if (MODE == MODE_HS):
@@ -89,6 +81,32 @@ async def main():
                     csvFile.flush()
 
         csvFile.close()
+
+async def initialize_hue_bridge(websession) -> aiohue.Bridge:
+    f = open("bridge_user.txt", "r")
+
+    bridge = aiohue.Bridge(
+        host=HUE_BRIDGE_IP,
+        websession=websession
+    )
+
+    authenticated_user = f.read()
+    if (len(authenticated_user) > 0):
+        bridge.username = authenticated_user
+    f.close()
+
+    try:
+        await bridge.initialize()
+    except (aiohue.Unauthorized) as err:
+        print("Please click the link button on the bridge, than hit enter..")
+        input()
+        await bridge.create_user("huepower")
+        await bridge.initialize()
+        f = open("bridge_user.txt", "w")
+        f.write(bridge.username)
+        f.close()
+
+    return bridge
 
 if __name__ == "__main__":
     asyncio.run(main())
