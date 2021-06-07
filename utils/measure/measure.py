@@ -11,7 +11,7 @@ MODE_COLOR_TEMP = "color_temp"
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
 HUE_BRIDGE_USERNAME="huepower"
-MODE = MODE_COLOR_TEMP
+MODE = MODE_HS
 SLEEP_TIME=2
 
 async def main():
@@ -85,7 +85,7 @@ async def main():
         csvFile.close()
 
 async def initialize_hue_bridge(websession) -> aiohue.Bridge:
-    f = open("bridge_user.txt", "a+")
+    f = open("bridge_user.txt", "w+")
 
     bridge = aiohue.Bridge(
         host=HUE_BRIDGE_IP,
