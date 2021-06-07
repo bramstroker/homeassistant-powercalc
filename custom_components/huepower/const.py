@@ -7,7 +7,7 @@ DATA_CALCULATOR_FACTORY = "calculator_factory"
 CONF_MODEL = "model"
 CONF_MANUFACTURER = "manufacturer"
 CONF_MODE = "mode"
-CONF_POWER_RANGE = "power_range"
+CONF_STANDBY_USAGE = 'standby_usage'
 
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"

@@ -12,11 +12,12 @@ from .const import (
     CONF_MODEL,
     CONF_MANUFACTURER,
     CONF_MODE,
+    CONF_STANDBY_USAGE,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT
 )
-from . import PowerCalculationStrategyInterface
+from .strategy_interface import PowerCalculationStrategyInterface
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.core import callback
@@ -58,7 +59,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
             ]
         ),
         vol.Optional(CONF_MINIMUM): cv.string,
-        vol.Optional(CONF_MAXIMUM): cv.string
+        vol.Optional(CONF_MAXIMUM): cv.string,
+        vol.Optional(CONF_STANDBY_USAGE, default=0): cv.string
     }
 )
 
@@ -128,7 +130,8 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
             entity_id=config[CONF_ENTITY_ID],
             unique_id=entity_entry.unique_id,
             manufacturer=manufacturer,
-            light_model=model
+            light_model=model,
+            standby_usage=config.get(CONF_STANDBY_USAGE)
         )
     ])
 
@@ -168,12 +171,13 @@ class HuePowerSensor(Entity):
 
     def __init__(
         self,
-        power_calculator: PowerCalculator,
+        power_calculator: PowerCalculationStrategyInterface,
         name: str,
         entity_id: str,
         manufacturer: str,
         light_model: str,
         unique_id: str,
+        standby_usage: float | None
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -183,6 +187,7 @@ class HuePowerSensor(Entity):
         self._manufacturer = manufacturer
         self._light_model = light_model
         self._unique_id = unique_id
+        self._standby_usage = standby_usage
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -210,14 +215,14 @@ class HuePowerSensor(Entity):
 
     async def _update_sensor(self, light_state):
         """Update power sensor based on new dependant hue light state."""
-        if light_state is None:
+        if light_state is None or light_state.state == STATE_UNKNOWN:
             return False
 
-        if light_state is None and light_state.state == STATE_UNKNOWN:
-           return False
+        if (light_state.state == STATE_UNAVAILABLE):
+            return False
 
-        if (light_state.state == STATE_OFF or light_state.state == STATE_UNAVAILABLE):
-            self._power = 0 #todo standy usage configurable
+        if (light_state.state == STATE_OFF):
+            self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(light_state)
 
