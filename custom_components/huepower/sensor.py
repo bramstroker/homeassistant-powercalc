@@ -8,16 +8,18 @@ import os;
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
     DOMAIN,
-    DATA_CALCULATOR,
+    DATA_CALCULATOR_FACTORY,
     CONF_MODEL,
-    CONF_MANUFACTURER
+    CONF_MANUFACTURER,
+    CONF_MODE,
+    MODE_LUT
 )
-from . import PowerCalculator
+from . import PowerCalculationStrategyInterface
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import async_track_state_change_event
-import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 
 from homeassistant.const import (
@@ -41,7 +43,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_NAME): cv.string,
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
         vol.Optional(CONF_MODEL): cv.string,
-        vol.Optional(CONF_MANUFACTURER): cv.string
+        vol.Optional(CONF_MANUFACTURER): cv.string,
+        vol.Optional(CONF_MODE): cv.string
     }
 )
 
@@ -50,10 +53,10 @@ NAME_FORMAT = "{} power"
 class LightNotSupported(HomeAssistantError):
     """Raised when try to login as invalid user."""
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(hass: HomeAssistantType, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
 
-    power_calculator = hass.data[DOMAIN][DATA_CALCULATOR]
+    power_calculator_strategy = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
     entity_id = config[CONF_ENTITY_ID]
 
@@ -62,6 +65,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
+    mode = config.get(CONF_MODE) or MODE_LUT
 
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
     if (hass.data.get(HUE_DOMAIN)):
@@ -93,18 +97,20 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     light_name = entity_entry.name or entity_entry.original_name
     name = config.get(CONF_NAME) or NAME_FORMAT.format(light_name)
 
-    try:
-        validate_light_support(power_calculator, entity_entry, manufacturer, model)
-    except LightNotSupported as err:
-        _LOGGER.error(
-            "Light not supported: %s",
-            err
-        )
-        return
+    calculation_strategy = power_calculator_strategy.create(mode, config)
+
+    # try:
+    #     validate_light_support(power_calculator, entity_entry, manufacturer, model)
+    # except LightNotSupported as err:
+    #     _LOGGER.error(
+    #         "Light not supported: %s",
+    #         err
+    #     )
+    #     return
 
     async_add_entities([
         HuePowerSensor(
-            power_calculator=power_calculator,
+            power_calculator=calculation_strategy,
             name=name,
             entity_id=config[CONF_ENTITY_ID],
             unique_id=entity_entry.unique_id,
@@ -113,7 +119,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         )
     ])
 
-async def find_hue_light(hass, entity_entry: er.RegistryEntry) -> Light | None:
+async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
 
     bridge = hass.data[HUE_DOMAIN][entity_entry.config_entry_id]
@@ -126,7 +132,7 @@ async def find_hue_light(hass, entity_entry: er.RegistryEntry) -> Light | None:
     return None
 
 def validate_light_support(
-    power_calculator: PowerCalculator,
+    power_calculator: PowerCalculationStrategyInterface,
     entity_entry: er.RegistryEntry,
     manufacturer: str,
     model: str
@@ -197,11 +203,7 @@ class HuePowerSensor(Entity):
         if light_state is None and light_state.state == STATE_UNKNOWN:
            return False
 
-        self._power = await self._power_calculator.calculate(
-            self._manufacturer,
-            self._light_model,
-            light_state
-        )
+        self._power = await self._power_calculator.calculate(light_state)
 
         self.async_write_ha_state()
         return True
