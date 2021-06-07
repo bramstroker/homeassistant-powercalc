@@ -12,6 +12,8 @@ from .const import (
     CONF_MODEL,
     CONF_MANUFACTURER,
     CONF_MODE,
+    MODE_FIXED,
+    MODE_LINEAR,
     MODE_LUT
 )
 from . import PowerCalculationStrategyInterface
@@ -23,12 +25,16 @@ from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.entity_registry as er
 
 from homeassistant.const import (
+    CONF_MAXIMUM,
+    CONF_MINIMUM,
     EVENT_HOMEASSISTANT_START,
     DEVICE_CLASS_POWER,
     POWER_WATT,
     STATE_UNKNOWN,
     CONF_NAME,
-    CONF_ENTITY_ID
+    CONF_ENTITY_ID,
+    STATE_OFF,
+    STATE_UNAVAILABLE
 )
 import voluptuous as vol
 
@@ -44,7 +50,15 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
         vol.Optional(CONF_MODEL): cv.string,
         vol.Optional(CONF_MANUFACTURER): cv.string,
-        vol.Optional(CONF_MODE): cv.string
+        vol.Optional(CONF_MODE, default=MODE_LUT): vol.In(
+            [
+                MODE_LUT,
+                MODE_FIXED,
+                MODE_LINEAR
+            ]
+        ),
+        vol.Optional(CONF_MINIMUM): cv.string,
+        vol.Optional(CONF_MAXIMUM): cv.string
     }
 )
 
@@ -65,7 +79,6 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
 
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    mode = config.get(CONF_MODE) or MODE_LUT
 
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
     if (hass.data.get(HUE_DOMAIN)):
@@ -97,7 +110,7 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
     light_name = entity_entry.name or entity_entry.original_name
     name = config.get(CONF_NAME) or NAME_FORMAT.format(light_name)
 
-    calculation_strategy = power_calculator_strategy.create(mode, config)
+    calculation_strategy = power_calculator_strategy.create(config, manufacturer, model)
 
     # try:
     #     validate_light_support(power_calculator, entity_entry, manufacturer, model)
@@ -203,7 +216,10 @@ class HuePowerSensor(Entity):
         if light_state is None and light_state.state == STATE_UNKNOWN:
            return False
 
-        self._power = await self._power_calculator.calculate(light_state)
+        if (light_state.state == STATE_OFF or light_state.state == STATE_UNAVAILABLE):
+            self._power = 0 #todo standy usage configurable
+        else:
+            self._power = await self._power_calculator.calculate(light_state)
 
         self.async_write_ha_state()
         return True

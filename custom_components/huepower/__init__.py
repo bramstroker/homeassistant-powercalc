@@ -13,6 +13,7 @@ from csv import reader
 from functools import partial
 
 from .const import (
+    CONF_MODE,
     DOMAIN,
     DATA_CALCULATOR_FACTORY,
     MANUFACTURER_DIRECTORY_MAPPING,
@@ -23,7 +24,9 @@ from .const import (
 
 from homeassistant.const import (
     STATE_OFF,
-    STATE_UNAVAILABLE
+    STATE_UNAVAILABLE,
+    CONF_MINIMUM,
+    CONF_MAXIMUM
 )
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -56,14 +59,25 @@ class PowerCalculatorStrategyFactory:
         self._hass = hass
         self._lut_registry = LutRegistry()
 
-    def create(self, mode: str) -> Optional[int]:
+    def create(self, config: str, manufacturer: str, model: str) -> Optional[int]:
+        mode = config.get(CONF_MODE) or MODE_LUT
+
         if (mode == MODE_LINEAR):
-            return LinearStrategy()
+            return LinearStrategy(
+                min=config.get(CONF_MINIMUM),
+                max=config.get(CONF_MAXIMUM)
+            )
         
         if (mode == MODE_FIXED):
             return FixedStrategy()
         
-        return LutStrategy(self._lut_registry)
+        if (mode == MODE_LUT):
+
+            return LutStrategy(
+                self._lut_registry,
+                manufacturer=manufacturer,
+                model=model
+            )
 
 class PowerCalculationStrategyInterface:
     async def calculate(self, light_state: State) -> Optional[int]:
@@ -82,7 +96,7 @@ class LutRegistry:
             lookup_dict = defaultdict(defaultdict_of_dict)
 
             path = os.path.join(
-                self.get_light_model_directory(manufacturer, model),
+                get_light_model_directory(manufacturer, model),
                 f'{color_mode}.csv'
             )
 
@@ -108,17 +122,13 @@ class LutRegistry:
         return lookup_dict
         
 class LutStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, lut_registry: LutRegistry, hass: HomeAssistantType, manufacturer: str, model: str) -> None:
-        self._hass = hass
+    def __init__(self, lut_registry: LutRegistry, manufacturer: str, model: str) -> None:
         self._lut_registry = lut_registry
         self._manufacturer = manufacturer
         self._model = model
 
     async def calculate(self, light_state: State) -> Optional[int]:
         """Calculate the power consumption based on brightness, mired, hsl values."""
-        if (light_state.state == STATE_OFF or light_state.state == STATE_UNAVAILABLE):
-            return 0 #todo maybe consider standby usage
-
         attrs = light_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
         brightness = attrs.get(ATTR_BRIGHTNESS)
@@ -155,15 +165,16 @@ class LutStrategy(PowerCalculationStrategyInterface):
         ]
     
 class LinearStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, hass: HomeAssistantType) -> None:
-        self._hass = hass
+    def __init__(self, min: int, max: int) -> None:
+        self._min = min
+        self._max = max
     
     async def calculate(self, light_state: State) -> Optional[int]:
         return 5
 
 class FixedStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, hass: HomeAssistantType) -> None:
-        self._hass = hass
+    def __init__(self) -> None:
+        pass
     
     async def calculate(self, light_state: State) -> Optional[int]:
         return 5
