@@ -52,8 +52,8 @@ sensor:
   - platform: huepower
     entity_id: light.livingroom_floorlamp
     mode: linear
-    min_usage: 0.5
-    max_usage: 8
+    min_watt: 0.5
+    max_watt: 8
 ```
 
 ### Fixed mode
@@ -65,7 +65,7 @@ sensor:
   - platform: huepower
     entity_id: light.nondimmabled_bulb
     mode: fixed
-    usage: 20
+    watt: 20
 ```
 
 ## Additional configuration options
@@ -80,8 +80,8 @@ sensor:
   - platform: huepower
     entity_id: light.livingroom_floorlamp
     mode: linear
-    min_usage: 0.5
-    max_usage: 8
+    min_watt: 0.5
+    max_watt: 8
     standby_usage: 0.2
     name: My amazing power meter
 ```
