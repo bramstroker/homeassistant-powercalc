@@ -1,8 +1,8 @@
 {
-  "domain": "huepower",
-  "name": "Hue power consumption",
-  "documentation": "https://github.com/bramstroker/homeassistant-huepower",
-  "issue_tracker": "https://github.com/bramstroker/homeassistant-huepower/issues",
+  "domain": "powercalc",
+  "name": "Power consumption",
+  "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
+  "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "dependencies": [
     "hue"
   ],
