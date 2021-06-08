@@ -1,4 +1,4 @@
-# homeassistant-huepower
+# homeassistant-powercalc
 Custom component to calculate power consumption of lights and other appliances.
 Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
@@ -7,7 +7,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
 
 ## Installation
 
-Copy `custom_components/huepower` into your Home Assistant `config` directory.
+Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
 HACS support is coming soon.
 
@@ -27,7 +27,7 @@ For some models from the Philips Hue line measurements are taken using smart plu
 
 ```yaml
 sensor:
-  - platform: huepower
+  - platform: powercalc
     entity_id: light.livingroom_floorlamp
     manufacturer: signify
     model: LCT010
@@ -37,7 +37,7 @@ When you are using the official Philips Hue integration the manufacturer and mod
 
 ```yaml
 sensor:
-  - platform: huepower
+  - platform: powercalc
     entity_id: light.livingroom_floorlamp
 ```
 
@@ -49,11 +49,11 @@ You need to supply the min and max power draw yourself, by eighter looking at th
 
 ```yaml
 sensor:
-  - platform: huepower
+  - platform: powercalc
     entity_id: light.livingroom_floorlamp
     mode: linear
-    min_usage: 0.5
-    max_usage: 8
+    min_watt: 0.5
+    max_watt 8
 ```
 
 ### Fixed mode
@@ -62,10 +62,10 @@ You need to supply a single watt value in the configuration which will be used w
 
 ```yaml
 sensor:
-  - platform: huepower
+  - platform: powercalc
     entity_id: light.nondimmabled_bulb
     mode: fixed
-    usage: 20
+    watt: 20
 ```
 
 ## Additional configuration options
@@ -77,11 +77,11 @@ Full example:
 
 ```yaml
 sensor:
-  - platform: huepower
+  - platform: powercalc
     entity_id: light.livingroom_floorlamp
     mode: linear
-    min_usage: 0.5
-    max_usage: 8
+    min_watt: 0.5
+    max_watt: 8
     standby_usage: 0.2
     name: My amazing power meter
 ```
@@ -92,7 +92,7 @@ sensor:
 
 To calculate power consumtion a lookup is done into CSV data files.
 
-These files are located in `custom_components/huepower/data` directory.
+These files are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufactuer}/{modelid}`
 Depending on the supported color modes the integration expects multiple CSV files here:
  - hs.csv (hue/saturation, colored lamps)
@@ -149,5 +149,5 @@ Add the following to configuration.yaml:
 logger:
   default: warning
   logs:
-    custom_components.huepower: debug
+    custom_components.powercalc: debug
 ```
