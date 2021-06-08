@@ -53,7 +53,7 @@ sensor:
     entity_id: light.livingroom_floorlamp
     mode: linear
     min_watt: 0.5
-    max_watt 8
+    max_watt: 8
 ```
 
 ### Fixed mode

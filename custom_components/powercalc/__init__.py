@@ -1,12 +1,12 @@
-"""The HuePower integration."""
+"""The PowerCalc integration."""
 
 from __future__ import annotations
 
 from .const import (
     CONF_MODE,
-    CONF_MIN_USAGE,
-    CONF_MAX_USAGE,
-    CONF_USAGE,
+    CONF_MIN_WATT,
+    CONF_MAX_WATT,
+    CONF_WATT,
     DOMAIN,
     DATA_CALCULATOR_FACTORY,
     MODE_FIXED,
@@ -48,13 +48,13 @@ class PowerCalculatorStrategyFactory:
 
         if (mode == MODE_LINEAR):
             return LinearStrategy(
-                min=config.get(CONF_MIN_USAGE),
-                max=config.get(CONF_MAX_USAGE)
+                min=config.get(CONF_MIN_WATT),
+                max=config.get(CONF_MAX_WATT)
             )
         
         if (mode == MODE_FIXED):
             return FixedStrategy(
-                wattage=config.get(CONF_USAGE)
+                wattage=config.get(CONF_WATT)
             )
         
         if (mode == MODE_LUT):

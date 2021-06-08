@@ -11,9 +11,9 @@ from .const import (
     CONF_MODEL,
     CONF_MANUFACTURER,
     CONF_MODE,
-    CONF_MIN_USAGE,
-    CONF_MAX_USAGE,
-    CONF_USAGE,
+    CONF_MIN_WATT,
+    CONF_MAX_WATT,
+    CONF_WATT,
     CONF_STANDBY_USAGE,
     MODE_FIXED,
     MODE_LINEAR,
@@ -60,9 +60,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
                 MODE_LINEAR
             ]
         ),
-        vol.Optional(CONF_MIN_USAGE): cv.string,
-        vol.Optional(CONF_MAX_USAGE): cv.string,
-        vol.Optional(CONF_USAGE): cv.string,
+        vol.Optional(CONF_MIN_WATT): cv.string,
+        vol.Optional(CONF_MAX_WATT): cv.string,
+        vol.Optional(CONF_WATT): cv.string,
         vol.Optional(CONF_STANDBY_USAGE, default=0): cv.string
     }
 )
@@ -134,7 +134,7 @@ async def autodiscover_hue_model(hass, entity_entry):
 
     return {
         "manufacturer": light.manufacturername,
-        "model": light.model
+        "model": light.modelid
     }
 
 async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry) -> Light | None:

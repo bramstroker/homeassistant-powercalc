@@ -1,0 +1,13 @@
+{
+  "domain": "powercalc",
+  "name": "Power consumption",
+  "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
+  "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
+  "dependencies": [
+    "hue"
+  ],
+  "codeowners": ["@bramstroker"],
+  "requirements": [],
+  "version": "0.1.0",
+  "iot_class": "local_polling"
+}
