@@ -20,6 +20,8 @@ from homeassistant.components.light import (
 
 from .helpers import get_light_model_directory
 from .strategy_interface import PowerCalculationStrategyInterface
+import homeassistant.helpers.entity_registry as er
+from .errors import LightNotSupported
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -102,3 +104,28 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return dict.get(search_key) or dict[
             min(dict.keys(), key = lambda key: abs(key-search_key))
         ]
+    
+    def validate_config(
+        self,
+        entity_entry: er.RegistryEntry,
+    ):
+        if (self._manufacturer is None):
+            _LOGGER.error("Manufacturer not supplied for entity: %s", entity_entry.entity_id)
+
+
+        if (self._model is None):
+            _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
+            return
+
+        model_directory = get_light_model_directory(self._manufacturer, self._model)
+        if (not os.path.exists(model_directory)):
+            raise LightNotSupported("Model not found in data directory", self._model)
+        
+        supported_color_modes = entity_entry.capabilities['supported_color_modes']
+        for color_mode in supported_color_modes:
+            lookup_file = os.path.join(
+                model_directory,
+                f'{color_mode}.csv'
+            )
+            if (not os.path.exists(lookup_file)):
+                raise LightNotSupported("No lookup file found for mode", color_mode)

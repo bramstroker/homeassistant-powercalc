@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os;
 
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
@@ -12,6 +11,9 @@ from .const import (
     CONF_MODEL,
     CONF_MANUFACTURER,
     CONF_MODE,
+    CONF_MIN_USAGE,
+    CONF_MAX_USAGE,
+    CONF_USAGE,
     CONF_STANDBY_USAGE,
     MODE_FIXED,
     MODE_LINEAR,
@@ -21,7 +23,6 @@ from .strategy_interface import PowerCalculationStrategyInterface
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.core import callback
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.entity_registry as er
 
@@ -42,6 +43,7 @@ import voluptuous as vol
 from homeassistant.components import light
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
+from .errors import StrategyConfigurationError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,21 +60,20 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
                 MODE_LINEAR
             ]
         ),
-        vol.Optional(CONF_MINIMUM): cv.string,
-        vol.Optional(CONF_MAXIMUM): cv.string,
+        vol.Optional(CONF_MIN_USAGE): cv.string,
+        vol.Optional(CONF_MAX_USAGE): cv.string,
+        vol.Optional(CONF_USAGE): cv.string,
         vol.Optional(CONF_STANDBY_USAGE, default=0): cv.string
     }
 )
 
 NAME_FORMAT = "{} power"
 
-class LightNotSupported(HomeAssistantError):
-    """Raised when try to login as invalid user."""
 
 async def async_setup_platform(hass: HomeAssistantType, config, async_add_entities, discovery_info=None):
     """Set up the sensor platform."""
 
-    power_calculator_strategy = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+    calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
     entity_id = config[CONF_ENTITY_ID]
 
@@ -82,49 +83,28 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
 
-    # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if (hass.data.get(HUE_DOMAIN)):
-        light = await find_hue_light(hass, entity_entry)
-        if (light is None):
-            _LOGGER.error("Cannot setup power sensor for light '%s', not found in the hue bridge api")
-            return
+    entity_name = entity_entry.name or entity_entry.original_name
+    name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
 
-        _LOGGER.debug(
-            "%s: (manufacturer=%s, model=%s)",
-            entity_id,
-            light.manufacturername,
-            light.modelid
+    if (manufacturer is None or model is None):
+        hue_model_data = await autodiscover_hue_model(hass, entity_entry)
+        if (hue_model_data):
+            manufacturer = hue_model_data["manufacturer"]
+            model = hue_model_data["model"]
+
+    calculation_strategy = calculation_strategy_factory.create(config, manufacturer, model)
+
+    try:
+        calculation_strategy.validate_config(entity_entry)
+    except StrategyConfigurationError as err:
+        _LOGGER.error(
+            "Error setting up calculation strategy: %s",
+            err
         )
-
-        if (manufacturer == None):
-            manufacturer = light.manufacturername
-
-        if (model == None):
-            model = light.modelid
-
-    if (manufacturer is None):
-        _LOGGER.error("Manufacturer not supplied for entity: %s", entity_id)
-
-    if (model is None):
-        _LOGGER.error("Model not supplied for entity: %s", entity_id)
         return
 
-    light_name = entity_entry.name or entity_entry.original_name
-    name = config.get(CONF_NAME) or NAME_FORMAT.format(light_name)
-
-    calculation_strategy = power_calculator_strategy.create(config, manufacturer, model)
-
-    # try:
-    #     validate_light_support(power_calculator, entity_entry, manufacturer, model)
-    # except LightNotSupported as err:
-    #     _LOGGER.error(
-    #         "Light not supported: %s",
-    #         err
-    #     )
-    #     return
-
     async_add_entities([
-        HuePowerSensor(
+        GenericPowerSensor(
             power_calculator=calculation_strategy,
             name=name,
             entity_id=config[CONF_ENTITY_ID],
@@ -134,6 +114,28 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
             standby_usage=config.get(CONF_STANDBY_USAGE)
         )
     ])
+
+async def autodiscover_hue_model(hass, entity_entry):
+    # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
+    if (hass.data.get(HUE_DOMAIN) == None):
+        return
+
+    light = await find_hue_light(hass, entity_entry)
+    if (light is None):
+        _LOGGER.error("Cannot autodisover model for '%s', not found in the hue bridge api", entity_entry.entity_id)
+        return
+
+    _LOGGER.debug(
+        "%s: (manufacturer=%s, model=%s)",
+        entity_entry.entity_id,
+        light.manufacturername,
+        light.modelid
+    )
+
+    return {
+        "manufacturer": light.manufacturername,
+        "model": light.model
+    }
 
 async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
@@ -147,26 +149,7 @@ async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry
     
     return None
 
-def validate_light_support(
-    power_calculator: PowerCalculationStrategyInterface,
-    entity_entry: er.RegistryEntry,
-    manufacturer: str,
-    model: str
-):
-    model_directory = power_calculator.get_light_model_directory(manufacturer, model)
-    if (not os.path.exists(model_directory)):
-        raise LightNotSupported("Model not found in data directory", model)
-    
-    supported_color_modes = entity_entry.capabilities['supported_color_modes']
-    for mode in supported_color_modes:
-        lookup_file = os.path.join(
-            model_directory,
-            f'{mode}.csv'
-        )
-        if (not os.path.exists(lookup_file)):
-            raise LightNotSupported("No lookup file found for mode", mode)
-
-class HuePowerSensor(Entity):
+class GenericPowerSensor(Entity):
     """Representation of a Sensor."""
 
     def __init__(

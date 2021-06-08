@@ -5,6 +5,7 @@ from homeassistant.components.light import (
 )
 from .strategy_interface import PowerCalculationStrategyInterface
 from typing import Optional
+import homeassistant.helpers.entity_registry as er
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,3 +23,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         converted = ( (brightness - 0) / (255 - 0) ) * (self._max - self._min) + self._min
         return round(converted, 2)
+    
+    def validate_config(self, entity_entry: er.RegistryEntry):
+        """Validate correct setup of the strategy"""
+        pass
