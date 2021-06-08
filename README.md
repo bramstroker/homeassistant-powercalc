@@ -51,8 +51,9 @@ You need to supply the min and max power draw yourself, by eighter looking at th
 sensor:
   - platform: huepower
     entity_id: light.livingroom_floorlamp
-    min: 0.5
-    max: 8
+    mode: linear
+    min_usage: 0.5
+    max_usage: 8
 ```
 
 ### Fixed mode
@@ -63,13 +64,27 @@ You need to supply a single watt value in the configuration which will be used w
 sensor:
   - platform: huepower
     entity_id: light.nondimmabled_bulb
-    watt: 20
+    mode: fixed
+    usage: 20
 ```
 
 ## Additional configuration options
 
-`standby_usage`: Supply the wattage when the device is off
-`name`: Override the name
+- `standby_usage`: Supply the wattage when the device is off
+- `name`: Override the name
+
+Full example:
+
+```yaml
+sensor:
+  - platform: huepower
+    entity_id: light.livingroom_floorlamp
+    mode: linear
+    min_usage: 0.5
+    max_usage: 8
+    standby_usage: 0.2
+    name: My amazing power meter
+```
 
 <hr>
 
