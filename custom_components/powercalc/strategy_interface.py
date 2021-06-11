@@ -7,6 +7,6 @@ class PowerCalculationStrategyInterface:
         """Calculate power consumption based on entity state"""
         pass
 
-    def validate_config(self, entity_entry: er.RegistryEntry):
+    async def validate_config(self, entity_entry: er.RegistryEntry):
         """Validate correct setup of the strategy"""
         pass

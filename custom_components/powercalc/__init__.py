@@ -16,6 +16,8 @@ from .const import (
 
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .errors import StrategyConfigurationError
+
 from .strategy_lut import (
     LutRegistry,
     LutStrategy
@@ -30,6 +32,7 @@ from.strategy_interface import (
     PowerCalculationStrategyInterface
 )
 
+from .light_model import LightModel
 from .errors import UnsupportedMode
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
@@ -43,25 +46,60 @@ class PowerCalculatorStrategyFactory:
         self._hass = hass
         self._lut_registry = LutRegistry()
 
-    def create(self, config: str, manufacturer: str, model: str) -> PowerCalculationStrategyInterface:
-        mode = config.get(CONF_MODE) or MODE_LUT
+    def create(self, config: dict, light_model: LightModel) -> PowerCalculationStrategyInterface:
+        """Create instance of calculation strategy based on configuration"""
+        mode = self.select_mode(config, light_model)
 
         if (mode == MODE_LINEAR):
-            return LinearStrategy(
-                min=config.get(CONF_MIN_WATT),
-                max=config.get(CONF_MAX_WATT)
-            )
+            return self.create_linear(config, light_model)
         
         if (mode == MODE_FIXED):
-            return FixedStrategy(
-                wattage=config.get(CONF_WATT)
-            )
+            return self.create_fixed(config, light_model)
         
         if (mode == MODE_LUT):
-            return LutStrategy(
-                self._lut_registry,
-                manufacturer=manufacturer,
-                model=model
-            )
+            return self.create_lut(light_model)
         
         raise UnsupportedMode("Invalid calculation mode", mode)
+    
+    def select_mode(self, config: dict, light_model: LightModel):
+        """Select the calculation mode"""
+        config_mode = config.get(CONF_MODE)
+        if (config_mode):
+            return config_mode
+
+        if (light_model):
+            return light_model.supported_modes[0]
+
+        if (config.get(CONF_MIN_WATT)):
+            return MODE_LINEAR
+
+        if (config.get(CONF_WATT)):
+            return MODE_FIXED
+
+        raise UnsupportedMode("Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config")
+    
+    def create_linear(self, config: dict, light_model: LightModel) -> LinearStrategy:
+        """Create the linear strategy"""
+        min = config.get(CONF_MIN_WATT)
+        max = config.get(CONF_MAX_WATT)
+        if (min is None and max is None):
+            min = light_model.linear_mode_config.get(CONF_MIN_WATT)
+            max = light_model.linear_mode_config.get(CONF_MAX_WATT)
+
+        return LinearStrategy(min, max)
+    
+    def create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
+        """Create the fixed strategy"""
+        return FixedStrategy(
+            config.get(CONF_WATT) or light_model.fixed_mode_config.get(CONF_WATT)
+        )
+    
+    def create_lut(self, light_model: LightModel) -> LutStrategy:
+        """Create the lut strategy"""
+        if (light_model is None):
+            raise StrategyConfigurationError("You must supply a valid manufacturer and model to use the LUT mode")
+
+        return LutStrategy(
+            self._lut_registry,
+            light_model
+        )

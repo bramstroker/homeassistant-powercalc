@@ -19,16 +19,14 @@ from .const import (
     MODE_LINEAR,
     MODE_LUT
 )
+
 from .strategy_interface import PowerCalculationStrategyInterface
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import HomeAssistantType
-from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.entity_registry as er
 
 from homeassistant.const import (
-    CONF_MAXIMUM,
-    CONF_MINIMUM,
     EVENT_HOMEASSISTANT_START,
     DEVICE_CLASS_POWER,
     POWER_WATT,
@@ -43,7 +41,12 @@ import voluptuous as vol
 from homeassistant.components import light
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
-from .errors import StrategyConfigurationError
+from .errors import (
+    ModelNotSupported,
+    StrategyConfigurationError,
+    UnsupportedMode
+)
+from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,7 +66,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_MIN_WATT): cv.string,
         vol.Optional(CONF_MAX_WATT): cv.string,
         vol.Optional(CONF_WATT): cv.string,
-        vol.Optional(CONF_STANDBY_USAGE, default=0): cv.string
+        vol.Optional(CONF_STANDBY_USAGE): cv.string
     }
 )
 
@@ -92,26 +95,38 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
             manufacturer = hue_model_data["manufacturer"]
             model = hue_model_data["model"]
 
-    calculation_strategy = calculation_strategy_factory.create(config, manufacturer, model)
-
     try:
-        calculation_strategy.validate_config(entity_entry)
-    except StrategyConfigurationError as err:
-        _LOGGER.error(
-            "Error setting up calculation strategy: %s",
-            err
-        )
+        light_model = None
+        if (manufacturer is not None and model is not None):
+            light_model = LightModel(manufacturer, model)
+        calculation_strategy = calculation_strategy_factory.create(config, light_model)
+        await calculation_strategy.validate_config(entity_entry)
+    except (ModelNotSupported, UnsupportedMode) as err:
+        _LOGGER.error("Skipping sensor setup: %s", err)
         return
+    except StrategyConfigurationError as err:
+        _LOGGER.error("Error setting up calculation strategy: %s", err)
+        return
+
+    standby_usage = config.get(CONF_STANDBY_USAGE)
+    if (standby_usage is None and light_model is not None):
+        standby_usage = light_model.standby_usage
+
+    _LOGGER.debug(
+        "Setting up power sensor. strategy=%s manufacturer=%s model=%s standby_usage=%s",
+        calculation_strategy.__class__.__name__,
+        manufacturer,
+        model,
+        standby_usage
+    )
 
     async_add_entities([
         GenericPowerSensor(
             power_calculator=calculation_strategy,
             name=name,
-            entity_id=config[CONF_ENTITY_ID],
+            entity_id=entity_id,
             unique_id=entity_entry.unique_id,
-            manufacturer=manufacturer,
-            light_model=model,
-            standby_usage=config.get(CONF_STANDBY_USAGE)
+            standby_usage=standby_usage
         )
     ])
 
@@ -157,8 +172,6 @@ class GenericPowerSensor(Entity):
         power_calculator: PowerCalculationStrategyInterface,
         name: str,
         entity_id: str,
-        manufacturer: str,
-        light_model: str,
         unique_id: str,
         standby_usage: float | None
     ):
@@ -167,8 +180,6 @@ class GenericPowerSensor(Entity):
         self._entity_id = entity_id
         self._name = name
         self._power = None
-        self._manufacturer = manufacturer
-        self._light_model = light_model
         self._unique_id = unique_id
         self._standby_usage = standby_usage
 

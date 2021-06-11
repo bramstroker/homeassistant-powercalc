@@ -24,6 +24,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         converted = ( (brightness - 0) / (255 - 0) ) * (self._max - self._min) + self._min
         return round(converted, 2)
     
-    def validate_config(self, entity_entry: er.RegistryEntry):
+    async def validate_config(self, entity_entry: er.RegistryEntry):
         """Validate correct setup of the strategy"""
         pass

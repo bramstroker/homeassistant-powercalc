@@ -10,6 +10,6 @@ class FixedStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, light_state: State) -> Optional[int]:
         return self._wattage
     
-    def validate_config(self, entity_entry: er.RegistryEntry):
+    async def validate_config(self, entity_entry: er.RegistryEntry):
         """Validate correct setup of the strategy"""
         pass
