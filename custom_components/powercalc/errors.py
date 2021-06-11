@@ -9,3 +9,6 @@ class LightNotSupported(StrategyConfigurationError):
 
 class UnsupportedMode(HomeAssistantError):
     """Mode not supported."""
+
+class LutFileNotFound(HomeAssistantError):
+    """Raise when LUT CSV file does not exist"""
