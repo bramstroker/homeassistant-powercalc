@@ -95,31 +95,33 @@ To calculate power consumtion a lookup is done into CSV data files.
 These files are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufactuer}/{modelid}`
 Depending on the supported color modes the integration expects multiple CSV files here:
- - hs.csv (hue/saturation, colored lamps)
- - color_temp.csv (color temperature)
+ - hs.csv.gz (hue/saturation, colored lamps)
+ - color_temp.csv.gz (color temperature)
 
 Some lights support both color modes, so there must be two CSV files.
+
+The files are gzipped to keep the repository footprint small, and installation fast.
 
 Example:
 
 ```
 - signify
   - LCT010
-    - hs.csv
-    - color_temp.csv
+    - hs.csv.gz
+    - color_temp.csv.gz
 ```
 
 ### Expected file structure
 
-hs.csv:
+The data rows in the CSV files MUST have the following column order:
 
-```
+**hs.csv**
+```csv
 brightness,hue,saturation,watt
 ```
 
-color_temp.csv
-
-```
+**color_temp.csv**
+```csv
 brightness,mired,watt
 ```
 
