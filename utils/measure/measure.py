@@ -85,7 +85,7 @@ async def main():
         csvFile.close()
 
 async def initialize_hue_bridge(websession) -> aiohue.Bridge:
-    f = open("bridge_user.txt", "w+")
+    f = open("bridge_user.txt", "r+")
 
     bridge = aiohue.Bridge(
         host=HUE_BRIDGE_IP,
