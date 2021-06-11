@@ -6,6 +6,7 @@ import logging
 from typing import Optional
 from collections import defaultdict
 import os;
+import gzip;
 from csv import reader
 from functools import partial
 
@@ -21,7 +22,7 @@ from homeassistant.components.light import (
 from .helpers import get_light_model_directory
 from .strategy_interface import PowerCalculationStrategyInterface
 import homeassistant.helpers.entity_registry as er
-from .errors import LightNotSupported
+from .errors import LightNotSupported, LutFileNotFound
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,25 +30,14 @@ class LutRegistry:
     def __init__(self) -> None:
         self._lookup_dictionaries = {}
     
-    async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str):
+    async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str) -> dict | None:
         cache_key = f'{manufacturer}_{model}_{color_mode}'
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
 
-            path = os.path.join(
-                get_light_model_directory(manufacturer, model),
-                f'{color_mode}.csv'
-            )
-
-            _LOGGER.debug("Loading data file: %s", path)
-
-            if (not os.path.exists(path)):
-                _LOGGER.error("Data file not found: %s", path)
-                return None
-
-            with open(path, 'r') as csv_file:
+            with self.get_lut_file(manufacturer, model, color_mode) as csv_file:
                 csv_reader = reader(csv_file)
                 next(csv_reader) #skip header row
 
@@ -61,6 +51,24 @@ class LutRegistry:
             self._lookup_dictionaries[cache_key] = lookup_dict
 
         return lookup_dict
+    
+    def get_lut_file(self, manufacturer: str, model: str, color_mode: str):
+        path = os.path.join(
+            get_light_model_directory(manufacturer, model),
+            f'{color_mode}.csv'
+        )
+
+        gzip_path = f'{path}.gz'
+        if (os.path.exists(gzip_path)):
+            _LOGGER.debug("Loading data file: %s", gzip_path)
+            return gzip.open(gzip_path, 'rt')
+
+        elif (os.path.exists(path)):
+            _LOGGER.debug("Loading data file: %s", path)
+            return open(path, 'r')
+
+        raise LutFileNotFound("Data file not found: %s")
+
         
 class LutStrategy(PowerCalculationStrategyInterface):
     def __init__(self, lut_registry: LutRegistry, manufacturer: str, model: str) -> None:
@@ -77,8 +85,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.error("No brightness for entity: %s", light_state.entity_id)
             return None
 
-        lookup_table = await self._lut_registry.get_lookup_dictionary(self._manufacturer, self._model, color_mode)
-        if (lookup_table == None):
+        try:
+            lookup_table = await self._lut_registry.get_lookup_dictionary(self._manufacturer, self._model, color_mode)
+        except LutFileNotFound:
             _LOGGER.error("Lookup table not found")
             return None
 
@@ -117,15 +126,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
             return
 
-        model_directory = get_light_model_directory(self._manufacturer, self._model)
-        if (not os.path.exists(model_directory)):
-            raise LightNotSupported("Model not found in data directory", self._model)
-        
         supported_color_modes = entity_entry.capabilities['supported_color_modes']
         for color_mode in supported_color_modes:
-            lookup_file = os.path.join(
-                model_directory,
-                f'{color_mode}.csv'
-            )
-            if (not os.path.exists(lookup_file)):
+            try:
+                self._lut_registry.get_lookup_dictionary(self._manufacturer, self._model, color_mode)
+            except LutFileNotFound:
                 raise LightNotSupported("No lookup file found for mode", color_mode)
