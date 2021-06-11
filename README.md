@@ -21,7 +21,7 @@ To calculate estimated power consumption different modes are support, they are a
 ### LUT mode
 This is the most accurate mode.
 For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
-#todo link supported
+[Supported models list](#supported-models)
 
 #### Configuration
 
