@@ -113,7 +113,9 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         standby_usage = light_model.standby_usage
 
     _LOGGER.debug(
-        "Setting up power sensor. strategy=%s manufacturer=%s model=%s standby_usage=%s",
+        "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",
+        entity_id,
+        name,
         calculation_strategy.__class__.__name__,
         manufacturer,
         model,
