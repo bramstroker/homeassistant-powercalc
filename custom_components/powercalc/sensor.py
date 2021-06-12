@@ -39,6 +39,7 @@ from homeassistant.const import (
 import voluptuous as vol
 
 from homeassistant.components import light
+from homeassistant.components import switch
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
 from .errors import (
@@ -53,10 +54,10 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME): cv.string,
-        vol.Required(CONF_ENTITY_ID): cv.entity_domain(light.DOMAIN),
+        vol.Required(CONF_ENTITY_ID): cv.entity_domain((light.DOMAIN, switch.DOMAIN)),
         vol.Optional(CONF_MODEL): cv.string,
         vol.Optional(CONF_MANUFACTURER): cv.string,
-        vol.Optional(CONF_MODE, default=MODE_LUT): vol.In(
+        vol.Optional(CONF_MODE): vol.In(
             [
                 MODE_LUT,
                 MODE_FIXED,
@@ -102,7 +103,7 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         calculation_strategy = calculation_strategy_factory.create(config, light_model)
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
-        _LOGGER.error("Skipping sensor setup: %s", err)
+        _LOGGER.error("Skipping sensor setup %s: %s", entity_id, err)
         return
     except StrategyConfigurationError as err:
         _LOGGER.error("Error setting up calculation strategy: %s", err)
@@ -134,7 +135,7 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
 
 async def autodiscover_hue_model(hass, entity_entry):
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if (hass.data.get(HUE_DOMAIN) == None):
+    if (hass.data.get(HUE_DOMAIN) == None or entity_entry.platform != "hue"):
         return
 
     light = await find_hue_light(hass, entity_entry)

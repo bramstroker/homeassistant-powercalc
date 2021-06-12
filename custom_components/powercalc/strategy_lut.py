@@ -1,4 +1,5 @@
 from __future__ import annotations
+from homeassistant.components import light
 
 from homeassistant.core import State
 import logging
@@ -21,7 +22,7 @@ from homeassistant.components.light import (
 
 from .strategy_interface import PowerCalculationStrategyInterface
 import homeassistant.helpers.entity_registry as er
-from .errors import ModelNotSupported, LutFileNotFound
+from .errors import ModelNotSupported, LutFileNotFound, StrategyConfigurationError
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
@@ -117,6 +118,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
         self,
         entity_entry: er.RegistryEntry,
     ):
+        if (entity_entry.domain != light.DOMAIN):
+            raise StrategyConfigurationError("Only light entities can use the LUT mode")
+
         if (self._model.manufacturer is None):
             _LOGGER.error("Manufacturer not supplied for entity: %s", entity_entry.entity_id)
 
