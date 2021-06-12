@@ -46,10 +46,8 @@ class PowerCalculatorStrategyFactory:
         self._hass = hass
         self._lut_registry = LutRegistry()
 
-    def create(self, config: dict, light_model: LightModel) -> PowerCalculationStrategyInterface:
+    def create(self, config: dict, mode: str, light_model: LightModel) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
-        mode = self.select_mode(config, light_model)
-
         if (mode == MODE_LINEAR):
             return self.create_linear(config, light_model)
         
@@ -60,23 +58,6 @@ class PowerCalculatorStrategyFactory:
             return self.create_lut(light_model)
         
         raise UnsupportedMode("Invalid calculation mode", mode)
-    
-    def select_mode(self, config: dict, light_model: LightModel):
-        """Select the calculation mode"""
-        config_mode = config.get(CONF_MODE)
-        if (config_mode):
-            return config_mode
-
-        if (light_model):
-            return light_model.supported_modes[0]
-
-        if (config.get(CONF_MIN_WATT)):
-            return MODE_LINEAR
-
-        if (config.get(CONF_WATT)):
-            return MODE_FIXED
-
-        raise UnsupportedMode("Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config")
     
     def create_linear(self, config: dict, light_model: LightModel) -> LinearStrategy:
         """Create the linear strategy"""

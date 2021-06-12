@@ -105,9 +105,15 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         entity_name = entity_state.name
     name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
 
+    light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, config)
-        calculation_strategy = calculation_strategy_factory.create(config, light_model)
+    except (ModelNotSupported) as err:
+        _LOGGER.info("Model not found in library %s: %s", entity_id, err)
+    
+    try:
+        mode = select_calculation_mode(config, light_model)
+        calculation_strategy = calculation_strategy_factory.create(config, mode, light_model)
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", entity_id, err)
@@ -140,6 +146,23 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         )
     ])
 
+def select_calculation_mode(config: dict, light_model: LightModel):
+    """Select the calculation mode"""
+    config_mode = config.get(CONF_MODE)
+    if (config_mode):
+        return config_mode
+
+    if (light_model):
+        return light_model.supported_modes[0]
+
+    if (config.get(CONF_MIN_WATT)):
+        return MODE_LINEAR
+
+    if (config.get(CONF_WATT)):
+        return MODE_FIXED
+
+    raise UnsupportedMode("Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config")
+
 async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
@@ -165,7 +188,7 @@ async def autodiscover_hue_model(hass, entity_entry):
         return
 
     _LOGGER.debug(
-        "%s: (manufacturer=%s, model=%s)",
+        "Auto discovered Hue model for entity %s: (manufacturer=%s, model=%s)",
         entity_entry.entity_id,
         light.manufacturername,
         light.modelid

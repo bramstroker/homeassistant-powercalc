@@ -1,0 +1,10 @@
+{
+    "name": "Hue Go",
+    "supported_modes": [
+        "linear"
+    ],
+    "linear_config": {
+        "min_watt": 0,
+        "max_watt": 6
+    }
+}
