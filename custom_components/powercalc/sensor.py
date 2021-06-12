@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 import logging
 
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
@@ -38,6 +40,8 @@ from homeassistant.const import (
 )
 import voluptuous as vol
 
+from homeassistant.components import binary_sensor
+from homeassistant.components import fan
 from homeassistant.components import light
 from homeassistant.components import switch
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
@@ -54,7 +58,14 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Optional(CONF_NAME): cv.string,
-        vol.Required(CONF_ENTITY_ID): cv.entity_domain((light.DOMAIN, switch.DOMAIN)),
+        vol.Required(CONF_ENTITY_ID): cv.entity_domain(
+            (
+                light.DOMAIN,
+                switch.DOMAIN,
+                fan.DOMAIN,
+                binary_sensor.DOMAIN
+            )
+        ),
         vol.Optional(CONF_MODEL): cv.string,
         vol.Optional(CONF_MANUFACTURER): cv.string,
         vol.Optional(CONF_MODE): vol.In(
@@ -83,23 +94,19 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
 
     entity_registry = await er.async_get_registry(hass)
     entity_entry = entity_registry.async_get(entity_id)
+    entity_state = hass.states.get(entity_id)
 
-    manufacturer = config.get(CONF_MANUFACTURER)
-    model = config.get(CONF_MODEL)
+    unique_id = None
 
-    entity_name = entity_entry.name or entity_entry.original_name
+    if (entity_entry):
+        entity_name = entity_entry.name or entity_entry.original_name
+        unique_id = entity_entry.unique_id
+    else:
+        entity_name = entity_state.name
     name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
 
-    if (manufacturer is None or model is None):
-        hue_model_data = await autodiscover_hue_model(hass, entity_entry)
-        if (hue_model_data):
-            manufacturer = hue_model_data["manufacturer"]
-            model = hue_model_data["model"]
-
     try:
-        light_model = None
-        if (manufacturer is not None and model is not None):
-            light_model = LightModel(manufacturer, model)
+        light_model = await get_light_model(hass, entity_entry, config)
         calculation_strategy = calculation_strategy_factory.create(config, light_model)
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
@@ -118,8 +125,8 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         entity_id,
         name,
         calculation_strategy.__class__.__name__,
-        manufacturer,
-        model,
+        light_model.manufacturer if light_model else "",
+        light_model.model if light_model else "",
         standby_usage
     )
 
@@ -128,10 +135,24 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
             power_calculator=calculation_strategy,
             name=name,
             entity_id=entity_id,
-            unique_id=entity_entry.unique_id,
+            unique_id=unique_id,
             standby_usage=standby_usage
         )
     ])
+
+async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightModel]:
+    manufacturer = config.get(CONF_MANUFACTURER)
+    model = config.get(CONF_MODEL)
+    if ((manufacturer is None or model is None) and entity_entry):
+        hue_model_data = await autodiscover_hue_model(hass, entity_entry)
+        if (hue_model_data):
+            manufacturer = hue_model_data["manufacturer"]
+            model = hue_model_data["model"]
+
+    if (manufacturer is None or model is None):
+        return None
+    
+    return LightModel(manufacturer, model)
 
 async def autodiscover_hue_model(hass, entity_entry):
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
@@ -189,39 +210,39 @@ class GenericPowerSensor(Entity):
     async def async_added_to_hass(self):
         """Register callbacks."""
 
-        async def hue_light_state_listener(event):
+        async def appliance_state_listener(event):
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
 
-            await self._update_sensor(new_state)
+            await self._update_power_sensor(new_state)
 
         async def home_assistant_startup(event):
             """Add listeners and get initial state."""
 
             async_track_state_change_event(
-                self.hass, [self._entity_id], hue_light_state_listener
+                self.hass, [self._entity_id], appliance_state_listener
             )
 
-            light_state = self.hass.states.get(self._entity_id)
+            new_state = self.hass.states.get(self._entity_id)
 
-            await self._update_sensor(light_state)
+            await self._update_power_sensor(new_state)
 
         self.hass.bus.async_listen_once(
             EVENT_HOMEASSISTANT_START, home_assistant_startup
         )
 
-    async def _update_sensor(self, light_state):
+    async def _update_power_sensor(self, state) -> bool:
         """Update power sensor based on new dependant hue light state."""
-        if light_state is None or light_state.state == STATE_UNKNOWN:
+        if state is None or state.state == STATE_UNKNOWN:
             return False
 
-        if (light_state.state == STATE_UNAVAILABLE):
+        if (state.state == STATE_UNAVAILABLE):
             return False
 
-        if (light_state.state == STATE_OFF):
+        if (state.state == STATE_OFF):
             self._power = self._standby_usage or 0
         else:
-            self._power = await self._power_calculator.calculate(light_state)
+            self._power = await self._power_calculator.calculate(state)
 
         self.async_write_ha_state()
         return True
