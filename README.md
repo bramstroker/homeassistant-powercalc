@@ -2,6 +2,7 @@
 Custom component to calculate power consumption of lights and other appliances.
 Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
+Power sensors can be created for `light`, `switch`, `fan` and `binary_sensor` entities 
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
@@ -19,9 +20,13 @@ To calculate estimated power consumption different modes are support, they are a
 - Fixed
 
 ### LUT mode
+Supported platforms: `light`
+
 This is the most accurate mode.
 For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
-[Supported models list](#supported-models)
+- [Supported models](#supported-models) for LUT mode
+- [LUT file structure](#lut-data-files)
+
 
 #### Configuration
 
@@ -42,8 +47,11 @@ sensor:
 ```
 
 ### Linear mode
+Supported platforms: `light`, `fan`
+
 The linear mode can be used for dimmable devices which don't have a lookup table available.
 You need to supply the min and max power draw yourself, by eighter looking at the datasheet or measuring yourself with a smart plug / power meter.
+Power consumpion is calculated by ratio. So when you have your fan running at 50% speed and define watt range 2 - 6, than the estimated consumption will be 4 watt.
 
 #### Configuration
 
@@ -57,6 +65,8 @@ sensor:
 ```
 
 ### Fixed mode
+Supported platforms: `light`, `fan`, `switch`, `binary_sensor`
+
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
 
