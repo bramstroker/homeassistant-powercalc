@@ -1,3 +1,6 @@
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
+
 # homeassistant-powercalc
 Custom component to calculate power consumption of lights and other appliances.
 Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
@@ -8,9 +11,12 @@ Power sensors can be created for `light`, `switch`, `fan` and `binary_sensor` en
 
 ## Installation
 
+### HACS
+This integration is part of the default HACS repository. Just click "Explore and add repository" to install
+
+### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
-HACS support is coming soon.
 
 ## Calculation modes
 
