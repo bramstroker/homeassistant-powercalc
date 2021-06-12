@@ -1,4 +1,5 @@
 from __future__ import annotations
+from homeassistant.components import light
 
 from homeassistant.core import State
 import logging
@@ -19,10 +20,10 @@ from homeassistant.components.light import (
     COLOR_MODE_HS
 )
 
-from .helpers import get_light_model_directory
 from .strategy_interface import PowerCalculationStrategyInterface
 import homeassistant.helpers.entity_registry as er
-from .errors import LightNotSupported, LutFileNotFound
+from .errors import ModelNotSupported, LutFileNotFound, StrategyConfigurationError
+from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,14 +31,14 @@ class LutRegistry:
     def __init__(self) -> None:
         self._lookup_dictionaries = {}
     
-    async def get_lookup_dictionary(self, manufacturer: str, model: str, color_mode: str) -> dict | None:
-        cache_key = f'{manufacturer}_{model}_{color_mode}'
+    async def get_lookup_dictionary(self, light_model: LightModel, color_mode: str) -> dict | None:
+        cache_key = f'{light_model.manufacturer}_{light_model.model}_{color_mode}'
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if (lookup_dict == None):
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
 
-            with self.get_lut_file(manufacturer, model, color_mode) as csv_file:
+            with self.get_lut_file(light_model, color_mode) as csv_file:
                 csv_reader = reader(csv_file)
                 next(csv_reader) #skip header row
 
@@ -52,9 +53,9 @@ class LutRegistry:
 
         return lookup_dict
     
-    def get_lut_file(self, manufacturer: str, model: str, color_mode: str):
+    def get_lut_file(self, light_model: LightModel, color_mode: str):
         path = os.path.join(
-            get_light_model_directory(manufacturer, model),
+            light_model.get_directory(),
             f'{color_mode}.csv'
         )
 
@@ -71,9 +72,8 @@ class LutRegistry:
 
         
 class LutStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, lut_registry: LutRegistry, manufacturer: str, model: str) -> None:
+    def __init__(self, lut_registry: LutRegistry, model: LightModel) -> None:
         self._lut_registry = lut_registry
-        self._manufacturer = manufacturer
         self._model = model
 
     async def calculate(self, light_state: State) -> Optional[int]:
@@ -86,7 +86,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         try:
-            lookup_table = await self._lut_registry.get_lookup_dictionary(self._manufacturer, self._model, color_mode)
+            lookup_table = await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
         except LutFileNotFound:
             _LOGGER.error("Lookup table not found")
             return None
@@ -114,21 +114,24 @@ class LutStrategy(PowerCalculationStrategyInterface):
             min(dict.keys(), key = lambda key: abs(key-search_key))
         ]
     
-    def validate_config(
+    async def validate_config(
         self,
         entity_entry: er.RegistryEntry,
     ):
-        if (self._manufacturer is None):
+        if (entity_entry.domain != light.DOMAIN):
+            raise StrategyConfigurationError("Only light entities can use the LUT mode")
+
+        if (self._model.manufacturer is None):
             _LOGGER.error("Manufacturer not supplied for entity: %s", entity_entry.entity_id)
 
 
-        if (self._model is None):
+        if (self._model.model is None):
             _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
             return
 
         supported_color_modes = entity_entry.capabilities['supported_color_modes']
         for color_mode in supported_color_modes:
             try:
-                self._lut_registry.get_lookup_dictionary(self._manufacturer, self._model, color_mode)
+                await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
             except LutFileNotFound:
-                raise LightNotSupported("No lookup file found for mode", color_mode)
+                raise ModelNotSupported("No lookup file found for mode", color_mode)

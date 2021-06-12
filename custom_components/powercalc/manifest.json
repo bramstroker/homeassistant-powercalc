@@ -4,7 +4,11 @@
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "dependencies": [
-    "hue"
+    "hue",
+    "fan",
+    "switch",
+    "binary_sensor",
+    "light"
   ],
   "codeowners": ["@bramstroker"],
   "requirements": [],
