@@ -6,9 +6,10 @@ from .const import MANUFACTURER_DIRECTORY_MAPPING, MODE_FIXED, MODE_LINEAR
 from .errors import ModelNotSupported, UnsupportedMode
 
 class LightModel:
-    def __init__(self, manufacturer: str, model: str):
+    def __init__(self, manufacturer: str, model: str, custom_model_directory: str):
         self._manufacturer = manufacturer
         self._model = model
+        self._custom_model_directory = custom_model_directory
         self._json_data = self.load_model_manifest()
     
     def load_model_manifest(self) -> dict:
@@ -23,6 +24,9 @@ class LightModel:
         return json.load(json_file)
     
     def get_directory(self) -> str:
+        if (self._custom_model_directory):
+            return self._custom_model_directory
+
         manufacturer_directory = MANUFACTURER_DIRECTORY_MAPPING.get(self._manufacturer) or self._manufacturer
 
         return os.path.join(
