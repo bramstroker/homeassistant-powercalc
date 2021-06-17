@@ -44,6 +44,7 @@ from homeassistant.components import binary_sensor
 from homeassistant.components import fan
 from homeassistant.components import light
 from homeassistant.components import switch
+from homeassistant.components import remote
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
 from .errors import (
@@ -63,7 +64,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
                 light.DOMAIN,
                 switch.DOMAIN,
                 fan.DOMAIN,
-                binary_sensor.DOMAIN
+                binary_sensor.DOMAIN,
+                remote.DOMAIN
             )
         ),
         vol.Optional(CONF_MODEL): cv.string,
