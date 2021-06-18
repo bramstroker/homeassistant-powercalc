@@ -33,7 +33,6 @@ For some models from the Philips Hue line measurements are taken using smart plu
 - [Supported models](#supported-models) for LUT mode
 - [LUT file structure](#lut-data-files)
 
-
 #### Configuration
 
 ```yaml
@@ -88,6 +87,7 @@ sensor:
 
 - `standby_usage`: Supply the wattage when the device is off
 - `name`: Override the name
+- `custom_model_directory` Directory for a custom light model
 
 Full example:
 
@@ -104,13 +104,50 @@ sensor:
 
 <hr>
 
-## LUT data files
+## Light model library
+
+The component ships with predefined light measurements for some light models.
+This library will keep extending by the effort of community users.
+
+These models are located in `custom_components/powercalc/data` directory.
+Each light model has it's own subdirectory `{manufactuer}/{modelid}`
+
+Every model MUST contain a `model.json` file which defined the support calculation modes and other configuration.
+When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
+
+Example tut mode:
+
+```json
+{
+    "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
+    "standby_usage": 0.4,
+    "supported_modes": [
+        "lut"
+    ]
+}
+```
+
+Example linear mode
+
+```json
+{
+    "name": "Hue Go",
+    "supported_modes": [
+        "linear"
+    ],
+    "standby_usage": 0.2,
+    "linear_config": {
+        "min_watt": 0,
+        "max_watt": 6
+    }
+}
+```
+
+### LUT data files
 
 To calculate power consumtion a lookup is done into CSV data files.
 
-These files are located in `custom_components/powercalc/data` directory.
-Each light model has it's own subdirectory `{manufactuer}/{modelid}`
-Depending on the supported color modes the integration expects multiple CSV files here:
+Depending on the supported color modes of the light the integration expects multiple CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
 
@@ -127,7 +164,7 @@ Example:
     - color_temp.csv.gz
 ```
 
-### Expected file structure
+#### Expected file structure
 
 The data rows in the CSV files MUST have the following column order:
 
@@ -147,7 +184,7 @@ brightness,mired,watt
 - saturation (0-255)
 - mired (0-500)  min value depending on min mired value of the light model
 
-### Creating LUT files
+#### Creating LUT files
 
 New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
 An example script is available `utils/measure/measure.py`.
