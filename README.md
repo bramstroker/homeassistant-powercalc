@@ -154,10 +154,10 @@ An example script is available `utils/measure/measure.py`.
 I am using the "Shelly Plug S"
 
 ### Supported models
-- Signify LCA001 (color_temp)
+- Signify LCA001 (hs and color_temp)
 - Signify LCT003 (hs and color_temp)
 - Signify LCT010 (hs and color_temp)
-- Signify LCT012 (hs and color_temp). Thanks Simon Hörrle
+- Signify LCT012 (hs and color_temp)
 - Signify LCT015 (color_temp)
 - Signify LTW001 (color_temp)
 
