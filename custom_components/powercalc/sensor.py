@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import logging
+import os
 
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
@@ -17,6 +18,7 @@ from .const import (
     CONF_MAX_WATT,
     CONF_WATT,
     CONF_STANDBY_USAGE,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT
@@ -78,7 +80,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_MIN_WATT): cv.string,
         vol.Optional(CONF_MAX_WATT): cv.string,
         vol.Optional(CONF_WATT): cv.string,
-        vol.Optional(CONF_STANDBY_USAGE): cv.string
+        vol.Optional(CONF_STANDBY_USAGE): cv.string,
+        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string
     }
 )
 
@@ -175,7 +178,11 @@ async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightMod
     if (manufacturer is None or model is None):
         return None
     
-    return LightModel(manufacturer, model)
+    custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
+    if (custom_model_directory):
+        custom_model_directory = os.path.join(hass.config.config_dir, custom_model_directory)
+
+    return LightModel(manufacturer, model, custom_model_directory)
 
 async def autodiscover_hue_model(hass, entity_entry):
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
