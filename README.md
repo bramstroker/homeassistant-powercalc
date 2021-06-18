@@ -110,7 +110,7 @@ The component ships with predefined light measurements for some light models.
 This library will keep extending by the effort of community users.
 
 These models are located in `custom_components/powercalc/data` directory.
-Each light model has it's own subdirectory `{manufactuer}/{modelid}`
+Each light model has it's own subdirectory `{manufacturer}/{modelid}`
 
 Every model MUST contain a `model.json` file which defined the support calculation modes and other configuration.
 When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
