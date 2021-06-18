@@ -115,7 +115,7 @@ Each light model has it's own subdirectory `{manufactuer}/{modelid}`
 Every model MUST contain a `model.json` file which defined the support calculation modes and other configuration.
 When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
 
-Example tut mode:
+Example lut mode:
 
 ```json
 {
