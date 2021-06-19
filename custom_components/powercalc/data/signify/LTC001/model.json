@@ -1,0 +1,6 @@
+{
+    "name": "Hue Being Ceiling Light",
+    "supported_modes": [
+        "lut"
+    ]
+}
