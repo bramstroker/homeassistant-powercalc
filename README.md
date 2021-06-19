@@ -71,7 +71,7 @@ sensor:
 ```
 
 ### Fixed mode
-Supported platforms: `light`, `fan`, `switch`, `binary_sensor`, `remote`
+Supported platforms: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
