@@ -1,0 +1,37 @@
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+change-template: '- #$NUMBER $TITLE @$AUTHOR'
+sort-direction: ascending
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+
+  - title: '🧰 Maintenance'
+    label: 'chore'
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## Changes
+
+  $CHANGES
+
+  ## ⭐️ Thank you so much for helping out to keep this integration awesome
+  $CONTRIBUTORS  
