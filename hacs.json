@@ -1,5 +1,5 @@
 {
-  "name": "Hue power consumption",
+  "name": "Power calculation",
   "render_readme": true,
   "domains": ["sensor"]
 }
