@@ -36,7 +36,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_ENTITY_ID,
     STATE_OFF,
-    STATE_UNAVAILABLE
+    STATE_UNAVAILABLE,
+    STATE_STANDBY
 )
 import voluptuous as vol
 
@@ -266,7 +267,7 @@ class GenericPowerSensor(Entity):
         if (state.state == STATE_UNAVAILABLE):
             return False
 
-        if (state.state == STATE_OFF):
+        if (state.state == STATE_OFF or state.state == STATE_STANDBY):
             self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(state)
