@@ -5,7 +5,7 @@
 Custom component to calculate power consumption of lights and other appliances.
 Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
-Power sensors can be created for `light`, `switch`, `fan` and `binary_sensor` entities 
+Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `remote` and `media_player` entities 
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
