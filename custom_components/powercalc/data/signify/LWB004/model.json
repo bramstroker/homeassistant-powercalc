@@ -1,0 +1,6 @@
+{
+    "name": "Hue Lux E27 750lm",
+    "supported_modes": [
+        "lut"
+    ]
+}
