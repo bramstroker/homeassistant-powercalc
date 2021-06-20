@@ -11,8 +11,9 @@ MODE_COLOR_TEMP = "color_temp"
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
 HUE_BRIDGE_USERNAME="huepower"
-MODE = MODE_HS
+MODE = MODE_COLOR_TEMP
 SLEEP_TIME=2
+START_BRIGHTNESS=1
 
 async def main():
     options = aioshelly.ConnectionOptions(SHELLY_IP)
@@ -46,9 +47,9 @@ async def main():
         await asyncio.sleep(10) 
 
         if (MODE == MODE_HS):
-            for bri in range(1, 254, 10):
-                for hue in range(0, 65535, 2000):
-                    for sat in range(0, 254, 10):
+            for bri in range(START_BRIGHTNESS, 254, 10):
+                for hue in range(1, 65535, 2000):
+                    for sat in range(1, 254, 10):
                         print('Setting hsl to: {}:{}:{}', hue, sat, bri)
                         await light.set_state(bri=bri, hue=hue, sat=sat)
                         await asyncio.sleep(SLEEP_TIME)
@@ -65,7 +66,7 @@ async def main():
                         )
                     csvFile.flush()
         else:
-            for bri in range(1, 254, 5):
+            for bri in range(START_BRIGHTNESS, 254, 5):
                 for mired in range(150, 500, 10):
                     print('Setting bri:mired to: {}:{}', bri, mired)
                     await light.set_state(bri=bri, ct=mired)
