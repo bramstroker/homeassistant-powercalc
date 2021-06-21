@@ -182,6 +182,11 @@ brightness,hue,saturation,watt
 brightness,mired,watt
 ```
 
+**brightness.csv**
+```csv
+brightness,watt
+```
+
 ***Ranges***:
 - brightness (0-255)
 - hue (0-65535)
