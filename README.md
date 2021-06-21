@@ -1,14 +1,11 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
-![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
 # homeassistant-powercalc
 Custom component to calculate power consumption of lights and other appliances.
 Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
 Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `remote` and `media_player` entities 
-
-![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
@@ -89,9 +86,8 @@ sensor:
 ## Additional configuration options
 
 - `standby_usage`: Supply the wattage when the device is off
-- `disable_standby_usage`: Set to `true` to not show any power consumption when the device is standby
 - `name`: Override the name
-- `custom_model_directory` Directory for a custom light model. Relative from the `config` directory
+- `custom_model_directory` Directory for a custom light model
 
 Full example:
 
@@ -116,7 +112,7 @@ This library will keep extending by the effort of community users.
 These models are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufacturer}/{modelid}`
 
-Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
+Every model MUST contain a `model.json` file which defined the support calculation modes and other configuration.
 When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
 
 Example lut mode:
@@ -154,9 +150,8 @@ To calculate power consumtion a lookup is done into CSV data files.
 Depending on the supported color modes of the light the integration expects multiple CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
- - brightness.csv.gz (brightness only lights)
 
-Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
+Some lights support both color modes, so there must be two CSV files.
 
 The files are gzipped to keep the repository footprint small, and installation fast.
 
@@ -171,8 +166,7 @@ Example:
 
 #### Expected file structure
 
-- The file MUST not contain a header row.
-- The data rows in the CSV files MUST have the following column order:
+The data rows in the CSV files MUST have the following column order:
 
 **hs.csv**
 ```csv
@@ -182,11 +176,6 @@ brightness,hue,saturation,watt
 **color_temp.csv**
 ```csv
 brightness,mired,watt
-```
-
-**brightness.csv**
-```csv
-brightness,watt
 ```
 
 ***Ranges***:
@@ -207,9 +196,7 @@ I am using the "Shelly Plug S"
 - Signify LCT010 (hs and color_temp)
 - Signify LCT012 (hs and color_temp)
 - Signify LCT015 (color_temp)
-- Signify LTC001 (color_temp)
 - Signify LTW001 (color_temp)
-- Signify LWA004 (brightness)
 - Signify LWB004 (brightness)
 - Signify LWB010 (brightness)
 
