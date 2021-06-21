@@ -8,7 +8,7 @@ Provides easy configuration to get power consumption sensors in Home Assistant f
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
 Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `remote` and `media_player` entities 
 
-[Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
+![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
@@ -154,8 +154,9 @@ To calculate power consumtion a lookup is done into CSV data files.
 Depending on the supported color modes of the light the integration expects multiple CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
+ - brightness.csv.gz (brightness only lights)
 
-Some lights support both color modes, so there must be two CSV files.
+Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
 
 The files are gzipped to keep the repository footprint small, and installation fast.
 
@@ -170,7 +171,8 @@ Example:
 
 #### Expected file structure
 
-The data rows in the CSV files MUST have the following column order:
+- The file MUST not contain a header row.
+- The data rows in the CSV files MUST have the following column order:
 
 **hs.csv**
 ```csv
@@ -180,6 +182,11 @@ brightness,hue,saturation,watt
 **color_temp.csv**
 ```csv
 brightness,mired,watt
+```
+
+**brightness.csv**
+```csv
+brightness,watt
 ```
 
 ***Ranges***:
