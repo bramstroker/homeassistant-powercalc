@@ -86,6 +86,7 @@ sensor:
 ## Additional configuration options
 
 - `standby_usage`: Supply the wattage when the device is off
+- `disable_standby_usage`: Set to `true` to not show any power consumption when the device is standby
 - `name`: Override the name
 - `custom_model_directory` Directory for a custom light model
 
