@@ -209,6 +209,7 @@ I am using the "Shelly Plug S"
 - Signify LCT015 (color_temp)
 - Signify LTC001 (color_temp)
 - Signify LTW001 (color_temp)
+- Signify LWA004 (brightness)
 - Signify LWB004 (brightness)
 - Signify LWB010 (brightness)
 
