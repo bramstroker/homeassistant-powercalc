@@ -8,11 +8,12 @@ import csv
 
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"
+MODE_BRIGHTNESS = "brightness"
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
 HUE_BRIDGE_USERNAME="huepower"
-MODE = MODE_COLOR_TEMP
-SLEEP_TIME=2
+MODE = MODE_BRIGHTNESS
+SLEEP_TIME=10
 START_BRIGHTNESS=1
 
 async def main():
@@ -65,7 +66,7 @@ async def main():
                             ]
                         )
                     csvFile.flush()
-        else:
+        elif (MODE == MODE_COLOR_TEMP):
             for bri in range(START_BRIGHTNESS, 254, 5):
                 for mired in range(150, 500, 10):
                     print('Setting bri:mired to: {}:{}', bri, mired)
@@ -82,6 +83,21 @@ async def main():
                         ]
                     )
                     csvFile.flush()
+        else:
+            for bri in range(START_BRIGHTNESS, 254, 1):
+                print('Setting bri to: {}', bri)
+                await light.set_state(bri=bri)
+                await asyncio.sleep(SLEEP_TIME)
+                power = powermeter.current_values()["power"]
+                print(power)
+                print()
+                csvWriter.writerow(
+                    [
+                        bri,
+                        power
+                    ]
+                )
+                csvFile.flush()
 
         csvFile.close()
 
