@@ -1,0 +1,19 @@
+{
+    "properties": {
+      "bri": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "mired": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 500
+      },
+      "watt": {
+          "type": "number",
+          "minimum": 0
+      }
+    },
+    "required": ["bri", "mired", "watt"]
+  }

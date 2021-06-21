@@ -1,0 +1,16 @@
+{
+  "name": "lut_validator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "validate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csval": "^1.1.1",
+    "node-gzip": "^1.1.2",
+    "readdirp": "^3.6.0"
+  }
+}

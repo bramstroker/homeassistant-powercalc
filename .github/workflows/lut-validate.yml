@@ -1,0 +1,26 @@
+name: validate-lut-files
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - '**.csv.gz'
+  pull_request:
+    branches: [ master ]
+    paths:
+    - '**.csv.gz'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        cd .github/scripts/lut_validator
+        npm install
+    - name: Validate LUT CSV files
+      run: node .github/scripts/lut_validator/validate.js
