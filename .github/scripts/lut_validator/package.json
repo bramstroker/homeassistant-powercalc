@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "csval": "^1.1.1",
     "node-gzip": "^1.1.2",
     "readdirp": "^3.6.0"
   }
