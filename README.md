@@ -197,6 +197,8 @@ I am using the "Shelly Plug S"
 - Signify LCT012 (hs and color_temp)
 - Signify LCT015 (color_temp)
 - Signify LTW001 (color_temp)
+- Signify LWB004 (brightness)
+- Signify LWB010 (brightness)
 
 ## Debug logging
 
