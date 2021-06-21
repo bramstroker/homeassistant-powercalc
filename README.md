@@ -154,8 +154,9 @@ To calculate power consumtion a lookup is done into CSV data files.
 Depending on the supported color modes of the light the integration expects multiple CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
+ - brightness.csv.gz (brightness only lights)
 
-Some lights support both color modes, so there must be two CSV files.
+Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
 
 The files are gzipped to keep the repository footprint small, and installation fast.
 
@@ -170,7 +171,8 @@ Example:
 
 #### Expected file structure
 
-The data rows in the CSV files MUST have the following column order:
+- The file MUST not contain a header row.
+- The data rows in the CSV files MUST have the following column order:
 
 **hs.csv**
 ```csv
