@@ -8,7 +8,7 @@ Provides easy configuration to get power consumption sensors in Home Assistant f
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
 Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `remote` and `media_player` entities 
 
-[Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
+![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
