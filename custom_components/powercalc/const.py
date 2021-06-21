@@ -19,7 +19,7 @@ MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
 
 MANUFACTURER_DIRECTORY_MAPPING = {
-    "IKEA of Sweden": "ikea"
-    "OSRAM": "osram"
+    "IKEA of Sweden": "ikea",
+    "OSRAM": "osram",
     "Signify Netherlands B.V.": "signify"
 }
