@@ -16,13 +16,19 @@ from homeassistant.components.light import (
     ATTR_COLOR_TEMP,
     ATTR_COLOR_MODE,
     ATTR_HS_COLOR,
+    COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS
 )
 
 from .strategy_interface import PowerCalculationStrategyInterface
 import homeassistant.helpers.entity_registry as er
-from .errors import ModelNotSupported, LutFileNotFound, StrategyConfigurationError
+from .errors import (
+    ModelNotSupported,
+    LutFileNotFound,
+    StrategyConfigurationError,
+    UnsupportedMode
+)
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,8 +51,12 @@ class LutRegistry:
                 for row in csv_reader:
                     if (color_mode == COLOR_MODE_HS):
                         lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(row[3])
-                    else:
+                    elif (color_mode == COLOR_MODE_COLOR_TEMP):
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
+                    elif (color_mode == COLOR_MODE_BRIGHTNESS):
+                        lookup_dict[int(row[0])] = float(row[1])
+                    else:
+                        raise UnsupportedMode(f"Unsupported color mode {color_mode}")
 
             lookup_dict = dict(lookup_dict)
             self._lookup_dictionaries[cache_key] = lookup_dict
@@ -105,6 +115,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.debug("Looking up power usage for bri:%s mired:%s", brightness, mired)
             mired_values = self.get_closest_from_dictionary(lookup_table, brightness)
             power = self.get_closest_from_dictionary(mired_values, mired)
+        elif (color_mode == COLOR_MODE_BRIGHTNESS):
+            _LOGGER.debug("Looking up power usage for bri:%s", brightness)
+            power = self.get_closest_from_dictionary(lookup_table, brightness)
 
         _LOGGER.debug("Power:%s", power)
         return power
