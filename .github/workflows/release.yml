@@ -18,7 +18,7 @@ jobs:
 
       - name: "Set version number"
         run: |
-          python3 ${{ github.workspace }}/manage/update_hacs_manifest.py --version ${{ steps.version.outputs.version }}
+          python3 ${{ github.workspace }}/.github/scripts/update_hacs_manifest.py --version ${{ steps.version.outputs.version }}
       - name: Create zip
         run: |
           cd custom_components/powercalc
