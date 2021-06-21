@@ -19,7 +19,7 @@ START_BRIGHTNESS=1
 async def main():
     options = aioshelly.ConnectionOptions(SHELLY_IP)
 
-    csvFile = open('measurements.csv', 'w')
+    csvFile = open(f'{MODE}.csv', 'w')
     csvWriter = csv.writer(csvFile)
 
     async with aiohttp.ClientSession() as aiohttp_session, aioshelly.COAP() as coap_context:
@@ -48,6 +48,7 @@ async def main():
         await asyncio.sleep(10) 
 
         if (MODE == MODE_HS):
+            csvWriter.writerow(["bri", "hue", "sat", "watt"])
             for bri in range(START_BRIGHTNESS, 254, 10):
                 for hue in range(1, 65535, 2000):
                     for sat in range(1, 254, 10):
@@ -67,6 +68,7 @@ async def main():
                         )
                     csvFile.flush()
         elif (MODE == MODE_COLOR_TEMP):
+            csvWriter.writerow(["bri", "mired", "watt"])
             for bri in range(START_BRIGHTNESS, 254, 5):
                 for mired in range(150, 500, 10):
                     print('Setting bri:mired to: {}:{}', bri, mired)
@@ -84,6 +86,7 @@ async def main():
                     )
                     csvFile.flush()
         else:
+            csvWriter.writerow(["bri", "watt"])
             for bri in range(START_BRIGHTNESS, 254, 1):
                 print('Setting bri to: {}', bri)
                 await light.set_state(bri=bri)
@@ -118,7 +121,7 @@ async def initialize_hue_bridge(websession) -> aiohue.Bridge:
     except (aiohue.Unauthorized) as err:
         print("Please click the link button on the bridge, than hit enter..")
         input()
-        await bridge.create_user("huepower")
+        await bridge.create_user(HUE_BRIDGE_USERNAME)
         await bridge.initialize()
         f.write(bridge.username)
         
