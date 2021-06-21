@@ -1,5 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
+![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
 # homeassistant-powercalc
 Custom component to calculate power consumption of lights and other appliances.
