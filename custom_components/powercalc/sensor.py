@@ -9,16 +9,17 @@ import os
 
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from .const import (
-    DOMAIN,
-    DATA_CALCULATOR_FACTORY,
-    CONF_MODEL,
-    CONF_MANUFACTURER,
-    CONF_MODE,
-    CONF_MIN_WATT,
-    CONF_MAX_WATT,
-    CONF_WATT,
-    CONF_STANDBY_USAGE,
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_DISABLE_STANDBY_USAGE,
+    CONF_MANUFACTURER,
+    CONF_MAX_WATT,
+    CONF_MIN_WATT,
+    CONF_MODE,
+    CONF_MODEL,
+    CONF_STANDBY_USAGE,
+    CONF_WATT,
+    DATA_CALCULATOR_FACTORY,
+    DOMAIN,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT
@@ -86,6 +87,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_MAX_WATT): cv.string,
         vol.Optional(CONF_WATT): cv.string,
         vol.Optional(CONF_STANDBY_USAGE): cv.string,
+        vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
         vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string
     }
 )
@@ -130,9 +132,11 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         _LOGGER.error("Error setting up calculation strategy: %s", err)
         return
 
-    standby_usage = config.get(CONF_STANDBY_USAGE)
-    if (standby_usage is None and light_model is not None):
-        standby_usage = light_model.standby_usage
+    standby_usage = None
+    if (config.get(CONF_DISABLE_STANDBY_USAGE) == False):
+        standby_usage = config.get(CONF_STANDBY_USAGE)
+        if (standby_usage is None and light_model is not None):
+            standby_usage = light_model.standby_usage
 
     _LOGGER.debug(
         "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",

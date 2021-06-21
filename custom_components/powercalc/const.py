@@ -11,6 +11,7 @@ CONF_MIN_WATT = "min_watt"
 CONF_MAX_WATT = "max_watt"
 CONF_WATT= "watt"
 CONF_STANDBY_USAGE = "standby_usage"
+CONF_DISABLE_STANDBY_USAGE = "disable_standby_usage"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 
 MODE_LUT = "lut"
