@@ -22,7 +22,7 @@ from .const import (
     DOMAIN,
     MODE_FIXED,
     MODE_LINEAR,
-    MODE_LUT
+    MODE_LUT,
 )
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -40,7 +40,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     STATE_OFF,
     STATE_UNAVAILABLE,
-    STATE_STANDBY
+    STATE_STANDBY,
 )
 import voluptuous as vol
 
@@ -52,11 +52,7 @@ from homeassistant.components import remote
 from homeassistant.components import media_player
 from homeassistant.components.light import Light, PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
-from .errors import (
-    ModelNotSupported,
-    StrategyConfigurationError,
-    UnsupportedMode
-)
+from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
@@ -71,31 +67,27 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
                 fan.DOMAIN,
                 binary_sensor.DOMAIN,
                 remote.DOMAIN,
-                media_player.DOMAIN
+                media_player.DOMAIN,
             )
         ),
         vol.Optional(CONF_MODEL): cv.string,
         vol.Optional(CONF_MANUFACTURER): cv.string,
-        vol.Optional(CONF_MODE): vol.In(
-            [
-                MODE_LUT,
-                MODE_FIXED,
-                MODE_LINEAR
-            ]
-        ),
+        vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
         vol.Optional(CONF_MIN_WATT): cv.string,
         vol.Optional(CONF_MAX_WATT): cv.string,
         vol.Optional(CONF_WATT): cv.string,
         vol.Optional(CONF_STANDBY_USAGE): cv.string,
         vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
-        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string
+        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     }
 )
 
 NAME_FORMAT = "{} power"
 
 
-async def async_setup_platform(hass: HomeAssistantType, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(
+    hass: HomeAssistantType, config, async_add_entities, discovery_info=None
+):
     """Set up the sensor platform."""
 
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
@@ -108,7 +100,7 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
 
     unique_id = None
 
-    if (entity_entry):
+    if entity_entry:
         entity_name = entity_entry.name or entity_entry.original_name
         unique_id = entity_entry.unique_id
     else:
@@ -120,10 +112,12 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         light_model = await get_light_model(hass, entity_entry, config)
     except (ModelNotSupported) as err:
         _LOGGER.info("Model not found in library %s: %s", entity_id, err)
-    
+
     try:
         mode = select_calculation_mode(config, light_model)
-        calculation_strategy = calculation_strategy_factory.create(config, mode, light_model)
+        calculation_strategy = calculation_strategy_factory.create(
+            config, mode, light_model
+        )
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", entity_id, err)
@@ -133,9 +127,9 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         return
 
     standby_usage = None
-    if (config.get(CONF_DISABLE_STANDBY_USAGE) == False):
+    if config.get(CONF_DISABLE_STANDBY_USAGE) == False:
         standby_usage = config.get(CONF_STANDBY_USAGE)
-        if (standby_usage is None and light_model is not None):
+        if standby_usage is None and light_model is not None:
             standby_usage = light_model.standby_usage
 
     _LOGGER.debug(
@@ -145,87 +139,100 @@ async def async_setup_platform(hass: HomeAssistantType, config, async_add_entiti
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
-        standby_usage
+        standby_usage,
     )
 
-    async_add_entities([
-        GenericPowerSensor(
-            power_calculator=calculation_strategy,
-            name=name,
-            entity_id=entity_id,
-            unique_id=unique_id,
-            standby_usage=standby_usage
-        )
-    ])
+    async_add_entities(
+        [
+            GenericPowerSensor(
+                power_calculator=calculation_strategy,
+                name=name,
+                entity_id=entity_id,
+                unique_id=unique_id,
+                standby_usage=standby_usage,
+            )
+        ]
+    )
+
 
 def select_calculation_mode(config: dict, light_model: LightModel):
     """Select the calculation mode"""
     config_mode = config.get(CONF_MODE)
-    if (config_mode):
+    if config_mode:
         return config_mode
 
-    if (light_model):
+    if light_model:
         return light_model.supported_modes[0]
 
-    if (config.get(CONF_MIN_WATT)):
+    if config.get(CONF_MIN_WATT):
         return MODE_LINEAR
 
-    if (config.get(CONF_WATT)):
+    if config.get(CONF_WATT):
         return MODE_FIXED
 
-    raise UnsupportedMode("Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config")
+    raise UnsupportedMode(
+        "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
+    )
+
 
 async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if ((manufacturer is None or model is None) and entity_entry):
+    if (manufacturer is None or model is None) and entity_entry:
         hue_model_data = await autodiscover_hue_model(hass, entity_entry)
-        if (hue_model_data):
+        if hue_model_data:
             manufacturer = hue_model_data["manufacturer"]
             model = hue_model_data["model"]
 
-    if (manufacturer is None or model is None):
+    if manufacturer is None or model is None:
         return None
-    
+
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
-    if (custom_model_directory):
-        custom_model_directory = os.path.join(hass.config.config_dir, custom_model_directory)
+    if custom_model_directory:
+        custom_model_directory = os.path.join(
+            hass.config.config_dir, custom_model_directory
+        )
 
     return LightModel(manufacturer, model, custom_model_directory)
 
+
 async def autodiscover_hue_model(hass, entity_entry):
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if (hass.data.get(HUE_DOMAIN) == None or entity_entry.platform != "hue"):
+    if hass.data.get(HUE_DOMAIN) == None or entity_entry.platform != "hue":
         return
 
     light = await find_hue_light(hass, entity_entry)
-    if (light is None):
-        _LOGGER.error("Cannot autodisover model for '%s', not found in the hue bridge api", entity_entry.entity_id)
+    if light is None:
+        _LOGGER.error(
+            "Cannot autodisover model for '%s', not found in the hue bridge api",
+            entity_entry.entity_id,
+        )
         return
 
     _LOGGER.debug(
         "Auto discovered Hue model for entity %s: (manufacturer=%s, model=%s)",
         entity_entry.entity_id,
         light.manufacturername,
-        light.modelid
+        light.modelid,
     )
 
-    return {
-        "manufacturer": light.manufacturername,
-        "model": light.modelid
-    }
+    return {"manufacturer": light.manufacturername, "model": light.modelid}
 
-async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry) -> Light | None:
+
+async def find_hue_light(
+    hass: HomeAssistantType, entity_entry: er.RegistryEntry
+) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
 
     bridge = hass.data[HUE_DOMAIN][entity_entry.config_entry_id]
     lights = bridge.api.lights
     for light_id in lights:
         light = bridge.api.lights[light_id]
-        if (light.uniqueid == entity_entry.unique_id):
+        if light.uniqueid == entity_entry.unique_id:
             return light
-    
+
     return None
+
 
 class GenericPowerSensor(Entity):
     """Representation of a Sensor."""
@@ -236,7 +243,7 @@ class GenericPowerSensor(Entity):
         name: str,
         entity_id: str,
         unique_id: str,
-        standby_usage: float | None
+        standby_usage: float | None,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -275,10 +282,10 @@ class GenericPowerSensor(Entity):
         if state is None or state.state == STATE_UNKNOWN:
             return False
 
-        if (state.state == STATE_UNAVAILABLE):
+        if state.state == STATE_UNAVAILABLE:
             return False
 
-        if (state.state == STATE_OFF or state.state == STATE_STANDBY):
+        if state.state == STATE_OFF or state.state == STATE_STANDBY:
             self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(state)
@@ -310,7 +317,7 @@ class GenericPowerSensor(Entity):
     def unit_of_measurement(self):
         """Return the unit of measurement."""
         return POWER_WATT
-    
+
     @property
     def device_class(self) -> str:
         """Device class of the sensor."""

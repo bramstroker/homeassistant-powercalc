@@ -11,7 +11,9 @@ def update_manifest():
         if value in ["--version", "-V"]:
             version = sys.argv[index + 1]
 
-    with open(f"{os.getcwd()}/custom_components/powercalc/manifest.json") as manifestfile:
+    with open(
+        f"{os.getcwd()}/custom_components/powercalc/manifest.json"
+    ) as manifestfile:
         manifest = json.load(manifestfile)
 
     manifest["version"] = version
