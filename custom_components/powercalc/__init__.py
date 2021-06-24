@@ -7,7 +7,6 @@ from homeassistant.helpers.typing import HomeAssistantType
 from .const import (
     CONF_MAX_WATT,
     CONF_MIN_WATT,
-    CONF_MODE,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
