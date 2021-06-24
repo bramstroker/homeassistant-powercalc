@@ -1,10 +1,10 @@
 import asyncio
+import csv
 from pprint import pprint
+
 import aiohttp
 import aiohue
 import aioshelly
-import asyncio
-import csv
 
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"

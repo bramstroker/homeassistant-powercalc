@@ -1,14 +1,13 @@
-from homeassistant.components import light
-from homeassistant.core import State
 import logging
-
-from homeassistant.components import fan
-from homeassistant.components import light
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.fan import ATTR_PERCENTAGE
-from .strategy_interface import PowerCalculationStrategyInterface
 from typing import Optional
+
 import homeassistant.helpers.entity_registry as er
+from homeassistant.components import fan, light
+from homeassistant.components.fan import ATTR_PERCENTAGE
+from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.core import State
+
+from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -2,12 +2,38 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import logging
 import os
+from typing import Optional
 
+import homeassistant.helpers.config_validation as cv
+import homeassistant.helpers.entity_registry as er
+import voluptuous as vol
+from homeassistant.components import (
+    binary_sensor,
+    fan,
+    light,
+    media_player,
+    remote,
+    switch,
+)
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
+from homeassistant.components.light import PLATFORM_SCHEMA, Light
+from homeassistant.const import (
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    DEVICE_CLASS_POWER,
+    EVENT_HOMEASSISTANT_START,
+    POWER_WATT,
+    STATE_OFF,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+)
+from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.typing import HomeAssistantType
+
 from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
@@ -24,36 +50,9 @@ from .const import (
     MODE_LINEAR,
     MODE_LUT,
 )
-
-from .strategy_interface import PowerCalculationStrategyInterface
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.typing import HomeAssistantType
-from homeassistant.helpers.event import async_track_state_change_event
-import homeassistant.helpers.entity_registry as er
-
-from homeassistant.const import (
-    EVENT_HOMEASSISTANT_START,
-    DEVICE_CLASS_POWER,
-    POWER_WATT,
-    STATE_UNKNOWN,
-    CONF_NAME,
-    CONF_ENTITY_ID,
-    STATE_OFF,
-    STATE_UNAVAILABLE,
-    STATE_STANDBY,
-)
-import voluptuous as vol
-
-from homeassistant.components import binary_sensor
-from homeassistant.components import fan
-from homeassistant.components import light
-from homeassistant.components import switch
-from homeassistant.components import remote
-from homeassistant.components import media_player
-from homeassistant.components.light import Light, PLATFORM_SCHEMA
-import homeassistant.helpers.config_validation as cv
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
+from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 

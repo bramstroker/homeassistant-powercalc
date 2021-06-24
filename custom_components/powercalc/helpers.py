@@ -1,5 +1,7 @@
-from custom_components.powercalc import LightModel
 import os
+
+from custom_components.powercalc import LightModel
+
 from .const import MANUFACTURER_DIRECTORY_MAPPING
 
 

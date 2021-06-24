@@ -2,29 +2,25 @@
 
 from __future__ import annotations
 
+from homeassistant.helpers.typing import HomeAssistantType
+
 from .const import (
-    CONF_MODE,
-    CONF_MIN_WATT,
     CONF_MAX_WATT,
+    CONF_MIN_WATT,
+    CONF_MODE,
     CONF_WATT,
-    DOMAIN,
     DATA_CALCULATOR_FACTORY,
+    DOMAIN,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
 )
-
-from homeassistant.helpers.typing import HomeAssistantType
-
-from .errors import StrategyConfigurationError
-
-from .strategy_lut import LutRegistry, LutStrategy
-from .strategy_linear import LinearStrategy
+from .errors import StrategyConfigurationError, UnsupportedMode
+from .light_model import LightModel
 from .strategy_fixed import FixedStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
-
-from .light_model import LightModel
-from .errors import UnsupportedMode
+from .strategy_linear import LinearStrategy
+from .strategy_lut import LutRegistry, LutStrategy
 
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:

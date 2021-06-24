@@ -1,7 +1,9 @@
-from homeassistant.core import State
 from typing import Optional
-from .strategy_interface import PowerCalculationStrategyInterface
+
 import homeassistant.helpers.entity_registry as er
+from homeassistant.core import State
+
+from .strategy_interface import PowerCalculationStrategyInterface
 
 
 class FixedStrategy(PowerCalculationStrategyInterface):

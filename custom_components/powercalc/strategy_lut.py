@@ -1,35 +1,34 @@
 from __future__ import annotations
-from homeassistant.components import light
 
-from homeassistant.core import State
-import logging
-
-from typing import Optional
-from collections import defaultdict
-import os
 import gzip
+import logging
+import os
+from collections import defaultdict
 from csv import reader
 from functools import partial
+from typing import Optional
 
+import homeassistant.helpers.entity_registry as er
+from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
     ATTR_COLOR_MODE,
+    ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
 )
+from homeassistant.core import State
 
-from .strategy_interface import PowerCalculationStrategyInterface
-import homeassistant.helpers.entity_registry as er
 from .errors import (
-    ModelNotSupported,
     LutFileNotFound,
+    ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
 from .light_model import LightModel
+from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 
