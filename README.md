@@ -191,6 +191,8 @@ An example script is available `utils/measure/measure.py`.
 I am using the "Shelly Plug S"
 
 ### Supported models
+- innr RB175W (brightness)
+- innr RS125  (brightness)
 - Signify LCA001 (hs and color_temp)
 - Signify LCT003 (hs and color_temp)
 - Signify LCT010 (hs and color_temp)
