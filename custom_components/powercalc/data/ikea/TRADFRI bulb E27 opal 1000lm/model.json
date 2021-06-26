@@ -1,0 +1,7 @@
+{
+    "name": "TRADFRI bulb E27 opal 1000lm LED1623G12",
+    "standby_usage": 0.36,
+    "supported_modes": [
+        "lut"
+    ]
+}
