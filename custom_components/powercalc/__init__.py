@@ -59,14 +59,15 @@ class PowerCalculatorStrategyFactory:
         linear_config = config.get(CONF_LINEAR)
 
         if linear_config is None:
-            if light_model is not None:
-                linear_config = light_model.linear_mode_config
             # Below is for BC compatibility
-            else:
+            if config.get(CONF_MIN_WATT) is not None:
                 linear_config = {
                     CONF_MIN_POWER: config.get(CONF_MIN_WATT),
                     CONF_MAX_POWER: config.get(CONF_MAX_WATT)
                 }
+
+            elif light_model is not None:
+                linear_config = light_model.linear_mode_config
 
         return LinearStrategy(linear_config, entity_domain)
 
