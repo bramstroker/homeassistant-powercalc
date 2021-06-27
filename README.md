@@ -67,9 +67,27 @@ Power consumpion is calculated by ratio. So when you have your fan running at 50
 sensor:
   - platform: powercalc
     entity_id: light.livingroom_floorlamp
-    mode: linear
-    min_watt: 0.5
-    max_watt: 8
+    linear:
+      min_power: 0.5
+      max_power: 8
+```
+
+#### Advanced precision calibration
+
+With the `calibrate` setting you can supply more than one power value for multiple brightness/percentage levels.
+This allows for a more accurate estimation because not all lights are straight linear.
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.livingroom_floorlamp
+    linear:
+      calibrate:
+        - 1 -> 0.3
+        - 10 -> 1.25
+        - 50 -> 3.50
+        - 100 -> 6.8
+        - 255 -> 15.3
 ```
 
 ### Fixed mode
