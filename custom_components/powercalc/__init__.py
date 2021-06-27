@@ -5,8 +5,13 @@ from __future__ import annotations
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
+    CONF_FIXED,
+    CONF_LINEAR,
+    CONF_MAX_POWER,
     CONF_MAX_WATT,
+    CONF_MIN_POWER,
     CONF_MIN_WATT,
+    CONF_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
@@ -35,11 +40,11 @@ class PowerCalculatorStrategyFactory:
         self._lut_registry = LutRegistry()
 
     def create(
-        self, config: dict, mode: str, light_model: LightModel
+        self, config: dict, mode: str, light_model: LightModel, entity_domain: str
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
-            return self.create_linear(config, light_model)
+            return self.create_linear(config, light_model, entity_domain)
 
         if mode == MODE_FIXED:
             return self.create_fixed(config, light_model)
@@ -49,20 +54,36 @@ class PowerCalculatorStrategyFactory:
 
         raise UnsupportedMode("Invalid calculation mode", mode)
 
-    def create_linear(self, config: dict, light_model: LightModel) -> LinearStrategy:
+    def create_linear(self, config: dict, light_model: LightModel, entity_domain: str) -> LinearStrategy:
         """Create the linear strategy"""
-        min = config.get(CONF_MIN_WATT)
-        max = config.get(CONF_MAX_WATT)
-        if min is None and max is None:
-            min = light_model.linear_mode_config.get(CONF_MIN_WATT)
-            max = light_model.linear_mode_config.get(CONF_MAX_WATT)
+        linear_config = config.get(CONF_LINEAR)
 
-        return LinearStrategy(min, max)
+        if linear_config is None:
+            if light_model is not None:
+                linear_config = light_model.linear_mode_config
+            # Below is for BC compatibility
+            else:
+                linear_config = {
+                    CONF_MIN_POWER: config.get(CONF_MIN_WATT),
+                    CONF_MAX_POWER: config.get(CONF_MAX_WATT)
+                }
+
+        return LinearStrategy(linear_config, entity_domain)
 
     def create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
         """Create the fixed strategy"""
+        fixed_config = config.get(CONF_FIXED)
+        if (fixed_config is None and light_model is not None):
+            fixed_config = light_model.fixed_mode_config
+
+        #BC compat
+        if (fixed_config is None):
+            fixed_config = {
+                CONF_POWER: config.get(CONF_WATT)
+            }
+
         return FixedStrategy(
-            config.get(CONF_WATT) or light_model.fixed_mode_config.get(CONF_WATT)
+            fixed_config.get(CONF_POWER)
         )
 
     def create_lut(self, light_model: LightModel) -> LutStrategy:
