@@ -28,6 +28,23 @@ To calculate estimated power consumption different modes are supported, they are
 - [Linear](#linear-mode)
 - [Fixed](#fixed-mode)
 
+## Configuration
+
+Each virtual power sensor have it's own configuration possibilities. They are as follows:
+
+| Name                   | Type    | Requirement  | Description                                                                |
+| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id              | string  | **Required** | HA entity ID                                                               |
+| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                   | string  | **Optional** | Override the name                                                          |
+| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+
 ### LUT mode
 Supported domain: `light`
 
@@ -116,30 +133,17 @@ sensor:
       power: 20
 ```
 
-## Additional configuration options
+## Configuration examples
 
-| Name                   | Type    | Requirement  | Description                                                                |
-| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id              | string  | **Required** | HA entity ID                                                               |
-| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
-| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
-| name                   | string  | **Optional** | Override the name                                                          |
-| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
-| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
-| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
-| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
-
-Full example:
+### Linear mode with additional standby usage
 
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.livingroom_floorlamp
-    mode: linear
-    min_watt: 0.5
-    max_watt: 8
+    linear:
+      min_power: 0.5
+      max_power: 8
     standby_usage: 0.2
     name: My amazing power meter
 ```
