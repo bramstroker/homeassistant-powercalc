@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
@@ -26,6 +28,7 @@ from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
 from .strategy_lut import LutRegistry, LutStrategy
 
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     hass.data.setdefault(DOMAIN, {})
@@ -61,6 +64,7 @@ class PowerCalculatorStrategyFactory:
         if linear_config is None:
             # Below is for BC compatibility
             if config.get(CONF_MIN_WATT) is not None:
+                _LOGGER.warning("min_watt is deprecated and will be removed in version 0.3, use linear->min_power")
                 linear_config = {
                     CONF_MIN_POWER: config.get(CONF_MIN_WATT),
                     CONF_MAX_POWER: config.get(CONF_MAX_WATT)
@@ -79,6 +83,7 @@ class PowerCalculatorStrategyFactory:
 
         #BC compat
         if (fixed_config is None):
+            _LOGGER.warning("watt is deprecated and will be removed in version 0.3, use fixed->power")
             fixed_config = {
                 CONF_POWER: config.get(CONF_WATT)
             }
