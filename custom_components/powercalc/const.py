@@ -31,7 +31,5 @@ MANUFACTURER_DIRECTORY_MAPPING = {
 }
 
 MODEL_DIRECTORY_MAPPING = {
-    "IKEA of Sweden": {
-        "TRADFRI bulb E14 W op/ch 400lm": "LED1649C5"
-    },
+    "IKEA of Sweden": {"TRADFRI bulb E14 W op/ch 400lm": "LED1649C5"},
 }
