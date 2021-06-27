@@ -24,12 +24,12 @@ Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 ## Calculation modes
 
 To calculate estimated power consumption different modes are supported, they are as follows:
-- LUT (lookup table)
-- Linear
-- Fixed
+- [LUT (lookup table)](#lut-mode)
+- [Linear](#linear-mode)
+- [Fixed](#fixed-mode)
 
 ### LUT mode
-Supported platforms: `light`
+Supported domain: `light`
 
 This is the most accurate mode.
 For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
@@ -55,13 +55,20 @@ sensor:
 ```
 
 ### Linear mode
-Supported platforms: `light`, `fan`
+Supported domains: `light`, `fan`
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
-You need to supply the min and max power draw yourself, by eighter looking at the datasheet or measuring yourself with a smart plug / power meter.
+You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
 Power consumpion is calculated by ratio. So when you have your fan running at 50% speed and define watt range 2 - 6, than the estimated consumption will be 4 watt.
 
-#### Configuration
+#### Configuration options
+| Name              | Type    | Requirement  | Description                                 |
+| ----------------- | ------- | ------------ | ------------------------------------------- |
+| min_power         | float   | **Optional** | Power usage for lowest brightness level     |
+| max_power         | float   | **Optional** | Power usage for highest brightness level    |
+| calibrate         | string  | **Optional** | Calibration values                          |
+
+#### Example configuration
 
 ```yaml
 sensor:
@@ -91,17 +98,22 @@ sensor:
 ```
 
 ### Fixed mode
-Supported platforms: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
+
+#### Configuration options
+| Name              | Type    | Requirement  | Description                                 |
+| ----------------- | ------- | ------------ | ------------------------------------------- |
+| power             | float   | **Optional** | Power usage when the appliance is turned on |
 
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.nondimmabled_bulb
-    mode: fixed
-    watt: 20
+    fixed:
+      power: 20
 ```
 
 ## Additional configuration options
