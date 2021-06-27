@@ -29,3 +29,9 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "OSRAM": "osram",
     "Signify Netherlands B.V.": "signify",
 }
+
+MODEL_DIRECTORY_MAPPING = {
+    "IKEA of Sweden": {
+        "TRADFRI bulb E14 W op/ch 400lm": "LED1649C5"
+    },
+}
