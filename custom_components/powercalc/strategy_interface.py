@@ -1,6 +1,8 @@
-from homeassistant.core import State
 from typing import Optional
+
 import homeassistant.helpers.entity_registry as er
+from homeassistant.core import State
+
 
 class PowerCalculationStrategyInterface:
     async def calculate(self, light_state: State) -> Optional[int]:
