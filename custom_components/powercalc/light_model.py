@@ -2,7 +2,7 @@ import json
 import os
 from typing import Optional
 
-from .const import MANUFACTURER_DIRECTORY_MAPPING, MODE_FIXED, MODE_LINEAR
+from .const import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING, MODE_FIXED, MODE_LINEAR
 from .errors import ModelNotSupported, UnsupportedMode
 
 
@@ -29,8 +29,14 @@ class LightModel:
             MANUFACTURER_DIRECTORY_MAPPING.get(self._manufacturer) or self._manufacturer
         )
 
+        model_directory = self._model
+        if (
+            isinstance(MODEL_DIRECTORY_MAPPING.get(self._manufacturer), dict) and 
+            MODEL_DIRECTORY_MAPPING.get(self._manufacturer).get(self._model)):
+            model_directory = MODEL_DIRECTORY_MAPPING.get(self._manufacturer).get(self._model)
+
         return os.path.join(
-            os.path.dirname(__file__), f"data/{manufacturer_directory}/{self._model}"
+            os.path.dirname(__file__), f"data/{manufacturer_directory}/{model_directory}"
         )
 
     @property
