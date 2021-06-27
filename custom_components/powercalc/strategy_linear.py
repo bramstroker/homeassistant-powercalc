@@ -23,14 +23,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if entity_state.domain == light.DOMAIN:
             max_value = 255
             value = attrs.get(ATTR_BRIGHTNESS)
-            if value == None:
+            if value is None:
                 _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
                 return None
 
         if entity_state.domain == fan.DOMAIN:
             max_value = 100
             value = attrs.get(ATTR_PERCENTAGE)
-            if value == None:
+            if value is None:
                 _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
                 return None
 
