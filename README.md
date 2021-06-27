@@ -118,10 +118,18 @@ sensor:
 
 ## Additional configuration options
 
-- `standby_usage`: Supply the wattage when the device is off
-- `disable_standby_usage`: Set to `true` to not show any power consumption when the device is standby
-- `name`: Override the name
-- `custom_model_directory` Directory for a custom light model. Relative from the `config` directory
+| Name                   | Type    | Requirement  | Description                                                                |
+| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id              | string  | **Required** | HA entity ID                                                               |
+| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                   | string  | **Optional** | Override the name                                                          |
+| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 
 Full example:
 
