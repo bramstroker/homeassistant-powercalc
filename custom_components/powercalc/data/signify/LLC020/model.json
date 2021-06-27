@@ -4,7 +4,7 @@
         "linear"
     ],
     "linear_config": {
-        "min_watt": 0,
-        "max_watt": 6
+        "min_power": 0,
+        "max_power": 6
     }
 }

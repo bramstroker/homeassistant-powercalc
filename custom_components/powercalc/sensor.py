@@ -35,13 +35,19 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
+    CONF_CALIBRATE,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
+    CONF_FIXED,
+    CONF_LINEAR,
     CONF_MANUFACTURER,
+    CONF_MAX_POWER,
     CONF_MAX_WATT,
+    CONF_MIN_POWER,
     CONF_MIN_WATT,
     CONF_MODE,
     CONF_MODEL,
+    CONF_POWER,
     CONF_STANDBY_USAGE,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
@@ -56,29 +62,49 @@ from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+LINEAR_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_NAME): cv.string,
-        vol.Required(CONF_ENTITY_ID): cv.entity_domain(
-            (
-                light.DOMAIN,
-                switch.DOMAIN,
-                fan.DOMAIN,
-                binary_sensor.DOMAIN,
-                remote.DOMAIN,
-                media_player.DOMAIN,
-            )
-        ),
-        vol.Optional(CONF_MODEL): cv.string,
-        vol.Optional(CONF_MANUFACTURER): cv.string,
-        vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
-        vol.Optional(CONF_MIN_WATT): cv.string,
-        vol.Optional(CONF_MAX_WATT): cv.string,
-        vol.Optional(CONF_WATT): cv.string,
-        vol.Optional(CONF_STANDBY_USAGE): cv.string,
-        vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
-        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
+        vol.Optional(CONF_CALIBRATE): vol.All(cv.ensure_list, [vol.Match('^[0-9]+ -> ([0-9]*[.])?[0-9]+$')]),
+        vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
+        vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     }
+)
+FIXED_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_POWER): vol.Coerce(float)
+    }
+)
+
+PLATFORM_SCHEMA = vol.All(
+    cv.deprecated(CONF_MIN_WATT),
+    cv.deprecated(CONF_MAX_WATT),
+    cv.deprecated(CONF_WATT),
+    PLATFORM_SCHEMA.extend(
+        {
+            vol.Optional(CONF_NAME): cv.string,
+            vol.Required(CONF_ENTITY_ID): cv.entity_domain(
+                (
+                    light.DOMAIN,
+                    switch.DOMAIN,
+                    fan.DOMAIN,
+                    binary_sensor.DOMAIN,
+                    remote.DOMAIN,
+                    media_player.DOMAIN,
+                )
+            ),
+            vol.Optional(CONF_MODEL): cv.string,
+            vol.Optional(CONF_MANUFACTURER): cv.string,
+            vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
+            vol.Optional(CONF_MIN_WATT): cv.string,
+            vol.Optional(CONF_MAX_WATT): cv.string,
+            vol.Optional(CONF_WATT): cv.string,
+            vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
+            vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
+            vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
+            vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+            vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+        }
+    )
 )
 
 NAME_FORMAT = "{} power"
@@ -101,9 +127,11 @@ async def async_setup_platform(
 
     if entity_entry:
         entity_name = entity_entry.name or entity_entry.original_name
+        entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
     else:
         entity_name = entity_state.name
+        entity_domain = entity_state.domain
     name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
 
     light_model = None
@@ -115,7 +143,7 @@ async def async_setup_platform(
     try:
         mode = select_calculation_mode(config, light_model)
         calculation_strategy = calculation_strategy_factory.create(
-            config, mode, light_model
+            config, mode, light_model, entity_domain
         )
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
@@ -160,12 +188,20 @@ def select_calculation_mode(config: dict, light_model: LightModel):
     if config_mode:
         return config_mode
 
+    if (config.get(CONF_LINEAR)):
+        return MODE_LINEAR
+    
+    if (config.get(CONF_FIXED)):
+        return MODE_FIXED
+
     if light_model:
         return light_model.supported_modes[0]
 
+    # BC compat
     if config.get(CONF_MIN_WATT):
         return MODE_LINEAR
 
+    # BC compat
     if config.get(CONF_WATT):
         return MODE_FIXED
 

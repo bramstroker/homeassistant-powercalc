@@ -20,16 +20,32 @@ This integration is part of the default HACS repository. Just click "Explore and
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
+## Configuration
+
+Each virtual power sensor have it's own configuration possibilities. They are as follows:
+
+| Name                   | Type    | Requirement  | Description                                                                |
+| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id              | string  | **Required** | HA entity ID                                                               |
+| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                   | string  | **Optional** | Override the name                                                          |
+| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 
 ## Calculation modes
 
 To calculate estimated power consumption different modes are supported, they are as follows:
-- LUT (lookup table)
-- Linear
-- Fixed
+- [LUT (lookup table)](#lut-mode)
+- [Linear](#linear-mode)
+- [Fixed](#fixed-mode)
 
 ### LUT mode
-Supported platforms: `light`
+Supported domain: `light`
 
 This is the most accurate mode.
 For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
@@ -55,53 +71,78 @@ sensor:
 ```
 
 ### Linear mode
-Supported platforms: `light`, `fan`
+Supported domains: `light`, `fan`
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
-You need to supply the min and max power draw yourself, by eighter looking at the datasheet or measuring yourself with a smart plug / power meter.
+You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
 Power consumpion is calculated by ratio. So when you have your fan running at 50% speed and define watt range 2 - 6, than the estimated consumption will be 4 watt.
 
-#### Configuration
+#### Configuration options
+| Name              | Type    | Requirement  | Description                                 |
+| ----------------- | ------- | ------------ | ------------------------------------------- |
+| min_power         | float   | **Optional** | Power usage for lowest brightness level     |
+| max_power         | float   | **Optional** | Power usage for highest brightness level    |
+| calibrate         | string  | **Optional** | Calibration values                          |
+
+#### Example configuration
 
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.livingroom_floorlamp
-    mode: linear
-    min_watt: 0.5
-    max_watt: 8
+    linear:
+      min_power: 0.5
+      max_power: 8
+```
+
+#### Advanced precision calibration
+
+With the `calibrate` setting you can supply more than one power value for multiple brightness/percentage levels.
+This allows for a more accurate estimation because not all lights are straight linear.
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.livingroom_floorlamp
+    linear:
+      calibrate:
+        - 1 -> 0.3
+        - 10 -> 1.25
+        - 50 -> 3.50
+        - 100 -> 6.8
+        - 255 -> 15.3
 ```
 
 ### Fixed mode
-Supported platforms: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
+
+#### Configuration options
+| Name              | Type    | Requirement  | Description                                 |
+| ----------------- | ------- | ------------ | ------------------------------------------- |
+| power             | float   | **Optional** | Power usage when the appliance is turned on |
 
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.nondimmabled_bulb
-    mode: fixed
-    watt: 20
+    fixed:
+      power: 20
 ```
 
-## Additional configuration options
+## Configuration examples
 
-- `standby_usage`: Supply the wattage when the device is off
-- `disable_standby_usage`: Set to `true` to not show any power consumption when the device is standby
-- `name`: Override the name
-- `custom_model_directory` Directory for a custom light model. Relative from the `config` directory
-
-Full example:
+### Linear mode with additional standby usage
 
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.livingroom_floorlamp
-    mode: linear
-    min_watt: 0.5
-    max_watt: 8
+    linear:
+      min_power: 0.5
+      max_power: 8
     standby_usage: 0.2
     name: My amazing power meter
 ```
@@ -141,8 +182,8 @@ Example linear mode
     ],
     "standby_usage": 0.2,
     "linear_config": {
-        "min_watt": 0,
-        "max_watt": 6
+        "min_power": 0,
+        "max_power": 6
     }
 }
 ```
