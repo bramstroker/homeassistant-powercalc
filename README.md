@@ -182,8 +182,8 @@ Example linear mode
     ],
     "standby_usage": 0.2,
     "linear_config": {
-        "min_watt": 0,
-        "max_watt": 6
+        "min_power": 0,
+        "max_power": 6
     }
 }
 ```
