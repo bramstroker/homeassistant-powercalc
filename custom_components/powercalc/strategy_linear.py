@@ -1,19 +1,15 @@
-from config.custom_components.powercalc.errors import StrategyConfigurationError
-from homeassistant.helpers.config_validation import entity_domain
 import logging
 from typing import Optional
 
 import homeassistant.helpers.entity_registry as er
+from config.custom_components.powercalc.errors import StrategyConfigurationError
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
+from homeassistant.helpers.config_validation import entity_domain
 
-from .const import (
-    CONF_CALIBRATE,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER
-)
+from .const import CONF_CALIBRATE, CONF_MAX_POWER, CONF_MIN_POWER
 from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,7 +44,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         max_power = max_calibrate[1]
 
         value_range = max_value - min_value
-        if (value_range == 0):
+        if value_range == 0:
             power = min_power
         else:
             power_range = max_power - min_power
@@ -58,10 +54,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         return min(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
-        
+
     def get_max_calibrate(self, value: int) -> tuple[int, float]:
         return max(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
-    
+
     def create_calibrate_list(self) -> list[tuple]:
         list = []
 
@@ -74,11 +70,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 max = 255
             list.append((max, float(self._config.get(CONF_MAX_POWER))))
             return list
-        
+
         for line in calibrate:
             parts = line.split(" -> ")
             list.append((int(parts[0]), float(parts[1])))
-        
+
         sorted_list = sorted(list, key=lambda tup: tup[0])
         return sorted_list
 
@@ -88,6 +84,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if self._config.get(CONF_CALIBRATE) is None:
             if self._config.get(CONF_MIN_POWER) is None:
                 raise StrategyConfigurationError("You must supply min power")
-            
+
             if self._config.get(CONF_MAX_POWER) is None:
                 raise StrategyConfigurationError("You must supply max power")

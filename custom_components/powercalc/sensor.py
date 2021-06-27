@@ -64,16 +64,14 @@ _LOGGER = logging.getLogger(__name__)
 
 LINEAR_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_CALIBRATE): vol.All(cv.ensure_list, [vol.Match('^[0-9]+ -> ([0-9]*[.])?[0-9]+$')]),
+        vol.Optional(CONF_CALIBRATE): vol.All(
+            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
+        ),
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     }
 )
-FIXED_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_POWER): vol.Coerce(float)
-    }
-)
+FIXED_SCHEMA = vol.Schema({vol.Optional(CONF_POWER): vol.Coerce(float)})
 
 PLATFORM_SCHEMA = vol.All(
     cv.deprecated(CONF_MIN_WATT),
@@ -104,7 +102,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
         }
-    )
+    ),
 )
 
 NAME_FORMAT = "{} power"
@@ -188,10 +186,10 @@ def select_calculation_mode(config: dict, light_model: LightModel):
     if config_mode:
         return config_mode
 
-    if (config.get(CONF_LINEAR)):
+    if config.get(CONF_LINEAR):
         return MODE_LINEAR
-    
-    if (config.get(CONF_FIXED)):
+
+    if config.get(CONF_FIXED):
         return MODE_FIXED
 
     if light_model:
