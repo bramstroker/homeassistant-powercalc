@@ -20,14 +20,6 @@ This integration is part of the default HACS repository. Just click "Explore and
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
-
-## Calculation modes
-
-To calculate estimated power consumption different modes are supported, they are as follows:
-- [LUT (lookup table)](#lut-mode)
-- [Linear](#linear-mode)
-- [Fixed](#fixed-mode)
-
 ## Configuration
 
 Each virtual power sensor have it's own configuration possibilities. They are as follows:
@@ -44,6 +36,13 @@ Each virtual power sensor have it's own configuration possibilities. They are as
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+
+## Calculation modes
+
+To calculate estimated power consumption different modes are supported, they are as follows:
+- [LUT (lookup table)](#lut-mode)
+- [Linear](#linear-mode)
+- [Fixed](#fixed-mode)
 
 ### LUT mode
 Supported domain: `light`
