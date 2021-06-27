@@ -28,10 +28,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, entity_state: State) -> Optional[int]:
         attrs = entity_state.attributes
 
-        # - 1 -> 0.7       144
-        # - 10 -> 2        135
-        # - 200 -> 7       - 45
-
         if entity_state.domain == light.DOMAIN:
             value = attrs.get(ATTR_BRIGHTNESS)
             if value is None:
@@ -51,10 +47,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         min_power = min_calibrate[1]
         max_power = max_calibrate[1]
 
-        converted = ((value - min_value) / (max_value - min_value)) * (
-            max_power - min_power
-        ) + min_power
-        return round(converted, 2)
+        value_range = max_value - min_value
+        if (value_range == 0):
+            power = min_power
+        else:
+            power_range = max_power - min_power
+            power = (((value - min_value) * power_range) / value_range) + min_power
+
+        return round(power, 2)
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         return min(self._calibration, key=lambda v: (v[0] > value, value - v[0]))

@@ -98,7 +98,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_MIN_WATT): cv.string,
             vol.Optional(CONF_MAX_WATT): cv.string,
             vol.Optional(CONF_WATT): cv.string,
-            vol.Optional(CONF_STANDBY_USAGE): cv.string,
+            vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
             vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
