@@ -12,6 +12,7 @@ import voluptuous as vol
 from homeassistant.components import (
     binary_sensor,
     fan,
+    input_boolean,
     light,
     media_player,
     remote,
@@ -88,6 +89,7 @@ PLATFORM_SCHEMA = vol.All(
                     binary_sensor.DOMAIN,
                     remote.DOMAIN,
                     media_player.DOMAIN,
+                    input_boolean.DOMAIN,
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,

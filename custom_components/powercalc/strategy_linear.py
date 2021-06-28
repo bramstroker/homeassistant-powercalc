@@ -4,7 +4,6 @@ import logging
 from typing import Optional
 
 import homeassistant.helpers.entity_registry as er
-from .errors import StrategyConfigurationError
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
@@ -12,6 +11,7 @@ from homeassistant.core import State
 from homeassistant.helpers.config_validation import entity_domain
 
 from .const import CONF_CALIBRATE, CONF_MAX_POWER, CONF_MIN_POWER
+from .errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
