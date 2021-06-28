@@ -229,7 +229,7 @@ Example:
 
 #### Expected file structure
 
-- The file MUST not contain a header row.
+- The file MUST contain a header row.
 - The data rows in the CSV files MUST have the following column order:
 
 **hs.csv**
