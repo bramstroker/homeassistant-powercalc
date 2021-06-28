@@ -234,17 +234,17 @@ Example:
 
 **hs.csv**
 ```csv
-brightness,hue,saturation,watt
+bri,hue,sat,watt
 ```
 
 **color_temp.csv**
 ```csv
-brightness,mired,watt
+bri,mired,watt
 ```
 
 **brightness.csv**
 ```csv
-brightness,watt
+bri,watt
 ```
 
 ***Ranges***:
