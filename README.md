@@ -207,7 +207,7 @@ Example linear mode
 
 ### LUT data files
 
-To calculate power consumtion a lookup is done into CSV data files.
+To calculate power consumption a lookup is done into CSV data files.
 
 Depending on the supported color modes of the light the integration expects multiple CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
