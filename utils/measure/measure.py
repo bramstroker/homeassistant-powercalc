@@ -9,11 +9,15 @@ import aioshelly
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"
 MODE_BRIGHTNESS = "brightness"
+HUE_BRIDGE_USERNAME = "huepower"
+
+## Change the params below
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
-HUE_BRIDGE_USERNAME = "huepower"
 MODE = MODE_BRIGHTNESS
-SLEEP_TIME = 10
+SLEEP_TIME = 2 #time between changing the light params and taking the measurement
+
+#Change this when the script crashes due to connectivity issues, so you don't have to start all over again
 START_BRIGHTNESS = 1
 
 
@@ -49,7 +53,7 @@ async def main():
         light = hue_bridge.lights[light_id]
         await light.set_state(on=True, bri=1)
 
-        # Initialy wait longer so the Shelly plug can settle
+        # Initially wait longer so the Shelly plug can settle
         await asyncio.sleep(10)
 
         if MODE == MODE_HS:
