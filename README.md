@@ -3,14 +3,28 @@
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
 # homeassistant-powercalc
-Custom component to calculate power consumption of lights and other appliances.
-Provides easy configuration to get power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
+Custom component to calculate estimated power consumption of lights and other appliances.
+Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
 Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `remote` and `media_player` entities 
 
 ![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
+
+## TOC
+- [Installation](#installation)
+    - [HACS](#hacs)
+    - [Manual](#manual)
+- [Configuration](#configuration)
+- [Calculation modes](#calculation-modes)
+    - [LUT](#lut-mode)
+    - [Linear](#linear-mode)
+    - [Fixed](#fixed-mode)
+- [Light model library](#light-model-library)
+    - [LUT data files](#lut-data-files)
+    - [Supported models](#supported-models)
+- [Debug logging](#debug-logging)
 
 ## Installation
 
@@ -112,6 +126,9 @@ sensor:
         - 100 -> 6.8
         - 255 -> 15.3
 ```
+
+> Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
+> For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
 Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
