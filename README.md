@@ -260,21 +260,8 @@ An example script is available `utils/measure/measure.py`.
 I am using the "Shelly Plug S"
 
 ### Supported models
-- Ikea LED1623G12 (brightness)
-- Ikea LED1649C5 (brightness)
-- Ikea LED1650R5 (brightness)
-- innr RB175W (brightness)
-- innr RS125  (brightness)
-- Signify LCA001 (hs and color_temp)
-- Signify LCT003 (hs and color_temp)
-- Signify LCT010 (hs and color_temp)
-- Signify LCT012 (hs and color_temp)
-- Signify LCT015 (color_temp)
-- Signify LTC001 (color_temp)
-- Signify LTW001 (color_temp)
-- Signify LWA004 (brightness)
-- Signify LWB004 (brightness)
-- Signify LWB010 (brightness)
+
+See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
 ## Debug logging
 
