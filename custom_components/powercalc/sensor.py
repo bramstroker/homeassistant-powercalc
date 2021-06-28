@@ -325,6 +325,8 @@ class GenericPowerSensor(Entity):
         else:
             self._power = await self._power_calculator.calculate(state)
 
+        _LOGGER.debug("State changed to \"%s\" for entity \"%s\". Power:%s", state.state, state.entity_id, self._power)
+
         self.async_write_ha_state()
         return True
 
