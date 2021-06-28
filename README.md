@@ -127,6 +127,9 @@ sensor:
         - 255 -> 15.3
 ```
 
+> Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3
+> For fan speeds the range is 1-100 (percentage)
+
 ### Fixed mode
 Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`
 
