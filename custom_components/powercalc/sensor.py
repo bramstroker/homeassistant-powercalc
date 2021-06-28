@@ -16,6 +16,7 @@ from homeassistant.components import (
     media_player,
     remote,
     switch,
+    input_boolean
 )
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
@@ -88,6 +89,7 @@ PLATFORM_SCHEMA = vol.All(
                     binary_sensor.DOMAIN,
                     remote.DOMAIN,
                     media_player.DOMAIN,
+                    input_boolean.DOMAIN
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,
