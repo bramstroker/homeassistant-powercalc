@@ -15,9 +15,9 @@ HUE_BRIDGE_USERNAME = "huepower"
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
 MODE = MODE_BRIGHTNESS
-SLEEP_TIME = 2 #time between changing the light params and taking the measurement
+SLEEP_TIME = 2  # time between changing the light params and taking the measurement
 
-#Change this when the script crashes due to connectivity issues, so you don't have to start all over again
+# Change this when the script crashes due to connectivity issues, so you don't have to start all over again
 START_BRIGHTNESS = 1
 
 
