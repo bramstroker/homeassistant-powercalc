@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 import homeassistant.helpers.entity_registry as er
-from config.custom_components.powercalc.errors import StrategyConfigurationError
+from .errors import StrategyConfigurationError
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
