@@ -261,6 +261,8 @@ I am using the "Shelly Plug S"
 
 ### Supported models
 - Ikea LED1623G12 (brightness)
+- Ikea LED1649C5 (brightness)
+- Ikea LED1650R5 (brightness)
 - innr RB175W (brightness)
 - innr RS125  (brightness)
 - Signify LCA001 (hs and color_temp)
