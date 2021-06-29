@@ -3,16 +3,32 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
+import voluptuous as vol
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
 from homeassistant.helpers.config_validation import entity_domain
 
-from .const import CONF_CALIBRATE, CONF_MAX_POWER, CONF_MIN_POWER
+from .const import (
+    CONF_CALIBRATE,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER
+)
 from .errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_CALIBRATE): vol.All(
+            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
+        ),
+        vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
+        vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
+    }
+)
 
 _LOGGER = logging.getLogger(__name__)
 

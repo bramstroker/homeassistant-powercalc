@@ -1,10 +1,26 @@
 from typing import Optional
 
+import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
+import voluptuous as vol
 from homeassistant.core import State
 
+from .const import (
+    CONF_POWER,
+    CONF_STATES_POWER
+)
 from .strategy_interface import PowerCalculationStrategyInterface
 
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_STATES_POWER, default={}): vol.Schema(
+            {
+                cv.string: vol.Coerce(float)
+            }
+        )
+    }
+)
 
 class FixedStrategy(PowerCalculationStrategyInterface):
     def __init__(

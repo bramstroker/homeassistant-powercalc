@@ -36,21 +36,16 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
-    CONF_CALIBRATE,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
-    CONF_MAX_POWER,
     CONF_MAX_WATT,
-    CONF_MIN_POWER,
     CONF_MIN_WATT,
     CONF_MODE,
     CONF_MODEL,
-    CONF_POWER,
     CONF_STANDBY_USAGE,
-    CONF_STATES_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
@@ -61,26 +56,10 @@ from .const import (
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
+from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
+from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
-
-LINEAR_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_CALIBRATE): vol.All(
-            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
-        ),
-        vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
-        vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
-    }
-)
-FIXED_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_POWER): vol.Coerce(float),
-        vol.Optional(CONF_STATES_POWER, default={}): vol.Schema(
-            {cv.string: vol.Coerce(float)}
-        ),
-    }
-)
 
 PLATFORM_SCHEMA = vol.All(
     cv.deprecated(CONF_MIN_WATT),
