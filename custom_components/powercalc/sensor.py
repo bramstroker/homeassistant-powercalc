@@ -50,6 +50,7 @@ from .const import (
     CONF_MODEL,
     CONF_POWER,
     CONF_STANDBY_USAGE,
+    CONF_STATES_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
@@ -72,7 +73,16 @@ LINEAR_SCHEMA = vol.Schema(
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     }
 )
-FIXED_SCHEMA = vol.Schema({vol.Optional(CONF_POWER): vol.Coerce(float)})
+FIXED_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_STATES_POWER, default={}): vol.Schema(
+            {
+                cv.string: vol.Coerce(float)
+            }
+        )
+    }
+)
 
 PLATFORM_SCHEMA = vol.All(
     cv.deprecated(CONF_MIN_WATT),
@@ -359,3 +369,4 @@ class GenericPowerSensor(Entity):
     def device_class(self) -> str:
         """Device class of the sensor."""
         return DEVICE_CLASS_POWER
+
