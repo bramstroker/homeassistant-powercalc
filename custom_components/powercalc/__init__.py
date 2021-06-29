@@ -14,6 +14,7 @@ from .const import (
     CONF_MIN_POWER,
     CONF_MIN_WATT,
     CONF_POWER,
+    CONF_STATES_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
@@ -93,7 +94,10 @@ class PowerCalculatorStrategyFactory:
             )
             fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
-        return FixedStrategy(fixed_config.get(CONF_POWER))
+        return FixedStrategy(
+            fixed_config.get(CONF_POWER),
+            fixed_config.get(CONF_STATES_POWER)
+        )
 
     def create_lut(self, light_model: LightModel) -> LutStrategy:
         """Create the lut strategy"""

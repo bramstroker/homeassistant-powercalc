@@ -5,7 +5,7 @@ from homeassistant.core import State
 
 
 class PowerCalculationStrategyInterface:
-    async def calculate(self, light_state: State) -> Optional[int]:
+    async def calculate(self, entity_state: State) -> Optional[int]:
         """Calculate power consumption based on entity state"""
         pass
 
