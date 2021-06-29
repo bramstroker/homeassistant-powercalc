@@ -95,8 +95,7 @@ class PowerCalculatorStrategyFactory:
             fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
         return FixedStrategy(
-            fixed_config.get(CONF_POWER),
-            fixed_config.get(CONF_STATES_POWER)
+            fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
         )
 
     def create_lut(self, light_model: LightModel) -> LutStrategy:

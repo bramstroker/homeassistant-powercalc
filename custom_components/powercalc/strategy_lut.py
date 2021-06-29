@@ -151,7 +151,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
             return
 
-        supported_color_modes = entity_entry.capabilities[light.ATTR_SUPPORTED_COLOR_MODES]
+        supported_color_modes = entity_entry.capabilities[
+            light.ATTR_SUPPORTED_COLOR_MODES
+        ]
         for color_mode in supported_color_modes:
             try:
                 await self._lut_registry.get_lookup_dictionary(self._model, color_mode)

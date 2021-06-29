@@ -77,10 +77,8 @@ FIXED_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_POWER): vol.Coerce(float),
         vol.Optional(CONF_STATES_POWER, default={}): vol.Schema(
-            {
-                cv.string: vol.Coerce(float)
-            }
-        )
+            {cv.string: vol.Coerce(float)}
+        ),
     }
 )
 
@@ -335,7 +333,12 @@ class GenericPowerSensor(Entity):
         else:
             self._power = await self._power_calculator.calculate(state)
 
-        _LOGGER.debug("State changed to \"%s\" for entity \"%s\". Power:%s", state.state, state.entity_id, self._power)
+        _LOGGER.debug(
+            'State changed to "%s" for entity "%s". Power:%s',
+            state.state,
+            state.entity_id,
+            self._power,
+        )
 
         self.async_write_ha_state()
         return True
@@ -369,4 +372,3 @@ class GenericPowerSensor(Entity):
     def device_class(self) -> str:
         """Device class of the sensor."""
         return DEVICE_CLASS_POWER
-
