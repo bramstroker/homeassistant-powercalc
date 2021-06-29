@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Optional
 import logging
+from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -46,7 +46,11 @@ class PowerCalculatorStrategyFactory:
         self._lut_registry = LutRegistry()
 
     def create(
-        self, config: dict, mode: str, light_model: Optional[LightModel], entity_domain: str
+        self,
+        config: dict,
+        mode: str,
+        light_model: Optional[LightModel],
+        entity_domain: str,
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
@@ -96,8 +100,7 @@ class PowerCalculatorStrategyFactory:
             fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
         return FixedStrategy(
-            fixed_config.get(CONF_POWER),
-            fixed_config.get(CONF_STATES_POWER)
+            fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
         )
 
     def _create_lut(self, light_model: LightModel) -> LutStrategy:

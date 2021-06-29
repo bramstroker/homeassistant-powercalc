@@ -55,8 +55,8 @@ from .const import (
 )
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
-from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
+from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
