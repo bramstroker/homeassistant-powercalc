@@ -158,10 +158,11 @@ The `states_power` setting allows you to specify a power per entity state. This 
 sensor:
   - platform: powercalc
     entity_id: media_player.sonos_living
-    states_power:
-      playing: 8.3
-      paused: 2.25
-      idle: 1.5
+    fixed:
+      states_power:
+        playing: 8.3
+        paused: 2.25
+        idle: 1.5
 ```
 
 ## Configuration examples
