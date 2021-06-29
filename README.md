@@ -137,16 +137,31 @@ When you have an appliance which only can be set on and off you can use this mod
 You need to supply a single watt value in the configuration which will be used when the device is ON
 
 #### Configuration options
-| Name              | Type    | Requirement  | Description                                 |
-| ----------------- | ------- | ------------ | ------------------------------------------- |
-| power             | float   | **Optional** | Power usage when the appliance is turned on |
+| Name              | Type    | Requirement  | Description                                           |
+| ----------------- | ------- | ------------ | ----------------------------------------------------- |
+| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt) |
+| states_power      | dict    | **Optional** | Power usage per entity state                          |
 
+#### Simple example
 ```yaml
 sensor:
   - platform: powercalc
     entity_id: light.nondimmabled_bulb
     fixed:
       power: 20
+```
+
+#### Power per state
+The `states_power` setting allows you to specify a power per entity state. This can be useful for example on Sonos devices which have a different power consumption in different states.
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: media_player.sonos_living
+    states_power:
+      playing: 8.3
+      paused: 2.25
+      idle: 1.5
 ```
 
 ## Configuration examples
