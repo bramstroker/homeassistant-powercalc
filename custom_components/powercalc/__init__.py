@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -14,6 +15,7 @@ from .const import (
     CONF_MIN_POWER,
     CONF_MIN_WATT,
     CONF_POWER,
+    CONF_STATES_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
@@ -44,21 +46,25 @@ class PowerCalculatorStrategyFactory:
         self._lut_registry = LutRegistry()
 
     def create(
-        self, config: dict, mode: str, light_model: LightModel, entity_domain: str
+        self,
+        config: dict,
+        mode: str,
+        light_model: Optional[LightModel],
+        entity_domain: str,
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
-            return self.create_linear(config, light_model, entity_domain)
+            return self._create_linear(config, light_model, entity_domain)
 
         if mode == MODE_FIXED:
-            return self.create_fixed(config, light_model)
+            return self._create_fixed(config, light_model)
 
         if mode == MODE_LUT:
-            return self.create_lut(light_model)
+            return self._create_lut(light_model)
 
         raise UnsupportedMode("Invalid calculation mode", mode)
 
-    def create_linear(
+    def _create_linear(
         self, config: dict, light_model: LightModel, entity_domain: str
     ) -> LinearStrategy:
         """Create the linear strategy"""
@@ -80,7 +86,7 @@ class PowerCalculatorStrategyFactory:
 
         return LinearStrategy(linear_config, entity_domain)
 
-    def create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
+    def _create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
         """Create the fixed strategy"""
         fixed_config = config.get(CONF_FIXED)
         if fixed_config is None and light_model is not None:
@@ -93,9 +99,11 @@ class PowerCalculatorStrategyFactory:
             )
             fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
-        return FixedStrategy(fixed_config.get(CONF_POWER))
+        return FixedStrategy(
+            fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
+        )
 
-    def create_lut(self, light_model: LightModel) -> LutStrategy:
+    def _create_lut(self, light_model: LightModel) -> LutStrategy:
         """Create the lut strategy"""
         if light_model is None:
             raise StrategyConfigurationError(

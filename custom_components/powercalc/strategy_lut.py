@@ -87,13 +87,13 @@ class LutStrategy(PowerCalculationStrategyInterface):
         self._lut_registry = lut_registry
         self._model = model
 
-    async def calculate(self, light_state: State) -> Optional[int]:
+    async def calculate(self, entity_state: State) -> Optional[int]:
         """Calculate the power consumption based on brightness, mired, hsl values."""
-        attrs = light_state.attributes
+        attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness == None:
-            _LOGGER.error("No brightness for entity: %s", light_state.entity_id)
+            _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
             return None
 
         try:
@@ -151,7 +151,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
             return
 
-        supported_color_modes = entity_entry.capabilities["supported_color_modes"]
+        supported_color_modes = entity_entry.capabilities[
+            light.ATTR_SUPPORTED_COLOR_MODES
+        ]
         for color_mode in supported_color_modes:
             try:
                 await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
