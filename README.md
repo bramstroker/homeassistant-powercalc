@@ -275,6 +275,19 @@ New files are created by taking measurements using a smartplug (i.e. Shelly plug
 An example script is available `utils/measure/measure.py`.
 I am using the "Shelly Plug S"
 
+Setup requirements for the script. It is advised to run in a virtual environment.
+```
+cd utils/measure
+python3 -m venv measure
+source measure/bin/activate
+pip install -r requirements.txt
+```
+
+Run the script:
+```
+python3 measure.py
+```
+
 ### Supported models
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
