@@ -1,0 +1,7 @@
+{
+    "name": "TRADFRI bulb E27 WS clear 950lm LED1546G12",
+    "standby_usage": 0.43,
+    "supported_modes": [
+        "lut"
+    ]
+}
