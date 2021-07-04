@@ -1,4 +1,4 @@
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, annotations
 from PyInquirer import prompt
 from typing import Iterator
 from aiohue.lights import Light
