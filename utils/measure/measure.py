@@ -27,6 +27,8 @@ CSV_HEADERS = {
 SHELLY_IP = "192.168.178.254"
 HUE_BRIDGE_IP = "192.168.178.44"
 SLEEP_TIME = 2  # time between changing the light params and taking the measurement
+SLEEP_TIME_HUE = 5  # time to wait between each increase in hue
+SLEEP_TIME_SAT = 10  # time to wait between each increase in saturation
 
 # Change this when the script crashes due to connectivity issues, so you don't have to start all over again
 START_BRIGHTNESS = 1
@@ -132,8 +134,9 @@ async def get_ct_variations(light: Light):
 async def get_hs_variations():
     for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
         for sat in inclusive_range(1, 254, 10):
-            await asyncio.sleep(10)
+            await asyncio.sleep(SLEEP_TIME_SAT)
             for hue in inclusive_range(1, 65535, 2000):
+                await asyncio.sleep(SLEEP_TIME_HUE)
                 yield {"bri": bri, "hue": hue, "sat": sat}
 
 
