@@ -131,9 +131,9 @@ async def get_ct_variations(light: Light):
 
 async def get_hs_variations():
     for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
-        for hue in inclusive_range(1, 65535, 2000):
+        for sat in inclusive_range(1, 254, 10):
             await asyncio.sleep(10)
-            for sat in inclusive_range(1, 254, 10):
+            for hue in inclusive_range(1, 65535, 2000):
                 yield {"bri": bri, "hue": hue, "sat": sat}
 
 
