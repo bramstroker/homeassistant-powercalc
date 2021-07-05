@@ -2,6 +2,7 @@ aiohttp==3.7.4.post0
 aiohue==2.5.1
 aioshelly==0.6.4
 async-timeout==3.0.1
+asyncstdlib==3.9.2
 attrs==21.2.0
 chardet==4.0.0
 idna==3.2

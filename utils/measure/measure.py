@@ -7,6 +7,7 @@ import aiohttp
 import aiohue
 import aioshelly
 import asyncio
+import asyncstdlib as a
 import csv
 import json
 import os
@@ -76,10 +77,12 @@ async def main():
             await light.set_state(on=True, bri=1)
 
             # Initially wait longer so the Shelly plug can settle
+            print("Start taking measurements for color mode: ", color_mode)
+            print("Waiting 10 seconds...")
             await asyncio.sleep(10)
 
             csv_writer.writerow(CSV_HEADERS[color_mode])
-            for count, variation in enumerate(get_variations(color_mode, light)):
+            async for count, variation in a.enumerate(get_variations(color_mode, light)):
                 print("Changing light to: ", variation)
                 await light.set_state(**variation)
                 await asyncio.sleep(SLEEP_TIME)
@@ -95,16 +98,19 @@ async def main():
             csv_file.close()
 
 
-def get_variations(color_mode: str, light) -> Iterator[dict]:
+async def get_variations(color_mode: str, light: Light):
     if color_mode == MODE_HS:
-        return get_hs_variations()
+        async for v in get_hs_variations():
+            yield v
     elif color_mode == MODE_COLOR_TEMP:
-        return get_ct_variations(light)
+        async for v in  get_ct_variations(light):
+            yield v
     else:
-        return get_brightness_variations()
+        async for v in get_brightness_variations():
+            yield v
 
 
-def get_ct_variations(light: Light) -> Iterator[dict]:
+async def get_ct_variations(light: Light):
     if "ct" in light.controlcapabilities:
         min_mired = light.controlcapabilities["ct"]["min"]
         max_mired = light.controlcapabilities["ct"]["max"]
@@ -112,19 +118,26 @@ def get_ct_variations(light: Light) -> Iterator[dict]:
         min_mired = 150
         max_mired = 500
 
+    if max_mired > 500:
+        max_mired = 500
+
+    if min_mired < 150:
+        min_mired = 150
+
     for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
         for mired in inclusive_range(min_mired, max_mired, 10):
             yield {"bri": bri, "ct": mired}
 
 
-def get_hs_variations() -> Iterator[dict]:
+async def get_hs_variations():
     for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
         for hue in inclusive_range(1, 65535, 2000):
+            await asyncio.sleep(10)
             for sat in inclusive_range(1, 254, 10):
                 yield {"bri": bri, "hue": hue, "sat": sat}
 
 
-def get_brightness_variations() -> Iterator[dict]:
+async def get_brightness_variations():
     for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
         yield {"bri": bri}
 
@@ -152,6 +165,7 @@ def write_model_json(directory: str, standby_usage: float, name: str):
 
 async def measure_standby_usage(light: Light, power_meter) -> float:
     await light.set_state(on=False)
+    print("Measuring standby usage. Waiting for 5 seconds...")
     await asyncio.sleep(5)
     return power_meter.current_values()["power"]
 
