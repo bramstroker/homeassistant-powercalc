@@ -18,6 +18,7 @@ from homeassistant.components.light import (
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
+    COLOR_MODES_COLOR
 )
 from homeassistant.core import State
 
@@ -91,8 +92,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
         """Calculate the power consumption based on brightness, mired, hsl values."""
         attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
+        if color_mode in COLOR_MODES_COLOR:
+            color_mode = COLOR_MODE_HS
+
         brightness = attrs.get(ATTR_BRIGHTNESS)
-        if brightness == None:
+        if brightness is None:
             _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
             return None
 
