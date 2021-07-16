@@ -18,6 +18,7 @@ from homeassistant.components.light import (
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
+    COLOR_MODES_COLOR
 )
 from homeassistant.core import State
 
@@ -29,6 +30,12 @@ from .errors import (
 )
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
+
+LUT_COLOR_MODES = {
+    COLOR_MODE_BRIGHTNESS,
+    COLOR_MODE_COLOR_TEMP,
+    COLOR_MODE_HS
+}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -91,8 +98,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
         """Calculate the power consumption based on brightness, mired, hsl values."""
         attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
+        if color_mode in COLOR_MODES_COLOR:
+            color_mode = COLOR_MODE_HS
+
         brightness = attrs.get(ATTR_BRIGHTNESS)
-        if brightness == None:
+        if brightness is None:
             _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
             return None
 
@@ -155,7 +165,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             light.ATTR_SUPPORTED_COLOR_MODES
         ]
         for color_mode in supported_color_modes:
-            try:
-                await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
-            except LutFileNotFound:
-                raise ModelNotSupported("No lookup file found for mode", color_mode)
+            if color_mode in LUT_COLOR_MODES:
+                try:
+                    await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
+                except LutFileNotFound:
+                    raise ModelNotSupported("No lookup file found for mode", color_mode)
