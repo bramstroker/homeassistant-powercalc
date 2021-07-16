@@ -18,7 +18,7 @@ from homeassistant.components.light import (
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
-    COLOR_MODES_COLOR
+    COLOR_MODES_COLOR,
 )
 from homeassistant.core import State
 
@@ -31,11 +31,7 @@ from .errors import (
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
 
-LUT_COLOR_MODES = {
-    COLOR_MODE_BRIGHTNESS,
-    COLOR_MODE_COLOR_TEMP,
-    COLOR_MODE_HS
-}
+LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -167,6 +163,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
         for color_mode in supported_color_modes:
             if color_mode in LUT_COLOR_MODES:
                 try:
-                    await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
+                    await self._lut_registry.get_lookup_dictionary(
+                        self._model, color_mode
+                    )
                 except LutFileNotFound:
                     raise ModelNotSupported("No lookup file found for mode", color_mode)

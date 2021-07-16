@@ -1,17 +1,17 @@
-from __future__ import print_function, unicode_literals, annotations
-from PyInquirer import prompt
+from __future__ import annotations, print_function, unicode_literals
+
+import asyncio
+import csv
+import json
+import os
 from typing import Iterator
-from aiohue.lights import Light
 
 import aiohttp
 import aiohue
 import aioshelly
-import asyncio
 import asyncstdlib as a
-import csv
-import json
-import os
-
+from aiohue.lights import Light
+from PyInquirer import prompt
 
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"
