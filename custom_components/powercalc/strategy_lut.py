@@ -31,6 +31,12 @@ from .errors import (
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
 
+LUT_COLOR_MODES = {
+    COLOR_MODE_BRIGHTNESS,
+    COLOR_MODE_COLOR_TEMP,
+    COLOR_MODE_HS
+}
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -159,7 +165,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             light.ATTR_SUPPORTED_COLOR_MODES
         ]
         for color_mode in supported_color_modes:
-            try:
-                await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
-            except LutFileNotFound:
-                raise ModelNotSupported("No lookup file found for mode", color_mode)
+            if color_mode in LUT_COLOR_MODES:
+                try:
+                    await self._lut_registry.get_lookup_dictionary(self._model, color_mode)
+                except LutFileNotFound:
+                    raise ModelNotSupported("No lookup file found for mode", color_mode)
