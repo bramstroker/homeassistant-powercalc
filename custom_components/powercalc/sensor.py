@@ -31,6 +31,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
+from homeassistant.core import split_entity_id
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
@@ -116,9 +117,13 @@ async def async_setup_platform(
         entity_name = entity_entry.name or entity_entry.original_name
         entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
-    else:
+    elif entity_state:
         entity_name = entity_state.name
         entity_domain = entity_state.domain
+    else:
+        entity_name = split_entity_id(entity_id)[1].replace("_", " ")
+        entity_domain = split_entity_id(entity_id)[0]
+
     name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
 
     light_model = None
