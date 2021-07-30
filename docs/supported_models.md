@@ -9,10 +9,10 @@
 |ikea        |LED1732G11|TRADFRI bulb E27 WS opal 1000lm LED1732G11         |lut              |color_temp   |
 |innr        |RB 175 W  |RB175W E27 806lm 2200K-2700K automatic warm dimming|lut              |brightness   |
 |innr        |RS 125    |RS125 GU10 350lm 2700K                             |lut              |brightness   |
-|signify     |LCA001    |Hue White and Color Ambiance A19 E26 (Gen 5)       |lut              |hs,color_temp|
-|signify     |LCT003    |Hue White and Color Ambiance Spot GU10             |lut              |hs,color_temp|
-|signify     |LCT010    |Hue White and Color Ambiance A19 E26 (Gen 3)       |lut              |hs,color_temp|
-|signify     |LCT012    |Hue White and Color Ambiance Candle E12            |lut              |hs,color_temp|
+|signify     |LCA001    |Hue White and Color Ambiance A19 E26 (Gen 5)       |lut              |color_temp,hs|
+|signify     |LCT003    |Hue White and Color Ambiance Spot GU10             |lut              |color_temp,hs|
+|signify     |LCT010    |Hue White and Color Ambiance A19 E26 (Gen 3)       |lut              |color_temp,hs|
+|signify     |LCT012    |Hue White and Color Ambiance Candle E12            |lut              |color_temp,hs|
 |signify     |LCT015    |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp   |
 |signify     |LLC011    |Living Colours Bloom 7099760PH                     |lut              |hs           |
 |signify     |LLC020    |Hue Go                                             |linear           |             |
