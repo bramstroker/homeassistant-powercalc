@@ -20,6 +20,7 @@ from homeassistant.components import (
 )
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
+from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -163,7 +164,7 @@ async def async_setup_platform(
 
     async_add_entities(
         [
-            GenericPowerSensor(
+            VirtualPowerSensor(
                 power_calculator=calculation_strategy,
                 name=name,
                 entity_id=entity_id,
@@ -261,8 +262,12 @@ async def find_hue_light(
     return None
 
 
-class GenericPowerSensor(Entity):
+class VirtualPowerSensor(Entity):
     """Representation of a Sensor."""
+
+    _attr_device_class = DEVICE_CLASS_POWER
+    _attr_state_class = STATE_CLASS_MEASUREMENT
+    _attr_unit_of_measurement = POWER_WATT
 
     def __init__(
         self,
@@ -346,13 +351,3 @@ class GenericPowerSensor(Entity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
-
-    @property
-    def unit_of_measurement(self):
-        """Return the unit of measurement."""
-        return POWER_WATT
-
-    @property
-    def device_class(self) -> str:
-        """Device class of the sensor."""
-        return DEVICE_CLASS_POWER
