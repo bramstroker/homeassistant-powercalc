@@ -343,7 +343,6 @@ class VirtualPowerSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        _LOGGER.info("Retrieving state of: %s", self._name)
         return self._power
 
     @property
