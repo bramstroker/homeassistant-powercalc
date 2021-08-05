@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 import logging
 import os
 from typing import Optional
@@ -62,6 +63,7 @@ from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
+SCAN_INTERVAL = timedelta(minutes=30)
 
 PLATFORM_SCHEMA = vol.All(
     cv.deprecated(CONF_MIN_WATT),
@@ -284,6 +286,7 @@ class VirtualPowerSensor(Entity):
         self._power = None
         self._unique_id = unique_id
         self._standby_usage = standby_usage
+        self._attr_force_update = True
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -340,6 +343,7 @@ class VirtualPowerSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
+        _LOGGER.info("Retrieving state of: %s", self._name)
         return self._power
 
     @property
