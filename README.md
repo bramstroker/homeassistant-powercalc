@@ -6,7 +6,7 @@
 Custom component to calculate estimated power consumption of lights and other appliances.
 Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
-Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `input_boolean`, `remote` and `media_player` entities 
+Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `input_boolean`, `group`, `sensor`, `remote` and `media_player` entities 
 
 ![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
@@ -85,7 +85,7 @@ sensor:
 ```
 
 ### Linear mode
-Supported domains: `light`, `fan`
+Supported domains: `light`, `fan` 
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
 You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
@@ -131,7 +131,7 @@ sensor:
 > For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
-Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`, `input_boolean`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`, `input_boolean`, `sensor`, `group`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
