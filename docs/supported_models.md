@@ -13,7 +13,7 @@
 |signify     |LCT003    |Hue White and Color Ambiance Spot GU10             |lut              |color_temp,hs|
 |signify     |LCT010    |Hue White and Color Ambiance A19 E26 (Gen 3)       |lut              |color_temp,hs|
 |signify     |LCT012    |Hue White and Color Ambiance Candle E12            |lut              |color_temp,hs|
-|signify     |LCT015    |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp   |
+|signify     |LCT015    |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp,hs|
 |signify     |LLC011    |Living Colours Bloom 7099760PH                     |lut              |hs           |
 |signify     |LLC020    |Hue Go                                             |linear           |             |
 |signify     |LTC001    |Hue Being Ceiling Light                            |lut              |color_temp   |
