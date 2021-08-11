@@ -96,8 +96,12 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def validate_config(self, entity_entry: er.RegistryEntry):
         """Validate correct setup of the strategy"""
 
-        if (self._entity_domain not in ALLOWED_DOMAINS):
-            raise StrategyConfigurationError("Entity not supported for linear mode. Must be one of: {}".format(",".join(ALLOWED_DOMAINS)))
+        if self._entity_domain not in ALLOWED_DOMAINS:
+            raise StrategyConfigurationError(
+                "Entity not supported for linear mode. Must be one of: {}".format(
+                    ",".join(ALLOWED_DOMAINS)
+                )
+            )
 
         if self._config.get(CONF_CALIBRATE) is None:
             if self._config.get(CONF_MIN_POWER) is None:

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
 import os
+from datetime import timedelta
 from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
@@ -17,8 +17,8 @@ from homeassistant.components import (
     light,
     media_player,
     remote,
+    sensor,
     switch,
-    sensor
 )
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
@@ -82,7 +82,7 @@ PLATFORM_SCHEMA = vol.All(
                     remote.DOMAIN,
                     media_player.DOMAIN,
                     input_boolean.DOMAIN,
-                    sensor.DOMAIN
+                    sensor.DOMAIN,
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,
