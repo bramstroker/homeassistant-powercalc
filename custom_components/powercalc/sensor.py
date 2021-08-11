@@ -19,7 +19,6 @@ from homeassistant.components import (
     sensor,
     switch,
 )
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
@@ -35,9 +34,12 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import split_entity_id, callback
+from homeassistant.core import callback, split_entity_id
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.event import (
+    async_track_state_change_event,
+    async_track_time_interval,
+)
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
@@ -174,7 +176,7 @@ async def async_setup_platform(
                 entity_id=entity_id,
                 unique_id=unique_id,
                 standby_usage=standby_usage,
-                scan_interval=hass.data[DOMAIN][CONF_SCAN_INTERVAL]
+                scan_interval=hass.data[DOMAIN][CONF_SCAN_INTERVAL],
             )
         ]
     )
@@ -281,7 +283,7 @@ class VirtualPowerSensor(Entity):
         entity_id: str,
         unique_id: str,
         standby_usage: float | None,
-        scan_interval
+        scan_interval,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
