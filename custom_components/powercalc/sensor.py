@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import timedelta
 from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
@@ -20,12 +19,14 @@ from homeassistant.components import (
     sensor,
     switch,
 )
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
+    CONF_SCAN_INTERVAL,
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
@@ -34,7 +35,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import split_entity_id
+from homeassistant.core import split_entity_id, callback
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
@@ -64,7 +65,6 @@ from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(minutes=30)
 
 PLATFORM_SCHEMA = vol.All(
     cv.deprecated(CONF_MIN_WATT),
@@ -174,6 +174,7 @@ async def async_setup_platform(
                 entity_id=entity_id,
                 unique_id=unique_id,
                 standby_usage=standby_usage,
+                scan_interval=hass.data[DOMAIN][CONF_SCAN_INTERVAL]
             )
         ]
     )
@@ -280,6 +281,7 @@ class VirtualPowerSensor(Entity):
         entity_id: str,
         unique_id: str,
         standby_usage: float | None,
+        scan_interval
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -289,6 +291,7 @@ class VirtualPowerSensor(Entity):
         self._unique_id = unique_id
         self._standby_usage = standby_usage
         self._attr_force_update = True
+        self._scan_interval = scan_interval
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -309,6 +312,13 @@ class VirtualPowerSensor(Entity):
             new_state = self.hass.states.get(self._entity_id)
 
             await self._update_power_sensor(new_state)
+
+        @callback
+        def async_update(event_time=None):
+            """Update the entity."""
+            self.async_schedule_update_ha_state(True)
+
+        async_track_time_interval(self.hass, async_update, self._scan_interval)
 
         self.hass.bus.async_listen_once(
             EVENT_HOMEASSISTANT_START, home_assistant_startup

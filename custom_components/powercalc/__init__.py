@@ -2,9 +2,17 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 import logging
+
 from typing import Optional
 
+import voluptuous as vol
+import homeassistant.helpers.config_validation as cv
+
+from homeassistant.const import (
+    CONF_SCAN_INTERVAL
+)
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
@@ -32,10 +40,26 @@ from .strategy_lut import LutRegistry, LutStrategy
 
 _LOGGER = logging.getLogger(__name__)
 
+DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
+
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema(
+            {
+                vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.time_period,
+            }
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][DATA_CALCULATOR_FACTORY] = PowerCalculatorStrategyFactory(hass)
+    conf = config.get(DOMAIN) or {}
+
+    hass.data[DOMAIN] = {
+        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        CONF_SCAN_INTERVAL: conf.get(CONF_SCAN_INTERVAL) or DEFAULT_SCAN_INTERVAL
+    }
 
     return True
 
