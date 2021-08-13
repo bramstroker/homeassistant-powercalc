@@ -22,3 +22,4 @@
 |signify     |LWA004    |Hue White Filament Bulb A60 E27                    |lut              |brightness   |
 |signify     |LWB004    |Hue Lux E27 750lm                                  |lut              |brightness   |
 |signify     |LWB010    |Hue White A60 E27 806lm                            |lut              |brightness   |
+|sonoff      |B02BA60   |Sonoff B02 Light with dimmer and temperature       |lut              |color_temp   |
