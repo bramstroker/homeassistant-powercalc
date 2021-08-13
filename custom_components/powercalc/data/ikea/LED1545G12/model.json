@@ -1,0 +1,6 @@
+{
+    "name": "TRADFRI bulb E27 WS opal 980lm LED1545G12",
+    "supported_modes": [
+        "lut"
+    ]
+}
