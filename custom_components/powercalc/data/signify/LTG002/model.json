@@ -1,0 +1,10 @@
+{
+    "name": "Hue White Ambiance GU10",
+    "supported_modes": [
+        "linear"
+    ],
+    "linear_config": {
+        "min_power": 0,
+        "max_power": 5.5
+    }
+}
