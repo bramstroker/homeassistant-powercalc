@@ -102,7 +102,7 @@ PLATFORM_SCHEMA = vol.All(
     ),
 )
 
-NAME_FORMAT = "{} power"
+NAME_FORMAT = "{} Power"
 
 
 async def async_setup_platform(
