@@ -1,0 +1,7 @@
+{
+    "name": "Hue White A60 E27 800lm",
+    "standby_usage": 0.0,
+    "supported_modes": [
+        "lut"
+    ]
+}
