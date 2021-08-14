@@ -1,0 +1,7 @@
+{
+    "name": "WeMo smart LED bulb",
+    "standby_usage": 0.0,
+    "supported_modes": [
+        "lut"
+    ]
+}
