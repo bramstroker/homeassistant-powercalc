@@ -307,6 +307,51 @@ python3 measure.py
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
+## Using the power sensors with the energy dashboard
+If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below:
+
+````yaml
+sensor:
+    - platform: integration
+      source: sensor.kingkong_power
+      name: kingkong_power_kWh
+      unit_prefix: k
+      round: 2
+````
+If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the delevoper tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
+
+````yaml
+{% for state in states -%}
+{%- if state.attributes.unit_of_measurement == "W" and state.attributes.device_class == "power" -%}
+- platform: integration
+  source: {{ state.entity_id }}
+  unit_prefix: k
+  round: 2
+{% endif -%}
+{%- endfor -%}
+````
+
+### Creating energy groups
+If you want to sum up all energy usage from one category e.g. all of your servers, then createa powercalc sensor and a integration sensor for each of these server like described in the section before. Then you create a template energyusage sensor which sums up all values of the energy sensors (a example sensor can be found below). It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be useable with the energy integration.  
+
+````yaml
+- platform: template
+  sensors:
+    energy_server:
+      friendly_name: "Alle Server Energieverbrauch"
+      unit_of_measurement: kWh
+      value_template: >-
+        {{states('sensor.kingkong_power_kwh') | float + states('sensor.kinglouie_power_kwh') | float}}
+      attribute_templates:
+        last_reset: "1970-01-01T00:00:00+00:00"
+        state_class: measurement
+        device_class: energy
+        icon: mdi:counter
+````
+> **Don't** create a template sensor which sums up all values from the power sensors and use this sensor to create a energy sensor because this wont work as you would exspect. It 
+> wouldn't update in regular bases and as a consequence wont be shown in the energy dashboard in the wright timeslots.
+
+
 ## Debug logging
 
 Add the following to configuration.yaml:
