@@ -165,6 +165,21 @@ sensor:
         idle: 1.5
 ```
 
+You can also use state attributes. Use the `|` delimiter to seperate the attribute and value. Here is en example:
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: media_player.sonos_living
+    fixed:
+      power: 12
+      states_power:
+        media_content_id|Spotify: 5
+        media_content_id|Youtube: 10
+```
+
+When no match is found in `states_power` lookup than the configured `power` will be considered.
+
 ## Configuration examples
 
 ### Linear mode with additional standby usage
