@@ -24,6 +24,8 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
     - [Supported models](#supported-models)
+- [Using the power sensors with the energy dashboard](#using-the-power-sensors-with-the-energy-dashboard)
+    - [Creating energy groups](#creating-energy-groups)   
 - [Debug logging](#debug-logging)
 
 ## Installation
