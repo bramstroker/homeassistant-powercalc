@@ -12,6 +12,7 @@ from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
+    CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
@@ -23,6 +24,7 @@ from .const import (
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
+    DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
@@ -37,6 +39,7 @@ from .strategy_lut import LutRegistry, LutStrategy
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
+DEFAULT_NAME_PATTERN = "{} power"
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -45,6 +48,9 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(
                     CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                 ): cv.time_period,
+                vol.Optional(
+                    CONF_ENTITY_NAME_PATTERN, default=DEFAULT_NAME_PATTERN
+                ): vol.Match(r"\{\}")
             }
         )
     },
@@ -53,11 +59,14 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
-    conf = config.get(DOMAIN) or {}
+    conf = config.get(DOMAIN) or {
+        CONF_ENTITY_NAME_PATTERN: DEFAULT_NAME_PATTERN,
+        CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL
+    }
 
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        CONF_SCAN_INTERVAL: conf.get(CONF_SCAN_INTERVAL) or DEFAULT_SCAN_INTERVAL,
+        DOMAIN_CONFIG: conf
     }
 
     return True
