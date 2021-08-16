@@ -17,6 +17,8 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
     - [HACS](#hacs)
     - [Manual](#manual)
 - [Configuration](#configuration)
+    - [Sensor](#sensor-configuration)
+    - [Global](#global-configuration)
 - [Calculation modes](#calculation-modes)
     - [LUT](#lut-mode)
     - [Linear](#linear-mode)
@@ -36,13 +38,24 @@ This integration is part of the default HACS repository. Just click "Explore and
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
+### Post installation step
+Restart HA
+
 ## Configuration
 
-Each virtual power sensor have it's own configuration possibilities. They are as follows:
+To add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
+Additionally some settings can be applied on global level and will apply to all your virtual power sensors.
+After changing the configuration you need to restart HA to get your power sensors to appear.
+
+### Sensor configuration
+
+For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml`.
+Each virtual power sensor have it's own configuration possibilities.
+They are as follows:
 
 | Name                   | Type    | Requirement  | Description                                                                |
 | ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id              | string  | **Required** | HA entity ID                                                               |
+| entity_id              | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
 | manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
 | standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
@@ -52,6 +65,36 @@ Each virtual power sensor have it's own configuration possibilities. They are as
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+
+**Minimalistic example creating two power sensors:**
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.hallway
+  - platform: powercalc
+    entity_id: light.living_room
+```
+
+This will add a power sensors with the entity ids `sensor.hallway_power` and `sensor.living_room_power` to your installation.
+See [Calculation modes](#calculation-modes) for all possible sensor configurations.
+
+### Global configuration
+
+All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
+
+| Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00 | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| entity_name_pattern    | string  | **Optional** | {} power | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+
+**Example:**
+
+```yaml
+powercalc:
+  scan_interval: 00:01:00 #Each minute
+  entity_name_pattern: "{} Powersensor" 
+```
 
 ## Calculation modes
 
