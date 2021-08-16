@@ -50,7 +50,7 @@ CONFIG_SCHEMA = vol.Schema(
                 ): cv.time_period,
                 vol.Optional(
                     CONF_ENTITY_NAME_PATTERN, default=DEFAULT_NAME_PATTERN
-                ): vol.Match(r"\{\}")
+                ): vol.Match(r"\{\}"),
             }
         )
     },
@@ -61,12 +61,12 @@ CONFIG_SCHEMA = vol.Schema(
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     conf = config.get(DOMAIN) or {
         CONF_ENTITY_NAME_PATTERN: DEFAULT_NAME_PATTERN,
-        CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL
+        CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
     }
 
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        DOMAIN_CONFIG: conf
+        DOMAIN_CONFIG: conf,
     }
 
     return True
