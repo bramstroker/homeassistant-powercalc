@@ -320,7 +320,7 @@ sensor:
       unit_prefix: k
       round: 2
 ````
-If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the delevoper tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
+If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the developer tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
 
 ````yaml
 {% for state in states -%}
