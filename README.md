@@ -48,6 +48,7 @@ Additionally some settings can be applied on global level and will apply to all 
 After changing the configuration you need to restart HA to get your power sensors to appear.
 
 ### Sensor configuration
+
 For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml`.
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
@@ -79,6 +80,8 @@ This will add a power sensors with the entity ids `sensor.hallway_power` and `se
 See [Calculation modes](#calculation-modes) for all possible sensor configurations.
 
 ### Global configuration
+
+All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
 | Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
 | ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
