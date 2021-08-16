@@ -24,7 +24,7 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
     - [Supported models](#supported-models)
-- [Using the power sensors with the energy dashboard](#using-the-power-sensors-with-the-energy-dashboard)
+- [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)   
 - [Debug logging](#debug-logging)
 
@@ -309,7 +309,7 @@ python3 measure.py
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
-## Using the power sensors with the energy dashboard
+## Setting up for energy dashboard
 If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below:
 
 ````yaml
