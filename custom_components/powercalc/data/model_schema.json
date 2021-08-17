@@ -24,6 +24,7 @@
     },
     "measure_method": {
       "type": "string",
+      "enum": ["manual", "script"],
       "description": "How the light was measured"
     },
     "measure_device": {

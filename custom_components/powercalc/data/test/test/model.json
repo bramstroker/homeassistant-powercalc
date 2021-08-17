@@ -3,5 +3,6 @@
     "standby_usage": 0.38,
     "supported_modes": [
         "lut"
-    ]
+    ],
+    "measure_method": "manual2"
 }
