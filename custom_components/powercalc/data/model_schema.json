@@ -20,7 +20,10 @@
     },
     "supported_modes": {
       "type": "array",
-      "enum": ["lut", "linear", "fixed"],
+      "items": {
+        "type": "string",
+        "enum": ["lut", "linear", "fixed"]
+      },
       "description": "Supported calculation modes"
     },
     "measure_method": {
