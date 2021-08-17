@@ -1,6 +1,10 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
+from homeassistant.components.integration.sensor import (
+    IntegrationSensor,
+    TRAPEZOIDAL_METHOD
+)
 
 import logging
 import os
@@ -33,14 +37,21 @@ from homeassistant.const import (
     STATE_STANDBY,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    TIME_HOURS
 )
 from homeassistant.core import callback, split_entity_id
+from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.helpers.typing import (
+    ConfigType,
+    DiscoveryInfoType,
+    HomeAssistantType
+)
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -108,18 +119,21 @@ NAME_FORMAT = "{} power"
 
 
 async def async_setup_platform(
-    hass: HomeAssistantType, config, async_add_entities, discovery_info=None
+    hass: HomeAssistantType,
+    config: ConfigType,
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
 ):
     """Set up the sensor platform."""
 
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
     component_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
-    entity_id = config[CONF_ENTITY_ID]
+    device_entity_id = config[CONF_ENTITY_ID]
 
     entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(entity_id)
-    entity_state = hass.states.get(entity_id)
+    entity_entry = entity_registry.async_get(device_entity_id)
+    entity_state = hass.states.get(device_entity_id)
 
     unique_id = None
 
@@ -131,8 +145,8 @@ async def async_setup_platform(
         entity_name = entity_state.name
         entity_domain = entity_state.domain
     else:
-        entity_name = split_entity_id(entity_id)[1].replace("_", " ")
-        entity_domain = split_entity_id(entity_id)[0]
+        entity_name = split_entity_id(device_entity_id)[1].replace("_", " ")
+        entity_domain = split_entity_id(device_entity_id)[0]
 
     name_pattern = component_config.get(CONF_ENTITY_NAME_PATTERN)
     name = config.get(CONF_NAME) or name_pattern.format(entity_name)
@@ -141,7 +155,7 @@ async def async_setup_platform(
     try:
         light_model = await get_light_model(hass, entity_entry, config)
     except (ModelNotSupported) as err:
-        _LOGGER.info("Model not found in library %s: %s", entity_id, err)
+        _LOGGER.info("Model not found in library %s: %s", device_entity_id, err)
 
     try:
         mode = select_calculation_mode(config, light_model)
@@ -150,7 +164,7 @@ async def async_setup_platform(
         )
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
-        _LOGGER.error("Skipping sensor setup %s: %s", entity_id, err)
+        _LOGGER.error("Skipping sensor setup %s: %s", device_entity_id, err)
         return
     except StrategyConfigurationError as err:
         _LOGGER.error("Error setting up calculation strategy: %s", err)
@@ -164,7 +178,7 @@ async def async_setup_platform(
 
     _LOGGER.debug(
         "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",
-        entity_id,
+        device_entity_id,
         name,
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
@@ -172,19 +186,35 @@ async def async_setup_platform(
         standby_usage,
     )
 
-    async_add_entities(
-        [
-            VirtualPowerSensor(
-                power_calculator=calculation_strategy,
-                name=name,
-                entity_id=entity_id,
-                unique_id=unique_id,
-                standby_usage=standby_usage,
-                scan_interval=component_config.get(CONF_SCAN_INTERVAL),
-            )
-        ]
+    power_sensor = VirtualPowerSensor(
+        hass=hass,
+        power_calculator=calculation_strategy,
+        name=name,
+        device_entity_id=device_entity_id,
+        unique_id=unique_id,
+        standby_usage=standby_usage,
+        scan_interval=component_config.get(CONF_SCAN_INTERVAL),
     )
 
+    entities_to_add = [power_sensor]
+
+    entities_to_add.append(
+        create_energy_sensor(entity_name, power_sensor)
+    )
+
+    async_add_entities(entities_to_add)
+
+def create_energy_sensor(base_entity_name: str, power_sensor: VirtualPowerSensor) -> IntegrationSensor:
+    name = f"{base_entity_name} energy"
+    return IntegrationSensor(
+        source_entity=power_sensor.entity_id,
+        name=name,
+        round_digits=2,
+        unit_prefix="k",
+        unit_of_measurement=None,
+        unit_time="h",
+        integration_method=TRAPEZOIDAL_METHOD
+    )
 
 def select_calculation_mode(config: dict, light_model: LightModel):
     """Select the calculation mode"""
@@ -282,22 +312,24 @@ class VirtualPowerSensor(Entity):
 
     def __init__(
         self,
+        hass: HomeAssistantType,
         power_calculator: PowerCalculationStrategyInterface,
         name: str,
-        entity_id: str,
+        device_entity_id: str,
         unique_id: str,
         standby_usage: float | None,
         scan_interval,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
-        self._entity_id = entity_id
+        self._device_entity_id = device_entity_id
         self._name = name
         self._power = None
         self._unique_id = unique_id
         self._standby_usage = standby_usage
         self._attr_force_update = True
         self._scan_interval = scan_interval
+        self.entity_id = async_generate_entity_id("sensor.{}", name, hass=hass)
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -312,10 +344,10 @@ class VirtualPowerSensor(Entity):
             """Add listeners and get initial state."""
 
             async_track_state_change_event(
-                self.hass, [self._entity_id], appliance_state_listener
+                self.hass, [self._device_entity_id], appliance_state_listener
             )
 
-            new_state = self.hass.states.get(self._entity_id)
+            new_state = self.hass.states.get(self._device_entity_id)
 
             await self._update_power_sensor(new_state)
 
