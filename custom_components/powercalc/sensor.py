@@ -45,6 +45,7 @@ from homeassistant.helpers.typing import HomeAssistantType
 from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
+    CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -56,6 +57,7 @@ from .const import (
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
+    DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
@@ -111,6 +113,7 @@ async def async_setup_platform(
     """Set up the sensor platform."""
 
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+    component_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
     entity_id = config[CONF_ENTITY_ID]
 
@@ -131,7 +134,8 @@ async def async_setup_platform(
         entity_name = split_entity_id(entity_id)[1].replace("_", " ")
         entity_domain = split_entity_id(entity_id)[0]
 
-    name = config.get(CONF_NAME) or NAME_FORMAT.format(entity_name)
+    name_pattern = component_config.get(CONF_ENTITY_NAME_PATTERN)
+    name = config.get(CONF_NAME) or name_pattern.format(entity_name)
 
     light_model = None
     try:
@@ -176,7 +180,7 @@ async def async_setup_platform(
                 entity_id=entity_id,
                 unique_id=unique_id,
                 standby_usage=standby_usage,
-                scan_interval=hass.data[DOMAIN][CONF_SCAN_INTERVAL],
+                scan_interval=component_config.get(CONF_SCAN_INTERVAL),
             )
         ]
     )
