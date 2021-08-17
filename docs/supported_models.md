@@ -1,6 +1,7 @@
 # Supported models
 |manufacturer| model id |                       name                        |calculation modes| color modes |
 |------------|----------|---------------------------------------------------|-----------------|-------------|
+|belkin      |F7C033    |WeMo smart LED bulb                                |lut              |brightness   |
 |ikea        |LED1536G5 |TRADFRI bulb E14 WS opal 400lm LED1536G5           |lut              |color_temp   |
 |ikea        |LED1545G12|TRADFRI bulb E27 WS opal 980lm LED1545G12          |lut              |color_temp   |
 |ikea        |LED1546G12|TRADFRI bulb E27 WS clear 950lm LED1546G12         |lut              |color_temp   |
@@ -22,5 +23,6 @@
 |signify     |LTW010    |Hue White Ambiance A60 E27 806lm 9290012001A       |lut              |color_temp   |
 |signify     |LWA004    |Hue White Filament Bulb A60 E27                    |lut              |brightness   |
 |signify     |LWB004    |Hue Lux E27 750lm                                  |lut              |brightness   |
+|signify     |LWB006    |Hue White A60 E27 800lm                            |lut              |brightness   |
 |signify     |LWB010    |Hue White A60 E27 806lm                            |lut              |brightness   |
 |sonoff      |B02BA60   |Sonoff B02 Light with dimmer and temperature       |lut              |color_temp   |

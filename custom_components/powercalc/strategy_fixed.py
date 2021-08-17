@@ -28,8 +28,17 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         self._per_state_power = per_state_power
 
     async def calculate(self, entity_state: State) -> Optional[int]:
-        if entity_state.state in self._per_state_power:
-            return self._per_state_power.get(entity_state.state)
+        if self._per_state_power is not None:
+            # Lookup by state
+            if entity_state.state in self._per_state_power:
+                return self._per_state_power.get(entity_state.state)
+            else:
+                # Lookup by state attribute (attribute|value)
+                for state_key, power in self._per_state_power.items():
+                    if "|" in state_key:
+                        attribute, value = state_key.split("|", 2)
+                        if entity_state.attributes.get(attribute) == value:
+                            return power
 
         return self._power
 
