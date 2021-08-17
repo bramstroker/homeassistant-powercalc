@@ -2,7 +2,8 @@
     "name": "TRADFRI bulb GU10 W 400lm LED1650R5",
     "standby_usage": 0.38,
     "supported_modes": [
-        "lut"
+        "lutz"
     ],
-    "measure_method": "manual2"
+    "measure_method": "manual",
+    "measure_device": "Fdffsdfsfd"
 }
