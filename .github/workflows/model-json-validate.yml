@@ -2,6 +2,8 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - '**/model.json'
 name: Validate model.json files
 jobs:
   validate_model_json:
