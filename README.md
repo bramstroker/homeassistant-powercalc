@@ -17,6 +17,8 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
     - [HACS](#hacs)
     - [Manual](#manual)
 - [Configuration](#configuration)
+    - [Sensor](#sensor-configuration)
+    - [Global](#global-configuration)
 - [Calculation modes](#calculation-modes)
     - [LUT](#lut-mode)
     - [Linear](#linear-mode)
@@ -24,6 +26,8 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
     - [Supported models](#supported-models)
+- [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
+    - [Creating energy groups](#creating-energy-groups)   
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -34,13 +38,24 @@ This integration is part of the default HACS repository. Just click "Explore and
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
+### Post installation step
+Restart HA
+
 ## Configuration
 
-Each virtual power sensor have it's own configuration possibilities. They are as follows:
+To add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
+Additionally some settings can be applied on global level and will apply to all your virtual power sensors.
+After changing the configuration you need to restart HA to get your power sensors to appear.
+
+### Sensor configuration
+
+For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml`.
+Each virtual power sensor have it's own configuration possibilities.
+They are as follows:
 
 | Name                   | Type    | Requirement  | Description                                                                |
 | ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id              | string  | **Required** | HA entity ID                                                               |
+| entity_id              | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
 | manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
 | standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
@@ -50,6 +65,36 @@ Each virtual power sensor have it's own configuration possibilities. They are as
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+
+**Minimalistic example creating two power sensors:**
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.hallway
+  - platform: powercalc
+    entity_id: light.living_room
+```
+
+This will add a power sensors with the entity ids `sensor.hallway_power` and `sensor.living_room_power` to your installation.
+See [Calculation modes](#calculation-modes) for all possible sensor configurations.
+
+### Global configuration
+
+All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
+
+| Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00 | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| entity_name_pattern    | string  | **Optional** | {} power | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+
+**Example:**
+
+```yaml
+powercalc:
+  scan_interval: 00:01:00 #Each minute
+  entity_name_pattern: "{} Powersensor" 
+```
 
 ## Calculation modes
 
@@ -306,6 +351,51 @@ python3 measure.py
 ### Supported models
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
+
+## Setting up for energy dashboard
+If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below (assuming you have a powercalc sensor with entity_id `sensor.kingkong_power`:
+
+````yaml
+sensor:
+    - platform: integration
+      source: sensor.kingkong_power
+      name: kingkong_power_kWh
+      unit_prefix: k
+      round: 2
+````
+If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the developer tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
+
+````yaml
+{% for state in states -%}
+{%- if state.attributes.unit_of_measurement == "W" and state.attributes.device_class == "power" -%}
+- platform: integration
+  source: {{ state.entity_id }}
+  unit_prefix: k
+  round: 2
+{% endif -%}
+{%- endfor -%}
+````
+
+### Creating energy groups
+If you want to sum up all energy usage from one category e.g. all of your servers, then create a powercalc sensor and an integration sensor for each of these servers like described in the section before. Then you create a template energy usage sensor which sums up all values of the energy sensors (a example sensor can be found below). It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
+
+````yaml
+- platform: template
+  sensors:
+    energy_server:
+      friendly_name: "Alle Server Energieverbrauch"
+      unit_of_measurement: kWh
+      value_template: >-
+        {{states('sensor.kingkong_power_kwh') | float + states('sensor.kinglouie_power_kwh') | float}}
+      attribute_templates:
+        last_reset: "1970-01-01T00:00:00+00:00"
+        state_class: measurement
+        device_class: energy
+        icon: mdi:counter
+````
+> **Don't** create a template sensor which sums up all values from the power sensors and use this sensor to create a energy sensor because this won't work as you would expect. It 
+> wouldn't update in regular bases and as a consequence wont be shown in the energy dashboard in the right timeslots.
+
 
 ## Debug logging
 

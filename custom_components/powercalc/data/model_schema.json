@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "model.json described a light model",
+  "type": "object",
+  "required": [
+    "name",
+    "standby_usage",
+    "supported_modes",
+    "measure_method",
+    "measure_device"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The full name"
+    },
+    "standby_usage": {
+      "type": "number",
+      "description": "Power draw when the light is turned of. When you are not able to measure set to 0.4"
+    },
+    "supported_modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["lut", "linear", "fixed"]
+      },
+      "description": "Supported calculation modes"
+    },
+    "measure_method": {
+      "type": "string",
+      "enum": ["manual", "script"],
+      "description": "How the light was measured"
+    },
+    "measure_device": {
+      "type": "string",
+      "description": "Device which was used to measure"
+    },
+    "measure_description": {
+      "type": "string",
+      "description": "Add more information about how you measured the light or any remarks"
+    },
+    "linear_config": {
+      "type": "object",
+      "description": "Configuration for linear calculation mode",
+      "properties": {
+        "min_watt": {
+          "type": "number"
+        },
+        "max_watt": {
+          "type": "number"
+        }
+      }
+    },
+    "fixed_config": {
+      "type": "object",
+      "description": "Configuration for fixed calculation mode",
+      "properties": {
+        "watt": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
