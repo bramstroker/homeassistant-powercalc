@@ -1,10 +1,7 @@
 {
-    "name": "Hue White E27",
+    "name": "Hue White Ambiance E27",
+    "standby_usage": 0.300,
     "supported_modes": [
-        "linear"
-    ],
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 9
-    }
+        "lut"
+    ]
 }
