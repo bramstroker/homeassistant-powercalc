@@ -1,0 +1,6 @@
+{
+    "name": "Sonoff B02 Light with dimmer and temperature",
+    "supported_modes": [
+        "lut"
+    ]
+}
