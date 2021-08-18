@@ -1,0 +1,11 @@
+{
+    "name": "Hue Iris",
+    "standby_usage": 0.500,
+    "supported_modes": [
+        "linear"
+    ],
+    "linear_config": {
+        "min_power": 0,
+        "max_power": 10 
+    }
+}
