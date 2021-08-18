@@ -1,10 +1,7 @@
 {
     "name": "Hue Go",
+    "standby_usage": 0.290,
     "supported_modes": [
-        "linear"
-    ],
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 6
-    }
+        "lut"
+    ]
 }
