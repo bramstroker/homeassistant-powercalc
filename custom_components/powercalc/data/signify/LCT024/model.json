@@ -1,10 +1,7 @@
 {
     "name": "Hue Play",
+    "standby_usage": 0.100,
     "supported_modes": [
-        "linear"
-    ],
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 6.6
-    }
+        "lut"
+    ]
 }
