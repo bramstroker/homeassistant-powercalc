@@ -1,0 +1,23 @@
+name: validate-light-model
+
+on:
+  push:
+    paths:
+      - '**.csv.gz'
+  pull_request:
+    paths:
+       - '**.csv.gz'
+
+jobs:
+  validate-lut:
+    name: Validate LUT CSV files
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        cd .github/scripts/lut_validator
+        npm install
+    - name: Validate LUT CSV files
+      run: node .github/scripts/lut_validator/validate.js
