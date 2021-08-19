@@ -12,6 +12,7 @@ from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
@@ -51,6 +52,9 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(
                     CONF_ENTITY_NAME_PATTERN, default=DEFAULT_NAME_PATTERN
                 ): vol.Match(r"\{\}"),
+                vol.Optional(
+                    CONF_CREATE_ENERGY_SENSORS, default=True
+                ): cv.boolean
             }
         )
     },
@@ -62,6 +66,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     conf = config.get(DOMAIN) or {
         CONF_ENTITY_NAME_PATTERN: DEFAULT_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+        CONF_CREATE_ENERGY_SENSORS: True
     }
 
     hass.data[DOMAIN] = {
