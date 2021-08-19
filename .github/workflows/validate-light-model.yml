@@ -11,6 +11,10 @@ on:
       - '**.csv.gz'
       - '**/model.json'
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   validate-lut:
     name: Validate LUT CSV files
