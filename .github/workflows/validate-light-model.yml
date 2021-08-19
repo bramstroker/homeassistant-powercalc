@@ -7,9 +7,10 @@ on:
       - '**.csv.gz'
       - '**/model.json'
   pull_request_target:
-    paths:
-      - '**.csv.gz'
-      - '**/model.json'
+    branches: [ master ]
+#    paths:
+#      - '**.csv.gz'
+#      - '**/model.json'
 
 permissions:
   issues: write
