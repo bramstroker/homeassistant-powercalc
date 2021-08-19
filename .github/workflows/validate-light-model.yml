@@ -23,6 +23,9 @@ jobs:
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{github.event.pull_request.head.ref}}
+        repository: ${{github.event.pull_request.head.repo.full_name}}
     - name: Install dependencies
       run: |
         cd .github/scripts/lut_validator
@@ -35,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
       - name: Validate model.json against schema
         uses: bramstroker/json-schema-validator@master
         with:
