@@ -1,9 +1,0 @@
-{
-    "name": "Test bulb7",
-    "supported_modes": [
-        "lut"
-    ],
-    "standby_usage": 0.3,
-    "measure_device": "2dfdsd",
-    "measure_method": "script"
-}
