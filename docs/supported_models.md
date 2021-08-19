@@ -27,4 +27,4 @@
 |signify     |LWB006    |Hue White A60 E27 800lm                            |lut              |brightness   |
 |signify     |LWB010    |Hue White A60 E27 806lm                            |lut              |brightness   |
 |sonoff      |B02BA60   |Sonoff B02 Light with dimmer and temperature       |lut              |color_temp   |
-|test        |test      |Test bulb5                                         |lut              |             |
+|test        |test      |Test bulb6                                         |lut              |             |
