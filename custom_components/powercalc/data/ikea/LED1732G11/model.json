@@ -3,5 +3,8 @@
     "standby_usage": 0.26,
     "supported_modes": [
         "lut"
-    ]
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly Plug S",
+    "measure_description": "Measured with script made by bramstroker and partially verified manual"
 }
