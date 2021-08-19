@@ -117,6 +117,7 @@ PLATFORM_SCHEMA = vol.All(
     ),
 )
 
+ENERGY_ICON = "mdi:flash"
 
 async def async_setup_platform(
     hass: HomeAssistantType,
@@ -210,16 +211,16 @@ async def async_setup_platform(
 
     async_add_entities(entities_to_add)
 
-def create_energy_sensor(name: str, power_sensor: VirtualPowerSensor) -> IntegrationSensor:
+def create_energy_sensor(name: str, power_sensor: VirtualPowerSensor) -> VirtualEnergySensor:
     _LOGGER.debug("Creating energy sensor: %s", name)
-    return IntegrationSensor(
+    return VirtualEnergySensor(
         source_entity=power_sensor.entity_id,
         name=name,
         round_digits=2,
         unit_prefix="k",
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
-        integration_method=TRAPEZOIDAL_METHOD
+        integration_method=TRAPEZOIDAL_METHOD,
     )
 
 def select_calculation_mode(config: dict, light_model: LightModel):
@@ -410,3 +411,8 @@ class VirtualPowerSensor(Entity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+
+class VirtualEnergySensor(IntegrationSensor):
+    @property
+    def icon(self):
+        return ENERGY_ICON
