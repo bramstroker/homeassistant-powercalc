@@ -1,11 +1,10 @@
 {
     "name": "Hue Iris",
-    "standby_usage": 0.500,
+    "standby_usage": 0.40,
     "supported_modes": [
-        "linear"
+        "lut"
     ],
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 10 
-    }
+    "measure_method": "script",
+    "measure_device": "TP-Link HS110",
+    "measure_description": "Measured with script made by smonesi"
 }

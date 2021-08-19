@@ -6,5 +6,8 @@
     "linear_config": {
         "min_power": 0,
         "max_power": 6
-    }
+    },
+    "measure_method": "from specs",
+    "measure_device": "",
+    "measure_description": ""
 }
