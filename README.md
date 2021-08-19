@@ -83,11 +83,12 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
-| ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scan_interval          | string  | **Optional** | 00:10:00 | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| entity_name_pattern    | string  | **Optional** | {} power | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
-| create_energy_sensors  | boolean | **Optional** | true     | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| Name                   | Type    | Requirement  | Default   | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00  | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| create_energy_sensors  | boolean | **Optional** | true      | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| power_sensor_naming    | string  | **Optional** | {} power  | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_naming   | string  | **Optional** | {} energy | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
 
 **Example:**
 

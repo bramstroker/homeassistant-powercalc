@@ -57,7 +57,7 @@ from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
-    CONF_ENTITY_NAME_PATTERN,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -65,6 +65,7 @@ from .const import (
     CONF_MIN_WATT,
     CONF_MODE,
     CONF_MODEL,
+    CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
@@ -116,8 +117,6 @@ PLATFORM_SCHEMA = vol.All(
     ),
 )
 
-NAME_FORMAT = "{} power"
-
 
 async def async_setup_platform(
     hass: HomeAssistantType,
@@ -149,8 +148,8 @@ async def async_setup_platform(
         entity_name = split_entity_id(device_entity_id)[1].replace("_", " ")
         entity_domain = split_entity_id(device_entity_id)[0]
 
-    name_pattern = component_config.get(CONF_ENTITY_NAME_PATTERN)
-    name = config.get(CONF_NAME) or name_pattern.format(entity_name)
+    power_name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
+    name = config.get(CONF_NAME) or power_name_pattern.format(entity_name)
 
     light_model = None
     try:
@@ -200,14 +199,18 @@ async def async_setup_platform(
     entities_to_add = [power_sensor]
 
     if (component_config.get(CONF_CREATE_ENERGY_SENSORS)):
+        energy_name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
+        energy_sensor_name = energy_name_pattern.format(entity_name)
         entities_to_add.append(
-            create_energy_sensor(entity_name, power_sensor)
+            create_energy_sensor(
+                energy_sensor_name,
+                power_sensor
+            )
         )
 
     async_add_entities(entities_to_add)
 
-def create_energy_sensor(base_entity_name: str, power_sensor: VirtualPowerSensor) -> IntegrationSensor:
-    name = f"{base_entity_name} energy"
+def create_energy_sensor(name: str, power_sensor: VirtualPowerSensor) -> IntegrationSensor:
     _LOGGER.debug("Creating energy sensor: %s", name)
     return IntegrationSensor(
         source_entity=power_sensor.entity_id,
@@ -215,7 +218,7 @@ def create_energy_sensor(base_entity_name: str, power_sensor: VirtualPowerSensor
         round_digits=2,
         unit_prefix="k",
         unit_of_measurement=None,
-        unit_time="h",
+        unit_time=TIME_HOURS,
         integration_method=TRAPEZOIDAL_METHOD
     )
 
