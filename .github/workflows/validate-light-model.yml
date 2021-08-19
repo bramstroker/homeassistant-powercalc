@@ -7,7 +7,7 @@ on:
       - '**.csv.gz'
       - '**/model.json'
   pull_request_target:
-    branches: [ master ]
+    #branches: [ master ]
 #    paths:
 #      - '**.csv.gz'
 #      - '**/model.json'
