@@ -10,6 +10,9 @@
     "binary_sensor",
     "light"
   ],
+  "after_dependencies": [
+    "integration"
+  ],
   "codeowners": ["@bramstroker"],
   "requirements": [],
   "version": "0.1.0",
