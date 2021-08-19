@@ -7,10 +7,10 @@ on:
       - '**.csv.gz'
       - '**/model.json'
   pull_request_target:
-    #branches: [ master ]
-#    paths:
-#      - '**.csv.gz'
-#      - '**/model.json'
+    branches: [ master ]
+    paths:
+       - '**.csv.gz'
+       - '**/model.json'
 
 permissions:
   issues: write
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Validate model.json against schema
-        uses: bramstroker/json-schema-validator@v1.0.0
+        uses: bramstroker/json-schema-validator@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           json_schema: ./custom_components/powercalc/data/model_schema.json
