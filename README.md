@@ -356,40 +356,20 @@ python3 measure.py
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
 ## Setting up for energy dashboard
-If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below (assuming you have a powercalc sensor with entity_id `sensor.kingkong_power`:
-
-````yaml
-sensor:
-    - platform: integration
-      source: sensor.kingkong_power
-      name: kingkong_power_kWh
-      unit_prefix: k
-      round: 2
-````
-If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the developer tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
-
-````yaml
-{% for state in states -%}
-{%- if state.attributes.unit_of_measurement == "W" and state.attributes.device_class == "power" -%}
-- platform: integration
-  source: {{ state.entity_id }}
-  unit_prefix: k
-  round: 2
-{% endif -%}
-{%- endfor -%}
-````
+If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. 
+Starting from v0.4 of powercalc it will automatically create energy sensors for you. No need for any custom configuration.
 
 ### Creating energy groups
-If you want to sum up all energy usage from one category e.g. all of your servers, then create a powercalc sensor and an integration sensor for each of these servers like described in the section before. Then you create a template energy usage sensor which sums up all values of the energy sensors (a example sensor can be found below). It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
+Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
 
 ````yaml
 - platform: template
   sensors:
     energy_server:
-      friendly_name: "Alle Server Energieverbrauch"
+      friendly_name: "All Server Energy Consumption"
       unit_of_measurement: kWh
       value_template: >-
-        {{states('sensor.kingkong_power_kwh') | float + states('sensor.kinglouie_power_kwh') | float}}
+        {{states('sensor.kingkong_energy') | float + states('sensor.kinglouie_energy') | float}}
       attribute_templates:
         last_reset: "1970-01-01T00:00:00+00:00"
         state_class: measurement
