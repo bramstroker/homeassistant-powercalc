@@ -1,0 +1,28 @@
+name: validate-light-model
+
+on:
+  pull_request_target:
+    paths:
+       - '**/model.json'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  validate_model_json:
+    name: Validate model.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+      - name: Validate model.json against schema
+        uses: bramstroker/json-schema-validator@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          json_schema: ./custom_components/powercalc/data/model_schema.json
+          json_path_pattern: .*model.json$
+          send_comment: true
+          clear_comments: true
