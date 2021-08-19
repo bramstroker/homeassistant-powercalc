@@ -20,7 +20,7 @@
 |signify     |LCT024    |Hue Play                                           |lut              |color_temp,hs|
 |signify     |LCT026    |Hue Go 2.0                                         |linear           |             |
 |signify     |LLC001    |Philips Living Color Iris                          |lut              |hs           |
-|signify     |LLC010    |Hue Iris                                           |linear           |             |
+|signify     |LLC010    |Hue Iris                                           |lut              |hs           |
 |signify     |LLC011    |Living Colours Bloom 7099760PH                     |lut              |hs           |
 |signify     |LLC020    |Hue Go                                             |lut              |color_temp,hs|
 |signify     |LTA001    |Hue White Ambiance E27                             |lut              |color_temp   |
