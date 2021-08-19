@@ -1,9 +1,6 @@
 name: validate-light-model
 
 on:
-  push:
-    paths:
-      - '**/model.json'
   pull_request_target:
     paths:
        - '**/model.json'
