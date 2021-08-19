@@ -4,6 +4,6 @@
         "lut"
     ],
     "standby_usage": 0.3,
-    "measure_device": "2dsd",
+    "measure_device": "2dfdsd",
     "measure_method": "script"
 }
