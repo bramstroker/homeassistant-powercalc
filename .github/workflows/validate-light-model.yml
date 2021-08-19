@@ -39,8 +39,7 @@ jobs:
         uses: bramstroker/json-schema-validator@v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          #token: ${{ secrets.GH_API_TOKEN }}
           json_schema: ./custom_components/powercalc/data/model_schema.json
           json_path_pattern: .*model.json$
           send_comment: true
-          clear_comments: false
+          clear_comments: true
