@@ -1,0 +1,46 @@
+name: validate-light-model
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '**.csv.gz'
+      - '**/model.json'
+  pull_request_target:
+    #branches: [ master ]
+#    paths:
+#      - '**.csv.gz'
+#      - '**/model.json'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  validate-lut:
+    name: Validate LUT CSV files
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        cd .github/scripts/lut_validator
+        npm install
+    - name: Validate LUT CSV files
+      run: node .github/scripts/lut_validator/validate.js
+  
+  validate_model_json:
+    name: Validate model.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate model.json against schema
+        uses: bramstroker/json-schema-validator@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          #token: ${{ secrets.GH_API_TOKEN }}
+          json_schema: ./custom_components/powercalc/data/model_schema.json
+          json_path_pattern: .*model.json$
+          send_comment: true
+          clear_comments: false
