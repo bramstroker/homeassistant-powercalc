@@ -13,8 +13,8 @@ from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
-    CONF_ENTITY_NAME_PATTERN,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
@@ -54,20 +54,16 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                     ): cv.time_period,
-                    vol.Optional(
-                        CONF_ENTITY_NAME_PATTERN
-                    ): vol.Match(r"\{\}"),
+                    vol.Optional(CONF_ENTITY_NAME_PATTERN): vol.Match(r"\{\}"),
                     vol.Optional(
                         CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
                     ): vol.Match(r"\{\}"),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): vol.Match(r"\{\}"),
-                    vol.Optional(
-                        CONF_CREATE_ENERGY_SENSORS, default=True
-                    ): cv.boolean
+                    vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                 }
-            )
+            ),
         )
     },
     extra=vol.ALLOW_EXTRA,
@@ -79,7 +75,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
-        CONF_CREATE_ENERGY_SENSORS: True
+        CONF_CREATE_ENERGY_SENSORS: True,
     }
 
     # This is for BC. Can be removed in v0.5

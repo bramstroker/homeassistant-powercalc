@@ -1,10 +1,6 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
-from homeassistant.components.integration.sensor import (
-    IntegrationSensor,
-    TRAPEZOIDAL_METHOD
-)
 
 import logging
 import os
@@ -24,6 +20,10 @@ from homeassistant.components import (
     switch,
 )
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
+from homeassistant.components.integration.sensor import (
+    TRAPEZOIDAL_METHOD,
+    IntegrationSensor,
+)
 from homeassistant.components.light import PLATFORM_SCHEMA, Light
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.const import (
@@ -37,11 +37,11 @@ from homeassistant.const import (
     STATE_STANDBY,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
-    TIME_HOURS
+    TIME_HOURS,
 )
 from homeassistant.core import callback, split_entity_id
-from homeassistant.helpers.entity import async_generate_entity_id
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, async_generate_entity_id
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
@@ -49,9 +49,8 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.typing import (
     ConfigType,
     DiscoveryInfoType,
-    HomeAssistantType
+    HomeAssistantType,
 )
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -114,12 +113,13 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-            vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean
+            vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
         }
     ),
 )
 
 ENERGY_ICON = "mdi:lightning-bolt"
+
 
 async def async_setup_platform(
     hass: HomeAssistantType,
@@ -413,6 +413,7 @@ class VirtualPowerSensor(Entity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+
 
 class VirtualEnergySensor(IntegrationSensor):
     @property
