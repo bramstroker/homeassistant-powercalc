@@ -61,6 +61,7 @@ They are as follows:
 | standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
 | disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                   | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor   | boolean | **Optional** | Ability to disable energy sensor creation per entity                       |
 | custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
@@ -356,8 +357,9 @@ python3 measure.py
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
 ## Setting up for energy dashboard
-If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. 
-Starting from v0.4 of powercalc it will automatically create energy sensors for you. No need for any custom configuration.
+If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
+
+If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
 ### Creating energy groups
 Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  

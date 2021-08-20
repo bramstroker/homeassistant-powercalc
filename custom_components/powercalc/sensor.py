@@ -54,6 +54,7 @@ from homeassistant.helpers.typing import (
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
@@ -113,6 +114,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+            vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): cv.boolean
         }
     ),
 )
@@ -199,7 +201,7 @@ async def async_setup_platform(
 
     entities_to_add = [power_sensor]
 
-    if (component_config.get(CONF_CREATE_ENERGY_SENSORS)):
+    if (config.get(CONF_CREATE_ENERGY_SENSOR) and component_config.get(CONF_CREATE_ENERGY_SENSORS)):
         energy_name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
         energy_sensor_name = energy_name_pattern.format(entity_name)
         entities_to_add.append(
