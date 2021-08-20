@@ -111,7 +111,7 @@ To calculate estimated power consumption different modes are supported, they are
 Supported domain: `light`
 
 This is the most accurate mode.
-For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
+For a lot of light models measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
 - [Supported models](#supported-models) for LUT mode
 - [LUT file structure](#lut-data-files)
 
@@ -254,8 +254,12 @@ This library will keep extending by the effort of community users.
 These models are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufacturer}/{modelid}`
 
+### model.json
+
 Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
-When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
+See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
+
+When [LUT mode](#lut-mode) is supported also [CSV lookup files](#lut-data-files) must be provided.
 
 Example lut mode:
 
@@ -265,7 +269,9 @@ Example lut mode:
     "standby_usage": 0.4,
     "supported_modes": [
         "lut"
-    ]
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly Plug S"
 }
 ```
 
@@ -281,7 +287,9 @@ Example linear mode
     "linear_config": {
         "min_power": 0,
         "max_power": 6
-    }
+    },
+    "measure_method": "manual",
+    "measure_device": "From manufacturer specifications"
 }
 ```
 
@@ -289,7 +297,7 @@ Example linear mode
 
 To calculate power consumption a lookup is done into CSV data files.
 
-Depending on the supported color modes of the light the integration expects multiple CSV files here:
+Depending on the supported color modes of the light the integration expects one or more CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
  - brightness.csv.gz (brightness only lights)
@@ -309,8 +317,8 @@ Example:
 
 #### Expected file structure
 
-- The file MUST contain a header row.
-- The data rows in the CSV files MUST have the following column order:
+- The file **MUST** contain a header row.
+- The data rows in the CSV files **MUST** have the following column order:
 
 **hs.csv**
 ```csv
@@ -337,7 +345,8 @@ bri,watt
 
 New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
 An example script is available `utils/measure/measure.py`.
-I am using the "Shelly Plug S"
+
+I am using the "Shelly Plug S", so this script is specifically build for Shelly smartplugs. When you want to use another plug you'll need to modify the script or write your own.
 
 Setup requirements for the script. It is advised to run in a virtual environment.
 ```
