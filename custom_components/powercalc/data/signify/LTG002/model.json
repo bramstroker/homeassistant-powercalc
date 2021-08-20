@@ -1,5 +1,6 @@
 {
     "name": "Hue White Ambiance GU10",
+    "standby_usage": 0.20,
     "supported_modes": [
         "linear"
     ],
