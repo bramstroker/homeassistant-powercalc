@@ -61,7 +61,7 @@ They are as follows:
 | standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
 | disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                   | string  | **Optional** | Override the name                                                          |
-| create_energy_sensor   | boolean | **Optional** | Ability to disable energy sensor creation per entity                       |
+| create_energy_sensor   | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |

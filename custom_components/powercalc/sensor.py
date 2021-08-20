@@ -114,7 +114,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-            vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): cv.boolean
+            vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean
         }
     ),
 )
@@ -201,29 +201,29 @@ async def async_setup_platform(
 
     entities_to_add = [power_sensor]
 
-    if (config.get(CONF_CREATE_ENERGY_SENSOR) and component_config.get(CONF_CREATE_ENERGY_SENSORS)):
+    should_create_energy_sensor = component_config.get(CONF_CREATE_ENERGY_SENSORS)
+    if CONF_CREATE_ENERGY_SENSOR in config:
+        should_create_energy_sensor = config.get(CONF_CREATE_ENERGY_SENSOR)
+
+    if should_create_energy_sensor:
         energy_name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
         energy_sensor_name = energy_name_pattern.format(entity_name)
+
+        _LOGGER.debug("Creating energy sensor: %s", energy_sensor_name)
         entities_to_add.append(
-            create_energy_sensor(
-                energy_sensor_name,
-                power_sensor
+            VirtualEnergySensor(
+                source_entity=power_sensor.entity_id,
+                name=energy_sensor_name,
+                round_digits=2,
+                unit_prefix="k",
+                unit_of_measurement=None,
+                unit_time=TIME_HOURS,
+                integration_method=TRAPEZOIDAL_METHOD,
             )
         )
 
     async_add_entities(entities_to_add)
 
-def create_energy_sensor(name: str, power_sensor: VirtualPowerSensor) -> VirtualEnergySensor:
-    _LOGGER.debug("Creating energy sensor: %s", name)
-    return VirtualEnergySensor(
-        source_entity=power_sensor.entity_id,
-        name=name,
-        round_digits=2,
-        unit_prefix="k",
-        unit_of_measurement=None,
-        unit_time=TIME_HOURS,
-        integration_method=TRAPEZOIDAL_METHOD,
-    )
 
 def select_calculation_mode(config: dict, light_model: LightModel):
     """Select the calculation mode"""
