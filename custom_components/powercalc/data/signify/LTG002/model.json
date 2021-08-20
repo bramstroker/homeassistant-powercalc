@@ -7,7 +7,7 @@
         "min_power": 0,
         "max_power": 5.5
     },
-    "measure_method": "from specs",
+    "measure_method": "manual",
     "measure_device": "",
-    "measure_description": ""
+    "measure_description": "From specs"
 }
