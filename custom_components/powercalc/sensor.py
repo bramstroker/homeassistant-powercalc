@@ -149,9 +149,6 @@ async def async_setup_platform(
         entity_name = split_entity_id(device_entity_id)[1].replace("_", " ")
         entity_domain = split_entity_id(device_entity_id)[0]
 
-    power_name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
-    name = config.get(CONF_NAME) or power_name_pattern.format(entity_name)
-
     light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, config)
@@ -176,6 +173,9 @@ async def async_setup_platform(
         standby_usage = config.get(CONF_STANDBY_USAGE)
         if standby_usage is None and light_model is not None:
             standby_usage = light_model.standby_usage
+
+    power_name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
+    name = config.get(CONF_NAME) or power_name_pattern.format(entity_name)
 
     _LOGGER.debug(
         "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",
