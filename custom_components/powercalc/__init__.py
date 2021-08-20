@@ -12,7 +12,9 @@ from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_ENTITY_NAME_PATTERN,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
@@ -20,6 +22,7 @@ from .const import (
     CONF_MIN_POWER,
     CONF_MIN_WATT,
     CONF_POWER,
+    CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
     CONF_WATT,
     DATA_CALCULATOR_FACTORY,
@@ -39,19 +42,32 @@ from .strategy_lut import LutRegistry, LutStrategy
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
-DEFAULT_NAME_PATTERN = "{} power"
+DEFAULT_POWER_NAME_PATTERN = "{} power"
+DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        DOMAIN: vol.Schema(
-            {
-                vol.Optional(
-                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
-                ): cv.time_period,
-                vol.Optional(
-                    CONF_ENTITY_NAME_PATTERN, default=DEFAULT_NAME_PATTERN
-                ): vol.Match(r"\{\}"),
-            }
+        DOMAIN: vol.All(
+            cv.deprecated(CONF_ENTITY_NAME_PATTERN, CONF_POWER_SENSOR_NAMING),
+            vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                    ): cv.time_period,
+                    vol.Optional(
+                        CONF_ENTITY_NAME_PATTERN
+                    ): vol.Match(r"\{\}"),
+                    vol.Optional(
+                        CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
+                    ): vol.Match(r"\{\}"),
+                    vol.Optional(
+                        CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
+                    ): vol.Match(r"\{\}"),
+                    vol.Optional(
+                        CONF_CREATE_ENERGY_SENSORS, default=True
+                    ): cv.boolean
+                }
+            )
         )
     },
     extra=vol.ALLOW_EXTRA,
@@ -60,9 +76,15 @@ CONFIG_SCHEMA = vol.Schema(
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     conf = config.get(DOMAIN) or {
-        CONF_ENTITY_NAME_PATTERN: DEFAULT_NAME_PATTERN,
+        CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
+        CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+        CONF_CREATE_ENERGY_SENSORS: True
     }
+
+    # This is for BC. Can be removed in v0.5
+    if CONF_ENTITY_NAME_PATTERN in conf:
+        conf[CONF_POWER_SENSOR_NAMING] = conf.get(CONF_ENTITY_NAME_PATTERN)
 
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
