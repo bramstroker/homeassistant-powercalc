@@ -117,7 +117,7 @@ PLATFORM_SCHEMA = vol.All(
     ),
 )
 
-ENERGY_ICON = "mdi:flash"
+ENERGY_ICON = "mdi:lightning-bolt"
 
 async def async_setup_platform(
     hass: HomeAssistantType,
