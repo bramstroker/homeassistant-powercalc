@@ -25,6 +25,7 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
     - [Fixed](#fixed-mode)
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
+      - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)   
@@ -61,6 +62,7 @@ They are as follows:
 | standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
 | disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                   | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor   | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
@@ -83,17 +85,20 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
-| ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scan_interval          | string  | **Optional** | 00:10:00 | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| entity_name_pattern    | string  | **Optional** | {} power | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| Name                   | Type    | Requirement  | Default   | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00  | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| create_energy_sensors  | boolean | **Optional** | true      | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| power_sensor_naming    | string  | **Optional** | {} power  | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_naming   | string  | **Optional** | {} energy | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
 
 **Example:**
 
 ```yaml
 powercalc:
   scan_interval: 00:01:00 #Each minute
-  entity_name_pattern: "{} Powersensor" 
+  entity_name_pattern: "{} Powersensor"
+  create_energy_sensors: false
 ```
 
 ## Calculation modes
@@ -107,7 +112,7 @@ To calculate estimated power consumption different modes are supported, they are
 Supported domain: `light`
 
 This is the most accurate mode.
-For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
+For a lot of light models measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
 - [Supported models](#supported-models) for LUT mode
 - [LUT file structure](#lut-data-files)
 
@@ -250,8 +255,12 @@ This library will keep extending by the effort of community users.
 These models are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufacturer}/{modelid}`
 
+### model.json
+
 Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
-When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
+See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
+
+When [LUT mode](#lut-mode) is supported also [CSV lookup files](#lut-data-files) must be provided.
 
 Example lut mode:
 
@@ -261,7 +270,9 @@ Example lut mode:
     "standby_usage": 0.4,
     "supported_modes": [
         "lut"
-    ]
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly Plug S"
 }
 ```
 
@@ -277,7 +288,9 @@ Example linear mode
     "linear_config": {
         "min_power": 0,
         "max_power": 6
-    }
+    },
+    "measure_method": "manual",
+    "measure_device": "From manufacturer specifications"
 }
 ```
 
@@ -285,7 +298,7 @@ Example linear mode
 
 To calculate power consumption a lookup is done into CSV data files.
 
-Depending on the supported color modes of the light the integration expects multiple CSV files here:
+Depending on the supported color modes of the light the integration expects one or more CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
  - brightness.csv.gz (brightness only lights)
@@ -305,8 +318,8 @@ Example:
 
 #### Expected file structure
 
-- The file MUST contain a header row.
-- The data rows in the CSV files MUST have the following column order:
+- The file **MUST** contain a header row.
+- The data rows in the CSV files **MUST** have the following column order:
 
 **hs.csv**
 ```csv
@@ -333,7 +346,8 @@ bri,watt
 
 New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
 An example script is available `utils/measure/measure.py`.
-I am using the "Shelly Plug S"
+
+I am using the "Shelly Plug S", so this script is specifically build for Shelly smartplugs. When you want to use another plug you'll need to modify the script or write your own.
 
 Setup requirements for the script. It is advised to run in a virtual environment.
 ```
@@ -353,40 +367,21 @@ python3 measure.py
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
 ## Setting up for energy dashboard
-If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below (assuming you have a powercalc sensor with entity_id `sensor.kingkong_power`:
+If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
 
-````yaml
-sensor:
-    - platform: integration
-      source: sensor.kingkong_power
-      name: kingkong_power_kWh
-      unit_prefix: k
-      round: 2
-````
-If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the developer tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
-
-````yaml
-{% for state in states -%}
-{%- if state.attributes.unit_of_measurement == "W" and state.attributes.device_class == "power" -%}
-- platform: integration
-  source: {{ state.entity_id }}
-  unit_prefix: k
-  round: 2
-{% endif -%}
-{%- endfor -%}
-````
+If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
 ### Creating energy groups
-If you want to sum up all energy usage from one category e.g. all of your servers, then create a powercalc sensor and an integration sensor for each of these servers like described in the section before. Then you create a template energy usage sensor which sums up all values of the energy sensors (a example sensor can be found below). It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
+Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
 
 ````yaml
 - platform: template
   sensors:
     energy_server:
-      friendly_name: "Alle Server Energieverbrauch"
+      friendly_name: "All Server Energy Consumption"
       unit_of_measurement: kWh
       value_template: >-
-        {{states('sensor.kingkong_power_kwh') | float + states('sensor.kinglouie_power_kwh') | float}}
+        {{states('sensor.kingkong_energy') | float + states('sensor.kinglouie_energy') | float}}
       attribute_templates:
         last_reset: "1970-01-01T00:00:00+00:00"
         state_class: measurement
