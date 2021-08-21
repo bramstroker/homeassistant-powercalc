@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
+from typing import Any, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -121,7 +121,7 @@ PLATFORM_SCHEMA = vol.All(
 )
 
 ENERGY_ICON = "mdi:lightning-bolt"
-ATTR_SOURCE_ID = "source"
+ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
 async def async_setup_platform(
@@ -223,6 +223,8 @@ async def async_setup_platform(
                 unit_of_measurement=None,
                 unit_time=TIME_HOURS,
                 integration_method=TRAPEZOIDAL_METHOD,
+                powercalc_source_entity=source_entity,
+                powercalc_source_domain=source_entity_domain,
             )
         )
 
@@ -404,7 +406,7 @@ class VirtualPowerSensor(Entity):
     def extra_state_attributes(self):
         """Return entity state attributes."""
         return {
-            ATTR_SOURCE_ID: self._source_entity,
+            ATTR_SOURCE_ENTITY: self._source_entity,
             ATTR_SOURCE_DOMAIN: self._source_domain,
         }
 
@@ -430,6 +432,38 @@ class VirtualPowerSensor(Entity):
 
 
 class VirtualEnergySensor(IntegrationSensor):
+    def __init__(
+        self,
+        source_entity,
+        name,
+        round_digits,
+        unit_prefix,
+        unit_time,
+        unit_of_measurement,
+        integration_method,
+        powercalc_source_entity: str,
+        powercalc_source_domain: str
+    ):
+        super().__init__(
+            source_entity,
+            name,
+            round_digits,
+            unit_prefix,
+            unit_time,
+            unit_of_measurement,
+            integration_method
+        )
+        self._powercalc_source_entity = powercalc_source_entity
+        self._powercalc_source_domain = powercalc_source_domain
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the state attributes of the acceleration sensor."""
+        state_attr = super().extra_state_attributes
+        state_attr[ATTR_SOURCE_ENTITY] = self._powercalc_source_entity
+        state_attr[ATTR_SOURCE_DOMAIN] = self._powercalc_source_domain
+        return state_attr
+
     @property
     def icon(self):
         return ENERGY_ICON
