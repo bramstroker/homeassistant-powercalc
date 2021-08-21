@@ -1,3 +1,4 @@
+# Supported models
 |manufacturer |      model id      |                       name                        |calculation modes| color modes |
 |-------------|--------------------|---------------------------------------------------|-----------------|-------------|
 |belkin       |F7C033              |WeMo smart LED bulb                                |lut              |brightness   |
@@ -20,12 +21,14 @@
 |signify      |LCT012              |Hue White and Color Ambiance Candle E12            |lut              |color_temp,hs|
 |signify      |LCT015              |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp,hs|
 |signify      |LCT024              |Hue Play                                           |lut              |color_temp,hs|
+|signify      |LCT026              |Hue Go 2.0                                         |linear           |             |
 |signify      |LLC001              |Philips Living Color Iris                          |lut              |hs           |
 |signify      |LLC010              |Hue Iris                                           |lut              |hs           |
 |signify      |LLC011              |Living Colours Bloom 7099760PH                     |lut              |hs           |
-|signify      |LLC020              |Hue Go                                             |linear           |             |
+|signify      |LLC020              |Hue Go                                             |lut              |color_temp,hs|
 |signify      |LTA001              |Hue White Ambiance E27                             |lut              |color_temp   |
 |signify      |LTC001              |Hue Being Ceiling Light                            |lut              |color_temp   |
+|signify      |LTG002              |Hue White Ambiance GU10                            |linear           |             |
 |signify      |LTW001              |Hue White Ambiance A19                             |lut              |color_temp   |
 |signify      |LTW010              |Hue White Ambiance A60 E27 806lm 9290012001A       |lut              |color_temp   |
 |signify      |LWA004              |Hue White Filament Bulb A60 E27                    |lut              |brightness   |
