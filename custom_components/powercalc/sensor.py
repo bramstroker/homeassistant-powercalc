@@ -121,7 +121,8 @@ PLATFORM_SCHEMA = vol.All(
 )
 
 ENERGY_ICON = "mdi:lightning-bolt"
-
+ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_SOURCE_DOMAIN = "source_domain"
 
 async def async_setup_platform(
     hass: HomeAssistantType,
@@ -134,46 +135,46 @@ async def async_setup_platform(
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
     component_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
-    device_entity_id = config[CONF_ENTITY_ID]
+    source_entity = config[CONF_ENTITY_ID]
 
     entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(device_entity_id)
-    entity_state = hass.states.get(device_entity_id)
+    entity_entry = entity_registry.async_get(source_entity)
+    entity_state = hass.states.get(source_entity)
 
     unique_id = None
 
     if entity_entry:
         entity_name = entity_entry.name or entity_entry.original_name
-        entity_domain = entity_entry.domain
+        source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
     elif entity_state:
         entity_name = entity_state.name
-        entity_domain = entity_state.domain
+        source_entity_domain = entity_state.domain
     else:
-        entity_name = split_entity_id(device_entity_id)[1].replace("_", " ")
-        entity_domain = split_entity_id(device_entity_id)[0]
+        entity_name = split_entity_id(source_entity)[1].replace("_", " ")
+        source_entity_domain = split_entity_id(source_entity)[0]
 
     light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, config)
     except (ModelNotSupported) as err:
-        _LOGGER.info("Model not found in library %s: %s", device_entity_id, err)
+        _LOGGER.info("Model not found in library %s: %s", source_entity, err)
 
     try:
         mode = select_calculation_mode(config, light_model)
         calculation_strategy = calculation_strategy_factory.create(
-            config, mode, light_model, entity_domain
+            config, mode, light_model, source_entity_domain
         )
         await calculation_strategy.validate_config(entity_entry)
     except (ModelNotSupported, UnsupportedMode) as err:
-        _LOGGER.error("Skipping sensor setup %s: %s", device_entity_id, err)
+        _LOGGER.error("Skipping sensor setup %s: %s", source_entity, err)
         return
     except StrategyConfigurationError as err:
         _LOGGER.error("Error setting up calculation strategy: %s", err)
         return
 
     standby_usage = None
-    if config.get(CONF_DISABLE_STANDBY_USAGE) == False:
+    if not config.get(CONF_DISABLE_STANDBY_USAGE):
         standby_usage = config.get(CONF_STANDBY_USAGE)
         if standby_usage is None and light_model is not None:
             standby_usage = light_model.standby_usage
@@ -183,7 +184,7 @@ async def async_setup_platform(
 
     _LOGGER.debug(
         "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",
-        device_entity_id,
+        source_entity,
         name,
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
@@ -195,7 +196,8 @@ async def async_setup_platform(
         hass=hass,
         power_calculator=calculation_strategy,
         name=name,
-        device_entity_id=device_entity_id,
+        source_entity=source_entity,
+        source_domain=source_entity_domain,
         unique_id=unique_id,
         standby_usage=standby_usage,
         scan_interval=component_config.get(CONF_SCAN_INTERVAL),
@@ -326,14 +328,16 @@ class VirtualPowerSensor(Entity):
         hass: HomeAssistantType,
         power_calculator: PowerCalculationStrategyInterface,
         name: str,
-        device_entity_id: str,
+        source_entity: str,
+        source_domain: str,
         unique_id: str,
         standby_usage: float | None,
         scan_interval,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
-        self._device_entity_id = device_entity_id
+        self._source_entity = source_entity
+        self._source_domain = source_domain
         self._name = name
         self._power = None
         self._unique_id = unique_id
@@ -355,10 +359,10 @@ class VirtualPowerSensor(Entity):
             """Add listeners and get initial state."""
 
             async_track_state_change_event(
-                self.hass, [self._device_entity_id], appliance_state_listener
+                self.hass, [self._source_entity], appliance_state_listener
             )
 
-            new_state = self.hass.states.get(self._device_entity_id)
+            new_state = self.hass.states.get(self._source_entity)
 
             await self._update_power_sensor(new_state)
 
@@ -395,6 +399,14 @@ class VirtualPowerSensor(Entity):
 
         self.async_write_ha_state()
         return True
+
+    @property
+    def extra_state_attributes(self):
+        """Return entity state attributes."""
+        return {
+            ATTR_SOURCE_ENTITY: self._source_entity,
+            ATTR_SOURCE_DOMAIN: self._source_domain,
+        }
 
     @property
     def name(self):
