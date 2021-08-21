@@ -11,6 +11,7 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components import (
     binary_sensor,
+    climate,
     fan,
     input_boolean,
     light,
@@ -96,6 +97,7 @@ PLATFORM_SCHEMA = vol.All(
                     switch.DOMAIN,
                     fan.DOMAIN,
                     binary_sensor.DOMAIN,
+                    climate.DOMAIN,
                     remote.DOMAIN,
                     media_player.DOMAIN,
                     input_boolean.DOMAIN,
