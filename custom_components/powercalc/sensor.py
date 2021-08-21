@@ -121,7 +121,7 @@ PLATFORM_SCHEMA = vol.All(
 )
 
 ENERGY_ICON = "mdi:lightning-bolt"
-ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_SOURCE_ID = "source"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
 async def async_setup_platform(
@@ -404,7 +404,7 @@ class VirtualPowerSensor(Entity):
     def extra_state_attributes(self):
         """Return entity state attributes."""
         return {
-            ATTR_SOURCE_ENTITY: self._source_entity,
+            ATTR_SOURCE_ID: self._source_entity,
             ATTR_SOURCE_DOMAIN: self._source_domain,
         }
 
