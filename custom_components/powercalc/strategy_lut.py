@@ -45,7 +45,7 @@ class LutRegistry:
     ) -> dict | None:
         cache_key = f"{light_model.manufacturer}_{light_model.model}_{color_mode}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
-        if lookup_dict == None:
+        if lookup_dict is None:
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
 
@@ -136,6 +136,12 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return power
 
     def get_closest_from_dictionary(self, dict: dict, search_key):
+        return (
+            dict.get(search_key)
+            or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
+        )
+
+    def get_nearest_lower(self, dict: dict, search_key):
         return (
             dict.get(search_key)
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
