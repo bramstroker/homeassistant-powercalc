@@ -2,20 +2,20 @@ from __future__ import annotations, print_function, unicode_literals
 
 import asyncio
 import csv
+import datetime
 import json
 import os
+import time
 from typing import Iterator
 
 import aiohttp
 import aiohue
 import asyncstdlib as a
-from aiohue.lights import Light
-from PyInquirer import prompt
-from kasa import SmartPlug
-import time
-import datetime
-
 import nest_asyncio
+from aiohue.lights import Light
+from kasa import SmartPlug
+from PyInquirer import prompt
+
 nest_asyncio.apply()
 
 MODE_HS = "hs"

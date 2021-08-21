@@ -9,9 +9,9 @@ from typing import Iterator
 import aiohttp
 import aiohue
 import asyncstdlib as a
+import tuyapower
 from aiohue.lights import Light
 from PyInquirer import prompt
-import tuyapower
 
 MODE_HS = "hs"
 MODE_COLOR_TEMP = "color_temp"

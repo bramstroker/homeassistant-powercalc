@@ -1,8 +1,9 @@
-import sys
 import csv
+import sys
+from typing import Iterator
+
 import numpy as np
 from scipy.interpolate import griddata
-from typing import Iterator
 
 # default from measure.py
 BRIGHTNESS_STEP=5
