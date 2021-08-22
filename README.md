@@ -2,7 +2,7 @@
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
-# homeassistant-powercalc
+# Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.
 Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
