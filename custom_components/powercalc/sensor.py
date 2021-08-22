@@ -66,6 +66,7 @@ from .const import (
     CONF_MIN_WATT,
     CONF_MODE,
     CONF_MODEL,
+    CONF_MULTIPLY_FACTOR,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
     CONF_WATT,
@@ -116,6 +117,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+            vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
         }
     ),
 )
@@ -201,6 +203,7 @@ async def async_setup_platform(
         unique_id=unique_id,
         standby_usage=standby_usage,
         scan_interval=component_config.get(CONF_SCAN_INTERVAL),
+        multiply_factor=config.get(CONF_MULTIPLY_FACTOR)
     )
 
     entities_to_add = [power_sensor]
@@ -335,6 +338,7 @@ class VirtualPowerSensor(Entity):
         unique_id: str,
         standby_usage: float | None,
         scan_interval,
+        multiply_factor: float | None
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -346,6 +350,7 @@ class VirtualPowerSensor(Entity):
         self._standby_usage = standby_usage
         self._attr_force_update = True
         self._scan_interval = scan_interval
+        self._multiply_factor = multiply_factor
         self.entity_id = async_generate_entity_id("sensor.{}", name, hass=hass)
 
     async def async_added_to_hass(self):
@@ -391,6 +396,10 @@ class VirtualPowerSensor(Entity):
             self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(state)
+            if self._multiply_factor:
+                self._power *= self._multiply_factor
+
+        self._power = round(self._power, 2)
 
         _LOGGER.debug(
             'State changed to "%s" for entity "%s". Power:%s',
