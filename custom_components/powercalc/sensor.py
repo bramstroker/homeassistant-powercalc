@@ -218,7 +218,7 @@ async def async_setup_platform(
             VirtualEnergySensor(
                 source_entity=power_sensor.entity_id,
                 name=energy_sensor_name,
-                round_digits=2,
+                round_digits=4,
                 unit_prefix="k",
                 unit_of_measurement=None,
                 unit_time=TIME_HOURS,
