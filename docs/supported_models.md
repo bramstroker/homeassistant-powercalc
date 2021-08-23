@@ -14,12 +14,12 @@
 |innr         |RS 125              |RS125 GU10 350lm 2700K                             |lut              |brightness   |
 |ledvance     |Tibea TW Z3         |Tibea Lamp E27 Tuneable White 2000lm               |lut              |color_temp   |
 |mueller-licht|ZBT-ColorTemperature|tint GU10 Spot 350lm                               |lut              |color_temp   |
-|signify      |LCA001              |Hue White and Color Ambiance A19 E26 (Gen 5)       |lut              |color_temp,hs|
+|signify      |LCA001              |Hue White and Color Ambiance A19 E26/E27 (Gen 5)   |lut              |color_temp,hs|
 |signify      |LCE002              |Hue White and Color Ambiance E14 Candle w/ BT      |lut              |color_temp,hs|
 |signify      |LCT003              |Hue White and Color Ambiance Spot GU10             |lut              |color_temp,hs|
 |signify      |LCT010              |Hue White and Color Ambiance A19 E26 (Gen 3)       |lut              |color_temp,hs|
 |signify      |LCT012              |Hue White and Color Ambiance Candle E12            |lut              |color_temp,hs|
-|signify      |LCT015              |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp,hs|
+|signify      |LCT015              |Hue White and Color Ambiance A19 E26/E27 (Gen 4)   |lut              |color_temp,hs|
 |signify      |LCT024              |Hue Play                                           |lut              |color_temp,hs|
 |signify      |LLC001              |Philips Living Color Iris                          |lut              |hs           |
 |signify      |LLC010              |Hue Iris                                           |lut              |hs           |
