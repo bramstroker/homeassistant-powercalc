@@ -126,6 +126,7 @@ ENERGY_ICON = "mdi:lightning-bolt"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
+
 async def async_setup_platform(
     hass: HomeAssistantType,
     config: ConfigType,
@@ -203,7 +204,7 @@ async def async_setup_platform(
         unique_id=unique_id,
         standby_usage=standby_usage,
         scan_interval=component_config.get(CONF_SCAN_INTERVAL),
-        multiply_factor=config.get(CONF_MULTIPLY_FACTOR)
+        multiply_factor=config.get(CONF_MULTIPLY_FACTOR),
     )
 
     entities_to_add = [power_sensor]
@@ -338,7 +339,7 @@ class VirtualPowerSensor(Entity):
         unique_id: str,
         standby_usage: float | None,
         scan_interval,
-        multiply_factor: float | None
+        multiply_factor: float | None,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -451,7 +452,7 @@ class VirtualEnergySensor(IntegrationSensor):
         unit_of_measurement,
         integration_method,
         powercalc_source_entity: str,
-        powercalc_source_domain: str
+        powercalc_source_domain: str,
     ):
         super().__init__(
             source_entity,
@@ -460,7 +461,7 @@ class VirtualEnergySensor(IntegrationSensor):
             unit_prefix,
             unit_time,
             unit_of_measurement,
-            integration_method
+            integration_method,
         )
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
