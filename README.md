@@ -28,7 +28,9 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
       - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
-    - [Creating energy groups](#creating-energy-groups)   
+    - [Creating energy groups](#creating-energy-groups)
+- [Advanced features](#advanced-features)
+    - [Multiply Factor](#multiply-factor)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -65,6 +67,7 @@ They are as follows:
 | create_energy_sensor   | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| multiply_factor        | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor)
 | fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 
@@ -391,6 +394,29 @@ Let's assume you want to sum up all energy usage from one category e.g. all of y
 > **Don't** create a template sensor which sums up all values from the power sensors and use this sensor to create a energy sensor because this won't work as you would expect. It 
 > wouldn't update in regular bases and as a consequence wont be shown in the energy dashboard in the right timeslots.
 
+## Advanced features
+
+### Multiply Factor
+
+This feature allows you to multiply the calculated power.
+
+This can be useful in the following use cases:
+- You have a bunch of similar lights which you control as a group and want a single power sensor.
+- You are using a LED strip from the LUT models, but you have extended or shortened it.
+
+Let's assume you have a combination of 4 GU10 spots in your ceiling in a light group `light.livingroom_spots`
+
+```yaml
+- platform: powercalc
+  entity_id: light.livingroom_spots
+  manufacturer: signify
+  model: LCT003
+  multiply_factor: 4
+```
+
+This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
+
+> Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
 
 ## Debug logging
 
