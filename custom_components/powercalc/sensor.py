@@ -250,11 +250,11 @@ def select_calculation_mode(config: dict, light_model: LightModel):
     if light_model:
         return light_model.supported_modes[0]
 
-    # BC compat
+    # BC compat, can be removed in v0.5
     if config.get(CONF_MIN_WATT):
         return MODE_LINEAR
 
-    # BC compat
+    # BC compat, can be removed in v0.5
     if config.get(CONF_WATT):
         return MODE_FIXED
 
@@ -263,7 +263,7 @@ def select_calculation_mode(config: dict, light_model: LightModel):
     )
 
 
-async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightModel]:
+async def get_light_model(hass: HomeAssistantType, entity_entry, config: dict) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and entity_entry:
@@ -284,15 +284,15 @@ async def get_light_model(hass, entity_entry, config: dict) -> Optional[LightMod
     return LightModel(manufacturer, model, custom_model_directory)
 
 
-async def autodiscover_hue_model(hass, entity_entry):
+async def autodiscover_hue_model(hass: HomeAssistantType, entity_entry):
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if hass.data.get(HUE_DOMAIN) == None or entity_entry.platform != "hue":
+    if hass.data.get(HUE_DOMAIN) is None or entity_entry.platform != "hue":
         return
 
     light = await find_hue_light(hass, entity_entry)
     if light is None:
         _LOGGER.error(
-            "Cannot autodisover model for '%s', not found in the hue bridge api",
+            "Cannot autodiscover model for '%s', not found in the hue bridge api",
             entity_entry.entity_id,
         )
         return
@@ -387,10 +387,13 @@ class VirtualPowerSensor(Entity):
 
     async def _update_power_sensor(self, state) -> bool:
         """Update power sensor based on new dependant hue light state."""
-        if state is None or state.state == STATE_UNKNOWN:
-            return False
-
-        if state.state == STATE_UNAVAILABLE:
+        if (
+            state is None or 
+            state.state == STATE_UNKNOWN or 
+            state.state == STATE_UNAVAILABLE
+        ):
+            self._power = None
+            self.async_write_ha_state()
             return False
 
         if state.state == STATE_OFF or state.state == STATE_STANDBY:
@@ -399,6 +402,9 @@ class VirtualPowerSensor(Entity):
             self._power = await self._power_calculator.calculate(state)
             if self._multiply_factor:
                 self._power *= self._multiply_factor
+
+        if (self._power is None):
+            return False
 
         self._power = round(self._power, 2)
 
