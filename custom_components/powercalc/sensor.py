@@ -263,7 +263,9 @@ def select_calculation_mode(config: dict, light_model: LightModel):
     )
 
 
-async def get_light_model(hass: HomeAssistantType, entity_entry, config: dict) -> Optional[LightModel]:
+async def get_light_model(
+    hass: HomeAssistantType, entity_entry, config: dict
+) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and entity_entry:
@@ -388,9 +390,9 @@ class VirtualPowerSensor(Entity):
     async def _update_power_sensor(self, state) -> bool:
         """Update power sensor based on new dependant hue light state."""
         if (
-            state is None or 
-            state.state == STATE_UNKNOWN or 
-            state.state == STATE_UNAVAILABLE
+            state is None
+            or state.state == STATE_UNKNOWN
+            or state.state == STATE_UNAVAILABLE
         ):
             self._power = None
             self.async_write_ha_state()
@@ -403,7 +405,7 @@ class VirtualPowerSensor(Entity):
             if self._multiply_factor:
                 self._power *= self._multiply_factor
 
-        if (self._power is None):
+        if self._power is None:
             return False
 
         self._power = round(self._power, 2)
