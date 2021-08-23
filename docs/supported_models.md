@@ -19,7 +19,7 @@
 |signify      |LCT003              |Hue White and Color Ambiance Spot GU10             |lut              |color_temp,hs|
 |signify      |LCT010              |Hue White and Color Ambiance A19 E26 (Gen 3)       |lut              |color_temp,hs|
 |signify      |LCT012              |Hue White and Color Ambiance Candle E12            |lut              |color_temp,hs|
-|signify      |LCT015              |Hue White and Color Ambiance A19 E26 (Gen 4)       |lut              |color_temp,hs|
+|signify      |LCT015              |Hue White and Color Ambiance A19 E26/E27 (Gen 4)   |lut              |color_temp,hs|
 |signify      |LCT024              |Hue Play                                           |lut              |color_temp,hs|
 |signify      |LLC001              |Philips Living Color Iris                          |lut              |hs           |
 |signify      |LLC010              |Hue Iris                                           |lut              |hs           |
