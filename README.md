@@ -97,7 +97,7 @@ All these settings are completely optional. You can skip this section if you don
 ```yaml
 powercalc:
   scan_interval: 00:01:00 #Each minute
-  entity_name_pattern: "{} Powersensor"
+  power_sensor_naming: "{} Powersensor"
   create_energy_sensors: false
 ```
 
