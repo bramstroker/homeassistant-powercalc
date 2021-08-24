@@ -146,16 +146,17 @@ async def async_setup_platform(
 
     unique_id = None
 
+    source_entity_domain, source_object_id = split_entity_id(source_entity)
+
     if entity_entry:
-        entity_name = entity_entry.name or entity_entry.original_name
+        source_entity_name = entity_entry.name or entity_entry.original_name
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
-    elif entity_state:
-        entity_name = entity_state.name
-        source_entity_domain = entity_state.domain
     else:
-        entity_name = split_entity_id(source_entity)[1].replace("_", " ")
-        source_entity_domain = split_entity_id(source_entity)[0]
+        source_entity_name = source_object_id.replace("_", " ")
+
+    if entity_state:
+        source_entity_name = entity_state.name
 
     light_model = None
     try:
@@ -183,21 +184,24 @@ async def async_setup_platform(
             standby_usage = light_model.standby_usage
 
     power_name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
-    name = config.get(CONF_NAME) or power_name_pattern.format(entity_name)
+    name = config.get(CONF_NAME) or power_name_pattern.format(source_entity_name)
+    entity_id = config.get(CONF_NAME) or power_name_pattern.format(source_object_id)
 
     _LOGGER.debug(
-        "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s",
+        "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s",
         source_entity,
         name,
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
         standby_usage,
+        unique_id
     )
 
     power_sensor = VirtualPowerSensor(
         hass=hass,
         power_calculator=calculation_strategy,
+        entity_id=entity_id,
         name=name,
         source_entity=source_entity,
         source_domain=source_entity_domain,
@@ -215,12 +219,17 @@ async def async_setup_platform(
 
     if should_create_energy_sensor:
         energy_name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
-        energy_sensor_name = energy_name_pattern.format(entity_name)
+        energy_sensor_name = energy_name_pattern.format(source_entity_name)
+        energy_sensor_entity_id = energy_name_pattern.format(source_object_id)
+        energy_sensor_entity_id = async_generate_entity_id("sensor.{}", energy_sensor_entity_id, hass=hass)
+
 
         _LOGGER.debug("Creating energy sensor: %s", energy_sensor_name)
         entities_to_add.append(
             VirtualEnergySensor(
                 source_entity=power_sensor.entity_id,
+                unique_id=unique_id,
+                entity_id=energy_sensor_entity_id,
                 name=energy_sensor_name,
                 round_digits=4,
                 unit_prefix="k",
@@ -335,6 +344,7 @@ class VirtualPowerSensor(Entity):
         self,
         hass: HomeAssistantType,
         power_calculator: PowerCalculationStrategyInterface,
+        entity_id: str,
         name: str,
         source_entity: str,
         source_domain: str,
@@ -349,12 +359,12 @@ class VirtualPowerSensor(Entity):
         self._source_domain = source_domain
         self._name = name
         self._power = None
-        self._unique_id = unique_id
         self._standby_usage = standby_usage
         self._attr_force_update = True
+        self._attr_unique_id = unique_id
         self._scan_interval = scan_interval
         self._multiply_factor = multiply_factor
-        self.entity_id = async_generate_entity_id("sensor.{}", name, hass=hass)
+        self.entity_id = async_generate_entity_id("sensor.{}", entity_id, hass=hass)
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -439,11 +449,6 @@ class VirtualPowerSensor(Entity):
         return self._power
 
     @property
-    def unique_id(self):
-        """Return a unique id."""
-        return self._unique_id
-
-    @property
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
@@ -453,6 +458,8 @@ class VirtualEnergySensor(IntegrationSensor):
     def __init__(
         self,
         source_entity,
+        unique_id,
+        entity_id,
         name,
         round_digits,
         unit_prefix,
@@ -473,6 +480,9 @@ class VirtualEnergySensor(IntegrationSensor):
         )
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
+        self.entity_id = entity_id
+        if (unique_id):
+            self._attr_unique_id = f"{unique_id}_energy"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
