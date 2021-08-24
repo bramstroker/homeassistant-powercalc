@@ -61,14 +61,11 @@ from .const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
-    CONF_MAX_WATT,
-    CONF_MIN_WATT,
     CONF_MODE,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
-    CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -86,9 +83,6 @@ from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORM_SCHEMA = vol.All(
-    cv.deprecated(CONF_MIN_WATT),
-    cv.deprecated(CONF_MAX_WATT),
-    cv.deprecated(CONF_WATT),
     PLATFORM_SCHEMA.extend(
         {
             vol.Optional(CONF_NAME): cv.string,
@@ -108,9 +102,6 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_MODEL): cv.string,
             vol.Optional(CONF_MANUFACTURER): cv.string,
             vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
-            vol.Optional(CONF_MIN_WATT): cv.string,
-            vol.Optional(CONF_MAX_WATT): cv.string,
-            vol.Optional(CONF_WATT): cv.string,
             vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
             vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
@@ -296,14 +287,6 @@ def select_calculation_mode(config: dict, light_model: LightModel) -> str:
 
     if light_model:
         return light_model.supported_modes[0]
-
-    # BC compat, can be removed in v0.5
-    if config.get(CONF_MIN_WATT):
-        return MODE_LINEAR
-
-    # BC compat, can be removed in v0.5
-    if config.get(CONF_WATT):
-        return MODE_FIXED
 
     raise UnsupportedMode(
         "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
