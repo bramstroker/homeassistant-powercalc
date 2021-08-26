@@ -12,6 +12,7 @@ import voluptuous as vol
 from homeassistant.components import (
     binary_sensor,
     climate,
+    device_tracker,
     fan,
     input_boolean,
     light,
@@ -34,6 +35,7 @@ from homeassistant.const import (
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
+    STATE_NOT_HOME,
     STATE_OFF,
     STATE_STANDBY,
     STATE_UNAVAILABLE,
@@ -99,6 +101,7 @@ PLATFORM_SCHEMA = vol.All(
                     fan.DOMAIN,
                     binary_sensor.DOMAIN,
                     climate.DOMAIN,
+                    device_tracker.DOMAIN,
                     remote.DOMAIN,
                     media_player.DOMAIN,
                     input_boolean.DOMAIN,
@@ -125,7 +128,11 @@ PLATFORM_SCHEMA = vol.All(
 ENERGY_ICON = "mdi:lightning-bolt"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
-
+OFF_STATES = [
+    STATE_OFF,
+    STATE_NOT_HOME,
+    STATE_STANDBY
+]
 
 async def async_setup_platform(
     hass: HomeAssistantType,
@@ -398,7 +405,7 @@ class VirtualPowerSensor(Entity):
             self.async_write_ha_state()
             return False
 
-        if state.state == STATE_OFF or state.state == STATE_STANDBY:
+        if state.state in OFF_STATES:
             self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(state)
