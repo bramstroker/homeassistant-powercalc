@@ -24,6 +24,7 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
+from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.const import (
@@ -271,6 +272,16 @@ async def create_energy_sensor(
         integration_method=TRAPEZOIDAL_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
+    )
+
+async def create_utility_meter(
+    energy_sensor: VirtualEnergySensor
+):
+    cycle = "daily"
+    return UtilityMeterSensor(
+        energy_sensor.entity_id,
+        f"{energy_sensor.name} {cycle}",
+        cycle
     )
 
 def select_calculation_mode(config: dict, light_model: LightModel) -> str:
