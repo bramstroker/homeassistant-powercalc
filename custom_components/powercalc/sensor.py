@@ -128,11 +128,8 @@ PLATFORM_SCHEMA = vol.All(
 ENERGY_ICON = "mdi:lightning-bolt"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
-OFF_STATES = [
-    STATE_OFF,
-    STATE_NOT_HOME,
-    STATE_STANDBY
-]
+OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
+
 
 async def async_setup_platform(
     hass: HomeAssistantType,
