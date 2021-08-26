@@ -27,6 +27,8 @@
 |signify      |LLC020              |Hue Go                                             |lut              |color_temp,hs|
 |signify      |LTA001              |Hue White Ambiance E27                             |lut              |color_temp   |
 |signify      |LTC001              |Hue Being Ceiling Light                            |lut              |color_temp   |
+|signify      |LTC002              |LTC002                                             |lut              |color_temp   |
+|signify      |LTP003              |LTP003                                             |lut              |color_temp   |
 |signify      |LTW001              |Hue White Ambiance A19                             |lut              |color_temp   |
 |signify      |LTW010              |Hue White Ambiance A60 E27 806lm 9290012001A       |lut              |color_temp   |
 |signify      |LWA004              |Hue White Filament Bulb A60 E27                    |lut              |brightness   |
