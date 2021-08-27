@@ -9,6 +9,12 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.components.utility_meter.const import (
+    DAILY,
+    WEEKLY,
+    MONTHLY,
+    METER_TYPES
+)
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
@@ -20,6 +26,7 @@ from .const import (
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
+    CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -55,6 +62,9 @@ CONFIG_SCHEMA = vol.Schema(
                     ): vol.Match(r"\{\}"),
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
+                    vol.Optional(CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]): vol.All(
+                        cv.ensure_list, [vol.In(METER_TYPES)]
+                    ),
                 }
             ),
         )

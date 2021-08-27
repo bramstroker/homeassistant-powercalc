@@ -57,6 +57,7 @@ from homeassistant.helpers.typing import (
 )
 
 from .const import (
+    CALCULATION_MODES,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
@@ -71,12 +72,12 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
+    CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
-    MODE_LUT,
 )
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
@@ -107,7 +108,7 @@ PLATFORM_SCHEMA = vol.All(
             ),
             vol.Optional(CONF_MODEL): cv.string,
             vol.Optional(CONF_MANUFACTURER): cv.string,
-            vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
+            vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
             vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
             vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
@@ -185,9 +186,11 @@ async def async_setup_platform(
         entities_to_add.append(energy_sensor)
 
         if component_config.get(CONF_CREATE_UTILITY_METERS):
-            entities_to_add.append(
-                create_utility_meter_sensor(energy_sensor, "daily")
-            )
+            meter_types = component_config.get(CONF_UTILITY_METER_TYPES)
+            for meter_type in meter_types:
+                entities_to_add.append(
+                    create_utility_meter_sensor(energy_sensor, meter_type)
+                )
 
     async_add_entities(entities_to_add)
 
@@ -286,15 +289,15 @@ async def create_energy_sensor(
 
 def create_utility_meter_sensor(
     energy_sensor: VirtualEnergySensor,
-    cycle: str
-):
-    name = f"{energy_sensor.name} {cycle}"
-    entity_id = f"{energy_sensor.entity_id}_{cycle}"
-    _LOGGER.debug("Creating utility-meter sensor: %s", name)
+    meter_type: str
+) -> VirtualUtilityMeterSensor:
+    name = f"{energy_sensor.name} {meter_type}"
+    entity_id = f"{energy_sensor.entity_id}_{meter_type}"
+    _LOGGER.debug("Creating utility_meter sensor: %s", name)
     return VirtualUtilityMeterSensor(
         energy_sensor.entity_id,
         name,
-        cycle,
+        meter_type,
         entity_id
     )
 

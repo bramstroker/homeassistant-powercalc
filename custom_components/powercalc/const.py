@@ -28,10 +28,16 @@ CONF_STATES_POWER = "states_power"
 CONF_STANDBY_USAGE = "standby_usage"
 CONF_DISABLE_STANDBY_USAGE = "disable_standby_usage"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
+CONF_UTILITY_METER_TYPES = "utility_meter_types"
 
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
+CALCULATION_MODES = [
+    MODE_FIXED,
+    MODE_LINEAR,
+    MODE_LUT,
+]
 
 MANUFACTURER_DIRECTORY_MAPPING = {
     "IKEA of Sweden": "ikea",
