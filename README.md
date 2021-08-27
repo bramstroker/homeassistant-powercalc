@@ -31,6 +31,7 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `dev
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
     - [Multiply Factor](#multiply-factor)
+    - [Utility Meters](#utility-meters)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -88,12 +89,14 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                   | Type    | Requirement  | Default   | Description                                                                                                                                        |
-| ---------------------- | ------- | ------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scan_interval          | string  | **Optional** | 00:10:00  | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| create_energy_sensors  | boolean | **Optional** | true      | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
-| power_sensor_naming    | string  | **Optional** | {} power  | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
-| energy_sensor_naming   | string  | **Optional** | {} energy | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| Name                   | Type    | Requirement  | Default                | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| create_energy_sensors  | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| power_sensor_naming    | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_naming   | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| create_utility_meters  | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
+| utility_meter_types    | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
 
 **Example:**
 
@@ -417,6 +420,35 @@ Let's assume you have a combination of 4 GU10 spots in your ceiling in a light g
 This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
+
+## Utility meters
+
+The energy sensors created by the component will keep increasing the total kWh, and never reset.
+When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
+
+```yaml
+powercalc:
+  create_utility_meters: true
+```
+
+By default utility meters are created for `daily`, `weekly`, `monthly` cycles.
+You can change this behaviour with the `utility_meter_types` configuration option.
+
+```yaml
+powercalc:
+  create_utility_meters: true
+  utility_meter_types:
+    - daily
+    - yearly
+```
+
+The utility meters have the same name as your energy sensor, but are extended by the meter cycle.
+Assume you have a light `light.floorlamp_livingroom`, than you should have the following sensors created:
+- `sensor.floorlamp_livingroom_power`
+- `sensor.floorlamp_livingroom_energy`
+- `sensor.floorlamp_livingroom_energy_daily`
+- `sensor.floorlamp_livingroom_energy_weekly`
+- `sensor.floorlamp_livingroom_energy_monthly`
 
 ## Debug logging
 

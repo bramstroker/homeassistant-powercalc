@@ -194,6 +194,7 @@ async def async_setup_platform(
 
     async_add_entities(entities_to_add)
 
+
 async def create_power_sensor(
     hass: HomeAssistantType,
     entity_entry,
@@ -212,7 +213,7 @@ async def create_power_sensor(
     light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, sensor_config)
-    except (ModelNotSupported) as err:
+    except ModelNotSupported as err:
         _LOGGER.info("Model not found in library %s: %s", source_entity.entity_id, err)
 
     try:
@@ -258,6 +259,7 @@ async def create_power_sensor(
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
     )
 
+
 async def create_energy_sensor(
     hass: HomeAssistantType,
     component_config: dict,
@@ -287,6 +289,7 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
+
 def create_utility_meter_sensor(
     energy_sensor: VirtualEnergySensor,
     meter_type: str
@@ -300,6 +303,7 @@ def create_utility_meter_sensor(
         meter_type,
         entity_id
     )
+
 
 def select_calculation_mode(config: dict, light_model: LightModel) -> str:
     """Select the calculation mode"""
@@ -469,7 +473,7 @@ class VirtualEnergySensor(IntegrationSensor):
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
-        if (unique_id):
+        if unique_id:
             self._attr_unique_id = f"{unique_id}_energy"
 
     @property
@@ -483,6 +487,7 @@ class VirtualEnergySensor(IntegrationSensor):
     @property
     def icon(self):
         return ENERGY_ICON
+
 
 class VirtualUtilityMeterSensor(UtilityMeterSensor):
     def __init__(
