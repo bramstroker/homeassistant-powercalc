@@ -11,7 +11,8 @@
     "light"
   ],
   "after_dependencies": [
-    "integration"
+    "integration",
+    "utility_meter"
   ],
   "codeowners": ["@bramstroker"],
   "requirements": [],
