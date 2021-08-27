@@ -25,6 +25,7 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
+from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
@@ -58,6 +59,7 @@ from homeassistant.helpers.typing import (
 from .const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
@@ -174,14 +176,18 @@ async def async_setup_platform(
         should_create_energy_sensor = config.get(CONF_CREATE_ENERGY_SENSOR)
 
     if should_create_energy_sensor:
-        entities_to_add.append(
-            await create_energy_sensor(
+        energy_sensor = await create_energy_sensor(
                 hass,
                 component_config,
                 power_sensor,
                 source_entity
             )
-        )
+        entities_to_add.append(energy_sensor)
+
+        if component_config.get(CONF_CREATE_UTILITY_METERS):
+            entities_to_add.append(
+                create_utility_meter_sensor(energy_sensor, "daily")
+            )
 
     async_add_entities(entities_to_add)
 
@@ -278,14 +284,18 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
-async def create_utility_meter(
-    energy_sensor: VirtualEnergySensor
+def create_utility_meter_sensor(
+    energy_sensor: VirtualEnergySensor,
+    cycle: str
 ):
-    cycle = "daily"
-    return UtilityMeterSensor(
+    name = f"{energy_sensor.name} {cycle}"
+    entity_id = f"{energy_sensor.entity_id}_{cycle}"
+    _LOGGER.debug("Creating utility-meter sensor: %s", name)
+    return VirtualUtilityMeterSensor(
         energy_sensor.entity_id,
-        f"{energy_sensor.name} {cycle}",
-        cycle
+        name,
+        cycle,
+        entity_id
     )
 
 def select_calculation_mode(config: dict, light_model: LightModel) -> str:
@@ -470,6 +480,24 @@ class VirtualEnergySensor(IntegrationSensor):
     @property
     def icon(self):
         return ENERGY_ICON
+
+class VirtualUtilityMeterSensor(UtilityMeterSensor):
+    def __init__(
+        self,
+        source_entity,
+        name,
+        meter_type,
+        entity_id
+    ):
+        super().__init__(
+            source_entity,
+            name,
+            meter_type,
+            DEFAULT_OFFSET,
+            False
+        )
+        self.entity_id = entity_id
+
 
 class SourceEntity(NamedTuple):
     unique_id: str

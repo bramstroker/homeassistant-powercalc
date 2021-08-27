@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from datetime import timedelta
 from typing import Optional
 
@@ -13,12 +12,11 @@ from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER,
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
@@ -35,8 +33,6 @@ from .strategy_fixed import FixedStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
 from .strategy_lut import LutRegistry, LutStrategy
-
-_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
@@ -58,6 +54,7 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): vol.Match(r"\{\}"),
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
+                    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                 }
             ),
         )
@@ -72,6 +69,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
+        CONF_CREATE_UTILITY_METERS: False
     }
 
     hass.data[DOMAIN] = {
@@ -122,13 +120,6 @@ class PowerCalculatorStrategyFactory:
         fixed_config = config.get(CONF_FIXED)
         if fixed_config is None and light_model is not None:
             fixed_config = light_model.fixed_mode_config
-
-        # BC compat
-        if fixed_config is None:
-            _LOGGER.warning(
-                "watt is deprecated and will be removed in version 0.3, use fixed->power"
-            )
-            fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
         return FixedStrategy(
             fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
