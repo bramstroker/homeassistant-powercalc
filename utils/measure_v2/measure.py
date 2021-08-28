@@ -116,7 +116,7 @@ class Measure():
             csv_file.close()
 
     def measure_standby_usage(self) -> float:
-        self.light_controller.change_light_state(on=False)
+        self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         print("Measuring standby usage. Waiting for 5 seconds...")
         time.sleep(5)
         return self.power_meter.get_power()

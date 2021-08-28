@@ -48,12 +48,12 @@ class HassLightController(LightController):
         return LightInfo(self._model_id, min_mired, max_mired)
 
     def get_questions(self) -> list[dict]:
-        #todo, selection list (use states api, filter by light. entities)
         return [
             {
                 'type': 'input',
                 'name': 'light_entity_id',
                 'message': 'Specify the entity_id of your light in HA?',
+                'validate': lambda val: val.startswith("light.") or "entity id must start with light."
             },
             {
                 'type': 'input',
