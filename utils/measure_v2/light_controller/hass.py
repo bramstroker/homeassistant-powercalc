@@ -1,7 +1,13 @@
 import requests
 from .controller import LightController, LightInfo
+from .const import (
+    MODE_BRIGHTNESS,
+    MODE_COLOR_TEMP,
+    MODE_HS
+)
 
 TURN_ON_ENDPOINT = "/services/light/turn_on"
+TURN_OFF_ENDPOINT = "/services/light/turn_off"
 
 class HassLightController(LightController):
     def __init__(
@@ -12,8 +18,27 @@ class HassLightController(LightController):
         self._api_url = api_url
         self._auth_header = {"Authorization": "Bearer " + token}
 
-    def change_light_state(self, color_mode: str, **kwargs):
-        pass
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
+        if on == False:
+            requests.post(
+                self._api_url + TURN_OFF_ENDPOINT,
+                headers=self._auth_header
+            )
+            return
+
+        if color_mode == MODE_HS:
+            json = self.build_hs_json_body(**kwargs)
+        elif color_mode == MODE_COLOR_TEMP:
+            json = self.build_ct_json_body(**kwargs)
+        else:
+            json = self.build_bri_json_body(**kwargs)
+
+        requests.post(
+            self._api_url + TURN_ON_ENDPOINT,
+            json=json,
+            headers=self._auth_header
+        )
+        #todo error handling
 
     def get_light_info(self) -> LightInfo:
         state = self.get_entity_state(self._entity_id)
@@ -66,16 +91,3 @@ class HassLightController(LightController):
             'entity_id': self._entity_id,
             'brightness': bri
         }
-
-
-    def set_light_state(self, color_mode: str, **kwargs):
-        if color_mode == MODE_HS:
-            json = self.build_hs_json_body()
-        elif color_mode == MODE_COLOR_TEMP:
-            json = self.build_ct_json_body()
-        else:
-            json = self.build_bri_json_body()
-        
-        url = self._api_url + TURN_ON_ENDPOINT
-        requests.post(url, json=json, headers=self._auth_header)
-        #todo error handling

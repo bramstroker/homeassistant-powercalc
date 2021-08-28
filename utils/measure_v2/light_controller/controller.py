@@ -10,7 +10,7 @@ class LightInfo():
         max_mired: int = 500
     ):
         self.model_id = model_id
-        self._min_mired = min_mired,
+        self._min_mired = min_mired
         self._max_mired = max_mired
 
     def get_min_mired(self) -> int:
@@ -22,7 +22,7 @@ class LightInfo():
         self._min_mired = value
 
     def get_max_mired(self) -> int:
-        return self._min_mired
+        return self._max_mired
 
     def set_max_mired(self, value: int):
         if value > 500:
@@ -33,7 +33,7 @@ class LightInfo():
     max_mired = property(get_max_mired, set_max_mired)
 
 class LightController():
-    def change_light_state(self, color_mode: str, **kwargs):
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         pass
 
     def get_light_info(self) -> LightInfo:

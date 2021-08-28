@@ -1,4 +1,9 @@
 from asyncio.tasks import sleep
+from light_controller.const import (
+    MODE_BRIGHTNESS,
+    MODE_COLOR_TEMP,
+    MODE_HS
+)
 from light_controller.controller import LightController
 from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
@@ -11,9 +16,6 @@ from PyInquirer import prompt
 import os
 import csv
 
-MODE_HS = "hs"
-MODE_COLOR_TEMP = "color_temp"
-MODE_BRIGHTNESS = "brightness"
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -66,9 +68,9 @@ class Measure():
         with open(f"{export_directory}/{color_mode}.csv", "w") as csv_file:
             csv_writer = csv.writer(csv_file)
 
-            self.light_controller.change_light_state(color_mode, on=True, bri=1)
+            self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
-            # Initially wait longer so the Shelly plug can settle
+            # Initially wait longer so the smartplug can settle
             print("Start taking measurements for color mode: ", color_mode)
             print("Waiting 10 seconds...")
             time.sleep(10)
@@ -76,7 +78,7 @@ class Measure():
             csv_writer.writerow(CSV_HEADERS[color_mode])
             for count, variation in enumerate(self.get_variations(color_mode)):
                 print("Changing light to: ", variation)
-                self.light_controller.change_light_state(color_mode, **variation)
+                self.light_controller.change_light_state(color_mode, on=True, **variation)
                 time.sleep(SLEEP_TIME)
                 power = self.power_meter.get_power()
                 print("Measured power: ", power)
