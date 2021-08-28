@@ -59,6 +59,7 @@ class HassLightController(LightController):
                 'type': 'input',
                 'name': 'light_model_id',
                 'message': 'What is the model_id of your light? for example LWA004',
+                'validate': lambda val: len(val) > 0 or "This is required"
             },
         ]
     
