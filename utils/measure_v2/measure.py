@@ -1,6 +1,7 @@
 from asyncio.tasks import sleep
 from light_controller.controller import LightController
-from light_controller.hue import Hue
+from light_controller.hue import HueLightController
+from light_controller.hass import HassLightController
 from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 import time
@@ -34,6 +35,9 @@ SHELLY_IP = "192.168.178.254"
 
 # Light controller settings
 HUE_BRIDGE_IP = "192.168.178.44"
+
+HASS_URL = "http://192.168.178.99:8123/api"
+HASS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIzNDQ3NTFjNDQ4MWQ0MzRkOWZlNmRkNWE3MzkyYzhjNCIsImlhdCI6MTYzMDE1MzUzNCwiZXhwIjoxOTQ1NTEzNTM0fQ.-hieXd-D3txoUaVeqbRBJxPZazVx6Xb7xw-QQvgBkzc"
 
 class Measure():
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -163,8 +167,17 @@ class Measure():
             },
         ] + self.light_controller.get_questions()
 
+
+def create_light_controller() -> LightController:
+    #return HueLightController(HUE_BRIDGE_IP)
+    return HassLightController(HASS_URL, HASS_TOKEN)
+
+def create_power_meter() -> PowerMeter:
+    return ShellyPowerMeter(SHELLY_IP)
+
 measure = Measure(
-    Hue(HUE_BRIDGE_IP),
-    ShellyPowerMeter(SHELLY_IP)
+    create_light_controller(),
+    create_power_meter()
 )
+
 measure.start()
