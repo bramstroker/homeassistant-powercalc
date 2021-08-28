@@ -87,7 +87,12 @@ class Measure():
 
         if answers["generate_model_json"]:
             standby_usage = self.measure_standby_usage()
-            self.write_model_json(directory=export_directory, standby_usage=standby_usage, name=answers["model_name"])
+            self.write_model_json(
+                directory=export_directory,
+                standby_usage=standby_usage,
+                name=answers["model_name"],
+                measure_device=answers["measure_device"]
+            )
 
         with open(f"{export_directory}/{color_mode}.csv", "w") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -113,6 +118,7 @@ class Measure():
                 if count % 100 == 0:
                     csv_file.flush()
 
+            #todo gzip json
             csv_file.close()
 
     def measure_standby_usage(self) -> float:
@@ -158,14 +164,22 @@ class Measure():
             i += step
         yield end
 
-    def write_model_json(directory: str, standby_usage: float, name: str):
+    def write_model_json(
+        self,
+        directory: str,
+        standby_usage: float,
+        name: str,
+        measure_device: str
+    ):
         json_data = json.dumps({
+            "measure_device": measure_device,
+            "measure_method": "script",
             "name": name,
             "standby_usage": standby_usage,
             "supported_modes": [
                 "lut"
             ]
-        })
+        }, indent=4, sort_keys=True)
         json_file = open(os.path.join(directory, "model.json"), "w")
         json_file.write(json_data)
         json_file.close()
@@ -189,6 +203,12 @@ class Measure():
                 'type': 'input',
                 'name': 'model_name',
                 'message': 'Specify the full light model name',
+                'when': lambda answers: answers['generate_model_json']
+            },
+            {
+                'type': 'input',
+                'name': 'measure_device',
+                'message': 'Which device (manufacturer, model) do you use to take the measurement?',
                 'when': lambda answers: answers['generate_model_json']
             },
         ] + self.light_controller.get_questions() + self.power_meter.get_questions()
