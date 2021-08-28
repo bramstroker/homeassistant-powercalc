@@ -7,6 +7,7 @@ from light_controller.controller import LightController
 from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
 from powermeter.powermeter import PowerMeter
+from powermeter.hass import HassPowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tuya import TuyaPowerMeter
 import time
@@ -71,6 +72,7 @@ class Measure():
     def start(self):
         answers = prompt(self.get_questions())
         self.light_controller.process_answers(answers)
+        self.power_meter.process_answers(answers)
         self.light_info = self.light_controller.get_light_info()
 
         color_mode = answers["color_mode"]
@@ -189,7 +191,7 @@ class Measure():
                 'message': 'Specify the full light model name',
                 'when': lambda answers: answers['generate_model_json']
             },
-        ] + self.light_controller.get_questions()
+        ] + self.light_controller.get_questions() + self.power_meter.get_questions()
 
 
 def create_light_controller() -> LightController:
@@ -203,7 +205,8 @@ def create_power_meter() -> PowerMeter:
     #     TUYA_DEVICE_KEY,
     #     TUYA_DEVICE_VERSION
     # )
-    return ShellyPowerMeter(SHELLY_IP)
+    return HassPowerMeter(HASS_URL, HASS_TOKEN)
+    #return ShellyPowerMeter(SHELLY_IP)
 
 measure = Measure(
     create_light_controller(),

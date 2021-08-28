@@ -1,10 +1,11 @@
 import requests
 from .controller import LightController, LightInfo
 from .const import (
-    MODE_BRIGHTNESS,
     MODE_COLOR_TEMP,
     MODE_HS
 )
+
+NAME = "hass"
 
 TURN_ON_ENDPOINT = "/services/light/turn_on"
 TURN_OFF_ENDPOINT = "/services/light/turn_off"
@@ -47,7 +48,7 @@ class HassLightController(LightController):
         return LightInfo(self._model_id, min_mired, max_mired)
 
     def get_questions(self) -> list[dict]:
-        #todo, selection list
+        #todo, selection list (use states api, filter by light. entities)
         return [
             {
                 'type': 'input',
