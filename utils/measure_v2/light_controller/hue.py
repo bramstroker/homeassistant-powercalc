@@ -4,6 +4,8 @@ from phue import (
 )
 from .controller import LightController, LightInfo
 
+NAME = "hue"
+
 class HueLightController(LightController):
     def __init__(self, bridge_ip: str):
         self.bridge = self.initialize_hue_bridge(bridge_ip)

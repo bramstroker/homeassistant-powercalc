@@ -1,3 +1,3 @@
 class PowerMeter():
-    def get_power():
+    def get_power(self) -> float:
         pass

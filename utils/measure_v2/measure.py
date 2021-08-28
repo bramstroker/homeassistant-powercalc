@@ -1,4 +1,3 @@
-from asyncio.tasks import sleep
 from light_controller.const import (
     MODE_BRIGHTNESS,
     MODE_COLOR_TEMP,
@@ -9,6 +8,7 @@ from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
 from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
+from powermeter.tuya import TuyaPowerMeter
 import time
 import json
 from typing import Iterator
@@ -32,12 +32,34 @@ SLEEP_TIME_SAT = 10  # time to wait between each increase in saturation
 START_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 255
 
-# Power meter settings
+POWER_METER_SHELLY = "shelly"
+POWER_METER_HASS = "hass"
+POWER_METERS = [
+    POWER_METER_SHELLY,
+    POWER_METER_HASS
+]
+
+LIGHT_CONTROLLER_HUE = "hue"
+LIGHT_CONTROLLER_HASS = "hass"
+LIGHT_CONTROLLERS = [
+    
+]
+
+#@todo move params below to .env file so we don't commit sensitive information
+
+# Shelly
 SHELLY_IP = "192.168.178.254"
 
-# Light controller settings
+# Tuya
+TUYA_DEVICE_ID="aaaaaaaaad89682385bbb"
+TUYA_DEVICE_IP="192.168.1.148"
+TUYA_DEVICE_KEY="aaaaaaaae1b8abb"
+TUYA_DEVICE_VERSION="3.3"
+
+# Hue
 HUE_BRIDGE_IP = "192.168.178.44"
 
+# Home assistant
 HASS_URL = "http://192.168.178.99:8123/api"
 HASS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIzNDQ3NTFjNDQ4MWQ0MzRkOWZlNmRkNWE3MzkyYzhjNCIsImlhdCI6MTYzMDE1MzUzNCwiZXhwIjoxOTQ1NTEzNTM0fQ.-hieXd-D3txoUaVeqbRBJxPZazVx6Xb7xw-QQvgBkzc"
 
@@ -175,6 +197,12 @@ def create_light_controller() -> LightController:
     return HassLightController(HASS_URL, HASS_TOKEN)
 
 def create_power_meter() -> PowerMeter:
+    # return TuyaPowerMeter(
+    #     TUYA_DEVICE_ID,
+    #     TUYA_DEVICE_IP,
+    #     TUYA_DEVICE_KEY,
+    #     TUYA_DEVICE_VERSION
+    # )
     return ShellyPowerMeter(SHELLY_IP)
 
 measure = Measure(
