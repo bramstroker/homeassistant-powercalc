@@ -1,6 +1,7 @@
+from .powermeter import PowerMeter
 import tuyapower
 
-class ShellyPowerMeter(PowerMeter):
+class TuyaPowerMeter(PowerMeter):
     def __init__(
         self,
         device_id: str,
@@ -20,7 +21,7 @@ class ShellyPowerMeter(PowerMeter):
             self._device_key,
             self._device_version
         )
-        
+
         if(err == "OK"):
             return w
         else:
