@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, NamedTuple
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -19,6 +18,7 @@ from homeassistant.components import (
     remote,
     sensor,
     switch,
+    vacuum,
 )
 
 from homeassistant.components.integration.sensor import (
@@ -81,6 +81,7 @@ from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from .common import SourceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -100,6 +101,7 @@ PLATFORM_SCHEMA = vol.All(
                     media_player.DOMAIN,
                     input_boolean.DOMAIN,
                     sensor.DOMAIN,
+                    vacuum.DOMAIN,
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,
@@ -150,21 +152,26 @@ async def async_setup_platform(
     if entity_state:
         source_entity_name = entity_state.name
 
+    capabilities = entity_entry.capabilities if entity_entry else []
     source_entity = SourceEntity(
         unique_id,
         source_object_id,
         source_entity,
         source_entity_name,
-        source_entity_domain
+        source_entity_domain,
+        capabilities
     )
 
-    power_sensor = await create_power_sensor(
-        hass,
-        entity_entry,
-        config,
-        component_config,
-        source_entity
-    )
+    try:
+        power_sensor = await create_power_sensor(
+            hass,
+            entity_entry,
+            config,
+            component_config,
+            source_entity
+        )
+    except (ModelNotSupported, StrategyConfigurationError) as err:
+        return
 
     entities_to_add = [power_sensor]
 
@@ -204,19 +211,20 @@ async def create_power_sensor(
         light_model = await get_light_model(hass, entity_entry, sensor_config)
     except (ModelNotSupported) as err:
         _LOGGER.info("Model not found in library %s: %s", source_entity.entity_id, err)
+        raise err
 
     try:
         mode = select_calculation_mode(sensor_config, light_model)
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity.domain
         )
-        await calculation_strategy.validate_config(entity_entry)
+        await calculation_strategy.validate_config(source_entity)
     except (ModelNotSupported, UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
-        return
+        raise err
     except StrategyConfigurationError as err:
-        _LOGGER.error("Error setting up calculation strategy: %s", err)
-        return
+        _LOGGER.error("Error setting up calculation strategy for %s: %s", source_entity.entity_id, err)
+        raise err
 
     standby_usage = None
     if not sensor_config.get(CONF_DISABLE_STANDBY_USAGE):
@@ -459,10 +467,3 @@ class VirtualEnergySensor(IntegrationSensor):
     @property
     def icon(self):
         return ENERGY_ICON
-
-class SourceEntity(NamedTuple):
-    unique_id: str
-    object_id: str
-    entity_id: str
-    name: str
-    domain: str

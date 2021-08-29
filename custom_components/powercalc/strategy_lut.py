@@ -8,7 +8,6 @@ from csv import reader
 from functools import partial
 from typing import Optional
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -28,6 +27,7 @@ from .errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
+from .common import SourceEntity
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -149,21 +149,21 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     async def validate_config(
         self,
-        entity_entry: er.RegistryEntry,
+        source_entity: SourceEntity
     ):
-        if entity_entry.domain != light.DOMAIN:
+        if source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError("Only light entities can use the LUT mode")
 
         if self._model.manufacturer is None:
             _LOGGER.error(
-                "Manufacturer not supplied for entity: %s", entity_entry.entity_id
+                "Manufacturer not supplied for entity: %s", source_entity.entity_id
             )
 
         if self._model.model is None:
-            _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
+            _LOGGER.error("Model not supplied for entity: %s", source_entity.entity_id)
             return
 
-        supported_color_modes = entity_entry.capabilities[
+        supported_color_modes = source_entity.capabilities[
             light.ATTR_SUPPORTED_COLOR_MODES
         ]
         for color_mode in supported_color_modes:

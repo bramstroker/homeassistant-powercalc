@@ -17,8 +17,6 @@ from .const import (
     CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER,
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
@@ -35,8 +33,6 @@ from .strategy_fixed import FixedStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
 from .strategy_lut import LutRegistry, LutStrategy
-
-_LOGGER = logging.getLogger(__name__)
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
@@ -122,13 +118,6 @@ class PowerCalculatorStrategyFactory:
         fixed_config = config.get(CONF_FIXED)
         if fixed_config is None and light_model is not None:
             fixed_config = light_model.fixed_mode_config
-
-        # BC compat
-        if fixed_config is None:
-            _LOGGER.warning(
-                "watt is deprecated and will be removed in version 0.3, use fixed->power"
-            )
-            fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
         return FixedStrategy(
             fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
