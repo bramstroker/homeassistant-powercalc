@@ -347,23 +347,12 @@ bri,watt
 
 #### Creating LUT files
 
-New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
-An example script is available `utils/measure/measure.py`.
+New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API or Home Assistant API.
+The tooling is available at `utils/measure_v2_`.
 
-I am using the "Shelly Plug S", so this script is specifically build for Shelly smartplugs. When you want to use another plug you'll need to modify the script or write your own.
+The script supports several smartplugs with power monitoring.
 
-Setup requirements for the script. It is advised to run in a virtual environment.
-```
-cd utils/measure
-python3 -m venv measure
-source measure/bin/activate
-pip install -r requirements.txt
-```
-
-Run the script:
-```
-python3 measure.py
-```
+See the [README](utils/measure_v2/README.md) for more information.
 
 ### Supported models
 
