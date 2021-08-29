@@ -13,6 +13,7 @@ from homeassistant.components import (
     device_tracker,
     fan,
     input_boolean,
+    input_select,
     light,
     media_player,
     remote,
@@ -100,6 +101,7 @@ PLATFORM_SCHEMA = vol.All(
                     remote.DOMAIN,
                     media_player.DOMAIN,
                     input_boolean.DOMAIN,
+                    input_select.DOMAIN,
                     sensor.DOMAIN,
                     vacuum.DOMAIN,
                 )
@@ -384,10 +386,11 @@ class VirtualPowerSensor(Entity):
             self._power = self._standby_usage or 0
         else:
             self._power = await self._power_calculator.calculate(state)
-            if self._multiply_factor:
+            if self._multiply_factor and self._power is not None:
                 self._power *= self._multiply_factor
 
         if self._power is None:
+            self.async_write_ha_state()
             return False
 
         self._power = round(self._power, 2)
