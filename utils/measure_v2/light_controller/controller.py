@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from __future__ import annotations
 
 class LightInfo():
     model_id: str

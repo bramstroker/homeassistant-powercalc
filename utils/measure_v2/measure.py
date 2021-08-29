@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from light_controller.const import (
     MODE_BRIGHTNESS,
     MODE_COLOR_TEMP,
@@ -72,6 +74,7 @@ HUE_BRIDGE_IP = config('HUE_BRIDGE_IP')
 HASS_URL = config('HASS_URL')
 HASS_TOKEN = config('HASS_TOKEN')
 TASMOTA_DEVICE_IP = config('TASMOTA_DEVICE_IP')
+KASA_DEVICE_IP = config('KASA_DEVICE_IP')
 
 class Measure():
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -263,7 +266,7 @@ class PowerMeterFactory():
         return HassPowerMeter(HASS_URL, HASS_TOKEN)
     
     def kasa(self):
-        return KasaPowerMeter()
+        return KasaPowerMeter(KASA_DEVICE_IP)
 
     def shelly(self):
         return ShellyPowerMeter(SHELLY_IP)

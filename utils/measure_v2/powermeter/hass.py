@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dateutil.parser import parse
 from .errors import PowerMeterError
 from .powermeter import PowerMeter

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from kasa import SmartPlug
 import asyncio
 from .powermeter import PowerMeter
