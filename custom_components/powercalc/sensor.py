@@ -21,15 +21,14 @@ from homeassistant.components import (
     switch,
     vacuum,
 )
-
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
-from homeassistant.components.utility_meter import DEFAULT_OFFSET
-from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
+from homeassistant.components.utility_meter import DEFAULT_OFFSET
+from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -57,6 +56,7 @@ from homeassistant.helpers.typing import (
     HomeAssistantType,
 )
 
+from .common import SourceEntity
 from .const import (
     CALCULATION_MODES,
     CONF_CREATE_ENERGY_SENSOR,
@@ -86,7 +86,6 @@ from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
-from .common import SourceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -165,16 +164,12 @@ async def async_setup_platform(
         source_entity,
         source_entity_name,
         source_entity_domain,
-        capabilities
+        capabilities,
     )
 
     try:
         power_sensor = await create_power_sensor(
-            hass,
-            entity_entry,
-            config,
-            component_config,
-            source_entity
+            hass, entity_entry, config, component_config, source_entity
         )
     except (ModelNotSupported, StrategyConfigurationError) as err:
         return
@@ -187,11 +182,8 @@ async def async_setup_platform(
 
     if should_create_energy_sensor:
         energy_sensor = await create_energy_sensor(
-                hass,
-                component_config,
-                power_sensor,
-                source_entity
-            )
+            hass, component_config, power_sensor, source_entity
+        )
         entities_to_add.append(energy_sensor)
 
         if component_config.get(CONF_CREATE_UTILITY_METERS):
@@ -209,7 +201,7 @@ async def create_power_sensor(
     entity_entry,
     sensor_config: dict,
     component_config: dict,
-    source_entity: SourceEntity
+    source_entity: SourceEntity,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
 
@@ -217,7 +209,9 @@ async def create_power_sensor(
 
     name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or name_pattern.format(source_entity.name)
-    entity_id = sensor_config.get(CONF_NAME) or name_pattern.format(source_entity.object_id)
+    entity_id = sensor_config.get(CONF_NAME) or name_pattern.format(
+        source_entity.object_id
+    )
 
     light_model = None
     try:
@@ -236,7 +230,11 @@ async def create_power_sensor(
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
     except StrategyConfigurationError as err:
-        _LOGGER.error("Error setting up calculation strategy for %s: %s", source_entity.entity_id, err)
+        _LOGGER.error(
+            "Error setting up calculation strategy for %s: %s",
+            source_entity.entity_id,
+            err,
+        )
         raise err
 
     standby_usage = None
@@ -253,7 +251,7 @@ async def create_power_sensor(
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
         standby_usage,
-        source_entity.unique_id
+        source_entity.unique_id,
     )
 
     return VirtualPowerSensor(
@@ -274,14 +272,12 @@ async def create_energy_sensor(
     hass: HomeAssistantType,
     component_config: dict,
     power_sensor: VirtualPowerSensor,
-    source_entity: SourceEntity
+    source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
     name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(source_entity.name)
     entity_id = async_generate_entity_id(
-        "sensor.{}",
-        name_pattern.format(source_entity.object_id), 
-        hass=hass
+        "sensor.{}", name_pattern.format(source_entity.object_id), hass=hass
     )
 
     _LOGGER.debug("Creating energy sensor: %s", name)
@@ -301,17 +297,13 @@ async def create_energy_sensor(
 
 
 def create_utility_meter_sensor(
-    energy_sensor: VirtualEnergySensor,
-    meter_type: str
+    energy_sensor: VirtualEnergySensor, meter_type: str
 ) -> VirtualUtilityMeterSensor:
     name = f"{energy_sensor.name} {meter_type}"
     entity_id = f"{energy_sensor.entity_id}_{meter_type}"
     _LOGGER.debug("Creating utility_meter sensor: %s", name)
     return VirtualUtilityMeterSensor(
-        energy_sensor.entity_id,
-        name,
-        meter_type,
-        entity_id
+        energy_sensor.entity_id, name, meter_type, entity_id
     )
 
 
@@ -501,18 +493,6 @@ class VirtualEnergySensor(IntegrationSensor):
 
 
 class VirtualUtilityMeterSensor(UtilityMeterSensor):
-    def __init__(
-        self,
-        source_entity,
-        name,
-        meter_type,
-        entity_id
-    ):
-        super().__init__(
-            source_entity,
-            name,
-            meter_type,
-            DEFAULT_OFFSET,
-            False
-        )
+    def __init__(self, source_entity, name, meter_type, entity_id):
+        super().__init__(source_entity, name, meter_type, DEFAULT_OFFSET, False)
         self.entity_id = entity_id

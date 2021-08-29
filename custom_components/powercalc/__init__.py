@@ -8,14 +8,14 @@ from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.const import CONF_SCAN_INTERVAL
-from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.components.utility_meter.const import (
     DAILY,
-    WEEKLY,
+    METER_TYPES,
     MONTHLY,
-    METER_TYPES
+    WEEKLY,
 )
+from homeassistant.const import CONF_SCAN_INTERVAL
+from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
@@ -46,12 +46,14 @@ DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 
+
 def validate_name_pattern(value: str) -> str:
     """Validate that the naming pattern contains {}."""
     regex = re.compile(r"\{\}")
     if not regex.search(value):
         raise vol.Invalid("Naming pattern must contain {}")
     return value
+
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -70,9 +72,9 @@ CONFIG_SCHEMA = vol.Schema(
                     ): validate_name_pattern,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
-                    vol.Optional(CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]): vol.All(
-                        cv.ensure_list, [vol.In(METER_TYPES)]
-                    ),
+                    vol.Optional(
+                        CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]
+                    ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                 }
             ),
         )
@@ -80,13 +82,14 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
+
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     conf = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
-        CONF_CREATE_UTILITY_METERS: False
+        CONF_CREATE_UTILITY_METERS: False,
     }
 
     hass.data[DOMAIN] = {

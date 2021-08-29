@@ -1,7 +1,8 @@
-from .common import SourceEntity
 from typing import Optional
 
 from homeassistant.core import State
+
+from .common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:

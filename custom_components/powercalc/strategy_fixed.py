@@ -4,24 +4,18 @@ from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from homeassistant.components import climate, media_player, vacuum
 from homeassistant.core import State
 
+from .common import SourceEntity
 from .const import CONF_POWER, CONF_STATES_POWER
 from .errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
-from .common import SourceEntity
-from homeassistant.components import (
-    climate,
-    media_player,
-    vacuum,
-)
 
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_POWER): vol.Coerce(float),
-        vol.Optional(CONF_STATES_POWER): vol.Schema(
-            {cv.string: vol.Coerce(float)}
-        ),
+        vol.Optional(CONF_STATES_POWER): vol.Schema({cv.string: vol.Coerce(float)}),
     }
 )
 
@@ -30,6 +24,7 @@ STATE_BASED_ENTITY_DOMAINS = [
     media_player.DOMAIN,
     vacuum.DOMAIN,
 ]
+
 
 class FixedStrategy(PowerCalculationStrategyInterface):
     def __init__(
@@ -55,7 +50,11 @@ class FixedStrategy(PowerCalculationStrategyInterface):
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
-        
-        if source_entity.domain in STATE_BASED_ENTITY_DOMAINS and self._per_state_power is None:
-            raise StrategyConfigurationError("This entity can only work with 'state_power' not 'power'")
 
+        if (
+            source_entity.domain in STATE_BASED_ENTITY_DOMAINS
+            and self._per_state_power is None
+        ):
+            raise StrategyConfigurationError(
+                "This entity can only work with 'state_power' not 'power'"
+            )

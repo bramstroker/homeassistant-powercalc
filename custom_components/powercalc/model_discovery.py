@@ -1,28 +1,22 @@
 """Utilities for auto discovery of light models."""
 
 from __future__ import annotations
-from collections import namedtuple
 
 import logging
 import os
+from collections import namedtuple
 from typing import NamedTuple, Optional
 
-from .const import (
-    CONF_CUSTOM_MODEL_DIRECTORY,
-    CONF_MANUFACTURER,
-    CONF_MODEL,
-)
-
+import homeassistant.helpers.entity_registry as er
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import Light
-import homeassistant.helpers.entity_registry as er
-from homeassistant.helpers.typing import (
-    HomeAssistantType,
-)
+from homeassistant.helpers.typing import HomeAssistantType
 
+from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
+
 
 async def get_light_model(
     hass: HomeAssistantType, entity_entry, config: dict
@@ -47,7 +41,9 @@ async def get_light_model(
     return LightModel(manufacturer, model, custom_model_directory)
 
 
-async def autodiscover_hue_model(hass: HomeAssistantType, entity_entry) -> Optional[HueModelInfo]:
+async def autodiscover_hue_model(
+    hass: HomeAssistantType, entity_entry
+) -> Optional[HueModelInfo]:
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
     if hass.data.get(HUE_DOMAIN) is None or entity_entry.platform != "hue":
         return
@@ -69,6 +65,7 @@ async def autodiscover_hue_model(hass: HomeAssistantType, entity_entry) -> Optio
 
     return HueModelInfo(light.manufacturername, light.modelid)
 
+
 async def find_hue_light(
     hass: HomeAssistantType, entity_entry: er.RegistryEntry
 ) -> Light | None:
@@ -82,6 +79,7 @@ async def find_hue_light(
             return light
 
     return None
+
 
 class HueModelInfo(NamedTuple):
     manufacturer: str

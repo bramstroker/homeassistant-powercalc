@@ -21,13 +21,13 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import State
 
+from .common import SourceEntity
 from .errors import (
     LutFileNotFound,
     ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from .common import SourceEntity
 from .light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -147,10 +147,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
-    async def validate_config(
-        self,
-        source_entity: SourceEntity
-    ):
+    async def validate_config(self, source_entity: SourceEntity):
         if source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError("Only light entities can use the LUT mode")
 
