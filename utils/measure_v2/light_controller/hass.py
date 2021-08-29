@@ -4,6 +4,7 @@ from .const import (
     MODE_COLOR_TEMP,
     MODE_HS
 )
+from .errors import LightControllerError
 
 NAME = "hass"
 
@@ -21,10 +22,7 @@ class HassLightController(LightController):
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         if on == False:
-            requests.post(
-                self._api_url + TURN_OFF_ENDPOINT,
-                headers=self._auth_header
-            )
+            self.call_ha_service(TURN_OFF_ENDPOINT, {"entity_id": self._entity_id})
             return
 
         if color_mode == MODE_HS:
@@ -34,12 +32,20 @@ class HassLightController(LightController):
         else:
             json = self.build_bri_json_body(**kwargs)
 
-        requests.post(
-            self._api_url + TURN_ON_ENDPOINT,
+        self.call_ha_service(TURN_ON_ENDPOINT, json)
+
+    def call_ha_service(self, endpoint: str, json: dict, retry_count = 0):
+        resp = requests.post(
+            self._api_url + endpoint,
             json=json,
             headers=self._auth_header
         )
-        #todo error handling
+        if resp.status_code != 200 and resp.status_code != 201:
+            if (retry_count < 3):
+                retry_count = retry_count + 1
+                self.call_ha_service(endpoint, json, retry_count)
+            raise LightControllerError("Tried to call HA api 3 times, but response was invalid", resp.content)
+
 
     def get_light_info(self) -> LightInfo:
         state = self.get_entity_state(self._entity_id)
