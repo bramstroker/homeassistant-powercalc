@@ -15,6 +15,12 @@ source measure/bin/activate
 pip install -r requirements.txt
 ```
 
+When this is not working on your machine (i.e. windows) just install globally.
+```
+cd utils/measure_v2
+pip install -r requirements.txt
+```
+
 Copy the `.env.dist` file to `.env` and modify the configuration parameters according to your needs.
 You will need to select a `POWER_METER` and `LIGHT_CONTROLLER`
 
