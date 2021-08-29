@@ -11,6 +11,7 @@ class HueLightController(LightController):
         self.bridge = self.initialize_hue_bridge(bridge_ip)
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
+        kwargs["on"] = on
         self.bridge.set_light(self.light_id, kwargs)
 
     def get_light_info(self) -> LightInfo:
