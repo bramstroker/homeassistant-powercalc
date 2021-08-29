@@ -71,6 +71,7 @@ TUYA_DEVICE_VERSION = config('EMAIL_PORT', default='3.3')
 HUE_BRIDGE_IP = config('HUE_BRIDGE_IP')
 HASS_URL = config('HASS_URL')
 HASS_TOKEN = config('HASS_TOKEN')
+TASMOTA_DEVICE_IP = config('TASMOTA_DEVICE_IP')
 
 class Measure():
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -268,7 +269,7 @@ class PowerMeterFactory():
         return ShellyPowerMeter(SHELLY_IP)
     
     def tasmota(self):
-        return TasmotaPowerMeter()
+        return TasmotaPowerMeter(TASMOTA_DEVICE_IP)
 
     def tuya(self):
         return TuyaPowerMeter(
