@@ -18,13 +18,10 @@ from .const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
-    CONF_MAX_WATT,
     CONF_MIN_POWER,
-    CONF_MIN_WATT,
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
-    CONF_WATT,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -48,7 +45,6 @@ DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
-            cv.deprecated(CONF_ENTITY_NAME_PATTERN, CONF_POWER_SENSOR_NAMING),
             vol.Schema(
                 {
                     vol.Optional(
@@ -77,10 +73,6 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
     }
-
-    # This is for BC. Can be removed in v0.5
-    if CONF_ENTITY_NAME_PATTERN in conf:
-        conf[CONF_POWER_SENSOR_NAMING] = conf.get(CONF_ENTITY_NAME_PATTERN)
 
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
@@ -120,19 +112,8 @@ class PowerCalculatorStrategyFactory:
         """Create the linear strategy"""
         linear_config = config.get(CONF_LINEAR)
 
-        if linear_config is None:
-            # Below is for BC compatibility
-            if config.get(CONF_MIN_WATT) is not None:
-                _LOGGER.warning(
-                    "min_watt is deprecated and will be removed in version 0.3, use linear->min_power"
-                )
-                linear_config = {
-                    CONF_MIN_POWER: config.get(CONF_MIN_WATT),
-                    CONF_MAX_POWER: config.get(CONF_MAX_WATT),
-                }
-
-            elif light_model is not None:
-                linear_config = light_model.linear_mode_config
+        if linear_config is None and light_model is not None:
+            linear_config = light_model.linear_mode_config
 
         return LinearStrategy(linear_config, entity_domain)
 
