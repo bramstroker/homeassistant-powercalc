@@ -10,7 +10,7 @@ from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tuya import TuyaPowerMeter
-from dotenv import load_dotenv
+from decouple import config
 import time
 import json
 from typing import Iterator
@@ -25,46 +25,46 @@ CSV_HEADERS = {
     MODE_COLOR_TEMP: ["bri", "mired", "watt"],
     MODE_BRIGHTNESS: ["bri", "watt"]
 }
-
-# Change the params below
-SLEEP_TIME = 2  # time between changing the light params and taking the measurement
-SLEEP_TIME_HUE = 5  # time to wait between each increase in hue
-SLEEP_TIME_SAT = 10  # time to wait between each increase in saturation
-
-# Change this when the script crashes due to connectivity issues, so you don't have to start all over again
-START_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 255
+MAX_SAT = 254
+MAX_HUE = 65535
 
-POWER_METER_SHELLY = "shelly"
 POWER_METER_HASS = "hass"
+POWER_METER_SHELLY = "shelly"
+POWER_METER_TUYA = "tuya"
 POWER_METERS = [
+    POWER_METER_HASS,
     POWER_METER_SHELLY,
-    POWER_METER_HASS
+    POWER_METER_TUYA
 ]
+
+SELECTED_POWER_METER = config('POWER_METER')
 
 LIGHT_CONTROLLER_HUE = "hue"
 LIGHT_CONTROLLER_HASS = "hass"
 LIGHT_CONTROLLERS = [
-    
+    LIGHT_CONTROLLER_HUE,
+    LIGHT_CONTROLLER_HASS
 ]
 
-#@todo move params below to .env file so we don't commit sensitive information
+SELECTED_LIGHT_CONTROLLER = config('LIGHT_CONTROLLER')
 
-# Shelly
-SHELLY_IP = "192.168.178.254"
+# Change the params below
+SLEEP_TIME = config('SLEEP_TIME', default=2, cast=int)
+SLEEP_TIME_HUE = config('SLEEP_TIME_HUE', default=5, cast=int)
+SLEEP_TIME_SAT = config('SLEEP_TIME_SAT', default=10, cast=int)
 
-# Tuya
-TUYA_DEVICE_ID="aaaaaaaaad89682385bbb"
-TUYA_DEVICE_IP="192.168.1.148"
-TUYA_DEVICE_KEY="aaaaaaaae1b8abb"
-TUYA_DEVICE_VERSION="3.3"
+# Change this when the script crashes due to connectivity issues, so you don't have to start all over again
+START_BRIGHTNESS = config('START_BRIGHTNESS', default=1, cast=int)
 
-# Hue
-HUE_BRIDGE_IP = "192.168.178.44"
-
-# Home assistant
-HASS_URL = "http://192.168.178.99:8123/api"
-HASS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIzNDQ3NTFjNDQ4MWQ0MzRkOWZlNmRkNWE3MzkyYzhjNCIsImlhdCI6MTYzMDE1MzUzNCwiZXhwIjoxOTQ1NTEzNTM0fQ.-hieXd-D3txoUaVeqbRBJxPZazVx6Xb7xw-QQvgBkzc"
+SHELLY_IP = config('SHELLY_IP')
+TUYA_DEVICE_ID = config('TUYA_DEVICE_ID')
+TUYA_DEVICE_IP = config('TUYA_DEVICE_IP')
+TUYA_DEVICE_KEY = config('TUYA_DEVICE_KEY')
+TUYA_DEVICE_VERSION = config('EMAIL_PORT', default='3.3')
+HUE_BRIDGE_IP = config('HUE_BRIDGE_IP')
+HASS_URL = config('HASS_URL')
+HASS_TOKEN = config('HASS_TOKEN')
 
 class Measure():
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -155,15 +155,15 @@ class Measure():
 
     def get_hs_variations(self) -> Iterator[dict]:
         for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
-            for sat in self.inclusive_range(1, 254, 10):
+            for sat in self.inclusive_range(1, MAX_SAT, 10):
                 time.sleep(SLEEP_TIME_SAT)
-                for hue in self.inclusive_range(1, 65535, 2000):
+                for hue in self.inclusive_range(1, MAX_HUE, 2000):
                     time.sleep(SLEEP_TIME_HUE)
                     yield {"bri": bri, "hue": hue, "sat": sat}
 
 
     def get_brightness_variations(self) -> Iterator[dict]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 100):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
             yield {"bri": bri}
 
 
@@ -230,23 +230,62 @@ class Measure():
         ] + self.light_controller.get_questions() + self.power_meter.get_questions()
 
 
-def create_light_controller() -> LightController:
-    #return HueLightController(HUE_BRIDGE_IP)
-    return HassLightController(HASS_URL, HASS_TOKEN)
+class LightControllerFactory():
+    def hass(self):
+        return HassLightController(HASS_URL, HASS_TOKEN)
+    
+    def hue(self):
+        return HueLightController(HUE_BRIDGE_IP)
+    
+    def create(self) -> LightController:
+        factories = {
+            LIGHT_CONTROLLER_HUE: self.hue,
+            LIGHT_CONTROLLER_HASS: self.hass
+        }
+        factory = factories.get(SELECTED_LIGHT_CONTROLLER)
+        if factory is None:
+            print("factory not found")
+            #todo exception
 
-def create_power_meter() -> PowerMeter:
-    # return TuyaPowerMeter(
-    #     TUYA_DEVICE_ID,
-    #     TUYA_DEVICE_IP,
-    #     TUYA_DEVICE_KEY,
-    #     TUYA_DEVICE_VERSION
-    # )
-    return HassPowerMeter(HASS_URL, HASS_TOKEN)
-    #return ShellyPowerMeter(SHELLY_IP)
+        print("light controller", SELECTED_LIGHT_CONTROLLER)
+        return factory()
 
+
+class PowerMeterFactory():
+    def hass(self):
+        return HassPowerMeter(HASS_URL, HASS_TOKEN)
+    
+    def shelly(self):
+        return ShellyPowerMeter(SHELLY_IP)
+    
+    def tuya(self):
+        return TuyaPowerMeter(
+            TUYA_DEVICE_ID,
+            TUYA_DEVICE_IP,
+            TUYA_DEVICE_KEY,
+            TUYA_DEVICE_VERSION
+        )
+    
+    def create(self) -> PowerMeter:
+        factories = {
+            POWER_METER_HASS: self.hass,
+            POWER_METER_SHELLY: self.shelly,
+            POWER_METER_TUYA: self.tuya
+        }
+        factory = factories.get(SELECTED_POWER_METER)
+        if factory is None:
+            print("factory not found")
+            #todo exception
+
+        print("powermeter", SELECTED_POWER_METER)
+        return factory()
+
+
+light_controller_factory = LightControllerFactory()
+power_meter_factory = PowerMeterFactory()
 measure = Measure(
-    create_light_controller(),
-    create_power_meter()
+    light_controller_factory.create(),
+    power_meter_factory.create()
 )
 
 measure.start()
