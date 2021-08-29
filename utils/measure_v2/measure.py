@@ -10,13 +10,15 @@ from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tuya import TuyaPowerMeter
+from dotenv import load_dotenv
 import time
 import json
 from typing import Iterator
 from PyInquirer import prompt
 import os
 import csv
-
+import gzip
+import shutil
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -94,7 +96,8 @@ class Measure():
                 measure_device=answers["measure_device"]
             )
 
-        with open(f"{export_directory}/{color_mode}.csv", "w") as csv_file:
+        csv_file_path = f"{export_directory}/{color_mode}.csv"
+        with open(csv_file_path, "w") as csv_file:
             csv_writer = csv.writer(csv_file)
 
             self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
@@ -118,8 +121,15 @@ class Measure():
                 if count % 100 == 0:
                     csv_file.flush()
 
-            #todo gzip json
             csv_file.close()
+        
+        if answers["gzip"] or True:
+            self.gzip_csv(csv_file_path)
+    
+    def gzip_csv(self, csv_file_path: str):
+        with open(csv_file_path, "rb") as csv_file:
+                with gzip.open(f"{csv_file_path}.gz", 'wb') as gzip_file:
+                    shutil.copyfileobj(csv_file, gzip_file)
 
     def measure_standby_usage(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
@@ -153,7 +163,7 @@ class Measure():
 
 
     def get_brightness_variations(self) -> Iterator[dict]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 100):
             yield {"bri": bri}
 
 
@@ -210,6 +220,12 @@ class Measure():
                 'name': 'measure_device',
                 'message': 'Which device (manufacturer, model) do you use to take the measurement?',
                 'when': lambda answers: answers['generate_model_json']
+            },
+            {
+                'type': 'confirm',
+                'message': 'Do you want to gzip CSV files?',
+                'name': 'gzip',
+                'default': True,
             },
         ] + self.light_controller.get_questions() + self.power_meter.get_questions()
 
