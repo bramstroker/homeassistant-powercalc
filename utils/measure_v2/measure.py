@@ -8,7 +8,9 @@ from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
 from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
+from powermeter.kasa import KasaPowerMeter
 from powermeter.shelly import ShellyPowerMeter
+from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
 from decouple import config
 import time
@@ -30,11 +32,15 @@ MAX_SAT = 254
 MAX_HUE = 65535
 
 POWER_METER_HASS = "hass"
+POWER_METER_KASA = "kasa"
 POWER_METER_SHELLY = "shelly"
+POWER_METER_TASMOTA = "tasmota"
 POWER_METER_TUYA = "tuya"
 POWER_METERS = [
     POWER_METER_HASS,
+    POWER_METER_KASA,
     POWER_METER_SHELLY,
+    POWER_METER_TASMOTA,
     POWER_METER_TUYA
 ]
 
@@ -255,9 +261,15 @@ class PowerMeterFactory():
     def hass(self):
         return HassPowerMeter(HASS_URL, HASS_TOKEN)
     
+    def kasa(self):
+        return KasaPowerMeter()
+
     def shelly(self):
         return ShellyPowerMeter(SHELLY_IP)
     
+    def tasmota(self):
+        return TasmotaPowerMeter()
+
     def tuya(self):
         return TuyaPowerMeter(
             TUYA_DEVICE_ID,
@@ -269,7 +281,9 @@ class PowerMeterFactory():
     def create(self) -> PowerMeter:
         factories = {
             POWER_METER_HASS: self.hass,
+            POWER_METER_KASA: self.kasa,
             POWER_METER_SHELLY: self.shelly,
+            POWER_METER_TASMOTA: self.tasmota,
             POWER_METER_TUYA: self.tuya
         }
         factory = factories.get(SELECTED_POWER_METER)
