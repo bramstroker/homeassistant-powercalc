@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from datetime import timedelta
 from typing import Optional
 
@@ -10,9 +9,16 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.components.utility_meter.const import (
+    DAILY,
+    WEEKLY,
+    MONTHLY,
+    METER_TYPES
+)
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
@@ -20,6 +26,7 @@ from .const import (
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
+    CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -54,6 +61,10 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): vol.Match(r"\{\}"),
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
+                    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
+                    vol.Optional(CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]): vol.All(
+                        cv.ensure_list, [vol.In(METER_TYPES)]
+                    ),
                 }
             ),
         )
@@ -68,6 +79,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
+        CONF_CREATE_UTILITY_METERS: False
     }
 
     hass.data[DOMAIN] = {

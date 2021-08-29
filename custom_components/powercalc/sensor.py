@@ -26,6 +26,8 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
+from homeassistant.components.utility_meter import DEFAULT_OFFSET
+from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.const import (
@@ -56,8 +58,10 @@ from homeassistant.helpers.typing import (
 )
 
 from .const import (
+    CALCULATION_MODES,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
@@ -69,12 +73,12 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
+    CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
-    MODE_LUT,
 )
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
@@ -108,7 +112,7 @@ PLATFORM_SCHEMA = vol.All(
             ),
             vol.Optional(CONF_MODEL): cv.string,
             vol.Optional(CONF_MANUFACTURER): cv.string,
-            vol.Optional(CONF_MODE): vol.In([MODE_LUT, MODE_FIXED, MODE_LINEAR]),
+            vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
             vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
             vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
             vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
@@ -182,16 +186,23 @@ async def async_setup_platform(
         should_create_energy_sensor = config.get(CONF_CREATE_ENERGY_SENSOR)
 
     if should_create_energy_sensor:
-        entities_to_add.append(
-            await create_energy_sensor(
+        energy_sensor = await create_energy_sensor(
                 hass,
                 component_config,
                 power_sensor,
                 source_entity
             )
-        )
+        entities_to_add.append(energy_sensor)
+
+        if component_config.get(CONF_CREATE_UTILITY_METERS):
+            meter_types = component_config.get(CONF_UTILITY_METER_TYPES)
+            for meter_type in meter_types:
+                entities_to_add.append(
+                    create_utility_meter_sensor(energy_sensor, meter_type)
+                )
 
     async_add_entities(entities_to_add)
+
 
 async def create_power_sensor(
     hass: HomeAssistantType,
@@ -211,7 +222,7 @@ async def create_power_sensor(
     light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, sensor_config)
-    except (ModelNotSupported) as err:
+    except ModelNotSupported as err:
         _LOGGER.info("Model not found in library %s: %s", source_entity.entity_id, err)
         raise err
 
@@ -258,6 +269,7 @@ async def create_power_sensor(
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
     )
 
+
 async def create_energy_sensor(
     hass: HomeAssistantType,
     component_config: dict,
@@ -286,6 +298,22 @@ async def create_energy_sensor(
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )
+
+
+def create_utility_meter_sensor(
+    energy_sensor: VirtualEnergySensor,
+    meter_type: str
+) -> VirtualUtilityMeterSensor:
+    name = f"{energy_sensor.name} {meter_type}"
+    entity_id = f"{energy_sensor.entity_id}_{meter_type}"
+    _LOGGER.debug("Creating utility_meter sensor: %s", name)
+    return VirtualUtilityMeterSensor(
+        energy_sensor.entity_id,
+        name,
+        meter_type,
+        entity_id
+    )
+
 
 def select_calculation_mode(config: dict, light_model: LightModel) -> str:
     """Select the calculation mode"""
@@ -456,7 +484,7 @@ class VirtualEnergySensor(IntegrationSensor):
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
-        if (unique_id):
+        if unique_id:
             self._attr_unique_id = f"{unique_id}_energy"
 
     @property
@@ -470,3 +498,21 @@ class VirtualEnergySensor(IntegrationSensor):
     @property
     def icon(self):
         return ENERGY_ICON
+
+
+class VirtualUtilityMeterSensor(UtilityMeterSensor):
+    def __init__(
+        self,
+        source_entity,
+        name,
+        meter_type,
+        entity_id
+    ):
+        super().__init__(
+            source_entity,
+            name,
+            meter_type,
+            DEFAULT_OFFSET,
+            False
+        )
+        self.entity_id = entity_id
