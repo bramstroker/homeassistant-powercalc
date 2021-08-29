@@ -1,0 +1,2 @@
+class PowerMeterError(Exception):
+    pass
