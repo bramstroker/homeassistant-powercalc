@@ -148,7 +148,7 @@ class Measure():
             time.sleep(0.5)        
 
         avg = sum(measurements) / len(measurements)
-        return round(avg)
+        return round(avg, 2)
 
     def gzip_csv(self, csv_file_path: str):
         with open(csv_file_path, "rb") as csv_file:
