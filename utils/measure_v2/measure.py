@@ -8,6 +8,7 @@ from light_controller.const import (
 from light_controller.controller import LightController
 from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
+from powermeter.errors import OutdatedMeasurementError
 from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
@@ -137,13 +138,22 @@ class Measure():
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
     
-    def take_power_measurement(self, start_time: datetime.datetime) -> float:
+    def take_power_measurement(self, start_time: datetime.datetime, retry_count = 0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
             print("Taking sample", i)
             measurement = self.power_meter.get_power()
-            #@todo account for outdated measurements
+
+            # Check if measurement is not outdated
+            if (measurement.updated < start_time):
+                # Prevent endless recursion and raise exception
+                if (retry_count == MAX_RETRIES):
+                    raise OutdatedMeasurementError("Power measurement is outdated. Aborting after 10 retries")
+
+                retry_count += 1
+                self.take_power_measurement(start_time, retry_count)
+
             measurements.append(measurement.power)
             time.sleep(0.5)        
 
