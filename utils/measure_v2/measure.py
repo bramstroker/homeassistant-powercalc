@@ -148,7 +148,7 @@ class Measure():
             if (measurement.updated < start_timestamp):
                 # Prevent endless recursion and raise exception
                 if (retry_count == MAX_RETRIES):
-                    raise OutdatedMeasurementError("Power measurement is outdated. Aborting after 10 retries")
+                    raise OutdatedMeasurementError("Power measurement is outdated. Aborting after {} retries".format(MAX_RETRIES))
 
                 retry_count += 1
                 time.sleep(0.5)
