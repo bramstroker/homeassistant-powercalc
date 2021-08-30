@@ -20,7 +20,6 @@ import time
 import json
 from typing import Iterator
 from PyInquirer import prompt
-import datetime
 import os
 import csv
 import gzip
@@ -121,7 +120,7 @@ class Measure():
             csv_writer.writerow(CSV_HEADERS[color_mode])
             for count, variation in enumerate(self.get_variations(color_mode)):
                 print("Changing light to: ", variation)
-                variation_start_time = datetime.datetime.now()
+                variation_start_time = time.time()
                 self.light_controller.change_light_state(color_mode, on=True, **variation)
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
@@ -138,7 +137,7 @@ class Measure():
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
     
-    def take_power_measurement(self, start_time: datetime.datetime, retry_count = 0) -> float:
+    def take_power_measurement(self, start_timestamp: float, retry_count = 0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
@@ -146,13 +145,14 @@ class Measure():
             measurement = self.power_meter.get_power()
 
             # Check if measurement is not outdated
-            if (measurement.updated < start_time):
+            if (measurement.updated < start_timestamp):
                 # Prevent endless recursion and raise exception
                 if (retry_count == MAX_RETRIES):
                     raise OutdatedMeasurementError("Power measurement is outdated. Aborting after 10 retries")
 
                 retry_count += 1
-                self.take_power_measurement(start_time, retry_count)
+                time.sleep(0.5)
+                self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
             time.sleep(0.5)        
@@ -167,7 +167,7 @@ class Measure():
 
     def measure_standby_usage(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
-        start_time = datetime.datetime.now()
+        start_time = time.time()
         print("Measuring standby usage. Waiting for 5 seconds...")
         time.sleep(5)
         return self.take_power_measurement(start_time)

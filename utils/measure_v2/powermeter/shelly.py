@@ -13,5 +13,5 @@ class ShellyPowerMeter(PowerMeter):
         json = r.json()
         return PowerMeasurementResult(
             float(json["power"]),
-            datetime.datetime.fromtimestamp(json["timestamp"])
+            float(json["timestamp"]),
         )
