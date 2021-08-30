@@ -1,0 +1,10 @@
+{
+   "name":"LIGHTIFY Indoor Flex RGBW 3P (1.8m)",
+   "standby_usage":0.3,
+   "supported_modes":[
+      "lut"
+   ],
+   "measure_device":"Gosund SP111 on Tasmota 9.5.0",
+   "measure_description":"Measure Script for Tasmota",
+   "measure_method":"script"
+}

@@ -6,13 +6,13 @@ import datetime
 import json
 import os
 import time
-import urllib.request
 from typing import Iterator
 
 import aiohttp
 import aiohue
 import asyncstdlib as a
 import nest_asyncio
+import urllib.request
 from aiohue.lights import Light
 from PyInquirer import prompt
 
@@ -28,9 +28,9 @@ CSV_HEADERS = {
     MODE_BRIGHTNESS: ["bri", "watt"]
 }
 
-# Change the params below; tested with Tasmota 9.5.0 on Gosund SP111
-DEVICE_IP = "192.168.0.1"
-HUE_BRIDGE_IP = "192.168.0.2"
+# Change the params below
+DEVICE_IP = "192.168.178.41"
+HUE_BRIDGE_IP = "192.168.178.20"
 SLEEP_TIME = 2  # time between changing the light params and taking the measurement
 SLEEP_TIME_HUE = 2  # time to wait between each increase in hue
 SLEEP_TIME_SAT = 3  # time to wait between each increase in saturation
@@ -140,22 +140,17 @@ async def get_ct_variations(light: Light):
     if min_mired < 150:
         min_mired = 150
 
-    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
-        for mired in inclusive_range(min_mired, max_mired, 30):
-            await asyncio.sleep(SLEEP_TIME_SAT)
+    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
+        for mired in inclusive_range(min_mired, max_mired, 10):
             yield {"bri": bri, "ct": mired}
 
 
 async def get_hs_variations():
-    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 20):
-        print(datetime.datetime.now())
-        await asyncio.sleep(SLEEP_TIME_SAT)
-        for sat in inclusive_range(1, 254, 40):
-            print(datetime.datetime.now())
+    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
+        for sat in inclusive_range(1, 254, 10):
             await asyncio.sleep(SLEEP_TIME_SAT)
             for hue in inclusive_range(1, 65535, 2000):
-                if sat > 50:
-                    await asyncio.sleep(SLEEP_TIME_HUE)
+                await asyncio.sleep(SLEEP_TIME_HUE)
                 yield {"bri": bri, "hue": hue, "sat": sat}
 
 
