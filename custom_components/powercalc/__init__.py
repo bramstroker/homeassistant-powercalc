@@ -2,29 +2,32 @@
 
 from __future__ import annotations
 
-import logging
+import re
 from datetime import timedelta
 from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from homeassistant.components.utility_meter.const import (
+    DAILY,
+    METER_TYPES,
+    MONTHLY,
+    WEEKLY,
+)
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
-    CONF_MAX_POWER,
-    CONF_MAX_WATT,
-    CONF_MIN_POWER,
-    CONF_MIN_WATT,
     CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
     CONF_STATES_POWER,
-    CONF_WATT,
+    CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -39,29 +42,39 @@ from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
 from .strategy_lut import LutRegistry, LutStrategy
 
-_LOGGER = logging.getLogger(__name__)
-
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 
+
+def validate_name_pattern(value: str) -> str:
+    """Validate that the naming pattern contains {}."""
+    regex = re.compile(r"\{\}")
+    if not regex.search(value):
+        raise vol.Invalid("Naming pattern must contain {}")
+    return value
+
+
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
-            cv.deprecated(CONF_ENTITY_NAME_PATTERN, CONF_POWER_SENSOR_NAMING),
             vol.Schema(
                 {
                     vol.Optional(
                         CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                     ): cv.time_period,
-                    vol.Optional(CONF_ENTITY_NAME_PATTERN): vol.Match(r"\{\}"),
+                    vol.Optional(CONF_ENTITY_NAME_PATTERN): validate_name_pattern,
                     vol.Optional(
                         CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
-                    ): vol.Match(r"\{\}"),
+                    ): validate_name_pattern,
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
-                    ): vol.Match(r"\{\}"),
+                    ): validate_name_pattern,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
+                    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
+                    vol.Optional(
+                        CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]
+                    ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                 }
             ),
         )
@@ -76,11 +89,8 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
+        CONF_CREATE_UTILITY_METERS: False,
     }
-
-    # This is for BC. Can be removed in v0.5
-    if CONF_ENTITY_NAME_PATTERN in conf:
-        conf[CONF_POWER_SENSOR_NAMING] = conf.get(CONF_ENTITY_NAME_PATTERN)
 
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
@@ -120,19 +130,8 @@ class PowerCalculatorStrategyFactory:
         """Create the linear strategy"""
         linear_config = config.get(CONF_LINEAR)
 
-        if linear_config is None:
-            # Below is for BC compatibility
-            if config.get(CONF_MIN_WATT) is not None:
-                _LOGGER.warning(
-                    "min_watt is deprecated and will be removed in version 0.3, use linear->min_power"
-                )
-                linear_config = {
-                    CONF_MIN_POWER: config.get(CONF_MIN_WATT),
-                    CONF_MAX_POWER: config.get(CONF_MAX_WATT),
-                }
-
-            elif light_model is not None:
-                linear_config = light_model.linear_mode_config
+        if linear_config is None and light_model is not None:
+            linear_config = light_model.linear_mode_config
 
         return LinearStrategy(linear_config, entity_domain)
 
@@ -141,13 +140,6 @@ class PowerCalculatorStrategyFactory:
         fixed_config = config.get(CONF_FIXED)
         if fixed_config is None and light_model is not None:
             fixed_config = light_model.fixed_mode_config
-
-        # BC compat
-        if fixed_config is None:
-            _LOGGER.warning(
-                "watt is deprecated and will be removed in version 0.3, use fixed->power"
-            )
-            fixed_config = {CONF_POWER: config.get(CONF_WATT)}
 
         return FixedStrategy(
             fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
