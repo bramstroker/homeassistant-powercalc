@@ -107,7 +107,7 @@ class Measure():
             )
 
         csv_file_path = f"{export_directory}/{color_mode}.csv"
-        with open(csv_file_path, "w") as csv_file:
+        with open(csv_file_path, "w", newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
 
             self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
