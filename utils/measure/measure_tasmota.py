@@ -6,13 +6,13 @@ import datetime
 import json
 import os
 import time
+import urllib.request
 from typing import Iterator
 
 import aiohttp
 import aiohue
 import asyncstdlib as a
 import nest_asyncio
-import urllib.request
 from aiohue.lights import Light
 from PyInquirer import prompt
 

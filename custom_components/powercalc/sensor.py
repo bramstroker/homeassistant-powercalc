@@ -220,7 +220,9 @@ async def create_power_sensor(
     except ModelNotSupported as err:
         mode = select_calculation_mode(sensor_config, None)
         if mode == MODE_LUT:
-            _LOGGER.error("Model not found in library %s: %s", source_entity.entity_id, err)
+            _LOGGER.error(
+                "Model not found in library %s: %s", source_entity.entity_id, err
+            )
             raise err
 
     try:
