@@ -79,6 +79,7 @@ from .const import (
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
+    MODE_LUT,
 )
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
@@ -213,18 +214,20 @@ async def create_power_sensor(
         source_entity.object_id
     )
 
-    light_model = None
     try:
-        light_model = await get_light_model(hass, entity_entry, sensor_config)
-    except ModelNotSupported as err:
-        _LOGGER.info("Model not found in library %s: %s", source_entity.entity_id, err)
-        raise err
+        light_model = None
+        try:
+            light_model = await get_light_model(hass, entity_entry, sensor_config)
+        except ModelNotSupported as err:
+            model_not_supported_error = err
 
-    try:
         mode = select_calculation_mode(sensor_config, light_model)
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity.domain
         )
+        if mode == MODE_LUT and model_not_supported_error:
+            _LOGGER.info("Model not found in library %s: %s", source_entity.entity_id, err)
+            raise model_not_supported_error
         await calculation_strategy.validate_config(source_entity)
     except (ModelNotSupported, UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
