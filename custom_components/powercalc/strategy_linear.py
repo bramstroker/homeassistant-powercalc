@@ -41,6 +41,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         if entity_state.domain == light.DOMAIN:
             value = attrs.get(ATTR_BRIGHTNESS)
+            #Some integrations set a higher brightness value than 255, causing powercalc to misbehave
+            if value > 255: 
+                value = 255
             if value is None:
                 _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
                 return None
