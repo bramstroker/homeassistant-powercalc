@@ -151,7 +151,7 @@ class Measure():
                     raise OutdatedMeasurementError("Power measurement is outdated. Aborting after {} retries".format(MAX_RETRIES))
 
                 retry_count += 1
-                time.sleep(0.5)
+                time.sleep(1)
                 self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
