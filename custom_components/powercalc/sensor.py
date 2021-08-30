@@ -71,6 +71,7 @@ from .const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
+    CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
@@ -120,6 +121,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
             vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
+            vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean
         }
     ),
 )
@@ -270,6 +272,7 @@ async def create_power_sensor(
         standby_usage=standby_usage,
         scan_interval=component_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
+        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
     )
 
 
@@ -351,6 +354,7 @@ class VirtualPowerSensor(Entity):
         standby_usage: float | None,
         scan_interval,
         multiply_factor: float | None,
+        multiply_factor_standby: bool
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -363,6 +367,7 @@ class VirtualPowerSensor(Entity):
         self._attr_unique_id = unique_id
         self._scan_interval = scan_interval
         self._multiply_factor = multiply_factor
+        self._multiply_factor_standby = multiply_factor_standby
         self.entity_id = async_generate_entity_id("sensor.{}", entity_id, hass=hass)
 
     async def async_added_to_hass(self):
@@ -409,6 +414,8 @@ class VirtualPowerSensor(Entity):
 
         if state.state in OFF_STATES:
             self._power = self._standby_usage or 0
+            if self._multiply_factor and self._multiply_factor_standby:
+                self._power *= self._multiply_factor
         else:
             self._power = await self._power_calculator.calculate(state)
             if self._multiply_factor and self._power is not None:
