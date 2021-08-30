@@ -19,6 +19,7 @@ import time
 import json
 from typing import Iterator
 from PyInquirer import prompt
+import datetime
 import os
 import csv
 import gzip
@@ -120,9 +121,10 @@ class Measure():
             csv_writer.writerow(CSV_HEADERS[color_mode])
             for count, variation in enumerate(self.get_variations(color_mode)):
                 print("Changing light to: ", variation)
+                variation_start_time = datetime.datetime.now()
                 self.light_controller.change_light_state(color_mode, on=True, **variation)
                 time.sleep(SLEEP_TIME)
-                power = self.power_meter.get_power()
+                power = self.take_power_measurement(variation_start_time)
                 print("Measured power: ", power)
                 print()
                 row = list(variation.values())
@@ -136,6 +138,14 @@ class Measure():
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
     
+    def take_power_measurement(self, start_time: datetime.datetime) -> float:
+        measurement = self.power_meter.get_power()
+        
+        #@todo account for outdated measurements
+        #@todo implement taking multiple samples and averaging (to reduce noise)
+
+        return measurement.power
+
     def gzip_csv(self, csv_file_path: str):
         with open(csv_file_path, "rb") as csv_file:
                 with gzip.open(f"{csv_file_path}.gz", 'wb') as gzip_file:
@@ -143,9 +153,10 @@ class Measure():
 
     def measure_standby_usage(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
+        start_time = datetime.datetime.now()
         print("Measuring standby usage. Waiting for 5 seconds...")
         time.sleep(5)
-        return self.power_meter.get_power()
+        return self.take_power_measurement(start_time)
     
     def get_variations(self, color_mode: str):
         if color_mode == MODE_HS:

@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from kasa import SmartPlug
 import asyncio
-from .powermeter import PowerMeter
+from .powermeter import PowerMeter, PowerMeasurementResult
 
 class KasaPowerMeter(PowerMeter):
     def __init__(self, device_ip: str):
         self._smartplug = SmartPlug(device_ip)
 
-    def get_power(self) -> float:
+    def get_power(self) -> PowerMeasurementResult:
         loop = asyncio.get_event_loop()
         power = loop.run_until_complete(self.async_read_power_meter())
-        return power
+        return PowerMeasurementResult(power)
     
     async def async_read_power_meter(self):
         await self._smartplug.update()

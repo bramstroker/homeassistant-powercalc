@@ -1,7 +1,9 @@
 from __future__ import annotations
+from typing import NamedTuple
+from datetime import datetime
 
 class PowerMeter():
-    def get_power(self) -> float:
+    def get_power(self) -> PowerMeasurementResult:
         pass
     
     def get_questions(self) -> list[dict]:
@@ -9,3 +11,7 @@ class PowerMeter():
     
     def process_answers(self, answers):
         pass
+
+class PowerMeasurementResult(NamedTuple):
+    power: float
+    updated: datetime

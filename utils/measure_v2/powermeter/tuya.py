@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .powermeter import PowerMeter
+from .powermeter import PowerMeter, PowerMeasurementResult
 import tuyapower
 
 class TuyaPowerMeter(PowerMeter):
@@ -17,6 +17,7 @@ class TuyaPowerMeter(PowerMeter):
         self._device_version = device_version
 
     def get_power(self) -> float:
+        #@todo we can get updated at from deviceJson
         (on, w, mA, V, err) = tuyapower.deviceInfo(
             self._device_id,
             self._device_ip,
@@ -25,6 +26,6 @@ class TuyaPowerMeter(PowerMeter):
         )
 
         if(err == "OK"):
-            return w
+            return PowerMeasurementResult(w)
         else:
             return -1
