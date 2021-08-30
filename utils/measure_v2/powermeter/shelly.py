@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import requests
 from .powermeter import PowerMeter, PowerMeasurementResult
 
@@ -10,4 +11,7 @@ class ShellyPowerMeter(PowerMeter):
     def get_power(self) -> PowerMeasurementResult:
         r = requests.get(self.meter_uri)
         json = r.json()
-        return PowerMeasurementResult(float(json["power"]))
+        return PowerMeasurementResult(
+            float(json["power"]),
+            datetime.datetime.fromtimestamp(json["timestamp"])
+        )

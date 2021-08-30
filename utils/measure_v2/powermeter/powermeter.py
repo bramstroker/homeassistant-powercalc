@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import NamedTuple
-from datetime import datetime
+from datetime import date, datetime
 
 class PowerMeter():
     def get_power(self) -> PowerMeasurementResult:
@@ -14,4 +14,4 @@ class PowerMeter():
 
 class PowerMeasurementResult(NamedTuple):
     power: float
-    updated: datetime
+    updated: datetime = datetime.now()

@@ -58,13 +58,12 @@ LIGHT_CONTROLLERS = [
 
 SELECTED_LIGHT_CONTROLLER = config('LIGHT_CONTROLLER')
 
-# Change the params below
 SLEEP_TIME = config('SLEEP_TIME', default=2, cast=int)
 SLEEP_TIME_HUE = config('SLEEP_TIME_HUE', default=5, cast=int)
 SLEEP_TIME_SAT = config('SLEEP_TIME_SAT', default=10, cast=int)
-
-# Change this when the script crashes due to connectivity issues, so you don't have to start all over again
 START_BRIGHTNESS = config('START_BRIGHTNESS', default=1, cast=int)
+MAX_RETRIES = config('MAX_RETRIES', default=5, cast=int)
+SAMPLE_COUNT = config('SAMPLE_COUNT', default=1, cast=int)
 
 SHELLY_IP = config('SHELLY_IP')
 TUYA_DEVICE_ID = config('TUYA_DEVICE_ID')
@@ -139,12 +138,17 @@ class Measure():
             self.gzip_csv(csv_file_path)
     
     def take_power_measurement(self, start_time: datetime.datetime) -> float:
-        measurement = self.power_meter.get_power()
-        
-        #@todo account for outdated measurements
-        #@todo implement taking multiple samples and averaging (to reduce noise)
+        measurements = []
+        # Take multiple samples to reduce noise
+        for i in range(SAMPLE_COUNT):
+            print("Taking sample", i)
+            measurement = self.power_meter.get_power()
+            #@todo account for outdated measurements
+            measurements.append(measurement.power)
+            time.sleep(0.5)        
 
-        return measurement.power
+        avg = sum(measurements) / len(measurements)
+        return round(avg)
 
     def gzip_csv(self, csv_file_path: str):
         with open(csv_file_path, "rb") as csv_file:
