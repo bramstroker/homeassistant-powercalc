@@ -121,7 +121,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
             vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
-            vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean
+            vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
         }
     ),
 )
@@ -354,7 +354,7 @@ class VirtualPowerSensor(Entity):
         standby_usage: float | None,
         scan_interval,
         multiply_factor: float | None,
-        multiply_factor_standby: bool
+        multiply_factor_standby: bool,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator

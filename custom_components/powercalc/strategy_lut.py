@@ -101,7 +101,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness is None:
             _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
             return None
-        if brightness > 255: 
+        if brightness > 255:
             brightness = 255
 
         try:
