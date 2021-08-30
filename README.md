@@ -56,20 +56,21 @@ For each entity you want to create a virtual power sensor for you'll need to add
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
-| Name                   | Type    | Requirement  | Description                                                                |
-| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id              | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
-| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
-| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
-| name                   | string  | **Optional** | Override the name                                                          |
-| create_energy_sensor   | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
-| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
-| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
-| multiply_factor        | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor)
-| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
-| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| Name                    | Type    | Requirement  | Description                                                                |
+| ----------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
+| manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_usage           | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                    | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
+| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
+| fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 
 **Minimalistic example creating two power sensors:**
 
@@ -411,12 +412,19 @@ Let's assume you have a combination of 4 GU10 spots in your ceiling in a light g
 ```yaml
 - platform: powercalc
   entity_id: light.livingroom_spots
-  manufacturer: signify
-  model: LCT003
   multiply_factor: 4
 ```
 
 This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
+
+By default the multiply factor will **NOT** be applied to the standby usage, you can set the `multiply_factor_standby` to do this.
+
+```yaml
+- platform: powercalc
+  entity_id: light.livingroom_spots
+  multiply_factor: 4
+  multiply_factor_standby: true
+```
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
 
