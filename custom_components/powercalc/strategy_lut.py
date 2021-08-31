@@ -158,7 +158,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if (light_setting.color_mode == COLOR_MODE_BRIGHTNESS):
             return lut_value
         if (light_setting.color_mode == COLOR_MODE_COLOR_TEMP):
-            return self.get_nearest(lut_value, light_setting.hue)
+            return self.get_nearest(lut_value, light_setting.color_temp)
         else:
             sat_values = self.get_nearest(lut_value, light_setting.hue)
             return self.get_nearest(sat_values, light_setting.saturation)
@@ -169,12 +169,20 @@ class LutStrategy(PowerCalculationStrategyInterface):
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
-    def get_nearest_lower_brightness(self, dict: dict, search_key: int):
+    def get_nearest_lower_brightness(self, dict: dict, search_key: int) -> int:
         keys = dict.keys()
+        last_key = [*keys][-1]
+        if (last_key < search_key):
+            return last_key
+
         return max((k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0])
 
-    def get_nearest_higher_brightness(self, dict: dict, search_key: int):
+    def get_nearest_higher_brightness(self, dict: dict, search_key: int) -> int:
         keys = dict.keys()
+        first_key = [*keys][0]
+        if (first_key > search_key):
+            return first_key
+
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
 
     async def validate_config(self, source_entity: SourceEntity):
