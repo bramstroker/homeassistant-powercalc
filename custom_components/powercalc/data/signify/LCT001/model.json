@@ -1,1 +1,10 @@
-{"name": "LCT001", "standby_usage": "0.4", "supported_modes": ["lut"]}
+{
+    "name": "Philips Hue White and Color Ambience (1 gen)",
+    "supported_modes": [
+        "lut"
+    ],
+    "standby_usage": 0.4,
+    "measure_method": "script",
+    "measure_device": "Shelly PM1",
+    "measure_description": "Used HASS based script"
+}
