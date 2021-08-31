@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import logging
 import os
+from dataclasses import dataclass
 from collections import defaultdict
 from csv import reader
 from functools import partial
@@ -118,14 +119,14 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if color_mode == COLOR_MODE_HS:
             hs = attrs[ATTR_HS_COLOR]
             light_setting.hue = int(hs[0] / 360 * 65535)
-            light_setting.sat = int(hs[1] / 100 * 255)
+            light_setting.saturation = int(hs[1] / 100 * 255)
             _LOGGER.debug(
-                "Looking up power usage for bri:%s hue:%s sat:%s}", brightness, hue, sat
+                "Looking up power usage for bri:%s hue:%s sat:%s}", brightness, light_setting.hue, light_setting.saturation
             )
         elif color_mode == COLOR_MODE_COLOR_TEMP:
             light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
-                "Looking up power usage for bri:%s mired:%s", brightness, mired
+                "Looking up power usage for bri:%s mired:%s", brightness, light_setting.color_temp
             )
         elif color_mode == COLOR_MODE_BRIGHTNESS:
             _LOGGER.debug("Looking up power usage for bri:%s", brightness)
@@ -139,7 +140,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         brightness_table = lookup_table.get(brightness)
 
         # Check if we have an exact match for the selected brightness level in de LUT
-        if (brightness_table):
+        if brightness_table:
             return self.lookup_power_for_brightness(brightness_table, light_setting)
             
         # We don't have an exact match, use interpolation
@@ -169,10 +170,12 @@ class LutStrategy(PowerCalculationStrategyInterface):
         )
 
     def get_nearest_lower_brightness(self, dict: dict, search_key: int):
-        return max(k for k in dict.keys() if int(k) <= int(search_key))
+        keys = dict.keys()
+        return max((k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0])
 
     def get_nearest_higher_brightness(self, dict: dict, search_key: int):
-        return min(k for k in dict.keys() if int(k) >= int(search_key))
+        keys = dict.keys()
+        return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
 
     async def validate_config(self, source_entity: SourceEntity):
         if source_entity.domain != light.DOMAIN:
@@ -199,9 +202,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 except LutFileNotFound:
                     raise ModelNotSupported("No lookup file found for mode", color_mode)
 
-class LightSetting(NamedTuple):
+@dataclass
+class LightSetting:
     color_mode: str
     brightness: int
-    hue: int
-    saturation: int
-    color_temp: int
+    hue: Optional[int] = None
+    saturation: Optional[int] = None
+    color_temp: Optional[int] = None
