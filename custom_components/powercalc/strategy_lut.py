@@ -6,7 +6,8 @@ import os
 from collections import defaultdict
 from csv import reader
 from functools import partial
-from typing import Optional
+from typing import NamedTuple, Optional, Union
+import numpy as np
 
 from homeassistant.components import light
 from homeassistant.components.light import (
@@ -113,41 +114,65 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
 
         power = 0
+        light_setting = LightSetting(color_mode=color_mode, brightness=brightness)
         if color_mode == COLOR_MODE_HS:
             hs = attrs[ATTR_HS_COLOR]
-            hue = int(hs[0] / 360 * 65535)
-            sat = int(hs[1] / 100 * 255)
+            light_setting.hue = int(hs[0] / 360 * 65535)
+            light_setting.sat = int(hs[1] / 100 * 255)
             _LOGGER.debug(
                 "Looking up power usage for bri:%s hue:%s sat:%s}", brightness, hue, sat
             )
-            hue_values = self.get_closest_from_dictionary(lookup_table, brightness)
-            sat_values = self.get_closest_from_dictionary(hue_values, hue)
-            power = self.get_closest_from_dictionary(sat_values, sat)
         elif color_mode == COLOR_MODE_COLOR_TEMP:
-            mired = attrs[ATTR_COLOR_TEMP]
+            light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
                 "Looking up power usage for bri:%s mired:%s", brightness, mired
             )
-            mired_values = self.get_closest_from_dictionary(lookup_table, brightness)
-            power = self.get_closest_from_dictionary(mired_values, mired)
         elif color_mode == COLOR_MODE_BRIGHTNESS:
             _LOGGER.debug("Looking up power usage for bri:%s", brightness)
-            power = self.get_closest_from_dictionary(lookup_table, brightness)
 
+        power = self.lookup_power(lookup_table, light_setting)
         _LOGGER.debug("Power:%s", power)
         return power
 
-    def get_closest_from_dictionary(self, dict: dict, search_key):
+    def lookup_power(self, lookup_table: dict, light_setting: LightSetting) -> float:
+        brightness = light_setting.brightness
+        brightness_table = lookup_table.get(brightness)
+
+        # Check if we have an exact match for the selected brightness level in de LUT
+        if (brightness_table):
+            return self.lookup_power_for_brightness(brightness_table, light_setting)
+            
+        # We don't have an exact match, use interpolation
+        brightness_range = [
+            self.get_nearest_lower_brightness(lookup_table, brightness),
+            self.get_nearest_higher_brightness(lookup_table, brightness)
+        ]
+        power_range = [
+            self.lookup_power_for_brightness(lookup_table[brightness_range[0]], light_setting),
+            self.lookup_power_for_brightness(lookup_table[brightness_range[1]], light_setting)
+        ]
+        return np.interp(brightness, brightness_range, power_range)
+
+    def lookup_power_for_brightness(self, lut_value: Union(dict, int), light_setting: LightSetting):
+        if (light_setting.color_mode == COLOR_MODE_BRIGHTNESS):
+            return lut_value
+        if (light_setting.color_mode == COLOR_MODE_COLOR_TEMP):
+            return self.get_nearest(lut_value, light_setting.hue)
+        else:
+            sat_values = self.get_nearest(lut_value, light_setting.hue)
+            return self.get_nearest(sat_values, light_setting.saturation)
+
+    def get_nearest(self, dict: dict, search_key: int):
         return (
             dict.get(search_key)
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
-    def get_nearest_lower(self, dict: dict, search_key):
-        return (
-            dict.get(search_key)
-            or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
-        )
+    def get_nearest_lower_brightness(self, dict: dict, search_key: int):
+        return max(k for k in dict.keys() if int(k) <= int(search_key))
+
+    def get_nearest_higher_brightness(self, dict: dict, search_key: int):
+        return min(k for k in dict.keys() if int(k) >= int(search_key))
 
     async def validate_config(self, source_entity: SourceEntity):
         if source_entity.domain != light.DOMAIN:
@@ -173,3 +198,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
                     )
                 except LutFileNotFound:
                     raise ModelNotSupported("No lookup file found for mode", color_mode)
+
+class LightSetting(NamedTuple):
+    color_mode: str
+    brightness: int
+    hue: int
+    saturation: int
+    color_temp: int
