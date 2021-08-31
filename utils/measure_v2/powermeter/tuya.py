@@ -5,6 +5,8 @@ from .powermeter import PowerMeter, PowerMeasurementResult
 import time
 import tuyapower
 
+STATUS_OK = "OK"
+
 class TuyaPowerMeter(PowerMeter):
     def __init__(
         self,
@@ -19,7 +21,6 @@ class TuyaPowerMeter(PowerMeter):
         self._device_version = device_version
 
     def get_power(self) -> float:
-        #@todo we can get updated at from deviceJson
         (on, w, mA, V, err) = tuyapower.deviceInfo(
             self._device_id,
             self._device_ip,
@@ -27,7 +28,7 @@ class TuyaPowerMeter(PowerMeter):
             self._device_version
         )
 
-        if(err != "OK"):
+        if(err != STATUS_OK):
             raise PowerMeterError("Could not get a succesfull power reading")
         
         return PowerMeasurementResult(w, time.time())
