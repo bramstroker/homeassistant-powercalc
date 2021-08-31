@@ -41,3 +41,4 @@
 |signify      |LWB010                   |Hue White A60 E27 806lm                                 |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                        |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature            |lut              |color_temp   |
+|yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                        |lut              |brightness   |
