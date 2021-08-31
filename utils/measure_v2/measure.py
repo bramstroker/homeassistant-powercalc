@@ -8,7 +8,7 @@ from light_controller.const import (
 from light_controller.controller import LightController
 from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
-from powermeter.errors import OutdatedMeasurementError
+from powermeter.errors import OutdatedMeasurementError, PowerMeterError
 from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
@@ -142,7 +142,14 @@ class Measure():
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
             print("Taking sample", i)
-            measurement = self.power_meter.get_power()
+            try:
+                measurement = self.power_meter.get_power()
+            except PowerMeterError as err:
+                if (retry_count == MAX_RETRIES):
+                    raise err
+
+                retry_count += 1
+                self.take_power_measurement(start_timestamp, retry_count)
 
             # Check if measurement is not outdated
             if (measurement.updated < start_timestamp):

@@ -14,4 +14,4 @@ class PowerMeter():
 
 class PowerMeasurementResult(NamedTuple):
     power: float
-    updated: float = time.time()
+    updated: float

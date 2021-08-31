@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from .errors import PowerMeterError
 from .powermeter import PowerMeter, PowerMeasurementResult
+import time
 import tuyapower
 
 class TuyaPowerMeter(PowerMeter):
@@ -25,7 +27,8 @@ class TuyaPowerMeter(PowerMeter):
             self._device_version
         )
 
-        if(err == "OK"):
-            return PowerMeasurementResult(w)
-        else:
-            return -1
+        if(err != "OK"):
+            raise PowerMeterError("Could not get a succesfull power reading")
+        
+        return PowerMeasurementResult(w, time.time())
+        
