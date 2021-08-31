@@ -1,7 +1,8 @@
 from typing import Optional
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.core import State
+
+from .common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:
@@ -9,6 +10,6 @@ class PowerCalculationStrategyInterface:
         """Calculate power consumption based on entity state"""
         pass
 
-    async def validate_config(self, entity_entry: er.RegistryEntry):
+    async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
         pass

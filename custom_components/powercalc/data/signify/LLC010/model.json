@@ -1,0 +1,10 @@
+{
+    "name": "Hue Iris",
+    "standby_usage": 0.40,
+    "supported_modes": [
+        "lut"
+    ],
+    "measure_method": "script",
+    "measure_device": "TP-Link HS110",
+    "measure_description": "Measured with script made by smonesi (steps: bri 50/sat 60/hue 2000) and linearly interpolated to provide more data"
+}

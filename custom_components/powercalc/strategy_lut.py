@@ -8,7 +8,6 @@ from csv import reader
 from functools import partial
 from typing import Optional
 
-import homeassistant.helpers.entity_registry as er
 from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -22,6 +21,7 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import State
 
+from .common import SourceEntity
 from .errors import (
     LutFileNotFound,
     ModelNotSupported,
@@ -45,7 +45,7 @@ class LutRegistry:
     ) -> dict | None:
         cache_key = f"{light_model.manufacturer}_{light_model.model}_{color_mode}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
-        if lookup_dict == None:
+        if lookup_dict is None:
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
 
@@ -101,6 +101,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness is None:
             _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
             return None
+        if brightness > 255:
+            brightness = 255
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
@@ -141,23 +143,26 @@ class LutStrategy(PowerCalculationStrategyInterface):
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
-    async def validate_config(
-        self,
-        entity_entry: er.RegistryEntry,
-    ):
-        if entity_entry.domain != light.DOMAIN:
+    def get_nearest_lower(self, dict: dict, search_key):
+        return (
+            dict.get(search_key)
+            or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
+        )
+
+    async def validate_config(self, source_entity: SourceEntity):
+        if source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError("Only light entities can use the LUT mode")
 
         if self._model.manufacturer is None:
             _LOGGER.error(
-                "Manufacturer not supplied for entity: %s", entity_entry.entity_id
+                "Manufacturer not supplied for entity: %s", source_entity.entity_id
             )
 
         if self._model.model is None:
-            _LOGGER.error("Model not supplied for entity: %s", entity_entry.entity_id)
+            _LOGGER.error("Model not supplied for entity: %s", source_entity.entity_id)
             return
 
-        supported_color_modes = entity_entry.capabilities[
+        supported_color_modes = source_entity.capabilities[
             light.ATTR_SUPPORTED_COLOR_MODES
         ]
         for color_mode in supported_color_modes:

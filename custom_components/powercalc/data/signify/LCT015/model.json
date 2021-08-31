@@ -1,5 +1,6 @@
 {
-    "name": "Hue White and Color Ambiance A19 E26 (Gen 4)",
+    "name": "Hue White and Color Ambiance A19 E26/E27 (Gen 4)",
+    "standby_usage": 0.35,
     "supported_modes": [
         "lut"
     ]
