@@ -1,0 +1,10 @@
+{
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_description": "Measured with utils/measure_v2, SAMPLE_COUNT=3",
+    "name": "Hue White Filament Bulb G93 E27 w/ BT",
+    "standby_usage": 0.35,
+    "supported_modes": [
+        "lut"
+    ]
+}
