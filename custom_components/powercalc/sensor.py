@@ -185,7 +185,7 @@ async def async_setup_platform(
 
     if should_create_energy_sensor:
         energy_sensor = await create_energy_sensor(
-            hass, component_config, power_sensor, source_entity
+            hass, component_config, config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
 
@@ -211,10 +211,10 @@ async def create_power_sensor(
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
     name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
-    name = sensor_config.get(CONF_NAME) or name_pattern.format(source_entity.name)
-    entity_id = sensor_config.get(CONF_NAME) or name_pattern.format(
-        source_entity.object_id
-    )
+    name = sensor_config.get(CONF_NAME) or source_entity.name
+    name = name_pattern.format(name)
+    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
+    entity_id = async_generate_entity_id("sensor.{}", name_pattern.format(object_id), hass=hass)
 
     light_model = None
     try:
@@ -262,7 +262,6 @@ async def create_power_sensor(
     )
 
     return VirtualPowerSensor(
-        hass=hass,
         power_calculator=calculation_strategy,
         entity_id=entity_id,
         name=name,
@@ -279,13 +278,16 @@ async def create_power_sensor(
 async def create_energy_sensor(
     hass: HomeAssistantType,
     component_config: dict,
+    sensor_config: dict,
     power_sensor: VirtualPowerSensor,
     source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
     name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
-    name = name_pattern.format(source_entity.name)
+    name = sensor_config.get(CONF_NAME) or source_entity.name
+    name = name_pattern.format(name)
+    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
-        "sensor.{}", name_pattern.format(source_entity.object_id), hass=hass
+        "sensor.{}", name_pattern.format(object_id), hass=hass
     )
 
     _LOGGER.debug("Creating energy sensor: %s", name)
@@ -344,7 +346,6 @@ class VirtualPowerSensor(Entity):
 
     def __init__(
         self,
-        hass: HomeAssistantType,
         power_calculator: PowerCalculationStrategyInterface,
         entity_id: str,
         name: str,
@@ -368,7 +369,7 @@ class VirtualPowerSensor(Entity):
         self._scan_interval = scan_interval
         self._multiply_factor = multiply_factor
         self._multiply_factor_standby = multiply_factor_standby
-        self.entity_id = async_generate_entity_id("sensor.{}", entity_id, hass=hass)
+        self.entity_id = entity_id
 
     async def async_added_to_hass(self):
         """Register callbacks."""
