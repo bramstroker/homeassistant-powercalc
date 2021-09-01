@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from phue import (
-    Bridge,
-    PhueRegistrationException
-)
+from phue import Bridge, PhueRegistrationException
+
 from .controller import LightController, LightInfo
 
 NAME = "hue"
+
 
 class HueLightController(LightController):
     def __init__(self, bridge_ip: str):
@@ -41,14 +40,16 @@ class HueLightController(LightController):
     def get_questions(self) -> list[dict]:
         light_list = []
         for light in self.bridge.lights:
-            light_list.append({"key": light.light_id, "value": light.light_id, "name": light.name})
+            light_list.append(
+                {"key": light.light_id, "value": light.light_id, "name": light.name}
+            )
 
         return [
             {
-                'type': 'list',
-                'name': 'light',
-                'message': 'Select the light?',
-                'choices': light_list
+                "type": "list",
+                "name": "light",
+                "message": "Select the light?",
+                "choices": light_list,
             },
         ]
 

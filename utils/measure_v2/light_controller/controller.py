@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-class LightInfo():
+
+class LightInfo:
     model_id: str
 
-    def __init__(
-        self,
-        model_id: str,
-        min_mired: int = 150,
-        max_mired: int = 500
-    ):
+    def __init__(self, model_id: str, min_mired: int = 150, max_mired: int = 500):
         self.model_id = model_id
         self._min_mired = min_mired
         self._max_mired = max_mired
@@ -32,7 +28,8 @@ class LightInfo():
     min_mired = property(get_min_mired, set_min_mired)
     max_mired = property(get_max_mired, set_max_mired)
 
-class LightController():
+
+class LightController:
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         pass
 
@@ -41,6 +38,6 @@ class LightController():
 
     def get_questions(self) -> list[dict]:
         return []
-    
+
     def process_answers(self, answers):
         pass

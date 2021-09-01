@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from .errors import PowerMeterError
-from .powermeter import PowerMeter, PowerMeasurementResult
 import time
+
 import tuyapower
 
+from .errors import PowerMeterError
+from .powermeter import PowerMeasurementResult, PowerMeter
+
 STATUS_OK = "OK"
+
 
 class TuyaPowerMeter(PowerMeter):
     def __init__(
@@ -13,7 +16,7 @@ class TuyaPowerMeter(PowerMeter):
         device_id: str,
         device_ip: str,
         device_key: str,
-        device_version: str = "3.3"
+        device_version: str = "3.3",
     ):
         self._device_id = device_id
         self._device_ip = device_ip
@@ -22,14 +25,10 @@ class TuyaPowerMeter(PowerMeter):
 
     def get_power(self) -> float:
         (on, w, mA, V, err) = tuyapower.deviceInfo(
-            self._device_id,
-            self._device_ip,
-            self._device_key,
-            self._device_version
+            self._device_id, self._device_ip, self._device_key, self._device_version
         )
 
-        if(err != STATUS_OK):
+        if err != STATUS_OK:
             raise PowerMeterError("Could not get a succesfull power reading")
-        
+
         return PowerMeasurementResult(w, time.time())
-        

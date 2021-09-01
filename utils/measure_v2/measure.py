@@ -1,34 +1,31 @@
 from __future__ import annotations
 
-from light_controller.const import (
-    MODE_BRIGHTNESS,
-    MODE_COLOR_TEMP,
-    MODE_HS
-)
+import csv
+import gzip
+import json
+import os
+import shutil
+import time
+from typing import Iterator
+
+from decouple import config
+from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
-from light_controller.hue import HueLightController
 from light_controller.hass import HassLightController
+from light_controller.hue import HueLightController
 from powermeter.errors import OutdatedMeasurementError, PowerMeterError
-from powermeter.powermeter import PowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
+from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
-from decouple import config
-import time
-import json
-from typing import Iterator
 from PyInquirer import prompt
-import os
-import csv
-import gzip
-import shutil
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
     MODE_COLOR_TEMP: ["bri", "mired", "watt"],
-    MODE_BRIGHTNESS: ["bri", "watt"]
+    MODE_BRIGHTNESS: ["bri", "watt"],
 }
 MAX_BRIGHTNESS = 255
 MAX_SAT = 254
@@ -44,39 +41,37 @@ POWER_METERS = [
     POWER_METER_KASA,
     POWER_METER_SHELLY,
     POWER_METER_TASMOTA,
-    POWER_METER_TUYA
+    POWER_METER_TUYA,
 ]
 
-SELECTED_POWER_METER = config('POWER_METER')
+SELECTED_POWER_METER = config("POWER_METER")
 
 LIGHT_CONTROLLER_HUE = "hue"
 LIGHT_CONTROLLER_HASS = "hass"
-LIGHT_CONTROLLERS = [
-    LIGHT_CONTROLLER_HUE,
-    LIGHT_CONTROLLER_HASS
-]
+LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
 
-SELECTED_LIGHT_CONTROLLER = config('LIGHT_CONTROLLER')
+SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 
-SLEEP_TIME = config('SLEEP_TIME', default=2, cast=int)
-SLEEP_TIME_HUE = config('SLEEP_TIME_HUE', default=5, cast=int)
-SLEEP_TIME_SAT = config('SLEEP_TIME_SAT', default=10, cast=int)
-START_BRIGHTNESS = config('START_BRIGHTNESS', default=1, cast=int)
-MAX_RETRIES = config('MAX_RETRIES', default=5, cast=int)
-SAMPLE_COUNT = config('SAMPLE_COUNT', default=1, cast=int)
+SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
+SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
+SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
+START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
+MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
+SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
 
-SHELLY_IP = config('SHELLY_IP')
-TUYA_DEVICE_ID = config('TUYA_DEVICE_ID')
-TUYA_DEVICE_IP = config('TUYA_DEVICE_IP')
-TUYA_DEVICE_KEY = config('TUYA_DEVICE_KEY')
-TUYA_DEVICE_VERSION = config('EMAIL_PORT', default='3.3')
-HUE_BRIDGE_IP = config('HUE_BRIDGE_IP')
-HASS_URL = config('HASS_URL')
-HASS_TOKEN = config('HASS_TOKEN')
-TASMOTA_DEVICE_IP = config('TASMOTA_DEVICE_IP')
-KASA_DEVICE_IP = config('KASA_DEVICE_IP')
+SHELLY_IP = config("SHELLY_IP")
+TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
+TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
+TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
+TUYA_DEVICE_VERSION = config("EMAIL_PORT", default="3.3")
+HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
+HASS_URL = config("HASS_URL")
+HASS_TOKEN = config("HASS_TOKEN")
+TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
+KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
-class Measure():
+
+class Measure:
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
         self.light_controller = light_controller
         self.power_meter = power_meter
@@ -90,9 +85,7 @@ class Measure():
         color_mode = answers["color_mode"]
 
         export_directory = os.path.join(
-            os.path.dirname(__file__),
-            "export",
-            self.light_info.model_id
+            os.path.dirname(__file__), "export", self.light_info.model_id
         )
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
@@ -103,11 +96,11 @@ class Measure():
                 directory=export_directory,
                 standby_usage=standby_usage,
                 name=answers["model_name"],
-                measure_device=answers["measure_device"]
+                measure_device=answers["measure_device"],
             )
 
         csv_file_path = f"{export_directory}/{color_mode}.csv"
-        with open(csv_file_path, "w", newline='') as csv_file:
+        with open(csv_file_path, "w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
 
             self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
@@ -121,7 +114,9 @@ class Measure():
             for count, variation in enumerate(self.get_variations(color_mode)):
                 print("Changing light to: ", variation)
                 variation_start_time = time.time()
-                self.light_controller.change_light_state(color_mode, on=True, **variation)
+                self.light_controller.change_light_state(
+                    color_mode, on=True, **variation
+                )
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
                 print("Measured power: ", power)
@@ -133,11 +128,11 @@ class Measure():
                     csv_file.flush()
 
             csv_file.close()
-        
+
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
-    
-    def take_power_measurement(self, start_timestamp: float, retry_count = 0) -> float:
+
+    def take_power_measurement(self, start_timestamp: float, retry_count=0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
@@ -145,32 +140,36 @@ class Measure():
             try:
                 measurement = self.power_meter.get_power()
             except PowerMeterError as err:
-                if (retry_count == MAX_RETRIES):
+                if retry_count == MAX_RETRIES:
                     raise err
 
                 retry_count += 1
                 self.take_power_measurement(start_timestamp, retry_count)
 
             # Check if measurement is not outdated
-            if (measurement.updated < start_timestamp):
+            if measurement.updated < start_timestamp:
                 # Prevent endless recursion and raise exception
-                if (retry_count == MAX_RETRIES):
-                    raise OutdatedMeasurementError("Power measurement is outdated. Aborting after {} retries".format(MAX_RETRIES))
+                if retry_count == MAX_RETRIES:
+                    raise OutdatedMeasurementError(
+                        "Power measurement is outdated. Aborting after {} retries".format(
+                            MAX_RETRIES
+                        )
+                    )
 
                 retry_count += 1
                 time.sleep(1)
                 self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
-            time.sleep(0.5)        
+            time.sleep(0.5)
 
         avg = sum(measurements) / len(measurements)
         return round(avg, 2)
 
     def gzip_csv(self, csv_file_path: str):
         with open(csv_file_path, "rb") as csv_file:
-                with gzip.open(f"{csv_file_path}.gz", 'wb') as gzip_file:
-                    shutil.copyfileobj(csv_file, gzip_file)
+            with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
+                shutil.copyfileobj(csv_file, gzip_file)
 
     def measure_standby_usage(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
@@ -178,7 +177,7 @@ class Measure():
         print("Measuring standby usage. Waiting for 5 seconds...")
         time.sleep(5)
         return self.take_power_measurement(start_time)
-    
+
     def get_variations(self, color_mode: str):
         if color_mode == MODE_HS:
             yield from self.get_hs_variations()
@@ -194,7 +193,6 @@ class Measure():
             for mired in self.inclusive_range(min_mired, max_mired, 10):
                 yield {"bri": bri, "ct": mired}
 
-
     def get_hs_variations(self) -> Iterator[dict]:
         for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
             for sat in self.inclusive_range(1, MAX_SAT, 10):
@@ -203,11 +201,9 @@ class Measure():
                     time.sleep(SLEEP_TIME_HUE)
                     yield {"bri": bri, "hue": hue, "sat": sat}
 
-
     def get_brightness_variations(self) -> Iterator[dict]:
         for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
             yield {"bri": bri}
-
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
         i = start
@@ -217,115 +213,111 @@ class Measure():
         yield end
 
     def write_model_json(
-        self,
-        directory: str,
-        standby_usage: float,
-        name: str,
-        measure_device: str
+        self, directory: str, standby_usage: float, name: str, measure_device: str
     ):
-        json_data = json.dumps({
-            "measure_device": measure_device,
-            "measure_method": "script",
-            "name": name,
-            "standby_usage": standby_usage,
-            "supported_modes": [
-                "lut"
-            ]
-        }, indent=4, sort_keys=True)
+        json_data = json.dumps(
+            {
+                "measure_device": measure_device,
+                "measure_method": "script",
+                "name": name,
+                "standby_usage": standby_usage,
+                "supported_modes": ["lut"],
+            },
+            indent=4,
+            sort_keys=True,
+        )
         json_file = open(os.path.join(directory, "model.json"), "w")
         json_file.write(json_data)
         json_file.close()
-    
+
     def get_questions(self) -> list[dict]:
-        return [
-            {
-                'type': 'list',
-                'name': 'color_mode',
-                'message': 'Select the color mode?',
-                'default': MODE_HS,
-                'choices': [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
-            },
-            {
-                'type': 'confirm',
-                'message': 'Do you want to generate model.json?',
-                'name': 'generate_model_json',
-                'default': True,
-            },
-            {
-                'type': 'input',
-                'name': 'model_name',
-                'message': 'Specify the full light model name',
-                'when': lambda answers: answers['generate_model_json']
-            },
-            {
-                'type': 'input',
-                'name': 'measure_device',
-                'message': 'Which device (manufacturer, model) do you use to take the measurement?',
-                'when': lambda answers: answers['generate_model_json']
-            },
-            {
-                'type': 'confirm',
-                'message': 'Do you want to gzip CSV files?',
-                'name': 'gzip',
-                'default': True,
-            },
-        ] + self.light_controller.get_questions() + self.power_meter.get_questions()
+        return (
+            [
+                {
+                    "type": "list",
+                    "name": "color_mode",
+                    "message": "Select the color mode?",
+                    "default": MODE_HS,
+                    "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
+                },
+                {
+                    "type": "confirm",
+                    "message": "Do you want to generate model.json?",
+                    "name": "generate_model_json",
+                    "default": True,
+                },
+                {
+                    "type": "input",
+                    "name": "model_name",
+                    "message": "Specify the full light model name",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
+                    "type": "input",
+                    "name": "measure_device",
+                    "message": "Which device (manufacturer, model) do you use to take the measurement?",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
+                    "type": "confirm",
+                    "message": "Do you want to gzip CSV files?",
+                    "name": "gzip",
+                    "default": True,
+                },
+            ]
+            + self.light_controller.get_questions()
+            + self.power_meter.get_questions()
+        )
 
 
-class LightControllerFactory():
+class LightControllerFactory:
     def hass(self):
         return HassLightController(HASS_URL, HASS_TOKEN)
-    
+
     def hue(self):
         return HueLightController(HUE_BRIDGE_IP)
-    
+
     def create(self) -> LightController:
-        factories = {
-            LIGHT_CONTROLLER_HUE: self.hue,
-            LIGHT_CONTROLLER_HASS: self.hass
-        }
+        factories = {LIGHT_CONTROLLER_HUE: self.hue, LIGHT_CONTROLLER_HASS: self.hass}
         factory = factories.get(SELECTED_LIGHT_CONTROLLER)
         if factory is None:
             print("factory not found")
-            #todo exception
+            # todo exception
 
         print("light controller", SELECTED_LIGHT_CONTROLLER)
         return factory()
 
 
-class PowerMeterFactory():
+class PowerMeterFactory:
     def hass(self):
         return HassPowerMeter(HASS_URL, HASS_TOKEN)
-    
+
     def kasa(self):
         return KasaPowerMeter(KASA_DEVICE_IP)
 
     def shelly(self):
         return ShellyPowerMeter(SHELLY_IP)
-    
+
     def tasmota(self):
         return TasmotaPowerMeter(TASMOTA_DEVICE_IP)
 
     def tuya(self):
         return TuyaPowerMeter(
-            TUYA_DEVICE_ID,
-            TUYA_DEVICE_IP,
-            TUYA_DEVICE_KEY,
-            TUYA_DEVICE_VERSION
+            TUYA_DEVICE_ID, TUYA_DEVICE_IP, TUYA_DEVICE_KEY, TUYA_DEVICE_VERSION
         )
-    
+
     def create(self) -> PowerMeter:
         factories = {
             POWER_METER_HASS: self.hass,
             POWER_METER_KASA: self.kasa,
             POWER_METER_SHELLY: self.shelly,
             POWER_METER_TASMOTA: self.tasmota,
-            POWER_METER_TUYA: self.tuya
+            POWER_METER_TUYA: self.tuya,
         }
         factory = factories.get(SELECTED_POWER_METER)
         if factory is None:
             print("factory not found")
-            #todo exception
+            # todo exception
 
         print("powermeter", SELECTED_POWER_METER)
         return factory()
@@ -333,9 +325,6 @@ class PowerMeterFactory():
 
 light_controller_factory = LightControllerFactory()
 power_meter_factory = PowerMeterFactory()
-measure = Measure(
-    light_controller_factory.create(),
-    power_meter_factory.create()
-)
+measure = Measure(light_controller_factory.create(), power_meter_factory.create())
 
 measure.start()

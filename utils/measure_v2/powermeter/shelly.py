@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import datetime
+
 import requests
-from .powermeter import PowerMeter, PowerMeasurementResult
+
+from .powermeter import PowerMeasurementResult, PowerMeter
+
 
 class ShellyPowerMeter(PowerMeter):
     def __init__(self, shelly_ip):
