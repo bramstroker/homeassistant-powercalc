@@ -404,7 +404,7 @@ If you want to use the virtual power sensors with the new [energy integration](h
 If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
 ### Creating energy groups
-Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
+Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
 
 ````yaml
 - platform: template
@@ -415,8 +415,7 @@ Let's assume you want to sum up all energy usage from one category e.g. all of y
       value_template: >-
         {{states('sensor.kingkong_energy') | float + states('sensor.kinglouie_energy') | float}}
       attribute_templates:
-        last_reset: "1970-01-01T00:00:00+00:00"
-        state_class: measurement
+        state_class: total_increasing
         device_class: energy
         icon: mdi:counter
 ````
