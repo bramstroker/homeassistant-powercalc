@@ -26,6 +26,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [LUT data files](#lut-data-files)
       - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
+- [Sensor naming](#sensor-naming)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
