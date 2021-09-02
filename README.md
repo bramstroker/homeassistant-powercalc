@@ -26,6 +26,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [LUT data files](#lut-data-files)
       - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
+- [Sensor naming](#sensor-naming)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
@@ -360,6 +361,42 @@ See the [README](utils/measure_v2/README.md) for more information.
 ### Supported models
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
+
+## Sensor naming
+
+Let's assume you have a source sensor `light.patio` with name "Patio".
+Powercalc will create the following sensors by default.
+- sensor.patio_power (Patio power)
+- sensor.patio_energy (Patio energy)
+
+> Utility meters will use the energy name as a base and suffix with `_daily`, `_weekly`, `_monthly`
+
+### Change suffixes
+To change the default suffixes `_power` and `_energy` you can use the `power_sensor_naming` and `energy_sensor_naming` options.
+The following configuration:
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kWh consumed"
+```
+
+will create:
+- sensor.patio_power (Patio power)
+- sensor.patio_kwh_consumed (Patio kWh consumed)
+
+### Change name
+You can also change the sensor name with the `name` option
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.patio
+    name: Patio Light
+```
+
+will create:
+- sensor.patio_light_power (Patio light power)
+- sensor.patio_light_energy (Patio light energy)
 
 ## Setting up for energy dashboard
 If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
