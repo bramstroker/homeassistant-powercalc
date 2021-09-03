@@ -24,6 +24,7 @@
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                 |lut              |color_temp,hs|
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)        |lut              |color_temp,hs|
 |signify      |LCT024                   |Hue Play                                                |lut              |color_temp,hs|
+|signify      |LCT026                   |Hue Go 2.0                                              |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                               |lut              |hs           |
 |signify      |LLC010                   |Hue Iris                                                |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                          |lut              |hs           |
