@@ -1,6 +1,6 @@
 {
     "name": "Hue White Ambiance E27",
-    "standby_usage": 0.300,
+    "standby_usage": 0.29,
     "supported_modes": [
         "lut"
     ],
