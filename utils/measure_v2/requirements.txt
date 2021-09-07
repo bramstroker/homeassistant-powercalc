@@ -1,10 +1,15 @@
+aiohttp==3.7.4.post0
 anyio==3.3.0
+async-timeout==3.0.1
 asyncclick==7.1.2.3
+attrs==21.2.0
 certifi==2021.5.30
+chardet==4.0.0
 charset-normalizer==2.0.4
 gensim==3.8.1
 idna==3.2
 importlib-metadata==4.8.1
+multidict==5.1.0
 phue==1.1
 prompt-toolkit==1.0.14
 pycryptodome==3.10.1
@@ -20,6 +25,9 @@ smart-open==5.2.1
 sniffio==1.2.0
 tinytuya==1.2.7
 tuyapower==0.0.25
+typing-extensions==3.10.0.2
 urllib3==1.26.6
 wcwidth==0.2.5
+yarl==1.6.3
 zipp==3.5.0
+zwave-js-server-python==0.30.0
