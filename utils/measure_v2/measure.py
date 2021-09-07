@@ -7,6 +7,7 @@ import os
 import shutil
 import time
 from typing import Iterator
+from utils.measure_v2.powermeter.zwavejs import ZwaveJsPowerMeter
 
 from decouple import config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
@@ -36,12 +37,14 @@ POWER_METER_KASA = "kasa"
 POWER_METER_SHELLY = "shelly"
 POWER_METER_TASMOTA = "tasmota"
 POWER_METER_TUYA = "tuya"
+POWER_METER_ZWAVE = "zwave"
 POWER_METERS = [
     POWER_METER_HASS,
     POWER_METER_KASA,
     POWER_METER_SHELLY,
     POWER_METER_TASMOTA,
     POWER_METER_TUYA,
+    POWER_METER_ZWAVE
 ]
 
 SELECTED_POWER_METER = config("POWER_METER")
@@ -69,6 +72,7 @@ HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
+ZWAVE_JS_URL = config("ZWAVE_JS_URL")
 
 
 class Measure:
@@ -305,6 +309,9 @@ class PowerMeterFactory:
         return TuyaPowerMeter(
             TUYA_DEVICE_ID, TUYA_DEVICE_IP, TUYA_DEVICE_KEY, TUYA_DEVICE_VERSION
         )
+    
+    def zwave(self):
+        return ZwaveJsPowerMeter(ZWAVE_JS_URL)
 
     def create(self) -> PowerMeter:
         factories = {
@@ -313,6 +320,7 @@ class PowerMeterFactory:
             POWER_METER_SHELLY: self.shelly,
             POWER_METER_TASMOTA: self.tasmota,
             POWER_METER_TUYA: self.tuya,
+            POWER_METER_ZWAVE: self.zwave
         }
         factory = factories.get(SELECTED_POWER_METER)
         if factory is None:
