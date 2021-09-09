@@ -80,9 +80,13 @@ from .const import (
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
-    MODE_LUT,
 )
-from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
+from .errors import (
+    PowercalcSetupError,
+    ModelNotSupported,
+    StrategyConfigurationError,
+    UnsupportedMode
+)
 from .light_model import LightModel
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -174,8 +178,8 @@ async def async_setup_platform(
         power_sensor = await create_power_sensor(
             hass, entity_entry, config, component_config, source_entity
         )
-    except (ModelNotSupported, StrategyConfigurationError) as err:
-        pass
+    except PowercalcSetupError as err:
+        return
 
     entities_to_add = [power_sensor]
 
@@ -219,15 +223,7 @@ async def create_power_sensor(
     light_model = None
     try:
         light_model = await get_light_model(hass, entity_entry, sensor_config)
-    except ModelNotSupported as err:
-        mode = select_calculation_mode(sensor_config, None)
-        if mode == MODE_LUT:
-            _LOGGER.error(
-                "Model not found in library %s: %s", source_entity.entity_id, err
-            )
-            raise err
 
-    try:
         mode = select_calculation_mode(sensor_config, light_model)
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity.domain
@@ -251,7 +247,7 @@ async def create_power_sensor(
             standby_usage = light_model.standby_usage
 
     _LOGGER.debug(
-        "Setting up power sensor. entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s",
+        "Setting up power sensor (entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s)",
         source_entity.entity_id,
         name,
         calculation_strategy.__class__.__name__,
