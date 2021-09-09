@@ -1,8 +1,10 @@
 """Errors for the power component."""
 from homeassistant.exceptions import HomeAssistantError
 
+
 class PowercalcSetupError(HomeAssistantError):
     """Raised when an error occured during powercalc sensor setup."""
+
 
 class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""

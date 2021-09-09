@@ -82,10 +82,10 @@ from .const import (
     MODE_LINEAR,
 )
 from .errors import (
-    PowercalcSetupError,
     ModelNotSupported,
+    PowercalcSetupError,
     StrategyConfigurationError,
-    UnsupportedMode
+    UnsupportedMode,
 )
 from .light_model import LightModel
 from .model_discovery import get_light_model
@@ -218,7 +218,9 @@ async def create_power_sensor(
     name = sensor_config.get(CONF_NAME) or source_entity.name
     name = name_pattern.format(name)
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
-    entity_id = async_generate_entity_id("sensor.{}", name_pattern.format(object_id), hass=hass)
+    entity_id = async_generate_entity_id(
+        "sensor.{}", name_pattern.format(object_id), hass=hass
+    )
 
     light_model = None
     try:
