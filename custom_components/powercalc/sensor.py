@@ -101,7 +101,7 @@ PLATFORM_SCHEMA = vol.All(
     PLATFORM_SCHEMA.extend(
         {
             vol.Optional(CONF_NAME): cv.string,
-            vol.Required(CONF_ENTITY_ID): vol.All(cv.entity_id, cv.entity_domain(
+            vol.Required(CONF_ENTITY_ID): cv.entity_domain(
                 (
                     light.DOMAIN,
                     switch.DOMAIN,
@@ -116,7 +116,7 @@ PLATFORM_SCHEMA = vol.All(
                     sensor.DOMAIN,
                     vacuum.DOMAIN,
                     water_heater.DOMAIN
-                ))
+                )
             ),
             vol.Optional(CONF_MODEL): cv.string,
             vol.Optional(CONF_MANUFACTURER): cv.string,
