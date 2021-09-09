@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -100,7 +101,7 @@ PLATFORM_SCHEMA = vol.All(
     PLATFORM_SCHEMA.extend(
         {
             vol.Optional(CONF_NAME): cv.string,
-            vol.Required(CONF_ENTITY_ID): cv.entity_domain(
+            vol.Required(CONF_ENTITY_ID): vol.All(cv.entity_id, cv.entity_domain(
                 (
                     light.DOMAIN,
                     switch.DOMAIN,
@@ -115,7 +116,7 @@ PLATFORM_SCHEMA = vol.All(
                     sensor.DOMAIN,
                     vacuum.DOMAIN,
                     water_heater.DOMAIN
-                )
+                ))
             ),
             vol.Optional(CONF_MODEL): cv.string,
             vol.Optional(CONF_MANUFACTURER): cv.string,
@@ -133,6 +134,8 @@ PLATFORM_SCHEMA = vol.All(
 )
 
 ENERGY_ICON = "mdi:lightning-bolt"
+ATTR_CALCULATION_MODE = "calculation_mode"
+ATTR_INTEGRATION = "integration"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
@@ -263,6 +266,7 @@ async def create_power_sensor(
 
     return VirtualPowerSensor(
         power_calculator=calculation_strategy,
+        calculation_mode=mode,
         entity_id=entity_id,
         name=name,
         source_entity=source_entity.entity_id,
@@ -347,6 +351,7 @@ class VirtualPowerSensor(Entity):
     def __init__(
         self,
         power_calculator: PowerCalculationStrategyInterface,
+        calculation_mode: str,
         entity_id: str,
         name: str,
         source_entity: str,
@@ -359,6 +364,7 @@ class VirtualPowerSensor(Entity):
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
+        self._calculation_mode = calculation_mode
         self._source_entity = source_entity
         self._source_domain = source_domain
         self._name = name
@@ -442,6 +448,8 @@ class VirtualPowerSensor(Entity):
     def extra_state_attributes(self):
         """Return entity state attributes."""
         return {
+            ATTR_CALCULATION_MODE: self._calculation_mode,
+            ATTR_INTEGRATION: DOMAIN,
             ATTR_SOURCE_ENTITY: self._source_entity,
             ATTR_SOURCE_DOMAIN: self._source_domain,
         }
