@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import csv
 import gzip
 import json
@@ -7,7 +8,6 @@ import os
 import shutil
 import time
 from typing import Iterator
-from utils.measure_v2.powermeter.zwavejs import ZwaveJsPowerMeter
 
 from decouple import config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
@@ -21,6 +21,7 @@ from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
+from powermeter.zwavejs import ZwaveJsPowerMeter
 from PyInquirer import prompt
 
 CSV_HEADERS = {
@@ -80,7 +81,8 @@ class Measure:
         self.light_controller = light_controller
         self.power_meter = power_meter
 
-    def start(self):
+    async def start(self):
+        await self.power_meter.setup()
         answers = prompt(self.get_questions())
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
@@ -335,4 +337,4 @@ light_controller_factory = LightControllerFactory()
 power_meter_factory = PowerMeterFactory()
 measure = Measure(light_controller_factory.create(), power_meter_factory.create())
 
-measure.start()
+asyncio.run(measure.start())
