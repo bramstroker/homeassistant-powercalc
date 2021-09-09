@@ -20,6 +20,7 @@ from homeassistant.components import (
     sensor,
     switch,
     vacuum,
+    water_heater
 )
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
@@ -113,6 +114,7 @@ PLATFORM_SCHEMA = vol.All(
                     input_select.DOMAIN,
                     sensor.DOMAIN,
                     vacuum.DOMAIN,
+                    water_heater.DOMAIN
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,

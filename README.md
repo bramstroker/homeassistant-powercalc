@@ -188,7 +188,7 @@ sensor:
 > For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
-Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_select`, `sensor`, `climate`, `vacuum`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
