@@ -31,6 +31,8 @@ async def on_driver_ready(client: Client, driver_ready: asyncio.Event) -> None:
 def on_value_updated(event: dict) -> None:
     """Log node value changes."""
     value = event["value"]
+    if value.metadata.unit != "W":
+        return
     power = value.value
     print(power)
 
