@@ -150,6 +150,7 @@ class Measure:
                     raise err
 
                 retry_count += 1
+                time.sleep(2)
                 self.take_power_measurement(start_timestamp, retry_count)
 
             # Check if measurement is not outdated
