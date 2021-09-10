@@ -2,11 +2,10 @@
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
-# homeassistant-powercalc
+# Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.
 Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
-Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `input_boolean`, `sensor`, `remote` and `media_player` entities 
 
 ![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
@@ -25,9 +24,14 @@ Power sensors can be created for `light`, `switch`, `fan`, `binary_sensor`, `inp
     - [Fixed](#fixed-mode)
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
+      - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
+- [Sensor naming](#sensor-naming)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
-    - [Creating energy groups](#creating-energy-groups)   
+    - [Creating energy groups](#creating-energy-groups)
+- [Advanced features](#advanced-features)
+    - [Multiply Factor](#multiply-factor)
+    - [Utility Meters](#utility-meters)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -53,18 +57,22 @@ For each entity you want to create a virtual power sensor for you'll need to add
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
-| Name                   | Type    | Requirement  | Description                                                                |
-| ---------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id              | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
-| manufacturer           | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
-| model                  | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_usage          | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_usage  | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
-| name                   | string  | **Optional** | Override the name                                                          |
-| custom_model_directory | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
-| mode                   | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
-| fixed                  | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
-| linear                 | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| Name                    | Type    | Requirement  | Description                                                                |
+| ----------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
+| manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_usage           | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                    | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
+| custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
+| multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
+| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
+| fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 
 **Minimalistic example creating two power sensors:**
 
@@ -83,17 +91,22 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                   | Type    | Requirement  | Default  | Description                                                                                                                                        |
-| ---------------------- | ------- | ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scan_interval          | string  | **Optional** | 00:10:00 | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| entity_name_pattern    | string  | **Optional** | {} power | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| Name                   | Type    | Requirement  | Default                | Description                                                                                                                                        |
+| ---------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scan_interval          | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| create_energy_sensors  | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| power_sensor_naming    | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_naming   | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| create_utility_meters  | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
+| utility_meter_types    | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
 
 **Example:**
 
 ```yaml
 powercalc:
   scan_interval: 00:01:00 #Each minute
-  entity_name_pattern: "{} Powersensor" 
+  power_sensor_naming: "{} Powersensor"
+  create_energy_sensors: false
 ```
 
 ## Calculation modes
@@ -107,7 +120,7 @@ To calculate estimated power consumption different modes are supported, they are
 Supported domain: `light`
 
 This is the most accurate mode.
-For some models from the Philips Hue line measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
+For a lot of light models measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
 - [Supported models](#supported-models) for LUT mode
 - [LUT file structure](#lut-data-files)
 
@@ -176,7 +189,7 @@ sensor:
 > For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
-Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `remote`, `media_player`, `input_boolean`, `sensor`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
@@ -250,8 +263,12 @@ This library will keep extending by the effort of community users.
 These models are located in `custom_components/powercalc/data` directory.
 Each light model has it's own subdirectory `{manufacturer}/{modelid}`
 
+### model.json
+
 Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
-When LUT mode is supported also [LUT data files](#lut-data-files) must be provided.
+See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
+
+When [LUT mode](#lut-mode) is supported also [CSV lookup files](#lut-data-files) must be provided.
 
 Example lut mode:
 
@@ -261,7 +278,9 @@ Example lut mode:
     "standby_usage": 0.4,
     "supported_modes": [
         "lut"
-    ]
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly Plug S"
 }
 ```
 
@@ -277,7 +296,9 @@ Example linear mode
     "linear_config": {
         "min_power": 0,
         "max_power": 6
-    }
+    },
+    "measure_method": "manual",
+    "measure_device": "From manufacturer specifications"
 }
 ```
 
@@ -285,7 +306,7 @@ Example linear mode
 
 To calculate power consumption a lookup is done into CSV data files.
 
-Depending on the supported color modes of the light the integration expects multiple CSV files here:
+Depending on the supported color modes of the light the integration expects one or more CSV files here:
  - hs.csv.gz (hue/saturation, colored lamps)
  - color_temp.csv.gz (color temperature)
  - brightness.csv.gz (brightness only lights)
@@ -305,8 +326,8 @@ Example:
 
 #### Expected file structure
 
-- The file MUST contain a header row.
-- The data rows in the CSV files MUST have the following column order:
+- The file **MUST** contain a header row.
+- The data rows in the CSV files **MUST** have the following column order:
 
 **hs.csv**
 ```csv
@@ -331,71 +352,136 @@ bri,watt
 
 #### Creating LUT files
 
-New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API.
-An example script is available `utils/measure/measure.py`.
-I am using the "Shelly Plug S"
+New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API or Home Assistant API.
+The tooling is available at `utils/measure_v2_`.
 
-Setup requirements for the script. It is advised to run in a virtual environment.
-```
-cd utils/measure
-python3 -m venv measure
-source measure/bin/activate
-pip install -r requirements.txt
-```
+The script supports several smartplugs with power monitoring.
 
-Run the script:
-```
-python3 measure.py
-```
+See the [README](utils/measure_v2/README.md) for more information.
 
 ### Supported models
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
-## Setting up for energy dashboard
-If you want to use this power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create a energy sensor which utilizes the power of the powercalc sensor. This can be done with the [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), which calculates the energy and since release 2021.8 this integration can natively be used in the energy dashboard. An example configuration, which you have to copy into your `configuration.yaml`, can be seen below (assuming you have a powercalc sensor with entity_id `sensor.kingkong_power`:
+## Sensor naming
 
-````yaml
+Let's assume you have a source sensor `light.patio` with name "Patio".
+Powercalc will create the following sensors by default.
+- sensor.patio_power (Patio power)
+- sensor.patio_energy (Patio energy)
+
+> Utility meters will use the energy name as a base and suffix with `_daily`, `_weekly`, `_monthly`
+
+### Change suffixes
+To change the default suffixes `_power` and `_energy` you can use the `power_sensor_naming` and `energy_sensor_naming` options.
+The following configuration:
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kWh consumed"
+```
+
+will create:
+- sensor.patio_power (Patio power)
+- sensor.patio_kwh_consumed (Patio kWh consumed)
+
+### Change name
+You can also change the sensor name with the `name` option
+
+```yaml
 sensor:
-    - platform: integration
-      source: sensor.kingkong_power
-      name: kingkong_power_kWh
-      unit_prefix: k
-      round: 2
-````
-If you are tired of writing out all these configuration, you can use the template below. Just copy the template into the template section in the developer tools. Then this template creates the configuration of all the power sensors you have (so not just the powercalc ones) which you can copy to your `configuration.yaml` (or only the parts you need).
+  - platform: powercalc
+    entity_id: light.patio
+    name: Patio Light
+```
 
-````yaml
-{% for state in states -%}
-{%- if state.attributes.unit_of_measurement == "W" and state.attributes.device_class == "power" -%}
-- platform: integration
-  source: {{ state.entity_id }}
-  unit_prefix: k
-  round: 2
-{% endif -%}
-{%- endfor -%}
-````
+will create:
+- sensor.patio_light_power (Patio light power)
+- sensor.patio_light_energy (Patio light energy)
+
+## Setting up for energy dashboard
+If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
+
+If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
 ### Creating energy groups
-If you want to sum up all energy usage from one category e.g. all of your servers, then create a powercalc sensor and an integration sensor for each of these servers like described in the section before. Then you create a template energy usage sensor which sums up all values of the energy sensors (a example sensor can be found below). It's essential to add the attributes `last_reset`, `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
+Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
 
 ````yaml
 - platform: template
   sensors:
     energy_server:
-      friendly_name: "Alle Server Energieverbrauch"
+      friendly_name: "All Server Energy Consumption"
       unit_of_measurement: kWh
       value_template: >-
-        {{states('sensor.kingkong_power_kwh') | float + states('sensor.kinglouie_power_kwh') | float}}
+        {{states('sensor.kingkong_energy') | float + states('sensor.kinglouie_energy') | float}}
       attribute_templates:
-        last_reset: "1970-01-01T00:00:00+00:00"
-        state_class: measurement
+        state_class: total_increasing
         device_class: energy
         icon: mdi:counter
 ````
 > **Don't** create a template sensor which sums up all values from the power sensors and use this sensor to create a energy sensor because this won't work as you would expect. It 
 > wouldn't update in regular bases and as a consequence wont be shown in the energy dashboard in the right timeslots.
 
+## Advanced features
+
+### Multiply Factor
+
+This feature allows you to multiply the calculated power.
+
+This can be useful in the following use cases:
+- You have a bunch of similar lights which you control as a group and want a single power sensor.
+- You are using a LED strip from the LUT models, but you have extended or shortened it.
+
+Let's assume you have a combination of 4 GU10 spots in your ceiling in a light group `light.livingroom_spots`
+
+```yaml
+- platform: powercalc
+  entity_id: light.livingroom_spots
+  multiply_factor: 4
+```
+
+This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
+
+By default the multiply factor will **NOT** be applied to the standby usage, you can set the `multiply_factor_standby` to do this.
+
+```yaml
+- platform: powercalc
+  entity_id: light.livingroom_spots
+  multiply_factor: 4
+  multiply_factor_standby: true
+```
+
+> Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
+
+## Utility meters
+
+The energy sensors created by the component will keep increasing the total kWh, and never reset.
+When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
+
+```yaml
+powercalc:
+  create_utility_meters: true
+```
+
+By default utility meters are created for `daily`, `weekly`, `monthly` cycles.
+You can change this behaviour with the `utility_meter_types` configuration option.
+
+```yaml
+powercalc:
+  create_utility_meters: true
+  utility_meter_types:
+    - daily
+    - yearly
+```
+
+The utility meters have the same name as your energy sensor, but are extended by the meter cycle.
+Assume you have a light `light.floorlamp_livingroom`, than you should have the following sensors created:
+- `sensor.floorlamp_livingroom_power`
+- `sensor.floorlamp_livingroom_energy`
+- `sensor.floorlamp_livingroom_energy_daily`
+- `sensor.floorlamp_livingroom_energy_weekly`
+- `sensor.floorlamp_livingroom_energy_monthly`
 
 ## Debug logging
 

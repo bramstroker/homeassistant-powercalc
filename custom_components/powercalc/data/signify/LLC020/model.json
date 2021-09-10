@@ -1,10 +1,10 @@
 {
     "name": "Hue Go",
+    "standby_usage": 0.290,
     "supported_modes": [
-        "linear"
+        "lut"
     ],
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 6
-    }
+    "measure_method": "script",
+    "measure_device": "TP-Link HS110",
+    "measure_description": "Measured with script made by smonesi (steps: bri 20/sat 40/hue 2000/mired 30) and linearly interpolated to provide more data"
 }

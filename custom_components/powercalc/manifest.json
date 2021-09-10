@@ -8,7 +8,12 @@
     "fan",
     "switch",
     "binary_sensor",
-    "light"
+    "light",
+    "template"
+  ],
+  "after_dependencies": [
+    "integration",
+    "utility_meter"
   ],
   "codeowners": ["@bramstroker"],
   "requirements": [],

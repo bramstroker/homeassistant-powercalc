@@ -21,7 +21,9 @@ class LightModel:
     def load_model_manifest(self) -> dict:
         file_path = os.path.join(self.get_directory(), "model.json")
         if not os.path.exists(file_path):
-            raise ModelNotSupported("Model not supported", self._model)
+            raise ModelNotSupported(
+                f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
+            )
 
         json_file = open(file_path)
         return json.load(json_file)
