@@ -68,6 +68,8 @@ They are as follows:
 | create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
 | custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| power_sensor_naming     | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
+| energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
 | mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
 | multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
