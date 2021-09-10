@@ -21,7 +21,7 @@ from homeassistant.components import (
     sensor,
     switch,
     vacuum,
-    water_heater
+    water_heater,
 )
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
@@ -30,9 +30,7 @@ from homeassistant.components.integration.sensor import (
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
-from homeassistant.components.utility_meter.const import (
-    METER_TYPES,
-)
+from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
     CONF_ENTITY_ID,
@@ -48,7 +46,6 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     TIME_HOURS,
 )
-
 from homeassistant.core import callback, split_entity_id
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -119,7 +116,7 @@ PLATFORM_SCHEMA = vol.All(
                     input_select.DOMAIN,
                     sensor.DOMAIN,
                     vacuum.DOMAIN,
-                    water_heater.DOMAIN
+                    water_heater.DOMAIN,
                 )
             ),
             vol.Optional(CONF_MODEL): cv.string,
@@ -132,7 +129,9 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
             vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-            vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
+            vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
+                cv.ensure_list, [vol.In(METER_TYPES)]
+            ),
             vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
             vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
             vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
@@ -212,6 +211,7 @@ async def async_setup_platform(
 
     async_add_entities(entities_to_add)
 
+
 def get_sensor_configuration(config: dict, component_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
 
@@ -219,7 +219,7 @@ def get_sensor_configuration(config: dict, component_config: dict) -> dict:
         CONF_CREATE_UTILITY_METERS,
         CONF_ENERGY_SENSOR_NAMING,
         CONF_POWER_SENSOR_NAMING,
-        CONF_UTILITY_METER_TYPES
+        CONF_UTILITY_METER_TYPES,
     )
 
     # When not set on sensor level will fallback to global level configuration
@@ -227,11 +227,13 @@ def get_sensor_configuration(config: dict, component_config: dict) -> dict:
         if not attribute in config:
             config[attribute] = component_config.get(attribute)
 
-    
     if not CONF_CREATE_ENERGY_SENSOR in config:
-        config[CONF_CREATE_ENERGY_SENSOR] = component_config.get(CONF_CREATE_ENERGY_SENSORS)
+        config[CONF_CREATE_ENERGY_SENSOR] = component_config.get(
+            CONF_CREATE_ENERGY_SENSORS
+        )
 
     return config
+
 
 async def create_power_sensor(
     hass: HomeAssistantType,
@@ -337,8 +339,7 @@ async def create_energy_sensor(
 
 
 def create_utility_meter_sensor(
-    energy_sensor: VirtualEnergySensor,
-    meter_type: str
+    energy_sensor: VirtualEnergySensor, meter_type: str
 ) -> VirtualUtilityMeterSensor:
     """Create the utility meter sensor entity"""
 
