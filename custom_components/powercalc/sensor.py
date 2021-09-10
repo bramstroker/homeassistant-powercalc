@@ -30,6 +30,9 @@ from homeassistant.components.integration.sensor import (
 from homeassistant.components.light import PLATFORM_SCHEMA
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
+from homeassistant.components.utility_meter.const import (
+    METER_TYPES,
+)
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
     CONF_ENTITY_ID,
@@ -45,6 +48,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     TIME_HOURS,
 )
+
 from homeassistant.core import callback, split_entity_id
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -58,7 +62,7 @@ from homeassistant.helpers.typing import (
     HomeAssistantType,
 )
 
-from .common import SourceEntity
+from .common import SourceEntity, validate_name_pattern
 from .const import (
     CALCULATION_MODES,
     CONF_CREATE_ENERGY_SENSOR,
@@ -128,8 +132,11 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
             vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
+            vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
             vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
             vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
+            vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
+            vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
         }
     ),
 )
@@ -151,6 +158,7 @@ async def async_setup_platform(
     """Set up the sensor platform."""
 
     component_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    sensor_config = get_sensor_configuration(config, component_config)
 
     source_entity = config[CONF_ENTITY_ID]
     source_entity_domain, source_object_id = split_entity_id(source_entity)
@@ -182,29 +190,21 @@ async def async_setup_platform(
 
     try:
         power_sensor = await create_power_sensor(
-            hass, entity_entry, config, component_config, source_entity
+            hass, entity_entry, sensor_config, component_config, source_entity
         )
     except PowercalcSetupError as err:
         return
 
     entities_to_add = [power_sensor]
 
-    should_create_energy_sensor = component_config.get(CONF_CREATE_ENERGY_SENSORS)
-    if CONF_CREATE_ENERGY_SENSOR in config:
-        should_create_energy_sensor = config.get(CONF_CREATE_ENERGY_SENSOR)
-
-    if should_create_energy_sensor:
+    if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
         energy_sensor = await create_energy_sensor(
-            hass, component_config, config, power_sensor, source_entity
+            hass, sensor_config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
 
-        should_create_utility_meters = component_config.get(CONF_CREATE_UTILITY_METERS)
-        if CONF_CREATE_UTILITY_METERS in config:
-            should_create_utility_meters = config.get(CONF_CREATE_UTILITY_METERS)
-
-        if should_create_utility_meters:
-            meter_types = component_config.get(CONF_UTILITY_METER_TYPES)
+        if sensor_config.get(CONF_CREATE_UTILITY_METERS):
+            meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
             for meter_type in meter_types:
                 entities_to_add.append(
                     create_utility_meter_sensor(energy_sensor, meter_type)
@@ -212,6 +212,26 @@ async def async_setup_platform(
 
     async_add_entities(entities_to_add)
 
+def get_sensor_configuration(config: dict, component_config: dict) -> dict:
+    """Build the configuration dictionary for the sensors."""
+
+    fallbackAttributes = (
+        CONF_CREATE_UTILITY_METERS,
+        CONF_ENERGY_SENSOR_NAMING,
+        CONF_POWER_SENSOR_NAMING,
+        CONF_UTILITY_METER_TYPES
+    )
+
+    # When not set on sensor level will fallback to global level configuration
+    for attribute in fallbackAttributes:
+        if not attribute in config:
+            config[attribute] = component_config.get(attribute)
+
+    
+    if not CONF_CREATE_ENERGY_SENSOR in config:
+        config[CONF_CREATE_ENERGY_SENSOR] = component_config.get(CONF_CREATE_ENERGY_SENSORS)
+
+    return config
 
 async def create_power_sensor(
     hass: HomeAssistantType,
@@ -224,7 +244,7 @@ async def create_power_sensor(
 
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
-    name_pattern = component_config.get(CONF_POWER_SENSOR_NAMING)
+    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or source_entity.name
     name = name_pattern.format(name)
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
@@ -259,7 +279,7 @@ async def create_power_sensor(
             standby_usage = light_model.standby_usage
 
     _LOGGER.debug(
-        "Setting up power sensor (entity_id:%s sensor_name:%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s)",
+        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s)",
         source_entity.entity_id,
         name,
         calculation_strategy.__class__.__name__,
@@ -286,12 +306,13 @@ async def create_power_sensor(
 
 async def create_energy_sensor(
     hass: HomeAssistantType,
-    component_config: dict,
     sensor_config: dict,
     power_sensor: VirtualPowerSensor,
     source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
-    name_pattern = component_config.get(CONF_ENERGY_SENSOR_NAMING)
+    """Create the energy sensor entity"""
+
+    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or source_entity.name
     name = name_pattern.format(name)
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
@@ -316,8 +337,11 @@ async def create_energy_sensor(
 
 
 def create_utility_meter_sensor(
-    energy_sensor: VirtualEnergySensor, meter_type: str
+    energy_sensor: VirtualEnergySensor,
+    meter_type: str
 ) -> VirtualUtilityMeterSensor:
+    """Create the utility meter sensor entity"""
+
     name = f"{energy_sensor.name} {meter_type}"
     entity_id = f"{energy_sensor.entity_id}_{meter_type}"
     _LOGGER.debug("Creating utility_meter sensor: %s", name)

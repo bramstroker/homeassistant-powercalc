@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from datetime import timedelta
 from typing import Optional
 
@@ -17,11 +16,11 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_NAMING,
-    CONF_ENTITY_NAME_PATTERN,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_POWER,
@@ -46,15 +45,6 @@ DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 
-
-def validate_name_pattern(value: str) -> str:
-    """Validate that the naming pattern contains {}."""
-    regex = re.compile(r"\{\}")
-    if not regex.search(value):
-        raise vol.Invalid("Naming pattern must contain {}")
-    return value
-
-
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
@@ -63,7 +53,6 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                     ): cv.time_period,
-                    vol.Optional(CONF_ENTITY_NAME_PATTERN): validate_name_pattern,
                     vol.Optional(
                         CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
                     ): validate_name_pattern,
