@@ -66,7 +66,10 @@ They are as follows:
 | disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                    | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
 | custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| power_sensor_naming     | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
+| energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
 | mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
 | multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
@@ -188,7 +191,7 @@ sensor:
 > For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
-Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_select`, `sensor`, `climate`, `vacuum`
+Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
