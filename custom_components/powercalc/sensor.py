@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -83,6 +83,7 @@ from .const import (
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
+    MODE_LUT,
 )
 from .errors import (
     ModelNotSupported,
@@ -256,9 +257,17 @@ async def create_power_sensor(
 
     light_model = None
     try:
-        light_model = await get_light_model(hass, entity_entry, sensor_config)
+        mode = select_calculation_mode(sensor_config)
+        if sensor_config.get(CONF_LINEAR) is None and sensor_config.get(CONF_FIXED) is None:
+            light_model = await get_light_model(hass, entity_entry, sensor_config)
+            if mode is None and light_model:
+                mode = light_model.supported_modes[0]
 
-        mode = select_calculation_mode(sensor_config, light_model)
+        if mode is None:
+            raise UnsupportedMode(
+                "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
+            )
+
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity.domain
         )
@@ -351,7 +360,7 @@ def create_utility_meter_sensor(
     )
 
 
-def select_calculation_mode(config: dict, light_model: LightModel) -> str:
+def select_calculation_mode(config: dict) -> Optional[str]:
     """Select the calculation mode"""
     config_mode = config.get(CONF_MODE)
     if config_mode:
@@ -362,13 +371,8 @@ def select_calculation_mode(config: dict, light_model: LightModel) -> str:
 
     if config.get(CONF_FIXED):
         return MODE_FIXED
-
-    if light_model:
-        return light_model.supported_modes[0]
-
-    raise UnsupportedMode(
-        "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
-    )
+    
+    return None
 
 
 class VirtualPowerSensor(Entity):
