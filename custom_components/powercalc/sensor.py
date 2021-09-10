@@ -127,6 +127,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_FIXED): FIXED_SCHEMA,
             vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
             vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+            vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
             vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
             vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
         }
@@ -198,7 +199,11 @@ async def async_setup_platform(
         )
         entities_to_add.append(energy_sensor)
 
-        if component_config.get(CONF_CREATE_UTILITY_METERS):
+        should_create_utility_meters = component_config.get(CONF_CREATE_UTILITY_METERS)
+        if CONF_CREATE_UTILITY_METERS in config:
+            should_create_utility_meters = config.get(CONF_CREATE_UTILITY_METERS)
+
+        if should_create_utility_meters:
             meter_types = component_config.get(CONF_UTILITY_METER_TYPES)
             for meter_type in meter_types:
                 entities_to_add.append(

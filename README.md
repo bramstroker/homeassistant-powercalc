@@ -66,6 +66,7 @@ They are as follows:
 | disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                    | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
 | custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`                          |
 | multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
