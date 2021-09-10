@@ -29,6 +29,7 @@
 |signify      |LLC010                   |Hue Iris                                                |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                          |lut              |hs           |
 |signify      |LLC020                   |Hue Go                                                  |lut              |color_temp,hs|
+|signify      |LST002                   |Hue LightStrip Plus (2m)                                |lut              |color_temp,hs|
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)|lut              |color_temp,hs|
 |signify      |LTA001                   |Hue White Ambiance E27                                  |lut              |color_temp   |
 |signify      |LTC001                   |Hue Being Ceiling Light                                 |lut              |color_temp   |
