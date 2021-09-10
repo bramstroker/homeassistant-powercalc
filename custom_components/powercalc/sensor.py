@@ -258,7 +258,10 @@ async def create_power_sensor(
     light_model = None
     try:
         mode = select_calculation_mode(sensor_config)
-        if sensor_config.get(CONF_LINEAR) is None and sensor_config.get(CONF_FIXED) is None:
+        if (
+            sensor_config.get(CONF_LINEAR) is None
+            and sensor_config.get(CONF_FIXED) is None
+        ):
             light_model = await get_light_model(hass, entity_entry, sensor_config)
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
@@ -371,7 +374,7 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
     if config.get(CONF_FIXED):
         return MODE_FIXED
-    
+
     return None
 
 

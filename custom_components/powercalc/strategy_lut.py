@@ -3,13 +3,13 @@ from __future__ import annotations
 import gzip
 import logging
 import os
-from dataclasses import dataclass
 from collections import defaultdict
 from csv import reader
+from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple, Optional, Union
-import numpy as np
 
+import numpy as np
 from homeassistant.components import light
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -121,12 +121,17 @@ class LutStrategy(PowerCalculationStrategyInterface):
             light_setting.hue = int(hs[0] / 360 * 65535)
             light_setting.saturation = int(hs[1] / 100 * 255)
             _LOGGER.debug(
-                "Looking up power usage for bri:%s hue:%s sat:%s}", brightness, light_setting.hue, light_setting.saturation
+                "Looking up power usage for bri:%s hue:%s sat:%s}",
+                brightness,
+                light_setting.hue,
+                light_setting.saturation,
             )
         elif color_mode == COLOR_MODE_COLOR_TEMP:
             light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
-                "Looking up power usage for bri:%s mired:%s", brightness, light_setting.color_temp
+                "Looking up power usage for bri:%s mired:%s",
+                brightness,
+                light_setting.color_temp,
             )
         elif color_mode == COLOR_MODE_BRIGHTNESS:
             _LOGGER.debug("Looking up power usage for bri:%s", brightness)
@@ -142,22 +147,28 @@ class LutStrategy(PowerCalculationStrategyInterface):
         # Check if we have an exact match for the selected brightness level in de LUT
         if brightness_table:
             return self.lookup_power_for_brightness(brightness_table, light_setting)
-            
+
         # We don't have an exact match, use interpolation
         brightness_range = [
             self.get_nearest_lower_brightness(lookup_table, brightness),
-            self.get_nearest_higher_brightness(lookup_table, brightness)
+            self.get_nearest_higher_brightness(lookup_table, brightness),
         ]
         power_range = [
-            self.lookup_power_for_brightness(lookup_table[brightness_range[0]], light_setting),
-            self.lookup_power_for_brightness(lookup_table[brightness_range[1]], light_setting)
+            self.lookup_power_for_brightness(
+                lookup_table[brightness_range[0]], light_setting
+            ),
+            self.lookup_power_for_brightness(
+                lookup_table[brightness_range[1]], light_setting
+            ),
         ]
         return np.interp(brightness, brightness_range, power_range)
 
-    def lookup_power_for_brightness(self, lut_value: Union(dict, int), light_setting: LightSetting):
-        if (light_setting.color_mode == COLOR_MODE_BRIGHTNESS):
+    def lookup_power_for_brightness(
+        self, lut_value: Union(dict, int), light_setting: LightSetting
+    ):
+        if light_setting.color_mode == COLOR_MODE_BRIGHTNESS:
             return lut_value
-        if (light_setting.color_mode == COLOR_MODE_COLOR_TEMP):
+        if light_setting.color_mode == COLOR_MODE_COLOR_TEMP:
             return self.get_nearest(lut_value, light_setting.color_temp)
         else:
             sat_values = self.get_nearest(lut_value, light_setting.hue)
@@ -172,15 +183,17 @@ class LutStrategy(PowerCalculationStrategyInterface):
     def get_nearest_lower_brightness(self, dict: dict, search_key: int) -> int:
         keys = dict.keys()
         last_key = [*keys][-1]
-        if (last_key < search_key):
+        if last_key < search_key:
             return last_key
 
-        return max((k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0])
+        return max(
+            (k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
+        )
 
     def get_nearest_higher_brightness(self, dict: dict, search_key: int) -> int:
         keys = dict.keys()
         first_key = [*keys][0]
-        if (first_key > search_key):
+        if first_key > search_key:
             return first_key
 
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
@@ -209,6 +222,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                     )
                 except LutFileNotFound:
                     raise ModelNotSupported("No lookup file found for mode", color_mode)
+
 
 @dataclass
 class LightSetting:
