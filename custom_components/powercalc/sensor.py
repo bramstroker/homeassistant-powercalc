@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
