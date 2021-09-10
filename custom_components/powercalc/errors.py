@@ -2,7 +2,11 @@
 from homeassistant.exceptions import HomeAssistantError
 
 
-class StrategyConfigurationError(HomeAssistantError):
+class PowercalcSetupError(HomeAssistantError):
+    """Raised when an error occured during powercalc sensor setup."""
+
+
+class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""
 
 
@@ -10,9 +14,9 @@ class ModelNotSupported(StrategyConfigurationError):
     """Raised when model is not supported."""
 
 
-class UnsupportedMode(HomeAssistantError):
+class UnsupportedMode(PowercalcSetupError):
     """Mode not supported."""
 
 
-class LutFileNotFound(HomeAssistantError):
+class LutFileNotFound(PowercalcSetupError):
     """Raised when LUT CSV file does not exist"""

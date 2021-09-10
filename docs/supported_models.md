@@ -18,11 +18,13 @@
 |signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)        |lut              |color_temp,hs|
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT           |lut              |color_temp,hs|
 |signify      |LCF002                   |Hue Calla Outdoor Pedestal                              |lut              |color_temp,hs|
+|signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)            |lut              |color_temp,hs|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                  |lut              |color_temp,hs|
 |signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)            |lut              |color_temp,hs|
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                 |lut              |color_temp,hs|
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)        |lut              |color_temp,hs|
 |signify      |LCT024                   |Hue Play                                                |lut              |color_temp,hs|
+|signify      |LCT026                   |Hue Go 2.0                                              |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                               |lut              |hs           |
 |signify      |LLC010                   |Hue Iris                                                |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                          |lut              |hs           |
@@ -34,11 +36,14 @@
 |signify      |LTP003                   |Hue Fair Pendant                                        |lut              |color_temp   |
 |signify      |LTW001                   |Hue White Ambiance A19                                  |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A            |lut              |color_temp   |
+|signify      |LTW012                   | Hue White Ambiance Candle E14                          |lut              |color_temp   |
+|signify      |LWA001                   |Hue White Ambiance Bulb A60 E27                         |lut              |brightness   |
 |signify      |LWA004                   |Hue White Filament Bulb A60 E27                         |lut              |brightness   |
 |signify      |LWA009                   |Hue White 1600 A67 E27 1600lm                           |lut              |brightness   |
 |signify      |LWB004                   |Hue Lux E27 750lm                                       |lut              |brightness   |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                 |lut              |brightness   |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                 |lut              |brightness   |
+|signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                   |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                        |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature            |lut              |color_temp   |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                        |lut              |brightness   |
