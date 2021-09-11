@@ -407,23 +407,7 @@ If you want to use the virtual power sensors with the new [energy integration](h
 If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
 ### Creating energy groups
-Let's assume you want to sum up all energy usage from one category e.g. all of your servers. This can easily be achieved by configuring a template sensor. It's essential to add the attributes `state_class` and `device_class` because these are needed for the sensor to be compatible with the energy integration.  
-
-````yaml
-- platform: template
-  sensors:
-    energy_server:
-      friendly_name: "All Server Energy Consumption"
-      unit_of_measurement: kWh
-      value_template: >-
-        {{states('sensor.kingkong_energy') | float + states('sensor.kinglouie_energy') | float}}
-      attribute_templates:
-        state_class: total_increasing
-        device_class: energy
-        icon: mdi:counter
-````
-> **Don't** create a template sensor which sums up all values from the power sensors and use this sensor to create a energy sensor because this won't work as you would expect. It 
-> wouldn't update in regular bases and as a consequence wont be shown in the energy dashboard in the right timeslots.
+See the [Wiki](https://github.com/bramstroker/homeassistant-powercalc/wiki/Grouping-sensors) for examples how to setup energy groups.
 
 ## Advanced features
 
