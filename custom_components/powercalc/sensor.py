@@ -155,10 +155,14 @@ async def async_setup_platform(
 ):
     """Set up the sensor platform."""
 
-    component_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-    sensor_config = get_sensor_configuration(config, component_config)
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    sensor_config = get_sensor_configuration(config, global_config)
+    entities = await create_entities(hass, sensor_config)
+    async_add_entities(entities)
+    
 
-    source_entity = config[CONF_ENTITY_ID]
+async def create_entities(hass: HomeAssistantType, sensor_config: dict):
+    source_entity = sensor_config[CONF_ENTITY_ID]
     source_entity_domain, source_object_id = split_entity_id(source_entity)
 
     entity_registry = await er.async_get_registry(hass)
@@ -188,7 +192,7 @@ async def async_setup_platform(
 
     try:
         power_sensor = await create_power_sensor(
-            hass, entity_entry, sensor_config, component_config, source_entity
+            hass, entity_entry, sensor_config, source_entity
         )
     except PowercalcSetupError as err:
         return
@@ -208,10 +212,9 @@ async def async_setup_platform(
                     create_utility_meter_sensor(energy_sensor, meter_type)
                 )
 
-    async_add_entities(entities_to_add)
+    return entities_to_add
 
-
-def get_sensor_configuration(config: dict, component_config: dict) -> dict:
+def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
 
     fallbackAttributes = (
@@ -224,12 +227,14 @@ def get_sensor_configuration(config: dict, component_config: dict) -> dict:
     # When not set on sensor level will fallback to global level configuration
     for attribute in fallbackAttributes:
         if not attribute in config:
-            config[attribute] = component_config.get(attribute)
+            config[attribute] = global_config.get(attribute)
 
     if not CONF_CREATE_ENERGY_SENSOR in config:
-        config[CONF_CREATE_ENERGY_SENSOR] = component_config.get(
+        config[CONF_CREATE_ENERGY_SENSOR] = global_config.get(
             CONF_CREATE_ENERGY_SENSORS
         )
+    
+    config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
 
     return config
 
@@ -238,7 +243,6 @@ async def create_power_sensor(
     hass: HomeAssistantType,
     entity_entry,
     sensor_config: dict,
-    component_config: dict,
     source_entity: SourceEntity,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
@@ -310,7 +314,7 @@ async def create_power_sensor(
         source_domain=source_entity.domain,
         unique_id=source_entity.unique_id,
         standby_usage=standby_usage,
-        scan_interval=component_config.get(CONF_SCAN_INTERVAL),
+        scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
     )
