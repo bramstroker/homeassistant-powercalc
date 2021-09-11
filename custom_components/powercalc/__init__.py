@@ -14,6 +14,7 @@ from homeassistant.components.utility_meter.const import (
     WEEKLY,
 )
 from homeassistant.const import CONF_SCAN_INTERVAL
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .common import validate_name_pattern
@@ -130,8 +131,19 @@ class PowerCalculatorStrategyFactory:
         if fixed_config is None and light_model is not None:
             fixed_config = light_model.fixed_mode_config
 
+        power = fixed_config.get(CONF_POWER)
+        if isinstance(power, Template):
+            power.hass = self._hass
+
+        states_power = fixed_config.get(CONF_STATES_POWER)
+        if states_power:
+            for p in states_power.values():
+                if isinstance(p, Template):
+                    p.hass = self._hass
+
         return FixedStrategy(
-            fixed_config.get(CONF_POWER), fixed_config.get(CONF_STATES_POWER)
+            power,
+            states_power
         )
 
     def _create_lut(self, light_model: LightModel) -> LutStrategy:

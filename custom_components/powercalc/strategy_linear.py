@@ -36,7 +36,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._entity_domain = entity_domain
         self._calibration = self.create_calibrate_list()
 
-    async def calculate(self, entity_state: State) -> Optional[int]:
+    async def calculate(self, entity_state: State) -> Optional[float]:
         attrs = entity_state.attributes
 
         if entity_state.domain == light.DOMAIN:
