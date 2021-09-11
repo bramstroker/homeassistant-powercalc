@@ -34,6 +34,7 @@ from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
     CONF_ENTITY_ID,
+    CONF_ENTITIES,
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_POWER,
@@ -97,44 +98,52 @@ from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
+SUPPORTED_ENTITY_DOMAINS = (
+    light.DOMAIN,
+    switch.DOMAIN,
+    fan.DOMAIN,
+    binary_sensor.DOMAIN,
+    climate.DOMAIN,
+    device_tracker.DOMAIN,
+    remote.DOMAIN,
+    media_player.DOMAIN,
+    input_boolean.DOMAIN,
+    input_select.DOMAIN,
+    sensor.DOMAIN,
+    vacuum.DOMAIN,
+    water_heater.DOMAIN,
+)
+
+SENSOR_CONFIG = {
+        vol.Optional(CONF_NAME): cv.string,
+        vol.Optional(CONF_ENTITY_ID): cv.entity_domain(SUPPORTED_ENTITY_DOMAINS),
+        vol.Optional(CONF_MODEL): cv.string,
+        vol.Optional(CONF_MANUFACTURER): cv.string,
+        vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
+        vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
+        vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
+        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
+        vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+        vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+        vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+        vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
+        vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
+            cv.ensure_list, [vol.In(METER_TYPES)]
+        ),
+        vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
+        vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
+        vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
+        vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+    }
+
 PLATFORM_SCHEMA = vol.All(
     PLATFORM_SCHEMA.extend(
         {
-            vol.Optional(CONF_NAME): cv.string,
-            vol.Required(CONF_ENTITY_ID): cv.entity_domain(
-                (
-                    light.DOMAIN,
-                    switch.DOMAIN,
-                    fan.DOMAIN,
-                    binary_sensor.DOMAIN,
-                    climate.DOMAIN,
-                    device_tracker.DOMAIN,
-                    remote.DOMAIN,
-                    media_player.DOMAIN,
-                    input_boolean.DOMAIN,
-                    input_select.DOMAIN,
-                    sensor.DOMAIN,
-                    vacuum.DOMAIN,
-                    water_heater.DOMAIN,
-                )
-            ),
-            vol.Optional(CONF_MODEL): cv.string,
-            vol.Optional(CONF_MANUFACTURER): cv.string,
-            vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
-            vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
-            vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
-            vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
-            vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-            vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-            vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
-            vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-            vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
-                cv.ensure_list, [vol.In(METER_TYPES)]
-            ),
-            vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
-            vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
-            vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
-            vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+            **SENSOR_CONFIG,
+            **{
+                vol.Optional(CONF_ENTITIES, None): vol.All(
+                    cv.ensure_list, [SENSOR_CONFIG]
+            )}
         }
     ),
 )
@@ -156,12 +165,25 @@ async def async_setup_platform(
     """Set up the sensor platform."""
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-    sensor_config = get_sensor_configuration(config, global_config)
-    entities = await create_entities(hass, sensor_config)
-    async_add_entities(entities)
+
+    entities = []
+    if CONF_ENTITIES in config:
+        for sensor_config in config.get(CONF_ENTITIES):
+            entities.extend(
+                await create_entities(
+                    hass,
+                    get_sensor_configuration(sensor_config, global_config)
+                )
+            )
+    else:
+        sensor_config = get_sensor_configuration(config, global_config)
+        entities.extend(await create_entities(hass, sensor_config))
+
+    if entities:
+        async_add_entities(entities)
     
 
-async def create_entities(hass: HomeAssistantType, sensor_config: dict):
+async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list:
     source_entity = sensor_config[CONF_ENTITY_ID]
     source_entity_domain, source_object_id = split_entity_id(source_entity)
 
@@ -195,7 +217,7 @@ async def create_entities(hass: HomeAssistantType, sensor_config: dict):
             hass, entity_entry, sensor_config, source_entity
         )
     except PowercalcSetupError as err:
-        return
+        return []
 
     entities_to_add = [power_sensor]
 
