@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from phue import Bridge, PhueRegistrationException
 
 from .controller import LightController, LightInfo
@@ -29,7 +30,7 @@ class HueLightController(LightController):
 
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
         try:
-            bridge = Bridge(bridge_ip)
+            bridge = Bridge(bridge_ip, config_file_path=os.path.join(os.path.dirname(__file__), ".python_hue"))
         except PhueRegistrationException as err:
             print("Please click the link button on the bridge, than hit enter..")
             input()
