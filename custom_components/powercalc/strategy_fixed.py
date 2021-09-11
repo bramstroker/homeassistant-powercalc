@@ -10,14 +10,16 @@ from homeassistant.helpers.template import Template
 
 from .common import SourceEntity
 from .const import CONF_POWER, CONF_STATES_POWER
-from .helpers import evaluate_power
 from .errors import StrategyConfigurationError
+from .helpers import evaluate_power
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_POWER): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_STATES_POWER): vol.Schema({cv.string: vol.Any(vol.Coerce(float), cv.template)}),
+        vol.Optional(CONF_STATES_POWER): vol.Schema(
+            {cv.string: vol.Any(vol.Coerce(float), cv.template)}
+        ),
     }
 )
 
@@ -29,7 +31,9 @@ STATE_BASED_ENTITY_DOMAINS = [
 
 class FixedStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self, power: Optional[Union[Template, float]], per_state_power: Optional[dict[str, float]]
+        self,
+        power: Optional[Union[Template, float]],
+        per_state_power: Optional[dict[str, float]],
     ) -> None:
         self._power = power
         self._per_state_power = per_state_power
@@ -38,7 +42,9 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:
-                return await evaluate_power(self._per_state_power.get(entity_state.state))
+                return await evaluate_power(
+                    self._per_state_power.get(entity_state.state)
+                )
             else:
                 # Lookup by state attribute (attribute|value)
                 for state_key, power in self._per_state_power.items():

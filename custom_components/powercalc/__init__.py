@@ -141,10 +141,7 @@ class PowerCalculatorStrategyFactory:
                 if isinstance(p, Template):
                     p.hass = self._hass
 
-        return FixedStrategy(
-            power,
-            states_power
-        )
+        return FixedStrategy(power, states_power)
 
     def _create_lut(self, light_model: LightModel) -> LutStrategy:
         """Create the lut strategy"""
