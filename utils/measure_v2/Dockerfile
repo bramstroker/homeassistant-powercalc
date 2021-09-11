@@ -2,12 +2,10 @@
 
 FROM python:3.8-slim-buster
 
-WORKDIR /app
+WORKDIR /
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
-RUN mkdir -p /root
-RUN touch /root/.python_hue
 
 COPY . .
 
