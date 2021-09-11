@@ -1,6 +1,8 @@
 import os
 
+from typing import Union
 from custom_components.powercalc import LightModel
+from homeassistant.helpers.template import Template
 
 from .const import MANUFACTURER_DIRECTORY_MAPPING
 
@@ -14,3 +16,11 @@ def get_light_model_directory(light_model: LightModel) -> str:
     return os.path.join(
         os.path.dirname(__file__), f"data/{manufacturer_directory}/{light_model.model}"
     )
+
+async def evaluate_power(power: Union[Template, float]) -> float:
+    """When power is a template render it."""
+
+    if isinstance(power, Template):
+        return power.async_render()
+
+    return power

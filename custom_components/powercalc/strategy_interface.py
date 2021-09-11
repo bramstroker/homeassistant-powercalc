@@ -6,7 +6,7 @@ from .common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:
-    async def calculate(self, entity_state: State) -> Optional[int]:
+    async def calculate(self, entity_state: State) -> Optional[float]:
         """Calculate power consumption based on entity state"""
         pass
 

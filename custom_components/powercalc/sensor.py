@@ -83,7 +83,6 @@ from .const import (
     DOMAIN_CONFIG,
     MODE_FIXED,
     MODE_LINEAR,
-    MODE_LUT,
 )
 from .errors import (
     ModelNotSupported,
@@ -91,7 +90,6 @@ from .errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from .light_model import LightModel
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_interface import PowerCalculationStrategyInterface
