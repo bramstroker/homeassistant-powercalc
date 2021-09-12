@@ -635,7 +635,7 @@ class GroupedSensor(SensorEntity):
         """Triggered when one of the group entities changes state"""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        summed = sum(float(state.state) for state in states)
+        summed = sum(float(state.state) for state in states if state.state != STATE_UNAVAILABLE)
         self._attr_native_value = round(summed, 2)
         self.async_schedule_update_ha_state(True)
 
