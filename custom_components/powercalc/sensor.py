@@ -27,8 +27,7 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
-from homeassistant.components.light import PLATFORM_SCHEMA
-from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT
+from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, PLATFORM_SCHEMA
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
@@ -90,6 +89,7 @@ from .errors import (
     PowercalcSetupError,
     StrategyConfigurationError,
     UnsupportedMode,
+    SensorConfigurationError
 )
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -127,9 +127,7 @@ SENSOR_CONFIG = {
         vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
         vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
         vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-        vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
-            cv.ensure_list, [vol.In(METER_TYPES)]
-        ),
+        vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
         vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
         vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
         vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
@@ -167,17 +165,21 @@ async def async_setup_platform(
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
     entities = []
-    if CONF_ENTITIES in config:
-        for sensor_config in config.get(CONF_ENTITIES):
-            entities.extend(
-                await create_entities(
-                    hass,
-                    get_sensor_configuration(sensor_config, global_config)
+    try:
+        if CONF_ENTITIES in config:
+            for sensor_config in config.get(CONF_ENTITIES):
+                entities.extend(
+                    await create_entities(
+                        hass,
+                        get_sensor_configuration(sensor_config, global_config)
+                    )
                 )
-            )
-    else:
-        sensor_config = get_sensor_configuration(config, global_config)
-        entities.extend(await create_entities(hass, sensor_config))
+        else:
+            sensor_config = get_sensor_configuration(config, global_config)
+            entities.extend(await create_entities(hass, sensor_config))
+    except SensorConfigurationError as err:
+        _LOGGER.error(err)
+        return
 
     if entities:
         async_add_entities(entities)
@@ -238,6 +240,9 @@ async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list:
 
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
+
+    if not CONF_ENTITY_ID in config:
+        raise SensorConfigurationError("You must supply a entity_id in the configuration, see the README")
 
     fallbackAttributes = (
         CONF_CREATE_UTILITY_METERS,
