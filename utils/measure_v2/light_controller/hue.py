@@ -30,7 +30,7 @@ class HueLightController(LightController):
 
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
         try:
-            bridge = Bridge(bridge_ip, config_file_path=os.path.join(os.path.dirname(__file__), ".python_hue"))
+            bridge = Bridge(bridge_ip, config_file_path=os.path.join(os.path.dirname(__file__), "../.persistent/.python_hue"))
         except PhueRegistrationException as err:
             print("Please click the link button on the bridge, than hit enter..")
             input()
