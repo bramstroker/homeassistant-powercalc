@@ -6,6 +6,7 @@ DOMAIN_CONFIG = "config"
 DATA_CALCULATOR_FACTORY = "calculator_factory"
 
 CONF_CALIBRATE = "calibrate"
+CONF_CREATE_GROUP = "create_group"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"

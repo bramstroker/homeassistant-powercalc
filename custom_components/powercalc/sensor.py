@@ -68,6 +68,7 @@ from homeassistant.helpers.typing import (
 from .common import SourceEntity, validate_name_pattern
 from .const import (
     CALCULATION_MODES,
+    CONF_CREATE_GROUP,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
@@ -145,6 +146,7 @@ PLATFORM_SCHEMA = vol.All(
         {
             **SENSOR_CONFIG,
             **{
+                vol.Optional(CONF_CREATE_GROUP): cv.string,
                 vol.Optional(CONF_ENTITIES, None): vol.All(
                     cv.ensure_list, [SENSOR_CONFIG]
             )}
@@ -174,18 +176,16 @@ async def async_setup_platform(
     try:
         if CONF_ENTITIES in config:
             for sensor_config in config.get(CONF_ENTITIES):
-                entities.extend(
-                    await create_entities(
-                        hass,
-                        get_sensor_configuration(sensor_config, global_config)
-                    )
-                )
+                merged_sensor_config = get_sensor_configuration(sensor_config, global_config)
+                entities.extend(await create_individual_sensors(hass, merged_sensor_config))
             
-            group_sensors = create_group_sensors("test", entities)
-            entities.extend(group_sensors)
+            if CONF_CREATE_GROUP in config:
+                group_name = config.get(CONF_CREATE_GROUP)
+                group_sensors = create_group_sensors(group_name, merged_sensor_config, entities)
+                entities.extend(group_sensors)
         else:
-            sensor_config = get_sensor_configuration(config, global_config)
-            entities.extend(await create_entities(hass, sensor_config))
+            merged_sensor_config = get_sensor_configuration(config, global_config)
+            entities.extend(await create_individual_sensors(hass, merged_sensor_config))
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
@@ -194,7 +194,9 @@ async def async_setup_platform(
         async_add_entities(entities)
     
 
-async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list[SensorEntity]:
+async def create_individual_sensors(hass: HomeAssistantType, sensor_config: dict) -> list[SensorEntity]:
+    """Create entities (power, energy, utility_meters) which track the appliance."""
+
     source_entity = sensor_config[CONF_ENTITY_ID]
     source_entity_domain, source_object_id = split_entity_id(source_entity)
 
@@ -247,14 +249,25 @@ async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list[
 
     return entities_to_add
 
-def create_group_sensors(group_name: str, entities: list[SensorEntity]) -> list[GroupedSensor]:
+def create_group_sensors(group_name: str, sensor_config: dict, entities: list[SensorEntity]) -> list[GroupedSensor]:
+    """Create grouped power and energy sensors."""
+
     group_sensors = []
 
     power_sensors = list(filter(lambda elm: isinstance(elm, VirtualPowerSensor), entities))
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
-    group_sensors.append(GroupedPowerSensor("testgroup", power_sensor_ids))
+    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
+    name = name_pattern.format(group_name)
+    group_sensors.append(GroupedPowerSensor(name, power_sensor_ids))
+    _LOGGER.debug("Creating grouped power sensor: %s", name)
 
-    #energy_sensors = list(filter(lambda elm: isinstance(elm, VirtualEnergySensor), entities))
+    energy_sensors = list(filter(lambda elm: isinstance(elm, VirtualEnergySensor), entities))
+    energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
+    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
+    name = name_pattern.format(group_name)
+    group_sensors.append(GroupedEnergySensor(name, energy_sensor_ids))
+    _LOGGER.debug("Creating grouped energy sensor: %s", name)
+
     return group_sensors
 
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
@@ -292,7 +305,6 @@ async def create_power_sensor(
     source_entity: SourceEntity,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
-
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
@@ -402,7 +414,6 @@ def create_utility_meter_sensor(
     energy_sensor: VirtualEnergySensor, meter_type: str
 ) -> VirtualUtilityMeterSensor:
     """Create the utility meter sensor entity"""
-
     name = f"{energy_sensor.name} {meter_type}"
     entity_id = f"{energy_sensor.entity_id}_{meter_type}"
     _LOGGER.debug("Creating utility_meter sensor: %s", name)
@@ -427,8 +438,7 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
 
 class VirtualPowerSensor(Entity):
-    """Representation of a Sensor."""
-
+    """Virtual power sensor"""
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
     _attr_unit_of_measurement = POWER_WATT
@@ -556,6 +566,7 @@ class VirtualPowerSensor(Entity):
 
 
 class VirtualEnergySensor(IntegrationSensor):
+    """Virtual energy sensor, totalling kWh"""
     def __init__(
         self,
         source_entity,
@@ -599,11 +610,13 @@ class VirtualEnergySensor(IntegrationSensor):
 
 
 class VirtualUtilityMeterSensor(UtilityMeterSensor):
+    """Utility meter resets on each cycle (daily, hourly etc)"""
     def __init__(self, source_entity, name, meter_type, entity_id):
         super().__init__(source_entity, name, meter_type, DEFAULT_OFFSET, False)
         self.entity_id = entity_id
 
 class GroupedSensor(SensorEntity):
+    """Base class for grouped sensors"""
     _attr_should_poll = False
 
     def __init__(self, name: str, entities: list[str]):
@@ -611,14 +624,14 @@ class GroupedSensor(SensorEntity):
         self._entities = entities
     
     async def async_added_to_hass(self) -> None:
-        """Register listeners."""
+        """Register state listeners."""
         async_track_state_change_event(
             self.hass, self._entities, self.on_state_change
         )
     
     @callback
     def on_state_change(self, event):
-        """Force the component to refresh."""
+        """Triggered when one of the group entities changes state"""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         summed = sum(float(state.state) for state in states)
@@ -626,9 +639,11 @@ class GroupedSensor(SensorEntity):
         self.async_schedule_update_ha_state(True)
 
 class GroupedPowerSensor(GroupedSensor):
+    """Grouped power sensor. Sums all values of underlying individual power sensors"""
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
 
 class GroupedEnergySensor(GroupedSensor):
+    """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
