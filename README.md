@@ -76,6 +76,8 @@ They are as follows:
 | multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
 | fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
+| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 
 **Minimalistic example creating two power sensors:**
 
@@ -420,6 +422,35 @@ If you'd like to create your energy sensors by your own with e.g. [Riemann integ
 See the [Wiki](https://github.com/bramstroker/homeassistant-powercalc/wiki/Grouping-sensors) for examples how to setup energy groups.
 
 ## Advanced features
+
+### Multiple entities and grouping
+
+> Available from v0.8 and higher
+
+Two new configuration parameters have been introduced `entities` and `create_group`.
+`entities` will allow you to multiple power sensors in one `powercalc` sensor entry.
+`create_group` will also create a group summing all the underlying entities. Which can directly be used in energy dashboard.
+Each entry under `entities` can use the same configuration as when defined directly under `sensor`
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: All hallway lights
+    entities:
+      -  entity_id: light.hallway
+      -  entity_id: light.living_room
+         linear:
+            min_power: 0.5
+            max_power: 8
+```
+
+This will create the following entities:
+- sensor.hallway_power
+- sensor.hallway_energy
+- sensor.living_room_power
+- sensor.living_room_energy
+- sensor.all_hallway_lights_power (group sensor)
+- sensor.all_hallway_lights_energy (group sensor)
 
 ### Multiply Factor
 
