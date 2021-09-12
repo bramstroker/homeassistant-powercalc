@@ -27,7 +27,12 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
-from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, PLATFORM_SCHEMA
+from homeassistant.components.sensor import (
+    SensorEntity,
+    STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
+    PLATFORM_SCHEMA,
+)
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
@@ -36,6 +41,7 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_NAME,
     CONF_SCAN_INTERVAL,
+    DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
@@ -46,7 +52,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     TIME_HOURS,
 )
-from homeassistant.core import callback, split_entity_id
+from homeassistant.core import State, callback, split_entity_id
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
@@ -174,6 +180,9 @@ async def async_setup_platform(
                         get_sensor_configuration(sensor_config, global_config)
                     )
                 )
+            
+            group_sensors = create_group_sensors("test", entities)
+            entities.extend(group_sensors)
         else:
             sensor_config = get_sensor_configuration(config, global_config)
             entities.extend(await create_entities(hass, sensor_config))
@@ -185,7 +194,7 @@ async def async_setup_platform(
         async_add_entities(entities)
     
 
-async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list:
+async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list[SensorEntity]:
     source_entity = sensor_config[CONF_ENTITY_ID]
     source_entity_domain, source_object_id = split_entity_id(source_entity)
 
@@ -237,6 +246,16 @@ async def create_entities(hass: HomeAssistantType, sensor_config: dict) -> list:
                 )
 
     return entities_to_add
+
+def create_group_sensors(group_name: str, entities: list[SensorEntity]) -> list[GroupedSensor]:
+    group_sensors = []
+
+    power_sensors = list(filter(lambda elm: isinstance(elm, VirtualPowerSensor), entities))
+    power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
+    group_sensors.append(GroupedPowerSensor("testgroup", power_sensor_ids))
+
+    #energy_sensors = list(filter(lambda elm: isinstance(elm, VirtualEnergySensor), entities))
+    return group_sensors
 
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
@@ -583,3 +602,33 @@ class VirtualUtilityMeterSensor(UtilityMeterSensor):
     def __init__(self, source_entity, name, meter_type, entity_id):
         super().__init__(source_entity, name, meter_type, DEFAULT_OFFSET, False)
         self.entity_id = entity_id
+
+class GroupedSensor(SensorEntity):
+    _attr_should_poll = False
+
+    def __init__(self, name: str, entities: list[str]):
+        self._attr_name = name
+        self._entities = entities
+    
+    async def async_added_to_hass(self) -> None:
+        """Register listeners."""
+        async_track_state_change_event(
+            self.hass, self._entities, self.on_state_change
+        )
+    
+    @callback
+    def on_state_change(self, event):
+        """Force the component to refresh."""
+        all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
+        states: list[State] = list(filter(None, all_states))
+        summed = sum(float(state.state) for state in states)
+        self._attr_native_value = round(summed, 2)
+        self.async_schedule_update_ha_state(True)
+
+class GroupedPowerSensor(GroupedSensor):
+    _attr_device_class = DEVICE_CLASS_POWER
+    _attr_state_class = STATE_CLASS_MEASUREMENT
+
+class GroupedEnergySensor(GroupedSensor):
+    _attr_device_class = DEVICE_CLASS_ENERGY
+    _attr_state_class = STATE_CLASS_TOTAL_INCREASING
