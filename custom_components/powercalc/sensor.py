@@ -43,6 +43,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
+    ENERGY_KILO_WATT_HOUR,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
     STATE_NOT_HOME,
@@ -642,8 +643,10 @@ class GroupedPowerSensor(GroupedSensor):
     """Grouped power sensor. Sums all values of underlying individual power sensors"""
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
+    _attr_unit_of_measurement = POWER_WATT
 
 class GroupedEnergySensor(GroupedSensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
+    _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR
