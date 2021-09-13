@@ -8,12 +8,16 @@ chardet==4.0.0
 idna==3.2
 ifaddr==0.1.7
 multidict==5.1.0
+nest-asyncio==1.4.3
 prompt-toolkit==1.0.14
+python-kasa==0.4.0.dev3
 Pygments==2.9.0
 PyInquirer==1.0.3
 pyShelly==0.2.24
 regex==2021.7.1
+scipy==1.6.2
 six==1.16.0
+tuyapower==0.0.25
 typing-extensions==3.10.0.0
 wcwidth==0.2.5
 yarl==1.6.3

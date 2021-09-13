@@ -1,0 +1,10 @@
+{
+   "name":"Hue LightStrip Plus (2m)",
+   "standby_usage":1.07,
+   "supported_modes":[
+      "lut"
+   ],
+   "measure_device":"FRITZ!DECT 200",
+   "measure_description":"Measured by custom script with all lightstrip extensions detached",
+   "measure_method":"script"
+}

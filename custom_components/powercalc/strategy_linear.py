@@ -4,7 +4,6 @@ import logging
 from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
@@ -12,10 +11,12 @@ from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
 from homeassistant.helpers.config_validation import entity_domain
 
+from .common import SourceEntity
 from .const import CONF_CALIBRATE, CONF_MAX_POWER, CONF_MIN_POWER
 from .errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
 
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -35,11 +36,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._entity_domain = entity_domain
         self._calibration = self.create_calibrate_list()
 
-    async def calculate(self, entity_state: State) -> Optional[int]:
+    async def calculate(self, entity_state: State) -> Optional[float]:
         attrs = entity_state.attributes
 
         if entity_state.domain == light.DOMAIN:
             value = attrs.get(ATTR_BRIGHTNESS)
+            # Some integrations set a higher brightness value than 255, causing powercalc to misbehave
+            if value > 255:
+                value = 255
             if value is None:
                 _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
                 return None
@@ -92,8 +96,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         sorted_list = sorted(list, key=lambda tup: tup[0])
         return sorted_list
 
-    async def validate_config(self, entity_entry: er.RegistryEntry):
+    async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
+
+        if source_entity.domain not in ALLOWED_DOMAINS:
+            raise StrategyConfigurationError(
+                "Entity not supported for linear mode. Must be one of: {}".format(
+                    ",".join(ALLOWED_DOMAINS)
+                )
+            )
 
         if self._config.get(CONF_CALIBRATE) is None:
             if self._config.get(CONF_MIN_POWER) is None:
