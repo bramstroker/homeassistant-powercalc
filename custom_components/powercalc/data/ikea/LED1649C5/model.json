@@ -1,5 +1,5 @@
 {
-    "name": "TRADFRI bulb E14 W op/ch 400lm LED1649C5",
+    "name": "TRADFRI bulb E14 W op/ch 400lm",
     "standby_usage": 0.40,
     "supported_modes": [
         "lut"
