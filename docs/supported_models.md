@@ -2,15 +2,15 @@
 |manufacturer |        model id         |                          name                          |calculation modes| color modes |
 |-------------|-------------------------|--------------------------------------------------------|-----------------|-------------|
 |belkin       |F7C033                   |WeMo smart LED bulb                                     |lut              |brightness   |
-|ikea         |LED1536G5                |TRADFRI bulb E14 WS opal 400lm LED1536G5                |lut              |color_temp   |
-|ikea         |LED1537R6                |TRADFRI bulb GU10 WS 400lm LED1537R6                    |lut              |color_temp   |
-|ikea         |LED1545G12               |TRADFRI bulb E27 WS opal 980lm LED1545G12               |lut              |color_temp   |
-|ikea         |LED1546G12               |TRADFRI bulb E27 WS clear 950lm LED1546G12              |lut              |color_temp   |
-|ikea         |LED1623G12               |TRADFRI bulb E27 opal 1000lm LED1623G12                 |lut              |brightness   |
-|ikea         |LED1649C5                |TRADFRI bulb E14 W op/ch 400lm LED1649C5                |lut              |brightness   |
-|ikea         |LED1650R5                |TRADFRI bulb GU10 W 400lm LED1650R5                     |lut              |brightness   |
-|ikea         |LED1732G11               |TRADFRI bulb E27 WS opal 1000lm LED1732G11              |lut              |color_temp   |
-|ikea         |LED1837R5                |IKEA Tradfri LED1837R5                                  |lut              |brightness   |
+|ikea         |LED1536G5                |TRADFRI bulb E14 WS opal 400lm                          |lut              |color_temp   |
+|ikea         |LED1537R6                |TRADFRI bulb GU10 WS 400lm                              |lut              |color_temp   |
+|ikea         |LED1545G12               |TRADFRI bulb E27 WS opal 980lm                          |lut              |color_temp   |
+|ikea         |LED1546G12               |TRADFRI bulb E27 WS clear 950lm                         |lut              |color_temp   |
+|ikea         |LED1623G12               |TRADFRI bulb E27 opal 1000lm                            |lut              |brightness   |
+|ikea         |LED1649C5                |TRADFRI bulb E14 W op/ch 400lm                          |lut              |brightness   |
+|ikea         |LED1650R5                |TRADFRI bulb GU10 W 400lm                               |lut              |brightness   |
+|ikea         |LED1732G11               |TRADFRI bulb E27 WS opal 1000lm                         |lut              |color_temp   |
+|ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                              |lut              |brightness   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming     |lut              |brightness   |
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                  |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                    |lut              |color_temp   |
