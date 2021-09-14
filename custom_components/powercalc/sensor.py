@@ -28,17 +28,17 @@ from homeassistant.components.integration.sensor import (
     IntegrationSensor,
 )
 from homeassistant.components.sensor import (
-    SensorEntity,
+    PLATFORM_SCHEMA,
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
-    PLATFORM_SCHEMA,
+    SensorEntity,
 )
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
-    CONF_ENTITY_ID,
     CONF_ENTITIES,
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     DEVICE_CLASS_ENERGY,
@@ -69,9 +69,9 @@ from homeassistant.helpers.typing import (
 from .common import SourceEntity, validate_name_pattern
 from .const import (
     CALCULATION_MODES,
-    CONF_CREATE_GROUP,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DISABLE_STANDBY_USAGE,
@@ -95,9 +95,9 @@ from .const import (
 from .errors import (
     ModelNotSupported,
     PowercalcSetupError,
+    SensorConfigurationError,
     StrategyConfigurationError,
     UnsupportedMode,
-    SensorConfigurationError
 )
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -123,24 +123,26 @@ SUPPORTED_ENTITY_DOMAINS = (
 )
 
 SENSOR_CONFIG = {
-        vol.Optional(CONF_NAME): cv.string,
-        vol.Optional(CONF_ENTITY_ID): cv.entity_domain(SUPPORTED_ENTITY_DOMAINS),
-        vol.Optional(CONF_MODEL): cv.string,
-        vol.Optional(CONF_MANUFACTURER): cv.string,
-        vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
-        vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
-        vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
-        vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
-        vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-        vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-        vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
-        vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-        vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
-        vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
-        vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
-        vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
-        vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    }
+    vol.Optional(CONF_NAME): cv.string,
+    vol.Optional(CONF_ENTITY_ID): cv.entity_domain(SUPPORTED_ENTITY_DOMAINS),
+    vol.Optional(CONF_MODEL): cv.string,
+    vol.Optional(CONF_MANUFACTURER): cv.string,
+    vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
+    vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
+    vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
+    vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
+    vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+    vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+    vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
+    vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
+    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
+        cv.ensure_list, [vol.In(METER_TYPES)]
+    ),
+    vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
+    vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
+    vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
+    vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+}
 
 PLATFORM_SCHEMA = vol.All(
     PLATFORM_SCHEMA.extend(
@@ -150,7 +152,8 @@ PLATFORM_SCHEMA = vol.All(
                 vol.Optional(CONF_CREATE_GROUP): cv.string,
                 vol.Optional(CONF_ENTITIES, None): vol.All(
                     cv.ensure_list, [SENSOR_CONFIG]
-            )}
+                ),
+            },
         }
     ),
 )
@@ -177,12 +180,18 @@ async def async_setup_platform(
     try:
         if CONF_ENTITIES in config:
             for sensor_config in config.get(CONF_ENTITIES):
-                merged_sensor_config = get_sensor_configuration(sensor_config, global_config)
-                entities.extend(await create_individual_sensors(hass, merged_sensor_config))
-            
+                merged_sensor_config = get_sensor_configuration(
+                    sensor_config, global_config
+                )
+                entities.extend(
+                    await create_individual_sensors(hass, merged_sensor_config)
+                )
+
             if CONF_CREATE_GROUP in config:
                 group_name = config.get(CONF_CREATE_GROUP)
-                group_sensors = create_group_sensors(group_name, merged_sensor_config, entities)
+                group_sensors = create_group_sensors(
+                    group_name, merged_sensor_config, entities
+                )
                 entities.extend(group_sensors)
         else:
             merged_sensor_config = get_sensor_configuration(config, global_config)
@@ -193,9 +202,11 @@ async def async_setup_platform(
 
     if entities:
         async_add_entities(entities)
-    
 
-async def create_individual_sensors(hass: HomeAssistantType, sensor_config: dict) -> list[SensorEntity]:
+
+async def create_individual_sensors(
+    hass: HomeAssistantType, sensor_config: dict
+) -> list[SensorEntity]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
     source_entity = sensor_config[CONF_ENTITY_ID]
@@ -250,19 +261,26 @@ async def create_individual_sensors(hass: HomeAssistantType, sensor_config: dict
 
     return entities_to_add
 
-def create_group_sensors(group_name: str, sensor_config: dict, entities: list[SensorEntity]) -> list[GroupedSensor]:
+
+def create_group_sensors(
+    group_name: str, sensor_config: dict, entities: list[SensorEntity]
+) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 
     group_sensors = []
 
-    power_sensors = list(filter(lambda elm: isinstance(elm, VirtualPowerSensor), entities))
+    power_sensors = list(
+        filter(lambda elm: isinstance(elm, VirtualPowerSensor), entities)
+    )
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     group_sensors.append(GroupedPowerSensor(name, power_sensor_ids))
     _LOGGER.debug("Creating grouped power sensor: %s", name)
 
-    energy_sensors = list(filter(lambda elm: isinstance(elm, VirtualEnergySensor), entities))
+    energy_sensors = list(
+        filter(lambda elm: isinstance(elm, VirtualEnergySensor), entities)
+    )
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
@@ -271,11 +289,14 @@ def create_group_sensors(group_name: str, sensor_config: dict, entities: list[Se
 
     return group_sensors
 
+
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
 
     if not CONF_ENTITY_ID in config:
-        raise SensorConfigurationError("You must supply a entity_id in the configuration, see the README")
+        raise SensorConfigurationError(
+            "You must supply a entity_id in the configuration, see the README"
+        )
 
     fallbackAttributes = (
         CONF_CREATE_UTILITY_METERS,
@@ -293,7 +314,7 @@ def get_sensor_configuration(config: dict, global_config: dict) -> dict:
         config[CONF_CREATE_ENERGY_SENSOR] = global_config.get(
             CONF_CREATE_ENERGY_SENSORS
         )
-    
+
     config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
 
     return config
@@ -440,6 +461,7 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
 class VirtualPowerSensor(Entity):
     """Virtual power sensor"""
+
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
     _attr_unit_of_measurement = POWER_WATT
@@ -568,6 +590,7 @@ class VirtualPowerSensor(Entity):
 
 class VirtualEnergySensor(IntegrationSensor):
     """Virtual energy sensor, totalling kWh"""
+
     def __init__(
         self,
         source_entity,
@@ -612,41 +635,48 @@ class VirtualEnergySensor(IntegrationSensor):
 
 class VirtualUtilityMeterSensor(UtilityMeterSensor):
     """Utility meter resets on each cycle (daily, hourly etc)"""
+
     def __init__(self, source_entity, name, meter_type, entity_id):
         super().__init__(source_entity, name, meter_type, DEFAULT_OFFSET, False)
         self.entity_id = entity_id
 
+
 class GroupedSensor(SensorEntity):
     """Base class for grouped sensors"""
+
     _attr_should_poll = False
 
     def __init__(self, name: str, entities: list[str]):
         self._attr_name = name
         self._entities = entities
-    
+
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
-        async_track_state_change_event(
-            self.hass, self._entities, self.on_state_change
-        )
-    
+        async_track_state_change_event(self.hass, self._entities, self.on_state_change)
+
     @callback
     def on_state_change(self, event):
         """Triggered when one of the group entities changes state"""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        summed = sum(float(state.state) for state in states if state.state != STATE_UNAVAILABLE)
+        summed = sum(
+            float(state.state) for state in states if state.state != STATE_UNAVAILABLE
+        )
         self._attr_native_value = round(summed, 2)
         self.async_schedule_update_ha_state(True)
 
+
 class GroupedPowerSensor(GroupedSensor):
     """Grouped power sensor. Sums all values of underlying individual power sensors"""
+
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
     _attr_unit_of_measurement = POWER_WATT
 
+
 class GroupedEnergySensor(GroupedSensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
+
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
     _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR
