@@ -44,6 +44,7 @@
 |signify      |LWB004                   |Hue Lux E27 750lm                                       |lut              |brightness   |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                 |lut              |brightness   |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                 |lut              |brightness   |
+|signify      |LWG001                   |Hue White GU10                                          |lut              |brightness   |
 |signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                   |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                        |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature            |lut              |color_temp   |
