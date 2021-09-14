@@ -30,6 +30,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
+    - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
 - [Debug logging](#debug-logging)
