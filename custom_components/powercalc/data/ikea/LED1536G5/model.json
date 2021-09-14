@@ -1,5 +1,5 @@
 {
-    "name": "TRADFRI bulb E14 WS opal 400lm LED1536G5",
+    "name": "TRADFRI bulb E14 WS opal 400lm",
     "standby_usage": 0.44,
     "supported_modes": [
         "lut"
