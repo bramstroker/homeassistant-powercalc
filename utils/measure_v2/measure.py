@@ -234,6 +234,12 @@ class Measure:
         return (
             [
                 {
+                    "type": "input",
+                    "name": "model_name",
+                    "message": "Specify the full model name of your light. Ex: TRADFRI bulb GU10 WW 400lm",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
                     "type": "list",
                     "name": "color_mode",
                     "message": "Select the color mode?",
@@ -241,22 +247,16 @@ class Measure:
                     "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
                 },
                 {
+                    "type": "input",
+                    "name": "measure_device",
+                    "message": "Which device do you use to take the measurement? Ex: Fibaro FGWP102",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
                     "type": "confirm",
                     "message": "Do you want to generate model.json?",
                     "name": "generate_model_json",
                     "default": True,
-                },
-                {
-                    "type": "input",
-                    "name": "model_name",
-                    "message": "Specify the full light model name",
-                    "when": lambda answers: answers["generate_model_json"],
-                },
-                {
-                    "type": "input",
-                    "name": "measure_device",
-                    "message": "Which device (manufacturer, model) do you use to take the measurement?",
-                    "when": lambda answers: answers["generate_model_json"],
                 },
                 {
                     "type": "confirm",
