@@ -19,6 +19,7 @@
 |signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)        |lut              |color_temp,hs|
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT           |lut              |color_temp,hs|
 |signify      |LCF002                   |Hue Calla Outdoor Pedestal                              |lut              |color_temp,hs|
+|signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                    |lut              |color_temp,hs|
 |signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)            |lut              |color_temp,hs|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                  |lut              |color_temp,hs|
 |signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)            |lut              |color_temp,hs|
