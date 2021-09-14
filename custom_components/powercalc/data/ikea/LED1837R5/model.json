@@ -1,0 +1,9 @@
+{
+    "measure_device": "Fibaro FGWP102",
+    "measure_method": "script",
+    "name": "IKEA Tradfri LED1837R5",
+    "standby_usage": 0.4,
+    "supported_modes": [
+        "lut"
+    ]
+}
