@@ -1,5 +1,8 @@
 {
+    "measure_device": "unknown",
+    "measure_method": "unknown",
     "name": "TRADFRI bulb E27 WS opal 980lm",
+    "standby_usage": 0.4,
     "supported_modes": [
         "lut"
     ]
