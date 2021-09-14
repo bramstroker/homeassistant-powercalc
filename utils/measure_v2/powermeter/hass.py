@@ -23,7 +23,7 @@ class HassPowerMeter(PowerMeter):
             {
                 "type": "input",
                 "name": "powermeter_entity_id",
-                "message": "Specify the entity_id of your powermeter in HA?",
+                "message": "Specify the entity_id of your powermeter in HA? Ex: sensor.fibaro_fgwp102_power",
             }
         ]
 
