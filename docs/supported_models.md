@@ -10,7 +10,7 @@
 |ikea         |LED1649C5                |TRADFRI bulb E14 W op/ch 400lm LED1649C5                |lut              |brightness   |
 |ikea         |LED1650R5                |TRADFRI bulb GU10 W 400lm LED1650R5                     |lut              |brightness   |
 |ikea         |LED1732G11               |TRADFRI bulb E27 WS opal 1000lm LED1732G11              |lut              |color_temp   |
-|ikea         |LED1837R5                |IKEA Tradfri LED1837R5                                  |lut              |brightness   |
+|ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                              |lut              |brightness   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming     |lut              |brightness   |
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                  |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                    |lut              |color_temp   |
