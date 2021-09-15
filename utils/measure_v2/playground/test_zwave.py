@@ -3,8 +3,8 @@ import websockets
 import aiohttp
 from zwave_js_server.client import Client
 
-ZWAVE_JS_URL = "ws://192.168.178.99:3000"
-NODE_ID = 28
+ZWAVE_JS_URL = "ws://192.168.1.188:3000"
+NODE_ID = 14
 
 async def connect(url) -> None:
     """Connect to the server."""

@@ -82,7 +82,6 @@ class Measure:
         self.power_meter = power_meter
 
     async def start(self):
-        await self.power_meter.setup()
         answers = prompt(self.get_questions())
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
@@ -97,7 +96,7 @@ class Measure:
             os.makedirs(export_directory)
 
         if answers["generate_model_json"]:
-            standby_usage = self.measure_standby_usage()
+            standby_usage = await self.measure_standby_usage()
             self.write_model_json(
                 directory=export_directory,
                 standby_usage=standby_usage,
@@ -124,7 +123,7 @@ class Measure:
                     color_mode, on=True, **variation
                 )
                 time.sleep(SLEEP_TIME)
-                power = self.take_power_measurement(variation_start_time)
+                power = await self.take_power_measurement(variation_start_time)
                 print("Measured power: ", power)
                 print()
                 row = list(variation.values())
@@ -138,13 +137,13 @@ class Measure:
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
 
-    def take_power_measurement(self, start_timestamp: float, retry_count=0) -> float:
+    async def take_power_measurement(self, start_timestamp: float, retry_count=0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
             print("Taking sample", i)
             try:
-                measurement = self.power_meter.get_power()
+                measurement = await self.power_meter.get_power()
             except PowerMeterError as err:
                 if retry_count == MAX_RETRIES:
                     raise err
@@ -178,12 +177,12 @@ class Measure:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
 
-    def measure_standby_usage(self) -> float:
+    async def measure_standby_usage(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
         print("Measuring standby usage. Waiting for 5 seconds...")
         time.sleep(5)
-        return self.take_power_measurement(start_time)
+        return await self.take_power_measurement(start_time)
 
     def get_variations(self, color_mode: str):
         if color_mode == MODE_HS:
