@@ -38,7 +38,7 @@ async def get_light_model(
             hass.config.config_dir, custom_model_directory
         )
 
-    return LightModel(manufacturer, model, custom_model_directory)
+    return LightModel(hass, manufacturer, model, custom_model_directory)
 
 
 async def autodiscover_hue_model(
