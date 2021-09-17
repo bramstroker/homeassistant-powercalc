@@ -275,8 +275,10 @@ sensor:
 The component ships with predefined light measurements for some light models.
 This library will keep extending by the effort of community users.
 
-These models are located in `custom_components/powercalc/data` directory.
-Each light model has it's own subdirectory `{manufacturer}/{modelid}`
+These models are located in `config/custom_components/powercalc/data` directory. 
+You can also define your own models in `config/powercalc-custom-models` directory, when a manufacturer/model exists in this directory this will take precedence over the default data directory.
+
+Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010
 
 ### model.json
 
@@ -335,6 +337,7 @@ Example:
 ```
 - signify
   - LCT010
+    - model.json
     - hs.csv.gz
     - color_temp.csv.gz
 ```
