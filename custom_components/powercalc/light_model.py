@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
@@ -10,6 +11,8 @@ from .const import (
     MODEL_DIRECTORY_MAPPING,
 )
 from .errors import ModelNotSupported, UnsupportedMode
+
+_LOGGER = logging.getLogger(__name__)
 
 CUSTOM_DATA_DIRECTORY = 'powercalc-custom-models'
 
@@ -28,6 +31,7 @@ class LightModel:
                 f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
             )
 
+        _LOGGER.debug(f"Loading {file_path}")
         json_file = open(file_path)
         return json.load(json_file)
 
