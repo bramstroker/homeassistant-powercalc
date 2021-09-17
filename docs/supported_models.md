@@ -15,24 +15,24 @@
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                  |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                    |lut              |color_temp   |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                    |lut              |color_temp   |
-|osram        |LIGHTIFY Indoor Flex RGBW|LIGHTIFY Indoor Flex RGBW 3P (1.8m)                     |lut              |color_temp,hs|
-|signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)        |lut              |color_temp,hs|
-|signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT           |lut              |color_temp,hs|
-|signify      |LCF002                   |Hue Calla Outdoor Pedestal                              |lut              |color_temp,hs|
-|signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                    |lut              |color_temp,hs|
-|signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)            |lut              |color_temp,hs|
-|signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                  |lut              |color_temp,hs|
-|signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)            |lut              |color_temp,hs|
-|signify      |LCT012                   |Hue White and Color Ambiance Candle E12                 |lut              |color_temp,hs|
-|signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)        |lut              |color_temp,hs|
-|signify      |LCT024                   |Hue Play                                                |lut              |color_temp,hs|
-|signify      |LCT026                   |Hue Go 2.0                                              |lut              |color_temp,hs|
+|osram        |LIGHTIFY Indoor Flex RGBW|LIGHTIFY Indoor Flex RGBW 3P (1.8m)                     |lut              |hs,color_temp|
+|signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)        |lut              |hs,color_temp|
+|signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT           |lut              |hs,color_temp|
+|signify      |LCF002                   |Hue Calla Outdoor Pedestal                              |lut              |hs,color_temp|
+|signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                    |lut              |hs,color_temp|
+|signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)            |lut              |hs,color_temp|
+|signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                  |lut              |hs,color_temp|
+|signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)            |lut              |hs,color_temp|
+|signify      |LCT012                   |Hue White and Color Ambiance Candle E12                 |lut              |hs,color_temp|
+|signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)        |lut              |hs,color_temp|
+|signify      |LCT024                   |Hue Play                                                |lut              |hs,color_temp|
+|signify      |LCT026                   |Hue Go 2.0                                              |lut              |hs,color_temp|
 |signify      |LLC001                   |Philips Living Color Iris                               |lut              |hs           |
 |signify      |LLC010                   |Hue Iris                                                |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                          |lut              |hs           |
-|signify      |LLC020                   |Hue Go                                                  |lut              |color_temp,hs|
-|signify      |LST002                   |Hue LightStrip Plus (2m)                                |lut              |color_temp,hs|
-|signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)|lut              |color_temp,hs|
+|signify      |LLC020                   |Hue Go                                                  |lut              |hs,color_temp|
+|signify      |LST002                   |Hue LightStrip Plus (2m)                                |lut              |hs,color_temp|
+|signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)|lut              |hs,color_temp|
 |signify      |LTA001                   |Hue White Ambiance E27                                  |lut              |color_temp   |
 |signify      |LTC001                   |Hue Being Ceiling Light                                 |lut              |color_temp   |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                   |lut              |color_temp   |
