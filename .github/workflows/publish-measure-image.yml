@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - 'master'
+      - 'feature/measure_v2_docker'
     tags:
       - 'v*.*.*'
-  pull_request:
-    branches:
-      - 'master'
 
 jobs:
   docker:
