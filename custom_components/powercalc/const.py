@@ -61,5 +61,6 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 W 400lm": "LED1650R5",
         "TRADFRI bulb E27 WS opal 1000lm": "LED1732G11",
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
+        "TRADFRI bulb E27 WW 806lm": "LED1836G9"
     }
 }
