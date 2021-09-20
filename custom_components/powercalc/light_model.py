@@ -1,9 +1,10 @@
 import json
-import os
 import logging
+import os
 from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
+
 from .const import (
     MANUFACTURER_DIRECTORY_MAPPING,
     MODE_FIXED,
@@ -14,10 +15,17 @@ from .errors import ModelNotSupported, UnsupportedMode
 
 _LOGGER = logging.getLogger(__name__)
 
-CUSTOM_DATA_DIRECTORY = 'powercalc-custom-models'
+CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
+
 
 class LightModel:
-    def __init__(self, hass: HomeAssistantType, manufacturer: str, model: str, custom_model_directory: str):
+    def __init__(
+        self,
+        hass: HomeAssistantType,
+        manufacturer: str,
+        model: str,
+        custom_model_directory: str,
+    ):
         self._manufacturer = manufacturer
         self._model = model
         self._custom_model_directory = custom_model_directory
