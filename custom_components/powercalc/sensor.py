@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional, Final
+from typing import Any, Final, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -150,14 +150,14 @@ SENSOR_CONFIG = {
 
 GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_ENTITIES, None): vol.All(
-        cv.ensure_list, [SENSOR_CONFIG]
-    ),
+    vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
 }
 
 PLATFORM_SCHEMA: Final = vol.All(
     cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES),
-    cv.deprecated(CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER),
+    cv.deprecated(
+        CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
+    ),
     cv.deprecated(CONF_STANDBY_USAGE, replacement_key=CONF_STANDBY_POWER),
     PLATFORM_SCHEMA.extend(
         {
