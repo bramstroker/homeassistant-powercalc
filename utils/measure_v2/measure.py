@@ -91,10 +91,10 @@ class Measure:
             os.makedirs(export_directory)
 
         if answers["generate_model_json"]:
-            standby_usage = self.measure_standby_usage()
+            standby_power = self.measure_standby_power()
             self.write_model_json(
                 directory=export_directory,
-                standby_usage=standby_usage,
+                standby_power=standby_power,
                 name=answers["model_name"],
                 measure_device=answers["measure_device"],
             )
@@ -171,10 +171,10 @@ class Measure:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
 
-    def measure_standby_usage(self) -> float:
+    def measure_standby_power(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
-        print("Measuring standby usage. Waiting for 5 seconds...")
+        print("Measuring standby power. Waiting for 5 seconds...")
         time.sleep(5)
         return self.take_power_measurement(start_time)
 
@@ -213,14 +213,14 @@ class Measure:
         yield end
 
     def write_model_json(
-        self, directory: str, standby_usage: float, name: str, measure_device: str
+        self, directory: str, standby_power: float, name: str, measure_device: str
     ):
         json_data = json.dumps(
             {
                 "measure_device": measure_device,
                 "measure_method": "script",
                 "name": name,
-                "standby_usage": standby_usage,
+                "standby_power": standby_power,
                 "supported_modes": ["lut"],
             },
             indent=4,
