@@ -63,8 +63,8 @@ They are as follows:
 | entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
 | manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_usage           | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| standby_power           | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_power   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                    | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
@@ -74,7 +74,7 @@ They are as follows:
 | energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
 | mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
 | multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
-| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
+| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
 | fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
@@ -255,7 +255,7 @@ When no match is found in `states_power` lookup than the configured `power` will
 
 ## Configuration examples
 
-### Linear mode with additional standby usage
+### Linear mode with additional standby power
 
 ```yaml
 sensor:
@@ -264,7 +264,7 @@ sensor:
     linear:
       min_power: 0.5
       max_power: 8
-    standby_usage: 0.2
+    standby_power: 0.2
     name: My amazing power meter
 ```
 
@@ -292,7 +292,7 @@ Example lut mode:
 ```json
 {
     "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
-    "standby_usage": 0.4,
+    "standby_power": 0.4,
     "supported_modes": [
         "lut"
     ],
@@ -309,7 +309,7 @@ Example linear mode
     "supported_modes": [
         "linear"
     ],
-    "standby_usage": 0.2,
+    "standby_power": 0.2,
     "linear_config": {
         "min_power": 0,
         "max_power": 6
@@ -474,7 +474,7 @@ Let's assume you have a combination of 4 GU10 spots in your ceiling in a light g
 
 This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
 
-By default the multiply factor will **NOT** be applied to the standby usage, you can set the `multiply_factor_standby` to do this.
+By default the multiply factor will **NOT** be applied to the standby power, you can set the `multiply_factor_standby` to do this.
 
 ```yaml
 - platform: powercalc

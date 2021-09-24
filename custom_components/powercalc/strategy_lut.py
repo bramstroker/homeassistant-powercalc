@@ -7,7 +7,7 @@ from collections import defaultdict
 from csv import reader
 from dataclasses import dataclass
 from functools import partial
-from typing import NamedTuple, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from homeassistant.components import light

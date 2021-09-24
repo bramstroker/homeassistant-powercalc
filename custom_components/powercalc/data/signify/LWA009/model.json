@@ -1,6 +1,6 @@
 {
     "name": "Hue White 1600 A67 E27 1600lm",
-    "standby_usage": 0.41,
+    "standby_power": 0.41,
     "supported_modes": [
         "lut"
     ],

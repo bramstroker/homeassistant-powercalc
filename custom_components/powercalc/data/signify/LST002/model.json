@@ -1,6 +1,6 @@
 {
    "name":"Hue LightStrip Plus (2m)",
-   "standby_usage":0.18,
+   "standby_power":0.18,
    "supported_modes":[
       "lut"
    ],

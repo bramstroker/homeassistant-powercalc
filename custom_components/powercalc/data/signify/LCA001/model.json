@@ -1,6 +1,8 @@
 {
     "name": "Hue White and Color Ambiance A19 E26/E27 (Gen 5)",
-    "standby_usage": 0.33,
+    "measure_method": "script",
+    "measure_device": "unknown",
+    "standby_power": 0.33,
     "supported_modes": [
         "lut"
     ]
