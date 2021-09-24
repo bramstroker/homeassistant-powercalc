@@ -1,6 +1,6 @@
 {
    "name":"LIGHTIFY Indoor Flex RGBW 3P (1.8m)",
-   "standby_usage":0.3,
+   "standby_power":0.3,
    "supported_modes":[
       "lut"
    ],

@@ -1,6 +1,6 @@
 {
     "name": "Hue White A60 E27 800lm",
-    "standby_usage": 0.4,
+    "standby_power": 0.4,
     "supported_modes": [
         "lut"
     ],

@@ -1,6 +1,6 @@
 {
    "name":"Hue White and Color Ambiance LED Outdoor Lightstrip (5m)",
-   "standby_usage":0.4,
+   "standby_power":0.4,
    "supported_modes":[
       "lut"
    ],

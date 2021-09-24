@@ -1,6 +1,6 @@
 {
     "name": "Hue Play",
-    "standby_usage": 0.100,
+    "standby_power": 0.100,
     "supported_modes": [
         "lut"
     ],

@@ -1,6 +1,6 @@
 {
     "name": "tint GU10 Spot 350lm",
-    "standby_usage": 0.31,
+    "standby_power": 0.31,
     "supported_modes": [
         "lut"
     ],

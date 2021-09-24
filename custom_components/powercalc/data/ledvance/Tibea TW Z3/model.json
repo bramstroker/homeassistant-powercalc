@@ -1,6 +1,6 @@
 {
     "name": "Tibea Lamp E27 Tuneable White 2000lm",
-    "standby_usage": 0.51,
+    "standby_power": 0.51,
     "supported_modes": [
         "lut"
     ],

@@ -1,6 +1,6 @@
 {
     "name": "RS125 GU10 350lm 2700K",
-    "standby_usage": 0.38,
+    "standby_power": 0.38,
     "supported_modes": [
         "lut"
     ],

@@ -3,8 +3,8 @@
     "supported_modes": [
         "lut"
     ],
-    "standby_usage": 0.3,
+    "standby_power": 0.3,
     "measure_method": "script",
     "measure_device": "Shelly PM",
-    "measure_description": "Used script utils/measure_shelly.py from repository, standby_usage estimated"
+    "measure_description": "Used script utils/measure_shelly.py from repository, standby_power estimated"
 }

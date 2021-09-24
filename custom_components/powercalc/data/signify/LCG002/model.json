@@ -1,6 +1,6 @@
 {
     "name":"Hue White and Color Ambiance GU10 BT",
-    "standby_usage":0.4,
+    "standby_power":0.4,
     "supported_modes":[
        "lut"
     ],

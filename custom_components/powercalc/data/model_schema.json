@@ -4,7 +4,7 @@
   "type": "object",
   "required": [
     "name",
-    "standby_usage",
+    "standby_power",
     "supported_modes",
     "measure_method",
     "measure_device"
@@ -14,7 +14,7 @@
       "type": "string",
       "description": "The full name"
     },
-    "standby_usage": {
+    "standby_power": {
       "type": "number",
       "description": "Power draw when the light is turned of. When you are not able to measure set to 0.4"
     },

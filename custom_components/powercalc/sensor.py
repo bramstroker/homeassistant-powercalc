@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Final
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -74,6 +74,7 @@ from .const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_DISABLE_STANDBY_POWER,
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
@@ -84,6 +85,7 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_NAMING,
+    CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
@@ -128,6 +130,8 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
     vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
+    vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
+    vol.Optional(CONF_DISABLE_STANDBY_POWER, default=False): cv.boolean,
     vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
     vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
@@ -144,16 +148,21 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
 }
 
-PLATFORM_SCHEMA = vol.All(
+GROUPED_SENSOR_CONFIG = {
+    vol.Optional(CONF_CREATE_GROUP): cv.string,
+    vol.Optional(CONF_ENTITIES, None): vol.All(
+        cv.ensure_list, [SENSOR_CONFIG]
+    ),
+}
+
+PLATFORM_SCHEMA: Final = vol.All(
+    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES),
+    cv.deprecated(CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER),
+    cv.deprecated(CONF_STANDBY_USAGE, replacement_key=CONF_STANDBY_POWER),
     PLATFORM_SCHEMA.extend(
         {
             **SENSOR_CONFIG,
-            **{
-                vol.Optional(CONF_CREATE_GROUP): cv.string,
-                vol.Optional(CONF_ENTITIES, None): vol.All(
-                    cv.ensure_list, [SENSOR_CONFIG]
-                ),
-            },
+            **GROUPED_SENSOR_CONFIG,
         }
     ),
 )
@@ -317,6 +326,11 @@ def get_sensor_configuration(config: dict, global_config: dict) -> dict:
 
     config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
 
+    if CONF_STANDBY_USAGE in config:
+        config[CONF_STANDBY_POWER] = config[CONF_STANDBY_USAGE]
+    if CONF_DISABLE_STANDBY_USAGE in config:
+        config[CONF_DISABLE_STANDBY_POWER] = config[CONF_DISABLE_STANDBY_USAGE]
+
     return config
 
 
@@ -368,20 +382,20 @@ async def create_power_sensor(
         )
         raise err
 
-    standby_usage = None
-    if not sensor_config.get(CONF_DISABLE_STANDBY_USAGE):
-        standby_usage = sensor_config.get(CONF_STANDBY_USAGE)
-        if standby_usage is None and light_model is not None:
-            standby_usage = light_model.standby_usage
+    standby_power = None
+    if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
+        standby_power = sensor_config.get(CONF_STANDBY_POWER)
+        if standby_power is None and light_model is not None:
+            standby_power = light_model.standby_power
 
     _LOGGER.debug(
-        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_usage=%s unique_id=%s)",
+        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
         source_entity.entity_id,
         name,
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
-        standby_usage,
+        standby_power,
         source_entity.unique_id,
     )
 
@@ -393,7 +407,7 @@ async def create_power_sensor(
         source_entity=source_entity.entity_id,
         source_domain=source_entity.domain,
         unique_id=source_entity.unique_id,
-        standby_usage=standby_usage,
+        standby_power=standby_power,
         scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
@@ -475,7 +489,7 @@ class VirtualPowerSensor(Entity):
         source_entity: str,
         source_domain: str,
         unique_id: str,
-        standby_usage: float | None,
+        standby_power: float | None,
         scan_interval,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
@@ -487,7 +501,7 @@ class VirtualPowerSensor(Entity):
         self._source_domain = source_domain
         self._name = name
         self._power = None
-        self._standby_usage = standby_usage
+        self._standby_power = standby_power
         self._attr_force_update = True
         self._attr_unique_id = unique_id
         self._scan_interval = scan_interval
@@ -538,7 +552,7 @@ class VirtualPowerSensor(Entity):
             return False
 
         if state.state in OFF_STATES:
-            self._power = self._standby_usage or 0
+            self._power = self._standby_power or 0
             if self._multiply_factor and self._multiply_factor_standby:
                 self._power *= self._multiply_factor
         else:

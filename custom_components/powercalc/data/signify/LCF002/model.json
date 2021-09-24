@@ -1,6 +1,6 @@
 {
    "name":"Hue Calla Outdoor Pedestal",
-   "standby_usage":0.4,
+   "standby_power":0.4,
    "supported_modes":[
       "lut"
    ],
