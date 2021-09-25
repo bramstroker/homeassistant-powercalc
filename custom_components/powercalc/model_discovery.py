@@ -1,7 +1,6 @@
 """Utilities for auto discovery of light models."""
 
 from __future__ import annotations
-from config.custom_components.powercalc.common import SourceEntity
 
 import logging
 import os
@@ -9,6 +8,7 @@ from collections import namedtuple
 from typing import NamedTuple, Optional
 
 import homeassistant.helpers.entity_registry as er
+from config.custom_components.powercalc.common import SourceEntity
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType

@@ -227,14 +227,18 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
         source_entity_name = entity_entry.name or entity_entry.original_name
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
-        supported_color_modes = entity_entry.capabilities.get(light.ATTR_SUPPORTED_COLOR_MODES)
+        supported_color_modes = entity_entry.capabilities.get(
+            light.ATTR_SUPPORTED_COLOR_MODES
+        )
     else:
         source_entity_name = source_object_id.replace("_", " ")
 
     entity_state = hass.states.get(entity_id)
     if entity_state:
         source_entity_name = entity_state.name
-        supported_color_modes = entity_state.attributes.get(light.ATTR_SUPPORTED_COLOR_MODES)
+        supported_color_modes = entity_state.attributes.get(
+            light.ATTR_SUPPORTED_COLOR_MODES
+        )
 
     return SourceEntity(
         unique_id,
@@ -243,7 +247,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
         source_entity_name,
         source_entity_domain,
         supported_color_modes or [],
-        entity_entry
+        entity_entry,
     )
 
 
@@ -252,12 +256,10 @@ async def create_individual_sensors(
 ) -> list[SensorEntity]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
-    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass) 
+    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     try:
-        power_sensor = await create_power_sensor(
-            hass, sensor_config, source_entity
-        )
+        power_sensor = await create_power_sensor(hass, sensor_config, source_entity)
     except PowercalcSetupError as err:
         return []
 
@@ -305,6 +307,7 @@ def create_group_sensors(
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
     return group_sensors
+
 
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""

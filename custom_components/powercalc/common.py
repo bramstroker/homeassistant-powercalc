@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 from typing import NamedTuple
-import homeassistant.helpers.entity_registry as er
 
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 
 
