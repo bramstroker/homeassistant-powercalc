@@ -1,6 +1,6 @@
 {
-    "name": "TRADFRI bulb GU10 WS 400lm LED1537R6",
-    "standby_usage": 0.44,
+    "name": "TRADFRI bulb GU10 WS 400lm",
+    "standby_power": 0.44,
     "supported_modes": [
         "lut"
     ],

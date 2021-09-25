@@ -1,6 +1,6 @@
 {
     "name": "RB175W E27 806lm 2200K-2700K automatic warm dimming",
-    "standby_usage": 0.35,
+    "standby_power": 0.35,
     "supported_modes": [
         "lut"
     ],

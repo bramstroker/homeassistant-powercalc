@@ -6,6 +6,7 @@ DOMAIN_CONFIG = "config"
 DATA_CALCULATOR_FACTORY = "calculator_factory"
 
 CONF_CALIBRATE = "calibrate"
+CONF_CREATE_GROUP = "create_group"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"
@@ -25,6 +26,8 @@ CONF_MIN_POWER = "min_power"
 CONF_MAX_POWER = "max_power"
 CONF_WATT = "watt"
 CONF_STATES_POWER = "states_power"
+CONF_STANDBY_POWER = "standby_power"
+CONF_DISABLE_STANDBY_POWER = "disable_standby_power"
 CONF_STANDBY_USAGE = "standby_usage"
 CONF_DISABLE_STANDBY_USAGE = "disable_standby_usage"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
@@ -59,5 +62,7 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb E14 W op/ch 400lm": "LED1649C5",
         "TRADFRI bulb GU10 W 400lm": "LED1650R5",
         "TRADFRI bulb E27 WS opal 1000lm": "LED1732G11",
+        "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
+        "TRADFRI bulb E27 WW 806lm": "LED1836G9",
     }
 }

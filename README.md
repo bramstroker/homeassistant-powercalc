@@ -30,6 +30,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
+    - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
 - [Debug logging](#debug-logging)
@@ -62,8 +63,8 @@ They are as follows:
 | entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
 | manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_usage           | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_usage   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| standby_power           | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_power   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                    | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
 | create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
@@ -73,9 +74,11 @@ They are as follows:
 | energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
 | mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
 | multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
-| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby usage |
+| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
 | fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
+| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 
 **Minimalistic example creating two power sensors:**
 
@@ -252,7 +255,7 @@ When no match is found in `states_power` lookup than the configured `power` will
 
 ## Configuration examples
 
-### Linear mode with additional standby usage
+### Linear mode with additional standby power
 
 ```yaml
 sensor:
@@ -261,7 +264,7 @@ sensor:
     linear:
       min_power: 0.5
       max_power: 8
-    standby_usage: 0.2
+    standby_power: 0.2
     name: My amazing power meter
 ```
 
@@ -272,8 +275,10 @@ sensor:
 The component ships with predefined light measurements for some light models.
 This library will keep extending by the effort of community users.
 
-These models are located in `custom_components/powercalc/data` directory.
-Each light model has it's own subdirectory `{manufacturer}/{modelid}`
+These models are located in `config/custom_components/powercalc/data` directory. 
+You can also define your own models in `config/powercalc-custom-models` directory, when a manufacturer/model exists in this directory this will take precedence over the default data directory.
+
+Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010
 
 ### model.json
 
@@ -287,7 +292,7 @@ Example lut mode:
 ```json
 {
     "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
-    "standby_usage": 0.4,
+    "standby_power": 0.4,
     "supported_modes": [
         "lut"
     ],
@@ -304,7 +309,7 @@ Example linear mode
     "supported_modes": [
         "linear"
     ],
-    "standby_usage": 0.2,
+    "standby_power": 0.2,
     "linear_config": {
         "min_power": 0,
         "max_power": 6
@@ -332,6 +337,7 @@ Example:
 ```
 - signify
   - LCT010
+    - model.json
     - hs.csv.gz
     - color_temp.csv.gz
 ```
@@ -421,6 +427,35 @@ See the [Wiki](https://github.com/bramstroker/homeassistant-powercalc/wiki/Group
 
 ## Advanced features
 
+### Multiple entities and grouping
+
+> Available from v0.8 and higher
+
+Two new configuration parameters have been introduced `entities` and `create_group`.
+`entities` will allow you to multiple power sensors in one `powercalc` sensor entry.
+`create_group` will also create a group summing all the underlying entities. Which can directly be used in energy dashboard.
+Each entry under `entities` can use the same configuration as when defined directly under `sensor`
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: All hallway lights
+    entities:
+      -  entity_id: light.hallway
+      -  entity_id: light.living_room
+         linear:
+            min_power: 0.5
+            max_power: 8
+```
+
+This will create the following entities:
+- sensor.hallway_power
+- sensor.hallway_energy
+- sensor.living_room_power
+- sensor.living_room_energy
+- sensor.all_hallway_lights_power (group sensor)
+- sensor.all_hallway_lights_energy (group sensor)
+
 ### Multiply Factor
 
 This feature allows you to multiply the calculated power.
@@ -439,7 +474,7 @@ Let's assume you have a combination of 4 GU10 spots in your ceiling in a light g
 
 This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
 
-By default the multiply factor will **NOT** be applied to the standby usage, you can set the `multiply_factor_standby` to do this.
+By default the multiply factor will **NOT** be applied to the standby power, you can set the `multiply_factor_standby` to do this.
 
 ```yaml
 - platform: powercalc

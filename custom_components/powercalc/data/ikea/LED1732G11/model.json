@@ -1,6 +1,6 @@
 {
-    "name": "TRADFRI bulb E27 WS opal 1000lm LED1732G11",
-    "standby_usage": 0.26,
+    "name": "TRADFRI bulb E27 WS opal 1000lm",
+    "standby_power": 0.26,
     "supported_modes": [
         "lut"
     ],

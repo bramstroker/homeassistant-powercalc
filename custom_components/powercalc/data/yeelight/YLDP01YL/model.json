@@ -1,6 +1,6 @@
 {
     "name": "Yeelight LED 600lm 4000K 8W WiFi",
-    "standby_usage": 1.1,
+    "standby_power": 1.1,
     "supported_modes": [
         "lut"
     ],

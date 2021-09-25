@@ -54,14 +54,14 @@ class HassLightController(LightController):
             {
                 "type": "input",
                 "name": "light_entity_id",
-                "message": "Specify the entity_id of your light in HA?",
+                "message": "Specify the entity_id of your light in HA? Ex: light.hall_lamp",
                 "validate": lambda val: val.startswith("light.")
                 or "entity id must start with light.",
             },
             {
                 "type": "input",
                 "name": "light_model_id",
-                "message": "What is the model_id of your light? for example LWA004",
+                "message": "What model is your light? Ex: LED1837R5",
                 "validate": lambda val: len(val) > 0 or "This is required",
             },
         ]

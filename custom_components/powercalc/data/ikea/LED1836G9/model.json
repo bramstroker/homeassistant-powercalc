@@ -1,7 +1,7 @@
 {
-    "measure_device": "unknown",
+    "measure_device": "Shelly Plug S",
     "measure_method": "script",
-    "name": "TRADFRI bulb E27 WS opal 980lm",
+    "name": "TRADFRI bulb E27 WW 806lm",
     "standby_power": 0.4,
     "supported_modes": [
         "lut"

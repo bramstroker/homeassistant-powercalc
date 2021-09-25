@@ -6,6 +6,10 @@ class PowercalcSetupError(HomeAssistantError):
     """Raised when an error occured during powercalc sensor setup."""
 
 
+class SensorConfigurationError(PowercalcSetupError):
+    """Raised when sensor configuration is invalid"""
+
+
 class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""
 

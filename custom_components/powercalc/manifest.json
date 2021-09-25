@@ -16,7 +16,7 @@
     "utility_meter"
   ],
   "codeowners": ["@bramstroker"],
-  "requirements": [],
+  "requirements": ["numpy>=1.21.1"],
   "version": "0.1.0",
   "iot_class": "local_polling"
 }

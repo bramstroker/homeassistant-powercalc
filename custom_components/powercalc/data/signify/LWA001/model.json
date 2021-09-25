@@ -5,6 +5,6 @@
     ],
     "measure_method": "script",
     "measure_device": "Shelly PM",
-    "standby_usage": 0.4,
+    "standby_power": 0.4,
     "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby"
 }

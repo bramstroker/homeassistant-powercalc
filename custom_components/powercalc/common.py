@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
-import attr
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 
 
@@ -14,7 +13,8 @@ class SourceEntity(NamedTuple):
     entity_id: str
     name: str
     domain: str
-    capabilities: Mapping[str, Any] | None = attr.ib(default=None)
+    supported_color_modes: list
+    entity_entry: er.RegistryEntry | None
 
 
 def validate_name_pattern(value: str) -> str:

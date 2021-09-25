@@ -12,6 +12,7 @@ from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .common import SourceEntity
 from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from .light_model import LightModel
 
@@ -19,12 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def get_light_model(
-    hass: HomeAssistantType, entity_entry, config: dict
+    hass: HomeAssistantType, source_entity: SourceEntity, config: dict
 ) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if (manufacturer is None or model is None) and entity_entry:
-        hue_model_info = await autodiscover_hue_model(hass, entity_entry)
+    if (manufacturer is None or model is None) and source_entity.entity_entry:
+        hue_model_info = await autodiscover_hue_model(hass, source_entity.entity_entry)
         if hue_model_info:
             manufacturer = hue_model_info.manufacturer
             model = hue_model_info.model
@@ -38,7 +39,7 @@ async def get_light_model(
             hass.config.config_dir, custom_model_directory
         )
 
-    return LightModel(manufacturer, model, custom_model_directory)
+    return LightModel(hass, manufacturer, model, custom_model_directory)
 
 
 async def autodiscover_hue_model(

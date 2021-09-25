@@ -1,6 +1,6 @@
 {
     "name": "Philips Living Color Iris",
-    "standby_usage": 0.500,
+    "standby_power": 0.500,
     "supported_modes": [
         "lut"
     ],

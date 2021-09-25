@@ -3,7 +3,7 @@
     "supported_modes": [
         "lut"
     ],
-    "standby_usage": 0.22,
+    "standby_power": 0.22,
     "measure_method": "script",
     "measure_device": "Shelly PM1",
     "measure_description": "Used HASS based script"

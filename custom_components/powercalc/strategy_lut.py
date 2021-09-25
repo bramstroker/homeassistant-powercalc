@@ -7,7 +7,7 @@ from collections import defaultdict
 from csv import reader
 from dataclasses import dataclass
 from functools import partial
-from typing import NamedTuple, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from homeassistant.components import light
@@ -211,10 +211,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             _LOGGER.error("Model not supplied for entity: %s", source_entity.entity_id)
             return
 
-        supported_color_modes = source_entity.capabilities[
-            light.ATTR_SUPPORTED_COLOR_MODES
-        ]
-        for color_mode in supported_color_modes:
+        for color_mode in source_entity.supported_color_modes:
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(

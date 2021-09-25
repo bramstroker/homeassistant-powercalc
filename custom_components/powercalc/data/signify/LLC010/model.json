@@ -1,6 +1,6 @@
 {
     "name": "Hue Iris",
-    "standby_usage": 0.40,
+    "standby_power": 0.40,
     "supported_modes": [
         "lut"
     ],

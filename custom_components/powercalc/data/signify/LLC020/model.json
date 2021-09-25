@@ -1,6 +1,6 @@
 {
     "name": "Hue Go",
-    "standby_usage": 0.290,
+    "standby_power": 0.290,
     "supported_modes": [
         "lut"
     ],
