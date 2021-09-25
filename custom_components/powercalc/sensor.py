@@ -213,42 +213,50 @@ async def async_setup_platform(
         async_add_entities(entities)
 
 
+async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
+    """Create object containing all information about the sourece entity"""
+
+    source_entity_domain, source_object_id = split_entity_id(entity_id)
+
+    entity_registry = await er.async_get_registry(hass)
+    entity_entry = entity_registry.async_get(entity_id)
+
+    unique_id = None
+    supported_color_modes = []
+    if entity_entry:
+        source_entity_name = entity_entry.name or entity_entry.original_name
+        source_entity_domain = entity_entry.domain
+        unique_id = entity_entry.unique_id
+        supported_color_modes = entity_entry.capabilities.get(light.ATTR_SUPPORTED_COLOR_MODES)
+    else:
+        source_entity_name = source_object_id.replace("_", " ")
+
+    entity_state = hass.states.get(entity_id)
+    if entity_state:
+        source_entity_name = entity_state.name
+        supported_color_modes = entity_state.attributes.get(light.ATTR_SUPPORTED_COLOR_MODES)
+
+    return SourceEntity(
+        unique_id,
+        source_object_id,
+        entity_id,
+        source_entity_name,
+        source_entity_domain,
+        supported_color_modes or [],
+        entity_entry
+    )
+
+
 async def create_individual_sensors(
     hass: HomeAssistantType, sensor_config: dict
 ) -> list[SensorEntity]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
-    source_entity = sensor_config[CONF_ENTITY_ID]
-    source_entity_domain, source_object_id = split_entity_id(source_entity)
-
-    entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(source_entity)
-
-    unique_id = None
-    if entity_entry:
-        source_entity_name = entity_entry.name or entity_entry.original_name
-        source_entity_domain = entity_entry.domain
-        unique_id = entity_entry.unique_id
-    else:
-        source_entity_name = source_object_id.replace("_", " ")
-
-    entity_state = hass.states.get(source_entity)
-    if entity_state:
-        source_entity_name = entity_state.name
-
-    capabilities = entity_entry.capabilities if entity_entry else []
-    source_entity = SourceEntity(
-        unique_id,
-        source_object_id,
-        source_entity,
-        source_entity_name,
-        source_entity_domain,
-        capabilities,
-    )
+    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass) 
 
     try:
         power_sensor = await create_power_sensor(
-            hass, entity_entry, sensor_config, source_entity
+            hass, sensor_config, source_entity
         )
     except PowercalcSetupError as err:
         return []
@@ -298,7 +306,6 @@ def create_group_sensors(
 
     return group_sensors
 
-
 def get_sensor_configuration(config: dict, global_config: dict) -> dict:
     """Build the configuration dictionary for the sensors."""
 
@@ -336,7 +343,6 @@ def get_sensor_configuration(config: dict, global_config: dict) -> dict:
 
 async def create_power_sensor(
     hass: HomeAssistantType,
-    entity_entry,
     sensor_config: dict,
     source_entity: SourceEntity,
 ) -> VirtualPowerSensor:
@@ -358,7 +364,7 @@ async def create_power_sensor(
             sensor_config.get(CONF_LINEAR) is None
             and sensor_config.get(CONF_FIXED) is None
         ):
-            light_model = await get_light_model(hass, entity_entry, sensor_config)
+            light_model = await get_light_model(hass, source_entity, sensor_config)
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
 
