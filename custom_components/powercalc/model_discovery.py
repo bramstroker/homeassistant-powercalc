@@ -1,6 +1,7 @@
 """Utilities for auto discovery of light models."""
 
 from __future__ import annotations
+from config.custom_components.powercalc.common import SourceEntity
 
 import logging
 import os
@@ -19,12 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def get_light_model(
-    hass: HomeAssistantType, entity_entry, config: dict
+    hass: HomeAssistantType, source_entity: SourceEntity, config: dict
 ) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if (manufacturer is None or model is None) and entity_entry:
-        hue_model_info = await autodiscover_hue_model(hass, entity_entry)
+    if (manufacturer is None or model is None) and source_entity.entity_entry:
+        hue_model_info = await autodiscover_hue_model(hass, source_entity.entity_entry)
         if hue_model_info:
             manufacturer = hue_model_info.manufacturer
             model = hue_model_info.model
