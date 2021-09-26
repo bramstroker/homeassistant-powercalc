@@ -8,11 +8,11 @@ from collections import namedtuple
 from typing import NamedTuple, Optional
 
 import homeassistant.helpers.entity_registry as er
-from config.custom_components.powercalc.common import SourceEntity
 from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .common import SourceEntity
 from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from .light_model import LightModel
 

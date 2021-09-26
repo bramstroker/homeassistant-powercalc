@@ -55,6 +55,7 @@ SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
+SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
 START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
@@ -111,12 +112,26 @@ class Measure:
             time.sleep(10)
 
             csv_writer.writerow(CSV_HEADERS[color_mode])
+            old_variation={"ct": 0, "hue": 0, "sat": 0}
             for count, variation in enumerate(self.get_variations(color_mode)):
                 print("Changing light to: ", variation)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
                     color_mode, on=True, **variation
                 )
+                if "ct" in variation:
+                    if variation["ct"] < old_variation["ct"]:
+                        print("Extra waiting for significant CT change...")
+                        time.sleep(SLEEP_TIME_CT)
+                if "sat" in variation:
+                    if variation["sat"] < old_variation["sat"]:
+                        print("Extra waiting for significant SAT change...")
+                        time.sleep(SLEEP_TIME_SAT)
+                if "hue" in variation:
+                    if variation["hue"] < old_variation["hue"]:
+                        print("Extra waiting for significant HUE change...")
+                        time.sleep(SLEEP_TIME_HUE)
+                old_variation = variation
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
                 print("Measured power: ", power)
@@ -196,9 +211,7 @@ class Measure:
     def get_hs_variations(self) -> Iterator[dict]:
         for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
             for sat in self.inclusive_range(1, MAX_SAT, 10):
-                time.sleep(SLEEP_TIME_SAT)
                 for hue in self.inclusive_range(1, MAX_HUE, 2000):
-                    time.sleep(SLEEP_TIME_HUE)
                     yield {"bri": bri, "hue": hue, "sat": sat}
 
     def get_brightness_variations(self) -> Iterator[dict]:
