@@ -4,7 +4,6 @@ import csv
 import gzip
 import json
 import logging
-import logging.config
 import os
 import shutil
 import time
