@@ -21,6 +21,8 @@ jobs:
           images: |
             ghcr.io/bramstroker/measure
             bramgerritsen/powercalc-measure
+          flavor: |
+            latest=auto
           # generate Docker tags based on the following events/attributes
           tags: |
             type=ref,event=branch
