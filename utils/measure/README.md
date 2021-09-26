@@ -9,7 +9,7 @@ This package contains everything you need to automatically take measurements of 
 
 Setup requirements for the script. It is advised to run in a virtual environment.
 ```
-cd utils/measure_v2
+cd utils/measure
 python3 -m venv measure
 source measure/bin/activate
 pip install -r requirements.txt
@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 When this is not working on your machine (i.e. windows) just install globally.
 ```
-cd utils/measure_v2
+cd utils/measure
 pip install -r requirements.txt
 ```
 
