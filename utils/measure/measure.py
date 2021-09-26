@@ -1,96 +1,152 @@
-from __future__ import annotations, print_function, unicode_literals
+from __future__ import annotations
 
-import asyncio
 import csv
+import gzip
 import json
+import logging
 import os
+import shutil
+import time
 from typing import Iterator
 
-import aiohttp
-import aiohue
-import aioshelly
-import asyncstdlib as a
-from aiohue.lights import Light
+from decouple import config
+from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
+from light_controller.controller import LightController
+from light_controller.hass import HassLightController
+from light_controller.hue import HueLightController
+from powermeter.errors import OutdatedMeasurementError, PowerMeterError
+from powermeter.hass import HassPowerMeter
+from powermeter.kasa import KasaPowerMeter
+from powermeter.powermeter import PowerMeter
+from powermeter.shelly import ShellyPowerMeter
+from powermeter.tasmota import TasmotaPowerMeter
+from powermeter.tuya import TuyaPowerMeter
 from PyInquirer import prompt
 
-MODE_HS = "hs"
-MODE_COLOR_TEMP = "color_temp"
-MODE_BRIGHTNESS = "brightness"
-HUE_BRIDGE_USERNAME = "huepower"
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
     MODE_COLOR_TEMP: ["bri", "mired", "watt"],
-    MODE_BRIGHTNESS: ["bri", "watt"]
+    MODE_BRIGHTNESS: ["bri", "watt"],
 }
-
-# Change the params below
-SHELLY_IP = "192.168.178.254"
-HUE_BRIDGE_IP = "192.168.178.44"
-SLEEP_TIME = 2  # time between changing the light params and taking the measurement
-SLEEP_TIME_HUE = 5  # time to wait between each increase in hue
-SLEEP_TIME_SAT = 10  # time to wait between each increase in saturation
-
-# Change this when the script crashes due to connectivity issues, so you don't have to start all over again
-START_BRIGHTNESS = 1
 MAX_BRIGHTNESS = 255
+MAX_SAT = 254
+MAX_HUE = 65535
 
+POWER_METER_HASS = "hass"
+POWER_METER_KASA = "kasa"
+POWER_METER_SHELLY = "shelly"
+POWER_METER_TASMOTA = "tasmota"
+POWER_METER_TUYA = "tuya"
+POWER_METERS = [
+    POWER_METER_HASS,
+    POWER_METER_KASA,
+    POWER_METER_SHELLY,
+    POWER_METER_TASMOTA,
+    POWER_METER_TUYA,
+]
 
-async def main():
-    options = aioshelly.ConnectionOptions(SHELLY_IP)
+SELECTED_POWER_METER = config("POWER_METER")
 
-    async with aiohttp.ClientSession() as aiohttp_session, aioshelly.COAP() as coap_context:
-        try:
-            device = await asyncio.wait_for(
-                aioshelly.Device.create(aiohttp_session, coap_context, options), 5
-            )
-        except asyncio.TimeoutError:
-            print("Timeout connecting to", SHELLY_IP)
-            return
+LIGHT_CONTROLLER_HUE = "hue"
+LIGHT_CONTROLLER_HASS = "hass"
+LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
 
-        power_meter = device.blocks[0]
+SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 
-        hue_bridge = await initialize_hue_bridge(aiohttp_session)
-        light_list = []
-        for light_id in hue_bridge.lights:
-            light = hue_bridge.lights[light_id]
-            light_list.append({"key": light_id, "value": light_id, "name": light.name})
+LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
+SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
+SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
+SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
+SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
+START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
+MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
+SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
 
-        answers = prompt(get_questions(light_list))
+SHELLY_IP = config("SHELLY_IP")
+TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
+TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
+TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
+TUYA_DEVICE_VERSION = config("EMAIL_PORT", default="3.3")
+HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
+HASS_URL = config("HASS_URL")
+HASS_TOKEN = config("HASS_TOKEN")
+TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
+KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
-        light_id = answers["light"]
+logging.basicConfig(
+    level=logging.getLevelName(LOG_LEVEL),
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("measure.log"),
+        logging.StreamHandler()
+    ]
+)
+
+_LOGGER = logging.getLogger("measure")
+
+class Measure:
+    def __init__(self, light_controller: LightController, power_meter: PowerMeter):
+        self.light_controller = light_controller
+        self.power_meter = power_meter
+
+    def start(self):
+        answers = prompt(self.get_questions())
+        self.light_controller.process_answers(answers)
+        self.power_meter.process_answers(answers)
+        self.light_info = self.light_controller.get_light_info()
+
         color_mode = answers["color_mode"]
 
-        light = hue_bridge.lights[light_id]
         export_directory = os.path.join(
-            os.path.dirname(__file__),
-            "export",
-            light.modelid
+            os.path.dirname(__file__), "export", self.light_info.model_id
         )
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
 
         if answers["generate_model_json"]:
-            standby_usage = await measure_standby_usage(light, power_meter)
-            write_model_json(directory=export_directory, standby_usage=standby_usage, name=answers["model_name"])
+            standby_power = self.measure_standby_power()
+            self.write_model_json(
+                directory=export_directory,
+                standby_power=standby_power,
+                name=answers["model_name"],
+                measure_device=answers["measure_device"],
+            )
 
-        with open(f"{export_directory}/{color_mode}.csv", "w") as csv_file:
+        csv_file_path = f"{export_directory}/{color_mode}.csv"
+        with open(csv_file_path, "w", newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
 
-            await light.set_state(on=True, bri=1)
+            self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
-            # Initially wait longer so the Shelly plug can settle
-            print("Start taking measurements for color mode: ", color_mode)
-            print("Waiting 10 seconds...")
-            await asyncio.sleep(10)
+            # Initially wait longer so the smartplug can settle
+            _LOGGER.info(f"Start taking measurements for color mode: {color_mode}")
+            _LOGGER.info("Waiting 10 seconds...")
+            time.sleep(10)
 
             csv_writer.writerow(CSV_HEADERS[color_mode])
-            async for count, variation in a.enumerate(get_variations(color_mode, light)):
-                print("Changing light to: ", variation)
-                await light.set_state(**variation)
-                await asyncio.sleep(SLEEP_TIME)
-                power = power_meter.current_values()["power"]
-                print("Measured power: ", power)
-                print()
+            old_variation={"ct": 0, "hue": 0, "sat": 0}
+            for count, variation in enumerate(self.get_variations(color_mode)):
+                _LOGGER.info(f"Changing light to: {variation}")
+                variation_start_time = time.time()
+                self.light_controller.change_light_state(
+                    color_mode, on=True, **variation
+                )
+                if "ct" in variation:
+                    if variation["ct"] < old_variation["ct"]:
+                        _LOGGER.info("Extra waiting for significant CT change...")
+                        time.sleep(SLEEP_TIME_CT)
+                if "sat" in variation:
+                    if variation["sat"] < old_variation["sat"]:
+                        _LOGGER.info("Extra waiting for significant SAT change...")
+                        time.sleep(SLEEP_TIME_SAT)
+                if "hue" in variation:
+                    if variation["hue"] < old_variation["hue"]:
+                        _LOGGER.info("Extra waiting for significant HUE change...")
+                        time.sleep(SLEEP_TIME_HUE)
+                old_variation = variation
+                time.sleep(SLEEP_TIME)
+                power = self.take_power_measurement(variation_start_time)
+                _LOGGER.info(f"Measured power: {power}")
                 row = list(variation.values())
                 row.append(power)
                 csv_writer.writerow(row)
@@ -99,132 +155,200 @@ async def main():
 
             csv_file.close()
 
+        if answers["gzip"] or True:
+            self.gzip_csv(csv_file_path)
 
-async def get_variations(color_mode: str, light: Light):
-    if color_mode == MODE_HS:
-        async for v in get_hs_variations():
-            yield v
-    elif color_mode == MODE_COLOR_TEMP:
-        async for v in  get_ct_variations(light):
-            yield v
-    else:
-        async for v in get_brightness_variations():
-            yield v
+    def take_power_measurement(self, start_timestamp: float, retry_count=0) -> float:
+        measurements = []
+        # Take multiple samples to reduce noise
+        for i in range(SAMPLE_COUNT):
+            _LOGGER.debug(f"Taking sample {i}")
+            try:
+                measurement = self.power_meter.get_power()
+            except PowerMeterError as err:
+                if retry_count == MAX_RETRIES:
+                    raise err
+
+                retry_count += 1
+                self.take_power_measurement(start_timestamp, retry_count)
+
+            # Check if measurement is not outdated
+            if measurement.updated < start_timestamp:
+                # Prevent endless recursion and raise exception
+                if retry_count == MAX_RETRIES:
+                    raise OutdatedMeasurementError(
+                        "Power measurement is outdated. Aborting after {} retries".format(
+                            MAX_RETRIES
+                        )
+                    )
+
+                retry_count += 1
+                time.sleep(1)
+                self.take_power_measurement(start_timestamp, retry_count)
+
+            measurements.append(measurement.power)
+            time.sleep(0.5)
+
+        avg = sum(measurements) / len(measurements)
+        return round(avg, 2)
+
+    def gzip_csv(self, csv_file_path: str):
+        with open(csv_file_path, "rb") as csv_file:
+            with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
+                shutil.copyfileobj(csv_file, gzip_file)
+
+    def measure_standby_power(self) -> float:
+        self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
+        start_time = time.time()
+        _LOGGER.info("Measuring standby power. Waiting for 5 seconds...")
+        time.sleep(5)
+        return self.take_power_measurement(start_time)
+
+    def get_variations(self, color_mode: str):
+        if color_mode == MODE_HS:
+            yield from self.get_hs_variations()
+        elif color_mode == MODE_COLOR_TEMP:
+            yield from self.get_ct_variations()
+        else:
+            yield from self.get_brightness_variations()
+
+    def get_ct_variations(self) -> Iterator[dict]:
+        min_mired = self.light_info.min_mired
+        max_mired = self.light_info.max_mired
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
+            for mired in self.inclusive_range(min_mired, max_mired, 10):
+                yield {"bri": bri, "ct": mired}
+
+    def get_hs_variations(self) -> Iterator[dict]:
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
+            for sat in self.inclusive_range(1, MAX_SAT, 10):
+                for hue in self.inclusive_range(1, MAX_HUE, 2000):
+                    yield {"bri": bri, "hue": hue, "sat": sat}
+
+    def get_brightness_variations(self) -> Iterator[dict]:
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
+            yield {"bri": bri}
+
+    def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
+        i = start
+        while i < end:
+            yield i
+            i += step
+        yield end
+
+    def write_model_json(
+        self, directory: str, standby_power: float, name: str, measure_device: str
+    ):
+        json_data = json.dumps(
+            {
+                "measure_device": measure_device,
+                "measure_method": "script",
+                "name": name,
+                "standby_power": standby_power,
+                "supported_modes": ["lut"],
+            },
+            indent=4,
+            sort_keys=True,
+        )
+        json_file = open(os.path.join(directory, "model.json"), "w")
+        json_file.write(json_data)
+        json_file.close()
+
+    def get_questions(self) -> list[dict]:
+        return (
+            [
+                {
+                    "type": "list",
+                    "name": "color_mode",
+                    "message": "Select the color mode?",
+                    "default": MODE_HS,
+                    "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
+                },
+                {
+                    "type": "confirm",
+                    "message": "Do you want to generate model.json?",
+                    "name": "generate_model_json",
+                    "default": True,
+                },
+                {
+                    "type": "input",
+                    "name": "model_name",
+                    "message": "Specify the full light model name",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
+                    "type": "input",
+                    "name": "measure_device",
+                    "message": "Which device (manufacturer, model) do you use to take the measurement?",
+                    "when": lambda answers: answers["generate_model_json"],
+                },
+                {
+                    "type": "confirm",
+                    "message": "Do you want to gzip CSV files?",
+                    "name": "gzip",
+                    "default": True,
+                },
+            ]
+            + self.light_controller.get_questions()
+            + self.power_meter.get_questions()
+        )
 
 
-async def get_ct_variations(light: Light):
-    if "ct" in light.controlcapabilities:
-        min_mired = light.controlcapabilities["ct"]["min"]
-        max_mired = light.controlcapabilities["ct"]["max"]
-    else:
-        min_mired = 150
-        max_mired = 500
+class LightControllerFactory:
+    def hass(self):
+        return HassLightController(HASS_URL, HASS_TOKEN)
 
-    if max_mired > 500:
-        max_mired = 500
+    def hue(self):
+        return HueLightController(HUE_BRIDGE_IP)
 
-    if min_mired < 150:
-        min_mired = 150
+    def create(self) -> LightController:
+        factories = {LIGHT_CONTROLLER_HUE: self.hue, LIGHT_CONTROLLER_HASS: self.hass}
+        factory = factories.get(SELECTED_LIGHT_CONTROLLER)
+        if factory is None:
+            _LOGGER.error("factory not found")
+            # todo exception
 
-    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
-        for mired in inclusive_range(min_mired, max_mired, 10):
-            yield {"bri": bri, "ct": mired}
-
-
-async def get_hs_variations():
-    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
-        for sat in inclusive_range(1, 254, 10):
-            await asyncio.sleep(SLEEP_TIME_SAT)
-            for hue in inclusive_range(1, 65535, 2000):
-                await asyncio.sleep(SLEEP_TIME_HUE)
-                yield {"bri": bri, "hue": hue, "sat": sat}
+        _LOGGER.info(f"Selected Light controller: {SELECTED_LIGHT_CONTROLLER}")
+        return factory()
 
 
-async def get_brightness_variations():
-    for bri in inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
-        yield {"bri": bri}
+class PowerMeterFactory:
+    def hass(self):
+        return HassPowerMeter(HASS_URL, HASS_TOKEN)
+
+    def kasa(self):
+        return KasaPowerMeter(KASA_DEVICE_IP)
+
+    def shelly(self):
+        return ShellyPowerMeter(SHELLY_IP)
+
+    def tasmota(self):
+        return TasmotaPowerMeter(TASMOTA_DEVICE_IP)
+
+    def tuya(self):
+        return TuyaPowerMeter(
+            TUYA_DEVICE_ID, TUYA_DEVICE_IP, TUYA_DEVICE_KEY, TUYA_DEVICE_VERSION
+        )
+
+    def create(self) -> PowerMeter:
+        factories = {
+            POWER_METER_HASS: self.hass,
+            POWER_METER_KASA: self.kasa,
+            POWER_METER_SHELLY: self.shelly,
+            POWER_METER_TASMOTA: self.tasmota,
+            POWER_METER_TUYA: self.tuya,
+        }
+        factory = factories.get(SELECTED_POWER_METER)
+        if factory is None:
+            _LOGGER.error("factory not found")
+            # todo exception
+
+        _LOGGER.info(f"Selected powermeter: {SELECTED_POWER_METER}")
+        return factory()
 
 
-def inclusive_range(start: int, end: int, step: int) -> Iterator[int]:
-    i = start
-    while i < end:
-        yield i
-        i += step
-    yield end
+light_controller_factory = LightControllerFactory()
+power_meter_factory = PowerMeterFactory()
+measure = Measure(light_controller_factory.create(), power_meter_factory.create())
 
-
-def write_model_json(directory: str, standby_usage: float, name: str):
-    json_data = json.dumps({
-        "name": name,
-        "standby_usage": standby_usage,
-        "supported_modes": [
-            "lut"
-        ]
-    })
-    json_file = open(os.path.join(directory, "model.json"), "w")
-    json_file.write(json_data)
-    json_file.close()
-
-
-async def measure_standby_usage(light: Light, power_meter) -> float:
-    await light.set_state(on=False)
-    print("Measuring standby usage. Waiting for 5 seconds...")
-    await asyncio.sleep(5)
-    return power_meter.current_values()["power"]
-
-
-def get_questions(light_list) -> list[dict]:
-    return [
-        {
-            'type': 'list',
-            'name': 'color_mode',
-            'message': 'Select the color mode?',
-            'default': MODE_HS,
-            'choices': [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
-        },
-        {
-            'type': 'list',
-            'name': 'light',
-            'message': 'Select the light?',
-            'choices': light_list
-        },
-        {
-            'type': 'confirm',
-            'message': 'Do you want to generate model.json?',
-            'name': 'generate_model_json',
-            'default': True,
-        },
-        {
-            'type': 'input',
-            'name': 'model_name',
-            'message': 'Specify the full light model name',
-            'when': lambda answers: answers['generate_model_json']
-        },
-    ]
-
-
-async def initialize_hue_bridge(websession) -> aiohue.Bridge:
-    f = open("bridge_user.txt", "r+")
-
-    bridge = aiohue.Bridge(host=HUE_BRIDGE_IP, websession=websession)
-
-    authenticated_user = f.read()
-    if len(authenticated_user) > 0:
-        bridge.username = authenticated_user
-
-    try:
-        await bridge.initialize()
-    except aiohue.Unauthorized as err:
-        print("Please click the link button on the bridge, than hit enter..")
-        input()
-        await bridge.create_user(HUE_BRIDGE_USERNAME)
-        await bridge.initialize()
-        f.write(bridge.username)
-
-    f.close()
-
-    return bridge
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+measure.start()

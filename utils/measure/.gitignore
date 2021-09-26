@@ -1,4 +1,5 @@
-bridge_user.txt
-export
+.env
+export/
 measure
-*.csv
+light_controller/.python_hue
+measure.log
