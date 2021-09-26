@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import gzip
 import json
+import logging
 import os
 import shutil
 import time
@@ -52,6 +53,7 @@ LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
 
 SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 
+LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
 SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
@@ -71,6 +73,16 @@ HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
+logging.basicConfig(
+    level=logging.getLevelName(LOG_LEVEL),
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("measure.log"),
+        logging.StreamHandler()
+    ]
+)
+
+_LOGGER = logging.getLogger("measure")
 
 class Measure:
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -107,35 +119,34 @@ class Measure:
             self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
             # Initially wait longer so the smartplug can settle
-            print("Start taking measurements for color mode: ", color_mode)
-            print("Waiting 10 seconds...")
+            _LOGGER.info(f"Start taking measurements for color mode: {color_mode}")
+            _LOGGER.info("Waiting 10 seconds...")
             time.sleep(10)
 
             csv_writer.writerow(CSV_HEADERS[color_mode])
             old_variation={"ct": 0, "hue": 0, "sat": 0}
             for count, variation in enumerate(self.get_variations(color_mode)):
-                print("Changing light to: ", variation)
+                _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
                     color_mode, on=True, **variation
                 )
                 if "ct" in variation:
                     if variation["ct"] < old_variation["ct"]:
-                        print("Extra waiting for significant CT change...")
+                        _LOGGER.info("Extra waiting for significant CT change...")
                         time.sleep(SLEEP_TIME_CT)
                 if "sat" in variation:
                     if variation["sat"] < old_variation["sat"]:
-                        print("Extra waiting for significant SAT change...")
+                        _LOGGER.info("Extra waiting for significant SAT change...")
                         time.sleep(SLEEP_TIME_SAT)
                 if "hue" in variation:
                     if variation["hue"] < old_variation["hue"]:
-                        print("Extra waiting for significant HUE change...")
+                        _LOGGER.info("Extra waiting for significant HUE change...")
                         time.sleep(SLEEP_TIME_HUE)
                 old_variation = variation
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
-                print("Measured power: ", power)
-                print()
+                _LOGGER.info(f"Measured power: {power}")
                 row = list(variation.values())
                 row.append(power)
                 csv_writer.writerow(row)
@@ -151,7 +162,7 @@ class Measure:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
-            print("Taking sample", i)
+            _LOGGER.debug(f"Taking sample {i}")
             try:
                 measurement = self.power_meter.get_power()
             except PowerMeterError as err:
@@ -189,7 +200,7 @@ class Measure:
     def measure_standby_power(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
-        print("Measuring standby power. Waiting for 5 seconds...")
+        _LOGGER.info("Measuring standby power. Waiting for 5 seconds...")
         time.sleep(5)
         return self.take_power_measurement(start_time)
 
@@ -294,10 +305,10 @@ class LightControllerFactory:
         factories = {LIGHT_CONTROLLER_HUE: self.hue, LIGHT_CONTROLLER_HASS: self.hass}
         factory = factories.get(SELECTED_LIGHT_CONTROLLER)
         if factory is None:
-            print("factory not found")
+            _LOGGER.error("factory not found")
             # todo exception
 
-        print("light controller", SELECTED_LIGHT_CONTROLLER)
+        _LOGGER.info(f"Selected Light controller: {SELECTED_LIGHT_CONTROLLER}")
         return factory()
 
 
@@ -329,10 +340,10 @@ class PowerMeterFactory:
         }
         factory = factories.get(SELECTED_POWER_METER)
         if factory is None:
-            print("factory not found")
+            _LOGGER.error("factory not found")
             # todo exception
 
-        print("powermeter", SELECTED_POWER_METER)
+        _LOGGER.info(f"Selected powermeter: {SELECTED_POWER_METER}")
         return factory()
 
 
