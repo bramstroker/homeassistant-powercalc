@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from phue import Bridge, PhueRegistrationException
+from PyInquirer import Separator
 
 from .controller import LightController, LightInfo
 
@@ -14,9 +15,14 @@ class HueLightController(LightController):
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         kwargs["on"] = on
-        self.bridge.set_light(self.light_id, kwargs)
+        if self.is_group:
+            self.bridge.set_group(self.light_id, kwargs)
+        else:
+            self.bridge.set_light(self.light_id, kwargs)
 
     def get_light_info(self) -> LightInfo:
+        #todo, how to get model for group?
+        
         light = self.bridge.get_light(self.light_id)
         lightinfo = LightInfo(
             model_id=light["modelid"],
@@ -40,20 +46,32 @@ class HueLightController(LightController):
         return bridge
 
     def get_questions(self) -> list[dict]:
-        light_list = []
-        for light in self.bridge.lights:
-            light_list.append(
-                {"key": light.light_id, "value": light.light_id, "name": light.name}
-            )
+
+        def get_light_list(answers):
+            light_list = []
+            for light in self.bridge.lights:
+                light_list.append(
+                    {"value": f"light:{light.light_id}", "name": light.name}
+                )
+            if answers["multiple_lights"]:
+                light_list.append(Separator())
+                for group in self.bridge.groups:
+                    light_list.append(
+                        {"value": f"group:{group.group_id}", "name": group.name}
+                    )
+
+            return light_list
 
         return [
             {
                 "type": "list",
                 "name": "light",
                 "message": "Select the light?",
-                "choices": light_list,
+                "choices": get_light_list,
             },
         ]
 
     def process_answers(self, answers):
-        self.light_id = answers["light"]
+        light_type, light_id = answers["light"].split (":")
+        self.is_group = light_type == "group"
+        self.light_id = light_id
