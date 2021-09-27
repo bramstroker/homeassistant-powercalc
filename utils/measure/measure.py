@@ -96,6 +96,8 @@ class Measure:
         self.light_info = self.light_controller.get_light_info()
 
         color_mode = answers["color_mode"]
+        self.num_lights = int(answers.get("num_lights", 1))
+        _LOGGER.debug(f"num lights: {self.num_lights}")
 
         export_directory = os.path.join(
             os.path.dirname(__file__), "export", self.light_info.model_id
@@ -189,7 +191,7 @@ class Measure:
             measurements.append(measurement.power)
             time.sleep(0.5)
 
-        avg = sum(measurements) / len(measurements)
+        avg = sum(measurements) / len(measurements) / self.num_lights
         return round(avg, 2)
 
     def gzip_csv(self, csv_file_path: str):
@@ -287,6 +289,18 @@ class Measure:
                     "message": "Do you want to gzip CSV files?",
                     "name": "gzip",
                     "default": True,
+                },
+                {
+                    "type": "confirm",
+                    "name": "multiple_lights",
+                    "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
+                    "default": False
+                },
+                {
+                    "type": "input",
+                    "name": "num_lights",
+                    "message": "Hpw many lights are you measuring?",
+                    "when": lambda answers: answers["multiple_lights"],
                 },
             ]
             + self.light_controller.get_questions()
