@@ -34,6 +34,15 @@ class HueLightController(LightController):
 
         return lightinfo
 
+    def find_group_info(self, group_id: str):
+        model_ids = {}
+        for light_id in self.bridge.get_group(group_id, "lights"):
+            light = self.bridge.get_light(light_id)
+            model_id = light["modelid"]
+            model_ids.add(model_id)
+
+
+
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(os.path.dirname(__file__), "../.persistent/.python_hue")
         try:
