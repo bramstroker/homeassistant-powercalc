@@ -3,3 +3,5 @@ export/
 measure
 light_controller/.python_hue
 measure.log
+.persistent
+!/**/.gitkeep
