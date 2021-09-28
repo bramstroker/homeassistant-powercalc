@@ -245,6 +245,11 @@ class Measure:
             {
                 "measure_device": measure_device,
                 "measure_method": "script",
+                "measure_description": "Measured with utils/measure script",
+                "measure_settings": {
+                    "SAMPLE_COUNT": SAMPLE_COUNT,
+                    "SLEEP_TIME": SLEEP_TIME
+                },
                 "name": name,
                 "standby_power": standby_power,
                 "supported_modes": ["lut"],
