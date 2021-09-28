@@ -4,3 +4,11 @@ class PowerMeterError(Exception):
 
 class OutdatedMeasurementError(PowerMeterError):
     pass
+
+
+class ConnectionError(PowerMeterError):
+    pass
+
+
+class UnsupportedMeter(PowerMeterError):
+    pass
