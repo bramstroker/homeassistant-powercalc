@@ -8,7 +8,3 @@ class OutdatedMeasurementError(PowerMeterError):
 
 class ConnectionError(PowerMeterError):
     pass
-
-
-class UnsupportedMeter(PowerMeterError):
-    pass
