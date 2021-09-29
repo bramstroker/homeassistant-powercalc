@@ -24,6 +24,7 @@
 |signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                      |lut              |hs,color_temp|
 |signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)              |lut              |hs,color_temp|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                    |lut              |hs,color_temp|
+|signify      |LCT007                   |Hue White and Color E27 Gen2 (2015)                       |lut              |hs,color_temp|
 |signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)              |lut              |hs,color_temp|
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                   |lut              |hs,color_temp|
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)          |lut              |hs,color_temp|
