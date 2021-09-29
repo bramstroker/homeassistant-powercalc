@@ -1,0 +1,9 @@
+{
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "name": "Hue White GU10 Bluetooth",
+    "standby_power": 0.25,
+    "supported_modes": [
+        "lut"
+    ]
+}
