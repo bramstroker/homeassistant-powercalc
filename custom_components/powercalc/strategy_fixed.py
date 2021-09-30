@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import climate, vacuum
+from homeassistant.components import climate, input_number, vacuum
 from homeassistant.core import State
 from homeassistant.helpers.template import Template
 
@@ -25,6 +25,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 STATE_BASED_ENTITY_DOMAINS = [
     climate.DOMAIN,
+    input_number.DOMAIN,
     vacuum.DOMAIN,
 ]
 
