@@ -101,6 +101,7 @@ from .errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
+from .migrate import async_migrate_entity_id, async_migrate_unique_id
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -361,6 +362,12 @@ async def create_power_sensor(
     entity_id = async_generate_entity_id(
         "sensor.{}", name_pattern.format(object_id), hass=hass
     )
+
+    entity_registry = await er.async_get_registry(hass)
+    if source_entity.unique_id:
+        unique_id = f"{source_entity.domain}_{source_entity.unique_id}"
+        async_migrate_unique_id(entity_registry, "sensor", source_entity.unique_id, unique_id)
+        #async_migrate_entity_id(entity_registry, "sensor", unique_id, entity_id)
 
     light_model = None
     try:
