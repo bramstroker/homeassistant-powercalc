@@ -12,6 +12,7 @@ from typing import Iterator
 from decouple import config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
+from light_controller.errors import LightControllerError
 from light_controller.hass import HassLightController
 from light_controller.hue import HueLightController
 from powermeter.errors import OutdatedMeasurementError, PowerMeterError
@@ -245,6 +246,11 @@ class Measure:
             {
                 "measure_device": measure_device,
                 "measure_method": "script",
+                "measure_description": "Measured with utils/measure script",
+                "measure_settings": {
+                    "SAMPLE_COUNT": SAMPLE_COUNT,
+                    "SLEEP_TIME": SLEEP_TIME
+                },
                 "name": name,
                 "standby_power": standby_power,
                 "supported_modes": ["lut"],
@@ -319,8 +325,7 @@ class LightControllerFactory:
         factories = {LIGHT_CONTROLLER_HUE: self.hue, LIGHT_CONTROLLER_HASS: self.hass}
         factory = factories.get(SELECTED_LIGHT_CONTROLLER)
         if factory is None:
-            _LOGGER.error("factory not found")
-            # todo exception
+            raise Exception(f"Could not find a factory for {SELECTED_LIGHT_CONTROLLER}")
 
         _LOGGER.info(f"Selected Light controller: {SELECTED_LIGHT_CONTROLLER}")
         return factory()
@@ -354,15 +359,30 @@ class PowerMeterFactory:
         }
         factory = factories.get(SELECTED_POWER_METER)
         if factory is None:
-            _LOGGER.error("factory not found")
-            # todo exception
+            raise PowerMeterError(f"Could not find a factory for {SELECTED_POWER_METER}")
 
         _LOGGER.info(f"Selected powermeter: {SELECTED_POWER_METER}")
         return factory()
 
+def main():
+    light_controller_factory = LightControllerFactory()
+    power_meter_factory = PowerMeterFactory()
 
-light_controller_factory = LightControllerFactory()
-power_meter_factory = PowerMeterFactory()
-measure = Measure(light_controller_factory.create(), power_meter_factory.create())
+    try:
+        power_meter = power_meter_factory.create()
+    except PowerMeterError as e:
+        _LOGGER.error(f"Aborting: {e}")
+        return
 
-measure.start()
+    try:
+        light_controller = light_controller_factory.create()
+    except LightControllerError as e:
+        _LOGGER.error(f"Aborting: {e}")
+        return
+
+    measure = Measure(light_controller, power_meter)
+
+    measure.start()
+
+if __name__ == "__main__":
+    main()

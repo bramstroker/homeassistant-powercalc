@@ -24,6 +24,7 @@
 |signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                      |lut              |hs,color_temp|
 |signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)              |lut              |hs,color_temp|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                    |lut              |hs,color_temp|
+|signify      |LCT007                   |Hue White and Color E27 Gen2 (2015)                       |lut              |hs,color_temp|
 |signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)              |lut              |hs,color_temp|
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                   |lut              |hs,color_temp|
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)          |lut              |hs,color_temp|
@@ -49,6 +50,7 @@
 |signify      |LWB006                   |Hue White A60 E27 800lm                                   |lut              |brightness   |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                   |lut              |brightness   |
 |signify      |LWG001                   |Hue White GU10                                            |lut              |brightness   |
+|signify      |LWG004                   |Hue White GU10 Bluetooth                                  |lut              |brightness   |
 |signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                     |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                          |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature              |lut              |color_temp   |

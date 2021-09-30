@@ -14,6 +14,7 @@ from homeassistant.components import (
     device_tracker,
     fan,
     input_boolean,
+    input_number,
     input_select,
     light,
     media_player,
@@ -118,6 +119,7 @@ SUPPORTED_ENTITY_DOMAINS = (
     remote.DOMAIN,
     media_player.DOMAIN,
     input_boolean.DOMAIN,
+    input_number.DOMAIN,
     input_select.DOMAIN,
     sensor.DOMAIN,
     vacuum.DOMAIN,
@@ -172,6 +174,7 @@ ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_INTEGRATION = "integration"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
+ATTR_ENTITIES = "entities"
 OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
 
 
@@ -227,9 +230,10 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
         source_entity_name = entity_entry.name or entity_entry.original_name
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
-        supported_color_modes = entity_entry.capabilities.get(
-            light.ATTR_SUPPORTED_COLOR_MODES
-        )
+        if entity_entry.capabilities:
+            supported_color_modes = entity_entry.capabilities.get(
+                light.ATTR_SUPPORTED_COLOR_MODES
+            )
     else:
         source_entity_name = source_object_id.replace("_", " ")
 
@@ -672,6 +676,9 @@ class GroupedSensor(SensorEntity):
     def __init__(self, name: str, entities: list[str]):
         self._attr_name = name
         self._entities = entities
+        self._attr_extra_state_attributes = {
+            ATTR_ENTITIES: self._entities
+        }
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -682,8 +689,9 @@ class GroupedSensor(SensorEntity):
         """Triggered when one of the group entities changes state"""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
+        ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
         summed = sum(
-            float(state.state) for state in states if state.state != STATE_UNAVAILABLE
+            float(state.state) for state in states if state.state not in ignored_states
         )
         self._attr_native_value = round(summed, 2)
         self.async_schedule_update_ha_state(True)
