@@ -274,7 +274,7 @@ async def create_individual_sensors(
             hass, sensor_config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
-        entities_to_add.extend(create_utility_meters(energy_sensor))
+        entities_to_add.extend(create_utility_meters(energy_sensor, sensor_config))
 
     return entities_to_add
 
@@ -305,7 +305,7 @@ def create_group_sensors(
     group_sensors.append(GroupedEnergySensor(name, energy_sensor_ids))
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
-    group_sensors.extend(create_utility_meters(group_energy_sensor))
+    group_sensors.extend(create_utility_meters(group_energy_sensor, sensor_config))
 
     return group_sensors
 
@@ -465,7 +465,7 @@ def create_utility_meters(
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return
-        
+
     meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
     for meter_type in meter_types:
         name = f"{energy_sensor.name} {meter_type}"
