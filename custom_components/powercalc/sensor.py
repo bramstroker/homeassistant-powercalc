@@ -463,16 +463,18 @@ def create_utility_meters(
     """Create the utility meters"""
     utility_meters = []
 
-    if sensor_config.get(CONF_CREATE_UTILITY_METERS):
-        meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
-        for meter_type in meter_types:
-            name = f"{energy_sensor.name} {meter_type}"
-            entity_id = f"{energy_sensor.entity_id}_{meter_type}"
-            _LOGGER.debug("Creating utility_meter sensor: %s", name)
-            utility_meter = VirtualUtilityMeterSensor(
-                energy_sensor.entity_id, name, meter_type, entity_id
-            )
-            utility_meters.append(utility_meter)
+    if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
+        return
+        
+    meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
+    for meter_type in meter_types:
+        name = f"{energy_sensor.name} {meter_type}"
+        entity_id = f"{energy_sensor.entity_id}_{meter_type}"
+        _LOGGER.debug("Creating utility_meter sensor: %s", name)
+        utility_meter = VirtualUtilityMeterSensor(
+            energy_sensor.entity_id, name, meter_type, entity_id
+        )
+        utility_meters.append(utility_meter)
 
     return utility_meters
 
