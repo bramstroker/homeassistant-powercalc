@@ -7,8 +7,9 @@ import logging
 import os
 import shutil
 import time
-from typing import Iterator, NamedTuple, Optional
+from typing import Iterator, Optional
 
+from dataclasses import dataclass, asdict
 from decouple import config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
@@ -55,7 +56,8 @@ LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
 SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
-SLEEP_INITIAL = 10
+SLEEP_INITIAL = 1
+SLEEP_STANDBY = 1
 SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
@@ -120,18 +122,11 @@ class Measure:
 
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
 
+        start_variation = None
         file_write_mode = "w"
-
         if self.should_resume(csv_file_path):
             start_variation = self.get_resume_variation(csv_file_path)
             file_write_mode = "a"
-        else:
-            start_variation = Variation(
-                bri=START_BRIGHTNESS,
-                hue=1,
-                sat=1,
-                ct=self.light_info.min_mired
-            )
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -144,22 +139,23 @@ class Measure:
             time.sleep(SLEEP_INITIAL)
 
             csv_writer.writerow(CSV_HEADERS[self.color_mode])
+            previous_variation = None
             for count, variation in enumerate(self.get_variations(self.color_mode, start_variation)):
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
-                    self.color_mode, on=True, **variation._asdict()
+                    self.color_mode, on=True, **asdict(variation)
                 )
 
-                if previous_variation and variation.ct < previous_variation.ct:
+                if previous_variation and isinstance(variation, ColorTempVariation) and variation.ct < previous_variation.ct:
                     _LOGGER.info("Extra waiting for significant CT change...")
                     time.sleep(SLEEP_TIME_CT)
 
-                if previous_variation and variation.sat < previous_variation.sat:
+                if previous_variation and isinstance(variation, HsVariation) and variation.sat < previous_variation.sat:
                     _LOGGER.info("Extra waiting for significant SAT change...")
                     time.sleep(SLEEP_TIME_SAT)
 
-                if previous_variation and variation.hue < previous_variation.hue:
+                if previous_variation and isinstance(variation, HsVariation) and variation.hue < previous_variation.hue:
                     _LOGGER.info("Extra waiting for significant HUE change...")
                     time.sleep(SLEEP_TIME_HUE)
 
@@ -167,11 +163,12 @@ class Measure:
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
                 _LOGGER.info(f"Measured power: {power}")
-                row = list(variation)
+                row = variation.to_csv_row()
                 row.append(power)
                 csv_writer.writerow(row)
-                if count % CSV_WRITE_BUFFER == 0:
+                if count % CSV_WRITE_BUFFER == 1:
                     csv_file.flush()
+                    _LOGGER.debug("Flushing CSV buffer")
 
             csv_file.close()
 
@@ -199,13 +196,13 @@ class Measure:
             last_row = list(rows)[-1]
 
         if self.color_mode == MODE_BRIGHTNESS:
-            return Variation(bri=last_row[0])
+            return Variation(bri=int(last_row[0]))
 
         if self.color_mode == MODE_COLOR_TEMP:
-            return Variation(bri=last_row[0], ct=last_row[1])
+            return ColorTempVariation(bri=int(last_row[0]), ct=int(last_row[1]))
 
         if self.color_mode == MODE_HS:
-            return Variation(bri=last_row[0], hue=last_row[1], sat=last_row[2])
+            return HsVariation(bri=int(last_row[0]), hue=int(last_row[1]), sat=int(last_row[2]))
 
         raise Exception(f"Color mode {self.color_mode} not supported")
 
@@ -249,14 +246,15 @@ class Measure:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
 
+
     def measure_standby_power(self) -> float:
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
-        _LOGGER.info("Measuring standby power. Waiting for 5 seconds...")
-        time.sleep(5)
+        _LOGGER.info(f"Measuring standby power. Waiting for {SLEEP_STANDBY} seconds...")
+        time.sleep(SLEEP_STANDBY)
         return self.take_power_measurement(start_time)
 
-    def get_variations(self, color_mode: str, start_variation: Optional[Variation]) -> Iterator[Variation]:
+    def get_variations(self, color_mode: str, start_variation: Optional[Variation] = None) -> Iterator[Variation]:
         if color_mode == MODE_HS:
             yield from self.get_hs_variations(start_variation)
         elif color_mode == MODE_COLOR_TEMP:
@@ -264,19 +262,28 @@ class Measure:
         else:
             yield from self.get_brightness_variations(start_variation)
 
-    def get_ct_variations(self, start_variation: Optional[Variation]) -> Iterator[Variation]:
+    def get_ct_variations(self, start_variation: Optional[Variation] = None) -> Iterator[ColorTempVariation]:
+        if start_variation is None:
+            start_variation = ColorTempVariation(bri=START_BRIGHTNESS, ct=1)
+
         max_mired = self.light_info.max_mired
         for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 5):
             for mired in self.inclusive_range(start_variation.ct, max_mired, 10):
-                yield Variation(bri=bri, ct=mired)
+                yield ColorTempVariation(bri=bri, ct=mired)
 
-    def get_hs_variations(self, start_variation: Optional[Variation]) -> Iterator[Variation]:
+    def get_hs_variations(self, start_variation: Optional[Variation] = None) -> Iterator[HsVariation]:
+        if start_variation is None:
+            start_variation = HsVariation(bri=START_BRIGHTNESS, hue=1, sat=1)
+
         for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 10):
             for sat in self.inclusive_range(start_variation.sat, MAX_SAT, 10):
                 for hue in self.inclusive_range(start_variation.hue, MAX_HUE, 2000):
-                    yield Variation(bri=bri, hue=hue, sat=sat)
+                    yield HsVariation(bri=bri, hue=hue, sat=sat)
 
-    def get_brightness_variations(self, start_variation: Optional[Variation]) -> Iterator[Variation]:
+    def get_brightness_variations(self, start_variation: Optional[Variation] = None) -> Iterator[Variation]:
+        if start_variation is None:
+            start_variation = Variation(bri=START_BRIGHTNESS)
+
         for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 1):
             yield Variation(bri=bri)
 
@@ -361,12 +368,36 @@ class Measure:
             + self.power_meter.get_questions()
         )
 
-class Variation(NamedTuple):
+@dataclass(frozen=True)
+class Variation:
     bri: int
-    hue: int | None
-    sat: int | None
-    ct: int | None
 
+    def to_csv_row(self) -> list:
+        return [self.bri]
+
+@dataclass(frozen=True)
+class HsVariation(Variation):
+    hue: int
+    sat: int
+
+    def to_csv_row(self) -> list:
+        return [self.bri, self.hue, self.sat]
+    
+    def is_hue_changed(self, other_variation: HsVariation):
+        return self.hue != other_variation.hue
+    
+    def is_sat_changed(self, other_variation: HsVariation):
+        return self.sat != other_variation.sat
+
+@dataclass(frozen=True)
+class ColorTempVariation(Variation):
+    ct: int
+
+    def to_csv_row(self) -> list:
+        return [self.bri, self.ct]
+    
+    def is_ct_changed(self, other_variation: ColorTempVariation):
+        return self.ct != other_variation.ct
 
 class LightControllerFactory:
     def hass(self):
