@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Final, Optional
+from typing import Any, Final, Optional, Union
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -274,13 +274,7 @@ async def create_individual_sensors(
             hass, sensor_config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
-
-        if sensor_config.get(CONF_CREATE_UTILITY_METERS):
-            meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
-            for meter_type in meter_types:
-                entities_to_add.append(
-                    create_utility_meter_sensor(energy_sensor, meter_type)
-                )
+        entities_to_add.extend(create_utility_meters(energy_sensor))
 
     return entities_to_add
 
@@ -307,8 +301,11 @@ def create_group_sensors(
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
+    group_energy_sensor = GroupedEnergySensor(name, energy_sensor_ids)
     group_sensors.append(GroupedEnergySensor(name, energy_sensor_ids))
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
+
+    group_sensors.extend(create_utility_meters(group_energy_sensor))
 
     return group_sensors
 
@@ -459,16 +456,25 @@ async def create_energy_sensor(
     )
 
 
-def create_utility_meter_sensor(
-    energy_sensor: VirtualEnergySensor, meter_type: str
-) -> VirtualUtilityMeterSensor:
-    """Create the utility meter sensor entity"""
-    name = f"{energy_sensor.name} {meter_type}"
-    entity_id = f"{energy_sensor.entity_id}_{meter_type}"
-    _LOGGER.debug("Creating utility_meter sensor: %s", name)
-    return VirtualUtilityMeterSensor(
-        energy_sensor.entity_id, name, meter_type, entity_id
-    )
+def create_utility_meters(
+    energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor],
+    sensor_config: dict
+) -> list[UtilityMeterSensor]:
+    """Create the utility meters"""
+    utility_meters = []
+
+    if sensor_config.get(CONF_CREATE_UTILITY_METERS):
+        meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
+        for meter_type in meter_types:
+            name = f"{energy_sensor.name} {meter_type}"
+            entity_id = f"{energy_sensor.entity_id}_{meter_type}"
+            _LOGGER.debug("Creating utility_meter sensor: %s", name)
+            utility_meter = VirtualUtilityMeterSensor(
+                energy_sensor.entity_id, name, meter_type, entity_id
+            )
+            utility_meters.append(utility_meter)
+
+    return utility_meters
 
 
 def select_calculation_mode(config: dict) -> Optional[str]:
