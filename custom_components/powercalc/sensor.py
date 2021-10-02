@@ -308,7 +308,7 @@ def create_group_sensors(
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
-    group_energy_sensor = GroupedEnergySensor(name, energy_sensor_ids, hass)
+    group_energy_sensor = GroupedEnergySensor(name, energy_sensor_ids, hass, rounding_digits=4)
     group_sensors.append(group_energy_sensor)
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
@@ -680,10 +680,17 @@ class GroupedSensor(SensorEntity):
 
     _attr_should_poll = False
 
-    def __init__(self, name: str, entities: list[str], hass: HomeAssistantType):
+    def __init__(
+        self,
+        name: str,
+        entities: list[str],
+        hass: HomeAssistantType,
+        rounding_digits: int = 2,
+    ):
         self._attr_name = name
         self._entities = entities
         self._attr_extra_state_attributes = {ATTR_ENTITIES: self._entities}
+        self._rounding_digits = rounding_digits
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
     async def async_added_to_hass(self) -> None:
@@ -699,7 +706,7 @@ class GroupedSensor(SensorEntity):
         summed = sum(
             float(state.state) for state in states if state.state not in ignored_states
         )
-        self._attr_native_value = round(summed, 2)
+        self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
 
 
