@@ -77,7 +77,7 @@ HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
-CSV_WRITE_BUFFER = 100
+CSV_WRITE_BUFFER = 5
 
 logging.basicConfig(
     level=logging.getLevelName(LOG_LEVEL),
@@ -99,11 +99,10 @@ class Measure:
         answers = prompt(self.get_questions())
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
-        self.light_info = self.light_controller.get_light_info()
-
         self.color_mode = answers["color_mode"]
         self.num_lights = int(answers.get("num_lights", 1))
-        _LOGGER.debug(f"num lights: {self.num_lights}")
+
+        self.light_info = self.light_controller.get_light_info()
 
         export_directory = os.path.join(
             os.path.dirname(__file__), "export", self.light_info.model_id
@@ -122,11 +121,13 @@ class Measure:
 
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
 
-        start_variation = None
+        resume_at = None
         file_write_mode = "w"
+        write_header_row = True
         if self.should_resume(csv_file_path):
-            start_variation = self.get_resume_variation(csv_file_path)
+            resume_at = self.get_resume_variation(csv_file_path)
             file_write_mode = "a"
+            write_header_row = False
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = csv.writer(csv_file)
@@ -138,9 +139,10 @@ class Measure:
             _LOGGER.info(f"Waiting {SLEEP_INITIAL} seconds...")
             time.sleep(SLEEP_INITIAL)
 
-            csv_writer.writerow(CSV_HEADERS[self.color_mode])
+            if write_header_row:
+                csv_writer.writerow(CSV_HEADERS[self.color_mode])
             previous_variation = None
-            for count, variation in enumerate(self.get_variations(self.color_mode, start_variation)):
+            for count, variation in enumerate(self.get_variations(self.color_mode, resume_at)):
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
@@ -254,37 +256,42 @@ class Measure:
         time.sleep(SLEEP_STANDBY)
         return self.take_power_measurement(start_time)
 
-    def get_variations(self, color_mode: str, start_variation: Optional[Variation] = None) -> Iterator[Variation]:
+    def get_variations(self, color_mode: str, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
         if color_mode == MODE_HS:
-            yield from self.get_hs_variations(start_variation)
+            variations = self.get_hs_variations()
         elif color_mode == MODE_COLOR_TEMP:
-            yield from self.get_ct_variations(start_variation)
+            variations = self.get_ct_variations()
         else:
-            yield from self.get_brightness_variations(start_variation)
+            variations = self.get_brightness_variations()
+        
+        if resume_at:
+            include_variation = False
+            for variation in variations:
+                if include_variation:
+                    yield variation
 
-    def get_ct_variations(self, start_variation: Optional[Variation] = None) -> Iterator[ColorTempVariation]:
-        if start_variation is None:
-            start_variation = ColorTempVariation(bri=START_BRIGHTNESS, ct=1)
+                # Current variation is the one we need to resume at.
+                # Set include_variation flag so it every variation from now on will be yielded next iteration
+                if variation == resume_at:
+                    include_variation = True
+        else:
+            yield from variations
 
+    def get_ct_variations(self) -> Iterator[ColorTempVariation]:
+        min_mired = self.light_info.min_mired
         max_mired = self.light_info.max_mired
-        for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 5):
-            for mired in self.inclusive_range(start_variation.ct, max_mired, 10):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
+            for mired in self.inclusive_range(min_mired, max_mired, 10):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
-    def get_hs_variations(self, start_variation: Optional[Variation] = None) -> Iterator[HsVariation]:
-        if start_variation is None:
-            start_variation = HsVariation(bri=START_BRIGHTNESS, hue=1, sat=1)
-
-        for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 10):
-            for sat in self.inclusive_range(start_variation.sat, MAX_SAT, 10):
-                for hue in self.inclusive_range(start_variation.hue, MAX_HUE, 2000):
+    def get_hs_variations(self) -> Iterator[HsVariation]:
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
+            for sat in self.inclusive_range(1, MAX_SAT, 10):
+                for hue in self.inclusive_range(1, MAX_HUE, 2000):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
-    def get_brightness_variations(self, start_variation: Optional[Variation] = None) -> Iterator[Variation]:
-        if start_variation is None:
-            start_variation = Variation(bri=START_BRIGHTNESS)
-
-        for bri in self.inclusive_range(start_variation.bri, MAX_BRIGHTNESS, 1):
+    def get_brightness_variations(self) -> Iterator[Variation]:
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
             yield Variation(bri=bri)
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
