@@ -676,9 +676,7 @@ class GroupedSensor(SensorEntity):
     def __init__(self, name: str, entities: list[str]):
         self._attr_name = name
         self._entities = entities
-        self._attr_extra_state_attributes = {
-            ATTR_ENTITIES: self._entities
-        }
+        self._attr_extra_state_attributes = {ATTR_ENTITIES: self._entities}
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""

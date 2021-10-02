@@ -7,9 +7,9 @@ import logging
 import os
 import shutil
 import time
+from dataclasses import asdict, dataclass
 from typing import Iterator, Optional
 
-from dataclasses import dataclass, asdict
 from decouple import config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
