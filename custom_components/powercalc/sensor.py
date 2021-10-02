@@ -324,19 +324,17 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
     for config in configs:
         merged_config.update(config)
 
-    # if not CONF_CREATE_ENERGY_SENSOR in config:
-    #     config[CONF_CREATE_ENERGY_SENSOR] = global_config.get(
-    #         CONF_CREATE_ENERGY_SENSORS
-    #     )
-
-    # config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
-
     if CONF_STANDBY_USAGE in merged_config:
         merged_config[CONF_STANDBY_POWER] = merged_config[CONF_STANDBY_USAGE]
     if CONF_DISABLE_STANDBY_USAGE in merged_config:
         merged_config[CONF_DISABLE_STANDBY_POWER] = merged_config[
             CONF_DISABLE_STANDBY_USAGE
         ]
+
+    if not CONF_CREATE_ENERGY_SENSOR in merged_config:
+        merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
+            CONF_CREATE_ENERGY_SENSORS
+        )
 
     if not CONF_ENTITY_ID in merged_config:
         raise SensorConfigurationError(
