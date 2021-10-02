@@ -1,4 +1,5 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc)
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 
