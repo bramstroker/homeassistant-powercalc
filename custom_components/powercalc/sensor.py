@@ -28,12 +28,12 @@ from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
 )
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     PLATFORM_SCHEMA,
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
     SensorEntity,
-    DOMAIN as SENSOR_DOMAIN
 )
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -208,7 +208,9 @@ async def async_setup_platform(
                 )
                 entities.extend(group_sensors)
         else:
-            merged_sensor_config = get_merged_sensor_configuration(global_config, config)
+            merged_sensor_config = get_merged_sensor_configuration(
+                global_config, config
+            )
             entities.extend(await create_individual_sensors(hass, merged_sensor_config))
     except SensorConfigurationError as err:
         _LOGGER.error(err)
@@ -282,7 +284,10 @@ async def create_individual_sensors(
 
 
 def create_group_sensors(
-    group_name: str, sensor_config: dict, entities: list[SensorEntity], hass: HomeAssistantType
+    group_name: str,
+    sensor_config: dict,
+    entities: list[SensorEntity],
+    hass: HomeAssistantType,
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 
@@ -324,12 +329,14 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
     #         CONF_CREATE_ENERGY_SENSORS
     #     )
 
-    #config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
+    # config[CONF_SCAN_INTERVAL] = global_config.get(CONF_SCAN_INTERVAL)
 
     if CONF_STANDBY_USAGE in merged_config:
         merged_config[CONF_STANDBY_POWER] = merged_config[CONF_STANDBY_USAGE]
     if CONF_DISABLE_STANDBY_USAGE in merged_config:
-        merged_config[CONF_DISABLE_STANDBY_POWER] = merged_config[CONF_DISABLE_STANDBY_USAGE]
+        merged_config[CONF_DISABLE_STANDBY_POWER] = merged_config[
+            CONF_DISABLE_STANDBY_USAGE
+        ]
 
     if not CONF_ENTITY_ID in merged_config:
         raise SensorConfigurationError(
@@ -678,9 +685,7 @@ class GroupedSensor(SensorEntity):
     def __init__(self, name: str, entities: list[str], hass: HomeAssistantType):
         self._attr_name = name
         self._entities = entities
-        self._attr_extra_state_attributes = {
-            ATTR_ENTITIES: self._entities
-        }
+        self._attr_extra_state_attributes = {ATTR_ENTITIES: self._entities}
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
     async def async_added_to_hass(self) -> None:
