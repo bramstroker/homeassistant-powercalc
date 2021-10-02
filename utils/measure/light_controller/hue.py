@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+
 from phue import Bridge, PhueRegistrationException
 
 from .controller import LightController, LightInfo
