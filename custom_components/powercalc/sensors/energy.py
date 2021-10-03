@@ -1,9 +1,8 @@
 from typing import Any
 
+from homeassistant.components.integration.sensor import IntegrationSensor
+
 from custom_components.powercalc.const import ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY
-from homeassistant.components.integration.sensor import (
-    IntegrationSensor,
-)
 
 ENERGY_ICON = "mdi:lightning-bolt"
 

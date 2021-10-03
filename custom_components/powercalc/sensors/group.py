@@ -1,4 +1,3 @@
-from custom_components.powercalc.const import ATTR_ENTITIES
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
@@ -17,6 +16,8 @@ from homeassistant.core import State, callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
+
+from custom_components.powercalc.const import ATTR_ENTITIES
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 

@@ -26,11 +26,7 @@ from homeassistant.components import (
 )
 from homeassistant.components.integration.sensor import TRAPEZOIDAL_METHOD
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import (
-    PLATFORM_SCHEMA,
-    SensorEntity,
-)
-
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
@@ -86,9 +82,9 @@ from .errors import (
 )
 from .migrate import async_migrate_entity_id
 from .model_discovery import get_light_model
-from .sensors.group import GroupedSensor, GroupedEnergySensor, GroupedPowerSensor
-from .sensors.power import VirtualPowerSensor
 from .sensors.energy import VirtualEnergySensor
+from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
+from .sensors.power import VirtualPowerSensor
 from .sensors.utility_meter import VirtualUtilityMeterSensor
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA

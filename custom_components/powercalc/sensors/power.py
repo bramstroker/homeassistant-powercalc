@@ -2,21 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from custom_components.powercalc.const import (
-    ATTR_CALCULATION_MODE,
-    ATTR_INTEGRATION,
-    ATTR_SOURCE_DOMAIN,
-    ATTR_SOURCE_ENTITY,
-    DOMAIN,
-)
-from custom_components.powercalc.strategy_interface import (
-    PowerCalculationStrategyInterface,
-)
-from homeassistant.core import callback
-from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
-    SensorEntity,
-)
+from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
@@ -27,9 +13,21 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
+from homeassistant.core import callback
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
+)
+
+from custom_components.powercalc.const import (
+    ATTR_CALCULATION_MODE,
+    ATTR_INTEGRATION,
+    ATTR_SOURCE_DOMAIN,
+    ATTR_SOURCE_ENTITY,
+    DOMAIN,
+)
+from custom_components.powercalc.strategy_interface import (
+    PowerCalculationStrategyInterface,
 )
 
 OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
