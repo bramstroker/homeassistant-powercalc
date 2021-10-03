@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Union
+
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 

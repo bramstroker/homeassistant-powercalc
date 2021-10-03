@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Any
 
-from homeassistant.components.integration.sensor import IntegrationSensor, TRAPEZOIDAL_METHOD
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
-    CONF_NAME,
-    TIME_HOURS,
+from homeassistant.components.integration.sensor import (
+    TRAPEZOIDAL_METHOD,
+    IntegrationSensor,
 )
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.const import CONF_NAME, TIME_HOURS
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_ENERGY_SENSOR_NAMING,
 )
+from custom_components.powercalc.migrate import async_migrate_entity_id
+
 from .power import VirtualPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
@@ -62,7 +62,7 @@ async def create_energy_sensor(
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )
-    
+
 
 class VirtualEnergySensor(IntegrationSensor):
     """Virtual energy sensor, totalling kWh"""

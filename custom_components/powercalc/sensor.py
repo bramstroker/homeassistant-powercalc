@@ -27,11 +27,7 @@ from homeassistant.components import (
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.const import (
-    CONF_ENTITIES,
-    CONF_ENTITY_ID,
-    CONF_NAME,
-)
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import split_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
@@ -65,13 +61,10 @@ from .const import (
     DOMAIN,
     DOMAIN_CONFIG,
 )
-from .errors import (
-    PowercalcSetupError,
-    SensorConfigurationError,
-)
-from .sensors.energy import create_energy_sensor, VirtualEnergySensor
+from .errors import PowercalcSetupError, SensorConfigurationError
+from .sensors.energy import VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import create_power_sensor, VirtualPowerSensor
+from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -305,4 +298,3 @@ def create_group_sensors(
     group_sensors.extend(create_utility_meters(group_energy_sensor, sensor_config))
 
     return group_sensors
-

@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Optional
+
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
+    CONF_NAME,
+    CONF_SCAN_INTERVAL,
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
-    CONF_NAME,
-    CONF_SCAN_INTERVAL,
     STATE_NOT_HOME,
     STATE_OFF,
     STATE_STANDBY,
