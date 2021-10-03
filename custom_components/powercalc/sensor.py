@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Final, Optional, Union
+from typing import Final
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -24,20 +24,15 @@ from homeassistant.components import (
     vacuum,
     water_heater,
 )
-from homeassistant.components.integration.sensor import TRAPEZOIDAL_METHOD
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_SCAN_INTERVAL,
-    TIME_HOURS,
 )
 from homeassistant.core import split_entity_id
-from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
     ConfigType,
@@ -67,25 +62,17 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
-    DATA_CALCULATOR_FACTORY,
     DOMAIN,
     DOMAIN_CONFIG,
-    MODE_FIXED,
-    MODE_LINEAR,
 )
 from .errors import (
-    ModelNotSupported,
     PowercalcSetupError,
     SensorConfigurationError,
-    StrategyConfigurationError,
-    UnsupportedMode,
 )
-from .migrate import async_migrate_entity_id
-from .model_discovery import get_light_model
-from .sensors.energy import VirtualEnergySensor
+from .sensors.energy import create_energy_sensor, VirtualEnergySensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import VirtualPowerSensor
-from .sensors.utility_meter import VirtualUtilityMeterSensor
+from .sensors.power import create_power_sensor, VirtualPowerSensor
+from .sensors.utility_meter import create_utility_meters
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
@@ -319,158 +306,3 @@ def create_group_sensors(
 
     return group_sensors
 
-
-async def create_power_sensor(
-    hass: HomeAssistantType,
-    sensor_config: dict,
-    source_entity: SourceEntity,
-) -> VirtualPowerSensor:
-    """Create the power sensor entity"""
-    calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
-
-    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
-    name = sensor_config.get(CONF_NAME) or source_entity.name
-    name = name_pattern.format(name)
-    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
-    entity_id = async_generate_entity_id(
-        ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
-    )
-
-    if source_entity.unique_id:
-        async_migrate_entity_id(hass, "sensor", source_entity.unique_id, entity_id)
-
-    light_model = None
-    try:
-        mode = select_calculation_mode(sensor_config)
-        if (
-            sensor_config.get(CONF_LINEAR) is None
-            and sensor_config.get(CONF_FIXED) is None
-        ):
-            light_model = await get_light_model(hass, source_entity, sensor_config)
-            if mode is None and light_model:
-                mode = light_model.supported_modes[0]
-
-        if mode is None:
-            raise UnsupportedMode(
-                "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
-            )
-
-        calculation_strategy = calculation_strategy_factory.create(
-            sensor_config, mode, light_model, source_entity.domain
-        )
-        await calculation_strategy.validate_config(source_entity)
-    except (ModelNotSupported, UnsupportedMode) as err:
-        _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
-        raise err
-    except StrategyConfigurationError as err:
-        _LOGGER.error(
-            "Error setting up calculation strategy for %s: %s",
-            source_entity.entity_id,
-            err,
-        )
-        raise err
-
-    standby_power = None
-    if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        standby_power = sensor_config.get(CONF_STANDBY_POWER)
-        if standby_power is None and light_model is not None:
-            standby_power = light_model.standby_power
-
-    _LOGGER.debug(
-        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
-        source_entity.entity_id,
-        name,
-        calculation_strategy.__class__.__name__,
-        light_model.manufacturer if light_model else "",
-        light_model.model if light_model else "",
-        standby_power,
-        source_entity.unique_id,
-    )
-
-    return VirtualPowerSensor(
-        power_calculator=calculation_strategy,
-        calculation_mode=mode,
-        entity_id=entity_id,
-        name=name,
-        source_entity=source_entity.entity_id,
-        source_domain=source_entity.domain,
-        unique_id=source_entity.unique_id,
-        standby_power=standby_power,
-        scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
-        multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
-        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
-    )
-
-
-async def create_energy_sensor(
-    hass: HomeAssistantType,
-    sensor_config: dict,
-    power_sensor: VirtualPowerSensor,
-    source_entity: SourceEntity,
-) -> VirtualEnergySensor:
-    """Create the energy sensor entity"""
-
-    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
-    name = sensor_config.get(CONF_NAME) or source_entity.name
-    name = name_pattern.format(name)
-    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
-    entity_id = async_generate_entity_id(
-        ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
-    )
-    unique_id = None
-    if source_entity.unique_id:
-        unique_id = f"{source_entity.unique_id}_energy"
-        async_migrate_entity_id(hass, "sensor", unique_id, entity_id)
-
-    _LOGGER.debug("Creating energy sensor: %s", name)
-    return VirtualEnergySensor(
-        source_entity=power_sensor.entity_id,
-        unique_id=unique_id,
-        entity_id=entity_id,
-        name=name,
-        round_digits=4,
-        unit_prefix="k",
-        unit_of_measurement=None,
-        unit_time=TIME_HOURS,
-        integration_method=TRAPEZOIDAL_METHOD,
-        powercalc_source_entity=source_entity.entity_id,
-        powercalc_source_domain=source_entity.domain,
-    )
-
-
-def create_utility_meters(
-    energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor],
-    sensor_config: dict,
-) -> list[UtilityMeterSensor]:
-    """Create the utility meters"""
-    utility_meters = []
-
-    if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
-        return []
-
-    meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
-    for meter_type in meter_types:
-        name = f"{energy_sensor.name} {meter_type}"
-        entity_id = f"{energy_sensor.entity_id}_{meter_type}"
-        _LOGGER.debug("Creating utility_meter sensor: %s", name)
-        utility_meter = VirtualUtilityMeterSensor(
-            energy_sensor.entity_id, name, meter_type, entity_id
-        )
-        utility_meters.append(utility_meter)
-
-    return utility_meters
-
-
-def select_calculation_mode(config: dict) -> Optional[str]:
-    """Select the calculation mode"""
-    config_mode = config.get(CONF_MODE)
-    if config_mode:
-        return config_mode
-
-    if config.get(CONF_LINEAR):
-        return MODE_LINEAR
-
-    if config.get(CONF_FIXED):
-        return MODE_FIXED
-
-    return None

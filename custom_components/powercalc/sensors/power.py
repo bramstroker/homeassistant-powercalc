@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import logging
 
+from typing import Optional
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
+    CONF_NAME,
+    CONF_SCAN_INTERVAL,
     STATE_NOT_HOME,
     STATE_OFF,
     STATE_STANDBY,
@@ -14,25 +18,144 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import callback
+from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
+from homeassistant.helpers.typing import HomeAssistantType
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_DISABLE_STANDBY_POWER,
+    CONF_FIXED,
+    CONF_LINEAR,
+    CONF_MODE,
+    CONF_MULTIPLY_FACTOR,
+    CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_POWER_SENSOR_NAMING,
+    CONF_STANDBY_POWER,
+    DATA_CALCULATOR_FACTORY,
     DOMAIN,
+    MODE_FIXED,
+    MODE_LINEAR,
 )
+from custom_components.powercalc.errors import (
+    ModelNotSupported,
+    StrategyConfigurationError,
+    UnsupportedMode,
+)
+from custom_components.powercalc.migrate import async_migrate_entity_id
+from custom_components.powercalc.model_discovery import get_light_model
 from custom_components.powercalc.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 
+ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
 
 _LOGGER = logging.getLogger(__name__)
+
+
+async def create_power_sensor(
+    hass: HomeAssistantType,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+) -> VirtualPowerSensor:
+    """Create the power sensor entity"""
+    calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+
+    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
+    name = sensor_config.get(CONF_NAME) or source_entity.name
+    name = name_pattern.format(name)
+    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
+    entity_id = async_generate_entity_id(
+        ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
+    )
+
+    if source_entity.unique_id:
+        async_migrate_entity_id(hass, "sensor", source_entity.unique_id, entity_id)
+
+    light_model = None
+    try:
+        mode = select_calculation_mode(sensor_config)
+        if (
+            sensor_config.get(CONF_LINEAR) is None
+            and sensor_config.get(CONF_FIXED) is None
+        ):
+            light_model = await get_light_model(hass, source_entity, sensor_config)
+            if mode is None and light_model:
+                mode = light_model.supported_modes[0]
+
+        if mode is None:
+            raise UnsupportedMode(
+                "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
+            )
+
+        calculation_strategy = calculation_strategy_factory.create(
+            sensor_config, mode, light_model, source_entity.domain
+        )
+        await calculation_strategy.validate_config(source_entity)
+    except (ModelNotSupported, UnsupportedMode) as err:
+        _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
+        raise err
+    except StrategyConfigurationError as err:
+        _LOGGER.error(
+            "Error setting up calculation strategy for %s: %s",
+            source_entity.entity_id,
+            err,
+        )
+        raise err
+
+    standby_power = None
+    if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
+        standby_power = sensor_config.get(CONF_STANDBY_POWER)
+        if standby_power is None and light_model is not None:
+            standby_power = light_model.standby_power
+
+    _LOGGER.debug(
+        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
+        source_entity.entity_id,
+        name,
+        calculation_strategy.__class__.__name__,
+        light_model.manufacturer if light_model else "",
+        light_model.model if light_model else "",
+        standby_power,
+        source_entity.unique_id,
+    )
+
+    return VirtualPowerSensor(
+        power_calculator=calculation_strategy,
+        calculation_mode=mode,
+        entity_id=entity_id,
+        name=name,
+        source_entity=source_entity.entity_id,
+        source_domain=source_entity.domain,
+        unique_id=source_entity.unique_id,
+        standby_power=standby_power,
+        scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
+        multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
+        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
+    )
+
+
+def select_calculation_mode(config: dict) -> Optional[str]:
+    """Select the calculation mode"""
+    config_mode = config.get(CONF_MODE)
+    if config_mode:
+        return config_mode
+
+    if config.get(CONF_LINEAR):
+        return MODE_LINEAR
+
+    if config.get(CONF_FIXED):
+        return MODE_FIXED
+
+    return None
 
 
 class VirtualPowerSensor(SensorEntity):
