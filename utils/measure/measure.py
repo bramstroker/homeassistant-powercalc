@@ -67,6 +67,7 @@ MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
 
 SHELLY_IP = config("SHELLY_IP")
+SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
 TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
 TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
 TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
@@ -431,7 +432,7 @@ class PowerMeterFactory:
         return KasaPowerMeter(KASA_DEVICE_IP)
 
     def shelly(self):
-        return ShellyPowerMeter(SHELLY_IP)
+        return ShellyPowerMeter(SHELLY_IP, SHELLY_TIMEOUT)
 
     def tasmota(self):
         return TasmotaPowerMeter(TASMOTA_DEVICE_IP)
