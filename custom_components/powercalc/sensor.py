@@ -442,6 +442,7 @@ async def create_energy_sensor(
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
+    unique_id = None
     if source_entity.unique_id:
         unique_id = f"{source_entity.unique_id}_energy"
         async_migrate_entity_id(hass, "sensor", unique_id, entity_id)
