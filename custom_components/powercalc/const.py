@@ -33,6 +33,12 @@ CONF_DISABLE_STANDBY_USAGE = "disable_standby_usage"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
 
+ATTR_CALCULATION_MODE = "calculation_mode"
+ATTR_ENTITIES = "entities"
+ATTR_INTEGRATION = "integration"
+ATTR_SOURCE_ENTITY = "source_entity"
+ATTR_SOURCE_DOMAIN = "source_domain"
+
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
