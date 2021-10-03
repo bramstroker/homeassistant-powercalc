@@ -103,6 +103,7 @@ from .errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
+from .migrate import async_migrate_entity_id, async_migrate_unique_id
 from .model_discovery import get_light_model
 from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -360,6 +361,9 @@ async def create_power_sensor(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
 
+    if source_entity.unique_id:
+        async_migrate_entity_id(hass, "sensor", source_entity.unique_id, entity_id)
+
     light_model = None
     try:
         mode = select_calculation_mode(sensor_config)
@@ -438,11 +442,15 @@ async def create_energy_sensor(
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
+    unique_id = None
+    if source_entity.unique_id:
+        unique_id = f"{source_entity.unique_id}_energy"
+        async_migrate_entity_id(hass, "sensor", unique_id, entity_id)
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
         source_entity=power_sensor.entity_id,
-        unique_id=source_entity.unique_id,
+        unique_id=unique_id,
         entity_id=entity_id,
         name=name,
         round_digits=4,
@@ -652,7 +660,7 @@ class VirtualEnergySensor(IntegrationSensor):
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
         if unique_id:
-            self._attr_unique_id = f"{unique_id}_energy"
+            self._attr_unique_id = unique_id
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
