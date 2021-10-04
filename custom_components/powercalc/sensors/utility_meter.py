@@ -35,7 +35,7 @@ def create_utility_meters(
         _LOGGER.debug("Creating utility_meter sensor: %s", name)
         if AwesomeVersion(__version__) >= AwesomeVersion("2021.10.0"):
             utility_meter = UtilityMeterSensor(
-                parent_entity=entity_id,
+                parent_meter=entity_id,
                 source_entity=energy_sensor.entity_id,
                 name=name,
                 meter_type=meter_type,
