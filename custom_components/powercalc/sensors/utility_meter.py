@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
+from awesomeversion import AwesomeVersion
 from typing import Union
 
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
+from homeassistant.const import __version__
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -31,9 +33,19 @@ def create_utility_meters(
         name = f"{energy_sensor.name} {meter_type}"
         entity_id = f"{energy_sensor.entity_id}_{meter_type}"
         _LOGGER.debug("Creating utility_meter sensor: %s", name)
-        utility_meter = VirtualUtilityMeterSensor(
-            energy_sensor.entity_id, name, meter_type, entity_id
-        )
+        if AwesomeVersion(__version__) >= AwesomeVersion("2021.10.0"):
+            utility_meter = UtilityMeterSensor(
+                parent_entity=entity_id,
+                source_entity=energy_sensor.entity_id,
+                name=name,
+                meter_type=meter_type,
+                meter_offset=DEFAULT_OFFSET,
+                net_consumption=False
+            )
+        else:
+            utility_meter = VirtualUtilityMeterSensor(
+                energy_sensor.entity_id, name, meter_type, entity_id
+            )
         utility_meters.append(utility_meter)
 
     return utility_meters
