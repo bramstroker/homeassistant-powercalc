@@ -1,0 +1,9 @@
+{
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "name": "Hue bloom",
+    "standby_power": 1.21,
+    "supported_modes": [
+        "lut"
+    ]
+}
