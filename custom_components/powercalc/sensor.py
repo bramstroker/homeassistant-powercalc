@@ -259,7 +259,7 @@ async def create_individual_sensors(
             hass, sensor_config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
-        entities_to_add.extend(create_utility_meters(energy_sensor, sensor_config))
+        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config))
 
     return entities_to_add
 

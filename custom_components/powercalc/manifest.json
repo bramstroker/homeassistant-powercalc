@@ -9,11 +9,11 @@
     "switch",
     "binary_sensor",
     "light",
-    "template"
+    "template",
+    "utility_meter"
   ],
   "after_dependencies": [
-    "integration",
-    "utility_meter"
+    "integration"
   ],
   "codeowners": ["@bramstroker"],
   "requirements": ["numpy>=1.21.1"],
