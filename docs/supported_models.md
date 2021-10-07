@@ -36,6 +36,7 @@
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                            |lut              |hs           |
 |signify      |LLC012                   |Hue bloom                                                 |lut              |hs           |
 |signify      |LLC020                   |Hue Go                                                    |lut              |hs,color_temp|
+|signify      |LST001                   |Hue lightstrip                                            |lut              |hs           |
 |signify      |LST002                   |Hue LightStrip Plus (2m)                                  |lut              |hs,color_temp|
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)  |lut              |hs,color_temp|
 |signify      |LTA001                   |Hue White Ambiance E27                                    |lut              |color_temp   |
