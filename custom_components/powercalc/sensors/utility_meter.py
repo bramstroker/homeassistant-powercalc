@@ -55,6 +55,8 @@ def create_utility_meters(
                 energy_sensor.entity_id, name, meter_type, entity_id
             )
         else:
+            if not DATA_UTILITY in hass.data:
+                hass.data[DATA_UTILITY] = {}
             hass.data[DATA_UTILITY][entity_id] = {
                 CONF_SOURCE_SENSOR: energy_sensor.entity_id,
                 CONF_METER_TYPE: meter_type,
