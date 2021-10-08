@@ -1,0 +1,14 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2
+    },
+    "name": "Hue Lily Outdoor Spot Light RGBCCT",
+    "standby_power": 0.36,
+    "supported_modes": [
+        "lut"
+    ]
+}
