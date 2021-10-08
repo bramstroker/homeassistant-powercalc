@@ -22,7 +22,7 @@
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT             |lut              |hs,color_temp|
 |signify      |LCF002                   |Hue Calla Outdoor Pedestal                                |lut              |hs,color_temp|
 |signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                      |lut              |hs,color_temp|
-|signify      |LCS001                   |Hue outdoor spot                                          |lut              |hs           |
+|signify      |LCS001                   |Hue Lily Outdoor Spot Light RGBCCT                        |lut              |hs           |
 |signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)              |lut              |hs,color_temp|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                    |lut              |hs,color_temp|
 |signify      |LCT007                   |Hue White and Color E27 Gen2 (2015)                       |lut              |hs,color_temp|
@@ -34,15 +34,15 @@
 |signify      |LLC001                   |Philips Living Color Iris                                 |lut              |hs           |
 |signify      |LLC010                   |Hue Iris                                                  |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                            |lut              |hs           |
-|signify      |LLC012                   |Hue bloom                                                 |lut              |hs           |
+|signify      |LLC012                   |Hue Bloom Table Lamp                                      |lut              |hs           |
 |signify      |LLC020                   |Hue Go                                                    |lut              |hs,color_temp|
-|signify      |LST001                   |Hue lightstrip                                            |lut              |hs           |
+|signify      |LST001                   |Hue LightStrip                                            |lut              |hs           |
 |signify      |LST002                   |Hue LightStrip Plus (2m)                                  |lut              |hs,color_temp|
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)  |lut              |hs,color_temp|
 |signify      |LTA001                   |Hue White Ambiance E27                                    |lut              |color_temp   |
 |signify      |LTC001                   |Hue Being Ceiling Light                                   |lut              |color_temp   |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                     |lut              |color_temp   |
-|signify      |LTG002                   |Hue ambiance spot                                         |lut              |color_temp   |
+|signify      |LTG002                   |Hue White Ambiance GU10 w/ BT                             |lut              |color_temp   |
 |signify      |LTP003                   |Hue Fair Pendant                                          |lut              |color_temp   |
 |signify      |LTW001                   |Hue White Ambiance A19                                    |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A              |lut              |color_temp   |
