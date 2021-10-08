@@ -51,18 +51,6 @@ def create_utility_meters(
 
         # Below is for BC purposes. Can be removed somewhere in the future
         if AwesomeVersion(__short_version__) < "2021.10":
-            
-
-            # hass.async_create_task(
-            #     discovery.async_load_platform(
-            #         hass,
-            #         SENSOR_DOMAIN,
-            #         UTILITY_DOMAIN,
-            #         [{CONF_METER: energy_sensor.entity_id, CONF_NAME: name}],
-            #         config,
-            #     )
-            # )
-
             utility_meter = VirtualUtilityMeterSensor(
                 energy_sensor.entity_id, name, meter_type, entity_id
             )
