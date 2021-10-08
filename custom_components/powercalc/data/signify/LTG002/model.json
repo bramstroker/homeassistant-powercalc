@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2
     },
     "name": "Hue White Ambiance GU10 w/ BT",
-    "standby_power": 1.08,
+    "standby_power": 0.3,
     "supported_modes": [
         "lut"
     ]
