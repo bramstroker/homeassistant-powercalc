@@ -6,7 +6,7 @@
         "SAMPLE_COUNT": 1,
         "SLEEP_TIME": 2
     },
-    "name": "Hue outdoor spot",
+    "name": "Hue Lily Outdoor Spot Light RGBCCT",
     "standby_power": 0.47,
     "supported_modes": [
         "lut"

@@ -6,7 +6,7 @@
         "SAMPLE_COUNT": 1,
         "SLEEP_TIME": 2
     },
-    "name": "Hue ambiance spot",
+    "name": "Hue White Ambiance GU10 w/ BT",
     "standby_power": 1.08,
     "supported_modes": [
         "lut"
