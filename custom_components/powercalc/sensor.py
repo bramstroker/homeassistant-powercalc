@@ -295,6 +295,6 @@ def create_group_sensors(
     group_sensors.append(group_energy_sensor)
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
-    group_sensors.extend(create_utility_meters(group_energy_sensor, sensor_config))
+    group_sensors.extend(create_utility_meters(hass, group_energy_sensor, sensor_config))
 
     return group_sensors
