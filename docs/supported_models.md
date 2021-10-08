@@ -22,7 +22,7 @@
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT             |lut              |hs,color_temp|
 |signify      |LCF002                   |Hue Calla Outdoor Pedestal                                |lut              |hs,color_temp|
 |signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                      |lut              |hs,color_temp|
-|signify      |LCS001                   |Hue Lily Outdoor Spot Light RGBCCT                        |lut              |hs           |
+|signify      |LCS001                   |Hue Lily Outdoor Spot Light RGBCCT                        |lut              |hs,color_temp|
 |signify      |LCT001                   |Philips Hue White and Color Ambience (1 gen)              |lut              |hs,color_temp|
 |signify      |LCT003                   |Hue White and Color Ambiance Spot GU10                    |lut              |hs,color_temp|
 |signify      |LCT007                   |Hue White and Color E27 Gen2 (2015)                       |lut              |hs,color_temp|
