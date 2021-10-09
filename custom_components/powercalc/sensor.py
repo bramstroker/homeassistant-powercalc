@@ -259,7 +259,7 @@ async def create_individual_sensors(
             hass, sensor_config, power_sensor, source_entity
         )
         entities_to_add.append(energy_sensor)
-        entities_to_add.extend(create_utility_meters(energy_sensor, sensor_config))
+        entities_to_add.extend(create_utility_meters(hass, energy_sensor, sensor_config))
 
     return entities_to_add
 
@@ -295,6 +295,6 @@ def create_group_sensors(
     group_sensors.append(group_energy_sensor)
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
-    group_sensors.extend(create_utility_meters(group_energy_sensor, sensor_config))
+    group_sensors.extend(create_utility_meters(hass, group_energy_sensor, sensor_config))
 
     return group_sensors

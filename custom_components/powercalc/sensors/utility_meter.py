@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 import logging
+from awesomeversion import AwesomeVersion
 from typing import Union
 
-from awesomeversion import AwesomeVersion
-from homeassistant.components.utility_meter import DEFAULT_OFFSET
+from homeassistant.helpers import discovery
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.utility_meter import DOMAIN as UTILITY_DOMAIN
+from homeassistant.components.utility_meter import (
+    DEFAULT_OFFSET,
+)
+from homeassistant.components.utility_meter.const import (
+    CONF_METER_NET_CONSUMPTION,
+    DATA_UTILITY,
+    DATA_TARIFF_SENSORS,
+    CONF_METER_TYPE,
+    CONF_SOURCE_SENSOR,
+    CONF_TARIFFS
+)
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
 
@@ -14,11 +27,13 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from custom_components.powercalc.sensors.group import GroupedEnergySensor
+from homeassistant.helpers.typing import HomeAssistantType
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def create_utility_meters(
+    hass: HomeAssistantType,
     energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor],
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
@@ -40,14 +55,27 @@ def create_utility_meters(
                 energy_sensor.entity_id, name, meter_type, entity_id
             )
         else:
+            if not DATA_UTILITY in hass.data:
+                hass.data[DATA_UTILITY] = {}
+            hass.data[DATA_UTILITY][entity_id] = {
+                CONF_SOURCE_SENSOR: energy_sensor.entity_id,
+                CONF_METER_TYPE: meter_type,
+                CONF_TARIFFS: [],
+                CONF_METER_NET_CONSUMPTION: False
+            }
+
             utility_meter = UtilityMeterSensor(
                 parent_meter=entity_id,
                 source_entity=energy_sensor.entity_id,
                 name=name,
                 meter_type=meter_type,
                 meter_offset=DEFAULT_OFFSET,
-                net_consumption=False,
+                net_consumption=False
             )
+
+            hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [
+                utility_meter
+            ]
         utility_meters.append(utility_meter)
 
     return utility_meters
