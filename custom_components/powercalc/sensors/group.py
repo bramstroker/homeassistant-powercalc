@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
