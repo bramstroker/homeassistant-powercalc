@@ -71,7 +71,5 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
         "TRADFRI bulb E27 WW 806lm": "LED1836G9",
     },
-    "Signify Netherlands B.V.": {
-        "440400982841": "LCT024"
-    }
+    "Signify Netherlands B.V.": {"440400982841": "LCT024"},
 }

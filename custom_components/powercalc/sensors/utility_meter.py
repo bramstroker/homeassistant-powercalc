@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-from awesomeversion import AwesomeVersion
 from typing import Union
 
+from awesomeversion import AwesomeVersion
 from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
@@ -46,7 +46,7 @@ def create_utility_meters(
                 name=name,
                 meter_type=meter_type,
                 meter_offset=DEFAULT_OFFSET,
-                net_consumption=False
+                net_consumption=False,
             )
         utility_meters.append(utility_meter)
 
