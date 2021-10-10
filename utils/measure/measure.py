@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import shutil
+import sys
 import time
 from dataclasses import asdict, dataclass
 from typing import Iterator, Optional
@@ -47,7 +48,11 @@ POWER_METERS = [
     POWER_METER_TUYA,
 ]
 
-SELECTED_POWER_METER = config("POWER_METER")
+NOT_DEFINED="Not defined"
+SELECTED_POWER_METER = config("POWER_METER","Not defined")
+if SELECTED_POWER_METER == NOT_DEFINED:
+    print("*** ERROR: You need to setup '.env' from '.env.dist' with a POWER_METER.  See README.md ***\n")
+    sys.exit(-1)
 
 LIGHT_CONTROLLER_HUE = "hue"
 LIGHT_CONTROLLER_HASS = "hass"
