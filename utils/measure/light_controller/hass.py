@@ -16,9 +16,6 @@ class HassLightController(LightController):
         except Exception as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
-        self._api_url = api_url
-        self._auth_header = {"Authorization": "Bearer " + token}
-
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         if on == False:
             self.client.trigger_service('light', 'turn_off', entity_id=self._entity_id)
@@ -32,7 +29,6 @@ class HassLightController(LightController):
             json = self.build_bri_json_body(**kwargs)
 
         self.client.trigger_service('light', 'turn_on', **json)
-        self.call_ha_service(TURN_ON_ENDPOINT, json)
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(self._entity_id)
