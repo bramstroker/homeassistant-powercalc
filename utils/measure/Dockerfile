@@ -7,6 +7,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY . .
+# Not copying local dir, export local dir to container.
+#COPY . .
 
 CMD [ "python3", "measure.py"]

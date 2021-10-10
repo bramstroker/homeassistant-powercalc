@@ -49,7 +49,7 @@ POWER_METERS = [
 ]
 
 NOT_DEFINED="Not defined"
-SELECTED_POWER_METER = config("POWER_METER","Not defined")
+SELECTED_POWER_METER = config("POWER_METER",NOT_DEFINED)
 if SELECTED_POWER_METER == NOT_DEFINED:
     print("*** ERROR: You need to setup '.env' from '.env.dist' with a POWER_METER.  See README.md ***\n")
     sys.exit(-1)
