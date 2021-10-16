@@ -329,9 +329,10 @@ Depending on the supported color modes of the light the integration expects one 
  - color_temp.csv.gz (color temperature)
  - brightness.csv.gz (brightness only lights)
 
-Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
+Some lights support two color modes (both hs and color_temp), so there must be two CSV files. 
+For lights that use only hs, color_temp file is needed as well..
 
-The files are gzipped to keep the repository footprint small, and installation fast.
+The files are gzipped to keep the repository footprint small, and installation fast but is not mandatory.
 
 Example:
 
