@@ -1,0 +1,14 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 4,
+        "SLEEP_TIME": 2
+    },
+    "name": "RB 285 C 806lm E27 RGBW",
+    "standby_power": 0.4,
+    "supported_modes": [
+        "lut"
+    ]
+}
