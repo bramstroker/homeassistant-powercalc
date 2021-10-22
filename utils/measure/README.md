@@ -36,6 +36,10 @@ The script will ask you a few questions, than proceed taking measurements.
 
 `docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest`
 
+To update to the latest version of the script:
+
+`docker pull bramgerritsen/powercalc-measure`
+
 ## More information about measuring
 
 See the WIKI article for further documentation https://github.com/bramstroker/homeassistant-powercalc/wiki/Contributing-new-lights
