@@ -13,6 +13,7 @@
 |ikea         |LED1836G9                |TRADFRI bulb E27 WW 806lm                                 |lut              |brightness   |
 |ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                                |lut              |brightness   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming       |lut              |brightness   |
+|innr         |RB 285 C                 |RB285C E27 806lm RGBW                                     |lut              |hs,color_temp|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                    |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                      |lut              |color_temp   |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                      |lut              |color_temp   |
@@ -56,6 +57,7 @@
 |signify      |LWG001                   |Hue White GU10                                            |lut              |brightness   |
 |signify      |LWG004                   |Hue White GU10 Bluetooth                                  |lut              |brightness   |
 |signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                     |lut              |brightness   |
+|signify      |LWO003                   |Hue White Filament Bulb G125 E27 w/ BT                    |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                          |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature              |lut              |color_temp   |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                          |lut              |brightness   |
