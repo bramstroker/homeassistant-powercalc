@@ -21,11 +21,23 @@ class HassPowerMeter(PowerMeter):
     def get_questions(self) -> list[dict]:
         return [
             {
-                "type": "input",
+                "type": "list",
                 "name": "powermeter_entity_id",
-                "message": "Specify the entity_id of your powermeter in HA? Ex: sensor.fibaro_fgwp102_power",
-            }
+                "message": "Select the powermeter?",
+                "choices": self.get_power_sensors(),
+            },
         ]
+
+    def get_power_sensors(self) -> list[str]:
+        entities = self.client.get_entities()
+        sensors = entities["sensor"].entities.values()
+        power_sensors = [
+            entity.entity_id for entity in sensors if 
+            hasattr(entity.state, 'attributes') and 
+            hasattr(entity.state.attributes, 'unit_of_measurement') and 
+            entity.state.attributes['unit_of_measurement'] == "W"
+        ]
+        return sorted(power_sensors)
 
     def process_answers(self, answers):
         self._entity_id = answers["powermeter_entity_id"]
