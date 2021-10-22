@@ -34,7 +34,7 @@ The script will ask you a few questions, than proceed taking measurements.
 
 ## Run with docker
 
-`docker run --rm --name=measure -env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest`
+`docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest`
 
 ## More information about measuring
 
