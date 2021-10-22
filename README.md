@@ -331,7 +331,7 @@ Depending on the supported color modes of the light the integration expects one 
 
 Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
 
-The files are gzipped to keep the repository footprint small, and installation fast.
+The files are gzipped to keep the repository footprint small, and installation fast but gzipping files is not mandatory.
 
 Example:
 
