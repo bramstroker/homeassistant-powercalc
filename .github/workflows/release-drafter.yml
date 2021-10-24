@@ -21,7 +21,7 @@ jobs:
       - id: fetch-latest-release
         uses: gregziegan/fetch-latest-release@v2.0.0
         with:
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Dump latest release
         env:
           LATEST_RELEASE: ${{ steps.latest.outputs.tag_name }}
