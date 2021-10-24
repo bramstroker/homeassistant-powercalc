@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import shutil
+import sys
 import time
 from dataclasses import asdict, dataclass
 from typing import Iterator, Optional
@@ -84,12 +85,15 @@ logging.basicConfig(
     level=logging.getLevelName(LOG_LEVEL),
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("measure.log"),
+        logging.FileHandler(os.path.join(sys.path[0], "measure.log")),
         logging.StreamHandler()
     ]
 )
 
 _LOGGER = logging.getLogger("measure")
+
+with open(os.path.join(sys.path[0], ".VERSION"), "r") as f:
+    _VERSION = f.read().strip()
 
 class Measure:
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
@@ -458,6 +462,8 @@ class PowerMeterFactory:
         return factory()
 
 def main():
+    print(f"Powercalc measure: {_VERSION}\n")
+
     light_controller_factory = LightControllerFactory()
     power_meter_factory = PowerMeterFactory()
 
