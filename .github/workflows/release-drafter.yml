@@ -19,10 +19,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: fetch-latest-release
-        uses: gregziegan/fetch-latest-release@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        name: Fetch latest release
+        uses: reloc8/action-latest-release-version@1.0.0
       - name: Dump latest release
         env:
-          LATEST_RELEASE: ${{ steps.latest.outputs.tag_name }}
+          LATEST_RELEASE: ${{ steps.fetch-latest-release.outputs.latest-release }}
         run: echo "$LATEST_RELEASE"
