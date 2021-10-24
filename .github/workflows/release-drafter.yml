@@ -18,3 +18,11 @@ jobs:
           disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: fetch-latest-release
+        uses: thebritican/fetch-latest-release@v1
+        with:
+          github_token: ${{ github.token }}
+      - name: Dump latest release
+        env:
+          LATEST_RELEASE: ${{ steps.latest.outputs.tag_name }}
+        run: echo "$LATEST_RELEASE"
