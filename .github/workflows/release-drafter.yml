@@ -12,6 +12,10 @@ jobs:
     name: Update release draft
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create Release
         uses: release-drafter/release-drafter@v5
         with:
