@@ -25,7 +25,8 @@ jobs:
           myToken: ${{ secrets.GITHUB_TOKEN }}
           exclude_types: "release"
           view_top: 1
-      - name: Dump latest release
-        env:
-          LATEST_RELEASE: ${{ steps.last_release.outputs.tag_name }}
-        run: echo "$LATEST_RELEASE"
+      - name: Write version file
+        uses: brettdorrans/write-version-to-file@master
+        with:
+          filename: '/utils/measure/.VERSION'
+          placeholder: '${{ steps.last_release.outputs.tag_name }}'
