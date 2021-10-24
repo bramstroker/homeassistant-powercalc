@@ -19,7 +19,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: fetch-latest-release
-        uses: thebritican/fetch-latest-release@v1
+        uses: thebritican/fetch-latest-release@v2
         with:
           github_token: ${{ github.token }}
       - name: Dump latest release
