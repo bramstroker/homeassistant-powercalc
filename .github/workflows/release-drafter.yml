@@ -18,7 +18,7 @@ jobs:
           disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - id: fetch-latest-release
+      - id: last_release
         name: Fetch latest release
         uses: InsonusK/get-latest-release@v1.0.1
         with:
@@ -35,5 +35,5 @@ jobs:
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
       - name: Dump latest release
         env:
-          LATEST_RELEASE: ${{ steps.fetch-latest-release.outputs.latest-release }}
+          LATEST_RELEASE: ${{ steps.flast_release.outputs.latest-release }}
         run: echo "$LATEST_RELEASE"
