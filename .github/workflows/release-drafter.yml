@@ -27,5 +27,5 @@ jobs:
           view_top: 1
       - name: Dump latest release
         env:
-          LATEST_RELEASE: ${{ steps.flast_release.outputs.tag_name }}
+          LATEST_RELEASE: ${{ steps.last_release.outputs.tag_name }}
         run: echo "$LATEST_RELEASE"
