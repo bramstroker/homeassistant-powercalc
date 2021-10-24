@@ -315,6 +315,7 @@ class Measure:
                 "measure_method": "script",
                 "measure_description": "Measured with utils/measure script",
                 "measure_settings": {
+                    "VERSION": _VERSION,
                     "SAMPLE_COUNT": SAMPLE_COUNT,
                     "SLEEP_TIME": SLEEP_TIME
                 },
