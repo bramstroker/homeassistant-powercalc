@@ -21,6 +21,10 @@ jobs:
       - id: fetch-latest-release
         name: Fetch latest release
         uses: InsonusK/get-latest-release@v1.0.1
+        with:
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+          exclude_types: "release"
+          view_top: 1
       - name: "Print result"
         run: |
           echo "id: ${{ steps.last_release.outputs.id }}"
