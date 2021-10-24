@@ -20,7 +20,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: fetch-latest-release
         name: Fetch latest release
-        uses: reloc8/action-latest-release-version@1.0.0
+        uses: InsonusK/get-latest-release@v1.0.1
+      - name: "Print result"
+        run: |
+          echo "id: ${{ steps.last_release.outputs.id }}"
+          echo "name: ${{ steps.last_release.outputs.name }}"
+          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
+          echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
+          echo "draft: ${{ steps.last_release.outputs.draft }}"
+          echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
       - name: Dump latest release
         env:
           LATEST_RELEASE: ${{ steps.fetch-latest-release.outputs.latest-release }}
