@@ -30,7 +30,7 @@ jobs:
           exclude_types: "release"
           view_top: 1
       - name: Write version file
-        run: 'echo ${{ steps.last_release.outputs.tag_name }} > /utils/measure/.VERSION'
+        run: 'echo ${{ steps.last_release.outputs.tag_name }} > utils/measure/.VERSION'
       - name: Commit version file
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
