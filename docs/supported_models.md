@@ -13,7 +13,7 @@
 |ikea         |LED1836G9                |TRADFRI bulb E27 WW 806lm                                 |lut              |brightness   |
 |ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                                |lut              |brightness   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming       |lut              |brightness   |
-|innr         |RB 285 C                 |RB285C E27 806lm RGBW                                     |lut              |hs,color_temp|
+|innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                   |lut              |hs,color_temp|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                    |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                      |lut              |color_temp   |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                      |lut              |color_temp   |
