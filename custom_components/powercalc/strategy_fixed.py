@@ -25,7 +25,6 @@ CONFIG_SCHEMA = vol.Schema(
 
 STATE_BASED_ENTITY_DOMAINS = [
     climate.DOMAIN,
-    input_number.DOMAIN,
     vacuum.DOMAIN,
 ]
 
