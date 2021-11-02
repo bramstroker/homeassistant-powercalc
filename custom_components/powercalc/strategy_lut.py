@@ -111,7 +111,12 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 self._model, color_mode
             )
         except LutFileNotFound:
-            _LOGGER.error("Lookup table not found")
+            _LOGGER.error(
+                "Lookup table not found (entity: %s, model: %s, color_mode: %s)",
+                entity_state.entity_id,
+                self._model.model,
+                color_mode
+            )
             return None
 
         power = 0
