@@ -67,6 +67,8 @@ class LutRegistry:
                     else:
                         raise UnsupportedMode(f"Unsupported color mode {color_mode}")
 
+            _LOGGER.debug("LUT file loaded: %d lines", len(lookup_dict))
+
             lookup_dict = dict(lookup_dict)
             self._lookup_dictionaries[cache_key] = lookup_dict
 
@@ -77,11 +79,11 @@ class LutRegistry:
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
-            _LOGGER.debug("Loading data file: %s", gzip_path)
+            _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")
 
         elif os.path.exists(path):
-            _LOGGER.debug("Loading data file: %s", path)
+            _LOGGER.debug("Loading LUT data file: %s", path)
             return open(path, "r")
 
         raise LutFileNotFound("Data file not found: %s")
