@@ -67,7 +67,6 @@ def create_utility_meters(
         if "delta_values" in signature.parameters:
             params["delta_values"] = False
 
-
         utility_meter = UtilityMeterSensor(**params)
 
         hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [utility_meter]
