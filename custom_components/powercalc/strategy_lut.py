@@ -19,6 +19,7 @@ from homeassistant.components.light import (
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
+    COLOR_MODE_UNKNOWN,
     COLOR_MODES_COLOR,
 )
 from homeassistant.core import State
@@ -107,6 +108,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return None
         if brightness > 255:
             brightness = 255
+
+        if color_mode is COLOR_MODE_UNKNOWN:
+            _LOGGER.debug("Could not calculate power. color mode unknown")
+            return None
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
