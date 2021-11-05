@@ -1,4 +1,4 @@
-"""The Hue Power constants."""
+"""The Powercalc constants."""
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
