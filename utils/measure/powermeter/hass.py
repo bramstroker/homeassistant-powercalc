@@ -6,6 +6,7 @@ from homeassistant_api import Client
 from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter
 
+
 class HassPowerMeter(PowerMeter):
     def __init__(self, api_url: str, token: str):
         try:
