@@ -105,7 +105,7 @@ async def create_power_sensor(
         raise err
     except StrategyConfigurationError as err:
         _LOGGER.error(
-            "Error setting up calculation strategy for %s: %s",
+            "%s: Error setting up calculation strategy: %s",
             source_entity.entity_id,
             err,
         )
@@ -252,9 +252,9 @@ class VirtualPowerSensor(SensorEntity):
         self._power = round(self._power, 2)
 
         _LOGGER.debug(
-            'State changed to "%s" for entity "%s". Power:%s',
-            state.state,
+            '%s: State changed to "%s". Power:%s',
             state.entity_id,
+            state.state,
             self._power,
         )
 

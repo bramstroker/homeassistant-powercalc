@@ -104,13 +104,13 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness is None:
-            _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
+            _LOGGER.error("%s: Could not calculate power. no brightness set", entity_state.entity_id)
             return None
         if brightness > 255:
             brightness = 255
 
         if color_mode is COLOR_MODE_UNKNOWN:
-            _LOGGER.debug("Could not calculate power. color mode unknown")
+            _LOGGER.debug("%s: Could not calculate power. color mode unknown", entity_state.entity_id)
             return None
 
         try:
@@ -119,7 +119,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             )
         except LutFileNotFound:
             _LOGGER.error(
-                "Lookup table not found (entity: %s, model: %s, color_mode: %s)",
+                "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
                 self._model.model,
                 color_mode
@@ -133,7 +133,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             light_setting.hue = int(hs[0] / 360 * 65535)
             light_setting.saturation = int(hs[1] / 100 * 255)
             _LOGGER.debug(
-                "Looking up power usage for bri:%s hue:%s sat:%s}",
+                "%s: Looking up power usage for bri:%s hue:%s sat:%s}",
+                entity_state.entity_id,
                 brightness,
                 light_setting.hue,
                 light_setting.saturation,
@@ -141,15 +142,16 @@ class LutStrategy(PowerCalculationStrategyInterface):
         elif color_mode == COLOR_MODE_COLOR_TEMP:
             light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
-                "Looking up power usage for bri:%s mired:%s",
+                "%s: Looking up power usage for bri:%s mired:%s",
+                entity_state.entity_id,
                 brightness,
                 light_setting.color_temp,
             )
         elif color_mode == COLOR_MODE_BRIGHTNESS:
-            _LOGGER.debug("Looking up power usage for bri:%s", brightness)
+            _LOGGER.debug("%s: Looking up power usage for bri:%s", entity_state.entity_id, brightness)
 
         power = self.lookup_power(lookup_table, light_setting)
-        _LOGGER.debug("Power:%s", power)
+        _LOGGER.debug("%s: Calculated power:%s", entity_state.entity_id, power)
         return power
 
     def lookup_power(self, lookup_table: dict, light_setting: LightSetting) -> float:
