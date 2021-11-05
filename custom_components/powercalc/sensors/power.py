@@ -226,7 +226,7 @@ class VirtualPowerSensor(SensorEntity):
         )
 
     async def _update_power_sensor(self, state) -> bool:
-        """Update power sensor based on new dependant hue light state."""
+        """Update power sensor based on new dependant entity state."""
         if (
             state is None
             or state.state == STATE_UNKNOWN

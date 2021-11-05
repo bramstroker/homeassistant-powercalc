@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from collections import namedtuple
 from typing import NamedTuple, Optional
 
 import homeassistant.helpers.entity_registry as er
-from homeassistant.components.hue.const import DOMAIN as HUE_DOMAIN
+import homeassistant.helpers.device_registry as dr
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -46,19 +47,41 @@ async def autodiscover_hue_model(
     hass: HomeAssistantType, entity_entry
 ) -> Optional[HueModelInfo]:
     # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if hass.data.get(HUE_DOMAIN) is None or entity_entry.platform != "hue":
+    if entity_entry.platform != "hue":
         return
 
+    device_registry = await dr.async_get_registry(hass)
+    device_entry = device_registry.async_get(entity_entry.device_id)
+    if device_entry:
+        if device_entry.manufacturer is None or device_entry.model is None:
+            _LOGGER.error(
+                "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
+                entity_entry.entity_id,
+            )
+            return
+        
+        match = re.search('\((.*)\)$', device_entry.model)
+        if match:
+            model_id = match.group(1)
+            _LOGGER.debug(
+                "%s: Auto discovered Hue model: (manufacturer=%s, model=%s)",
+                entity_entry.entity_id,
+                device_entry.manufacturer,
+                model_id,
+            )
+            return HueModelInfo(device_entry.manufacturer, model_id)
+        
+    # Code below is for BC purposes. Will be removed in a future version
     light = await find_hue_light(hass, entity_entry)
     if light is None:
         _LOGGER.error(
-            "Cannot autodiscover model for '%s', not found in the hue bridge api",
+            "%s: Cannot autodiscover model, not found in the hue bridge api",
             entity_entry.entity_id,
         )
         return
 
     _LOGGER.debug(
-        "Auto discovered Hue model for entity %s: (manufacturer=%s, model=%s)",
+        "%s: Auto discovered Hue model: (manufacturer=%s, model=%s)",
         entity_entry.entity_id,
         light.manufacturername,
         light.modelid,
@@ -72,7 +95,7 @@ async def find_hue_light(
 ) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
 
-    bridge = hass.data[HUE_DOMAIN][entity_entry.config_entry_id]
+    bridge = hass.data["hue"][entity_entry.config_entry_id]
     lights = bridge.api.lights
     for light_id in lights:
         light = bridge.api.lights[light_id]
