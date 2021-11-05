@@ -104,13 +104,19 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness is None:
-            _LOGGER.error("%s: Could not calculate power. no brightness set", entity_state.entity_id)
+            _LOGGER.error(
+                "%s: Could not calculate power. no brightness set",
+                entity_state.entity_id,
+            )
             return None
         if brightness > 255:
             brightness = 255
 
         if color_mode is COLOR_MODE_UNKNOWN:
-            _LOGGER.debug("%s: Could not calculate power. color mode unknown", entity_state.entity_id)
+            _LOGGER.debug(
+                "%s: Could not calculate power. color mode unknown",
+                entity_state.entity_id,
+            )
             return None
 
         try:
@@ -122,7 +128,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
                 self._model.model,
-                color_mode
+                color_mode,
             )
             return None
 
@@ -148,7 +154,11 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 light_setting.color_temp,
             )
         elif color_mode == COLOR_MODE_BRIGHTNESS:
-            _LOGGER.debug("%s: Looking up power usage for bri:%s", entity_state.entity_id, brightness)
+            _LOGGER.debug(
+                "%s: Looking up power usage for bri:%s",
+                entity_state.entity_id,
+                brightness,
+            )
 
         power = self.lookup_power(lookup_table, light_setting)
         _LOGGER.debug("%s: Calculated power:%s", entity_state.entity_id, power)

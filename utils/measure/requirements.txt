@@ -7,7 +7,7 @@ certifi==2021.5.30
 chardet==4.0.0
 charset-normalizer==2.0.4
 gensim==3.8.1
-HomeAssistant-API==2.4.0.post1
+HomeAssistant-API==2.4.0.post2
 idna==3.2
 importlib-metadata==4.8.1
 multidict==5.1.0
