@@ -20,6 +20,7 @@ from light_controller.hue import HueLightController
 from powermeter.errors import OutdatedMeasurementError, PowerMeterError
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
+from powermeter.manual import ManualPowerMeter
 from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
@@ -37,12 +38,14 @@ MAX_HUE = 65535
 
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
+POWER_METER_MANUAL = "manual"
 POWER_METER_SHELLY = "shelly"
 POWER_METER_TASMOTA = "tasmota"
 POWER_METER_TUYA = "tuya"
 POWER_METERS = [
     POWER_METER_HASS,
     POWER_METER_KASA,
+    POWER_METER_MANUAL,
     POWER_METER_SHELLY,
     POWER_METER_TASMOTA,
     POWER_METER_TUYA,
@@ -66,6 +69,8 @@ SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
 START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
+if SELECTED_POWER_METER == POWER_METER_MANUAL:
+    SAMPLE_COUNT = 1
 
 SHELLY_IP = config("SHELLY_IP")
 SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
@@ -435,6 +440,9 @@ class PowerMeterFactory:
 
     def kasa(self):
         return KasaPowerMeter(KASA_DEVICE_IP)
+    
+    def manual(self):
+        return ManualPowerMeter()
 
     def shelly(self):
         return ShellyPowerMeter(SHELLY_IP, SHELLY_TIMEOUT)
@@ -451,6 +459,7 @@ class PowerMeterFactory:
         factories = {
             POWER_METER_HASS: self.hass,
             POWER_METER_KASA: self.kasa,
+            POWER_METER_MANUAL: self.manual,
             POWER_METER_SHELLY: self.shelly,
             POWER_METER_TASMOTA: self.tasmota,
             POWER_METER_TUYA: self.tuya,
