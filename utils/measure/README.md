@@ -4,7 +4,7 @@ This package contains everything you need to automatically take measurements of 
 
 ## Setup
 
-There are two ways to run the measure script, using Docker and natively using Python
+There are two ways to run the measure script, using Docker and natively using Python.
 The recommended way is with docker as all the needed dependencies are bundled.
 
 ### Docker
