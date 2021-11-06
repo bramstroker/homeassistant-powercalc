@@ -14,7 +14,12 @@ from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .common import SourceEntity
-from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
+from .const import (
+    CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
+    MANUFACTURER_ALIASES,
+)
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,7 +74,11 @@ async def autodiscover_model(
     if match:
         model_id = match.group(1)
 
-    model_info = ModelInfo(device_entry.manufacturer, model_id)
+    manufacturer = device_entry.manufacturer
+    if MANUFACTURER_ALIASES.get(manufacturer):
+        manufacturer = MANUFACTURER_ALIASES.get(manufacturer)
+
+    model_info = ModelInfo(manufacturer, model_id)
 
     # This check can be removed in future version
     if match is None and entity_entry.platform == "hue":
