@@ -8,8 +8,8 @@ import re
 from collections import namedtuple
 from typing import NamedTuple, Optional
 
-import homeassistant.helpers.entity_registry as er
 import homeassistant.helpers.device_registry as dr
+import homeassistant.helpers.entity_registry as er
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -25,7 +25,7 @@ async def get_light_model(
 ) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if (manufacturer is None or model is None):
+    if manufacturer is None or model is None:
         model_info = await autodiscover_model(hass, source_entity)
         if model_info:
             manufacturer = model_info.manufacturer
@@ -63,9 +63,9 @@ async def autodiscover_model(
             entity_entry.entity_id,
         )
         return None
-    
+
     model_id = device_entry.model
-    match = re.search('\((.*)\)$', device_entry.model)
+    match = re.search("\((.*)\)$", device_entry.model)
     if match:
         model_id = match.group(1)
 
@@ -86,7 +86,9 @@ async def autodiscover_model(
     return model_info
 
 
-async def autodiscover_from_hue_bridge(hass: HomeAssistantType, entity_entry: er.RegistryEntry):
+async def autodiscover_from_hue_bridge(
+    hass: HomeAssistantType, entity_entry: er.RegistryEntry
+):
     # Code below is for BC purposes. Will be removed in a future version
     light = await find_hue_light(hass, entity_entry)
     if light is None:
