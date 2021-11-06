@@ -8,8 +8,8 @@ import re
 from collections import namedtuple
 from typing import NamedTuple, Optional
 
-import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
+import homeassistant.helpers.device_registry as dr
 from homeassistant.components.light import Light
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -26,10 +26,10 @@ async def get_light_model(
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and source_entity.entity_entry:
-        hue_model_info = await autodiscover_hue_model(hass, source_entity.entity_entry)
-        if hue_model_info:
-            manufacturer = hue_model_info.manufacturer
-            model = hue_model_info.model
+        model_info = await autodiscover_model(hass, source_entity.entity_entry)
+        if model_info:
+            manufacturer = model_info.manufacturer
+            model = model_info.model
 
     if manufacturer is None or model is None:
         return None
@@ -43,12 +43,10 @@ async def get_light_model(
     return LightModel(hass, manufacturer, model, custom_model_directory)
 
 
-async def autodiscover_hue_model(
+async def autodiscover_model(
     hass: HomeAssistantType, entity_entry
-) -> Optional[HueModelInfo]:
-    # When Philips Hue model is enabled we can auto discover manufacturer and model from the bridge data
-    if entity_entry.platform != "hue":
-        return
+) -> Optional[ModelInfo]:
+    """Try to auto discover manufacturer and model from the known device information"""
 
     device_registry = await dr.async_get_registry(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
@@ -58,36 +56,42 @@ async def autodiscover_hue_model(
                 "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
                 entity_entry.entity_id,
             )
-            return
+            return None
+        
+        model_id = device_entry.model
+        if entity_entry.platform == "hue":
+            match = re.search('\((.*)\)$', device_entry.model)
+            if match:
+                model_id = match.group(1)
 
-        match = re.search("\((.*)\)$", device_entry.model)
-        if match:
-            model_id = match.group(1)
-            _LOGGER.debug(
-                "%s: Auto discovered Hue model: (manufacturer=%s, model=%s)",
-                entity_entry.entity_id,
-                device_entry.manufacturer,
-                model_id,
-            )
-            return HueModelInfo(device_entry.manufacturer, model_id)
-
-    # Code below is for BC purposes. Will be removed in a future version
-    light = await find_hue_light(hass, entity_entry)
-    if light is None:
-        _LOGGER.error(
-            "%s: Cannot autodiscover model, not found in the hue bridge api",
+        _LOGGER.debug(
+            "%s: Auto discovered model: (manufacturer=%s, model=%s)",
             entity_entry.entity_id,
+            device_entry.manufacturer,
+            model_id,
         )
-        return
+        return ModelInfo(device_entry.manufacturer, model_id)
+        
+    # Code below is for BC purposes. Will be removed in a future version
+    if entity_entry.platform == "hue":
+        light = await find_hue_light(hass, entity_entry)
+        if light is None:
+            _LOGGER.error(
+                "%s: Cannot autodiscover model, not found in the hue bridge api",
+                entity_entry.entity_id,
+            )
+            return None
 
-    _LOGGER.debug(
-        "%s: Auto discovered Hue model: (manufacturer=%s, model=%s)",
-        entity_entry.entity_id,
-        light.manufacturername,
-        light.modelid,
-    )
+        _LOGGER.debug(
+            "%s: Auto discovered Hue model: (manufacturer=%s, model=%s)",
+            entity_entry.entity_id,
+            light.manufacturername,
+            light.modelid,
+        )
 
-    return HueModelInfo(light.manufacturername, light.modelid)
+        return ModelInfo(light.manufacturername, light.modelid)
+    
+    return None
 
 
 async def find_hue_light(
@@ -105,6 +109,6 @@ async def find_hue_light(
     return None
 
 
-class HueModelInfo(NamedTuple):
+class ModelInfo(NamedTuple):
     manufacturer: str
     model: str
