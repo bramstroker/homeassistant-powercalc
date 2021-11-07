@@ -47,4 +47,5 @@ class ManualPowerMeter(PowerMeter):
 
     def process_answers(self, answers):
         self._unit_of_measurement = answers["unit_of_measurement"]
-        self._voltage = int(answers["voltage"])
+        if "voltage" in answers:
+            self._voltage = int(answers["voltage"])

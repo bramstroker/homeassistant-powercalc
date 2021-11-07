@@ -35,6 +35,12 @@ CSV_HEADERS = {
 MAX_BRIGHTNESS = 255
 MAX_SAT = 254
 MAX_HUE = 65535
+CT_BRI_STEPS = 5
+CT_MIRED_STEPS = 10
+BRI_BRI_STEPS = 1
+HS_BRI_STEPS = 10
+HS_HUE_STEPS = 2000
+HS_SAT_STEPS = 10
 
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
@@ -69,8 +75,6 @@ SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
 START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
-if SELECTED_POWER_METER == POWER_METER_MANUAL:
-    SAMPLE_COUNT = 1
 
 SHELLY_IP = config("SHELLY_IP")
 SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
@@ -83,6 +87,13 @@ HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
+
+# Change some settings when selected power meter is manual
+if SELECTED_POWER_METER == POWER_METER_MANUAL:
+    SAMPLE_COUNT = 1
+    BRI_BRI_STEPS = 3
+    CT_BRI_STEPS = 15
+    CT_MIRED_STEPS = 50
 
 CSV_WRITE_BUFFER = 50
 
@@ -290,18 +301,18 @@ class Measure:
     def get_ct_variations(self) -> Iterator[ColorTempVariation]:
         min_mired = self.light_info.min_mired
         max_mired = self.light_info.max_mired
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 5):
-            for mired in self.inclusive_range(min_mired, max_mired, 10):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
+            for mired in self.inclusive_range(min_mired, max_mired, CT_MIRED_STEPS):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 10):
-            for sat in self.inclusive_range(1, MAX_SAT, 10):
-                for hue in self.inclusive_range(1, MAX_HUE, 2000):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
+            for sat in self.inclusive_range(1, MAX_SAT, HS_SAT_STEPS):
+                for hue in self.inclusive_range(1, MAX_HUE, HS_HUE_STEPS):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, 1):
+        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
