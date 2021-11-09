@@ -445,8 +445,8 @@ sensor:
       -  entity_id: light.hallway
       -  entity_id: light.living_room
          linear:
-            min_power: 0.5
-            max_power: 8
+           min_power: 0.5
+           max_power: 8
 ```
 
 This will create the following entities:
