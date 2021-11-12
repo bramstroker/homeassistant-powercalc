@@ -70,6 +70,6 @@ def create_utility_meters(
         utility_meter = UtilityMeterSensor(**params)
 
         hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [utility_meter]
-    utility_meters.append(utility_meter)
+        utility_meters.append(utility_meter)
 
     return utility_meters
