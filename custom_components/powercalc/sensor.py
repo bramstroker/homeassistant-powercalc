@@ -34,6 +34,10 @@ from homeassistant.helpers.typing import (
     DiscoveryInfoType,
     HomeAssistantType,
 )
+from homeassistant.helpers import (
+    area_registry,
+    entity_registry,
+)
 
 from .common import validate_name_pattern, create_source_entity
 from .const import (
@@ -115,11 +119,12 @@ SENSOR_CONFIG = {
 
 GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_GROUP): cv.string,
+    vol.Optional("target", default={}): dict,
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
 }
 
 PLATFORM_SCHEMA: Final = vol.All(
-    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES),
+    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES, "target"),
     cv.deprecated(
         CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
     ),
@@ -143,32 +148,11 @@ async def async_setup_platform(
 ):
     """Set up the virtual power sensors."""
 
-    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
     if discovery_info:
         config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
 
-    entities = []
     try:
-        if CONF_ENTITIES in config:
-            for sensor_config in config.get(CONF_ENTITIES):
-                merged_sensor_config = get_merged_sensor_configuration(
-                    global_config, config, sensor_config
-                )
-                entities.extend(
-                    await create_individual_sensors(hass, merged_sensor_config)
-                )
-
-            if CONF_CREATE_GROUP in config:
-                group_name = config.get(CONF_CREATE_GROUP)
-                group_sensors = create_group_sensors(
-                    group_name, merged_sensor_config, entities, hass=hass
-                )
-                entities.extend(group_sensors)
-        else:
-            merged_sensor_config = get_merged_sensor_configuration(
-                global_config, config
-            )
-            entities.extend(await create_individual_sensors(hass, merged_sensor_config, discovery_info))
+        entities = await create_sensors(hass, config, discovery_info)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
@@ -202,6 +186,51 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
         )
 
     return merged_config
+
+
+async def create_sensors(
+    hass: HomeAssistantType, config: ConfigType, discovery_info: DiscoveryInfoType | None = None,
+) -> list[SensorEntity]:
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+
+    # Setup a power sensor for one single appliance. Eighter by manual configuration or discovery
+    if CONF_ENTITY_ID in config or discovery_info is not None:
+        merged_sensor_config = get_merged_sensor_configuration(
+            global_config, config
+        )
+        return await create_individual_sensors(hass, merged_sensor_config, discovery_info)
+    
+    # Setup power sensors for multiple appliances in one config entry
+    entities = []
+    if CONF_ENTITIES in config:
+        for sensor_config in config.get(CONF_ENTITIES):
+            merged_sensor_config = get_merged_sensor_configuration(
+                global_config, config, sensor_config
+            )
+            entities.extend(
+                await create_individual_sensors(hass, merged_sensor_config)
+            )
+        
+    if "target" in config:
+        area_id = config.get("target")["area"]
+        area_reg = await area_registry.async_get_registry(hass)
+        area = area_reg.areas.get(area_id)
+        entity_reg = await entity_registry.async_get_registry(hass)
+        source_entities = await entity_registry.async_entries_for_area(entity_reg, area_id)
+        #@todo error when area is not found
+        return []
+
+    # Create a group sensor
+    if CONF_CREATE_GROUP in config:
+        group_name = config.get(CONF_CREATE_GROUP)
+        if not entities:
+            _LOGGER.error("Could not create group %s, no entities resolved", group_name)
+        group_sensors = create_group_sensors(
+            group_name, merged_sensor_config, entities, hass=hass
+        )
+        entities.extend(group_sensors)
+    
+    return entities
 
 
 async def create_individual_sensors(
