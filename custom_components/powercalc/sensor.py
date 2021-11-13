@@ -54,6 +54,7 @@ from .const import (
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -123,7 +124,7 @@ SENSOR_CONFIG = {
 
 GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional("target", default={}): vol.Schema({
+    vol.Optional(CONF_INCLUDE, default={}): vol.Schema({
         vol.Optional(CONF_AREA): cv.string
     }),
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
@@ -212,9 +213,9 @@ async def create_sensors(
         sensor_configs = {conf[CONF_ENTITY_ID]: conf for conf in config.get(CONF_ENTITIES)}
     
     # Load entities from a certain area
-    if "target" in config:
-        if CONF_AREA in config.get("target"):
-            area_id = config.get("target")[CONF_AREA]
+    if CONF_INCLUDE in config:
+        if CONF_AREA in config.get(CONF_INCLUDE):
+            area_id = config.get(CONF_INCLUDE)[CONF_AREA]
             _LOGGER.debug("Loading entities from area: %s", area_id)
             sensor_configs = {
                 entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
