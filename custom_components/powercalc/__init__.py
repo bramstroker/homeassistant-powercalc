@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from datetime import timedelta
 from typing import Optional
+import logging
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.utility_meter.const import (
     DAILY,
@@ -13,14 +15,17 @@ from homeassistant.components.utility_meter.const import (
     MONTHLY,
     WEEKLY,
 )
-from homeassistant.const import CONF_SCAN_INTERVAL
+from homeassistant.const import CONF_ENTITY_ID, CONF_SCAN_INTERVAL
+from homeassistant.helpers import discovery
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 
 from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_LINEAR,
@@ -35,8 +40,10 @@ from .const import (
     MODE_LINEAR,
     MODE_LUT,
 )
-from .errors import StrategyConfigurationError, UnsupportedMode
+from .common import create_source_entity
+from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
+from .model_discovery import is_supported_for_autodiscovery, get_light_model
 from .strategy_fixed import FixedStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
@@ -60,6 +67,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): validate_name_pattern,
+                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=False): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(
@@ -71,6 +79,8 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
@@ -86,6 +96,38 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
         DOMAIN_CONFIG: conf,
     }
+
+    if conf.get(CONF_ENABLE_AUTODISCOVERY) == True:
+        _LOGGER.debug("Start auto discovering entities")
+        entity_registry = await er.async_get_registry(hass)
+        for entity_entry in list(entity_registry.entities.values()):
+            if entity_entry.domain != "light":
+                continue
+
+            if not await is_supported_for_autodiscovery(hass, entity_entry):
+                continue
+
+            source_entity = await create_source_entity(entity_entry.entity_id, hass)
+            try:
+                light_model = await get_light_model(hass, source_entity, {})
+            except ModelNotSupported:
+                _LOGGER.debug("%s: Model not found in library, skipping auto configuration", entity_entry.entity_id)
+                continue
+
+            if not light_model:
+                continue
+
+            discovery_info = {
+                CONF_ENTITY_ID: entity_entry.entity_id,
+                "source_entity": source_entity,
+                "light_model": light_model,
+            }
+            #discovery_info = {CONF_HOST: lte_conf[CONF_HOST], SENSOR_DOMAIN: sensor_conf}
+            hass.async_create_task(
+                discovery.async_load_platform(
+                    hass, SENSOR_DOMAIN, DOMAIN, discovery_info, config
+                )
+            )
 
     return True
 

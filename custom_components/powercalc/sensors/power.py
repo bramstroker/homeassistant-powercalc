@@ -65,6 +65,7 @@ async def create_power_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
     source_entity: SourceEntity,
+    discovery_info
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
@@ -87,7 +88,10 @@ async def create_power_sensor(
             sensor_config.get(CONF_LINEAR) is None
             and sensor_config.get(CONF_FIXED) is None
         ):
-            light_model = await get_light_model(hass, source_entity, sensor_config)
+            if discovery_info and discovery_info.get("light_mode"):
+                light_model = discovery_info.get("light_mode")
+            else:
+                light_model = await get_light_model(hass, source_entity, sensor_config)
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
 
@@ -260,6 +264,11 @@ class VirtualPowerSensor(SensorEntity):
 
         self.async_write_ha_state()
         return True
+
+    @property
+    def source_entity(self):
+        """The source entity this power sensor calculates power for."""
+        return self._source_entity
 
     @property
     def extra_state_attributes(self):

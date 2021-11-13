@@ -6,7 +6,6 @@ import logging
 from typing import Final
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components import (
     binary_sensor,
@@ -36,7 +35,7 @@ from homeassistant.helpers.typing import (
     HomeAssistantType,
 )
 
-from .common import SourceEntity, validate_name_pattern
+from .common import validate_name_pattern, create_source_entity
 from .const import (
     CALCULATION_MODES,
     CONF_CREATE_ENERGY_SENSOR,
@@ -162,6 +161,8 @@ async def async_setup_platform(
                 )
                 entities.extend(group_sensors)
         else:
+            if discovery_info is not None:
+                config = discovery_info
             merged_sensor_config = get_merged_sensor_configuration(
                 global_config, config
             )
@@ -201,54 +202,18 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
     return merged_config
 
 
-async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
-    """Create object containing all information about the source entity"""
-
-    source_entity_domain, source_object_id = split_entity_id(entity_id)
-
-    entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(entity_id)
-
-    unique_id = None
-    supported_color_modes = []
-    if entity_entry:
-        source_entity_name = entity_entry.name or entity_entry.original_name
-        source_entity_domain = entity_entry.domain
-        unique_id = entity_entry.unique_id
-        if entity_entry.capabilities:
-            supported_color_modes = entity_entry.capabilities.get(
-                light.ATTR_SUPPORTED_COLOR_MODES
-            )
-    else:
-        source_entity_name = source_object_id.replace("_", " ")
-
-    entity_state = hass.states.get(entity_id)
-    if entity_state:
-        source_entity_name = entity_state.name
-        supported_color_modes = entity_state.attributes.get(
-            light.ATTR_SUPPORTED_COLOR_MODES
-        )
-
-    return SourceEntity(
-        unique_id,
-        source_object_id,
-        entity_id,
-        source_entity_name,
-        source_entity_domain,
-        supported_color_modes or [],
-        entity_entry,
-    )
-
-
 async def create_individual_sensors(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistantType, sensor_config: dict, discovery_info: DiscoveryInfoType | None = None,
 ) -> list[SensorEntity]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
-    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+    if discovery_info:
+        source_entity = discovery_info.get("source_entity")
+    else:
+        source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     try:
-        power_sensor = await create_power_sensor(hass, sensor_config, source_entity)
+        power_sensor = await create_power_sensor(hass, sensor_config, source_entity, discovery_info)
     except PowercalcSetupError as err:
         return []
 

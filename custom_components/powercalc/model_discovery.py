@@ -54,21 +54,15 @@ async def autodiscover_model(
     """Try to auto discover manufacturer and model from the known device information"""
 
     entity_entry = source_entity.entity_entry
-    if entity_entry is None:
-        return None
-
-    device_registry = await dr.async_get_registry(hass)
-    device_entry = device_registry.async_get(entity_entry.device_id)
-    if device_entry is None:
-        return None
-
-    if device_entry.manufacturer is None or device_entry.model is None:
+    if not await is_supported_for_autodiscovery(hass, source_entity.entity_entry):
         _LOGGER.error(
             "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
             entity_entry.entity_id,
         )
         return None
 
+    device_registry = await dr.async_get_registry(hass)
+    device_entry = device_registry.async_get(entity_entry.device_id)
     model_id = device_entry.model
     match = re.search("\((.*)\)$", device_entry.model)
     if match:
@@ -93,6 +87,23 @@ async def autodiscover_model(
         model_info.model,
     )
     return model_info
+
+
+async def is_supported_for_autodiscovery(hass: HomeAssistantType, entity_entry: er.RegistryEntry | None):
+    """ See if we have enough information in device registry to automatically setup the power sensor """
+
+    if entity_entry is None:
+        return False
+
+    device_registry = await dr.async_get_registry(hass)
+    device_entry = device_registry.async_get(entity_entry.device_id)
+    if device_entry is None:
+        return False
+
+    if device_entry.manufacturer is None or device_entry.model is None:
+        return False
+    
+    return True
 
 
 async def autodiscover_from_hue_bridge(
