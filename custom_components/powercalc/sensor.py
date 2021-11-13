@@ -144,6 +144,8 @@ async def async_setup_platform(
     """Set up the virtual power sensors."""
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    if discovery_info:
+        config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
 
     entities = []
     try:
@@ -163,12 +165,10 @@ async def async_setup_platform(
                 )
                 entities.extend(group_sensors)
         else:
-            if discovery_info is not None:
-                config = discovery_info
             merged_sensor_config = get_merged_sensor_configuration(
                 global_config, config
             )
-            entities.extend(await create_individual_sensors(hass, merged_sensor_config))
+            entities.extend(await create_individual_sensors(hass, merged_sensor_config, discovery_info))
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
