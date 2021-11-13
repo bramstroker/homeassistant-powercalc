@@ -57,6 +57,8 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
+    DATA_CONFIGURED_ENTITIES,
+    DATA_DISCOVERED_ENTITIES,
     DOMAIN,
     DOMAIN_CONFIG,
 )
@@ -212,6 +214,10 @@ async def create_individual_sensors(
     else:
         source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
+    if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+        _LOGGER.debug("%s: This entity has already configured a power sensor", source_entity.entity_id)
+        return []
+
     try:
         power_sensor = await create_power_sensor(hass, sensor_config, source_entity, discovery_info)
     except PowercalcSetupError as err:
@@ -227,6 +233,11 @@ async def create_individual_sensors(
         entities_to_add.extend(
             create_utility_meters(hass, energy_sensor, sensor_config)
         )
+
+    if discovery_info:
+        hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].append(source_entity.entity_id)
+    else:
+        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].append(source_entity.entity_id)
 
     return entities_to_add
 

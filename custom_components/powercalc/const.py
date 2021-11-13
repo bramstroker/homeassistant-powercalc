@@ -4,6 +4,8 @@ DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
 DATA_CALCULATOR_FACTORY = "calculator_factory"
+DATA_CONFIGURED_ENTITIES = "configured_entities"
+DATA_DISCOVERED_ENTITIES = "discovered_entities"
 
 CONF_CALIBRATE = "calibrate"
 CONF_CREATE_GROUP = "create_group"

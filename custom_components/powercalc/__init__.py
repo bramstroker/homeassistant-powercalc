@@ -34,6 +34,8 @@ from .const import (
     CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
+    DATA_CONFIGURED_ENTITIES,
+    DATA_DISCOVERED_ENTITIES,
     DOMAIN,
     DOMAIN_CONFIG,
     MODE_FIXED,
@@ -95,6 +97,8 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
         DOMAIN_CONFIG: conf,
+        DATA_CONFIGURED_ENTITIES: [],
+        DATA_DISCOVERED_ENTITIES: [],
     }
 
     if conf.get(CONF_ENABLE_AUTODISCOVERY) == True:
