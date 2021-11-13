@@ -36,6 +36,7 @@ from homeassistant.helpers.typing import (
 )
 from homeassistant.helpers import (
     area_registry,
+    device_registry,
     entity_registry,
 )
 
@@ -213,12 +214,33 @@ async def create_sensors(
         
     if "target" in config:
         area_id = config.get("target")["area"]
-        area_reg = await area_registry.async_get_registry(hass)
-        area = area_reg.areas.get(area_id)
-        entity_reg = await entity_registry.async_get_registry(hass)
-        source_entities = await entity_registry.async_entries_for_area(entity_reg, area_id)
-        #@todo error when area is not found
-        return []
+        #area_reg = await area_registry.async_get(hass)
+        #area = area_reg.areas.get(area_id)
+        entity_reg = entity_registry.async_get(hass)
+
+        entity_ids = [
+            entry.entity_id
+            for entry in entity_registry.async_entries_for_area(entity_reg, area_id)
+        ]
+        device_reg = device_registry.async_get(hass)
+        # We also need to add entities tied to a device in the area that don't themselves
+        # have an area specified since they inherit the area from the device.
+        entity_ids.extend(
+            [
+                entity.entity_id
+                for device in device_registry.async_entries_for_area(device_reg, area_id)
+                for entity in entity_registry.async_entries_for_device(entity_reg, device.id)
+                if entity.area_id is None
+            ]
+        )
+
+        for entity_id in entity_ids:
+            merged_sensor_config = get_merged_sensor_configuration(
+                global_config, config, {CONF_ENTITY_ID: entity_id}
+            )
+            entities.extend(
+                await create_individual_sensors(hass, merged_sensor_config)
+            )
 
     # Create a group sensor
     if CONF_CREATE_GROUP in config:
