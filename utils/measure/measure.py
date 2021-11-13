@@ -67,7 +67,7 @@ SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
 SLEEP_INITIAL = 10
-SLEEP_STANDBY = 5
+SLEEP_STANDBY = config("SLEEP_STANDBY", default=20, cast=int)
 SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
@@ -371,7 +371,7 @@ class Measure:
                 {
                     "type": "input",
                     "name": "measure_device",
-                    "message": "Which device (manufacturer, model) do you use to take the measurement?",
+                    "message": "Which powermeter (manufacturer, model) do you use to take the measurement?",
                     "when": lambda answers: answers["generate_model_json"],
                 },
                 {
