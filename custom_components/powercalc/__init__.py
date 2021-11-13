@@ -113,7 +113,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
 
             source_entity = await create_source_entity(entity_entry.entity_id, hass)
             try:
-                light_model = await get_light_model(hass, source_entity, {})
+                light_model = await get_light_model(hass, source_entity.entity_entry, {})
             except ModelNotSupported:
                 _LOGGER.debug("%s: Model not found in library, skipping auto configuration", entity_entry.entity_id)
                 continue

@@ -37,6 +37,7 @@ from homeassistant.helpers.typing import (
 from homeassistant.helpers import (
     area_registry,
     device_registry,
+    entity,
     entity_registry,
 )
 
@@ -69,6 +70,7 @@ from .const import (
     DOMAIN_CONFIG,
 )
 from .errors import PowercalcSetupError, SensorConfigurationError
+from .model_discovery import is_supported_model
 from .sensors.energy import VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import VirtualPowerSensor, create_power_sensor
@@ -214,8 +216,12 @@ async def create_sensors(
         if CONF_AREA in config.get("target"):
             area_id = config.get("target")[CONF_AREA]
             _LOGGER.debug("Loading entities from area: %s", area_id)
-            entity_ids = await get_area_entities(hass, area_id)
-            sensor_configs = {entity_id: {CONF_ENTITY_ID: entity_id} for entity_id in entity_ids} | sensor_configs
+            sensor_configs = {
+                entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
+                for entity 
+                in await get_area_entities(hass, area_id)
+                if await is_supported_model(hass, entity)
+            } | sensor_configs
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
@@ -239,26 +245,24 @@ async def create_sensors(
     return entities
 
 
-async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[str]:
-    """Get a listing of al entity ids in a given area"""
+async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[entity_registry.RegistryEntry]:
+    """Get a listing of al entities in a given area"""
     entity_reg = entity_registry.async_get(hass)
 
-    entity_ids = [
-        entry.entity_id
-        for entry in entity_registry.async_entries_for_area(entity_reg, area_id)
-    ]
+    entities = entity_registry.async_entries_for_area(entity_reg, area_id)
+
     device_reg = device_registry.async_get(hass)
     # We also need to add entities tied to a device in the area that don't themselves
     # have an area specified since they inherit the area from the device.
-    entity_ids.extend(
+    entities.extend(
         [
-            entity.entity_id
+            entity
             for device in device_registry.async_entries_for_area(device_reg, area_id)
             for entity in entity_registry.async_entries_for_device(entity_reg, device.id)
             if entity.area_id is None
         ]
     )
-    return entity_ids
+    return entities
 
 
 async def create_individual_sensors(
