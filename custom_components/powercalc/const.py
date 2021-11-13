@@ -7,6 +7,7 @@ DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 
+CONF_AREA = "area"
 CONF_CALIBRATE = "calibrate"
 CONF_CREATE_GROUP = "create_group"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
