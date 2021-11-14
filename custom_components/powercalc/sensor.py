@@ -368,7 +368,7 @@ async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[entit
 
 
 async def get_group_entities(hass: HomeAssistantType, entity_id: str) -> list[entity_registry.RegistryEntry]:
-    """Get a listing of al entities in a given group"""
+    """Get a listing of all entities in a given group"""
     entity_reg = entity_registry.async_get(hass)
 
     group_state = hass.states.get(entity_id)
