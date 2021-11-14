@@ -69,6 +69,7 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
 )
@@ -189,7 +190,7 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
 
     if not CONF_ENTITY_ID in merged_config:
         raise SensorConfigurationError(
-            "You must supply a entity_id in the configuration, see the README"
+            "You must supply an entity_id in the configuration, see the README"
         )
 
     return merged_config
@@ -198,6 +199,8 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
 async def create_sensors(
     hass: HomeAssistantType, config: ConfigType, discovery_info: DiscoveryInfoType | None = None,
 ) -> list[SensorEntity]:
+    """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
+
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
@@ -220,7 +223,6 @@ async def create_sensors(
         # Include entities from a certain area
         if CONF_AREA in config.get(CONF_INCLUDE):
             area_id = config.get(CONF_INCLUDE)[CONF_AREA]
-            #@todo area not exists
             _LOGGER.debug("Loading entities from area: %s", area_id)
             sensor_configs = {
                 entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
@@ -268,12 +270,15 @@ async def create_individual_sensors(
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
     if discovery_info:
-        source_entity = discovery_info.get("source_entity")
+        source_entity = discovery_info.get(DISCOVERY_SOURCE_ENTITY)
     else:
         source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-        _LOGGER.debug("%s: This entity has already configured a power sensor", source_entity.entity_id)
+        # Display an error when a power sensor was already configured for the same entity by the user
+        # No log entry will be shown when the entity was auto discovered, we can silently continue
+        if not discovery_info:
+            _LOGGER.error("%s: This entity has already configured a power sensor", source_entity.entity_id)
         return []
 
     try:
@@ -340,6 +345,10 @@ def create_group_sensors(
 
 async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
+    area_reg = area_registry.async_get(hass)
+    if area_reg.async_get_area(area_id) is None:
+        raise SensorConfigurationError(f"No area with id '{area_id}' found in your HA instance")
+
     entity_reg = entity_registry.async_get(hass)
 
     entities = entity_registry.async_entries_for_area(entity_reg, area_id)

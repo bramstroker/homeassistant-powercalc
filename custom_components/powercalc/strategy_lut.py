@@ -56,6 +56,7 @@ class LutRegistry:
                 csv_reader = reader(csv_file)
                 next(csv_reader)  # skip header row
 
+                line_count = 0
                 for row in csv_reader:
                     if color_mode == COLOR_MODE_HS:
                         lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(
@@ -67,8 +68,9 @@ class LutRegistry:
                         lookup_dict[int(row[0])] = float(row[1])
                     else:
                         raise UnsupportedMode(f"Unsupported color mode {color_mode}")
+                    line_count += 1
 
-            _LOGGER.debug("LUT file loaded: %d lines", len(lookup_dict))
+            _LOGGER.debug("LUT file loaded: %d lines", line_count)
 
             lookup_dict = dict(lookup_dict)
             self._lookup_dictionaries[cache_key] = lookup_dict
