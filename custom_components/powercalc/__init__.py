@@ -72,7 +72,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): validate_name_pattern,
-                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=False): cv.boolean,
+                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(
@@ -95,6 +95,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_ENABLE_AUTODISCOVERY: True
     }
 
     hass.data[DOMAIN] = {
