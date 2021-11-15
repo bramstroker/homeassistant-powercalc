@@ -11,7 +11,7 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Iterator, Optional
 
-from decouple import config
+from decouple import config, Choices
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
@@ -32,15 +32,22 @@ CSV_HEADERS = {
     MODE_COLOR_TEMP: ["bri", "mired", "watt"],
     MODE_BRIGHTNESS: ["bri", "watt"],
 }
+
 MAX_BRIGHTNESS = 255
 MAX_SAT = 254
 MAX_HUE = 65535
 CT_BRI_STEPS = 5
 CT_MIRED_STEPS = 10
 BRI_BRI_STEPS = 1
-HS_BRI_STEPS = 10
-HS_HUE_STEPS = 2000
-HS_SAT_STEPS = 10
+HS_BRI_STEPS = config("HS_BRI_STEPS", default=10, cast=int)
+if HS_BRI_STEPS > 20:
+    HS_BRI_STEPS = 20
+HS_HUE_STEPS = config("HS_HUE_STEPS", default=2000, cast=int)
+if HS_HUE_STEPS > 4000:
+    HS_HUE_STEPS = 4000
+HS_SAT_STEPS = config("HS_SAT_STEPS", default=10, cast=int)
+if HS_SAT_STEPS > 20:
+    HS_SAT_STEPS = 20
 
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
@@ -57,13 +64,13 @@ POWER_METERS = [
     POWER_METER_TUYA,
 ]
 
-SELECTED_POWER_METER = config("POWER_METER")
+SELECTED_POWER_METER = config("POWER_METER", cast=Choices(POWER_METERS))
 
 LIGHT_CONTROLLER_HUE = "hue"
 LIGHT_CONTROLLER_HASS = "hass"
 LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
 
-SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER")
+SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER", cast=Choices(LIGHT_CONTROLLERS))
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
 SLEEP_INITIAL = 10
@@ -81,7 +88,7 @@ SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
 TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
 TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
 TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
-TUYA_DEVICE_VERSION = config("EMAIL_PORT", default="3.3")
+TUYA_DEVICE_VERSION = config("TUYA_DEVICE_VERSION", default="3.3")
 HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
 HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
@@ -389,7 +396,7 @@ class Measure:
                 {
                     "type": "input",
                     "name": "num_lights",
-                    "message": "Hpw many lights are you measuring?",
+                    "message": "How many lights are you measuring?",
                     "when": lambda answers: answers["multiple_lights"],
                 },
             ]
