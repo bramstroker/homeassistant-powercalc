@@ -6,13 +6,13 @@ import logging
 from typing import Final
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components import (
     binary_sensor,
     climate,
     device_tracker,
     fan,
+    group,
     input_boolean,
     input_number,
     input_select,
@@ -35,10 +35,17 @@ from homeassistant.helpers.typing import (
     DiscoveryInfoType,
     HomeAssistantType,
 )
+from homeassistant.helpers import (
+    area_registry,
+    device_registry,
+    entity,
+    entity_registry,
+)
 
-from .common import SourceEntity, validate_name_pattern
+from .common import validate_name_pattern, create_source_entity
 from .const import (
     CALCULATION_MODES,
+    CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -48,6 +55,8 @@ from .const import (
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_GROUP,
+    CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -58,10 +67,14 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
+    DATA_CONFIGURED_ENTITIES,
+    DATA_DISCOVERED_ENTITIES,
+    DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
 )
 from .errors import PowercalcSetupError, SensorConfigurationError
+from .model_discovery import is_supported_model
 from .sensors.energy import VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import VirtualPowerSensor, create_power_sensor
@@ -114,11 +127,14 @@ SENSOR_CONFIG = {
 
 GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_GROUP): cv.string,
+    vol.Optional(CONF_INCLUDE, default={}): vol.Schema({
+        vol.Optional(CONF_AREA): cv.string,
+    }),
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
 }
 
 PLATFORM_SCHEMA: Final = vol.All(
-    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES),
+    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE),
     cv.deprecated(
         CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
     ),
@@ -142,30 +158,8 @@ async def async_setup_platform(
 ):
     """Set up the virtual power sensors."""
 
-    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-
-    entities = []
     try:
-        if CONF_ENTITIES in config:
-            for sensor_config in config.get(CONF_ENTITIES):
-                merged_sensor_config = get_merged_sensor_configuration(
-                    global_config, config, sensor_config
-                )
-                entities.extend(
-                    await create_individual_sensors(hass, merged_sensor_config)
-                )
-
-            if CONF_CREATE_GROUP in config:
-                group_name = config.get(CONF_CREATE_GROUP)
-                group_sensors = create_group_sensors(
-                    group_name, merged_sensor_config, entities, hass=hass
-                )
-                entities.extend(group_sensors)
-        else:
-            merged_sensor_config = get_merged_sensor_configuration(
-                global_config, config
-            )
-            entities.extend(await create_individual_sensors(hass, merged_sensor_config))
+        entities = await create_sensors(hass, config, discovery_info)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
@@ -195,60 +189,88 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
 
     if not CONF_ENTITY_ID in merged_config:
         raise SensorConfigurationError(
-            "You must supply a entity_id in the configuration, see the README"
+            "You must supply an entity_id in the configuration, see the README"
         )
 
     return merged_config
 
 
-async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
-    """Create object containing all information about the source entity"""
+async def create_sensors(
+    hass: HomeAssistantType, config: ConfigType, discovery_info: DiscoveryInfoType | None = None,
+) -> list[SensorEntity]:
+    """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 
-    source_entity_domain, source_object_id = split_entity_id(entity_id)
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
-    entity_registry = await er.async_get_registry(hass)
-    entity_entry = entity_registry.async_get(entity_id)
+    # Setup a power sensor for one single appliance. Either by manual configuration or discovery
+    if CONF_ENTITY_ID in config or discovery_info is not None:
+        if discovery_info:
+            config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
+        merged_sensor_config = get_merged_sensor_configuration(
+            global_config, config
+        )
+        return await create_individual_sensors(hass, merged_sensor_config, discovery_info)
+    
+    # Setup power sensors for multiple appliances in one config entry
+    created_sensors = []
+    sensor_configs = {}
+    if CONF_ENTITIES in config:
+        sensor_configs = {conf[CONF_ENTITY_ID]: conf for conf in config.get(CONF_ENTITIES)}
+    
+    if CONF_INCLUDE in config:
 
-    unique_id = None
-    supported_color_modes = []
-    if entity_entry:
-        source_entity_name = entity_entry.name or entity_entry.original_name
-        source_entity_domain = entity_entry.domain
-        unique_id = entity_entry.unique_id
-        if entity_entry.capabilities:
-            supported_color_modes = entity_entry.capabilities.get(
-                light.ATTR_SUPPORTED_COLOR_MODES
-            )
-    else:
-        source_entity_name = source_object_id.replace("_", " ")
-
-    entity_state = hass.states.get(entity_id)
-    if entity_state:
-        source_entity_name = entity_state.name
-        supported_color_modes = entity_state.attributes.get(
-            light.ATTR_SUPPORTED_COLOR_MODES
+        # Include entities from a certain area
+        if CONF_AREA in config.get(CONF_INCLUDE):
+            area_id = config.get(CONF_INCLUDE)[CONF_AREA]
+            _LOGGER.debug("Loading entities from area: %s", area_id)
+            sensor_configs = {
+                entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
+                for entity 
+                in await get_area_entities(hass, area_id)
+                if await is_supported_model(hass, entity)
+            } | sensor_configs
+            
+    # Create sensors for each entity
+    for sensor_config in sensor_configs.values():
+        merged_sensor_config = get_merged_sensor_configuration(
+            global_config, config, sensor_config
+        )
+        created_sensors.extend(
+            await create_individual_sensors(hass, merged_sensor_config)
         )
 
-    return SourceEntity(
-        unique_id,
-        source_object_id,
-        entity_id,
-        source_entity_name,
-        source_entity_domain,
-        supported_color_modes or [],
-        entity_entry,
-    )
+    # Create group sensors (power, energy, utility)
+    if CONF_CREATE_GROUP in config:
+        group_name = config.get(CONF_CREATE_GROUP)
+        if not created_sensors:
+            _LOGGER.error("Could not create group %s, no entities resolved", group_name)
+        group_sensors = create_group_sensors(
+            group_name, merged_sensor_config, created_sensors, hass=hass
+        )
+        created_sensors.extend(group_sensors)
+    
+    return created_sensors
 
 
 async def create_individual_sensors(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistantType, sensor_config: dict, discovery_info: DiscoveryInfoType | None = None,
 ) -> list[SensorEntity]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
-    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+    if discovery_info:
+        source_entity = discovery_info.get(DISCOVERY_SOURCE_ENTITY)
+    else:
+        source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+
+    if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+        # Display an error when a power sensor was already configured for the same entity by the user
+        # No log entry will be shown when the entity was auto discovered, we can silently continue
+        if not discovery_info:
+            _LOGGER.error("%s: This entity has already configured a power sensor", source_entity.entity_id)
+        return []
 
     try:
-        power_sensor = await create_power_sensor(hass, sensor_config, source_entity)
+        power_sensor = await create_power_sensor(hass, sensor_config, source_entity, discovery_info)
     except PowercalcSetupError as err:
         return []
 
@@ -262,6 +284,11 @@ async def create_individual_sensors(
         entities_to_add.extend(
             create_utility_meters(hass, energy_sensor, sensor_config)
         )
+
+    if discovery_info:
+        hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].append(source_entity.entity_id)
+    else:
+        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].append(source_entity.entity_id)
 
     return entities_to_add
 
@@ -302,3 +329,27 @@ def create_group_sensors(
     )
 
     return group_sensors
+
+
+async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[entity_registry.RegistryEntry]:
+    """Get a listing of al entities in a given area"""
+    area_reg = area_registry.async_get(hass)
+    if area_reg.async_get_area(area_id) is None:
+        raise SensorConfigurationError(f"No area with id '{area_id}' found in your HA instance")
+
+    entity_reg = entity_registry.async_get(hass)
+
+    entities = entity_registry.async_entries_for_area(entity_reg, area_id)
+
+    device_reg = device_registry.async_get(hass)
+    # We also need to add entities tied to a device in the area that don't themselves
+    # have an area specified since they inherit the area from the device.
+    entities.extend(
+        [
+            entity
+            for device in device_registry.async_entries_for_area(device_reg, area_id)
+            for entity in entity_registry.async_entries_for_device(entity_reg, device.id)
+            if entity.area_id is None
+        ]
+    )
+    return entities

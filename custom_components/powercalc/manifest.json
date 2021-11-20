@@ -9,6 +9,7 @@
     "switch",
     "binary_sensor",
     "light",
+    "group",
     "template"
   ],
   "after_dependencies": [

@@ -16,6 +16,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
 - [Installation](#installation)
     - [HACS](#hacs)
     - [Manual](#manual)
+- [Setup power sensors](#setup-power-sensors)
 - [Configuration](#configuration)
     - [Sensor](#sensor-configuration)
     - [Global](#global-configuration)
@@ -44,12 +45,23 @@ This integration is part of the default HACS repository. Just click "Explore and
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
-### Post installation step
+### Post installation steps
 Restart HA
+
+### Setup power sensors
+
+Powercalc has a build-in library of more than 60 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
+
+Starting from 0.12.0 Powercalc can automatically discover entities in your HA instance which are supported for automatic configuration.
+After intallation and restarting HA power and energy sensors should appear. When this is not the case please check the logs for any errors.
+
+When your appliance is not supported you have extensive options for manual configuration. These are explained below.
+
+> Note: Manually configuring a entity will override an auto discovered entity
 
 ## Configuration
 
-To add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
+To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
 Additionally some settings can be applied on global level and will apply to all your virtual power sensors.
 After changing the configuration you need to restart HA to get your power sensors to appear.
 
@@ -80,6 +92,7 @@ They are as follows:
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
 | create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
+| include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area or group. See [Area include](#include-are-entities)
 
 **Minimalistic example creating two power sensors:**
 
@@ -100,6 +113,7 @@ All these settings are completely optional. You can skip this section if you don
 
 | Name                   | Type    | Requirement  | Default                | Description                                                                                                                                        |
 | ---------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| enable_autodiscovery   | boolean | **Optional** | true                   | Whether you want powercalc to automatically setup power sensors for supported models in your HA instance.
 | scan_interval          | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
 | create_energy_sensors  | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
 | power_sensor_naming    | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
@@ -456,6 +470,42 @@ This will create the following entities:
 - sensor.living_room_energy
 - sensor.all_hallway_lights_power (group sensor)
 - sensor.all_hallway_lights_energy (group sensor)
+
+#### Include area entities
+
+> Available from v0.12 and higher
+
+You can create a grouped power sensor for all supported entities in an area using the `include` option.
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: Outdoor
+    include:
+      area: outdoor
+```
+
+This can also be mixed with the `entities` option, to add or override entities to the group. i.e.
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: Outdoor
+    include:
+      area: outdoor
+    entities:
+      - entity_id: light.frontdoor
+        fixed:
+          power: 100
+```
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: Outdoor
+    include:
+      area: outdoor
+```
 
 ### Multiply Factor
 
