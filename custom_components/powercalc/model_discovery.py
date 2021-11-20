@@ -48,12 +48,15 @@ async def get_light_model(
     return LightModel(hass, manufacturer, model, custom_model_directory)
 
 
-async def is_supported_model(hass: HomeAssistantType, entity_registry: er.RegistryEntry, sensor_config: dict = {}) -> bool:
+async def is_supported_model(
+    hass: HomeAssistantType, entity_registry: er.RegistryEntry, sensor_config: dict = {}
+) -> bool:
     try:
         await get_light_model(hass, entity_registry, sensor_config)
         return True
     except ModelNotSupported:
         return False
+
 
 async def autodiscover_model(
     hass: HomeAssistantType, entity_entry: er.RegistryEntry
@@ -95,8 +98,10 @@ async def autodiscover_model(
     return model_info
 
 
-async def is_supported_for_autodiscovery(hass: HomeAssistantType, entity_entry: er.RegistryEntry | None):
-    """ See if we have enough information in device registry to automatically setup the power sensor """
+async def is_supported_for_autodiscovery(
+    hass: HomeAssistantType, entity_entry: er.RegistryEntry | None
+):
+    """See if we have enough information in device registry to automatically setup the power sensor"""
 
     if entity_entry is None:
         return False
@@ -108,7 +113,7 @@ async def is_supported_for_autodiscovery(hass: HomeAssistantType, entity_entry: 
 
     if device_entry.manufacturer is None or device_entry.model is None:
         return False
-    
+
     return True
 
 

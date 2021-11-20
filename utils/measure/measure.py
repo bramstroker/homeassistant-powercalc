@@ -11,7 +11,7 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Iterator, Optional
 
-from decouple import config, Choices
+from decouple import Choices, config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError

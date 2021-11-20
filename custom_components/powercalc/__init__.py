@@ -2,27 +2,27 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import timedelta
 from typing import Optional
-import logging
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.const import (
     DAILY,
     METER_TYPES,
     MONTHLY,
     WEEKLY,
 )
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import CONF_ENTITY_ID, CONF_SCAN_INTERVAL
 from homeassistant.helpers import discovery
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 
-from .common import validate_name_pattern
+from .common import create_source_entity, validate_name_pattern
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
@@ -45,10 +45,9 @@ from .const import (
     MODE_LINEAR,
     MODE_LUT,
 )
-from .common import create_source_entity
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
-from .model_discovery import is_supported_for_autodiscovery, get_light_model
+from .model_discovery import get_light_model, is_supported_for_autodiscovery
 from .strategy_fixed import FixedStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .strategy_linear import LinearStrategy
@@ -95,7 +94,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
-        CONF_ENABLE_AUTODISCOVERY: True
+        CONF_ENABLE_AUTODISCOVERY: True,
     }
 
     hass.data[DOMAIN] = {
@@ -110,7 +109,9 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     return True
 
 
-async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAssistantType):
+async def autodiscover_entities(
+    config: dict, domain_config: dict, hass: HomeAssistantType
+):
     """Discover entities supported for powercalc autoconfiguration in HA instance"""
 
     if not domain_config.get(CONF_ENABLE_AUTODISCOVERY):
@@ -129,7 +130,10 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
         try:
             light_model = await get_light_model(hass, source_entity.entity_entry, {})
         except ModelNotSupported:
-            _LOGGER.debug("%s: Model not found in library, skipping auto configuration", entity_entry.entity_id)
+            _LOGGER.debug(
+                "%s: Model not found in library, skipping auto configuration",
+                entity_entry.entity_id,
+            )
             continue
 
         if not light_model:
@@ -147,6 +151,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
         )
 
     _LOGGER.debug("Done auto discovering entities")
+
 
 class PowerCalculatorStrategyFactory:
     def __init__(self, hass: HomeAssistantType) -> None:

@@ -4,12 +4,10 @@ import re
 from typing import NamedTuple
 
 import homeassistant.helpers.entity_registry as er
-from homeassistant.core import split_entity_id
-from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
-from homeassistant.helpers.typing import (
-    HomeAssistantType,
-)
 import voluptuous as vol
+from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
+from homeassistant.core import split_entity_id
+from homeassistant.helpers.typing import HomeAssistantType
 
 
 class SourceEntity(NamedTuple):
@@ -46,9 +44,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
     entity_state = hass.states.get(entity_id)
     if entity_state:
         source_entity_name = entity_state.name
-        supported_color_modes = entity_state.attributes.get(
-            ATTR_SUPPORTED_COLOR_MODES
-        )
+        supported_color_modes = entity_state.attributes.get(ATTR_SUPPORTED_COLOR_MODES)
 
     return SourceEntity(
         unique_id,
