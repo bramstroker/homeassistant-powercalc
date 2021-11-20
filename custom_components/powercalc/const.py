@@ -69,7 +69,8 @@ MANUFACTURER_DIRECTORY_MAPPING = {
 
 MANUFACTURER_ALIASES = {
     "Philips": "Signify Netherlands B.V.",
-    "Xiaomi": "Aqara"
+    "Xiaomi": "Aqara",
+    "LUMI": "Aqara"
 }
 
 MODEL_DIRECTORY_MAPPING = {
