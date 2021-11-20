@@ -64,10 +64,12 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "MLI": "mueller-licht",
     "OSRAM": "osram",
     "Signify Netherlands B.V.": "signify",
+    "Aqara": "aqara"
 }
 
 MANUFACTURER_ALIASES = {
     "Philips": "Signify Netherlands B.V.",
+    "Xiaomi": "Aqara"
 }
 
 MODEL_DIRECTORY_MAPPING = {
