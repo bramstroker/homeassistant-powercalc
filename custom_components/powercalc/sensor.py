@@ -129,7 +129,6 @@ GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema({
         vol.Optional(CONF_AREA): cv.string,
-        vol.Optional(CONF_GROUP): cv.string
     }),
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
 }
@@ -228,17 +227,6 @@ async def create_sensors(
                 entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
                 for entity 
                 in await get_area_entities(hass, area_id)
-                if await is_supported_model(hass, entity)
-            } | sensor_configs
-        
-        # Include entities from a certain group
-        if CONF_GROUP in config.get(CONF_INCLUDE):
-            group_id = config.get(CONF_INCLUDE)[CONF_GROUP]
-            _LOGGER.debug("Loading entities from group: %s", group_id)
-            sensor_configs = {
-                entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
-                for entity 
-                in await get_group_entities(hass, group_id)
                 if await is_supported_model(hass, entity)
             } | sensor_configs
             
@@ -364,17 +352,4 @@ async def get_area_entities(hass: HomeAssistantType, area_id: str) -> list[entit
             if entity.area_id is None
         ]
     )
-    return entities
-
-
-async def get_group_entities(hass: HomeAssistantType, entity_id: str) -> list[entity_registry.RegistryEntry]:
-    """Get a listing of all entities in a given group"""
-    entity_reg = entity_registry.async_get(hass)
-
-    group_state = hass.states.get(entity_id)
-    if not group_state:
-        _LOGGER.error("Group %s does not exist, make sure you set the correct entity id", entity_id)
-
-    entity_ids = group.get_entity_ids(hass, entity_id, light.DOMAIN)
-    entities = []
     return entities
