@@ -1,6 +1,7 @@
 # Supported models
 |manufacturer |        model id         |                           name                           |calculation modes| color modes |
 |-------------|-------------------------|----------------------------------------------------------|-----------------|-------------|
+|aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                      |lut              |color_temp   |
 |belkin       |F7C033                   |WeMo smart LED bulb                                       |lut              |brightness   |
 |ikea         |LED1536G5                |TRADFRI bulb E14 WS opal 400lm                            |lut              |color_temp   |
 |ikea         |LED1537R6                |TRADFRI bulb GU10 WS 400lm                                |lut              |color_temp   |
