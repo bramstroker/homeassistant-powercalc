@@ -30,7 +30,9 @@ CONF_POWER_SENSOR_NAMING = "power_sensor_naming"
 CONF_POWER = "power"
 CONF_MIN_POWER = "min_power"
 CONF_MAX_POWER = "max_power"
+CONF_VOLTAGE = "voltage"
 CONF_WATT = "watt"
+CONF_WLED = "wled"
 CONF_STATES_POWER = "states_power"
 CONF_STANDBY_POWER = "standby_power"
 CONF_DISABLE_STANDBY_POWER = "disable_standby_power"
@@ -51,10 +53,12 @@ ATTR_SOURCE_DOMAIN = "source_domain"
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
+MODE_WLED = "wled"
 CALCULATION_MODES = [
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
+    MODE_WLED
 ]
 
 MANUFACTURER_DIRECTORY_MAPPING = {

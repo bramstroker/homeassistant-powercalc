@@ -3,16 +3,17 @@ from __future__ import annotations
 from typing import Optional
 
 import voluptuous as vol
-from homeassistant.core import State
+from homeassistant.core import State, split_entity_id
 
 from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_VOLTAGE
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import evaluate_power
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        vol.Optional("voltage"): vol.Coerce(float),
+        vol.Required(CONF_VOLTAGE): vol.Coerce(float),
     }
 )
 
@@ -20,14 +21,20 @@ CONFIG_SCHEMA = vol.Schema(
 class WledStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: dict
+        config: dict,
+        light_entity: SourceEntity
     ) -> None:
-        self._power = 0
+        self._voltage = config.get(CONF_VOLTAGE)
+        self._light_entity = light_entity
+
+        self._estimated_current_entity = f"sensor.{self._light_entity.object_id}_estimated_current"
 
     async def calculate(self, entity_state: State) -> Optional[float]:
-        return await evaluate_power(4)
+        if entity_state.entity_id != self._estimated_current_entity:
+            return None
 
-    async def validate_config(self, source_entity: SourceEntity):
-        """Validate correct setup of the strategy"""
-
-        pass
+        power = float(entity_state.state) / 1000 * self._voltage
+        return await evaluate_power(power)
+    
+    def get_entities_to_track(self) -> tuple:
+        return {self._estimated_current_entity}

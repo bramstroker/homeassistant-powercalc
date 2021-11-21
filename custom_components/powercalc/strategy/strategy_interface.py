@@ -13,3 +13,6 @@ class PowerCalculationStrategyInterface:
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
         pass
+
+    def get_entities_to_track() -> tuple:
+        return {}

@@ -22,7 +22,7 @@ from homeassistant.helpers import discovery
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 
-from .common import create_source_entity, validate_name_pattern
+from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
@@ -44,6 +44,7 @@ from .const import (
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
+    MODE_WLED
 )
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
@@ -52,6 +53,7 @@ from .strategy.fixed import FixedStrategy
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
 from .strategy.linear import LinearStrategy
 from .strategy.lut import LutRegistry, LutStrategy
+from .strategy.wled import WledStrategy
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
@@ -163,17 +165,20 @@ class PowerCalculatorStrategyFactory:
         config: dict,
         mode: str,
         light_model: Optional[LightModel],
-        entity_domain: str,
+        source_entity: SourceEntity
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
-            return self._create_linear(config, light_model, entity_domain)
+            return self._create_linear(config, light_model, source_entity.domain)
 
         if mode == MODE_FIXED:
             return self._create_fixed(config, light_model)
 
         if mode == MODE_LUT:
             return self._create_lut(light_model)
+
+        if mode == MODE_WLED:
+            return self._create_wled(config, source_entity)
 
         raise UnsupportedMode("Invalid calculation mode", mode)
 
@@ -214,3 +219,7 @@ class PowerCalculatorStrategyFactory:
             )
 
         return LutStrategy(self._lut_registry, light_model)
+    
+    def _create_wled(self, config: dict, source_entity: SourceEntity) -> WledStrategy:
+        """Create the WLED strategy"""
+        return WledStrategy(config=config, light_entity=source_entity)
