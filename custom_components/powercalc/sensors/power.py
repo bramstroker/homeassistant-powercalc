@@ -23,7 +23,10 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.helpers.typing import (
+    DiscoveryInfoType,
+    HomeAssistantType
+)
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -35,6 +38,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MODE,
+    CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_NAMING,
@@ -66,7 +70,7 @@ async def create_power_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
     source_entity: SourceEntity,
-    discovery_info,
+    discovery_info: DiscoveryInfoType | None = None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
     calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
@@ -85,11 +89,13 @@ async def create_power_sensor(
     light_model = None
     try:
         mode = select_calculation_mode(sensor_config)
+
         if (
             sensor_config.get(CONF_LINEAR) is None
             and sensor_config.get(CONF_FIXED) is None
         ):
-            if discovery_info and discovery_info.get(DISCOVERY_LIGHT_MODEL):
+            # When the user did not manually configured a model and a model was auto discovered we can load it.
+            if discovery_info and sensor_config.get(CONF_MODEL) is None and discovery_info.get(DISCOVERY_LIGHT_MODEL):
                 light_model = discovery_info.get(DISCOVERY_LIGHT_MODEL)
             else:
                 light_model = await get_light_model(
