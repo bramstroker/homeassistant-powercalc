@@ -53,7 +53,7 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.model_discovery import get_light_model
-from custom_components.powercalc.strategy_interface import (
+from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 

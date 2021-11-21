@@ -12,7 +12,6 @@ from homeassistant.components import (
     climate,
     device_tracker,
     fan,
-    group,
     input_boolean,
     input_number,
     input_select,
@@ -72,8 +71,8 @@ from .sensors.energy import VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
-from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
-from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
+from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 

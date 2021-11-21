@@ -2,7 +2,7 @@ from typing import Optional
 
 from homeassistant.core import State
 
-from .common import SourceEntity
+from custom_components.powercalc.common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:

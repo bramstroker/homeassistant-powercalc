@@ -48,10 +48,10 @@ from .const import (
 from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from .light_model import LightModel
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
-from .strategy_fixed import FixedStrategy
-from .strategy_interface import PowerCalculationStrategyInterface
-from .strategy_linear import LinearStrategy
-from .strategy_lut import LutRegistry, LutStrategy
+from .strategy.fixed import FixedStrategy
+from .strategy.strategy_interface import PowerCalculationStrategyInterface
+from .strategy.linear import LinearStrategy
+from .strategy.lut import LutRegistry, LutStrategy
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"

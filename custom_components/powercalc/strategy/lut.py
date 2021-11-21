@@ -24,14 +24,14 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import State
 
-from .common import SourceEntity
-from .errors import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.errors import (
     LutFileNotFound,
     ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from .light_model import LightModel
+from custom_components.powercalc.light_model import LightModel
 from .strategy_interface import PowerCalculationStrategyInterface
 
 LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
