@@ -33,8 +33,8 @@ async def get_light_model(
     if manufacturer is None or model is None:
         model_info = await autodiscover_model(hass, entity_entry)
         if model_info:
-            manufacturer = model_info.manufacturer
-            model = model_info.model
+            manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
+            model = config.get(CONF_MODEL) or model_info.model
 
     if manufacturer is None or model is None:
         return None

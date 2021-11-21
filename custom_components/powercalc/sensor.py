@@ -28,11 +28,9 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME
-from homeassistant.core import split_entity_id
 from homeassistant.helpers import (
     area_registry,
     device_registry,
-    entity,
     entity_registry,
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -55,7 +53,6 @@ from .const import (
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
-    CONF_GROUP,
     CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
