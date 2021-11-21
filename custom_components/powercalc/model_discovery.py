@@ -137,6 +137,9 @@ async def find_hue_light(
 ) -> Light | None:
     """Find the light in the Hue bridge, we need to extract the model id."""
 
+    if not hass.data.get("hue"):
+        return None
+        
     bridge = hass.data["hue"][entity_entry.config_entry_id]
     lights = bridge.api.lights
     for light_id in lights:
