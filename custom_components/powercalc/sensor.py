@@ -28,11 +28,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME
-from homeassistant.helpers import (
-    area_registry,
-    device_registry,
-    entity_registry,
-)
+from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
     ConfigType,

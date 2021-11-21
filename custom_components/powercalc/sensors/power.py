@@ -23,10 +23,7 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
-from homeassistant.helpers.typing import (
-    DiscoveryInfoType,
-    HomeAssistantType
-)
+from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -95,7 +92,11 @@ async def create_power_sensor(
             and sensor_config.get(CONF_FIXED) is None
         ):
             # When the user did not manually configured a model and a model was auto discovered we can load it.
-            if discovery_info and sensor_config.get(CONF_MODEL) is None and discovery_info.get(DISCOVERY_LIGHT_MODEL):
+            if (
+                discovery_info
+                and sensor_config.get(CONF_MODEL) is None
+                and discovery_info.get(DISCOVERY_LIGHT_MODEL)
+            ):
                 light_model = discovery_info.get(DISCOVERY_LIGHT_MODEL)
             else:
                 light_model = await get_light_model(
