@@ -12,7 +12,6 @@ from homeassistant.components import (
     climate,
     device_tracker,
     fan,
-    group,
     input_boolean,
     input_number,
     input_select,
@@ -24,6 +23,7 @@ from homeassistant.components import (
     vacuum,
     water_heater,
 )
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -368,4 +368,4 @@ async def get_area_entities(
             if entity.area_id is None
         ]
     )
-    return entities
+    return [entity for entity in entities if entity.domain == LIGHT_DOMAIN]
