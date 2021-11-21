@@ -23,6 +23,7 @@ from homeassistant.components import (
     vacuum,
     water_heater,
 )
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -336,15 +337,20 @@ def create_group_sensors(
 
 
 async def get_area_entities(
-    hass: HomeAssistantType, area_id: str
+    hass: HomeAssistantType, area_id_or_name: str
 ) -> list[entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
-    if area_reg.async_get_area(area_id) is None:
+    area = area_reg.async_get_area(area_id_or_name)
+    if area is None:
+        area = area_reg.async_get_area_by_name(str(area_id_or_name))
+
+    if area is None:
         raise SensorConfigurationError(
-            f"No area with id '{area_id}' found in your HA instance"
+            f"No area with id or name '{area_id_or_name}' found in your HA instance"
         )
 
+    area_id = area.id
     entity_reg = entity_registry.async_get(hass)
 
     entities = entity_registry.async_entries_for_area(entity_reg, area_id)
@@ -362,4 +368,4 @@ async def get_area_entities(
             if entity.area_id is None
         ]
     )
-    return entities
+    return [entity for entity in entities if entity.domain == LIGHT_DOMAIN]
