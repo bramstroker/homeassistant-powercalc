@@ -24,6 +24,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [LUT](#lut-mode)
     - [Linear](#linear-mode)
     - [Fixed](#fixed-mode)
+    - [WLED](#wled-mode)
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
       - [Measuring lights](#creating-lut-files)
@@ -90,6 +91,7 @@ They are as follows:
 | multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
 | fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| wled                    | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
 | create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 | include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area or group. See [Area include](#include-area-entities)
@@ -186,6 +188,29 @@ sensor:
     linear:
       min_power: 0.5
       max_power: 8
+```
+
+### WLED mode
+Supported domains: `light`
+
+You can use WLED strategy for light strips which are controlled by [WLED](https://github.com/Aircoookie/WLED).
+WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
+Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
+
+#### Configuration options
+| Name              | Type    | Requirement  | Default | Description                                 |
+| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
+| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
+| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
+
+#### Example configuration
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.wled_lightstrip
+    wled:
+      voltage: 5
 ```
 
 #### Advanced precision calibration
