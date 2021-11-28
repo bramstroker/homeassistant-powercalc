@@ -9,6 +9,8 @@ from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
 from homeassistant.core import split_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .errors import SensorConfigurationError
+
 
 class SourceEntity(NamedTuple):
     unique_id: str
@@ -27,6 +29,8 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
 
     entity_registry = await er.async_get_registry(hass)
     entity_entry = entity_registry.async_get(entity_id)
+    if entity_entry is None:
+        raise SensorConfigurationError(f"No entity with id {entity_id} found")
 
     unique_id = None
     supported_color_modes = []
