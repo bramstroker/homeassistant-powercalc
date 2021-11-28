@@ -233,9 +233,12 @@ async def create_sensors(
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
         )
-        created_sensors.extend(
-            await create_individual_sensors(hass, merged_sensor_config)
-        )
+        try:
+            created_sensors.extend(
+                await create_individual_sensors(hass, merged_sensor_config)
+            )
+        except SensorConfigurationError as error:
+            _LOGGER.error(error)
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
