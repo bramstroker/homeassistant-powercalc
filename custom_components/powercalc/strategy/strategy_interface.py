@@ -14,5 +14,8 @@ class PowerCalculationStrategyInterface:
         """Validate correct setup of the strategy"""
         pass
 
-    def get_entities_to_track() -> tuple:
+    def get_entities_to_track(self) -> tuple:
         return {}
+    
+    def can_calculate_standby(self) -> bool:
+        return False

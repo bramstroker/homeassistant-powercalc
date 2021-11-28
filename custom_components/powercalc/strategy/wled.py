@@ -43,3 +43,6 @@ class WledStrategy(PowerCalculationStrategyInterface):
     
     def get_entities_to_track(self) -> tuple:
         return {self._estimated_current_entity}
+    
+    def can_calculate_standby(self) -> bool:
+        return True

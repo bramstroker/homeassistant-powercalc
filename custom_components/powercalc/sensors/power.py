@@ -259,14 +259,9 @@ class VirtualPowerSensor(SensorEntity):
             self.async_write_ha_state()
             return False
 
-        if state.state in OFF_STATES:
-            self._power = self._standby_power or 0
-            if self._multiply_factor and self._multiply_factor_standby:
-                self._power *= self._multiply_factor
-        else:
-            self._power = await self._power_calculator.calculate(state)
-            if self._multiply_factor and self._power is not None:
-                self._power *= self._multiply_factor
+        self._power = await self.calculate_power(state)
+        if self._power and self._multiply_factor and self._multiply_factor_standby:
+            self._power *= self._multiply_factor
 
         if self._power is None:
             self.async_write_ha_state()
@@ -283,6 +278,17 @@ class VirtualPowerSensor(SensorEntity):
 
         self.async_write_ha_state()
         return True
+
+    async def calculate_power(self, state) -> float:
+        if state.state in OFF_STATES:
+            if self._standby_power:
+                return self._standby_power
+            elif self._power_calculator.can_calculate_standby():
+                return await self._power_calculator.calculate(state)
+            else:
+                return 0
+        else:
+           return await self._power_calculator.calculate(state)
 
     @property
     def source_entity(self):
