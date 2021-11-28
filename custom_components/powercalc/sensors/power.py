@@ -233,9 +233,10 @@ class VirtualPowerSensor(SensorEntity):
                 self.hass, tracked_entities, appliance_state_listener
             )
 
-            new_state = self.hass.states.get(self._source_entity)
+            for entity_id in tracked_entities:
+                new_state = self.hass.states.get(entity_id)
 
-            await self._update_power_sensor(new_state)
+                await self._update_power_sensor(new_state)
 
         @callback
         def async_update(event_time=None):
