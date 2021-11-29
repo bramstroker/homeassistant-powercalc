@@ -90,4 +90,4 @@ class PowerCalculatorStrategyFactory:
     
     def _create_wled(self, config: dict, source_entity: SourceEntity) -> WledStrategy:
         """Create the WLED strategy"""
-        return WledStrategy(config=config.get(CONF_WLED), light_entity=source_entity)
+        return WledStrategy(config=config.get(CONF_WLED), light_entity=source_entity, hass=self._hass)
