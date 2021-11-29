@@ -32,6 +32,7 @@ from custom_components.powercalc.errors import (
     UnsupportedMode,
 )
 from custom_components.powercalc.light_model import LightModel
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}

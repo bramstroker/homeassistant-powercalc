@@ -139,7 +139,7 @@ async def find_hue_light(
 
     if not hass.data.get("hue"):
         return None
-        
+
     bridge = hass.data["hue"][entity_entry.config_entry_id]
     lights = bridge.api.lights
     for light_id in lights:

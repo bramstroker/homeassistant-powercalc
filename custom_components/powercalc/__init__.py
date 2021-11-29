@@ -138,4 +138,3 @@ async def autodiscover_entities(
         )
 
     _LOGGER.debug("Done auto discovering entities")
-

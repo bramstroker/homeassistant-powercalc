@@ -91,7 +91,7 @@ async def create_power_sensor(
 
         if (
             sensor_config.get(CONF_LINEAR) is None
-            and sensor_config.get(CONF_FIXED) is None 
+            and sensor_config.get(CONF_FIXED) is None
             and sensor_config.get(CONF_WLED) is None
         ):
             # When the user did not manually configured a model and a model was auto discovered we can load it.
@@ -171,7 +171,7 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
     if config.get(CONF_FIXED):
         return MODE_FIXED
-    
+
     if config.get(CONF_WLED):
         return MODE_WLED
 
@@ -289,7 +289,7 @@ class VirtualPowerSensor(SensorEntity):
             else:
                 return 0
         else:
-           return await self._power_calculator.calculate(state)
+            return await self._power_calculator.calculate(state)
 
     @property
     def source_entity(self):

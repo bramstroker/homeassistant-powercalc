@@ -12,6 +12,7 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER, CONF_STATES_POWER
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import evaluate_power
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(

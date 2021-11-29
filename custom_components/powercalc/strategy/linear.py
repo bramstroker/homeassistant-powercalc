@@ -12,8 +12,13 @@ from homeassistant.core import State
 from homeassistant.helpers.config_validation import entity_domain
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_CALIBRATE, CONF_MAX_POWER, CONF_MIN_POWER
+from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]

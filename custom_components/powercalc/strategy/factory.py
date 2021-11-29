@@ -13,15 +13,21 @@ from custom_components.powercalc.const import (
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
-    MODE_WLED
+    MODE_WLED,
 )
-from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedMode
+from custom_components.powercalc.errors import (
+    StrategyConfigurationError,
+    UnsupportedMode,
+)
 from custom_components.powercalc.light_model import LightModel
 from custom_components.powercalc.strategy.fixed import FixedStrategy
-from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
 from custom_components.powercalc.strategy.linear import LinearStrategy
 from custom_components.powercalc.strategy.lut import LutRegistry, LutStrategy
+from custom_components.powercalc.strategy.strategy_interface import (
+    PowerCalculationStrategyInterface,
+)
 from custom_components.powercalc.strategy.wled import WledStrategy
+
 
 class PowerCalculatorStrategyFactory:
     def __init__(self, hass: HomeAssistantType) -> None:
@@ -33,7 +39,7 @@ class PowerCalculatorStrategyFactory:
         config: dict,
         mode: str,
         light_model: Optional[LightModel],
-        source_entity: SourceEntity
+        source_entity: SourceEntity,
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
@@ -87,7 +93,9 @@ class PowerCalculatorStrategyFactory:
             )
 
         return LutStrategy(self._lut_registry, light_model)
-    
+
     def _create_wled(self, config: dict, source_entity: SourceEntity) -> WledStrategy:
         """Create the WLED strategy"""
-        return WledStrategy(config=config.get(CONF_WLED), light_entity=source_entity, hass=self._hass)
+        return WledStrategy(
+            config=config.get(CONF_WLED), light_entity=source_entity, hass=self._hass
+        )
