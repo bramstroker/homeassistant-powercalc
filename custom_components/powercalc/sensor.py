@@ -60,6 +60,7 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
+    CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DISCOVERY_SOURCE_ENTITY,
@@ -72,8 +73,9 @@ from .sensors.energy import VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
-from .strategy_fixed import CONFIG_SCHEMA as FIXED_SCHEMA
-from .strategy_linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
+from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -107,6 +109,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+    vol.Optional(CONF_WLED): WLED_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(

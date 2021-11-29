@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -19,7 +18,6 @@ from homeassistant.components.utility_meter.const import (
 )
 from homeassistant.const import CONF_ENTITY_ID, CONF_SCAN_INTERVAL
 from homeassistant.helpers import discovery
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .common import create_source_entity, validate_name_pattern
@@ -28,11 +26,7 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_NAMING,
-    CONF_FIXED,
-    CONF_LINEAR,
-    CONF_POWER,
     CONF_POWER_SENSOR_NAMING,
-    CONF_STATES_POWER,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
@@ -41,17 +35,10 @@ from .const import (
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
-    MODE_FIXED,
-    MODE_LINEAR,
-    MODE_LUT,
 )
-from .errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
-from .light_model import LightModel
+from .errors import ModelNotSupported
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
-from .strategy_fixed import FixedStrategy
-from .strategy_interface import PowerCalculationStrategyInterface
-from .strategy_linear import LinearStrategy
-from .strategy_lut import LutRegistry, LutStrategy
+from .strategy.factory import PowerCalculatorStrategyFactory
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
@@ -152,65 +139,3 @@ async def autodiscover_entities(
 
     _LOGGER.debug("Done auto discovering entities")
 
-
-class PowerCalculatorStrategyFactory:
-    def __init__(self, hass: HomeAssistantType) -> None:
-        self._hass = hass
-        self._lut_registry = LutRegistry()
-
-    def create(
-        self,
-        config: dict,
-        mode: str,
-        light_model: Optional[LightModel],
-        entity_domain: str,
-    ) -> PowerCalculationStrategyInterface:
-        """Create instance of calculation strategy based on configuration"""
-        if mode == MODE_LINEAR:
-            return self._create_linear(config, light_model, entity_domain)
-
-        if mode == MODE_FIXED:
-            return self._create_fixed(config, light_model)
-
-        if mode == MODE_LUT:
-            return self._create_lut(light_model)
-
-        raise UnsupportedMode("Invalid calculation mode", mode)
-
-    def _create_linear(
-        self, config: dict, light_model: LightModel, entity_domain: str
-    ) -> LinearStrategy:
-        """Create the linear strategy"""
-        linear_config = config.get(CONF_LINEAR)
-
-        if linear_config is None and light_model is not None:
-            linear_config = light_model.linear_mode_config
-
-        return LinearStrategy(linear_config, entity_domain)
-
-    def _create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
-        """Create the fixed strategy"""
-        fixed_config = config.get(CONF_FIXED)
-        if fixed_config is None and light_model is not None:
-            fixed_config = light_model.fixed_mode_config
-
-        power = fixed_config.get(CONF_POWER)
-        if isinstance(power, Template):
-            power.hass = self._hass
-
-        states_power = fixed_config.get(CONF_STATES_POWER)
-        if states_power:
-            for p in states_power.values():
-                if isinstance(p, Template):
-                    p.hass = self._hass
-
-        return FixedStrategy(power, states_power)
-
-    def _create_lut(self, light_model: LightModel) -> LutStrategy:
-        """Create the lut strategy"""
-        if light_model is None:
-            raise StrategyConfigurationError(
-                "You must supply a valid manufacturer and model to use the LUT mode"
-            )
-
-        return LutStrategy(self._lut_registry, light_model)

@@ -40,11 +40,13 @@ from custom_components.powercalc.const import (
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
+    CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
     DOMAIN,
     MODE_FIXED,
     MODE_LINEAR,
+    MODE_WLED,
 )
 from custom_components.powercalc.errors import (
     ModelNotSupported,
@@ -53,7 +55,7 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.model_discovery import get_light_model
-from custom_components.powercalc.strategy_interface import (
+from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 
@@ -89,7 +91,8 @@ async def create_power_sensor(
 
         if (
             sensor_config.get(CONF_LINEAR) is None
-            and sensor_config.get(CONF_FIXED) is None
+            and sensor_config.get(CONF_FIXED) is None 
+            and sensor_config.get(CONF_WLED) is None
         ):
             # When the user did not manually configured a model and a model was auto discovered we can load it.
             if (
@@ -107,11 +110,11 @@ async def create_power_sensor(
 
         if mode is None:
             raise UnsupportedMode(
-                "Cannot select a mode (LINEAR, FIXED or LUT), supply it in the config"
+                "Cannot select a mode (LINEAR, FIXED or LUT, WLED), supply it in the config"
             )
 
         calculation_strategy = calculation_strategy_factory.create(
-            sensor_config, mode, light_model, source_entity.domain
+            sensor_config, mode, light_model, source_entity
         )
         await calculation_strategy.validate_config(source_entity)
     except (ModelNotSupported, UnsupportedMode) as err:
@@ -168,6 +171,9 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
     if config.get(CONF_FIXED):
         return MODE_FIXED
+    
+    if config.get(CONF_WLED):
+        return MODE_WLED
 
     return None
 
@@ -219,14 +225,18 @@ class VirtualPowerSensor(SensorEntity):
 
         async def home_assistant_startup(event):
             """Add listeners and get initial state."""
+            tracked_entities = self._power_calculator.get_entities_to_track()
+            if not tracked_entities:
+                tracked_entities = {self._source_entity}
 
             async_track_state_change_event(
-                self.hass, [self._source_entity], appliance_state_listener
+                self.hass, tracked_entities, appliance_state_listener
             )
 
-            new_state = self.hass.states.get(self._source_entity)
+            for entity_id in tracked_entities:
+                new_state = self.hass.states.get(entity_id)
 
-            await self._update_power_sensor(new_state)
+                await self._update_power_sensor(new_state)
 
         @callback
         def async_update(event_time=None):
@@ -250,14 +260,9 @@ class VirtualPowerSensor(SensorEntity):
             self.async_write_ha_state()
             return False
 
-        if state.state in OFF_STATES:
-            self._power = self._standby_power or 0
-            if self._multiply_factor and self._multiply_factor_standby:
-                self._power *= self._multiply_factor
-        else:
-            self._power = await self._power_calculator.calculate(state)
-            if self._multiply_factor and self._power is not None:
-                self._power *= self._multiply_factor
+        self._power = await self.calculate_power(state)
+        if self._power and self._multiply_factor and self._multiply_factor_standby:
+            self._power *= self._multiply_factor
 
         if self._power is None:
             self.async_write_ha_state()
@@ -274,6 +279,17 @@ class VirtualPowerSensor(SensorEntity):
 
         self.async_write_ha_state()
         return True
+
+    async def calculate_power(self, state) -> float:
+        if state.state in OFF_STATES:
+            if self._standby_power:
+                return self._standby_power
+            elif self._power_calculator.can_calculate_standby():
+                return await self._power_calculator.calculate(state)
+            else:
+                return 0
+        else:
+           return await self._power_calculator.calculate(state)
 
     @property
     def source_entity(self):
