@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 import logging
@@ -16,7 +16,8 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     DEVICE_CLASS_ENERGY,
-    ENERGY_KILO_WATT_HOUR
+    ENERGY_KILO_WATT_HOUR,
+    POWER_WATT
 )
 from homeassistant.const import CONF_NAME, TIME_HOURS
 from homeassistant.core import callback
@@ -147,6 +148,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
 
         if state := await self.async_get_last_state():
             self._state = Decimal(state.state)
+            delta = self.calculate_delta(round(datetime.now().timestamp() - state.last_changed.timestamp()))
+            self._state = self._state + delta
+            self.async_schedule_update_ha_state()
         else:
             self._state = Decimal(0)
 
@@ -162,10 +166,17 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
 
     def update(self):
         """Update the energy sensor state."""
-        _LOGGER.info("Updating energy sensor")
-        delta = Decimal(self._value / (86400 * self._update_frequency))
-        self._state = self._state + delta
+        _LOGGER.debug("Updating energy sensor")
+        self._state = self._state + self.calculate_delta(self._update_frequency)
         _LOGGER.debug(f"New state {self._state}")
+
+    def calculate_delta(self, elapsedSeconds: int) -> Decimal:
+        if self._unit_of_measurement == ENERGY_KILO_WATT_HOUR:
+            kwhPerDay = self._value
+        elif self._unit_of_measurement == POWER_WATT:
+            kwhPerDay = self._value * 24
+        
+        return Decimal((kwhPerDay / 86400) * elapsedSeconds)
     
     @property
     def native_value(self):
