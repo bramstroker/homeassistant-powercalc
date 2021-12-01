@@ -143,11 +143,12 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
         self._on_time = on_time
+        self.entity_id = async_generate_entity_id(
+            ENTITY_ID_FORMAT, name, hass=hass
+        )
 
     async def async_added_to_hass(self):
         """Handle entity which will be added."""
-
-        _LOGGER.info("Added to hass")
 
         if state := await self.async_get_last_state():
             self._state = Decimal(state.state)
@@ -157,7 +158,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         else:
             self._state = Decimal(0)
 
-        _LOGGER.debug(f"Restoring state: {self._state}")
+        _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._state}")
 
         @callback
         def refresh(event_time=None):
@@ -169,9 +170,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
 
     def update(self):
         """Update the energy sensor state."""
-        _LOGGER.debug("Updating energy sensor")
         self._state = self._state + self.calculate_delta(self._update_frequency)
-        _LOGGER.debug(f"New state {self._state}")
+        _LOGGER.debug(f"{self.entity_id}: Updating daily_fixed_energy sensor: {self._state}")
 
     def calculate_delta(self, elapsedSeconds: int) -> Decimal:
         if self._unit_of_measurement == ENERGY_KILO_WATT_HOUR:

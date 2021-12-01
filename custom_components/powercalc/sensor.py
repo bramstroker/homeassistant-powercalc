@@ -27,7 +27,7 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIT_OF_MEASUREMENT, ENERGY_KILO_WATT_HOUR
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIT_OF_MEASUREMENT, ENERGY_KILO_WATT_HOUR, POWER_WATT
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
@@ -84,7 +84,7 @@ from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): cv.string,
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In([ENERGY_KILO_WATT_HOUR, POWER_WATT]),
         vol.Optional(CONF_ON_TIME): cv.time_period
     }
 )
@@ -313,20 +313,22 @@ async def create_individual_sensors(
                 hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
-            entities_to_add.extend(
-                create_utility_meters(hass, energy_sensor, sensor_config)
-            )
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         mode_config = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
-        entities_to_add.append(
-            DailyEnergySensor(
-                hass,
-                sensor_config.get(CONF_NAME),
-                mode_config.get(CONF_VALUE),
-                mode_config.get(CONF_UNIT_OF_MEASUREMENT),
-                mode_config.get(CONF_ON_TIME)
-            )
+
+        energy_sensor = DailyEnergySensor(
+            hass,
+            sensor_config.get(CONF_NAME),
+            mode_config.get(CONF_VALUE),
+            mode_config.get(CONF_UNIT_OF_MEASUREMENT),
+            mode_config.get(CONF_ON_TIME)
+        )
+        entities_to_add.append(energy_sensor)
+
+    if energy_sensor:
+        entities_to_add.extend(
+            create_utility_meters(hass, energy_sensor, sensor_config)
         )
 
     if discovery_info:
