@@ -21,6 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import CONF_NAME, TIME_HOURS
 from homeassistant.core import callback
+from homeassistant.helpers.config_validation import time
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
@@ -133,6 +134,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         name: str,
         value: float,
         unit_of_measurement: str,
+        on_time: timedelta=timedelta(hours=24),
         update_frequency: int=10
     ):
         self._hass = hass
@@ -140,6 +142,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         self._value = value
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
+        self._on_time = on_time
 
     async def async_added_to_hass(self):
         """Handle entity which will be added."""
@@ -174,7 +177,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         if self._unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             kwhPerDay = self._value
         elif self._unit_of_measurement == POWER_WATT:
-            kwhPerDay = self._value * 24
+            kwhPerDay = (self._value * (self._on_time.seconds / 3600)) / 1000
         
         return Decimal((kwhPerDay / 86400) * elapsedSeconds)
     

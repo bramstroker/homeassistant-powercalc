@@ -57,6 +57,7 @@ from .const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_ON_TIME,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
@@ -84,6 +85,7 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): cv.string,
+        vol.Optional(CONF_ON_TIME): cv.time_period
     }
 )
 
@@ -322,7 +324,8 @@ async def create_individual_sensors(
                 hass,
                 sensor_config.get(CONF_NAME),
                 mode_config.get(CONF_VALUE),
-                mode_config.get(CONF_UNIT_OF_MEASUREMENT)
+                mode_config.get(CONF_UNIT_OF_MEASUREMENT),
+                mode_config.get(CONF_ON_TIME)
             )
         )
 
