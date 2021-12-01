@@ -27,7 +27,7 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIT_OF_MEASUREMENT, ENERGY_KILO_WATT_HOUR
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
@@ -45,6 +45,7 @@ from .const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_STANDBY_POWER,
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
@@ -60,22 +61,31 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UTILITY_METER_TYPES,
+    CONF_VALUE,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
+    DUMMY_ENTITY_ID
 )
 from .errors import PowercalcSetupError, SensorConfigurationError
 from .model_discovery import is_supported_model
-from .sensors.energy import VirtualEnergySensor, create_energy_sensor
+from .sensors.energy import DailyEnergySensor, VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
+
+DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): cv.string,
+    }
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -110,6 +120,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
+    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
@@ -132,7 +143,7 @@ GROUPED_SENSOR_CONFIG = {
 }
 
 PLATFORM_SCHEMA: Final = vol.All(
-    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE),
+    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY),
     cv.deprecated(
         CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
     ),
@@ -202,6 +213,9 @@ async def create_sensors(
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
+    if CONF_DAILY_FIXED_ENERGY in config:
+        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
     if CONF_ENTITY_ID in config or discovery_info is not None:
         if discovery_info:
@@ -268,7 +282,7 @@ async def create_individual_sensors(
     else:
         source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
-    if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+    if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] and source_entity.entity_id != DUMMY_ENTITY_ID:
         # Display an error when a power sensor was already configured for the same entity by the user
         # No log entry will be shown when the entity was auto discovered, we can silently continue
         if not discovery_info:
@@ -278,22 +292,38 @@ async def create_individual_sensors(
             )
         return []
 
-    try:
-        power_sensor = await create_power_sensor(
-            hass, sensor_config, source_entity, discovery_info
-        )
-    except PowercalcSetupError as err:
-        return []
+    entities_to_add = []
 
-    entities_to_add = [power_sensor]
+    should_create_power_sensor = not CONF_DAILY_FIXED_ENERGY in sensor_config
+    if should_create_power_sensor:
+        try:
+            power_sensor = await create_power_sensor(
+                hass, sensor_config, source_entity, discovery_info
+            )
+        except PowercalcSetupError as err:
+            return []
 
-    if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-        energy_sensor = await create_energy_sensor(
-            hass, sensor_config, power_sensor, source_entity
-        )
-        entities_to_add.append(energy_sensor)
-        entities_to_add.extend(
-            create_utility_meters(hass, energy_sensor, sensor_config)
+        entities_to_add.append(power_sensor)
+
+        # Create energy sensor which integrates the power sensor
+        if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
+            energy_sensor = await create_energy_sensor(
+                hass, sensor_config, power_sensor, source_entity
+            )
+            entities_to_add.append(energy_sensor)
+            entities_to_add.extend(
+                create_utility_meters(hass, energy_sensor, sensor_config)
+            )
+
+    if CONF_DAILY_FIXED_ENERGY in sensor_config:
+        mode_config = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+        entities_to_add.append(
+            DailyEnergySensor(
+                hass,
+                sensor_config.get(CONF_NAME),
+                mode_config.get(CONF_VALUE),
+                mode_config.get(CONF_UNIT_OF_MEASUREMENT)
+            )
         )
 
     if discovery_info:

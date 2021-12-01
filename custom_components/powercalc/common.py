@@ -13,17 +13,24 @@ from .errors import SensorConfigurationError
 
 
 class SourceEntity(NamedTuple):
-    unique_id: str
     object_id: str
     entity_id: str
-    name: str
     domain: str
-    supported_color_modes: list
-    entity_entry: er.RegistryEntry | None
+    unique_id: str | None = None
+    name: str | None = None
+    supported_color_modes: list | None = None
+    entity_entry: er.RegistryEntry | None = None
 
 
 async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
     """Create object containing all information about the source entity"""
+
+    if entity_id == "dummy":
+        return SourceEntity(
+            object_id="dummy",
+            entity_id="dummy",
+            domain="dummy"
+        )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
 
@@ -51,11 +58,11 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
         supported_color_modes = entity_state.attributes.get(ATTR_SUPPORTED_COLOR_MODES)
 
     return SourceEntity(
-        unique_id,
         source_object_id,
         entity_id,
-        source_entity_name,
         source_entity_domain,
+        unique_id,
+        source_entity_name,
         supported_color_modes or [],
         entity_entry,
     )
