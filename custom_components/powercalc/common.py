@@ -9,6 +9,7 @@ from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
 from homeassistant.core import split_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 
+from .const import DUMMY_ENTITY_ID
 from .errors import SensorConfigurationError
 
 
@@ -25,11 +26,11 @@ class SourceEntity(NamedTuple):
 async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
     """Create object containing all information about the source entity"""
 
-    if entity_id == "dummy":
+    if entity_id == DUMMY_ENTITY_ID:
         return SourceEntity(
-            object_id="dummy",
-            entity_id="dummy",
-            domain="dummy"
+            object_id=DUMMY_ENTITY_ID,
+            entity_id=DUMMY_ENTITY_ID,
+            domain=DUMMY_ENTITY_ID
         )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
