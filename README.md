@@ -30,6 +30,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
       - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
 - [Sensor naming](#sensor-naming)
+- [Daily fixed energy](#faily-fixed-energy)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
     - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
@@ -456,6 +457,48 @@ sensor:
 will create:
 - sensor.patio_light_power (Patio light power)
 - sensor.patio_light_energy (Patio light energy)
+
+## Daily fixed energy
+
+> Available from v0.13 an higher
+
+Sometimes you want to keep track of energy usage of individual devices which are not managed by Home Assistant.
+When you know the energy consumption in kWh or W powercalc can make it possible to create an energy sensor (which can also be used in the energy dashboard). 
+This can be helpful for devices which are always on and have a relatively fixed power draw. For example an IP camera, intercom, Google nest, Alexa, network switches etc.
+
+### Configuration options
+
+| Name                | Type    | Requirement  | Default  | Description                                           |
+| ------------------- | ------- | ------------ | ----------------------------------------------------- |
+| value               | float   | **Required** |          | Value either in watts or kWh. Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
+| unit_of_measurement | string  | **Optional** | kWh      | `kWh` or `W` |
+| on_time             | period  | **Optional** | 24:00:00 | How long the device is on per day. Only applies when unit_of_measurement is set to `W`. Format HH:MM:SS
+
+### Configuration examples
+
+This will add 0.05 kWh per day to the energy sensor called "IP camera upstairs"
+
+```yaml
+sensor:
+  - platform: powercalc
+    name: IP camera upstairs
+    daily_fixed_energy:
+      value: 0.05
+```
+
+Or define in watts, with an optional on time (which is 24 hour a day by default).
+
+```yaml
+sensor:
+  - platform: powercalc
+    name: Intercom
+    daily_fixed_energy:
+      value: 21
+      unit_of_measurement: W
+      on_time: 12:00:00
+```
+
+This will simulate the devices using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
 
 ## Setting up for energy dashboard
 If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
