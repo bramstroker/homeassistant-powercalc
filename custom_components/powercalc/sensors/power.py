@@ -103,7 +103,7 @@ async def create_power_sensor(
                 light_model = discovery_info.get(DISCOVERY_LIGHT_MODEL)
             else:
                 light_model = await get_light_model(
-                    hass, source_entity.entity_entry, sensor_config
+                    hass, sensor_config, source_entity.entity_entry
                 )
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
