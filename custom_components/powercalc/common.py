@@ -28,9 +28,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
 
     if entity_id == DUMMY_ENTITY_ID:
         return SourceEntity(
-            object_id=DUMMY_ENTITY_ID,
-            entity_id=DUMMY_ENTITY_ID,
-            domain=DUMMY_ENTITY_ID
+            object_id=DUMMY_ENTITY_ID, entity_id=DUMMY_ENTITY_ID, domain=DUMMY_ENTITY_ID
         )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)

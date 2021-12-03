@@ -27,7 +27,14 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIT_OF_MEASUREMENT, ENERGY_KILO_WATT_HOUR, POWER_WATT
+from homeassistant.const import (
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_UNIT_OF_MEASUREMENT,
+    ENERGY_KILO_WATT_HOUR,
+    POWER_WATT,
+)
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import (
@@ -70,7 +77,7 @@ from .const import (
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
-    DUMMY_ENTITY_ID
+    DUMMY_ENTITY_ID,
 )
 from .errors import PowercalcSetupError, SensorConfigurationError
 from .model_discovery import is_supported_model
@@ -104,9 +111,11 @@ SUPPORTED_ENTITY_DOMAINS = (
 DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In([ENERGY_KILO_WATT_HOUR, POWER_WATT]),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
+            [ENERGY_KILO_WATT_HOUR, POWER_WATT]
+        ),
         vol.Optional(CONF_ON_TIME): cv.time_period,
-        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int)
+        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int),
     }
 )
 
@@ -147,7 +156,9 @@ GROUPED_SENSOR_CONFIG = {
 }
 
 PLATFORM_SCHEMA: Final = vol.All(
-    cv.has_at_least_one_key(CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY),
+    cv.has_at_least_one_key(
+        CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY
+    ),
     cv.deprecated(
         CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
     ),
@@ -286,7 +297,10 @@ async def create_individual_sensors(
     else:
         source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
-    if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES] and source_entity.entity_id != DUMMY_ENTITY_ID:
+    if (
+        source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
+        and source_entity.entity_id != DUMMY_ENTITY_ID
+    ):
         # Display an error when a power sensor was already configured for the same entity by the user
         # No log entry will be shown when the entity was auto discovered, we can silently continue
         if not discovery_info:

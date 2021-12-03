@@ -21,7 +21,10 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_UTILITY_METER_TYPES,
 )
-from custom_components.powercalc.sensors.energy import DailyEnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.energy import (
+    DailyEnergySensor,
+    VirtualEnergySensor,
+)
 from custom_components.powercalc.sensors.group import GroupedEnergySensor
 
 _LOGGER = logging.getLogger(__name__)

@@ -25,7 +25,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def get_light_model(
-    hass: HomeAssistantType, config: dict, entity_entry: Optional[er.RegistryEntry] = None
+    hass: HomeAssistantType,
+    config: dict,
+    entity_entry: Optional[er.RegistryEntry] = None,
 ) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
