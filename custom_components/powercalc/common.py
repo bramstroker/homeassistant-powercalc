@@ -37,7 +37,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
 
     entity_registry = await er.async_get_registry(hass)
     entity_entry = entity_registry.async_get(entity_id)
-    if entity_entry is None:
+    if entity_entry is None and not hass.states.get(entity_id):
         raise SensorConfigurationError(f"No entity with id {entity_id} found")
 
     unique_id = None

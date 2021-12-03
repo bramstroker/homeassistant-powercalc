@@ -82,15 +82,6 @@ from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
-DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In([ENERGY_KILO_WATT_HOUR, POWER_WATT]),
-        vol.Optional(CONF_ON_TIME): cv.time_period,
-        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int)
-    }
-)
-
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORTED_ENTITY_DOMAINS = (
@@ -108,6 +99,15 @@ SUPPORTED_ENTITY_DOMAINS = (
     sensor.DOMAIN,
     vacuum.DOMAIN,
     water_heater.DOMAIN,
+)
+
+DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In([ENERGY_KILO_WATT_HOUR, POWER_WATT]),
+        vol.Optional(CONF_ON_TIME): cv.time_period,
+        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int)
+    }
 )
 
 SENSOR_CONFIG = {
