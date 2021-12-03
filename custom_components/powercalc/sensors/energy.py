@@ -21,9 +21,9 @@ from homeassistant.const import (
 )
 from homeassistant.const import CONF_NAME, TIME_HOURS
 from homeassistant.core import callback
-from homeassistant.helpers.config_validation import time
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.helpers.event import async_track_time_interval
 
@@ -127,6 +127,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
     _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+    _attr_should_poll = False
+    _attr_icon = ENERGY_ICON
 
     def __init__(
         self,
@@ -134,8 +136,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         name: str,
         value: float,
         unit_of_measurement: str,
+        update_frequency: int,
         on_time: timedelta=timedelta(hours=24),
-        update_frequency: int=10
     ):
         self._hass = hass
         self._attr_name = name
@@ -162,22 +164,24 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
 
         @callback
         def refresh(event_time=None):
-            self.async_schedule_update_ha_state(True)
+            """Update the energy sensor state."""
+            self._state = self._state + self.calculate_delta(self._update_frequency)
+            _LOGGER.debug(f"{self.entity_id}: Updating daily_fixed_energy sensor: {self._state}")
+            self.async_schedule_update_ha_state()
 
         self._timer = async_track_time_interval(
             self.hass, refresh, timedelta(seconds=self._update_frequency)
         )
 
-    def update(self):
-        """Update the energy sensor state."""
-        self._state = self._state + self.calculate_delta(self._update_frequency)
-        _LOGGER.debug(f"{self.entity_id}: Updating daily_fixed_energy sensor: {self._state}")
-
     def calculate_delta(self, elapsedSeconds: int) -> Decimal:
+        value = self._value
+        if isinstance(value, Template):
+            value = value.render()
+
         if self._unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            kwhPerDay = self._value
+            kwhPerDay = value
         elif self._unit_of_measurement == POWER_WATT:
-            kwhPerDay = (self._value * (self._on_time.seconds / 3600)) / 1000
+            kwhPerDay = (value * (self._on_time.seconds / 3600)) / 1000
         
         return Decimal((kwhPerDay / 86400) * elapsedSeconds)
     

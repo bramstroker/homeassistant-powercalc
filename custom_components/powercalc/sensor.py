@@ -61,6 +61,7 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
+    CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_WLED,
@@ -85,7 +86,8 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In([ENERGY_KILO_WATT_HOUR, POWER_WATT]),
-        vol.Optional(CONF_ON_TIME): cv.time_period
+        vol.Optional(CONF_ON_TIME): cv.time_period,
+        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int)
     }
 )
 
@@ -322,7 +324,8 @@ async def create_individual_sensors(
             sensor_config.get(CONF_NAME),
             mode_config.get(CONF_VALUE),
             mode_config.get(CONF_UNIT_OF_MEASUREMENT),
-            mode_config.get(CONF_ON_TIME)
+            mode_config.get(CONF_UPDATE_FREQUENCY),
+            mode_config.get(CONF_ON_TIME),
         )
         entities_to_add.append(energy_sensor)
 
