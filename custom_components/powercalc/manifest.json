@@ -4,6 +4,7 @@
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "dependencies": [
+    "device_tracker",
     "hue",
     "fan",
     "switch",

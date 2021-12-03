@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import os
 import re
-from collections import namedtuple
 from typing import NamedTuple, Optional
 
 import homeassistant.helpers.device_registry as dr
@@ -26,11 +25,11 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def get_light_model(
-    hass: HomeAssistantType, entity_entry: er.RegistryEntry, config: dict
+    hass: HomeAssistantType, config: dict, entity_entry: Optional[er.RegistryEntry] = None
 ) -> Optional[LightModel]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if manufacturer is None or model is None:
+    if (manufacturer is None or model is None) and entity_entry:
         model_info = await autodiscover_model(hass, entity_entry)
         if model_info:
             manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
@@ -49,10 +48,10 @@ async def get_light_model(
 
 
 async def is_supported_model(
-    hass: HomeAssistantType, entity_registry: er.RegistryEntry, sensor_config: dict = {}
+    hass: HomeAssistantType, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
-        await get_light_model(hass, entity_registry, sensor_config)
+        await get_light_model(hass, sensor_config, entry)
         return True
     except ModelNotSupported:
         return False

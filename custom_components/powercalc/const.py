@@ -7,12 +7,15 @@ DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 
+DUMMY_ENTITY_ID = "dummy"
+
 CONF_AREA = "area"
 CONF_CALIBRATE = "calibrate"
 CONF_CREATE_GROUP = "create_group"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"
+CONF_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 CONF_ENABLE_AUTODISCOVERY = "enable_autodiscovery"
 CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_FIXED = "fixed"
@@ -31,6 +34,9 @@ CONF_POWER_SENSOR_NAMING = "power_sensor_naming"
 CONF_POWER = "power"
 CONF_MIN_POWER = "min_power"
 CONF_MAX_POWER = "max_power"
+CONF_ON_TIME = "on_time"
+CONF_UPDATE_FREQUENCY = "update_frequency"
+CONF_VALUE = "value"
 CONF_VOLTAGE = "voltage"
 CONF_WATT = "watt"
 CONF_WLED = "wled"
@@ -51,11 +57,18 @@ ATTR_INTEGRATION = "integration"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
+MODE_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
 MODE_WLED = "wled"
-CALCULATION_MODES = [MODE_FIXED, MODE_LINEAR, MODE_LUT, MODE_WLED]
+CALCULATION_MODES = [
+    MODE_DAILY_FIXED_ENERGY,
+    MODE_FIXED,
+    MODE_LINEAR,
+    MODE_LUT,
+    MODE_WLED
+]
 
 MANUFACTURER_DIRECTORY_MAPPING = {
     "IKEA of Sweden": "ikea",

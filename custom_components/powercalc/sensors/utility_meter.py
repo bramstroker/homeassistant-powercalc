@@ -21,7 +21,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_UTILITY_METER_TYPES,
 )
-from custom_components.powercalc.sensors.energy import VirtualEnergySensor
+from custom_components.powercalc.sensors.energy import DailyEnergySensor, VirtualEnergySensor
 from custom_components.powercalc.sensors.group import GroupedEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def create_utility_meters(
     hass: HomeAssistantType,
-    energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor],
+    energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor, DailyEnergySensor],
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
