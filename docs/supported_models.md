@@ -44,11 +44,13 @@
 |signify      |LTA001                   |Hue White Ambiance E27                                    |lut              |color_temp   |
 |signify      |LTC001                   |Hue Being Ceiling Light                                   |lut              |color_temp   |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                     |lut              |color_temp   |
+|signify      |LTC012                   |Hue Struana Ceiling Light                                 |lut              |color_temp   |
 |signify      |LTG002                   |Hue White Ambiance GU10 w/ BT                             |lut              |color_temp   |
 |signify      |LTP003                   |Hue Fair Pendant                                          |lut              |color_temp   |
 |signify      |LTW001                   |Hue White Ambiance A19                                    |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A              |lut              |color_temp   |
 |signify      |LTW012                   | Hue White Ambiance Candle E14                            |lut              |color_temp   |
+|signify      |LTW017                   |Hue Adore Bathroom Mirror Light                           |lut              |color_temp   |
 |signify      |LWA001                   |Hue White Ambiance Bulb A60 E27                           |lut              |brightness   |
 |signify      |LWA004                   |Hue White Filament Bulb A60 E27                           |lut              |brightness   |
 |signify      |LWA009                   |Hue White 1600 A67 E27 1600lm                             |lut              |brightness   |
