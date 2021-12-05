@@ -102,5 +102,7 @@ MODEL_DIRECTORY_MAPPING = {
     "Signify Netherlands B.V.": {
         "440400982841": "LCT024",
         "8718696449691": "LWB010",
+        "3417711P6": "LTW017",
+        "3418931P6": "LTC012"
     },
 }
