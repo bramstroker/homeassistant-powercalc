@@ -7,12 +7,11 @@ import os
 import re
 from typing import NamedTuple, Optional
 
-from awesomeversion.awesomeversion import AwesomeVersion
-
-from homeassistant.const import __version__ as HA_VERSION
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.light import Light
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
@@ -88,7 +87,11 @@ async def autodiscover_model(
     model_info = ModelInfo(manufacturer, model_id)
 
     # This check can be removed in future version
-    if AwesomeVersion(HA_VERSION) <= AwesomeVersion("2021.11") and match is None and entity_entry.platform == "hue":
+    if (
+        AwesomeVersion(HA_VERSION) <= AwesomeVersion("2021.11")
+        and match is None
+        and entity_entry.platform == "hue"
+    ):
         model_info = await autodiscover_from_hue_bridge(hass, entity_entry)
         if model_info is None:
             return None
