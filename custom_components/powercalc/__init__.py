@@ -115,7 +115,7 @@ async def autodiscover_entities(
 
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
-            light_model = await get_light_model(hass, source_entity.entity_entry, {})
+            light_model = await get_light_model(hass, {}, source_entity.entity_entry)
         except ModelNotSupported:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping auto configuration",
