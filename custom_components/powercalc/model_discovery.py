@@ -10,7 +10,6 @@ from typing import NamedTuple, Optional
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.components.light import Light
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -141,7 +140,7 @@ async def autodiscover_from_hue_bridge(
 
 async def find_hue_light(
     hass: HomeAssistantType, entity_entry: er.RegistryEntry
-) -> Light | None:
+):
     """Find the light in the Hue bridge, we need to extract the model id."""
 
     if not hass.data.get("hue"):
