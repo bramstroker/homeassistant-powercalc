@@ -54,6 +54,7 @@ DISCOVERY_LIGHT_MODEL = "light_model"
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENTITIES = "entities"
 ATTR_INTEGRATION = "integration"
+ATTR_IS_GROUP = "is_group"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
