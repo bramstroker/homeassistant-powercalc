@@ -26,6 +26,7 @@ from homeassistant.components import (
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
     CONF_ENTITIES,
@@ -69,6 +70,7 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
     CONF_UPDATE_FREQUENCY,
+    CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_WLED,
@@ -138,6 +140,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
         cv.ensure_list, [vol.In(METER_TYPES)]
+    ),
+    vol.Optional(CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET): vol.All(
+        cv.time_period, cv.positive_timedelta, max_28_days
     ),
     vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
