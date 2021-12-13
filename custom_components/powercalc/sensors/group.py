@@ -19,10 +19,7 @@ from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc.const import (
-    ATTR_ENTITIES,
-    ATTR_IS_GROUP,
-)
+from custom_components.powercalc.const import ATTR_ENTITIES, ATTR_IS_GROUP
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -43,7 +40,7 @@ class GroupedSensor(SensorEntity):
         self._entities = entities
         self._attr_extra_state_attributes = {
             ATTR_ENTITIES: self._entities,
-            ATTR_IS_GROUP: True
+            ATTR_IS_GROUP: True,
         }
         self._rounding_digits = rounding_digits
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)

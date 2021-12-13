@@ -18,8 +18,8 @@ from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
+    CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
-    CONF_UTILITY_METER_OFFSET
 )
 from custom_components.powercalc.sensors.energy import (
     DailyEnergySensor,

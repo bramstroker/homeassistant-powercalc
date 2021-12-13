@@ -138,9 +138,7 @@ async def autodiscover_from_hue_bridge(
     return ModelInfo(light.manufacturername, light.modelid)
 
 
-async def find_hue_light(
-    hass: HomeAssistantType, entity_entry: er.RegistryEntry
-):
+async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry):
     """Find the light in the Hue bridge, we need to extract the model id."""
 
     if not hass.data.get("hue"):
