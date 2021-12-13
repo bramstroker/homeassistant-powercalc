@@ -4,7 +4,6 @@ import inspect
 import logging
 from typing import Union
 
-from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import (
     CONF_METER_NET_CONSUMPTION,
     CONF_METER_TYPE,
@@ -20,6 +19,7 @@ from homeassistant.helpers.typing import HomeAssistantType
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_UTILITY_METER_TYPES,
+    CONF_UTILITY_METER_OFFSET
 )
 from custom_components.powercalc.sensors.energy import (
     DailyEnergySensor,
@@ -60,7 +60,7 @@ def create_utility_meters(
             "source_entity": energy_sensor.entity_id,
             "name": name,
             "meter_type": meter_type,
-            "meter_offset": DEFAULT_OFFSET,
+            "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
             "net_consumption": False,
         }
 
