@@ -112,6 +112,9 @@ async def autodiscover_entities(
     _LOGGER.debug("Start auto discovering entities")
     entity_registry = await er.async_get_registry(hass)
     for entity_entry in list(entity_registry.entities.values()):
+        if entity_entry.disabled:
+            continue
+
         if entity_entry.domain != LIGHT_DOMAIN:
             continue
 
