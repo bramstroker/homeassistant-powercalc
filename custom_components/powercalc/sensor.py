@@ -1,9 +1,9 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
-from datetime import timedelta
 
 import logging
+from datetime import timedelta
 from typing import Final
 
 import homeassistant.helpers.config_validation as cv

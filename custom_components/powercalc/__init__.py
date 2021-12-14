@@ -66,9 +66,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
-                    vol.Optional(CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET): vol.All(
-                        cv.time_period, cv.positive_timedelta, max_28_days
-                    ),
+                    vol.Optional(
+                        CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
+                    ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                 }
             ),
         )
