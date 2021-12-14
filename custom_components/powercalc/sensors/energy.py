@@ -136,7 +136,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         value: float,
         unit_of_measurement: str,
         update_frequency: int,
-        on_time: timedelta = timedelta(hours=24),
+        on_time: timedelta = timedelta(days=1),
     ):
         self._hass = hass
         self._attr_name = name
@@ -182,7 +182,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity):
         if self._unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             kwhPerDay = value
         elif self._unit_of_measurement == POWER_WATT:
-            kwhPerDay = (value * (self._on_time.seconds / 3600)) / 1000
+            kwhPerDay = (value * (self._on_time.total_seconds() / 3600)) / 1000
 
         return Decimal((kwhPerDay / 86400) * elapsedSeconds)
 

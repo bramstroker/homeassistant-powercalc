@@ -1,6 +1,7 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
+from datetime import timedelta
 
 import logging
 from typing import Final
@@ -116,7 +117,7 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
         ),
-        vol.Optional(CONF_ON_TIME): cv.time_period,
+        vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
         vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int),
     }
 )
