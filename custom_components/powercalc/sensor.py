@@ -318,6 +318,7 @@ async def create_individual_sensors(
 
     entities_to_add = []
 
+    energy_sensor = None
     should_create_power_sensor = not CONF_DAILY_FIXED_ENERGY in sensor_config
     if should_create_power_sensor:
         try:
