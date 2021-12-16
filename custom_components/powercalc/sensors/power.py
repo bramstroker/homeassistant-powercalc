@@ -18,7 +18,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import callback
-from homeassistant.helpers.entity import DeviceInfo, async_generate_entity_id
+from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
@@ -320,11 +320,3 @@ class VirtualPowerSensor(SensorEntity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
-    
-    @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info for the thermostat."""
-        device_info: DeviceInfo = super().device_info
-        if device_info:
-            device_info["suggested_area"] = "Foo"
-        return device_info
