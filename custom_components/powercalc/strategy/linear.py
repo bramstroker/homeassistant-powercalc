@@ -2,14 +2,19 @@ from __future__ import annotations
 
 import logging
 from typing import Optional
+from homeassistant.components.climate.const import ATTR_HUMIDITY
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, light
+from homeassistant.components import fan, humidifier, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
+from homeassistant.components.humidifier import (
+    ATTR_MIN_HUMIDITY,
+    ATTR_MAX_HUMIDITY,
+)
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
-from homeassistant.helpers.config_validation import entity_domain
+from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -21,7 +26,7 @@ from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, humidifier.DOMAIN, light.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -36,28 +41,14 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class LinearStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, config, entity_domain: str) -> None:
+    def __init__(self, config, hass: HomeAssistantType, source_entity: SourceEntity) -> None:
         self._config = config
-        self._entity_domain = entity_domain
+        self._hass = hass
+        self._source_entity = source_entity
         self._calibration = self.create_calibrate_list()
 
     async def calculate(self, entity_state: State) -> Optional[float]:
-        attrs = entity_state.attributes
-
-        if entity_state.domain == light.DOMAIN:
-            value = attrs.get(ATTR_BRIGHTNESS)
-            # Some integrations set a higher brightness value than 255, causing powercalc to misbehave
-            if value > 255:
-                value = 255
-            if value is None:
-                _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
-                return None
-
-        if entity_state.domain == fan.DOMAIN:
-            value = attrs.get(ATTR_PERCENTAGE)
-            if value is None:
-                _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
-                return None
+        value = self.get_current_state_value(entity_state)
 
         min_calibrate = self.get_min_calibrate(value)
         max_calibrate = self.get_max_calibrate(value)
@@ -85,12 +76,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         list = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
+        full_range = self.get_entity_value_range()
+        min = full_range[0]
+        max = full_range[1]
         if calibrate is None:
-            list.append((1, float(self._config.get(CONF_MIN_POWER))))
-            if entity_domain == fan.DOMAIN:
-                max = 100
-            else:
-                max = 255
+            list.append((min, float(self._config.get(CONF_MIN_POWER))))
             list.append((max, float(self._config.get(CONF_MAX_POWER))))
             return list
 
@@ -100,6 +90,44 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         sorted_list = sorted(list, key=lambda tup: tup[0])
         return sorted_list
+
+    def get_entity_value_range(self) -> tuple:
+        if self._source_entity.domain == fan.DOMAIN:
+            return (1, 100)
+        
+        if self._source_entity.domain == light.DOMAIN:
+            return (1, 255)
+        
+        if self._source_entity.domain == humidifier.DOMAIN:
+            state = self._hass.states.get(self._source_entity.entity_id)
+            return (state.attributes[ATTR_MIN_HUMIDITY], state.attributes[ATTR_MAX_HUMIDITY])
+
+
+    def get_current_state_value(self, entity_state: State) -> Optional[int]:
+        attrs = entity_state.attributes
+
+        if entity_state.domain == light.DOMAIN:
+            value = attrs.get(ATTR_BRIGHTNESS)
+            # Some integrations set a higher brightness value than 255, causing powercalc to misbehave
+            if value > 255:
+                value = 255
+            if value is None:
+                _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
+                return None
+
+        if entity_state.domain == fan.DOMAIN:
+            value = attrs.get(ATTR_PERCENTAGE)
+            if value is None:
+                _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
+                return None
+        
+        if entity_state.domain == humidifier.DOMAIN:
+            value = attrs.get(ATTR_HUMIDITY)
+            if value is None:
+                _LOGGER.error("No humidity for entity: %s", entity_state.entity_id)
+                return None
+        
+        return value
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
