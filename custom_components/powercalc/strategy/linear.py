@@ -2,16 +2,13 @@ from __future__ import annotations
 
 import logging
 from typing import Optional
-from homeassistant.components.climate.const import ATTR_HUMIDITY
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components import fan, humidifier, light
+from homeassistant.components.climate.const import ATTR_HUMIDITY
 from homeassistant.components.fan import ATTR_PERCENTAGE
-from homeassistant.components.humidifier import (
-    ATTR_MIN_HUMIDITY,
-    ATTR_MAX_HUMIDITY,
-)
+from homeassistant.components.humidifier import ATTR_MAX_HUMIDITY, ATTR_MIN_HUMIDITY
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
 from homeassistant.helpers.typing import HomeAssistantType
@@ -41,7 +38,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class LinearStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, config, hass: HomeAssistantType, source_entity: SourceEntity) -> None:
+    def __init__(
+        self, config, hass: HomeAssistantType, source_entity: SourceEntity
+    ) -> None:
         self._config = config
         self._hass = hass
         self._source_entity = source_entity
@@ -94,14 +93,16 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def get_entity_value_range(self) -> tuple:
         if self._source_entity.domain == fan.DOMAIN:
             return (1, 100)
-        
+
         if self._source_entity.domain == light.DOMAIN:
             return (1, 255)
-        
+
         if self._source_entity.domain == humidifier.DOMAIN:
             state = self._hass.states.get(self._source_entity.entity_id)
-            return (state.attributes[ATTR_MIN_HUMIDITY], state.attributes[ATTR_MAX_HUMIDITY])
-
+            return (
+                state.attributes[ATTR_MIN_HUMIDITY],
+                state.attributes[ATTR_MAX_HUMIDITY],
+            )
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         attrs = entity_state.attributes
@@ -120,13 +121,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             if value is None:
                 _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
                 return None
-        
+
         if entity_state.domain == humidifier.DOMAIN:
             value = attrs.get(ATTR_HUMIDITY)
             if value is None:
                 _LOGGER.error("No humidity for entity: %s", entity_state.entity_id)
                 return None
-        
+
         return value
 
     async def validate_config(self, source_entity: SourceEntity):
