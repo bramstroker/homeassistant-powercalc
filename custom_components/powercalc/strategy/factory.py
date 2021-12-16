@@ -43,7 +43,7 @@ class PowerCalculatorStrategyFactory:
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
         if mode == MODE_LINEAR:
-            return self._create_linear(config, light_model, source_entity.domain)
+            return self._create_linear(config, light_model, source_entity)
 
         if mode == MODE_FIXED:
             return self._create_fixed(config, light_model)
@@ -57,7 +57,7 @@ class PowerCalculatorStrategyFactory:
         raise UnsupportedMode("Invalid calculation mode", mode)
 
     def _create_linear(
-        self, config: dict, light_model: LightModel, entity_domain: str
+        self, config: dict, light_model: LightModel, source_entity: SourceEntity
     ) -> LinearStrategy:
         """Create the linear strategy"""
         linear_config = config.get(CONF_LINEAR)
@@ -65,7 +65,7 @@ class PowerCalculatorStrategyFactory:
         if linear_config is None and light_model is not None:
             linear_config = light_model.linear_mode_config
 
-        return LinearStrategy(linear_config, entity_domain)
+        return LinearStrategy(linear_config, self._hass, source_entity)
 
     def _create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
         """Create the fixed strategy"""
