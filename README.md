@@ -168,7 +168,7 @@ sensor:
 ```
 
 ### Linear mode
-Supported domains: `light`, `fan` 
+Supported domains: `light`, `fan`, `humidifier`
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
 You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
@@ -237,7 +237,7 @@ sensor:
 > For fan speeds the range is 1-100 (percentage)
 
 ### Fixed mode
-Supported domains: `light`, `fan`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
+Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
