@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from datetime import timedelta
 from typing import Final
+from homeassistant.core import callback
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -40,6 +41,7 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import (
     ConfigType,
     DiscoveryInfoType,
@@ -71,6 +73,7 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
+    CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
@@ -158,6 +161,7 @@ GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
             vol.Optional(CONF_AREA): cv.string,
+            vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
@@ -256,17 +260,14 @@ async def create_sensors(
             conf[CONF_ENTITY_ID]: conf for conf in config.get(CONF_ENTITIES)
         }
 
+    # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-
-        # Include entities from a certain area
-        if CONF_AREA in config.get(CONF_INCLUDE):
-            area_id = config.get(CONF_INCLUDE)[CONF_AREA]
-            _LOGGER.debug("Loading entities from area: %s", area_id)
-            sensor_configs = {
-                entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
-                for entity in await get_area_entities(hass, area_id)
-                if await is_supported_model(hass, entity)
-            } | sensor_configs
+        entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))
+        sensor_configs = {
+            entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
+            for entity in entities
+            if await is_supported_model(hass, entity)
+        } | sensor_configs
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
@@ -402,10 +403,34 @@ def create_group_sensors(
 
     return group_sensors
 
+@callback
+def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> list[entity_registry.RegistryEntry]:
+    entities = {}
 
-async def get_area_entities(
+    # Include entities from a certain area
+    if CONF_AREA in include_config:
+        area_id = include_config.get(CONF_AREA)
+        _LOGGER.debug("Loading entities from area: %s", area_id)
+        entities = entities | get_area_entities(hass, area_id)
+    
+    # Include entities by evaluating a template
+    if CONF_TEMPLATE in include_config:
+        template = include_config.get(CONF_TEMPLATE)
+        if not isinstance(template, Template):
+            raise SensorConfigurationError("include->template is not a correct Template")
+        template.hass = hass
+
+        _LOGGER.debug("Loading entities from template")
+        entity_ids = template.async_render()
+        entity_reg = entity_registry.async_get(hass)
+        entities = entities | {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
+    
+    return entities.values()
+
+@callback
+def get_area_entities(
     hass: HomeAssistantType, area_id_or_name: str
-) -> list[entity_registry.RegistryEntry]:
+) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
     area = area_reg.async_get_area(area_id_or_name)
@@ -435,4 +460,4 @@ async def get_area_entities(
             if entity.area_id is None
         ]
     )
-    return [entity for entity in entities if entity.domain == LIGHT_DOMAIN]
+    return {entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN}
