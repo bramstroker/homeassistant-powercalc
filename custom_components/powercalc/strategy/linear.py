@@ -23,7 +23,7 @@ from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, humidifier.DOMAIN, light.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -47,6 +47,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._calibration = self.create_calibrate_list()
 
     async def calculate(self, entity_state: State) -> Optional[float]:
+        """Calculate the current power consumption"""
         value = self.get_current_state_value(entity_state)
 
         min_calibrate = self.get_min_calibrate(value)
@@ -66,12 +67,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         return round(power, 2)
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
+        """Get closest lower value from calibration table"""
         return min(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
 
     def get_max_calibrate(self, value: int) -> tuple[int, float]:
+        """Get closest higher value from calibration table"""
         return max(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
 
     def create_calibrate_list(self) -> list[tuple]:
+        """Build a table of calibration values"""
         list = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
@@ -91,20 +95,21 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         return sorted_list
 
     def get_entity_value_range(self) -> tuple:
+        """Get the min/max range for a given entity domain"""
         if self._source_entity.domain == fan.DOMAIN:
             return (1, 100)
 
         if self._source_entity.domain == light.DOMAIN:
             return (1, 255)
-
-        if self._source_entity.domain == humidifier.DOMAIN:
-            state = self._hass.states.get(self._source_entity.entity_id)
-            return (
-                state.attributes[ATTR_MIN_HUMIDITY],
-                state.attributes[ATTR_MAX_HUMIDITY],
+        
+        raise StrategyConfigurationError(
+            "Entity not supported for linear mode. Must be one of: {}".format(
+                ",".join(ALLOWED_DOMAINS)
             )
+        )
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
+        """Get the current entity state, i.e. selected brightness"""
         attrs = entity_state.attributes
 
         if entity_state.domain == light.DOMAIN:
@@ -120,12 +125,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             value = attrs.get(ATTR_PERCENTAGE)
             if value is None:
                 _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
-                return None
-
-        if entity_state.domain == humidifier.DOMAIN:
-            value = attrs.get(ATTR_HUMIDITY)
-            if value is None:
-                _LOGGER.error("No humidity for entity: %s", entity_state.entity_id)
                 return None
 
         return value

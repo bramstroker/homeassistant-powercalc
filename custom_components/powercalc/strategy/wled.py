@@ -4,15 +4,13 @@ import logging
 from typing import Optional
 
 import voluptuous as vol
-from homeassistant.core import State, callback
-from homeassistant.helpers import device_registry, entity_registry
-from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.core import State
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE
 from custom_components.powercalc.errors import (
-    SensorConfigurationError,
     StrategyConfigurationError,
 )
 from custom_components.powercalc.helpers import evaluate_power
