@@ -168,7 +168,7 @@ sensor:
 ```
 
 ### Linear mode
-Supported domains: `light`, `fan`, `humidifier`
+Supported domains: `light`, `fan`
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
 You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
