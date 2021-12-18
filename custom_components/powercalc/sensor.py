@@ -32,6 +32,7 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -62,6 +63,7 @@ from .const import (
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_GROUP,
     CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -161,6 +163,7 @@ GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
             vol.Optional(CONF_AREA): cv.string,
+            vol.Optional(CONF_GROUP): cv.entity_id,
             vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
@@ -406,6 +409,7 @@ def create_group_sensors(
 @callback
 def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> list[entity_registry.RegistryEntry]:
     entities = {}
+    entity_reg = entity_registry.async_get(hass)
 
     # Include entities from a certain area
     if CONF_AREA in include_config:
@@ -413,6 +417,16 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
         _LOGGER.debug("Loading entities from area: %s", area_id)
         entities = entities | get_area_entities(hass, area_id)
     
+    # Include entities from a certain group
+    if CONF_GROUP in include_config:
+        group = include_config.get(CONF_GROUP)
+        _LOGGER.debug("Loading entities from group: %s", group)
+        group_state = hass.states.get(group)
+        entities = entities | {
+            entity_id: entity_reg.async_get(entity_id) 
+            for entity_id in group_state.attributes[ATTR_ENTITY_ID]
+        }
+
     # Include entities by evaluating a template
     if CONF_TEMPLATE in include_config:
         template = include_config.get(CONF_TEMPLATE)
@@ -422,7 +436,6 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
 
         _LOGGER.debug("Loading entities from template")
         entity_ids = template.async_render()
-        entity_reg = entity_registry.async_get(hass)
         entities = entities | {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
     
     return entities.values()
