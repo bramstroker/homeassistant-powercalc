@@ -10,9 +10,7 @@ from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE
-from custom_components.powercalc.errors import (
-    StrategyConfigurationError,
-)
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.sensors.power import OFF_STATES
 
@@ -30,7 +28,11 @@ _LOGGER = logging.getLogger(__name__)
 
 class WledStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self,config: dict, light_entity: SourceEntity, hass: HomeAssistantType, standby_power: Optional[float]
+        self,
+        config: dict,
+        light_entity: SourceEntity,
+        hass: HomeAssistantType,
+        standby_power: Optional[float],
     ) -> None:
         self._hass = hass
         self._voltage = config.get(CONF_VOLTAGE)
@@ -43,7 +45,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
             light_state = entity_state.state
         else:
             light_state = self._hass.states.get(self._light_entity.entity_id)
-        
+
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power
 

@@ -101,7 +101,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         if self._source_entity.domain == light.DOMAIN:
             return (1, 255)
-        
+
         raise StrategyConfigurationError(
             "Entity not supported for linear mode. Must be one of: {}".format(
                 ",".join(ALLOWED_DOMAINS)
