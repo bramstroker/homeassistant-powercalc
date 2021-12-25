@@ -14,6 +14,7 @@ from custom_components.powercalc.errors import (
     StrategyConfigurationError,
 )
 from custom_components.powercalc.helpers import evaluate_power
+from custom_components.powercalc.sensors.power import OFF_STATES
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -29,14 +30,23 @@ _LOGGER = logging.getLogger(__name__)
 
 class WledStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self, config: dict, light_entity: SourceEntity, hass: HomeAssistantType
+        self,config: dict, light_entity: SourceEntity, hass: HomeAssistantType, standby_power: Optional[float]
     ) -> None:
         self._hass = hass
         self._voltage = config.get(CONF_VOLTAGE)
         self._power_factor = config.get(CONF_POWER_FACTOR) or 0.9
         self._light_entity = light_entity
+        self._standby_power = standby_power
 
     async def calculate(self, entity_state: State) -> Optional[float]:
+        if entity_state.entity_id == self._light_entity.entity_id:
+            light_state = entity_state.state
+        else:
+            light_state = self._hass.states.get(self._light_entity.entity_id)
+        
+        if light_state.state in OFF_STATES and self._standby_power:
+            return self._standby_power
+
         if entity_state.entity_id != self._estimated_current_entity:
             return None
 
