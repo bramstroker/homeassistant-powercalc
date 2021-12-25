@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from homeassistant_api import Client
 
-from .const import MODE_COLOR_TEMP, MODE_HS
+from .const import (
+    MAX_MIRED,
+    MIN_MIRED,
+    MODE_COLOR_TEMP,
+    MODE_HS
+)
 from .controller import LightController, LightInfo
 from .errors import LightControllerError
 
@@ -32,8 +37,8 @@ class HassLightController(LightController):
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(self._entity_id)
-        min_mired = state.attributes["min_mireds"]
-        max_mired = state.attributes["max_mireds"]
+        min_mired = state.attributes.get("min_mireds") or MIN_MIRED
+        max_mired = state.attributes.get("max_mireds") or MAX_MIRED
         return LightInfo(self._model_id, min_mired, max_mired)
 
     def get_questions(self) -> list[dict]:

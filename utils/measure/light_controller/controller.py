@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from .const import (
+    MAX_MIRED,
+    MIN_MIRED,
+)
 
 class LightInfo:
     model_id: str
 
-    def __init__(self, model_id: str, min_mired: int = 150, max_mired: int = 500):
+    def __init__(self, model_id: str, min_mired: int = MIN_MIRED, max_mired: int = MAX_MIRED):
         self.model_id = model_id
         self._min_mired = min_mired
         self._max_mired = max_mired
@@ -13,16 +17,16 @@ class LightInfo:
         return self._min_mired
 
     def set_min_mired(self, value: int):
-        if value < 150:
-            value = 150
+        if value < MIN_MIRED:
+            value = MIN_MIRED
         self._min_mired = value
 
     def get_max_mired(self) -> int:
         return self._max_mired
 
     def set_max_mired(self, value: int):
-        if value > 500:
-            value = 500
+        if value > MAX_MIRED:
+            value = MAX_MIRED
         self._max_mired = value
 
     min_mired = property(get_min_mired, set_min_mired)
