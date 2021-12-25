@@ -2,12 +2,7 @@ from __future__ import annotations
 
 from homeassistant_api import Client
 
-from .const import (
-    MAX_MIRED,
-    MIN_MIRED,
-    MODE_COLOR_TEMP,
-    MODE_HS
-)
+from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
 from .controller import LightController, LightInfo
 from .errors import LightControllerError
 
