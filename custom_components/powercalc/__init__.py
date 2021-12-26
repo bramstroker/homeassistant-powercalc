@@ -60,7 +60,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): validate_name_pattern,
-                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=False): cv.boolean,
+                    vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(

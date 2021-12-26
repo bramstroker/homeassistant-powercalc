@@ -22,6 +22,8 @@ Go to the directory you created in a command line and run:
 
 `docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest`
 
+If running Docker on Windows, replace `$(pwd)` with `%CD%`.
+
 The script will ask you a few questions, than proceed taking measurements.
 
 After the measurements are finished you will find the files in `export` directory.
