@@ -32,7 +32,6 @@ This component estimates power usage by looking at brightness, hue/saturation an
 - [Sensor naming](#sensor-naming)
 - [Daily fixed energy](#faily-fixed-energy)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
-    - [Creating energy groups](#creating-energy-groups)
 - [Advanced features](#advanced-features)
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
@@ -95,8 +94,8 @@ They are as follows:
 | linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
 | wled                    | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
-| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
-| include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area or group. See [Area include](#include-area-entities)
+| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
+| include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 
 **Minimalistic example creating two power sensors:**
 
@@ -507,9 +506,6 @@ If you want to use the virtual power sensors with the new [energy integration](h
 
 If you'd like to create your energy sensors by your own with e.g. [Riemann integration integration](https://www.home-assistant.io/integrations/integration/), then you can disable the automatic creation of energy sensors with the option `create_energy_sensors` in your configuration (see [global configuration](#global-configuration)).
 
-### Creating energy groups
-See the [Wiki](https://github.com/bramstroker/homeassistant-powercalc/wiki/Grouping-sensors) for examples how to setup energy groups.
-
 ## Advanced features
 
 ### Multiple entities and grouping
@@ -541,11 +537,14 @@ This will create the following entities:
 - sensor.all_hallway_lights_power (group sensor)
 - sensor.all_hallway_lights_energy (group sensor)
 
-#### Include area entities
+#### Dynamically including entities
+
+Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option.
+> Note: only entities will be included which are in the supported models list (these can be auto configured). You can combine `include` and `entities` to extend the group with custom configured entities.
+
+**Include area**
 
 > Available from v0.12 and higher
-
-You can create a grouped power sensor for all supported entities in an area using the `include` option.
 
 ```yaml
 sensor:
@@ -568,6 +567,35 @@ sensor:
         fixed:
           power: 100
 ```
+
+**Include template**
+
+> Available from v0.14 and higher
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: Outdoor
+    include:
+      area: outdoor
+```
+
+**Include group**
+
+> Available from v0.14 and higher
+
+Includes entities from a Home Assistant [group](https://www.home-assistant.io/integrations/group/)
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: Livingroom lights
+    include:
+      group: group.livingroom_lights
+```
+
+> Note: [Light groups](https://www.home-assistant.io/integrations/light.group/) are not supported yet. Maybe in future version.
+
 
 ### Multiply Factor
 

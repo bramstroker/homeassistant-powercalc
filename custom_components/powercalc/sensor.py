@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from datetime import timedelta
 from typing import Final
+from homeassistant.core import callback
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -31,6 +32,7 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -39,7 +41,8 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.helpers import area_registry, device_registry, entity_registry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import (
     ConfigType,
     DiscoveryInfoType,
@@ -60,6 +63,7 @@ from .const import (
     CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_GROUP,
     CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -71,6 +75,7 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
+    CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
@@ -83,7 +88,11 @@ from .const import (
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
 )
-from .errors import PowercalcSetupError, SensorConfigurationError
+from .errors import (
+    PowercalcSetupError,
+    SensorAlreadyConfiguredError,
+    SensorConfigurationError,
+)
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
@@ -158,6 +167,8 @@ GROUPED_SENSOR_CONFIG = {
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
             vol.Optional(CONF_AREA): cv.string,
+            vol.Optional(CONF_GROUP): cv.entity_id,
+            vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
     vol.Optional(CONF_ENTITIES, None): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
@@ -256,19 +267,17 @@ async def create_sensors(
             conf[CONF_ENTITY_ID]: conf for conf in config.get(CONF_ENTITIES)
         }
 
+    # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-
-        # Include entities from a certain area
-        if CONF_AREA in config.get(CONF_INCLUDE):
-            area_id = config.get(CONF_INCLUDE)[CONF_AREA]
-            _LOGGER.debug("Loading entities from area: %s", area_id)
-            sensor_configs = {
-                entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
-                for entity in await get_area_entities(hass, area_id)
-                if await is_supported_model(hass, entity)
-            } | sensor_configs
+        entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))
+        sensor_configs = {
+            entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
+            for entity in entities
+            if await is_supported_model(hass, entity)
+        } | sensor_configs
 
     # Create sensors for each entity
+    existing_sensors = []
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
@@ -277,16 +286,19 @@ async def create_sensors(
             created_sensors.extend(
                 await create_individual_sensors(hass, merged_sensor_config)
             )
+        except SensorAlreadyConfiguredError as error:
+            existing_sensors.extend(error.get_existing_entities())
         except SensorConfigurationError as error:
             _LOGGER.error(error)
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
+        group_entities = created_sensors + existing_sensors
         group_name = config.get(CONF_CREATE_GROUP)
-        if not created_sensors:
+        if not group_entities:
             _LOGGER.error("Could not create group %s, no entities resolved", group_name)
         group_sensors = create_group_sensors(
-            group_name, merged_sensor_config, created_sensors, hass=hass
+            group_name, merged_sensor_config, group_entities, hass=hass
         )
         created_sensors.extend(group_sensors)
 
@@ -312,10 +324,8 @@ async def create_individual_sensors(
         # Display an error when a power sensor was already configured for the same entity by the user
         # No log entry will be shown when the entity was auto discovered, we can silently continue
         if not discovery_info:
-            _LOGGER.error(
-                "%s: This entity has already configured a power sensor",
-                source_entity.entity_id,
-            )
+            existing_entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id)
+            raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
         return []
 
     entities_to_add = []
@@ -360,7 +370,7 @@ async def create_individual_sensors(
     if discovery_info:
         hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].append(source_entity.entity_id)
     else:
-        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].append(source_entity.entity_id)
+        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update({source_entity.entity_id: entities_to_add})
 
     return entities_to_add
 
@@ -402,10 +412,48 @@ def create_group_sensors(
 
     return group_sensors
 
+@callback
+def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> list[entity_registry.RegistryEntry]:
+    entities = {}
+    entity_reg = entity_registry.async_get(hass)
 
-async def get_area_entities(
+    # Include entities from a certain area
+    if CONF_AREA in include_config:
+        area_id = include_config.get(CONF_AREA)
+        _LOGGER.debug("Including entities from area: %s", area_id)
+        entities = entities | get_area_entities(hass, area_id)
+    
+    # Include entities from a certain group
+    if CONF_GROUP in include_config:
+        group = include_config.get(CONF_GROUP)
+        domain = split_entity_id(group)[0]
+        if domain == LIGHT_DOMAIN:
+            raise SensorConfigurationError("Light groups are not supported yet")
+
+        _LOGGER.debug("Including entities from group: %s", group)
+        group_state = hass.states.get(group)
+        entities = entities | {
+            entity_id: entity_reg.async_get(entity_id) 
+            for entity_id in group_state.attributes[ATTR_ENTITY_ID]
+        }
+
+    # Include entities by evaluating a template
+    if CONF_TEMPLATE in include_config:
+        template = include_config.get(CONF_TEMPLATE)
+        if not isinstance(template, Template):
+            raise SensorConfigurationError("include->template is not a correct Template")
+        template.hass = hass
+
+        _LOGGER.debug("Including entities from template")
+        entity_ids = template.async_render()
+        entities = entities | {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
+    
+    return entities.values()
+
+@callback
+def get_area_entities(
     hass: HomeAssistantType, area_id_or_name: str
-) -> list[entity_registry.RegistryEntry]:
+) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
     area = area_reg.async_get_area(area_id_or_name)
@@ -435,4 +483,4 @@ async def get_area_entities(
             if entity.area_id is None
         ]
     )
-    return [entity for entity in entities if entity.domain == LIGHT_DOMAIN]
+    return {entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN}

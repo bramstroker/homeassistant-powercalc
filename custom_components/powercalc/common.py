@@ -10,7 +10,6 @@ from homeassistant.core import split_entity_id
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import DUMMY_ENTITY_ID
-from .errors import SensorConfigurationError
 
 
 class SourceEntity(NamedTuple):
