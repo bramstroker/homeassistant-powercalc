@@ -568,23 +568,11 @@ sensor:
           power: 100
 ```
 
-**Include template**
-
-> Available from v0.14 and higher
-
-```yaml
-sensor:
-  - platform: powercalc
-    create_group: Outdoor
-    include:
-      area: outdoor
-```
-
 **Include group**
 
 > Available from v0.14 and higher
 
-Includes entities from a Home Assistant [group](https://www.home-assistant.io/integrations/group/)
+Includes entities from a Home Assistant [group](https://www.home-assistant.io/integrations/group/) or [light group](https://www.home-assistant.io/integrations/light.group/)
 
 ```yaml
 sensor:
@@ -594,8 +582,17 @@ sensor:
       group: group.livingroom_lights
 ```
 
-> Note: [Light groups](https://www.home-assistant.io/integrations/light.group/) are not supported yet. Maybe in future version.
+**Include template**
 
+> Available from v0.14 and higher
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: All indoor lightd
+    include:
+      template: {{expand('group.all_indoor_lights')|map(attribute='entity_id')|list}}
+```
 
 ### Multiply Factor
 
