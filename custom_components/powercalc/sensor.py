@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 from datetime import timedelta
 from typing import Final
-from homeassistant.core import callback
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -40,6 +39,7 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
 )
+from homeassistant.core import callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
@@ -324,8 +324,12 @@ async def create_individual_sensors(
         # Display an error when a power sensor was already configured for the same entity by the user
         # No log entry will be shown when the entity was auto discovered, we can silently continue
         if not discovery_info:
-            existing_entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id)
-            raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
+            existing_entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(
+                source_entity.entity_id
+            )
+            raise SensorAlreadyConfiguredError(
+                source_entity.entity_id, existing_entities
+            )
         return []
 
     entities_to_add = []
@@ -370,7 +374,9 @@ async def create_individual_sensors(
     if discovery_info:
         hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].append(source_entity.entity_id)
     else:
-        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update({source_entity.entity_id: entities_to_add})
+        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
+            {source_entity.entity_id: entities_to_add}
+        )
 
     return entities_to_add
 
@@ -412,8 +418,11 @@ def create_group_sensors(
 
     return group_sensors
 
+
 @callback
-def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> list[entity_registry.RegistryEntry]:
+def resolve_include_entities(
+    hass: HomeAssistantType, include_config: dict
+) -> list[entity_registry.RegistryEntry]:
     entities = {}
     entity_reg = entity_registry.async_get(hass)
 
@@ -422,7 +431,7 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
         area_id = include_config.get(CONF_AREA)
         _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | get_area_entities(hass, area_id)
-    
+
     # Include entities from a certain group
     if CONF_GROUP in include_config:
         group = include_config.get(CONF_GROUP)
@@ -433,7 +442,7 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
         _LOGGER.debug("Including entities from group: %s", group)
         group_state = hass.states.get(group)
         entities = entities | {
-            entity_id: entity_reg.async_get(entity_id) 
+            entity_id: entity_reg.async_get(entity_id)
             for entity_id in group_state.attributes[ATTR_ENTITY_ID]
         }
 
@@ -441,14 +450,19 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
     if CONF_TEMPLATE in include_config:
         template = include_config.get(CONF_TEMPLATE)
         if not isinstance(template, Template):
-            raise SensorConfigurationError("include->template is not a correct Template")
+            raise SensorConfigurationError(
+                "include->template is not a correct Template"
+            )
         template.hass = hass
 
         _LOGGER.debug("Including entities from template")
         entity_ids = template.async_render()
-        entities = entities | {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
-    
+        entities = entities | {
+            entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
+        }
+
     return entities.values()
+
 
 @callback
 def get_area_entities(
@@ -483,4 +497,6 @@ def get_area_entities(
             if entity.area_id is None
         ]
     )
-    return {entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN}
+    return {
+        entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN
+    }
