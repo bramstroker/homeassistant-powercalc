@@ -41,7 +41,7 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.helpers import area_registry, device_registry, entity_registry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import (
     ConfigType,
@@ -420,13 +420,17 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
     # Include entities from a certain area
     if CONF_AREA in include_config:
         area_id = include_config.get(CONF_AREA)
-        _LOGGER.debug("Loading entities from area: %s", area_id)
+        _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | get_area_entities(hass, area_id)
     
     # Include entities from a certain group
     if CONF_GROUP in include_config:
         group = include_config.get(CONF_GROUP)
-        _LOGGER.debug("Loading entities from group: %s", group)
+        domain = split_entity_id(group)[0]
+        if domain == LIGHT_DOMAIN:
+            raise SensorConfigurationError("Light groups are not supported yet")
+
+        _LOGGER.debug("Including entities from group: %s", group)
         group_state = hass.states.get(group)
         entities = entities | {
             entity_id: entity_reg.async_get(entity_id) 
@@ -440,7 +444,7 @@ def resolve_include_entities(hass: HomeAssistantType, include_config: dict) -> l
             raise SensorConfigurationError("include->template is not a correct Template")
         template.hass = hass
 
-        _LOGGER.debug("Loading entities from template")
+        _LOGGER.debug("Including entities from template")
         entity_ids = template.async_render()
         entities = entities | {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
     
