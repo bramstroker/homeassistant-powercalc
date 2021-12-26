@@ -92,7 +92,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
         DOMAIN_CONFIG: domain_config,
-        DATA_CONFIGURED_ENTITIES: [],
+        DATA_CONFIGURED_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: [],
     }
 

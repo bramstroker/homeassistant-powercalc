@@ -88,7 +88,11 @@ from .const import (
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
 )
-from .errors import PowercalcSetupError, SensorConfigurationError
+from .errors import (
+    PowercalcSetupError,
+    SensorAlreadyConfiguredError,
+    SensorConfigurationError,
+)
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
@@ -273,6 +277,7 @@ async def create_sensors(
         } | sensor_configs
 
     # Create sensors for each entity
+    existing_sensors = []
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
@@ -281,16 +286,19 @@ async def create_sensors(
             created_sensors.extend(
                 await create_individual_sensors(hass, merged_sensor_config)
             )
+        except SensorAlreadyConfiguredError as error:
+            existing_sensors.extend(error.get_existing_entities())
         except SensorConfigurationError as error:
             _LOGGER.error(error)
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
+        group_entities = created_sensors + existing_sensors
         group_name = config.get(CONF_CREATE_GROUP)
-        if not created_sensors:
+        if not group_entities:
             _LOGGER.error("Could not create group %s, no entities resolved", group_name)
         group_sensors = create_group_sensors(
-            group_name, merged_sensor_config, created_sensors, hass=hass
+            group_name, merged_sensor_config, group_entities, hass=hass
         )
         created_sensors.extend(group_sensors)
 
@@ -316,10 +324,8 @@ async def create_individual_sensors(
         # Display an error when a power sensor was already configured for the same entity by the user
         # No log entry will be shown when the entity was auto discovered, we can silently continue
         if not discovery_info:
-            _LOGGER.error(
-                "%s: This entity has already configured a power sensor",
-                source_entity.entity_id,
-            )
+            existing_entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id)
+            raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
         return []
 
     entities_to_add = []
@@ -364,7 +370,7 @@ async def create_individual_sensors(
     if discovery_info:
         hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].append(source_entity.entity_id)
     else:
-        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].append(source_entity.entity_id)
+        hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update({source_entity.entity_id: entities_to_add})
 
     return entities_to_add
 
