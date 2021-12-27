@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.13.4"
     },
-    "name": "TRADFRI LED bulb E14/E26/E27 600 lumen",
+    "name": "TRADFRI bulb E27 CWS opal 600lm",
     "standby_power": 0.48,
     "supported_modes": [
         "lut"
