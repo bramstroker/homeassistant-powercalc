@@ -8,6 +8,7 @@
 |ikea         |LED1545G12               |TRADFRI bulb E27 WS opal 980lm                            |lut              |color_temp   |
 |ikea         |LED1546G12               |TRADFRI bulb E27 WS clear 950lm                           |lut              |color_temp   |
 |ikea         |LED1623G12               |TRADFRI bulb E27 opal 1000lm                              |lut              |brightness   |
+|ikea         |LED1624G9                |TRADFRI bulb E27 CWS opal 600lm                           |lut              |color_temp,hs|
 |ikea         |LED1649C5                |TRADFRI bulb E14 W op/ch 400lm                            |lut              |brightness   |
 |ikea         |LED1650R5                |TRADFRI bulb GU10 W 400lm                                 |lut              |brightness   |
 |ikea         |LED1732G11               |TRADFRI bulb E27 WS opal 1000lm                           |lut              |color_temp   |
