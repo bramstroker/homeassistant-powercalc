@@ -158,7 +158,7 @@ sensor:
     model: LCT010
 ```
 
-When you are using the official Philips Hue integration the manufacturer and model can automatically be discovered, so there is no need to supply those.
+For most lights the device information in HA will supply the device and model correctly, so you can omit these.
 
 ```yaml
 sensor:
@@ -189,6 +189,27 @@ sensor:
     linear:
       min_power: 0.5
       max_power: 8
+```
+
+### Fixed mode
+Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
+
+When you have an appliance which only can be set on and off you can use this mode.
+You need to supply a single watt value in the configuration which will be used when the device is ON
+
+#### Configuration options
+| Name              | Type    | Requirement  | Description                                           |
+| ----------------- | ------- | ------------ | ----------------------------------------------------- |
+| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
+| states_power      | dict    | **Optional** | Power usage per entity state. Values can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
+
+#### Simple example
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.nondimmabled_bulb
+    fixed:
+      power: 20
 ```
 
 ### WLED mode
@@ -234,27 +255,6 @@ sensor:
 
 > Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
 > For fan speeds the range is 1-100 (percentage)
-
-### Fixed mode
-Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
-
-When you have an appliance which only can be set on and off you can use this mode.
-You need to supply a single watt value in the configuration which will be used when the device is ON
-
-#### Configuration options
-| Name              | Type    | Requirement  | Description                                           |
-| ----------------- | ------- | ------------ | ----------------------------------------------------- |
-| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-| states_power      | dict    | **Optional** | Power usage per entity state. Values can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-
-#### Simple example
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.nondimmabled_bulb
-    fixed:
-      power: 20
-```
 
 #### Using a template for the power value
 ```yaml
