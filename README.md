@@ -139,6 +139,7 @@ To calculate estimated power consumption different modes are supported, they are
 - [LUT (lookup table)](#lut-mode)
 - [Linear](#linear-mode)
 - [Fixed](#fixed-mode)
+- [WLED](#wled-mode)
 
 ### LUT mode
 Supported domain: `light`
