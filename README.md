@@ -212,29 +212,6 @@ sensor:
       power: 20
 ```
 
-### WLED mode
-Supported domains: `light`
-
-You can use WLED strategy for light strips which are controlled by [WLED](https://github.com/Aircoookie/WLED).
-WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
-Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
-
-#### Configuration options
-| Name              | Type    | Requirement  | Default | Description                                 |
-| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
-| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
-| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
-
-#### Example configuration
-
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.wled_lightstrip
-    wled:
-      voltage: 5
-```
-
 #### Advanced precision calibration
 
 With the `calibrate` setting you can supply more than one power value for multiple brightness/percentage levels.
@@ -293,6 +270,29 @@ sensor:
 ```
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
+
+### WLED mode
+Supported domains: `light`
+
+You can use WLED strategy for light strips which are controlled by [WLED](https://github.com/Aircoookie/WLED).
+WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
+Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
+
+#### Configuration options
+| Name              | Type    | Requirement  | Default | Description                                 |
+| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
+| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
+| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
+
+#### Example configuration
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.wled_lightstrip
+    wled:
+      voltage: 5
+```
 
 ## Configuration examples
 
