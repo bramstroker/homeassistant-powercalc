@@ -9,7 +9,6 @@ import shutil
 import sys
 import time
 from dataclasses import asdict, dataclass
-from numpy import clip, maximum
 from typing import Iterator, Optional
 
 from decouple import Choices, config
@@ -34,26 +33,24 @@ CSV_HEADERS = {
     MODE_BRIGHTNESS: ["bri", "watt"],
 }
 
-MIN_BRIGHTNESS = clip(
+MIN_BRIGHTNESS = min(max(
     config(
         "MIN_BRIGHTNESS",
         default=config("START_BRIGHTNESS", default=1, cast=int),
         cast=int
-    ),
-    1,
-    255
+    ), 1), 255
 )
 MAX_BRIGHTNESS = 255
-MIN_SAT = clip(config("MIN_SAT", default=1, cast=int), 1, 254)
-MAX_SAT = clip(config("MAX_SAT", default=254, cast=int), 1, 254)
-MIN_HUE = clip(config("MIN_HUE", default=1, cast=int), 1, 65535)
-MAX_HUE = clip(config("MAX_HUE", default=65535, cast=int), 1, 65535)
-CT_BRI_STEPS = maximum(config("CT_BRI_STEPS", default=5, cast=int), 10)
-CT_MIRED_STEPS = maximum(config("CT_BRI_STEPS", default=10, cast=int), 10)
+MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 254)
+MAX_SAT = min(max(config("MAX_SAT", default=254, cast=int), 1), 254)
+MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
+MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
+CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
+CT_MIRED_STEPS = min(config("CT_BRI_STEPS", default=10, cast=int), 10)
 BRI_BRI_STEPS = 1
-HS_BRI_STEPS = maximum(config("HS_BRI_STEPS", default=10, cast=int), 20)
-HS_HUE_STEPS = maximum(config("HS_HUE_STEPS", default=2000, cast=int), 4000)
-HS_SAT_STEPS = maximum(config("HS_SAT_STEPS", default=10, cast=int), 20)
+HS_BRI_STEPS = min(config("HS_BRI_STEPS", default=10, cast=int), 20)
+HS_HUE_STEPS = min(config("HS_HUE_STEPS", default=2000, cast=int), 4000)
+HS_SAT_STEPS = min(config("HS_SAT_STEPS", default=10, cast=int), 20)
 
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
