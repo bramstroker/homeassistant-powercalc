@@ -44,7 +44,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_energy_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
-    power_sensor: VirtualPowerSensor,
+    power_sensor_entity_id: str,
     source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
     """Create the energy sensor entity"""
@@ -63,7 +63,7 @@ async def create_energy_sensor(
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
-        source_entity=power_sensor.entity_id,
+        source_entity=power_sensor_entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
         name=name,

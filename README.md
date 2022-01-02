@@ -36,6 +36,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
+    - [Use real power sensor](#use-real-power-sensor)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -96,6 +97,7 @@ They are as follows:
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
 | create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 | include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
+| power_sensor_id         | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 
 **Minimalistic example creating two power sensors:**
 
@@ -624,7 +626,7 @@ By default the multiply factor will **NOT** be applied to the standby power, you
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
 
-## Utility meters
+### Utility meters
 
 The energy sensors created by the component will keep increasing the total kWh, and never reset.
 When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
@@ -652,6 +654,18 @@ Assume you have a light `light.floorlamp_livingroom`, than you should have the f
 - `sensor.floorlamp_livingroom_energy_daily`
 - `sensor.floorlamp_livingroom_energy_weekly`
 - `sensor.floorlamp_livingroom_energy_monthly`
+
+### Use real power sensor
+
+> Available from v0.14 and higher
+
+Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+
+```yaml
+- platform: powercalc
+  entity_id: light.toilet
+  power_sensor_id: sensor.toilet_light_power
+```
 
 ## Debug logging
 
