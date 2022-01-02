@@ -96,6 +96,7 @@ They are as follows:
 | entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
 | create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 | include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
+| power_sensor_id         | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 
 **Minimalistic example creating two power sensors:**
 
@@ -623,6 +624,18 @@ By default the multiply factor will **NOT** be applied to the standby power, you
 ```
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
+
+### Use real power sensor
+
+> Available from v0.14 and higher
+
+Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+
+```yaml
+- platform: powercalc
+  entity_id: light.toilet
+  power_sensor_id: sensor.toilet_light_power
+```
 
 ## Utility meters
 
