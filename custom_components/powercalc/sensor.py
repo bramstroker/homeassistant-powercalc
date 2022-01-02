@@ -74,6 +74,7 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
+    CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_STANDBY_USAGE,
@@ -146,6 +147,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
     vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
+    vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
@@ -337,21 +339,26 @@ async def create_individual_sensors(
     entities_to_add = []
 
     energy_sensor = None
-    should_create_power_sensor = not CONF_DAILY_FIXED_ENERGY in sensor_config
-    if should_create_power_sensor:
-        try:
-            power_sensor = await create_power_sensor(
-                hass, sensor_config, source_entity, discovery_info
-            )
-        except PowercalcSetupError as err:
-            return []
+    if not CONF_DAILY_FIXED_ENERGY in sensor_config:
+        # Use an existing power sensor, only create energy sensors / utility meters
+        if CONF_POWER_SENSOR_ID in sensor_config:
+            power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
+        # Create the virtual power sensor
+        else:
+            try:
+                power_sensor = await create_power_sensor(
+                    hass, sensor_config, source_entity, discovery_info
+                )
+            except PowercalcSetupError as err:
+                return []
 
-        entities_to_add.append(power_sensor)
+            entities_to_add.append(power_sensor)
+            power_sensor_id = power_sensor.entity_id
 
         # Create energy sensor which integrates the power sensor
         if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
             energy_sensor = await create_energy_sensor(
-                hass, sensor_config, power_sensor, source_entity
+                hass, sensor_config, power_sensor_id, source_entity
             )
             entities_to_add.append(energy_sensor)
 
