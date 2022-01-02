@@ -62,7 +62,6 @@ from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_STANDBY_POWER,
-    CONF_DISABLE_STANDBY_USAGE,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
@@ -77,7 +76,6 @@ from .const import (
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
-    CONF_STANDBY_USAGE,
     CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
@@ -144,8 +142,6 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
     vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
     vol.Optional(CONF_DISABLE_STANDBY_POWER, default=False): cv.boolean,
-    vol.Optional(CONF_STANDBY_USAGE): vol.Coerce(float),
-    vol.Optional(CONF_DISABLE_STANDBY_USAGE, default=False): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
@@ -182,10 +178,6 @@ PLATFORM_SCHEMA: Final = vol.All(
     cv.has_at_least_one_key(
         CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY
     ),
-    cv.deprecated(
-        CONF_DISABLE_STANDBY_USAGE, replacement_key=CONF_DISABLE_STANDBY_POWER
-    ),
-    cv.deprecated(CONF_STANDBY_USAGE, replacement_key=CONF_STANDBY_POWER),
     PLATFORM_SCHEMA.extend(
         {
             **SENSOR_CONFIG,
@@ -221,13 +213,6 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
     merged_config = {}
     for config in configs:
         merged_config.update(config)
-
-    if CONF_STANDBY_USAGE in merged_config:
-        merged_config[CONF_STANDBY_POWER] = merged_config[CONF_STANDBY_USAGE]
-    if CONF_DISABLE_STANDBY_USAGE in merged_config:
-        merged_config[CONF_DISABLE_STANDBY_POWER] = merged_config[
-            CONF_DISABLE_STANDBY_USAGE
-        ]
 
     if not CONF_CREATE_ENERGY_SENSOR in merged_config:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
