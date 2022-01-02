@@ -36,6 +36,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
+    - [Use real power sensor](#use-real-power-sensor)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -625,19 +626,7 @@ By default the multiply factor will **NOT** be applied to the standby power, you
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
 
-### Use real power sensor
-
-> Available from v0.14 and higher
-
-Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
-
-```yaml
-- platform: powercalc
-  entity_id: light.toilet
-  power_sensor_id: sensor.toilet_light_power
-```
-
-## Utility meters
+### Utility meters
 
 The energy sensors created by the component will keep increasing the total kWh, and never reset.
 When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
@@ -665,6 +654,18 @@ Assume you have a light `light.floorlamp_livingroom`, than you should have the f
 - `sensor.floorlamp_livingroom_energy_daily`
 - `sensor.floorlamp_livingroom_energy_weekly`
 - `sensor.floorlamp_livingroom_energy_monthly`
+
+### Use real power sensor
+
+> Available from v0.14 and higher
+
+Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+
+```yaml
+- platform: powercalc
+  entity_id: light.toilet
+  power_sensor_id: sensor.toilet_light_power
+```
 
 ## Debug logging
 
