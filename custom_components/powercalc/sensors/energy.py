@@ -30,10 +30,9 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_INTEGRATION_METHOD,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
-
-from .power import VirtualPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -71,7 +70,7 @@ async def create_energy_sensor(
         unit_prefix="k",
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
-        integration_method=TRAPEZOIDAL_METHOD,
+        integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD) or TRAPEZOIDAL_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )

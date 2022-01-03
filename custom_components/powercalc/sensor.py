@@ -26,6 +26,7 @@ from homeassistant.components import (
     water_heater,
 )
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
+from homeassistant.components.integration.sensor import INTEGRATION_METHOD, TRAPEZOIDAL_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -62,6 +63,7 @@ from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_STANDBY_POWER,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
@@ -160,6 +162,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD): vol.In(
+        INTEGRATION_METHOD
+    ),
 }
 
 GROUPED_SENSOR_CONFIG = {
