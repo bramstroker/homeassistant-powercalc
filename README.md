@@ -73,31 +73,32 @@ For each entity you want to create a virtual power sensor for you'll need to add
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
-| Name                    | Type    | Requirement  | Description                                                                |
-| ----------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
-| manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
-| model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_power           | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_power   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
-| name                    | string  | **Optional** | Override the name                                                          |
-| create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
-| create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
-| utility_meter_types     | list    | **Optional** | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle). This will override global setting `utility_meter_types` |
-| utility_meter_offset    | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
-| custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
-| power_sensor_naming     | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
-| energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
-| mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
-| multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
-| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
-| fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
-| linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
-| wled                    | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
-| entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
-| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
-| include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
-| power_sensor_id         | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
+| Name                      | Type    | Requirement  | Description                                                                |
+| ------------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id                 | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
+| manufacturer              | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                     | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_power             | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_power     | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                      | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor      | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| create_utility_meters     | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
+| utility_meter_types       | list    | **Optional** | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle). This will override global setting `utility_meter_types` |
+| utility_meter_offset      | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
+| custom_model_directory    | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| power_sensor_naming       | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
+| energy_sensor_naming      | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
+| energy_integration_method | string  | **Optional** | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
+| mode                      | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
+| multiply_factor           | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
+| multiply_factor_standby   | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
+| fixed                     | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                    | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| wled                      | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
+| entities                  | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
+| create_group              | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
+| include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
+| power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 
 **Minimalistic example creating two power sensors:**
 
