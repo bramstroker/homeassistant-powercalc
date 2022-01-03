@@ -8,7 +8,10 @@ from datetime import timedelta
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components.integration.sensor import INTEGRATION_METHOD, TRAPEZOIDAL_METHOD
+from homeassistant.components.integration.sensor import (
+    INTEGRATION_METHOD,
+    TRAPEZOIDAL_METHOD,
+)
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
@@ -71,9 +74,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
-                    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD): vol.In(
-                        INTEGRATION_METHOD
-                    ),
+                    vol.Optional(
+                        CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD
+                    ): vol.In(INTEGRATION_METHOD),
                 }
             ),
         )
