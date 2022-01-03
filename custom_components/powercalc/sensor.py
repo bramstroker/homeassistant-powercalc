@@ -165,7 +165,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD): vol.In(
+    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(
         INTEGRATION_METHOD
     ),
 }
