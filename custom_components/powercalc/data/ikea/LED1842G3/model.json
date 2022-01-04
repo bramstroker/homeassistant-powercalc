@@ -7,7 +7,7 @@
         "SLEEP_TIME": 5,
         "VERSION": "v0.13.5"
     },
-    "name": "Tradfri WW 250lm",
+    "name": "TRADFRI bulb E27 WW clear 250lm",
     "standby_power": 0.551,
     "supported_modes": [
         "lut"
