@@ -36,6 +36,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
+    - [Use real power sensor](#use-real-power-sensor)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -72,30 +73,32 @@ For each entity you want to create a virtual power sensor for you'll need to add
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
-| Name                    | Type    | Requirement  | Description                                                                |
-| ----------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
-| entity_id               | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
-| manufacturer            | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
-| model                   | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
-| standby_power           | float   | **Optional** | Supply the wattage when the device is off                                  |
-| disable_standby_power   | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
-| name                    | string  | **Optional** | Override the name                                                          |
-| create_energy_sensor    | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
-| create_utility_meters   | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
-| utility_meter_types     | list    | **Optional** | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle). This will override global setting `utility_meter_types` |
-| utility_meter_offset    | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
-| custom_model_directory  | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
-| power_sensor_naming     | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
-| energy_sensor_naming    | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
-| mode                    | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
-| multiply_factor         | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
-| multiply_factor_standby | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
-| fixed                   | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
-| linear                  | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
-| wled                    | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
-| entities                | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
-| create_group            | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
-| include                 | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
+| Name                      | Type    | Requirement  | Description                                                                |
+| ------------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
+| entity_id                 | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
+| manufacturer              | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
+| model                     | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
+| standby_power             | float   | **Optional** | Supply the wattage when the device is off                                  |
+| disable_standby_power     | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
+| name                      | string  | **Optional** | Override the name                                                          |
+| create_energy_sensor      | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
+| create_utility_meters     | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
+| utility_meter_types       | list    | **Optional** | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle). This will override global setting `utility_meter_types` |
+| utility_meter_offset      | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
+| custom_model_directory    | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| power_sensor_naming       | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
+| energy_sensor_naming      | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
+| energy_integration_method | string  | **Optional** | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
+| mode                      | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
+| multiply_factor           | float   | **Optional** | Multiplies the calculated power by this number. See [multiply factor](#multiply-factor) |
+| multiply_factor_standby   | boolean | **Optional** | When set to `true` the `multiply_factor` will also be applied to the standby power |
+| fixed                     | object  | **Optional** | [Fixed mode options](#fixed-mode)                                          |
+| linear                    | object  | **Optional** | [Linear mode options](#linear-mode)                                        |
+| wled                      | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
+| entities                  | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
+| create_group              | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
+| include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
+| power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 
 **Minimalistic example creating two power sensors:**
 
@@ -114,15 +117,16 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                   | Type    | Requirement  | Default                | Description                                                                                                                                        |
-| ---------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| enable_autodiscovery   | boolean | **Optional** | true                   | Whether you want powercalc to automatically setup power sensors for supported models in your HA instance.
-| scan_interval          | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| create_energy_sensors  | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
-| power_sensor_naming    | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
-| energy_sensor_naming   | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
-| create_utility_meters  | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
-| utility_meter_types    | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
+| Name                      | Type    | Requirement  | Default                | Description                                                                                                                                        |
+| ------------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| enable_autodiscovery      | boolean | **Optional** | true                   | Whether you want powercalc to automatically setup power sensors for supported models in your HA instance.
+| scan_interval             | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
+| create_energy_sensors     | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| power_sensor_naming       | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_naming      | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| create_utility_meters     | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
+| utility_meter_types       | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
+| energy_integration_method | string  | **Optional** | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 
 **Example:**
 
@@ -139,6 +143,7 @@ To calculate estimated power consumption different modes are supported, they are
 - [LUT (lookup table)](#lut-mode)
 - [Linear](#linear-mode)
 - [Fixed](#fixed-mode)
+- [WLED](#wled-mode)
 
 ### LUT mode
 Supported domain: `light`
@@ -158,7 +163,7 @@ sensor:
     model: LCT010
 ```
 
-When you are using the official Philips Hue integration the manufacturer and model can automatically be discovered, so there is no need to supply those.
+For most lights the device information in HA will supply the device and model correctly, so you can omit these.
 
 ```yaml
 sensor:
@@ -191,27 +196,25 @@ sensor:
       max_power: 8
 ```
 
-### WLED mode
-Supported domains: `light`
+### Fixed mode
+Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
-You can use WLED strategy for light strips which are controlled by [WLED](https://github.com/Aircoookie/WLED).
-WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
-Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
+When you have an appliance which only can be set on and off you can use this mode.
+You need to supply a single watt value in the configuration which will be used when the device is ON
 
 #### Configuration options
-| Name              | Type    | Requirement  | Default | Description                                 |
-| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
-| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
-| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
+| Name              | Type    | Requirement  | Description                                           |
+| ----------------- | ------- | ------------ | ----------------------------------------------------- |
+| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
+| states_power      | dict    | **Optional** | Power usage per entity state. Values can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
 
-#### Example configuration
-
+#### Simple example
 ```yaml
 sensor:
   - platform: powercalc
-    entity_id: light.wled_lightstrip
-    wled:
-      voltage: 5
+    entity_id: light.nondimmabled_bulb
+    fixed:
+      power: 20
 ```
 
 #### Advanced precision calibration
@@ -234,27 +237,6 @@ sensor:
 
 > Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
 > For fan speeds the range is 1-100 (percentage)
-
-### Fixed mode
-Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
-
-When you have an appliance which only can be set on and off you can use this mode.
-You need to supply a single watt value in the configuration which will be used when the device is ON
-
-#### Configuration options
-| Name              | Type    | Requirement  | Description                                           |
-| ----------------- | ------- | ------------ | ----------------------------------------------------- |
-| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-| states_power      | dict    | **Optional** | Power usage per entity state. Values can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-
-#### Simple example
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.nondimmabled_bulb
-    fixed:
-      power: 20
-```
 
 #### Using a template for the power value
 ```yaml
@@ -293,6 +275,29 @@ sensor:
 ```
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
+
+### WLED mode
+Supported domains: `light`
+
+You can use WLED strategy for light strips which are controlled by [WLED](https://github.com/Aircoookie/WLED).
+WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
+Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
+
+#### Configuration options
+| Name              | Type    | Requirement  | Default | Description                                 |
+| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
+| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
+| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
+
+#### Example configuration
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.wled_lightstrip
+    wled:
+      voltage: 5
+```
 
 ## Configuration examples
 
@@ -623,7 +628,7 @@ By default the multiply factor will **NOT** be applied to the standby power, you
 
 > Note: a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.
 
-## Utility meters
+### Utility meters
 
 The energy sensors created by the component will keep increasing the total kWh, and never reset.
 When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
@@ -651,6 +656,18 @@ Assume you have a light `light.floorlamp_livingroom`, than you should have the f
 - `sensor.floorlamp_livingroom_energy_daily`
 - `sensor.floorlamp_livingroom_energy_weekly`
 - `sensor.floorlamp_livingroom_energy_monthly`
+
+### Use real power sensor
+
+> Available from v0.14 and higher
+
+Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+
+```yaml
+- platform: powercalc
+  entity_id: light.toilet
+  power_sensor_id: sensor.toilet_light_power
+```
 
 ## Debug logging
 

@@ -29,11 +29,10 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
-
-from .power import VirtualPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -44,7 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_energy_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
-    power_sensor: VirtualPowerSensor,
+    power_sensor_entity_id: str,
     source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
     """Create the energy sensor entity"""
@@ -63,7 +62,7 @@ async def create_energy_sensor(
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
-        source_entity=power_sensor.entity_id,
+        source_entity=power_sensor_entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
         name=name,
@@ -71,7 +70,8 @@ async def create_energy_sensor(
         unit_prefix="k",
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
-        integration_method=TRAPEZOIDAL_METHOD,
+        integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
+        or TRAPEZOIDAL_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )

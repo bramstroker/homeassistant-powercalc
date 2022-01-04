@@ -51,7 +51,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 for state_key, power in self._per_state_power.items():
                     if "|" in state_key:
                         attribute, value = state_key.split("|", 2)
-                        if entity_state.attributes.get(attribute) == value:
+                        if str(entity_state.attributes.get(attribute)) == value:
                             return await evaluate_power(power)
 
         return await evaluate_power(self._power)

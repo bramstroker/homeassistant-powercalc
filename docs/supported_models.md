@@ -12,9 +12,14 @@
 |ikea         |LED1649C5                |TRADFRI bulb E14 W op/ch 400lm                            |lut              |brightness   |
 |ikea         |LED1650R5                |TRADFRI bulb GU10 W 400lm                                 |lut              |brightness   |
 |ikea         |LED1732G11               |TRADFRI bulb E27 WS opal 1000lm                           |lut              |color_temp   |
+|ikea         |LED1733G7                |TRADFRI bulb E14 WS opal 600lm                            |lut              |color_temp   |
+|ikea         |LED1736G9                |TRADFRI bulb E27 WS clear 806lm                           |lut              |color_temp   |
 |ikea         |LED1738G7                |TRADFRI bulb E14 WS opal 600lm                            |lut              |color_temp   |
+|ikea         |LED1835C6                |TRADFRI bulb E14 WS 470lm                                 |lut              |color_temp   |
 |ikea         |LED1836G9                |TRADFRI bulb E27 WW 806lm                                 |lut              |brightness   |
 |ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                                |lut              |brightness   |
+|ikea         |LED2002G5                |TRADFRIbulbE14WSglobeopal470lm                            |lut              |color_temp   |
+|ikea         |T1820                    |LEPTITER Recessed spot light                              |lut              |color_temp   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming       |lut              |brightness   |
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                   |lut              |color_temp,hs|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                    |lut              |brightness   |

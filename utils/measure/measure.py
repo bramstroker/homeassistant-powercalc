@@ -33,21 +33,24 @@ CSV_HEADERS = {
     MODE_BRIGHTNESS: ["bri", "watt"],
 }
 
+MIN_BRIGHTNESS = min(max(
+    config(
+        "MIN_BRIGHTNESS",
+        default=config("START_BRIGHTNESS", default=1, cast=int),
+        cast=int
+    ), 1), 255
+)
 MAX_BRIGHTNESS = 255
-MAX_SAT = 254
-MAX_HUE = 65535
-CT_BRI_STEPS = 5
-CT_MIRED_STEPS = 10
+MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 254)
+MAX_SAT = min(max(config("MAX_SAT", default=254, cast=int), 1), 254)
+MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
+MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
+CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
+CT_MIRED_STEPS = min(config("CT_BRI_STEPS", default=10, cast=int), 10)
 BRI_BRI_STEPS = 1
-HS_BRI_STEPS = config("HS_BRI_STEPS", default=10, cast=int)
-if HS_BRI_STEPS > 20:
-    HS_BRI_STEPS = 20
-HS_HUE_STEPS = config("HS_HUE_STEPS", default=2000, cast=int)
-if HS_HUE_STEPS > 4000:
-    HS_HUE_STEPS = 4000
-HS_SAT_STEPS = config("HS_SAT_STEPS", default=10, cast=int)
-if HS_SAT_STEPS > 20:
-    HS_SAT_STEPS = 20
+HS_BRI_STEPS = min(config("HS_BRI_STEPS", default=10, cast=int), 20)
+HS_HUE_STEPS = min(config("HS_HUE_STEPS", default=2000, cast=int), 4000)
+HS_SAT_STEPS = min(config("HS_SAT_STEPS", default=10, cast=int), 20)
 
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
@@ -79,7 +82,6 @@ SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
 SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
-START_BRIGHTNESS = config("START_BRIGHTNESS", default=1, cast=int)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
 
@@ -308,18 +310,18 @@ class Measure:
     def get_ct_variations(self) -> Iterator[ColorTempVariation]:
         min_mired = self.light_info.min_mired
         max_mired = self.light_info.max_mired
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
+        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
             for mired in self.inclusive_range(min_mired, max_mired, CT_MIRED_STEPS):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
-            for sat in self.inclusive_range(1, MAX_SAT, HS_SAT_STEPS):
-                for hue in self.inclusive_range(1, MAX_HUE, HS_HUE_STEPS):
+        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
+            for sat in self.inclusive_range(MIN_SAT, MAX_SAT, HS_SAT_STEPS):
+                for hue in self.inclusive_range(MIN_HUE, MAX_HUE, HS_HUE_STEPS):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
-        for bri in self.inclusive_range(START_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
+        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
