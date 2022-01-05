@@ -210,7 +210,9 @@ async def async_setup_platform(
         return
 
     if entities:
-        async_add_entities([entity for entity in entities if isinstance(entity, SensorEntity)])
+        async_add_entities(
+            [entity for entity in entities if isinstance(entity, SensorEntity)]
+        )
 
 
 def get_merged_sensor_configuration(*configs: dict) -> dict:
@@ -281,7 +283,9 @@ async def create_sensors(
             global_config, config, sensor_config
         )
         try:
-            new_sensors.extend(await create_individual_sensors(hass, merged_sensor_config))
+            new_sensors.extend(
+                await create_individual_sensors(hass, merged_sensor_config)
+            )
         except SensorAlreadyConfiguredError as error:
             existing_sensors.extend(error.get_existing_entities())
         except SensorConfigurationError as error:
@@ -396,12 +400,8 @@ def create_group_sensors(
 
     group_sensors = []
 
-    power_sensors = list(
-        filter(lambda elm: isinstance(elm, PowerSensor), entities)
-    )
-    power_sensor_ids = (
-        list(map(lambda x: x.entity_id, power_sensors))
-    )
+    power_sensors = list(filter(lambda elm: isinstance(elm, PowerSensor), entities))
+    power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     group_sensors.append(GroupedPowerSensor(name, power_sensor_ids, hass))
