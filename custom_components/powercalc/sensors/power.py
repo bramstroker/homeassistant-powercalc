@@ -320,3 +320,14 @@ class VirtualPowerSensor(SensorEntity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+
+class RealPowerSensor:
+    """Contains a reference to a existing real power sensor entity"""
+
+    def __init__(self, entity_id: str):
+        self._entity_id = entity_id
+
+    @property
+    def entity_id(self):
+        """Return the name of the sensor."""
+        return self._entity_id
