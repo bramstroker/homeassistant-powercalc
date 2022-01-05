@@ -106,6 +106,7 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb E14 WS opal 600lm": "LED1738G7",
         "TRADFRI bulb E14 WS 470lm": "LED1835C6",
         "TRADFRI bulb E27 WW 806lm": "LED1836G9",
+        "TRADFRI bulb E27 WW clear 250lm": "LED1842G3",
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
         "TRADFRIbulbE14WSglobeopal470lm": "LED2002G5",
         "LEPTITER Recessed spot light": "T1820",
