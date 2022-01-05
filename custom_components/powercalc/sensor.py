@@ -102,7 +102,7 @@ from .errors import (
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
+from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -255,8 +255,6 @@ async def create_sensors(
         )
 
     # Setup power sensors for multiple appliances in one config entry
-    new_sensors = []
-    existing_sensors = []
     sensor_configs = {}
     if CONF_ENTITIES in config:
         sensor_configs = {
@@ -273,6 +271,11 @@ async def create_sensors(
         } | sensor_configs
 
     # Create sensors for each entity
+    if not sensor_configs:
+        raise SensorConfigurationError("Could not resolve any entities")
+
+    new_sensors = []
+    existing_sensors = []
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
@@ -394,7 +397,7 @@ def create_group_sensors(
     group_sensors = []
 
     power_sensors = list(
-        filter(lambda elm: isinstance(elm, VirtualPowerSensor, RealPowerSensor), entities)
+        filter(lambda elm: isinstance(elm, PowerSensor), entities)
     )
     power_sensor_ids = (
         list(map(lambda x: x.entity_id, power_sensors))
