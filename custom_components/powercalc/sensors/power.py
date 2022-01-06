@@ -178,7 +178,13 @@ def select_calculation_mode(config: dict) -> Optional[str]:
     return None
 
 
-class VirtualPowerSensor(SensorEntity):
+class PowerSensor:
+    """Class which all power sensors should extend from"""
+
+    pass
+
+
+class VirtualPowerSensor(SensorEntity, PowerSensor):
     """Virtual power sensor"""
 
     _attr_device_class = DEVICE_CLASS_POWER
@@ -320,3 +326,15 @@ class VirtualPowerSensor(SensorEntity):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+
+
+class RealPowerSensor(PowerSensor):
+    """Contains a reference to a existing real power sensor entity"""
+
+    def __init__(self, entity_id: str):
+        self._entity_id = entity_id
+
+    @property
+    def entity_id(self):
+        """Return the name of the sensor."""
+        return self._entity_id

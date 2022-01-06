@@ -26,6 +26,10 @@ from homeassistant.components import (
     water_heater,
 )
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
+from homeassistant.components.integration.sensor import (
+    INTEGRATION_METHOD,
+    TRAPEZOIDAL_METHOD,
+)
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -62,6 +66,7 @@ from .const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_STANDBY_POWER,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
@@ -97,7 +102,7 @@ from .errors import (
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, VirtualEnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import VirtualPowerSensor, create_power_sensor
+from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -160,6 +165,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
+    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(INTEGRATION_METHOD),
 }
 
 GROUPED_SENSOR_CONFIG = {
@@ -204,7 +210,9 @@ async def async_setup_platform(
         return
 
     if entities:
-        async_add_entities(entities)
+        async_add_entities(
+            [entity for entity in entities if isinstance(entity, SensorEntity)]
+        )
 
 
 def get_merged_sensor_configuration(*configs: dict) -> dict:
@@ -249,7 +257,6 @@ async def create_sensors(
         )
 
     # Setup power sensors for multiple appliances in one config entry
-    created_sensors = []
     sensor_configs = {}
     if CONF_ENTITIES in config:
         sensor_configs = {
@@ -266,13 +273,17 @@ async def create_sensors(
         } | sensor_configs
 
     # Create sensors for each entity
+    if not sensor_configs:
+        raise SensorConfigurationError("Could not resolve any entities")
+
+    new_sensors = []
     existing_sensors = []
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
         )
         try:
-            created_sensors.extend(
+            new_sensors.extend(
                 await create_individual_sensors(hass, merged_sensor_config)
             )
         except SensorAlreadyConfiguredError as error:
@@ -282,23 +293,26 @@ async def create_sensors(
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
-        group_entities = created_sensors + existing_sensors
+        group_entities = new_sensors + existing_sensors
         group_name = config.get(CONF_CREATE_GROUP)
         if not group_entities:
             _LOGGER.error("Could not create group %s, no entities resolved", group_name)
         group_sensors = create_group_sensors(
-            group_name, merged_sensor_config, group_entities, hass=hass
+            group_name,
+            merged_sensor_config,
+            group_entities,
+            hass=hass,
         )
-        created_sensors.extend(group_sensors)
+        new_sensors.extend(group_sensors)
 
-    return created_sensors
+    return new_sensors
 
 
 async def create_individual_sensors(
     hass: HomeAssistantType,
     sensor_config: dict,
     discovery_info: DiscoveryInfoType | None = None,
-) -> list[SensorEntity]:
+) -> list[SensorEntity, RealPowerSensor]:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
     if discovery_info:
@@ -328,6 +342,7 @@ async def create_individual_sensors(
         # Use an existing power sensor, only create energy sensors / utility meters
         if CONF_POWER_SENSOR_ID in sensor_config:
             power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
+            entities_to_add.append(RealPowerSensor(power_sensor_id))
         # Create the virtual power sensor
         else:
             try:
@@ -378,16 +393,14 @@ async def create_individual_sensors(
 def create_group_sensors(
     group_name: str,
     sensor_config: dict,
-    entities: list[SensorEntity],
+    entities: list[SensorEntity, RealPowerSensor],
     hass: HomeAssistantType,
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 
     group_sensors = []
 
-    power_sensors = list(
-        filter(lambda elm: isinstance(elm, VirtualPowerSensor), entities)
-    )
+    power_sensors = list(filter(lambda elm: isinstance(elm, PowerSensor), entities))
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)

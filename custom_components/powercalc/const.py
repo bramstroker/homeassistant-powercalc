@@ -17,6 +17,7 @@ CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"
 CONF_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 CONF_ENABLE_AUTODISCOVERY = "enable_autodiscovery"
+CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
 CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_FIXED = "fixed"
 CONF_GROUP = "group"
@@ -84,7 +85,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
 
 MANUFACTURER_ALIASES = {
     "Philips": "Signify Netherlands B.V.",
-    "IKEA": "Ikea of Sweden",
+    "IKEA": "IKEA of Sweden",
     "Xiaomi": "Aqara",
     "LUMI": "Aqara",
 }
@@ -105,6 +106,7 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb E14 WS opal 600lm": "LED1738G7",
         "TRADFRI bulb E14 WS 470lm": "LED1835C6",
         "TRADFRI bulb E27 WW 806lm": "LED1836G9",
+        "TRADFRI bulb E27 WW clear 250lm": "LED1842G3",
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
         "TRADFRIbulbE14WSglobeopal470lm": "LED2002G5",
         "LEPTITER Recessed spot light": "T1820",
