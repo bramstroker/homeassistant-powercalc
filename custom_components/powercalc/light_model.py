@@ -49,8 +49,8 @@ class LightModel:
         Using the following fallback mechanism:
          - custom_model_directory defined on sensor configuration
          - check in user defined directory (config/powercalc-custom-models)
-         - check in alternative user defined directory (config/custom_components/custom_data)
-         - check in buildin directory (config/custom_components/data)
+         - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
+         - check in buildin directory (config/custom_components/powercalc/data)
         """
 
         if self._custom_model_directory:
