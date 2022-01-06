@@ -70,9 +70,24 @@ def create_utility_meters(
         if "delta_values" in signature.parameters:
             params["delta_values"] = False
 
-        utility_meter = UtilityMeterSensor(**params)
+        utility_meter = VirtualUtilityMeter(**params)
+
+        if energy_sensor.unique_id:
+            utility_meter.unique_id = f"{energy_sensor.unique_id}_{meter_type}"
 
         hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [utility_meter]
         utility_meters.append(utility_meter)
 
     return utility_meters
+
+
+class VirtualUtilityMeter(UtilityMeterSensor):
+    @property
+    def unique_id(self):
+        """Return the name of the group."""
+        return self._attr_unique_id
+
+    @unique_id.setter
+    def unique_id(self, value):
+        """Set last changed datetime."""
+        self._attr_unique_id = value
