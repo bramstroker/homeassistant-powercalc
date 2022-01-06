@@ -235,7 +235,7 @@ async def async_setup_platform(
 
     if entities:
         async_add_entities(
-            [entity for entity in entities if isinstance(entity, SensorEntity)]
+            [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
         )
 
 
@@ -262,9 +262,8 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
 async def create_sensors(
     hass: HomeAssistantType,
     config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None,
-    resolved_entities: list = []
-) -> list[SensorEntity]:
+    discovery_info: DiscoveryInfoType | None = None
+) -> tuple(list[SensorEntity, RealPowerSensor], list[SensorEntity, RealPowerSensor]):
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
@@ -284,15 +283,19 @@ async def create_sensors(
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
     new_sensors = []
+    existing_sensors = []
     if CONF_ENTITIES in config:
         for entity_config in config[CONF_ENTITIES]:
-            if CONF_ENTITIES in entity_config:
-                new_sensors.extend(await create_sensors(hass, entity_config))
-
             if CONF_ENTITY_ID in entity_config:
                 sensor_configs.update({
                     entity_config[CONF_ENTITY_ID]: entity_config
                 })
+
+            # When there are nested entities, combine these with the current entities, resursively
+            if CONF_ENTITIES in entity_config:
+                (child_new_sensors, child_existing_sensors) = await create_sensors(hass, entity_config);
+                new_sensors.extend(child_new_sensors)
+                existing_sensors.extend(child_existing_sensors)
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
@@ -307,7 +310,6 @@ async def create_sensors(
     if not sensor_configs:
         raise SensorConfigurationError("Could not resolve any entities")
 
-    existing_sensors = []
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
@@ -335,7 +337,7 @@ async def create_sensors(
         )
         new_sensors.extend(group_sensors)
 
-    return new_sensors
+    return (new_sensors, existing_sensors)
 
 
 async def create_individual_sensors(
