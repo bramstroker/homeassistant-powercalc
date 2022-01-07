@@ -185,27 +185,14 @@ SENSOR_CONFIG = {
     ),
 }
 
-GROUPED_SENSOR_CONFIG = {
-    vol.Optional(CONF_ENTITIES): vol.All(cv.ensure_list, [SENSOR_CONFIG]),
-}
-
 
 def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
-    internal_schema = copy.copy(schema)
     iteration += 1
     if iteration == 3:
-        return internal_schema
-    schema.update({vol.Optional(CONF_ENTITIES): vol.All(cv.ensure_list, [build_nested_configuration_schema(internal_schema, iteration)])})
-    #schema.update({"conf3": build_nested_configuration_schema(internal_schema, iteration)})
+        return schema
+    schema.update({vol.Optional(CONF_ENTITIES): vol.All(cv.ensure_list, [build_nested_configuration_schema(schema.copy(), iteration)])})
     return schema
-# def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
-#     iteration += 1
-#     if iteration == 3:
-#         return schema
-#     schema.update({vol.Optional(CONF_ENTITIES): vol.All(cv.ensure_list, [build_nested_configuration_schema(schema.copy(), iteration)])})
-#     return schema
 
-#SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
 SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
 
 PLATFORM_SCHEMA: Final = vol.All(
@@ -275,9 +262,10 @@ async def create_sensors(
         if discovery_info:
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-        return await create_individual_sensors(
+        new_sensors = await create_individual_sensors(
             hass, merged_sensor_config, discovery_info
         )
+        return (new_sensors, [])
 
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
