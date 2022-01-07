@@ -66,10 +66,9 @@ def async_migrate_entity_id(
         _LOGGER.error(e)
         entity_registry.async_remove(new_entity_id)
 
+
 @callback
-def async_set_unique_id(
-    hass, entity_id: str, unique_id: str
-) -> None:
+def async_set_unique_id(hass, entity_id: str, unique_id: str) -> None:
     """Set a new unique id for a given entity id."""
     entity_registry = async_get(hass)
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 import copy
+import logging
 from datetime import timedelta
 from typing import Final, cast
 
@@ -27,9 +27,7 @@ from homeassistant.components import (
     water_heater,
 )
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
-from homeassistant.components.integration.sensor import (
-    INTEGRATION_METHOD,
-)
+from homeassistant.components.integration.sensor import INTEGRATION_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -166,7 +164,6 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(INTEGRATION_METHOD),
-
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
@@ -190,8 +187,16 @@ def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
     iteration += 1
     if iteration == 3:
         return schema
-    schema.update({vol.Optional(CONF_ENTITIES): vol.All(cv.ensure_list, [build_nested_configuration_schema(schema.copy(), iteration)])})
+    schema.update(
+        {
+            vol.Optional(CONF_ENTITIES): vol.All(
+                cv.ensure_list,
+                [build_nested_configuration_schema(schema.copy(), iteration)],
+            )
+        }
+    )
     return schema
+
 
 SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
 
@@ -248,7 +253,7 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
 async def create_sensors(
     hass: HomeAssistantType,
     config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None
+    discovery_info: DiscoveryInfoType | None = None,
 ) -> tuple(list[SensorEntity, RealPowerSensor], list[SensorEntity, RealPowerSensor]):
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 
@@ -274,13 +279,13 @@ async def create_sensors(
     if CONF_ENTITIES in config:
         for entity_config in config[CONF_ENTITIES]:
             if CONF_ENTITY_ID in entity_config:
-                sensor_configs.update({
-                    entity_config[CONF_ENTITY_ID]: entity_config
-                })
+                sensor_configs.update({entity_config[CONF_ENTITY_ID]: entity_config})
 
             # When there are nested entities, combine these with the current entities, resursively
             if CONF_ENTITIES in entity_config:
-                (child_new_sensors, child_existing_sensors) = await create_sensors(hass, entity_config);
+                (child_new_sensors, child_existing_sensors) = await create_sensors(
+                    hass, entity_config
+                )
                 new_sensors.extend(child_new_sensors)
                 existing_sensors.extend(child_existing_sensors)
 
