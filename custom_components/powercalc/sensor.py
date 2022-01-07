@@ -297,7 +297,7 @@ async def create_sensors(
         group_name = config.get(CONF_CREATE_GROUP)
         if not group_entities:
             _LOGGER.error("Could not create group %s, no entities resolved", group_name)
-        group_sensors = create_group_sensors(
+        group_sensors = await create_group_sensors(
             group_name,
             merged_sensor_config,
             group_entities,
@@ -377,7 +377,7 @@ async def create_individual_sensors(
 
     if energy_sensor:
         entities_to_add.extend(
-            create_utility_meters(hass, energy_sensor, sensor_config)
+            await create_utility_meters(hass, energy_sensor, sensor_config)
         )
 
     if discovery_info:
@@ -390,7 +390,7 @@ async def create_individual_sensors(
     return entities_to_add
 
 
-def create_group_sensors(
+async def create_group_sensors(
     group_name: str,
     sensor_config: dict,
     entities: list[SensorEntity, RealPowerSensor],
@@ -420,7 +420,7 @@ def create_group_sensors(
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
 
     group_sensors.extend(
-        create_utility_meters(hass, group_energy_sensor, sensor_config)
+        await create_utility_meters(hass, group_energy_sensor, sensor_config)
     )
 
     return group_sensors
