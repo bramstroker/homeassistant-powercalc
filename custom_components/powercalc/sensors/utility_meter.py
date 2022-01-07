@@ -26,11 +26,12 @@ from custom_components.powercalc.sensors.energy import (
     VirtualEnergySensor,
 )
 from custom_components.powercalc.sensors.group import GroupedEnergySensor
+from custom_components.powercalc.migrate import async_set_unique_id
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def create_utility_meters(
+async def create_utility_meters(
     hass: HomeAssistantType,
     energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor, DailyEnergySensor],
     sensor_config: dict,
@@ -73,7 +74,10 @@ def create_utility_meters(
         utility_meter = VirtualUtilityMeter(**params)
 
         if energy_sensor.unique_id:
-            utility_meter.unique_id = f"{energy_sensor.unique_id}_{meter_type}"
+            unique_id = f"{energy_sensor.unique_id}_{meter_type}"
+            # Set new unique id if this entity already exists in the entity registry
+            async_set_unique_id(hass, entity_id, unique_id)
+            utility_meter.unique_id = unique_id
 
         hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [utility_meter]
         utility_meters.append(utility_meter)
