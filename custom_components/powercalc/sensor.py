@@ -29,7 +29,6 @@ from homeassistant.components import (
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.integration.sensor import (
     INTEGRATION_METHOD,
-    TRAPEZOIDAL_METHOD,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
