@@ -8,10 +8,11 @@ from homeassistant.components import climate, vacuum
 from homeassistant.core import State
 from homeassistant.helpers.template import Template
 
-from .common import SourceEntity
-from .const import CONF_POWER, CONF_STATES_POWER
-from .errors import StrategyConfigurationError
-from .helpers import evaluate_power
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_POWER, CONF_STATES_POWER
+from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.helpers import evaluate_power
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
@@ -50,7 +51,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 for state_key, power in self._per_state_power.items():
                     if "|" in state_key:
                         attribute, value = state_key.split("|", 2)
-                        if entity_state.attributes.get(attribute) == value:
+                        if str(entity_state.attributes.get(attribute)) == value:
                             return await evaluate_power(power)
 
         return await evaluate_power(self._power)
@@ -63,5 +64,5 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             and self._per_state_power is None
         ):
             raise StrategyConfigurationError(
-                "This entity can only work with 'state_power' not 'power'"
+                "This entity can only work with 'states_power' not 'power'"
             )

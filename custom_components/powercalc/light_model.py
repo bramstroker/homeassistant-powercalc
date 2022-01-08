@@ -49,7 +49,8 @@ class LightModel:
         Using the following fallback mechanism:
          - custom_model_directory defined on sensor configuration
          - check in user defined directory (config/powercalc-custom-models)
-         - check in buildin directory (config/custom_components/data)
+         - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
+         - check in buildin directory (config/custom_components/powercalc/data)
         """
 
         if self._custom_model_directory:
@@ -67,20 +68,18 @@ class LightModel:
                 self._model
             )
 
-        custom_model_data_dir = os.path.join(
-            self._hass.config.config_dir,
-            CUSTOM_DATA_DIRECTORY,
-            f"{manufacturer_directory}/{model_directory}",
+        data_directories = (
+            os.path.join(self._hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
+            os.path.join(os.path.dirname(__file__), "custom_data"),
+            os.path.join(os.path.dirname(__file__), "data"),
         )
-        if os.path.exists(custom_model_data_dir):
-            return custom_model_data_dir
-
-        model_data_dir = os.path.join(
-            os.path.dirname(__file__),
-            f"data/{manufacturer_directory}/{model_directory}",
-        )
-        if os.path.exists(model_data_dir):
-            return model_data_dir
+        for data_dir in data_directories:
+            model_data_dir = os.path.join(
+                data_dir,
+                f"{manufacturer_directory}/{model_directory}",
+            )
+            if os.path.exists(model_data_dir):
+                return model_data_dir
 
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"

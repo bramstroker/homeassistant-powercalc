@@ -19,18 +19,20 @@ from homeassistant.components.light import (
     COLOR_MODE_BRIGHTNESS,
     COLOR_MODE_COLOR_TEMP,
     COLOR_MODE_HS,
+    COLOR_MODE_UNKNOWN,
     COLOR_MODES_COLOR,
 )
 from homeassistant.core import State
 
-from .common import SourceEntity
-from .errors import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.errors import (
     LutFileNotFound,
     ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from .light_model import LightModel
+from custom_components.powercalc.light_model import LightModel
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
@@ -55,6 +57,7 @@ class LutRegistry:
                 csv_reader = reader(csv_file)
                 next(csv_reader)  # skip header row
 
+                line_count = 0
                 for row in csv_reader:
                     if color_mode == COLOR_MODE_HS:
                         lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(
@@ -66,6 +69,9 @@ class LutRegistry:
                         lookup_dict[int(row[0])] = float(row[1])
                     else:
                         raise UnsupportedMode(f"Unsupported color mode {color_mode}")
+                    line_count += 1
+
+            _LOGGER.debug("LUT file loaded: %d lines", line_count)
 
             lookup_dict = dict(lookup_dict)
             self._lookup_dictionaries[cache_key] = lookup_dict
@@ -77,11 +83,11 @@ class LutRegistry:
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
-            _LOGGER.debug("Loading data file: %s", gzip_path)
+            _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")
 
         elif os.path.exists(path):
-            _LOGGER.debug("Loading data file: %s", path)
+            _LOGGER.debug("Loading LUT data file: %s", path)
             return open(path, "r")
 
         raise LutFileNotFound("Data file not found: %s")
@@ -101,17 +107,32 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness is None:
-            _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
+            _LOGGER.error(
+                "%s: Could not calculate power. no brightness set",
+                entity_state.entity_id,
+            )
             return None
         if brightness > 255:
             brightness = 255
+
+        if color_mode is COLOR_MODE_UNKNOWN:
+            _LOGGER.debug(
+                "%s: Could not calculate power. color mode unknown",
+                entity_state.entity_id,
+            )
+            return None
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
                 self._model, color_mode
             )
         except LutFileNotFound:
-            _LOGGER.error("Lookup table not found")
+            _LOGGER.error(
+                "%s: Lookup table not found (model: %s, color_mode: %s)",
+                entity_state.entity_id,
+                self._model.model,
+                color_mode,
+            )
             return None
 
         power = 0
@@ -121,7 +142,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             light_setting.hue = int(hs[0] / 360 * 65535)
             light_setting.saturation = int(hs[1] / 100 * 255)
             _LOGGER.debug(
-                "Looking up power usage for bri:%s hue:%s sat:%s}",
+                "%s: Looking up power usage for bri:%s hue:%s sat:%s}",
+                entity_state.entity_id,
                 brightness,
                 light_setting.hue,
                 light_setting.saturation,
@@ -129,15 +151,20 @@ class LutStrategy(PowerCalculationStrategyInterface):
         elif color_mode == COLOR_MODE_COLOR_TEMP:
             light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
-                "Looking up power usage for bri:%s mired:%s",
+                "%s: Looking up power usage for bri:%s mired:%s",
+                entity_state.entity_id,
                 brightness,
                 light_setting.color_temp,
             )
         elif color_mode == COLOR_MODE_BRIGHTNESS:
-            _LOGGER.debug("Looking up power usage for bri:%s", brightness)
+            _LOGGER.debug(
+                "%s: Looking up power usage for bri:%s",
+                entity_state.entity_id,
+                brightness,
+            )
 
         power = self.lookup_power(lookup_table, light_setting)
-        _LOGGER.debug("Power:%s", power)
+        _LOGGER.debug("%s: Calculated power:%s", entity_state.entity_id, power)
         return power
 
     def lookup_power(self, lookup_table: dict, light_setting: LightSetting) -> float:

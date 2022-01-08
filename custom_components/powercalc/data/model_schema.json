@@ -39,6 +39,10 @@
       "type": "string",
       "description": "Add more information about how you measured the light or any remarks"
     },
+    "measure_settings": {
+      "type": "object",
+      "description": "Settings used for measure script"
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation mode",

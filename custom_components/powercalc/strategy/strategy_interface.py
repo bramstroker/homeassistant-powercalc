@@ -2,7 +2,7 @@ from typing import Optional
 
 from homeassistant.core import State
 
-from .common import SourceEntity
+from custom_components.powercalc.common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:
@@ -13,3 +13,9 @@ class PowerCalculationStrategyInterface:
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
         pass
+
+    def get_entities_to_track(self) -> tuple:
+        return {}
+
+    def can_calculate_standby(self) -> bool:
+        return False
