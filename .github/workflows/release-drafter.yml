@@ -22,16 +22,3 @@ jobs:
           disable-releaser: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - id: last_release
-        name: Fetch latest release
-        uses: InsonusK/get-latest-release@v1.0.1
-        with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
-          exclude_types: "release"
-          view_top: 1
-      - name: Write version file
-        run: 'echo ${{ steps.last_release.outputs.tag_name }} > utils/measure/.VERSION'
-      - name: Commit version file
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Update version
