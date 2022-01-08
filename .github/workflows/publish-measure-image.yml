@@ -16,9 +16,8 @@ jobs:
       - name: Get version
         id: version
         uses: home-assistant/actions/helpers/version@master
-      - name: Debug
-        run: 'echo ${{ github.event.action }}'
-      - name: Write version file
+      - if: github.event.action == "published"
+        name: Write version file
         run: 'echo ${{ steps.version.outputs.version }}:docker > utils/measure/.VERSION'
       - name: Docker meta
         id: meta
