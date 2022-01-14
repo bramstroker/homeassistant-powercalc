@@ -563,9 +563,9 @@ sensor:
 ```
 
 Each group will have power sensors created for the following lights:
-All lights: `light.a`, `light.b`, `light.c`, `light.d`
-Upstairs lights: `light.c`, `light.d`
-Bedroom Bob lights: `light.d`
+- All lights: `light.a`, `light.b`, `light.c`, `light.d`
+- Upstairs lights: `light.c`, `light.d`
+- Bedroom Bob lights: `light.d`
 
 #### Dynamically including entities
 
