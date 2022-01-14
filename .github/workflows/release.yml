@@ -16,9 +16,11 @@ jobs:
         id: version
         uses: home-assistant/actions/helpers/version@master
 
-      - name: "Set version number"
+      - name: "Set manifest version number"
         run: |
           python3 ${{ github.workspace }}/.github/scripts/update_hacs_manifest.py --version ${{ steps.version.outputs.version }}
+      - name: Set measure tool version number
+        run: 'echo ${{ steps.version.outputs.version }} > utils/measure/.VERSION'
       - name: Create zip
         run: |
           cd custom_components/powercalc

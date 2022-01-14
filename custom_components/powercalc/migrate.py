@@ -5,7 +5,6 @@ import logging
 from homeassistant.core import callback
 from homeassistant.helpers.entity_registry import (
     EntityRegistry,
-    RegistryEntry,
     async_entries_for_device,
     async_get,
 )
@@ -66,3 +65,18 @@ def async_migrate_entity_id(
     except ValueError as e:
         _LOGGER.error(e)
         entity_registry.async_remove(new_entity_id)
+
+
+@callback
+def async_set_unique_id(hass, entity_id: str, unique_id: str) -> None:
+    """Set a new unique id for a given entity id."""
+    entity_registry = async_get(hass)
+
+    entry = entity_registry.async_get(entity_id)
+    if entry and entry.unique_id != unique_id:
+        _LOGGER.debug(
+            "Migrating entity %s to new unique ID '%s'",
+            entity_id,
+            unique_id,
+        )
+        entity_registry.async_update_entity(entity_id, new_unique_id=unique_id)
