@@ -542,6 +542,31 @@ This will create the following entities:
 - sensor.all_hallway_lights_power (group sensor)
 - sensor.all_hallway_lights_energy (group sensor)
 
+**Nesting groups**
+> Available from v0.15 and higher
+
+You can also nest groups, this makes it possible to add an entity to multiple groups.
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: All lights
+    entities:
+      - entity_id: light.a
+      - entity_id: light.b
+      - create_group: Upstairs lights
+        entities:
+          - entity_id: light.c
+          - create_group: Bedroom Bob lights
+            entities:
+              - entity_id: light.d
+```
+
+Each group will have power sensors created for the following lights:
+All lights: `light.a`, `light.b`, `light.c`, `light.d`
+Upstairs lights: `light.c`, `light.d`
+Bedroom Bob lights: `light.d`
+
 #### Dynamically including entities
 
 Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option.
