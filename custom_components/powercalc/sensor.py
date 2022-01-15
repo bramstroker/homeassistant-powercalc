@@ -185,7 +185,7 @@ SENSOR_CONFIG = {
 
 def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
     iteration += 1
-    if iteration == 3:
+    if iteration == 4:
         return schema
     schema.update(
         {
