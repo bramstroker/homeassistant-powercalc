@@ -48,7 +48,12 @@ This integration is part of the default HACS repository. Just click "Explore and
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
 
 ### Post installation steps
-Restart HA
+- Restart HA
+- Add the following entry to `configuration.yaml`:
+```yaml
+powercalc:
+```
+- Restart HA final time
 
 ### Setup power sensors
 
