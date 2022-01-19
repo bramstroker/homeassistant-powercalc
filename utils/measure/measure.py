@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import gzip
+from io import TextIOWrapper
 import json
 import logging
 import os
@@ -9,6 +10,7 @@ import shutil
 import sys
 import time
 from dataclasses import asdict, dataclass
+from datetime import datetime as dt
 from typing import Iterator, Optional
 
 from decouple import Choices, config
@@ -97,6 +99,8 @@ HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
+CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
+
 # Change some settings when selected power meter is manual
 if SELECTED_POWER_METER == POWER_METER_MANUAL:
     SAMPLE_COUNT = 1
@@ -160,7 +164,7 @@ class Measure:
             write_header_row = False
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
-            csv_writer = csv.writer(csv_file)
+            csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
             self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
@@ -169,10 +173,8 @@ class Measure:
             _LOGGER.info(f"Waiting {SLEEP_INITIAL} seconds...")
             time.sleep(SLEEP_INITIAL)
 
-            if write_header_row:
-                csv_writer.writerow(CSV_HEADERS[self.color_mode])
             previous_variation = None
-            for count, variation in enumerate(self.get_variations(self.color_mode, resume_at)):
+            for variation in self.get_variations(self.color_mode, resume_at):
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
@@ -195,20 +197,14 @@ class Measure:
                 time.sleep(SLEEP_TIME)
                 power = self.take_power_measurement(variation_start_time)
                 _LOGGER.info(f"Measured power: {power}")
-                row = variation.to_csv_row()
-                row.append(power)
-                csv_writer.writerow(row)
-                if count % CSV_WRITE_BUFFER == 1:
-                    csv_file.flush()
-                    _LOGGER.debug("Flushing CSV buffer")
+                csv_writer.write_measurement(variation, power)
 
             csv_file.close()
 
         if answers["gzip"] or True:
             self.gzip_csv(csv_file_path)
 
-
-    def should_resume(self, csv_file_path) -> bool:
+    def should_resume(self, csv_file_path: str) -> bool:
         if not os.path.exists(csv_file_path):
             return False
         
@@ -239,7 +235,7 @@ class Measure:
         raise Exception(f"Color mode {self.color_mode} not supported")
 
 
-    def take_power_measurement(self, start_timestamp: float, retry_count=0) -> float:
+    def take_power_measurement(self, start_timestamp: float, retry_count: int=0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(SAMPLE_COUNT):
@@ -405,6 +401,29 @@ class Measure:
             + self.light_controller.get_questions()
             + self.power_meter.get_questions()
         )
+
+class CsvWriter:
+    def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
+        self.csv_file = csv_file
+        self.writer = csv.writer(csv_file)
+        self.rows_written = 0
+        if add_header:
+            header_row = CSV_HEADERS[color_mode]
+            if CSV_ADD_DATETIME_COLUMN:
+                header_row.append("time")
+            self.writer.writerow(header_row)
+    
+    def write_measurement(self, variation: Variation, power: float):
+        row = variation.to_csv_row()
+        row.append(power)
+        if CSV_ADD_DATETIME_COLUMN:
+            row.append(dt.now().strftime("%Y%m%d%H%M%S"))
+        self.writer.writerow(row)
+        self.rows_written += 1
+        if self.rows_written % CSV_WRITE_BUFFER == 1:
+            self.csv_file.flush()
+            _LOGGER.debug("Flushing CSV buffer")
+
 
 @dataclass(frozen=True)
 class Variation:
