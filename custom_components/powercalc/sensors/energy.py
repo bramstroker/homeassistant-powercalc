@@ -77,7 +77,13 @@ async def create_energy_sensor(
     )
 
 
-class VirtualEnergySensor(IntegrationSensor):
+class EnergySensor:
+    """Class which all power sensors should extend from"""
+
+    pass
+
+
+class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh"""
 
     def __init__(
@@ -122,7 +128,7 @@ class VirtualEnergySensor(IntegrationSensor):
         return ENERGY_ICON
 
 
-class DailyEnergySensor(RestoreEntity, SensorEntity):
+class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
     _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR

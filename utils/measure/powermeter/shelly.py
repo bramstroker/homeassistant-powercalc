@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
-import requests
 import time
+
+import requests
 
 from .errors import ConnectionError
 from .powermeter import PowerMeasurementResult, PowerMeter
