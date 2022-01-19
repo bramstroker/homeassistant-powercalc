@@ -295,12 +295,14 @@ async def create_sensors(
         sensor_configs = {
             entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
             for entity in entities
-            if await is_supported_model(hass, entity)
+            if entity and await is_supported_model(hass, entity)
         } | sensor_configs
 
     # Create sensors for each entity
-    if not sensor_configs:
-        raise SensorConfigurationError("Could not resolve any entities")
+    if not sensor_configs and CONF_CREATE_GROUP in config:
+        raise SensorConfigurationError(f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'")
+    elif not sensor_configs:
+        raise SensorConfigurationError(f"Could not resolve any entities for non-group sensor")
 
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
