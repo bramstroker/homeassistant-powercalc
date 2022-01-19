@@ -10,6 +10,7 @@ import shutil
 import sys
 import time
 from dataclasses import asdict, dataclass
+from datetime import datetime as dt
 from typing import Iterator, Optional
 
 from decouple import Choices, config
@@ -97,6 +98,8 @@ HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
+
+CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
 
 # Change some settings when selected power meter is manual
 if SELECTED_POWER_METER == POWER_METER_MANUAL:
@@ -406,11 +409,15 @@ class CsvWriter:
         self.rows_written = 0
         if add_header:
             header_row = CSV_HEADERS[color_mode]
+            if CSV_ADD_DATETIME_COLUMN:
+                header_row.append("time")
             self.writer.writerow(header_row)
     
     def write_measurement(self, variation: Variation, power: float):
         row = variation.to_csv_row()
         row.append(power)
+        if CSV_ADD_DATETIME_COLUMN:
+            row.append(dt.now().strftime("%Y%m%d%H%M%S"))
         self.writer.writerow(row)
         self.rows_written += 1
         if self.rows_written % CSV_WRITE_BUFFER == 1:
