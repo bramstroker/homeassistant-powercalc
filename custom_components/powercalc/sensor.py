@@ -241,7 +241,7 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
             CONF_CREATE_ENERGY_SENSORS
         )
-    
+
     if CONF_DAILY_FIXED_ENERGY in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
@@ -289,7 +289,7 @@ async def create_sensors(
                 new_sensors.extend(child_new_sensors)
                 existing_sensors.extend(child_existing_sensors)
                 continue
-            
+
             entity_id = entity_config.get(CONF_ENTITY_ID) or str(uuid.uuid4())
             sensor_configs.update({entity_id: entity_config})
 
@@ -441,9 +441,7 @@ async def create_group_sensors(
     group_sensors.append(GroupedPowerSensor(name, power_sensor_ids, hass))
     _LOGGER.debug("Creating grouped power sensor: %s", name)
 
-    energy_sensors = list(
-        filter(lambda elm: isinstance(elm, EnergySensor), entities)
-    )
+    energy_sensors = list(filter(lambda elm: isinstance(elm, EnergySensor), entities))
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)

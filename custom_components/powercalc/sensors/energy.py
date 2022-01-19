@@ -76,10 +76,12 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
+
 class EnergySensor:
     """Class which all power sensors should extend from"""
 
     pass
+
 
 class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh"""
