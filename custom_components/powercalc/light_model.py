@@ -27,7 +27,10 @@ class LightModel:
         custom_model_directory: str,
     ):
         self._manufacturer = manufacturer
-        self._model = model
+        if manufacturer and manufacturer.lower() == "ikea":
+            self._model = model.split("/")[0]
+        else:
+            self._model = model
         self._custom_model_directory = custom_model_directory
         self._hass = hass
         self._json_data = self.load_model_manifest()
