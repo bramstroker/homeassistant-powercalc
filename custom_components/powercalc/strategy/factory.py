@@ -66,7 +66,7 @@ class PowerCalculatorStrategyFactory:
         if linear_config is None and light_model is not None:
             linear_config = light_model.linear_mode_config
 
-        return LinearStrategy(linear_config, self._hass, source_entity)
+        return LinearStrategy(linear_config, self._hass, source_entity, config.get(CONF_STANDBY_POWER))
 
     def _create_fixed(self, config: dict, light_model: LightModel) -> FixedStrategy:
         """Create the fixed strategy"""

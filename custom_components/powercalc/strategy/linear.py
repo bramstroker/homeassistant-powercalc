@@ -39,11 +39,16 @@ _LOGGER = logging.getLogger(__name__)
 
 class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self, config, hass: HomeAssistantType, source_entity: SourceEntity
+        self,
+        config: dict,
+        hass: HomeAssistantType,
+        source_entity: SourceEntity,
+        standby_power: Optional[float]
     ) -> None:
         self._config = config
         self._hass = hass
         self._source_entity = source_entity
+        self._standby_power = standby_power
         self._calibration = self.create_calibrate_list()
 
     async def calculate(self, entity_state: State) -> Optional[float]:
@@ -83,7 +88,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         min = full_range[0]
         max = full_range[1]
         if calibrate is None:
-            list.append((min, float(self._config.get(CONF_MIN_POWER))))
+            min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
+            list.append((min, float(min_power)))
             list.append((max, float(self._config.get(CONF_MAX_POWER))))
             return list
 
@@ -139,9 +145,5 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 )
             )
 
-        if self._config.get(CONF_CALIBRATE) is None:
-            if self._config.get(CONF_MIN_POWER) is None:
-                raise StrategyConfigurationError("You must supply min power")
-
-            if self._config.get(CONF_MAX_POWER) is None:
-                raise StrategyConfigurationError("You must supply max power")
+        if not CONF_CALIBRATE in self._config and not CONF_MAX_POWER in self._config:
+            raise StrategyConfigurationError("You must supply max power")
