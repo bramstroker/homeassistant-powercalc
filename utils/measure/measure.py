@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import gzip
-from io import TextIOWrapper
 import json
 import logging
 import os
@@ -11,6 +10,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
+from io import TextIOWrapper
 from typing import Iterator, Optional
 
 from decouple import Choices, config

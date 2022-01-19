@@ -43,7 +43,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         config: dict,
         hass: HomeAssistantType,
         source_entity: SourceEntity,
-        standby_power: Optional[float]
+        standby_power: Optional[float],
     ) -> None:
         self._config = config
         self._hass = hass
