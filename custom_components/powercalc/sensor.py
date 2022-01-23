@@ -230,7 +230,7 @@ async def async_setup_platform(
         )
 
 
-def get_merged_sensor_configuration(*configs: dict) -> dict:
+def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
 
     merged_config = {}
@@ -245,7 +245,7 @@ def get_merged_sensor_configuration(*configs: dict) -> dict:
     if CONF_DAILY_FIXED_ENERGY in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
-    if not CONF_ENTITY_ID in merged_config:
+    if validate and not CONF_ENTITY_ID in merged_config:
         raise SensorConfigurationError(
             "You must supply an entity_id in the configuration, see the README"
         )
@@ -303,15 +303,6 @@ async def create_sensors(
         } | sensor_configs
 
     # Create sensors for each entity
-    if not sensor_configs and CONF_CREATE_GROUP in config:
-        raise SensorConfigurationError(
-            f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'"
-        )
-    elif not sensor_configs:
-        raise SensorConfigurationError(
-            f"Could not resolve any entities for non-group sensor"
-        )
-
     for sensor_config in sensor_configs.values():
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
@@ -324,6 +315,16 @@ async def create_sensors(
             existing_sensors.extend(error.get_existing_entities())
         except SensorConfigurationError as error:
             _LOGGER.error(error)
+    
+    if not new_sensors and not existing_sensors:
+        if CONF_CREATE_GROUP in config:
+            raise SensorConfigurationError(
+                f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'"
+            )
+        elif not sensor_configs:
+            raise SensorConfigurationError(
+                f"Could not resolve any entities for non-group sensor"
+        )
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
@@ -333,7 +334,7 @@ async def create_sensors(
             _LOGGER.error("Could not create group %s, no entities resolved", group_name)
         group_sensors = await create_group_sensors(
             group_name,
-            merged_sensor_config,
+            get_merged_sensor_configuration(global_config, config, validate=False),
             group_entities,
             hass=hass,
         )
