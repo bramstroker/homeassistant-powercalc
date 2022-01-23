@@ -81,6 +81,7 @@ LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
 SLEEP_INITIAL = 10
 SLEEP_STANDBY = config("SLEEP_STANDBY", default=20, cast=int)
 SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
+SLEEP_TIME_SAMPLE = config("SLEEP_TIME_SAMPLE", default=1, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
 SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
@@ -145,7 +146,12 @@ class Measure:
             os.makedirs(export_directory)
 
         if answers["generate_model_json"]:
-            standby_power = self.measure_standby_power()
+            try:
+                standby_power = self.measure_standby_power()
+            except PowerMeterError as error:
+                _LOGGER.error(f"Aborting: {error}")
+                return
+            
             self.write_model_json(
                 directory=export_directory,
                 standby_power=standby_power,
@@ -195,7 +201,11 @@ class Measure:
 
                 previous_variation = variation
                 time.sleep(SLEEP_TIME)
-                power = self.take_power_measurement(variation_start_time)
+                try:
+                    power = self.take_power_measurement(variation_start_time)
+                except PowerMeterError as error:
+                    _LOGGER.error(f"Aborting: {error}")
+                    return
                 _LOGGER.info(f"Measured power: {power}")
                 csv_writer.write_measurement(variation, power)
 
@@ -238,10 +248,12 @@ class Measure:
     def take_power_measurement(self, start_timestamp: float, retry_count: int=0) -> float:
         measurements = []
         # Take multiple samples to reduce noise
-        for i in range(SAMPLE_COUNT):
+        for i in range(1, SAMPLE_COUNT + 1):
             _LOGGER.debug(f"Taking sample {i}")
             try:
                 measurement = self.power_meter.get_power()
+                updated_at = dt.fromtimestamp(measurement.updated).strftime("%d-%m-%Y, %H:%M:%S")
+                _LOGGER.debug(f"Measurement received (update_time={updated_at})")
             except PowerMeterError as err:
                 if retry_count == MAX_RETRIES:
                     raise err
@@ -253,18 +265,14 @@ class Measure:
             if measurement.updated < start_timestamp:
                 # Prevent endless recursion and raise exception
                 if retry_count == MAX_RETRIES:
-                    raise OutdatedMeasurementError(
-                        "Power measurement is outdated. Aborting after {} retries".format(
-                            MAX_RETRIES
-                        )
-                    )
+                    raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} retries")
 
                 retry_count += 1
-                time.sleep(1)
+                time.sleep(SLEEP_TIME)
                 self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
-            time.sleep(0.5)
+            time.sleep(SLEEP_TIME_SAMPLE)
 
         avg = sum(measurements) / len(measurements) / self.num_lights
         return round(avg, 2)
