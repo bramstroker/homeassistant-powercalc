@@ -104,6 +104,7 @@ They are as follows:
 | create_group              | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
+| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off.
 
 **Minimalistic example creating two power sensors:**
 
