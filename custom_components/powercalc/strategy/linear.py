@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from dataclasses_json import config
-
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from dataclasses_json import config
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
@@ -141,17 +140,25 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         try:
             return int(float(entity_state.state))
         except ValueError as e:
-            _LOGGER.error(f"Expecting state to be a number for entity: {entity_state.entity_id}")
+            _LOGGER.error(
+                f"Expecting state to be a number for entity: {entity_state.entity_id}"
+            )
             return None
 
     def has_manual_value_range_configured(self) -> bool:
         """Check whether the user has manually defined min and max values for the state"""
-        return CONF_MIN_STATE_VALUE in self._config and CONF_MAX_STATE_VALUE in self._config
+        return (
+            CONF_MIN_STATE_VALUE in self._config
+            and CONF_MAX_STATE_VALUE in self._config
+        )
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
 
-        if not CONF_CALIBRATE in self._config and source_entity.domain not in ALLOWED_DOMAINS:
+        if (
+            not CONF_CALIBRATE in self._config
+            and source_entity.domain not in ALLOWED_DOMAINS
+        ):
             raise StrategyConfigurationError(
                 "Entity domain not supported for linear mode. Must be one of: {}".format(
                     ",".join(ALLOWED_DOMAINS)
@@ -159,4 +166,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             )
 
         if not CONF_CALIBRATE in self._config and not CONF_MAX_POWER in self._config:
-            raise StrategyConfigurationError("Linear strategy must have at least 'max power' or 'calibrate' defined")
+            raise StrategyConfigurationError(
+                "Linear strategy must have at least 'max power' or 'calibrate' defined"
+            )
