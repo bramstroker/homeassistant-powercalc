@@ -189,6 +189,7 @@ Power consumpion is calculated by ratio. So when you have your fan running at 50
 | min_power         | float   | **Optional** | Power usage for lowest brightness level     |
 | max_power         | float   | **Optional** | Power usage for highest brightness level    |
 | calibrate         | string  | **Optional** | Calibration values                          |
+| gamma_curve       | float   | **Optional** | Apply a gamma correction, for example 2.8   |
 
 #### Example configuration
 
