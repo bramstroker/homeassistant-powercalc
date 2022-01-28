@@ -55,13 +55,16 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, entity_state: State) -> Optional[float]:
         """Calculate the current power consumption"""
         value = self.get_current_state_value(entity_state)
-        if not value:
-            return None
 
         min_calibrate = self.get_min_calibrate(value)
         max_calibrate = self.get_max_calibrate(value)
         min_value = min_calibrate[0]
         max_value = max_calibrate[0]
+
+        _LOGGER.debug(f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})")
+        if not value:
+            return None
+
         min_power = min_calibrate[1]
         max_power = max_calibrate[1]
 
