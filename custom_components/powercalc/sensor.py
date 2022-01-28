@@ -172,14 +172,6 @@ SENSOR_CONFIG = {
             vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
-    vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
-        {
-            vol.Optional(CONF_AREA): cv.string,
-            vol.Optional(CONF_GROUP): cv.entity_id,
-            vol.Optional(CONF_TEMPLATE): cv.template,
-        }
-    ),
 }
 
 
@@ -233,8 +225,22 @@ async def async_setup_platform(
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
 
+    exclude_from_merging = [
+        CONF_NAME,
+        CONF_ENTITY_ID,
+        CONF_POWER_SENSOR_ID,
+    ]
+    num_configs = len(configs)
+
     merged_config = {}
-    for config in configs:
+    for i, config in enumerate(configs, 1):
+
+        # Remove config properties which are only allowed on the deepest level
+        if i < num_configs:
+            for key in exclude_from_merging:
+                if key in config:
+                    config.pop(key)
+                
         merged_config.update(config)
 
     if not CONF_CREATE_ENERGY_SENSOR in merged_config:
