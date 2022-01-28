@@ -7,7 +7,7 @@
         "SLEEP_TIME": 10,
         "VERSION": "master"
     },
-    "name": "FLOALT panel WS 30x30",
+    "name": "Floalt LED Light Panel 30x30",
     "standby_power": 0.08,
     "supported_modes": [
         "lut"
