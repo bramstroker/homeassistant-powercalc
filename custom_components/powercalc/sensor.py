@@ -68,6 +68,7 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -172,14 +173,7 @@ SENSOR_CONFIG = {
             vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
-    vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
-        {
-            vol.Optional(CONF_AREA): cv.string,
-            vol.Optional(CONF_GROUP): cv.entity_id,
-            vol.Optional(CONF_TEMPLATE): cv.template,
-        }
-    ),
+    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): cv.boolean,
 }
 
 
@@ -233,8 +227,22 @@ async def async_setup_platform(
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
 
+    exclude_from_merging = [
+        CONF_NAME,
+        CONF_ENTITY_ID,
+        CONF_POWER_SENSOR_ID,
+    ]
+    num_configs = len(configs)
+
     merged_config = {}
-    for config in configs:
+    for i, config in enumerate(configs, 1):
+
+        # Remove config properties which are only allowed on the deepest level
+        if i < num_configs:
+            for key in exclude_from_merging:
+                if key in config:
+                    config.pop(key)
+
         merged_config.update(config)
 
     if not CONF_CREATE_ENERGY_SENSOR in merged_config:
@@ -315,7 +323,7 @@ async def create_sensors(
             existing_sensors.extend(error.get_existing_entities())
         except SensorConfigurationError as error:
             _LOGGER.error(error)
-    
+
     if not new_sensors and not existing_sensors:
         if CONF_CREATE_GROUP in config:
             raise SensorConfigurationError(
@@ -324,7 +332,7 @@ async def create_sensors(
         elif not sensor_configs:
             raise SensorConfigurationError(
                 f"Could not resolve any entities for non-group sensor"
-        )
+            )
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:

@@ -57,7 +57,7 @@ powercalc:
 
 ### Setup power sensors
 
-Powercalc has a build-in library of more than 60 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
+Powercalc has a build-in library of more than 70 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
 
 Starting from 0.12.0 Powercalc can automatically discover entities in your HA instance which are supported for automatic configuration.
 After intallation and restarting HA power and energy sensors should appear. When this is not the case please check the logs for any errors.
@@ -104,6 +104,7 @@ They are as follows:
 | create_group              | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
+| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off.
 
 **Minimalistic example creating two power sensors:**
 
@@ -189,6 +190,7 @@ Power consumpion is calculated by ratio. So when you have your fan running at 50
 | min_power         | float   | **Optional** | Power usage for lowest brightness level     |
 | max_power         | float   | **Optional** | Power usage for highest brightness level    |
 | calibrate         | string  | **Optional** | Calibration values                          |
+| gamma_curve       | float   | **Optional** | Apply a gamma correction, for example 2.8   |
 
 #### Example configuration
 

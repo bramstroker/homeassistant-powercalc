@@ -21,6 +21,8 @@ CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
 CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_FIXED = "fixed"
 CONF_GROUP = "group"
+CONF_GAMMA_CURVE = "gamma_curve"
+CONF_IGNORE_UNAVAILABLE_STATE = "ignore_unavailable_state"
 CONF_INCLUDE = "include"
 CONF_LINEAR = "linear"
 CONF_MODEL = "model"
@@ -92,11 +94,14 @@ MANUFACTURER_ALIASES = {
 
 MODEL_DIRECTORY_MAPPING = {
     "IKEA of Sweden": {
+        "FLOALT panel WS 30x30": "L1527",
+        "FLOALT panel WS 60x60": "L1529",
         "TRADFRI bulb E14 WS opal 400lm": "LED1536G5",
         "TRADFRI bulb GU10 WS 400lm": "LED1537R6",
         "TRADFRI bulb E27 WS opal 980lm": "LED1545G12",
         "TRADFRI bulb E27 WS clear 950lm": "LED1546G12",
         "TRADFRI bulb E27 opal 1000lm": "LED1623G12",
+        "TRADFRI bulb E27 W opal 1000lm": "LED1623G12",
         "TRADFRI bulb E27 CWS opal 600lm": "LED1624G9",
         "TRADFRI bulb E14 W op/ch 400lm": "LED1649C5",
         "TRADFRI bulb GU10 W 400lm": "LED1650R5",
