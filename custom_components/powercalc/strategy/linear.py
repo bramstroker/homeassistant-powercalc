@@ -30,7 +30,7 @@ CONFIG_SCHEMA = vol.Schema(
         ),
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
-        vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float)
+        vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
     }
 )
 

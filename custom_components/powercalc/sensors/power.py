@@ -32,8 +32,8 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_STANDBY_POWER,
-    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_FIXED,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_LINEAR,
     CONF_MODE,
     CONF_MODEL,
@@ -263,7 +263,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Update power sensor based on new dependant entity state."""
         if (
             state is None
-            or state.state == STATE_UNKNOWN 
+            or state.state == STATE_UNKNOWN
             or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
         ):
             self._power = None
