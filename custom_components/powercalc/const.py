@@ -94,6 +94,8 @@ MANUFACTURER_ALIASES = {
 
 MODEL_DIRECTORY_MAPPING = {
     "IKEA of Sweden": {
+        "FLOALT panel WS 30x30": "L1527",
+        "FLOALT panel WS 60x60": "L1529",
         "TRADFRI bulb E14 WS opal 400lm": "LED1536G5",
         "TRADFRI bulb GU10 WS 400lm": "LED1537R6",
         "TRADFRI bulb E27 WS opal 980lm": "LED1545G12",
