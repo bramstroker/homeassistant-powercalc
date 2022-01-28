@@ -32,6 +32,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_STANDBY_POWER,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MODE,
@@ -60,7 +61,7 @@ from custom_components.powercalc.strategy.strategy_interface import (
 )
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
-OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY]
+OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -157,6 +158,7 @@ async def create_power_sensor(
         scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
+        ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
     )
 
 
@@ -204,6 +206,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         scan_interval,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
+        ignore_unavailable_state: bool,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -218,6 +221,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._scan_interval = scan_interval
         self._multiply_factor = multiply_factor
         self._multiply_factor_standby = multiply_factor_standby
+        self._ignore_unavailable_state = ignore_unavailable_state
         self.entity_id = entity_id
 
     async def async_added_to_hass(self):
@@ -259,8 +263,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Update power sensor based on new dependant entity state."""
         if (
             state is None
-            or state.state == STATE_UNKNOWN
-            or state.state == STATE_UNAVAILABLE
+            or state.state == STATE_UNKNOWN 
+            or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
         ):
             self._power = None
             self.async_write_ha_state()
