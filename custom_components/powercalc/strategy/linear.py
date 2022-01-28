@@ -5,10 +5,8 @@ from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, humidifier, light
-from homeassistant.components.climate.const import ATTR_HUMIDITY
+from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
-from homeassistant.components.humidifier import ATTR_MAX_HUMIDITY, ATTR_MIN_HUMIDITY
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.core import State
 from homeassistant.helpers.typing import HomeAssistantType
@@ -16,6 +14,7 @@ from homeassistant.helpers.typing import HomeAssistantType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
+    CONF_GAMMA_CURVE,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
 )
@@ -31,6 +30,7 @@ CONFIG_SCHEMA = vol.Schema(
         ),
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
+        vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float)
     }
 )
 
@@ -64,10 +64,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         value_range = max_value - min_value
         if value_range == 0:
-            power = min_power
-        else:
-            power_range = max_power - min_power
-            power = (((value - min_value) * power_range) / value_range) + min_power
+            return round(min_power, 2)
+
+        power_range = max_power - min_power
+
+        gamma_curve = self._config.get(CONF_GAMMA_CURVE) or 1
+
+        relative_value = (value - min_value) / value_range
+
+        power = power_range * relative_value ** gamma_curve + min_power
 
         return round(power, 2)
 
