@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from dataclasses_json import config
+
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components import fan, light
@@ -54,6 +56,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, entity_state: State) -> Optional[float]:
         """Calculate the current power consumption"""
         value = self.get_current_state_value(entity_state)
+        if not value:
+            return None
 
         min_calibrate = self.get_min_calibrate(value)
         max_calibrate = self.get_max_calibrate(value)
@@ -89,10 +93,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         list = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
-        full_range = self.get_entity_value_range()
-        min = full_range[0]
-        max = full_range[1]
         if calibrate is None:
+            full_range = self.get_entity_value_range()
+            min = full_range[0]
+            max = full_range[1]
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             list.append((min, float(min_power)))
             list.append((max, float(self._config.get(CONF_MAX_POWER))))
@@ -113,12 +117,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if self._source_entity.domain == light.DOMAIN:
             return (1, 255)
 
-        raise StrategyConfigurationError(
-            "Entity not supported for linear mode. Must be one of: {}".format(
-                ",".join(ALLOWED_DOMAINS)
-            )
-        )
-
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
         attrs = entity_state.attributes
@@ -129,26 +127,36 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             if value > 255:
                 value = 255
             if value is None:
-                _LOGGER.error("No brightness for entity: %s", entity_state.entity_id)
+                _LOGGER.error(f"No brightness for entity: {entity_state.entity_id}")
                 return None
+            return value
 
         if entity_state.domain == fan.DOMAIN:
             value = attrs.get(ATTR_PERCENTAGE)
             if value is None:
-                _LOGGER.error("No percentage for entity: %s", entity_state.entity_id)
+                _LOGGER.error(f"No percentage for entity: {entity_state.entity_id}")
                 return None
+            return value
 
-        return value
+        try:
+            return int(float(entity_state.state))
+        except ValueError as e:
+            _LOGGER.error(f"Expecting state to be a number for entity: {entity_state.entity_id}")
+            return None
+
+    def has_manual_value_range_configured(self) -> bool:
+        """Check whether the user has manually defined min and max values for the state"""
+        return CONF_MIN_STATE_VALUE in self._config and CONF_MAX_STATE_VALUE in self._config
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
 
-        if source_entity.domain not in ALLOWED_DOMAINS:
+        if not CONF_CALIBRATE in self._config and source_entity.domain not in ALLOWED_DOMAINS:
             raise StrategyConfigurationError(
-                "Entity not supported for linear mode. Must be one of: {}".format(
+                "Entity domain not supported for linear mode. Must be one of: {}".format(
                     ",".join(ALLOWED_DOMAINS)
                 )
             )
 
         if not CONF_CALIBRATE in self._config and not CONF_MAX_POWER in self._config:
-            raise StrategyConfigurationError("You must supply max power")
+            raise StrategyConfigurationError("Linear strategy must have at least 'max power' or 'calibrate' defined")
