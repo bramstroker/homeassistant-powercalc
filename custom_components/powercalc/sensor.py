@@ -68,6 +68,7 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -172,6 +173,7 @@ SENSOR_CONFIG = {
             vol.Optional(CONF_TEMPLATE): cv.template,
         }
     ),
+    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): cv.boolean,
 }
 
 
