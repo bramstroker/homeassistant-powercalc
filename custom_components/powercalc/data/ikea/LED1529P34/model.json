@@ -7,7 +7,7 @@
         "SLEEP_TIME": 10,
         "VERSION": "master"
     },
-    "name": "FLOALT panel WS 60x60",
+    "name": "Floalt LED Light Panel 60x60",
     "standby_power": 0.12,
     "supported_modes": [
         "lut"
