@@ -109,6 +109,9 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb E27 WW clear 250lm": "LED1842G3",
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
         "TRADFRIbulbE14WSglobeopal470lm": "LED2002G5",
+        "TRADFRIbulbE27WSglobeopal1055lm": "LED2003G10",
+        "TTRADFRIbulbGU10WS345lm": "LED2005R5",
+        "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
     "Signify Netherlands B.V.": {
