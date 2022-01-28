@@ -203,6 +203,44 @@ sensor:
       max_power: 8
 ```
 
+> Note: defining only `min_power` and `max_power` is only allowed for light and fan entities, when you are using another entity (for example a `sensor` or `input_number`) you must use the calibrate mode.
+
+#### Advanced precision calibration
+
+With the `calibrate` setting you can supply more than one power value for multiple brightness/percentage levels.
+This allows for a more accurate estimation because not all lights are straight linear.
+
+Also you can use this calibration table for other entities than lights and fans, to supply the state values and matching power values.
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.livingroom_floorlamp
+    linear:
+      calibrate:
+        - 1 -> 0.3
+        - 10 -> 1.25
+        - 50 -> 3.50
+        - 100 -> 6.8
+        - 255 -> 15.3
+```
+
+> Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
+> For fan speeds the range is 1-100 (percentage)
+
+Configuration with an sensor (`sensor.heater_modulation`) which supplies a percentage value (1-100):
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: sensor.heater_modulation
+    name: Heater
+    linear:
+      calibrate:
+        - 1 -> 200
+        - 100 -> 1650
+```
+
 ### Fixed mode
 Supported domains: `light`, `fan`, `humidifier`, `switch`, `binary_sensor`, `device_tracker`, `remote`, `media_player`, `input_boolean`, `input_number`, `input_select`, `sensor`, `climate`, `vacuum`, `water_heater`
 
@@ -223,27 +261,6 @@ sensor:
     fixed:
       power: 20
 ```
-
-#### Advanced precision calibration
-
-With the `calibrate` setting you can supply more than one power value for multiple brightness/percentage levels.
-This allows for a more accurate estimation because not all lights are straight linear.
-
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.livingroom_floorlamp
-    linear:
-      calibrate:
-        - 1 -> 0.3
-        - 10 -> 1.25
-        - 50 -> 3.50
-        - 100 -> 6.8
-        - 255 -> 15.3
-```
-
-> Note: For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
-> For fan speeds the range is 1-100 (percentage)
 
 #### Using a template for the power value
 ```yaml
@@ -306,7 +323,7 @@ sensor:
       voltage: 5
 ```
 
-## Configuration examples
+## More configuration examples
 
 ### Linear mode with additional standby power
 
