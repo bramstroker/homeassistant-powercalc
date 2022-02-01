@@ -21,6 +21,7 @@
 |ikea         |LED1836G9                |TRADFRI bulb E27 WW 806lm                                            |lut              |brightness   |
 |ikea         |LED1837R5                |TRADFRI bulb GU10 WW 400lm                                           |lut              |brightness   |
 |ikea         |LED1842G3                |TRADFRI bulb E27 WW clear 250lm                                      |lut              |brightness   |
+|ikea         |LED1923R5                |TRADFRI bulb GU10 CWS 345lm                                          |lut              |color_temp,hs|
 |ikea         |LED2002G5                |TRADFRIbulbE14WSglobeopal470lm                                       |lut              |color_temp   |
 |ikea         |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp   |
 |ikea         |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum            |lut              |color_temp   |
