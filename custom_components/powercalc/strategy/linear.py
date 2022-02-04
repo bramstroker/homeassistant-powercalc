@@ -5,7 +5,6 @@ from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from dataclasses_json import config
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
@@ -147,13 +146,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 f"Expecting state to be a number for entity: {entity_state.entity_id}"
             )
             return None
-
-    def has_manual_value_range_configured(self) -> bool:
-        """Check whether the user has manually defined min and max values for the state"""
-        return (
-            CONF_MIN_STATE_VALUE in self._config
-            and CONF_MAX_STATE_VALUE in self._config
-        )
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
