@@ -299,13 +299,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             if self._multiply_factor_standby and self._multiply_factor:
                 standby_power *= self._multiply_factor
             return standby_power
-        
+
         power = await self._power_calculator.calculate(state)
         if power and self._multiply_factor:
             power *= self._multiply_factor
-        
+
         return power
-        
 
     @property
     def source_entity(self):

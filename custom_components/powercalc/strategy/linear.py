@@ -60,7 +60,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         min_value = min_calibrate[0]
         max_value = max_calibrate[0]
 
-        _LOGGER.debug(f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})")
+        _LOGGER.debug(
+            f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})"
+        )
         if not value:
             return None
 
@@ -77,7 +79,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         relative_value = (value - min_value) / value_range
 
-        power = power_range * relative_value ** gamma_curve + min_power
+        power = power_range * relative_value**gamma_curve + min_power
 
         return round(power, 2)
 
