@@ -113,10 +113,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def get_entity_value_range(self) -> tuple:
         """Get the min/max range for a given entity domain"""
         if self._source_entity.domain == fan.DOMAIN:
-            return (1, 100)
+            return (0, 100)
 
         if self._source_entity.domain == light.DOMAIN:
-            return (1, 255)
+            return (0, 255)
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
