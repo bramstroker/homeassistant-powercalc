@@ -267,12 +267,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
         ):
             self._power = None
-            self.async_write_ha_state()
-            return False
-
-        self._power = await self.calculate_power(state)
-        if self._power and self._multiply_factor and self._multiply_factor_standby:
-            self._power *= self._multiply_factor
+        else:
+            self._power = await self.calculate_power(state)
 
         if self._power is None:
             self.async_write_ha_state()
@@ -290,16 +286,26 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_write_ha_state()
         return True
 
-    async def calculate_power(self, state) -> float:
+    async def calculate_power(self, state) -> Optional[float]:
+        """Calculate power consumption using configured strategy."""
+
         if state.state in OFF_STATES:
+            standby_power = 0
             if self._standby_power:
-                return self._standby_power
+                standby_power = self._standby_power
             elif self._power_calculator.can_calculate_standby():
-                return await self._power_calculator.calculate(state)
-            else:
-                return 0
-        else:
-            return await self._power_calculator.calculate(state)
+                standby_power = await self._power_calculator.calculate(state)
+
+            if self._multiply_factor_standby and self._multiply_factor:
+                standby_power *= self._multiply_factor
+            return standby_power
+        
+        power = await self._power_calculator.calculate(state)
+        if power and self._multiply_factor:
+            power *= self._multiply_factor
+        
+        return power
+        
 
     @property
     def source_entity(self):
