@@ -3,10 +3,7 @@ from __future__ import annotations
 import logging
 
 from homeassistant.core import callback
-from homeassistant.helpers.entity_registry import (
-    EntityRegistry,
-    async_get,
-)
+from homeassistant.helpers.entity_registry import EntityRegistry, async_get
 
 from .const import DOMAIN
 

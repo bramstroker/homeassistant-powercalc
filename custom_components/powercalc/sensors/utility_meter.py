@@ -16,18 +16,18 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
 from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.entity_registry import EntityRegistry, async_get
 from homeassistant.helpers.typing import HomeAssistantType
-from homeassistant.helpers.entity_registry import (
-    EntityRegistry,
-    async_get,
-)
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
 )
-from custom_components.powercalc.migrate import async_set_unique_id, async_migrate_entity_id
+from custom_components.powercalc.migrate import (
+    async_migrate_entity_id,
+    async_set_unique_id,
+)
 from custom_components.powercalc.sensors.energy import (
     DailyEnergySensor,
     VirtualEnergySensor,
@@ -84,12 +84,14 @@ async def create_utility_meters(
             # Set new unique id if this entity already exists in the entity registry
             async_set_unique_id(hass, entity_id, unique_id)
             utility_meter.unique_id = unique_id
-        
+
         # Migrate entity_id to new naming
         old_entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
         ent_reg = async_get(hass)
         if ent_reg.async_get(old_entity_id) and entity_id != old_entity_id:
-            _LOGGER.debug(f"Migrating utility_meter entity_id from {old_entity_id} to {entity_id}")
+            _LOGGER.debug(
+                f"Migrating utility_meter entity_id from {old_entity_id} to {entity_id}"
+            )
             ent_reg.async_update_entity(old_entity_id, new_entity_id=entity_id)
 
         utility_meter.entity_id = entity_id
