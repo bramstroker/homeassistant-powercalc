@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_PRECISION,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 
@@ -66,7 +67,7 @@ async def create_energy_sensor(
         unique_id=unique_id,
         entity_id=entity_id,
         name=name,
-        round_digits=4,
+        round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         unit_prefix="k",
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
