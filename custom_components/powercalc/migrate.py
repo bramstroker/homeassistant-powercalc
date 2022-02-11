@@ -5,7 +5,6 @@ import logging
 from homeassistant.core import callback
 from homeassistant.helpers.entity_registry import (
     EntityRegistry,
-    async_entries_for_device,
     async_get,
 )
 
