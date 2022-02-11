@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import NamedTuple
 
+import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
@@ -20,6 +21,7 @@ class SourceEntity(NamedTuple):
     name: str | None = None
     supported_color_modes: list | None = None
     entity_entry: er.RegistryEntry | None = None
+    device_entry: dr.DeviceEntry | None = None
 
 
 async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
@@ -32,8 +34,14 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
 
-    entity_registry = await er.async_get_registry(hass)
+    entity_registry = er.async_get(hass)
     entity_entry = entity_registry.async_get(entity_id)
+
+    dev = dr.async_get(hass)
+    if entity_entry and entity_entry.device_id:
+        device_entry = dev.async_get(entity_entry.device_id)
+    else:
+        device_entry = None
 
     unique_id = None
     supported_color_modes = []
@@ -61,6 +69,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> Sourc
         source_entity_name,
         supported_color_modes or [],
         entity_entry,
+        device_entry,
     )
 
 
