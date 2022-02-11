@@ -430,6 +430,14 @@ async def create_individual_sensors(
             {source_entity.entity_id: entities_to_add}
         )
 
+    # Attach all the power/energy sensors to the same device as the source entity
+    if source_entity.entity_entry and source_entity.device_entry:
+        for entity in entities_to_add:
+            if source_entity.entity_entry.device_id == source_entity.device_entry.id:
+                continue
+            ent_reg = entity_registry.async_get(hass)
+            ent_reg.async_update_entity(entity.entity_id, device_id=source_entity.device_entry.id)
+
     return entities_to_add
 
 
