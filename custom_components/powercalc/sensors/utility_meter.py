@@ -24,9 +24,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
 )
-from custom_components.powercalc.migrate import (
-    async_set_unique_id,
-)
+from custom_components.powercalc.migrate import async_set_unique_id
 from custom_components.powercalc.sensors.energy import (
     DailyEnergySensor,
     VirtualEnergySensor,

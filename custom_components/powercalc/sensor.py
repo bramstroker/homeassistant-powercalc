@@ -436,7 +436,9 @@ async def create_individual_sensors(
             if source_entity.entity_entry.device_id == source_entity.device_entry.id:
                 continue
             ent_reg = entity_registry.async_get(hass)
-            ent_reg.async_update_entity(entity.entity_id, device_id=source_entity.device_entry.id)
+            ent_reg.async_update_entity(
+                entity.entity_id, device_id=source_entity.device_entry.id
+            )
 
     return entities_to_add
 

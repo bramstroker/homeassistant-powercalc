@@ -80,7 +80,7 @@ CONFIG_SCHEMA = vol.Schema(
                     ): vol.In(INTEGRATION_METHOD),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_PRECISION, default=4
-                    ): cv.positive_int
+                    ): cv.positive_int,
                 }
             ),
         )
