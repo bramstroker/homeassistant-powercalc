@@ -32,6 +32,7 @@ from .const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_POWER_SENSOR_NAMING,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
@@ -77,6 +78,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD
                     ): vol.In(INTEGRATION_METHOD),
+                    vol.Optional(
+                        CONF_ENERGY_SENSOR_PRECISION, default=4
+                    ): cv.positive_int
                 }
             ),
         )
