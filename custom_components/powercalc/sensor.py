@@ -431,11 +431,14 @@ async def create_individual_sensors(
 
     if source_entity.entity_entry and source_entity.device_entry:
         hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STARTED, callback(lambda _: bind_entities_to_devices(
-                hass,
-                entities_to_add,
-                source_entity.device_entry.id,
-            ))
+            EVENT_HOMEASSISTANT_STARTED,
+            callback(
+                lambda _: bind_entities_to_devices(
+                    hass,
+                    entities_to_add,
+                    source_entity.device_entry.id,
+                )
+            ),
         )
 
     return entities_to_add
@@ -481,16 +484,15 @@ def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
     for entity in entities:
         ent_reg = entity_registry.async_get(hass)
         entity_entry = ent_reg.async_get(entity.entity_id)
-        if (not entity_entry or
-            entity_entry.platform != DOMAIN or
-            entity_entry.device_id == device_id
+        if (
+            not entity_entry
+            or entity_entry.platform != DOMAIN
+            or entity_entry.device_id == device_id
         ):
             continue
 
         _LOGGER.debug(f"Binding {entity.entity_id} to device {device_id}")
-        ent_reg.async_update_entity(
-            entity.entity_id, device_id=device_id
-        )
+        ent_reg.async_update_entity(entity.entity_id, device_id=device_id)
 
 
 @callback
