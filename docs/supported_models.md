@@ -4,6 +4,7 @@
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
 |belkin       |F7C033                   |WeMo smart LED bulb                                                  |lut              |brightness   |
 |ikea         |L1527                    |FLOALT panel WS 30x30                                                |lut              |color_temp   |
+|ikea         |L1528                    |FLOALT panel WS 30x90                                                |lut              |color_temp   |
 |ikea         |L1529                    |FLOALT panel WS 60x60                                                |lut              |color_temp   |
 |ikea         |LED1536G5                |TRADFRI bulb E14 WS opal 400lm                                       |lut              |color_temp   |
 |ikea         |LED1537R6                |TRADFRI bulb GU10 WS 400lm                                           |lut              |color_temp   |
