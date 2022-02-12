@@ -34,6 +34,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
+from custom_components.powercalc.sensors.power import PowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -44,7 +45,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_energy_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
-    power_sensor_entity_id: str,
+    power_sensor: PowerSensor,
     source_entity: SourceEntity,
 ) -> VirtualEnergySensor:
     """Create the energy sensor entity"""
@@ -63,7 +64,7 @@ async def create_energy_sensor(
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
-        source_entity=power_sensor_entity_id,
+        source_entity=power_sensor.entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
         name=name,
@@ -197,3 +198,14 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def native_value(self):
         """Return the state of the sensor."""
         return round(self._state, 4)
+
+class RealEnergySensor(EnergySensor):
+    """Contains a reference to a existing energy sensor entity"""
+
+    def __init__(self, entity_id: str):
+        self._entity_id = entity_id
+
+    @property
+    def entity_id(self):
+        """Return the name of the sensor."""
+        return self._entity_id

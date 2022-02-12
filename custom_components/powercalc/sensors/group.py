@@ -20,6 +20,8 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import ATTR_ENTITIES, ATTR_IS_GROUP
+from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.sensors.energy import EnergySensor
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -62,7 +64,7 @@ class GroupedSensor(SensorEntity):
         self.async_schedule_update_ha_state(True)
 
 
-class GroupedPowerSensor(GroupedSensor):
+class GroupedPowerSensor(GroupedSensor, PowerSensor):
     """Grouped power sensor. Sums all values of underlying individual power sensors"""
 
     _attr_device_class = DEVICE_CLASS_POWER
@@ -70,7 +72,7 @@ class GroupedPowerSensor(GroupedSensor):
     _attr_unit_of_measurement = POWER_WATT
 
 
-class GroupedEnergySensor(GroupedSensor):
+class GroupedEnergySensor(GroupedSensor, EnergySensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
 
     _attr_device_class = DEVICE_CLASS_ENERGY

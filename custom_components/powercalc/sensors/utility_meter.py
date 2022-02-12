@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import inspect
 import logging
-from typing import Union
 
 from homeassistant.components.sensor import ENTITY_ID_FORMAT
 from homeassistant.components.utility_meter.const import (
@@ -16,7 +15,7 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
 from homeassistant.helpers.entity import async_generate_entity_id
-from homeassistant.helpers.entity_registry import EntityRegistry, async_get
+from homeassistant.helpers.entity_registry import async_get
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
@@ -25,18 +24,14 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
 )
 from custom_components.powercalc.migrate import async_set_unique_id
-from custom_components.powercalc.sensors.energy import (
-    DailyEnergySensor,
-    VirtualEnergySensor,
-)
-from custom_components.powercalc.sensors.group import GroupedEnergySensor
+from custom_components.powercalc.sensors.energy import EnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def create_utility_meters(
     hass: HomeAssistantType,
-    energy_sensor: Union[VirtualEnergySensor, GroupedEnergySensor, DailyEnergySensor],
+    energy_sensor: EnergySensor,
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
