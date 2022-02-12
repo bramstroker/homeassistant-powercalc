@@ -40,6 +40,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
+    EVENT_HOMEASSISTANT_STARTED,
     POWER_WATT,
 )
 from homeassistant.core import callback
@@ -428,20 +429,14 @@ async def create_individual_sensors(
             {source_entity.entity_id: entities_to_add}
         )
 
-    # Attach all the power/energy sensors to the same device as the source entity
     if source_entity.entity_entry and source_entity.device_entry:
-        for entity in entities_to_add:
-            ent_reg = entity_registry.async_get(hass)
-            entity_entry = ent_reg.async_get(entity.entity_id)
-            if (
-                not entity_entry
-                or entity_entry.platform != DOMAIN
-                or entity_entry.device_id == source_entity.device_entry.id
-            ):
-                continue
-            ent_reg.async_update_entity(
-                entity.entity_id, device_id=source_entity.device_entry.id
-            )
+        hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STARTED, callback(lambda _: bind_entities_to_devices(
+                hass,
+                entities_to_add,
+                source_entity.device_entry.id,
+            ))
+        )
 
     return entities_to_add
 
@@ -478,6 +473,24 @@ async def create_group_sensors(
     )
 
     return group_sensors
+
+
+def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
+    """Attach all the power/energy sensors to the same device as the source entity"""
+
+    for entity in entities:
+        ent_reg = entity_registry.async_get(hass)
+        entity_entry = ent_reg.async_get(entity.entity_id)
+        if (not entity_entry or
+            entity_entry.platform != DOMAIN or
+            entity_entry.device_id == device_id
+        ):
+            continue
+
+        _LOGGER.debug(f"Binding {entity.entity_id} to device {device_id}")
+        ent_reg.async_update_entity(
+            entity.entity_id, device_id=device_id
+        )
 
 
 @callback
