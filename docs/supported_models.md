@@ -27,6 +27,7 @@
 |ikea         |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp   |
 |ikea         |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum            |lut              |color_temp   |
 |ikea         |T1820                    |LEPTITER Recessed spot light                                         |lut              |color_temp   |
+|innr         |BY 265                   |Innr BY 265 806lm B22 2700k                                          |lut              |brightness   |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming                  |lut              |brightness   |
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                              |lut              |hs,color_temp|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                               |lut              |brightness   |
