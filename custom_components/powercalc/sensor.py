@@ -433,9 +433,10 @@ async def create_individual_sensors(
         for entity in entities_to_add:
             ent_reg = entity_registry.async_get(hass)
             entity_entry = ent_reg.async_get(entity.entity_id)
-            if (not entity_entry or 
-                entity_entry.platform != DOMAIN or 
-                entity_entry.device_id == source_entity.device_entry.id
+            if (
+                not entity_entry
+                or entity_entry.platform != DOMAIN
+                or entity_entry.device_id == source_entity.device_entry.id
             ):
                 continue
             ent_reg.async_update_entity(

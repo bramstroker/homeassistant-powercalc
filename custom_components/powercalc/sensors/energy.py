@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import logging
-
-import homeassistant.helpers.entity_registry as er
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
+import homeassistant.helpers.entity_registry as er
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
     IntegrationSensor,
@@ -58,10 +57,14 @@ async def create_energy_sensor(
         power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
         registry_entry = find_related_real_energy_sensor(hass, power_sensor_id)
         if registry_entry:
-            _LOGGER.debug(f"Found existing energy sensor '{registry_entry.entity_id}' for the power sensor '{power_sensor_id}'")
+            _LOGGER.debug(
+                f"Found existing energy sensor '{registry_entry.entity_id}' for the power sensor '{power_sensor_id}'"
+            )
             return RealEnergySensor(registry_entry)
-        
-        _LOGGER.debug(f"No existing energy sensor found for the power sensor '{power_sensor_id}'")
+
+        _LOGGER.debug(
+            f"No existing energy sensor found for the power sensor '{power_sensor_id}'"
+        )
 
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or source_entity.name
@@ -91,21 +94,29 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
+
 @callback
-def find_related_real_energy_sensor(hass: HomeAssistantType, power_sensor_id: str) -> Optional[er.RegistryEntry]:
+def find_related_real_energy_sensor(
+    hass: HomeAssistantType, power_sensor_id: str
+) -> Optional[er.RegistryEntry]:
     ent_reg = er.async_get(hass)
     entity_entry = ent_reg.async_get(power_sensor_id)
     if not entity_entry.device_id:
         return None
 
     energy_sensors = [
-        entry for entry in er.async_entries_for_device(ent_reg, device_id=entity_entry.device_id)
-        if entry.device_class == DEVICE_CLASS_ENERGY or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
+        entry
+        for entry in er.async_entries_for_device(
+            ent_reg, device_id=entity_entry.device_id
+        )
+        if entry.device_class == DEVICE_CLASS_ENERGY
+        or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
     ]
     if not energy_sensors:
         return None
-    
+
     return energy_sensors[0]
+
 
 class EnergySensor:
     """Class which all power sensors should extend from"""
@@ -227,6 +238,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         """Return the state of the sensor."""
         return round(self._state, 4)
 
+
 class RealEnergySensor(EnergySensor):
     """Contains a reference to a existing energy sensor entity"""
 
@@ -237,12 +249,12 @@ class RealEnergySensor(EnergySensor):
     def entity_id(self) -> str:
         """Return the entity_id of the sensor."""
         return self._entity_entry.entity_id
-    
+
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
         return self._entity_entry.name or self._entity_entry.original_name
-    
+
     @property
     def unique_id(self) -> str | None:
         """Return the unique_id of the sensor."""

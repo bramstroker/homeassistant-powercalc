@@ -20,8 +20,8 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import ATTR_ENTITIES, ATTR_IS_GROUP
-from custom_components.powercalc.sensors.power import PowerSensor
 from custom_components.powercalc.sensors.energy import EnergySensor
+from custom_components.powercalc.sensors.power import PowerSensor
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
