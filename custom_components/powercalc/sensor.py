@@ -384,24 +384,22 @@ async def create_individual_sensors(
     if not CONF_DAILY_FIXED_ENERGY in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
         if CONF_POWER_SENSOR_ID in sensor_config:
-            power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
-            entities_to_add.append(RealPowerSensor(power_sensor_id))
+            power_sensor = RealPowerSensor(sensor_config.get(CONF_POWER_SENSOR_ID))
         # Create the virtual power sensor
         else:
             try:
                 power_sensor = await create_power_sensor(
                     hass, sensor_config, source_entity, discovery_info
                 )
-            except PowercalcSetupError as err:
+            except PowercalcSetupError:
                 return []
 
-            entities_to_add.append(power_sensor)
-            power_sensor_id = power_sensor.entity_id
+        entities_to_add.append(power_sensor)
 
         # Create energy sensor which integrates the power sensor
         if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
             energy_sensor = await create_energy_sensor(
-                hass, sensor_config, power_sensor_id, source_entity
+                hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
 
@@ -435,7 +433,10 @@ async def create_individual_sensors(
         for entity in entities_to_add:
             ent_reg = entity_registry.async_get(hass)
             entity_entry = ent_reg.async_get(entity.entity_id)
-            if entity_entry and entity_entry.device_id == source_entity.device_entry.id:
+            if (not entity_entry or 
+                entity_entry.platform != DOMAIN or 
+                entity_entry.device_id == source_entity.device_entry.id
+            ):
                 continue
             ent_reg.async_update_entity(
                 entity.entity_id, device_id=source_entity.device_entry.id
