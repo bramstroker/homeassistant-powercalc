@@ -1,4 +1,5 @@
 from __future__ import annotations
+from decimal import Decimal
 
 import logging
 from typing import Optional
@@ -51,7 +52,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._standby_power = standby_power
         self._calibration = self.create_calibrate_list()
 
-    async def calculate(self, entity_state: State) -> Optional[float]:
+    async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the current power consumption"""
         value = self.get_current_state_value(entity_state)
 
@@ -81,7 +82,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         power = power_range * relative_value**gamma_curve + min_power
 
-        return round(power, 2)
+        return Decimal(power)
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest lower value from calibration table"""
