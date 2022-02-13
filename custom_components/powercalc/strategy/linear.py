@@ -72,7 +72,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         value_range = max_value - min_value
         if value_range == 0:
-            return round(min_power, 2)
+            return Decimal(min_power)
 
         power_range = max_power - min_power
 
