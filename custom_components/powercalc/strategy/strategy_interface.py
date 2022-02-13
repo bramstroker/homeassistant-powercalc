@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Optional
 
 from homeassistant.core import State
@@ -6,7 +7,7 @@ from custom_components.powercalc.common import SourceEntity
 
 
 class PowerCalculationStrategyInterface:
-    async def calculate(self, entity_state: State) -> Optional[float]:
+    async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate power consumption based on entity state"""
         pass
 

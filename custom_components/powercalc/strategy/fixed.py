@@ -1,4 +1,5 @@
 from __future__ import annotations
+from decimal import Decimal
 
 from typing import Optional, Union
 
@@ -39,7 +40,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         self._power = power
         self._per_state_power = per_state_power
 
-    async def calculate(self, entity_state: State) -> Optional[float]:
+    async def calculate(self, entity_state: State) -> Optional[Decimal]:
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:

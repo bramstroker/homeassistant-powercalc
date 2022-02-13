@@ -1,4 +1,5 @@
 from __future__ import annotations
+from decimal import Decimal
 
 import logging
 from typing import Optional
@@ -40,7 +41,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._light_entity = light_entity
         self._standby_power = standby_power
 
-    async def calculate(self, entity_state: State) -> Optional[float]:
+    async def calculate(self, entity_state: State) -> Optional[Decimal]:
         if entity_state.entity_id == self._light_entity.entity_id:
             light_state = entity_state.state
         else:
@@ -55,8 +56,8 @@ class WledStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             f"{self._light_entity.entity_id}: Estimated current {entity_state.state} (voltage={self._voltage}, power_factor={self._power_factor})"
         )
-        power = float(entity_state.state) / 1000 * self._voltage * self._power_factor
-        return await evaluate_power(power)
+        power = Decimal(entity_state.state) / 1000 * self._voltage * self._power_factor
+        return await evaluate_power(Decimal(power))
 
     async def find_estimated_current_entity(self) -> str:
         entity_reg = entity_registry.async_get(self._hass)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from decimal import Decimal
 from typing import Optional
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -286,7 +287,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_write_ha_state()
         return True
 
-    async def calculate_power(self, state) -> Optional[float]:
+    async def calculate_power(self, state) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
 
         if state.state in OFF_STATES:
@@ -298,13 +299,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             if self._multiply_factor_standby and self._multiply_factor:
                 standby_power *= self._multiply_factor
-            return standby_power
+            return Decimal(standby_power)
 
         power = await self._power_calculator.calculate(state)
         if power and self._multiply_factor:
             power *= self._multiply_factor
 
-        return power
+        return Decimal(power)
 
     @property
     def source_entity(self):
