@@ -34,6 +34,7 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
@@ -80,6 +81,9 @@ CONFIG_SCHEMA = vol.Schema(
                     ): vol.In(INTEGRATION_METHOD),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_PRECISION, default=4
+                    ): cv.positive_int,
+                    vol.Optional(
+                        CONF_POWER_SENSOR_PRECISION, default=2
                     ): cv.positive_int,
                 }
             ),
