@@ -184,6 +184,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         unit_of_measurement: str,
         update_frequency: int,
         on_time: timedelta = timedelta(days=1),
+        rounding_digits: int = 4,
     ):
         self._hass = hass
         self._attr_name = name
@@ -191,6 +192,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
         self._on_time = on_time
+        self._rounding_digits = rounding_digits
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
     async def async_added_to_hass(self):
@@ -236,7 +238,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        return round(self._state, 4)
+        return round(self._state, self._rounding_digits)
 
 
 class RealEnergySensor(EnergySensor):
