@@ -1,7 +1,7 @@
 from __future__ import annotations
-from decimal import Decimal
 
 import logging
+from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol

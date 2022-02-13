@@ -467,7 +467,10 @@ async def create_group_sensors(
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     group_energy_sensor = GroupedEnergySensor(
-        name, energy_sensor_ids, hass, rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)
+        name,
+        energy_sensor_ids,
+        hass,
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
     group_sensors.append(group_energy_sensor)
     _LOGGER.debug("Creating grouped energy sensor: %s", name)

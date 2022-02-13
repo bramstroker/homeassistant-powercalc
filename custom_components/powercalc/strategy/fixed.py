@@ -1,6 +1,6 @@
 from __future__ import annotations
-from decimal import Decimal
 
+from decimal import Decimal
 from typing import Optional, Union
 
 import homeassistant.helpers.config_validation as cv

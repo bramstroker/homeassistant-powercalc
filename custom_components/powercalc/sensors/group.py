@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from decimal import Decimal
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -59,7 +60,9 @@ class GroupedSensor(SensorEntity):
         states: list[State] = list(filter(None, all_states))
         ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
         summed = sum(
-            Decimal(state.state) for state in states if state.state not in ignored_states
+            Decimal(state.state)
+            for state in states
+            if state.state not in ignored_states
         )
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)

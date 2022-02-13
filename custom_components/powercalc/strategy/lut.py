@@ -1,5 +1,4 @@
 from __future__ import annotations
-from decimal import Decimal
 
 import gzip
 import logging
@@ -7,6 +6,7 @@ import os
 from collections import defaultdict
 from csv import reader
 from dataclasses import dataclass
+from decimal import Decimal
 from functools import partial
 from typing import Optional, Union
 
