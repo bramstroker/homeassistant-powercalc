@@ -41,6 +41,7 @@ from custom_components.powercalc.const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
@@ -160,6 +161,7 @@ async def create_power_sensor(
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
+        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
     )
 
 
@@ -208,6 +210,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         multiply_factor: float | None,
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
+        rounding_digits: int,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -223,6 +226,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._multiply_factor = multiply_factor
         self._multiply_factor_standby = multiply_factor_standby
         self._ignore_unavailable_state = ignore_unavailable_state
+        self._rounding_digits = rounding_digits
         self.entity_id = entity_id
 
     async def async_added_to_hass(self):
@@ -275,7 +279,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self.async_write_ha_state()
             return False
 
-        self._power = round(self._power, 2)
+        self._power = round(self._power, self._rounding_digits)
 
         _LOGGER.debug(
             '%s: State changed to "%s". Power:%s',
