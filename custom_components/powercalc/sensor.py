@@ -416,6 +416,7 @@ async def create_individual_sensors(
             mode_config.get(CONF_UNIT_OF_MEASUREMENT),
             mode_config.get(CONF_UPDATE_FREQUENCY),
             mode_config.get(CONF_ON_TIME),
+            sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         )
         entities_to_add.append(energy_sensor)
 
