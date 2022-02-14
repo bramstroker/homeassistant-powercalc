@@ -68,6 +68,7 @@
 |signify      |LTW001                   |Hue White Ambiance A19                                               |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A                         |lut              |color_temp   |
 |signify      |LTW012                   | Hue White Ambiance Candle E14                                       |lut              |color_temp   |
+|signify      |LTW013                   |Hue white ambiance GU10                                              |lut              |color_temp   |
 |signify      |LTW017                   |Hue Adore Bathroom Mirror Light                                      |lut              |color_temp   |
 |signify      |LWA001                   |Hue White Ambiance Bulb A60 E27                                      |lut              |brightness   |
 |signify      |LWA004                   |Hue White Filament Bulb A60 E27                                      |lut              |brightness   |
