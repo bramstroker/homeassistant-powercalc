@@ -10,4 +10,4 @@ async def evaluate_power(power: Union[Template, Decimal]) -> Decimal:
     if isinstance(power, Template):
         return power.async_render()
 
-    return power
+    return Decimal(power)
