@@ -310,7 +310,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return None
 
         if self._multiply_factor:
-            power *= self._multiply_factor
+            power *= Decimal(self._multiply_factor)
 
         return Decimal(power)
 
