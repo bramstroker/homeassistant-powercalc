@@ -56,8 +56,8 @@ class WledStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             f"{self._light_entity.entity_id}: Estimated current {entity_state.state} (voltage={self._voltage}, power_factor={self._power_factor})"
         )
-        power = Decimal(entity_state.state) / 1000 * self._voltage * self._power_factor
-        return await evaluate_power(Decimal(power))
+        power = float(entity_state.state) / 1000 * self._voltage * self._power_factor
+        return await evaluate_power(power)
 
     async def find_estimated_current_entity(self) -> str:
         entity_reg = entity_registry.async_get(self._hass)

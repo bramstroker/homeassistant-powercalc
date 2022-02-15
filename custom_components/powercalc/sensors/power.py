@@ -306,8 +306,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return Decimal(standby_power)
 
         power = await self._power_calculator.calculate(state)
-        if power and self._multiply_factor:
-            power *= self._multiply_factor
+        if not power:
+            return None
+
+        if self._multiply_factor:
+            power *= Decimal(self._multiply_factor)
 
         return Decimal(power)
 
