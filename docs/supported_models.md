@@ -73,6 +73,7 @@
 |signify      |LWA001                   |Hue White Ambiance Bulb A60 E27                                      |lut              |brightness   |
 |signify      |LWA004                   |Hue White Filament Bulb A60 E27                                      |lut              |brightness   |
 |signify      |LWA009                   |Hue White 1600 A67 E27 1600lm                                        |lut              |brightness   |
+|signify      |LWA017                   |Hue white A60 bulb E27 1050lm with Bluetooth                         |lut              |brightness   |
 |signify      |LWB004                   |Hue Lux E27 750lm                                                    |lut              |brightness   |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                              |lut              |brightness   |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                              |lut              |brightness   |
