@@ -57,8 +57,9 @@ class LightModel:
                 raise ModelNotSupported(
                     f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
                 )
+            
+            # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
             json_file = open(os.path.join(model_directory, "model.json"))
-
             if os.path.exists(file_path):
                 json_file = open(file_path)
                 self._json_data = {**self._json_data, **json.load(json_file)}
