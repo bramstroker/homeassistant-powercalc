@@ -30,10 +30,12 @@ class LightModel:
         self._model = model
         self._custom_model_directory = custom_model_directory
         self._hass = hass
-        self._json_data = self.load_model_manifest()
+        self._directory: str = None
+        self.load_model_manifest()
 
     def load_model_manifest(self) -> dict:
-        file_path = os.path.join(self.get_directory(), "model.json")
+        model_directory = self.get_directory()
+        file_path = os.path.join(model_directory, "model.json")
         if not os.path.exists(file_path):
             raise ModelNotSupported(
                 f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
@@ -41,7 +43,28 @@ class LightModel:
 
         _LOGGER.debug(f"Loading {file_path}")
         json_file = open(file_path)
-        return json.load(json_file)
+        self._json_data = json.load(json_file)
+
+        if self.has_sub_luts():
+            model_parts = self._model.split("/", 1)
+            if len(model_parts) < 2:
+                raise ModelNotSupported(
+                    f"Invalid model supplied, must specify a subdirectory LUT (manufacturer: {self._manufacturer}, model: {self._model})"
+                )
+            self._directory = os.path.join(self._directory, model_parts[1])
+            _LOGGER.debug(f"Loading LUT directory {self._directory}")
+            if not os.path.exists(file_path):
+                raise ModelNotSupported(
+                    f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
+                )
+            json_file = open(os.path.join(model_directory, "model.json"))
+
+            if os.path.exists(file_path):
+                json_file = open(file_path)
+                self._json_data = {**self._json_data, **json.load(json_file)}
+
+        return self._json_data
+
 
     def get_directory(self) -> str:
         """
@@ -52,6 +75,10 @@ class LightModel:
          - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
          - check in buildin directory (config/custom_components/powercalc/data)
         """
+
+        #Only fetch directory once
+        if self._directory: 
+            return self._directory
 
         if self._custom_model_directory:
             return self._custom_model_directory
@@ -79,7 +106,8 @@ class LightModel:
                 f"{manufacturer_directory}/{model_directory}",
             )
             if os.path.exists(model_data_dir):
-                return model_data_dir
+                self._directory = model_data_dir
+                return self._directory
 
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
@@ -121,5 +149,13 @@ class LightModel:
             )
         return self._json_data.get("fixed_config")
 
-    def is_mode_supported(self, mode: str):
+    @property
+    def is_autodiscovery_allowed(self) -> bool:
+        return bool(self._json_data.get("is_autodisovery_allowed", True))
+    
+    @property
+    def has_sub_luts(self) -> bool:
+        return bool(self._json_data.get("has_sub_luts", False))
+
+    def is_mode_supported(self, mode: str) -> bool:
         return mode in self.supported_modes
