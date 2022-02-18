@@ -28,12 +28,22 @@ class LightModel:
     ):
         self._manufacturer = manufacturer
         self._model = model
+        self._lut_subdirectory = None
+
+        # Support multiple LUT in subdirectories
+        if "/" in model:
+            model_parts = model.split("/", 1)
+            self._model = model_parts[0]
+            self._lut_subdirectory = model_parts[1]    
+
         self._custom_model_directory = custom_model_directory
         self._hass = hass
         self._directory: str = None
         self.load_model_manifest()
 
     def load_model_manifest(self) -> dict:
+        """Load the model.json file data containing information about the light model"""
+
         model_directory = self.get_directory()
         file_path = os.path.join(model_directory, "model.json")
         if not os.path.exists(file_path):
@@ -45,13 +55,8 @@ class LightModel:
         json_file = open(file_path)
         self._json_data = json.load(json_file)
 
-        if self.has_sub_luts():
-            model_parts = self._model.split("/", 1)
-            if len(model_parts) < 2:
-                raise ModelNotSupported(
-                    f"Invalid model supplied, must specify a subdirectory LUT (manufacturer: {self._manufacturer}, model: {self._model})"
-                )
-            self._directory = os.path.join(self._directory, model_parts[1])
+        if self._lut_subdirectory:
+            subdirectory = os.path.join(self._directory, self._lut_subdirectory)
             _LOGGER.debug(f"Loading LUT directory {self._directory}")
             if not os.path.exists(file_path):
                 raise ModelNotSupported(
@@ -59,7 +64,7 @@ class LightModel:
                 )
             
             # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
-            json_file = open(os.path.join(model_directory, "model.json"))
+            json_file = open(os.path.join(subdirectory, "model.json"))
             if os.path.exists(file_path):
                 json_file = open(file_path)
                 self._json_data = {**self._json_data, **json.load(json_file)}
@@ -114,6 +119,13 @@ class LightModel:
             f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
         )
 
+    def get_lut_directory(self) -> str:
+        model_directory = self.get_directory()
+        if self._lut_subdirectory:
+            model_directory = os.path.join(model_directory, self._lut_subdirectory)
+        return model_directory
+
+
     @property
     def manufacturer(self) -> str:
         return self._manufacturer
@@ -152,11 +164,7 @@ class LightModel:
 
     @property
     def is_autodiscovery_allowed(self) -> bool:
-        return bool(self._json_data.get("is_autodisovery_allowed", True))
-    
-    @property
-    def has_sub_luts(self) -> bool:
-        return bool(self._json_data.get("has_sub_luts", False))
+        return self._lut_subdirectory is None
 
     def is_mode_supported(self, mode: str) -> bool:
         return mode in self.supported_modes
