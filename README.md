@@ -31,7 +31,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
       - [Measuring lights](#creating-lut-files)
     - [Supported models](#supported-models)
 - [Sensor naming](#sensor-naming)
-- [Daily fixed energy](#faily-fixed-energy)
+- [Daily fixed energy](#daily-fixed-energy)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
 - [Advanced features](#advanced-features)
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
