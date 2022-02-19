@@ -106,7 +106,7 @@ from .errors import (
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, EnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
+from .sensors.power import PowerSensor, RealPowerSensor, create_virtual_power_sensor, create_real_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -392,11 +392,11 @@ async def create_individual_sensors(
     if not CONF_DAILY_FIXED_ENERGY in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
         if CONF_POWER_SENSOR_ID in sensor_config:
-            power_sensor = RealPowerSensor(sensor_config.get(CONF_POWER_SENSOR_ID))
+            power_sensor = await create_real_power_sensor(hass, sensor_config)
         # Create the virtual power sensor
         else:
             try:
-                power_sensor = await create_power_sensor(
+                power_sensor = await create_virtual_power_sensor(
                     hass, sensor_config, source_entity, discovery_info
                 )
             except PowercalcSetupError:

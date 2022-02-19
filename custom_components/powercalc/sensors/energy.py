@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
+from numpy import power
+
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
@@ -37,7 +39,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -53,17 +55,16 @@ async def create_energy_sensor(
 ) -> EnergySensor:
     """Create the energy sensor entity"""
 
-    if CONF_POWER_SENSOR_ID in sensor_config:
-        power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
-        registry_entry = find_related_real_energy_sensor(hass, power_sensor_id)
-        if registry_entry:
+    if CONF_POWER_SENSOR_ID in sensor_config and isinstance(power_sensor, RealPowerSensor):
+        real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
+        if real_energy_sensor:
             _LOGGER.debug(
-                f"Found existing energy sensor '{registry_entry.entity_id}' for the power sensor '{power_sensor_id}'"
+                f"Found existing energy sensor '{real_energy_sensor.entity_id}' for the power sensor '{power_sensor.entity_id}'"
             )
-            return RealEnergySensor(registry_entry)
+            return real_energy_sensor
 
         _LOGGER.debug(
-            f"No existing energy sensor found for the power sensor '{power_sensor_id}'"
+            f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'"
         )
 
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
@@ -97,17 +98,18 @@ async def create_energy_sensor(
 
 @callback
 def find_related_real_energy_sensor(
-    hass: HomeAssistantType, power_sensor_id: str
-) -> Optional[er.RegistryEntry]:
-    ent_reg = er.async_get(hass)
-    entity_entry = ent_reg.async_get(power_sensor_id)
-    if not entity_entry or not entity_entry.device_id:
+    hass: HomeAssistantType, power_sensor: RealPowerSensor
+) -> Optional[RealEnergySensor]:
+    """See if a corresponding energy sensor exists in the HA installation for the power sensor"""
+
+    if not power_sensor.device_id:
         return None
 
+    ent_reg = er.async_get(hass)
     energy_sensors = [
         entry
         for entry in er.async_entries_for_device(
-            ent_reg, device_id=entity_entry.device_id
+            ent_reg, device_id=power_sensor.device_id
         )
         if entry.device_class == DEVICE_CLASS_ENERGY
         or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
@@ -115,7 +117,7 @@ def find_related_real_energy_sensor(
     if not energy_sensors:
         return None
 
-    return energy_sensors[0]
+    return RealEnergySensor(energy_sensors[0])
 
 
 class EnergySensor:

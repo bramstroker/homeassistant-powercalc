@@ -4,6 +4,7 @@ import logging
 from decimal import Decimal
 from typing import Optional
 
+import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
@@ -41,6 +42,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
@@ -69,7 +71,7 @@ OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE]
 _LOGGER = logging.getLogger(__name__)
 
 
-async def create_power_sensor(
+async def create_virtual_power_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
     source_entity: SourceEntity,
@@ -166,6 +168,24 @@ async def create_power_sensor(
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
     )
 
+async def create_real_power_sensor(hass: HomeAssistantType, sensor_config: dict) -> RealPowerSensor:
+    """Create reference to an existing power sensor"""
+
+    power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
+    unique_id = sensor_config.get(CONF_UNIQUE_ID)
+    device_id = None
+    ent_reg = er.async_get(hass)
+    entity_entry = ent_reg.async_get(power_sensor_id)
+    if entity_entry:
+        if not unique_id:
+            unique_id = entity_entry.unique_id
+        device_id = entity_entry.device_id
+        
+    return RealPowerSensor(
+        entity_id=power_sensor_id,
+        device_id=device_id,
+        unique_id=unique_id
+    )
 
 def select_calculation_mode(config: dict) -> Optional[str]:
     """Select the calculation mode"""
@@ -350,10 +370,22 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 class RealPowerSensor(PowerSensor):
     """Contains a reference to a existing real power sensor entity"""
 
-    def __init__(self, entity_id: str):
+    def __init__(self, entity_id: str, device_id: str = None, unique_id: str = None):
         self._entity_id = entity_id
+        self._device_id = device_id
+        self._unique_id = unique_id
 
     @property
-    def entity_id(self):
+    def entity_id(self) -> str:
         """Return the name of the sensor."""
         return self._entity_id
+    
+    @property
+    def device_id(self) -> str:
+        """Return the device_id of the sensor."""
+        return self._device_id
+    
+    @property
+    def unique_id(self) -> str:
+        """Return the unique_id of the sensor."""
+        return self._unique_id
