@@ -35,6 +35,7 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
     ATTR_ENTITY_ID,
+    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -174,6 +175,7 @@ SENSOR_CONFIG = {
             vol.Optional(CONF_AREA): cv.string,
             vol.Optional(CONF_GROUP): cv.entity_id,
             vol.Optional(CONF_TEMPLATE): cv.template,
+            vol.Optional(CONF_DOMAIN): cv.string,
         }
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): cv.boolean,
@@ -520,6 +522,12 @@ def resolve_include_entities(
         area_id = include_config.get(CONF_AREA)
         _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | resolve_area_entities(hass, area_id)
+    
+    # Include entities from a certain domain
+    if CONF_DOMAIN in include_config:
+        domain = include_config.get(CONF_DOMAIN)
+        _LOGGER.debug("Including entities from domain: %s", domain)
+        entities = entities | {entity.entity_id: entity for entity in entity_reg.entities.values() if entity.domain == domain}
 
     # Include entities from a certain group
     if CONF_GROUP in include_config:
@@ -570,7 +578,6 @@ def resolve_include_groups(
         entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
 
     return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
-
 
 @callback
 def resolve_area_entities(

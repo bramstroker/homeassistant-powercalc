@@ -660,9 +660,21 @@ sensor:
 ```yaml
 sensor:
   - platform: powercalc
-    create_group: All indoor lightd
+    create_group: All indoor lights
     include:
       template: {{expand('group.all_indoor_lights')|map(attribute='entity_id')|list}}
+```
+
+**Include domain**
+
+> Available from v0.19 and higher
+
+```yaml
+sensor:
+  - platform: powercalc
+    create_group: All lights
+    include:
+      domain: light
 ```
 
 ### Multiply Factor
