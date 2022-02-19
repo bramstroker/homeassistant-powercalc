@@ -55,7 +55,7 @@ async def is_supported_model(
 ) -> bool:
     try:
         light_model = await get_light_model(hass, sensor_config, entry)
-        return light_model.is_autodiscovery_allowed
+        return light_model and light_model.is_autodiscovery_allowed
     except ModelNotSupported:
         return False
 
