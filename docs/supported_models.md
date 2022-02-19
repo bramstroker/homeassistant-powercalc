@@ -1,4 +1,4 @@
-# Supported models
+# Supported models (87 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
