@@ -81,6 +81,7 @@ They are as follows:
 | Name                      | Type    | Requirement  | Description                                                                |
 | ------------------------- | ------- | ------------ | -------------------------------------------------------------------------- |
 | entity_id                 | string  | **Required** | HA entity ID. The id of the device you want your power sensor for          |
+| unique_id                 | string  | **Optional** | Powercalc tries to get a unique_id from the source entity by default. When the source entity does not have a unique_id you can configure one yourself. This allows you to change the name, area etc from the GUI. You can use for example https://www.uuidgenerator.net/ to generate a unique one |
 | manufacturer              | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                     | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
 | standby_power             | float   | **Optional** | Supply the wattage when the device is off                                  |
