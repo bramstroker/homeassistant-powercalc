@@ -23,6 +23,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           json_schema: ./custom_components/powercalc/data/model_schema.json
-          json_path_pattern: .*model.json$
+          json_path_pattern: .*/data/([^/]+/)?([^/]+/)?model.json$
           send_comment: true
           clear_comments: true
