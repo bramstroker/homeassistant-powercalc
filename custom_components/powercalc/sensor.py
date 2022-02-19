@@ -522,12 +522,16 @@ def resolve_include_entities(
         area_id = include_config.get(CONF_AREA)
         _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | resolve_area_entities(hass, area_id)
-    
+
     # Include entities from a certain domain
     if CONF_DOMAIN in include_config:
         domain = include_config.get(CONF_DOMAIN)
         _LOGGER.debug("Including entities from domain: %s", domain)
-        entities = entities | {entity.entity_id: entity for entity in entity_reg.entities.values() if entity.domain == domain}
+        entities = entities | {
+            entity.entity_id: entity
+            for entity in entity_reg.entities.values()
+            if entity.domain == domain
+        }
 
     # Include entities from a certain group
     if CONF_GROUP in include_config:
@@ -578,6 +582,7 @@ def resolve_include_groups(
         entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
 
     return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
+
 
 @callback
 def resolve_area_entities(
