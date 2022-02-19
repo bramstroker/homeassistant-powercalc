@@ -53,12 +53,12 @@ def generate_supported_model_list():
 
 
 def get_color_modes(model_directory) -> list:
-    color_modes = []
-    for path in glob.glob(f"{model_directory}/*.csv.gz"):
+    color_modes = set()
+    for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):
         filename = os.path.basename(path)
         index = filename.index(".")
         color_mode = filename[:index]
-        color_modes.append(color_mode)
+        color_modes.add(color_mode)
     return color_modes
 
 
