@@ -168,7 +168,10 @@ async def create_virtual_power_sensor(
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
     )
 
-async def create_real_power_sensor(hass: HomeAssistantType, sensor_config: dict) -> RealPowerSensor:
+
+async def create_real_power_sensor(
+    hass: HomeAssistantType, sensor_config: dict
+) -> RealPowerSensor:
     """Create reference to an existing power sensor"""
 
     power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
@@ -180,12 +183,11 @@ async def create_real_power_sensor(hass: HomeAssistantType, sensor_config: dict)
         if not unique_id:
             unique_id = entity_entry.unique_id
         device_id = entity_entry.device_id
-        
+
     return RealPowerSensor(
-        entity_id=power_sensor_id,
-        device_id=device_id,
-        unique_id=unique_id
+        entity_id=power_sensor_id, device_id=device_id, unique_id=unique_id
     )
+
 
 def select_calculation_mode(config: dict) -> Optional[str]:
     """Select the calculation mode"""
@@ -379,12 +381,12 @@ class RealPowerSensor(PowerSensor):
     def entity_id(self) -> str:
         """Return the name of the sensor."""
         return self._entity_id
-    
+
     @property
     def device_id(self) -> str:
         """Return the device_id of the sensor."""
         return self._device_id
-    
+
     @property
     def unique_id(self) -> str:
         """Return the unique_id of the sensor."""

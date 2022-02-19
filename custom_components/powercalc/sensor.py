@@ -106,7 +106,12 @@ from .errors import (
 from .model_discovery import is_supported_model
 from .sensors.energy import DailyEnergySensor, EnergySensor, create_energy_sensor
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import PowerSensor, RealPowerSensor, create_virtual_power_sensor, create_real_power_sensor
+from .sensors.power import (
+    PowerSensor,
+    RealPowerSensor,
+    create_real_power_sensor,
+    create_virtual_power_sensor,
+)
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA

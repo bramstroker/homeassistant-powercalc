@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
-from numpy import power
-
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.integration.sensor import (
     TRAPEZOIDAL_METHOD,
@@ -27,6 +25,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
+from numpy import power
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -55,7 +54,9 @@ async def create_energy_sensor(
 ) -> EnergySensor:
     """Create the energy sensor entity"""
 
-    if CONF_POWER_SENSOR_ID in sensor_config and isinstance(power_sensor, RealPowerSensor):
+    if CONF_POWER_SENSOR_ID in sensor_config and isinstance(
+        power_sensor, RealPowerSensor
+    ):
         real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
         if real_energy_sensor:
             _LOGGER.debug(
