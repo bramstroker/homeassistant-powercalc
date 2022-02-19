@@ -64,7 +64,7 @@ class LightModel:
                 )
             
             # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
-            json_file = open(os.path.join(subdirectory, "model.json"))
+            file_path = os.path.join(subdirectory, "model.json")
             if os.path.exists(file_path):
                 json_file = open(file_path)
                 self._json_data = {**self._json_data, **json.load(json_file)}
