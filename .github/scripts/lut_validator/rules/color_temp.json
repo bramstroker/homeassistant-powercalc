@@ -8,7 +8,7 @@
       "mired": {
         "type": "number",
         "minimum": 0,
-        "maximum": 650
+        "maximum": 670
       },
       "watt": {
           "type": "number",
