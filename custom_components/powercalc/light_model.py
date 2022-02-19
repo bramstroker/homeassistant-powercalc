@@ -34,7 +34,7 @@ class LightModel:
         if "/" in model:
             model_parts = model.split("/", 1)
             self._model = model_parts[0]
-            self._lut_subdirectory = model_parts[1]    
+            self._lut_subdirectory = model_parts[1]
 
         self._custom_model_directory = custom_model_directory
         self._hass = hass
@@ -62,7 +62,7 @@ class LightModel:
                 raise ModelNotSupported(
                     f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
                 )
-            
+
             # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
             file_path = os.path.join(subdirectory, "model.json")
             if os.path.exists(file_path):
@@ -70,7 +70,6 @@ class LightModel:
                 self._json_data = {**self._json_data, **json.load(json_file)}
 
         return self._json_data
-
 
     def get_directory(self) -> str:
         """
@@ -82,8 +81,8 @@ class LightModel:
          - check in buildin directory (config/custom_components/powercalc/data)
         """
 
-        #Only fetch directory once
-        if self._directory: 
+        # Only fetch directory once
+        if self._directory:
             return self._directory
 
         if self._custom_model_directory:
@@ -124,7 +123,6 @@ class LightModel:
         if self._lut_subdirectory:
             model_directory = os.path.join(model_directory, self._lut_subdirectory)
         return model_directory
-
 
     @property
     def manufacturer(self) -> str:

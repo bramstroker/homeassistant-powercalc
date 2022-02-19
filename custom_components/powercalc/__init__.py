@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from pyexpat import model
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -25,6 +24,7 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.const import CONF_ENTITY_ID, CONF_SCAN_INTERVAL
 from homeassistant.helpers import discovery
 from homeassistant.helpers.typing import HomeAssistantType
+from pyexpat import model
 
 from .common import create_source_entity, validate_name_pattern
 from .const import (
@@ -142,7 +142,9 @@ async def autodiscover_entities(
         try:
             light_model = await get_light_model(hass, {}, source_entity.entity_entry)
             if not light_model.is_autodiscovery_allowed:
-                _LOGGER.debug(f"{entity_entry.entity_id}: Model found in database, but needs manual configuration")
+                _LOGGER.debug(
+                    f"{entity_entry.entity_id}: Model found in database, but needs manual configuration"
+                )
                 continue
         except ModelNotSupported:
             _LOGGER.debug(

@@ -461,7 +461,14 @@ async def create_group_sensors(
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
-    group_sensors.append(GroupedPowerSensor(name, power_sensor_ids, hass, rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION)))
+    group_sensors.append(
+        GroupedPowerSensor(
+            name,
+            power_sensor_ids,
+            hass,
+            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        )
+    )
     _LOGGER.debug("Creating grouped power sensor: %s", name)
 
     energy_sensors = list(filter(lambda elm: isinstance(elm, EnergySensor), entities))
