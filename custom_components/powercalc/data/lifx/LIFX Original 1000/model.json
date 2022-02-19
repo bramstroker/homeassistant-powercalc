@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Kasa KP115",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 1,
+        "VERSION": "v0.17.0:docker"
+    },
+    "name": "LIFX Original 1000",
+    "standby_power": 2.46,
+    "supported_modes": [
+        "lut"
+    ]
+}
