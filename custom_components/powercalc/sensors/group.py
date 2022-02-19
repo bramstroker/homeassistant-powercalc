@@ -38,6 +38,7 @@ class GroupedSensor(SensorEntity):
         name: str,
         entities: list[str],
         hass: HomeAssistantType,
+        unique_id: str = None,
         rounding_digits: int = 2,
     ):
         self._attr_name = name
@@ -47,6 +48,8 @@ class GroupedSensor(SensorEntity):
             ATTR_IS_GROUP: True,
         }
         self._rounding_digits = rounding_digits
+        if unique_id:
+            self._attr_unique_id = unique_id
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
     async def async_added_to_hass(self) -> None:

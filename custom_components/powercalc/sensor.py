@@ -39,6 +39,7 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
+    CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     EVENT_HOMEASSISTANT_STARTED,
@@ -145,6 +146,7 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_domain(SUPPORTED_ENTITY_DOMAINS),
+    vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
     vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
@@ -235,20 +237,21 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
     exclude_from_merging = [
         CONF_NAME,
         CONF_ENTITY_ID,
+        CONF_UNIQUE_ID,
         CONF_POWER_SENSOR_ID,
     ]
     num_configs = len(configs)
 
     merged_config = {}
     for i, config in enumerate(configs, 1):
-
+        config_copy = config.copy()
         # Remove config properties which are only allowed on the deepest level
         if i < num_configs:
             for key in exclude_from_merging:
                 if key in config:
-                    config.pop(key)
+                    config_copy.pop(key)
 
-        merged_config.update(config)
+        merged_config.update(config_copy)
 
     if not CONF_CREATE_ENERGY_SENSOR in merged_config:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
@@ -417,8 +420,9 @@ async def create_individual_sensors(
             mode_config.get(CONF_VALUE),
             mode_config.get(CONF_UNIT_OF_MEASUREMENT),
             mode_config.get(CONF_UPDATE_FREQUENCY),
-            mode_config.get(CONF_ON_TIME),
-            sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+            unique_id=sensor_config.get(CONF_UNIQUE_ID),
+            on_time=mode_config.get(CONF_ON_TIME),
+            rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         )
         entities_to_add.append(energy_sensor)
 
@@ -463,24 +467,30 @@ async def create_group_sensors(
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
+    unique_id = sensor_config.get(CONF_UNIQUE_ID)
     group_sensors.append(
         GroupedPowerSensor(
             name,
             power_sensor_ids,
             hass,
+            unique_id=unique_id,
             rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
         )
     )
-    _LOGGER.debug("Creating grouped power sensor: %s", name)
+    _LOGGER.debug(f"Creating grouped power sensor: %s", name)
 
     energy_sensors = list(filter(lambda elm: isinstance(elm, EnergySensor), entities))
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
+    energy_unique_id = None
+    if unique_id:
+        energy_unique_id = f"{unique_id}_energy"
     group_energy_sensor = GroupedEnergySensor(
         name,
         energy_sensor_ids,
         hass,
+        unique_id=energy_unique_id,
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
     group_sensors.append(group_energy_sensor)

@@ -74,8 +74,8 @@ async def create_energy_sensor(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
     unique_id = None
-    if source_entity.unique_id:
-        unique_id = f"{source_entity.unique_id}_energy"
+    if power_sensor.unique_id:
+        unique_id = f"{power_sensor.unique_id}_energy"
         async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id, entity_id)
 
     _LOGGER.debug("Creating energy sensor: %s", name)
@@ -183,6 +183,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         value: float,
         unit_of_measurement: str,
         update_frequency: int,
+        unique_id: str = None,
         on_time: timedelta = timedelta(days=1),
         rounding_digits: int = 4,
     ):
@@ -193,6 +194,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._update_frequency = update_frequency
         self._on_time = on_time
         self._rounding_digits = rounding_digits
+        self._attr_unique_id = unique_id
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
     async def async_added_to_hass(self):

@@ -9,6 +9,7 @@ from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntit
 from homeassistant.const import (
     CONF_NAME,
     CONF_SCAN_INTERVAL,
+    CONF_UNIQUE_ID,
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
@@ -85,8 +86,9 @@ async def create_power_sensor(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
 
-    if source_entity.unique_id:
-        async_migrate_entity_id(hass, SENSOR_DOMAIN, source_entity.unique_id, entity_id)
+    unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
+    if unique_id:
+        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id, entity_id)
 
     light_model = None
     try:
@@ -145,7 +147,7 @@ async def create_power_sensor(
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
         standby_power,
-        source_entity.unique_id,
+        unique_id,
     )
 
     return VirtualPowerSensor(
@@ -155,7 +157,7 @@ async def create_power_sensor(
         name=name,
         source_entity=source_entity.entity_id,
         source_domain=source_entity.domain,
-        unique_id=source_entity.unique_id,
+        unique_id=unique_id,
         standby_power=standby_power,
         scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
