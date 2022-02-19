@@ -2,6 +2,7 @@
 ![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc)
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.
