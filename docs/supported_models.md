@@ -33,10 +33,10 @@
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                              |lut              |hs,color_temp|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                               |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp   |
-|lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |             |
+|lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |hs,color_temp|
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |hs,color_temp|
 |lifx         |LIFX Original 1000       |LIFX Original 1000                                                   |lut              |hs,color_temp|
-|lifx         |LIFX Z                   |LIFX Z                                                               |lut              |             |
+|lifx         |LIFX Z                   |LIFX Z                                                               |lut              |hs,color_temp|
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                                 |lut              |color_temp   |
 |osram        |LIGHTIFY Indoor Flex RGBW|LIGHTIFY Indoor Flex RGBW 3P (1.8m)                                  |lut              |hs,color_temp|
 |signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                     |lut              |hs,color_temp|
@@ -54,7 +54,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |hs,color_temp|
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |hs,color_temp|
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs           |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs|
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness|
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs           |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs           |
