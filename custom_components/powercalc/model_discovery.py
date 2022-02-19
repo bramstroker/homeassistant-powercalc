@@ -54,8 +54,8 @@ async def is_supported_model(
     hass: HomeAssistantType, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
-        await get_light_model(hass, sensor_config, entry)
-        return True
+        light_model = await get_light_model(hass, sensor_config, entry)
+        return light_model.is_autodiscovery_allowed
     except ModelNotSupported:
         return False
 
@@ -85,16 +85,6 @@ async def autodiscover_model(
 
     model_info = ModelInfo(manufacturer, model_id)
 
-    # This check can be removed in future version
-    if (
-        AwesomeVersion(HA_VERSION) <= AwesomeVersion("2021.11")
-        and match is None
-        and entity_entry.platform == "hue"
-    ):
-        model_info = await autodiscover_from_hue_bridge(hass, entity_entry)
-        if model_info is None:
-            return None
-
     _LOGGER.debug(
         "%s: Auto discovered model (manufacturer=%s, model=%s)",
         entity_entry.entity_id,
@@ -121,37 +111,6 @@ async def is_supported_for_autodiscovery(
         return False
 
     return True
-
-
-async def autodiscover_from_hue_bridge(
-    hass: HomeAssistantType, entity_entry: er.RegistryEntry
-):
-    # Code below is for BC purposes. Will be removed in a future version
-    light = await find_hue_light(hass, entity_entry)
-    if light is None:
-        _LOGGER.error(
-            "%s: Cannot autodiscover model, not found in the hue bridge api",
-            entity_entry.entity_id,
-        )
-        return None
-
-    return ModelInfo(light.manufacturername, light.modelid)
-
-
-async def find_hue_light(hass: HomeAssistantType, entity_entry: er.RegistryEntry):
-    """Find the light in the Hue bridge, we need to extract the model id."""
-
-    if not hass.data.get("hue"):
-        return None
-
-    bridge = hass.data["hue"][entity_entry.config_entry_id]
-    lights = bridge.api.lights
-    for light_id in lights:
-        light = bridge.api.lights[light_id]
-        if light.uniqueid == entity_entry.unique_id:
-            return light
-
-    return None
 
 
 class ModelInfo(NamedTuple):

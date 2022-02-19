@@ -80,7 +80,7 @@ class LutRegistry:
         return lookup_dict
 
     def get_lut_file(self, light_model: LightModel, color_mode: str):
-        path = os.path.join(light_model.get_directory(), f"{color_mode}.csv")
+        path = os.path.join(light_model.get_lut_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
