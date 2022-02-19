@@ -80,7 +80,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         relative_value = (value - min_value) / value_range
 
-        power = power_range * relative_value**gamma_curve + min_power
+        power = power_range * relative_value ** gamma_curve + min_power
 
         return Decimal(power)
 
