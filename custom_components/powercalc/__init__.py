@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
+from pyexpat import model
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -141,6 +142,7 @@ async def autodiscover_entities(
         try:
             light_model = await get_light_model(hass, {}, source_entity.entity_entry)
             if not light_model.is_autodiscovery_allowed:
+                _LOGGER.debug(f"{entity_entry.entity_id}: Model found in database, but needs manual configuration")
                 continue
         except ModelNotSupported:
             _LOGGER.debug(
