@@ -626,9 +626,7 @@ def resolve_area_entities(
         [
             entity
             for device in device_registry.async_entries_for_area(device_reg, area_id)
-            for entity in entity_registry.async_entries_for_device(
-                entity_reg, device.id
-            )
+            for entity in entity_registry.async_entries_for_device(entity_reg, device.id)
             if entity.area_id is None
         ]
     )
