@@ -26,7 +26,7 @@ def generate_supported_model_list():
 
         rows = []
         for json_path in glob.glob(
-            f"{project_root}/custom_components/powercalc/data/**/model.json",
+            f"{project_root}/custom_components/powercalc/data/*/*/model.json",
             recursive=True,
         ):
             with open(json_path) as json_file:
