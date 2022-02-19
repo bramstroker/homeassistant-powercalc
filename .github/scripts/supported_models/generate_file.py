@@ -9,7 +9,6 @@ from pytablewriter import MarkdownTableWriter
 
 def generate_supported_model_list():
     writer = MarkdownTableWriter()
-    writer.table_name = "Supported models"
     writer.header_list = [
         "manufacturer",
         "model id",
@@ -49,6 +48,7 @@ def generate_supported_model_list():
 
         rows = sorted(rows, key=lambda x: (x[0], x[1]))
         writer.value_matrix = rows
+        writer.table_name = f"Supported models ({len(rows)} total)"
         writer.dump(md_file)
 
 
