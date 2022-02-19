@@ -101,7 +101,7 @@ def find_related_real_energy_sensor(
 ) -> Optional[er.RegistryEntry]:
     ent_reg = er.async_get(hass)
     entity_entry = ent_reg.async_get(power_sensor_id)
-    if not entity_entry.device_id:
+    if not entity_entry or not entity_entry.device_id:
         return None
 
     energy_sensors = [
