@@ -52,7 +52,11 @@ from .strategy.factory import PowerCalculatorStrategyFactory
 
 DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
+DEFAULT_POWER_SENSOR_PRECISION = 2
+DEFAULT_ENERGY_INTEGRATION_METHOD = TRAPEZOIDAL_METHOD
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
+DEFAULT_ENERGY_SENSOR_PRECISION = 4
+DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -72,19 +76,19 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(
-                        CONF_UTILITY_METER_TYPES, default=[DAILY, WEEKLY, MONTHLY]
+                        CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                     vol.Optional(
                         CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                     vol.Optional(
-                        CONF_ENERGY_INTEGRATION_METHOD, default=TRAPEZOIDAL_METHOD
+                        CONF_ENERGY_INTEGRATION_METHOD, default=DEFAULT_ENERGY_INTEGRATION_METHOD
                     ): vol.In(INTEGRATION_METHOD),
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_PRECISION, default=4
+                        CONF_ENERGY_SENSOR_PRECISION, default=DEFAULT_ENERGY_SENSOR_PRECISION
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_POWER_SENSOR_PRECISION, default=2
+                        CONF_POWER_SENSOR_PRECISION, default=DEFAULT_POWER_SENSOR_PRECISION
                     ): cv.positive_int,
                 }
             ),
@@ -99,11 +103,16 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     domain_config = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
+        CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
+        CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
+        CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENABLE_AUTODISCOVERY: True,
+        CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
+        CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
     }
 
     hass.data[DOMAIN] = {
