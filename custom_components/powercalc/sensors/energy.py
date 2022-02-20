@@ -208,7 +208,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         unit_of_measurement: str,
         update_frequency: int,
         unique_id: str = None,
-        on_time: timedelta = timedelta(days=1),
+        on_time: timedelta = None,
         rounding_digits: int = 4,
     ):
         self._hass = hass
@@ -216,7 +216,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._value = value
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
-        self._on_time = on_time
+        self._on_time = on_time or timedelta(days=1)
         self._rounding_digits = rounding_digits
         self._attr_unique_id = unique_id
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
