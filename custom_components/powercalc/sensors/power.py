@@ -82,11 +82,11 @@ async def create_power_sensor(
     if CONF_POWER_SENSOR_ID in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
         return await create_real_power_sensor(hass, sensor_config)
-    
-    
+
     return await create_virtual_power_sensor(
         hass, sensor_config, source_entity, discovery_info
     )
+
 
 async def create_virtual_power_sensor(
     hass: HomeAssistantType,

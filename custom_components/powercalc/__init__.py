@@ -82,13 +82,16 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                     vol.Optional(
-                        CONF_ENERGY_INTEGRATION_METHOD, default=DEFAULT_ENERGY_INTEGRATION_METHOD
+                        CONF_ENERGY_INTEGRATION_METHOD,
+                        default=DEFAULT_ENERGY_INTEGRATION_METHOD,
                     ): vol.In(INTEGRATION_METHOD),
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_PRECISION, default=DEFAULT_ENERGY_SENSOR_PRECISION
+                        CONF_ENERGY_SENSOR_PRECISION,
+                        default=DEFAULT_ENERGY_SENSOR_PRECISION,
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_POWER_SENSOR_PRECISION, default=DEFAULT_POWER_SENSOR_PRECISION
+                        CONF_POWER_SENSOR_PRECISION,
+                        default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
                 }
             ),
