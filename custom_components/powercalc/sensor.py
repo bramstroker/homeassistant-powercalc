@@ -110,11 +110,7 @@ from .sensors.energy import (
     create_energy_sensor,
 )
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import (
-    PowerSensor,
-    RealPowerSensor,
-    create_power_sensor,
-)
+from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -148,7 +144,9 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
         ),
         vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
-        vol.Optional(CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY): vol.Coerce(int),
+        vol.Optional(
+            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
+        ): vol.Coerce(int),
     }
 )
 
@@ -614,7 +612,9 @@ def resolve_area_entities(
         [
             entity
             for device in device_registry.async_entries_for_area(device_reg, area_id)
-            for entity in entity_registry.async_entries_for_device(entity_reg, device.id)
+            for entity in entity_registry.async_entries_for_device(
+                entity_reg, device.id
+            )
             if entity.area_id is None
         ]
     )

@@ -14,8 +14,8 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
 from homeassistant.const import (
     CONF_NAME,
-    CONF_UNIT_OF_MEASUREMENT,
     CONF_UNIQUE_ID,
+    CONF_UNIT_OF_MEASUREMENT,
     DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
@@ -100,7 +100,10 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
-async def create_daily_fixed_energy_sensor(hass: HomeAssistantType, sensor_config: dict) -> DailyEnergySensor:
+
+async def create_daily_fixed_energy_sensor(
+    hass: HomeAssistantType, sensor_config: dict
+) -> DailyEnergySensor:
     mode_config = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
     return DailyEnergySensor(
@@ -113,6 +116,7 @@ async def create_daily_fixed_energy_sensor(hass: HomeAssistantType, sensor_confi
         on_time=mode_config.get(CONF_ON_TIME),
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
+
 
 @callback
 def find_related_real_energy_sensor(
