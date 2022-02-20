@@ -71,6 +71,23 @@ OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE]
 _LOGGER = logging.getLogger(__name__)
 
 
+async def create_power_sensor(
+    hass: HomeAssistantType,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> PowerSensor:
+    """Create the power sensor based on powercalc sensor configuration"""
+
+    if CONF_POWER_SENSOR_ID in sensor_config:
+        # Use an existing power sensor, only create energy sensors / utility meters
+        return await create_real_power_sensor(hass, sensor_config)
+    
+    
+    return await create_virtual_power_sensor(
+        hass, sensor_config, source_entity, discovery_info
+    )
+
 async def create_virtual_power_sensor(
     hass: HomeAssistantType,
     sensor_config: dict,
