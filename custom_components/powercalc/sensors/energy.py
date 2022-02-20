@@ -14,6 +14,8 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
 from homeassistant.const import (
     CONF_NAME,
+    CONF_UNIT_OF_MEASUREMENT,
+    CONF_UNIQUE_ID,
     DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
@@ -25,18 +27,20 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
-from numpy import power
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ON_TIME,
     CONF_POWER_SENSOR_ID,
+    CONF_UPDATE_FREQUENCY,
+    CONF_VALUE,
 )
-from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
 
@@ -96,6 +100,19 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
     )
 
+async def create_daily_fixed_energy_sensor(hass: HomeAssistantType, sensor_config: dict) -> DailyEnergySensor:
+    mode_config = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+
+    return DailyEnergySensor(
+        hass,
+        sensor_config.get(CONF_NAME),
+        mode_config.get(CONF_VALUE),
+        mode_config.get(CONF_UNIT_OF_MEASUREMENT),
+        mode_config.get(CONF_UPDATE_FREQUENCY),
+        unique_id=sensor_config.get(CONF_UNIQUE_ID),
+        on_time=mode_config.get(CONF_ON_TIME),
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+    )
 
 @callback
 def find_related_real_energy_sensor(
@@ -220,7 +237,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             """Update the energy sensor state."""
             self._state = self._state + self.calculate_delta(self._update_frequency)
             _LOGGER.debug(
-                f"{self.entity_id}: Updating daily_fixed_energy sensor: {self._state}"
+                f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}"
             )
             self.async_schedule_update_ha_state()
 

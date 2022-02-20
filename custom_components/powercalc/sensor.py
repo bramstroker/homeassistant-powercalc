@@ -104,13 +104,16 @@ from .errors import (
     SensorConfigurationError,
 )
 from .model_discovery import is_supported_model
-from .sensors.energy import DailyEnergySensor, EnergySensor, create_energy_sensor
+from .sensors.energy import (
+    EnergySensor,
+    create_daily_fixed_energy_sensor,
+    create_energy_sensor,
+)
 from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
 from .sensors.power import (
     PowerSensor,
     RealPowerSensor,
-    create_real_power_sensor,
-    create_virtual_power_sensor,
+    create_power_sensor,
 )
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -137,6 +140,7 @@ SUPPORTED_ENTITY_DOMAINS = (
     water_heater.DOMAIN,
 )
 
+DEFAULT_DAILY_UPDATE_FREQUENCY = 1800
 DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
@@ -144,7 +148,7 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
         ),
         vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
-        vol.Optional(CONF_UPDATE_FREQUENCY, default=1800): vol.Coerce(int),
+        vol.Optional(CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY): vol.Coerce(int),
     }
 )
 
@@ -394,18 +398,17 @@ async def create_individual_sensors(
     entities_to_add = []
 
     energy_sensor = None
-    if not CONF_DAILY_FIXED_ENERGY in sensor_config:
-        # Use an existing power sensor, only create energy sensors / utility meters
-        if CONF_POWER_SENSOR_ID in sensor_config:
-            power_sensor = await create_real_power_sensor(hass, sensor_config)
-        # Create the virtual power sensor
-        else:
-            try:
-                power_sensor = await create_virtual_power_sensor(
-                    hass, sensor_config, source_entity, discovery_info
-                )
-            except PowercalcSetupError:
-                return []
+    if CONF_DAILY_FIXED_ENERGY in sensor_config:
+        energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+        entities_to_add.append(energy_sensor)
+
+    else:
+        try:
+            power_sensor = await create_power_sensor(
+                hass, sensor_config, source_entity, discovery_info
+            )
+        except PowercalcSetupError:
+            return []
 
         entities_to_add.append(power_sensor)
 
@@ -415,21 +418,6 @@ async def create_individual_sensors(
                 hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
-
-    if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        mode_config = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
-
-        energy_sensor = DailyEnergySensor(
-            hass,
-            sensor_config.get(CONF_NAME),
-            mode_config.get(CONF_VALUE),
-            mode_config.get(CONF_UNIT_OF_MEASUREMENT),
-            mode_config.get(CONF_UPDATE_FREQUENCY),
-            unique_id=sensor_config.get(CONF_UNIQUE_ID),
-            on_time=mode_config.get(CONF_ON_TIME),
-            rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-        )
-        entities_to_add.append(energy_sensor)
 
     if energy_sensor:
         entities_to_add.extend(
