@@ -54,7 +54,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |color_temp,hs|
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs           |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs|
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness|
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs           |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs           |
