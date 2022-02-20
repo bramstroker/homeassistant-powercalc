@@ -396,7 +396,7 @@ sensor:
       on_time: 12:00:00
 ```
 
-This will simulate the devices using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
+This will simulate the device using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
 
 ## Sensor naming
 
