@@ -26,18 +26,18 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [Linear](#linear-mode)
     - [Fixed](#fixed-mode)
     - [WLED](#wled-mode)
-- [Light model library](#light-model-library)
-    - [LUT data files](#lut-data-files)
-      - [Measuring lights](#creating-lut-files)
-    - [Supported models](#supported-models)
-- [Sensor naming](#sensor-naming)
 - [Daily fixed energy](#daily-fixed-energy)
+- [Sensor naming](#sensor-naming)
 - [Setting up for energy dashboard](#setting-up-for-energy-dashboard)
 - [Advanced features](#advanced-features)
     - [Multiple entities and grouping](#multiple-entities-and-grouping)
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
     - [Use real power sensor](#use-real-power-sensor)
+- [Light model library](#light-model-library)
+    - [LUT data files](#lut-data-files)
+      - [Measuring lights](#creating-lut-files)
+    - [Supported models](#supported-models)
 - [Debug logging](#debug-logging)
 
 ## Installation
@@ -355,155 +355,6 @@ sensor:
     name: My amazing power meter
 ```
 
-<hr>
-
-## Light model library
-
-The component ships with predefined light measurements for some light models.
-This library will keep extending by the effort of community users.
-
-These models are located in `config/custom_components/powercalc/data` directory. 
-You can also define your own models in `config/powercalc-custom-models` directory, when a manufacturer/model exists in this directory this will take precedence over the default data directory.
-
-Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010
-
-### model.json
-
-Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
-See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
-
-When [LUT mode](#lut-mode) is supported also [CSV lookup files](#lut-data-files) must be provided.
-
-Example lut mode:
-
-```json
-{
-    "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
-    "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
-    "measure_method": "script",
-    "measure_device": "Shelly Plug S"
-}
-```
-
-Example linear mode
-
-```json
-{
-    "name": "Hue Go",
-    "supported_modes": [
-        "linear"
-    ],
-    "standby_power": 0.2,
-    "linear_config": {
-        "min_power": 0,
-        "max_power": 6
-    },
-    "measure_method": "manual",
-    "measure_device": "From manufacturer specifications"
-}
-```
-
-### LUT data files
-
-To calculate power consumption a lookup is done into CSV data files.
-
-Depending on the supported color modes of the light the integration expects one or more CSV files here:
- - hs.csv.gz (hue/saturation, colored lamps)
- - color_temp.csv.gz (color temperature)
- - brightness.csv.gz (brightness only lights)
-
-Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
-
-The files are gzipped to keep the repository footprint small, and installation fast but gzipping files is not mandatory.
-
-Example:
-
-```
-- signify
-  - LCT010
-    - model.json
-    - hs.csv.gz
-    - color_temp.csv.gz
-```
-
-#### Expected file structure
-
-- The file **MUST** contain a header row.
-- The data rows in the CSV files **MUST** have the following column order:
-
-**hs.csv**
-```csv
-bri,hue,sat,watt
-```
-
-**color_temp.csv**
-```csv
-bri,mired,watt
-```
-
-**brightness.csv**
-```csv
-bri,watt
-```
-
-***Ranges***:
-- brightness (0-255)
-- hue (0-65535)
-- saturation (0-255)
-- mired (0-500)  min value depending on min mired value of the light model
-
-#### Creating LUT files
-
-New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API or Home Assistant API.
-The tooling is available at `utils/measure`.
-
-The script supports several smartplugs with power monitoring.
-
-See the [README](utils/measure/README.md) for more information.
-
-### Supported models
-
-See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
-
-## Sensor naming
-
-Let's assume you have a source sensor `light.patio` with name "Patio".
-Powercalc will create the following sensors by default.
-- sensor.patio_power (Patio power)
-- sensor.patio_energy (Patio energy)
-
-> Utility meters will use the energy name as a base and suffix with `_daily`, `_weekly`, `_monthly`
-
-### Change suffixes
-To change the default suffixes `_power` and `_energy` you can use the `power_sensor_naming` and `energy_sensor_naming` options.
-The following configuration:
-
-```yaml
-powercalc:
-  energy_sensor_naming: "{} kWh consumed"
-```
-
-will create:
-- sensor.patio_power (Patio power)
-- sensor.patio_kwh_consumed (Patio kWh consumed)
-
-### Change name
-You can also change the sensor name with the `name` option
-
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.patio
-    name: Patio Light
-```
-
-will create:
-- sensor.patio_light_power (Patio light power)
-- sensor.patio_light_energy (Patio light energy)
-
 ## Daily fixed energy
 
 > Available from v0.13 an higher
@@ -546,6 +397,42 @@ sensor:
 ```
 
 This will simulate the devices using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
+
+## Sensor naming
+
+Let's assume you have a source sensor `light.patio` with name "Patio".
+Powercalc will create the following sensors by default.
+- sensor.patio_power (Patio power)
+- sensor.patio_energy (Patio energy)
+
+> Utility meters will use the energy name as a base and suffix with `_daily`, `_weekly`, `_monthly`
+
+### Change suffixes
+To change the default suffixes `_power` and `_energy` you can use the `power_sensor_naming` and `energy_sensor_naming` options.
+The following configuration:
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kWh consumed"
+```
+
+will create:
+- sensor.patio_power (Patio power)
+- sensor.patio_kwh_consumed (Patio kWh consumed)
+
+### Change name
+You can also change the sensor name with the `name` option
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: light.patio
+    name: Patio Light
+```
+
+will create:
+- sensor.patio_light_power (Patio light power)
+- sensor.patio_light_energy (Patio light energy)
 
 ## Setting up for energy dashboard
 If you want to use the virtual power sensors with the new [energy integration](https://www.home-assistant.io/blog/2021/08/04/home-energy-management/), you have to create an energy sensor which utilizes the power of the powercalc sensor. Starting from v0.4 of powercalc it will automatically create energy sensors for you by default. No need for any custom configuration. These energy sensors then can be selected in the energy dashboard. 
@@ -748,6 +635,119 @@ Use the following configuration to use an existing power sensor and let powercal
   entity_id: light.toilet
   power_sensor_id: sensor.toilet_light_power
 ```
+
+<hr>
+
+## Light model library
+
+The component ships with predefined light measurements for some light models.
+This library will keep extending by the effort of community users.
+
+These models are located in `config/custom_components/powercalc/data` directory. 
+You can also define your own models in `config/powercalc-custom-models` directory, when a manufacturer/model exists in this directory this will take precedence over the default data directory.
+
+Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010
+
+### model.json
+
+Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
+See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
+
+When [LUT mode](#lut-mode) is supported also [CSV lookup files](#lut-data-files) must be provided.
+
+Example lut mode:
+
+```json
+{
+    "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
+    "standby_power": 0.4,
+    "supported_modes": [
+        "lut"
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly Plug S"
+}
+```
+
+Example linear mode
+
+```json
+{
+    "name": "Hue Go",
+    "supported_modes": [
+        "linear"
+    ],
+    "standby_power": 0.2,
+    "linear_config": {
+        "min_power": 0,
+        "max_power": 6
+    },
+    "measure_method": "manual",
+    "measure_device": "From manufacturer specifications"
+}
+```
+
+### LUT data files
+
+To calculate power consumption a lookup is done into CSV data files.
+
+Depending on the supported color modes of the light the integration expects one or more CSV files here:
+ - hs.csv.gz (hue/saturation, colored lamps)
+ - color_temp.csv.gz (color temperature)
+ - brightness.csv.gz (brightness only lights)
+
+Some lights support two color modes (both hs and color_temp), so there must be two CSV files.
+
+The files are gzipped to keep the repository footprint small, and installation fast but gzipping files is not mandatory.
+
+Example:
+
+```
+- signify
+  - LCT010
+    - model.json
+    - hs.csv.gz
+    - color_temp.csv.gz
+```
+
+#### Expected file structure
+
+- The file **MUST** contain a header row.
+- The data rows in the CSV files **MUST** have the following column order:
+
+**hs.csv**
+```csv
+bri,hue,sat,watt
+```
+
+**color_temp.csv**
+```csv
+bri,mired,watt
+```
+
+**brightness.csv**
+```csv
+bri,watt
+```
+
+***Ranges***:
+- brightness (0-255)
+- hue (0-65535)
+- saturation (0-255)
+- mired (0-500)  min value depending on min mired value of the light model
+
+#### Creating LUT files
+
+New files are created by taking measurements using a smartplug (i.e. Shelly plug) and changing the light to all kind of different variations using the Hue API or Home Assistant API.
+The tooling is available at `utils/measure`.
+
+The script supports several smartplugs with power monitoring.
+
+See the [README](utils/measure/README.md) for more information.
+
+### Supported models
+
+See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
 ## Debug logging
 
