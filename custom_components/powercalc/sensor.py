@@ -456,7 +456,13 @@ async def create_group_sensors(
 
     group_sensors = []
 
-    power_sensors = list(filter(lambda elm: isinstance(elm, PowerSensor) and not isinstance(elm, GroupedPowerSensor), entities))
+    power_sensors = list(
+        filter(
+            lambda elm: isinstance(elm, PowerSensor)
+            and not isinstance(elm, GroupedPowerSensor),
+            entities,
+        )
+    )
     power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
@@ -472,7 +478,13 @@ async def create_group_sensors(
     )
     _LOGGER.debug(f"Creating grouped power sensor: %s", name)
 
-    energy_sensors = list(filter(lambda elm: isinstance(elm, EnergySensor) and not isinstance(elm, GroupedEnergySensor), entities))
+    energy_sensors = list(
+        filter(
+            lambda elm: isinstance(elm, EnergySensor)
+            and not isinstance(elm, GroupedEnergySensor),
+            entities,
+        )
+    )
     energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
