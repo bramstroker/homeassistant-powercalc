@@ -497,6 +497,8 @@ Each group will have power sensors created for the following lights:
 - Upstairs lights: `light.c`, `light.d`
 - Bedroom Bob lights: `light.d`
 
+> Note: a maximum nesting level of 5 groups is allowed!
+
 #### Dynamically including entities
 
 Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option.
