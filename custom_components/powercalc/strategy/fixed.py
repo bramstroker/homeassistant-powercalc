@@ -55,6 +55,9 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                         if str(entity_state.attributes.get(attribute)) == value:
                             return await evaluate_power(power)
 
+        if self._power is None:
+            return None
+
         return await evaluate_power(self._power)
 
     async def validate_config(self, source_entity: SourceEntity):
