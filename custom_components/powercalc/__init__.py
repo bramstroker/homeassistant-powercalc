@@ -37,6 +37,7 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
+    CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
@@ -75,6 +76,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
+                    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
+                        cv.ensure_list, [cv.string]
+                    ),
                     vol.Optional(
                         CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
