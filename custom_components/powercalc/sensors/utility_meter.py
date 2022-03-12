@@ -7,7 +7,6 @@ import logging
 from homeassistant.components.utility_meter import (
     TariffSelect
 )
-from homeassistant.core import split_entity_id
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.const import (
@@ -18,8 +17,10 @@ from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
 from homeassistant.helpers.typing import HomeAssistantType
 
+from custom_components.powercalc import DEFAULT_ENERGY_SENSOR_PRECISION
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TYPES,
@@ -36,12 +37,11 @@ async def create_utility_meters(
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
-
     utility_meters = []
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return []
-    
+
     if not DATA_UTILITY in hass.data:
         hass.data[DATA_UTILITY] = {}
 
@@ -67,12 +67,12 @@ async def create_utility_meters(
                 utility_meter = await create_utility_meter(hass, energy_sensor.entity_id, entity_id, name, sensor_config, meter_type, unique_id, tariff, tariff_select.entity_id)
                 tariff_sensors.append(utility_meter)
                 utility_meters.append(utility_meter)
-        
+
         else:
             utility_meter = await create_utility_meter(hass, energy_sensor.entity_id, entity_id, name, sensor_config, meter_type, unique_id)
             tariff_sensors.append(utility_meter)
             utility_meters.append(utility_meter)
-        
+
         hass.data[DATA_UTILITY][entity_id] = {
             DATA_TARIFF_SENSORS: tariff_sensors
         }
@@ -120,6 +120,7 @@ async def create_utility_meter(
         params["delta_values"] = False
 
     utility_meter = VirtualUtilityMeter(**params)
+    setattr(utility_meter, 'rounding_digits', sensor_config.get(CONF_ENERGY_SENSOR_PRECISION))
 
     if unique_id:
         # Set new unique id if this entity already exists in the entity registry
@@ -132,6 +133,8 @@ async def create_utility_meter(
 
 
 class VirtualUtilityMeter(UtilityMeterSensor):
+    rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
+
     @property
     def unique_id(self):
         """Return the unique id."""
@@ -141,3 +144,11 @@ class VirtualUtilityMeter(UtilityMeterSensor):
     def unique_id(self, value):
         """Set unique id."""
         self._attr_unique_id = value
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.rounding_digits and self._state:
+            return round(self._state, self.rounding_digits)
+
+        return self._state
