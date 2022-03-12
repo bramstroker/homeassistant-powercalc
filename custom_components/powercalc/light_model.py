@@ -90,7 +90,7 @@ class LightModel:
 
         manufacturer_directory = (
             MANUFACTURER_DIRECTORY_MAPPING.get(self._manufacturer) or self._manufacturer
-        )
+        ).lower()
 
         model_directory = self._model
         if isinstance(
