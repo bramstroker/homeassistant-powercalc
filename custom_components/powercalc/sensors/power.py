@@ -312,11 +312,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             or state.state == STATE_UNKNOWN
             or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
         ):
-            _LOGGER.debug("%s: Source entity has an invalid state, setting power sensor to unavailable", trigger_entity_id)
+            _LOGGER.debug(
+                "%s: Source entity has an invalid state, setting power sensor to unavailable",
+                trigger_entity_id,
+            )
             self._power = None
             self.async_write_ha_state()
             return False
-        
+
         self._power = await self.calculate_power(state)
 
         _LOGGER.debug(
