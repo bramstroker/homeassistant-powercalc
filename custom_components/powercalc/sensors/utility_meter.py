@@ -12,12 +12,13 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
-from homeassistant.core import split_entity_id
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import HomeAssistantType
 
+from custom_components.powercalc import DEFAULT_ENERGY_SENSOR_PRECISION
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -34,7 +35,6 @@ async def create_utility_meters(
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
-
     utility_meters = []
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
@@ -103,7 +103,7 @@ async def create_utility_meter(
     name: str,
     sensor_config: dict,
     meter_type: str,
-    unique_id=None,
+    unique_id: str = None,
     tariff: str = None,
     tariff_entity: str = None,
 ) -> VirtualUtilityMeter:
@@ -137,6 +137,7 @@ async def create_utility_meter(
         params["delta_values"] = False
 
     utility_meter = VirtualUtilityMeter(**params)
+    setattr(utility_meter, 'rounding_digits', sensor_config.get(CONF_ENERGY_SENSOR_PRECISION))
 
     if unique_id:
         # Set new unique id if this entity already exists in the entity registry
@@ -149,6 +150,8 @@ async def create_utility_meter(
 
 
 class VirtualUtilityMeter(UtilityMeterSensor):
+    rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
+
     @property
     def unique_id(self):
         """Return the unique id."""
@@ -158,3 +161,11 @@ class VirtualUtilityMeter(UtilityMeterSensor):
     def unique_id(self, value):
         """Set unique id."""
         self._attr_unique_id = value
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.rounding_digits and self._state:
+            return round(self._state, self.rounding_digits)
+
+        return self._state
