@@ -50,6 +50,7 @@ CONF_DISABLE_STANDBY_POWER = "disable_standby_power"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_OFFSET = "utility_meter_offset"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
+CONF_UTILITY_METER_TARIFFS = "utility_meter_tariffs"
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_LIGHT_MODEL = "light_model"

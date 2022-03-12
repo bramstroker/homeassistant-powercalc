@@ -93,6 +93,7 @@ They are as follows:
 | create_utility_meters     | boolean | **Optional** | Set to disable/enable utility meter creation. When set this will override global setting `create_utility_meters` |
 | utility_meter_types       | list    | **Optional** | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle). This will override global setting `utility_meter_types` |
 | utility_meter_offset      | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
+| utility_meter_tariffs     | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
 | custom_model_directory    | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
 | power_sensor_naming       | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
 | energy_sensor_naming      | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
@@ -135,6 +136,7 @@ All these settings are completely optional. You can skip this section if you don
 | energy_sensor_naming      | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
 | create_utility_meters     | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
 | utility_meter_types       | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
+| utility_meter_tariffs     | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
 | energy_integration_method | string  | **Optional** | trapezoid              | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 | energy_sensor_precision   | numeric | **Optional** | 4                      | Number of decimals you want for the energy sensors. See [HA docs](https://www.home-assistant.io/integrations/integration/#round) |
 
