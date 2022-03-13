@@ -139,6 +139,7 @@ All these settings are completely optional. You can skip this section if you don
 | utility_meter_tariffs     | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
 | energy_integration_method | string  | **Optional** | trapezoid              | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 | energy_sensor_precision   | numeric | **Optional** | 4                      | Number of decimals you want for the energy sensors. See [HA docs](https://www.home-assistant.io/integrations/integration/#round) |
+| create_domain_groups      | list    | **Optional** |                        | Create grouped power sensor aggregating all powercalc sensors of given domains, see [Group sensors per domain](#group-sensors-per-domain)
 
 **Example:**
 
