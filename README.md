@@ -66,7 +66,7 @@ After intallation and restarting HA power and energy sensors should appear. When
 
 When your appliance is not supported you have extensive options for manual configuration. These are explained below.
 
-> Note: Manually configuring a entity will override an auto discovered entity
+> Note: Manually configuring an entity will override an auto discovered entity
 
 ## Configuration
 
