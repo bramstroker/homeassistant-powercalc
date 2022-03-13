@@ -21,7 +21,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
-    DEFAULT_ENERGY_SENSOR_PRECISION
+    DEFAULT_ENERGY_SENSOR_PRECISION,
 )
 from custom_components.powercalc.migrate import async_set_unique_id
 from custom_components.powercalc.sensors.energy import EnergySensor
@@ -137,7 +137,11 @@ async def create_utility_meter(
         params["delta_values"] = False
 
     utility_meter = VirtualUtilityMeter(**params)
-    setattr(utility_meter, 'rounding_digits', sensor_config.get(CONF_ENERGY_SENSOR_PRECISION))
+    setattr(
+        utility_meter,
+        "rounding_digits",
+        sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+    )
 
     if unique_id:
         # Set new unique id if this entity already exists in the entity registry

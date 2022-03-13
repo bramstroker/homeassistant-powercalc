@@ -5,7 +5,6 @@ from datetime import timedelta
 from homeassistant.components.integration.sensor import TRAPEZOIDAL_METHOD
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 
-
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 

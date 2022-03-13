@@ -3,28 +3,24 @@
 from __future__ import annotations
 
 import logging
-from homeassistant.core import callback
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity_component import EntityComponent
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components.integration.sensor import (
-    INTEGRATION_METHOD,
-)
+from homeassistant.components.integration.sensor import INTEGRATION_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
-from homeassistant.components.utility_meter.const import (
-    METER_TYPES,
-)
+from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_STARTED
+    EVENT_HOMEASSISTANT_STARTED,
 )
+from homeassistant.core import callback
 from homeassistant.helpers import discovery
+from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .common import create_source_entity, validate_name_pattern
@@ -149,7 +145,8 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
             )
 
         hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STARTED, _create_domain_groups,
+            EVENT_HOMEASSISTANT_STARTED,
+            _create_domain_groups,
         )
 
     return True
@@ -207,7 +204,9 @@ async def autodiscover_entities(
     _LOGGER.debug("Done auto discovering entities")
 
 
-async def create_domain_groups(hass: HomeAssistantType, global_config: dict, domains: list[str]):
+async def create_domain_groups(
+    hass: HomeAssistantType, global_config: dict, domains: list[str]
+):
     """Create group sensors aggregating all power sensors from given domains"""
     component = EntityComponent(_LOGGER, DOMAIN, hass)
     sensor_config = global_config.copy()
@@ -220,12 +219,9 @@ async def create_domain_groups(hass: HomeAssistantType, global_config: dict, dom
         domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
         sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
         group_name = f"All {domain}"
-       
+
         entities = await create_group_sensors(
-            group_name,
-            sensor_config,
-            domain_entities,
-            hass
+            group_name, sensor_config, domain_entities, hass
         )
         await component.async_add_entities(entities)
     return []

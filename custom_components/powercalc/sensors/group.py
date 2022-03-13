@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-
 from decimal import Decimal
 from typing import Callable
 
@@ -41,6 +40,7 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 _LOGGER = logging.getLogger(__name__)
 
+
 async def create_group_sensors(
     group_name: str,
     sensor_config: dict,
@@ -50,16 +50,23 @@ async def create_group_sensors(
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 
-    def _get_filtered_entity_ids_by_class(all_entities: list, default_filters: list[Callable], className) -> list[str]:
+    def _get_filtered_entity_ids_by_class(
+        all_entities: list, default_filters: list[Callable], className
+    ) -> list[str]:
         filters = default_filters.copy()
         filters.append(lambda elm: not isinstance(elm, GroupedSensor))
         filters.append(lambda elm: isinstance(elm, className))
-        return list(map(lambda x: x.entity_id, list(
-            filter(
-                lambda x: all(f(x) for f in filters),
-                all_entities,
+        return list(
+            map(
+                lambda x: x.entity_id,
+                list(
+                    filter(
+                        lambda x: all(f(x) for f in filters),
+                        all_entities,
+                    )
+                ),
             )
-        )))
+        )
 
     group_sensors = []
 
@@ -78,7 +85,9 @@ async def create_group_sensors(
     )
     _LOGGER.debug(f"Creating grouped power sensor: %s", name)
 
-    energy_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, EnergySensor)
+    energy_sensor_ids = _get_filtered_entity_ids_by_class(
+        entities, filters, EnergySensor
+    )
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     energy_unique_id = None
@@ -99,8 +108,6 @@ async def create_group_sensors(
     )
 
     return group_sensors
-
-    
 
 
 class GroupedSensor(SensorEntity):

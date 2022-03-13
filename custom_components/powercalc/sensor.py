@@ -449,7 +449,9 @@ async def create_individual_sensors(
     if not source_entity.domain in hass.data[DOMAIN][DATA_DOMAIN_ENTITIES]:
         hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain] = []
 
-    hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain].extend(entities_to_add)
+    hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain].extend(
+        entities_to_add
+    )
 
     return entities_to_add
 
