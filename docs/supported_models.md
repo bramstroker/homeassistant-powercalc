@@ -1,4 +1,4 @@
-# Supported models (88 total)
+# Supported models (90 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
@@ -24,6 +24,8 @@
 |ikea         |LED1842G3                |TRADFRI bulb E27 WW clear 250lm                                      |lut              |brightness   |
 |ikea         |LED1923R5                |TRADFRI bulb GU10 CWS 345lm                                          |lut              |color_temp,hs|
 |ikea         |LED1924G9                |TRADFRI bulb E27 CWS 806lm                                           |lut              |color_temp,hs|
+|ikea         |LED1925G6                |TRADFRI LED 470 lm E14 RGB                                           |lut              |color_temp,hs|
+|ikea         |LED1949C5                |TRADFRI LED 470 lm E14 white spectrum, opal white                    |lut              |color_temp   |
 |ikea         |LED2002G5                |TRADFRIbulbE14WSglobeopal470lm                                       |lut              |color_temp   |
 |ikea         |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp   |
 |ikea         |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum            |lut              |color_temp   |
@@ -55,7 +57,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |color_temp,hs|
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs           |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness|
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs|
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs           |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs           |
