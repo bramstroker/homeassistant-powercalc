@@ -15,13 +15,13 @@ from homeassistant.const import __short_version__
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc import DEFAULT_ENERGY_SENSOR_PRECISION
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    DEFAULT_ENERGY_SENSOR_PRECISION
 )
 from custom_components.powercalc.migrate import async_set_unique_id
 from custom_components.powercalc.sensors.energy import EnergySensor

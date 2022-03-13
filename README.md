@@ -448,9 +448,28 @@ You can disable the automatic creation of energy sensors with the option `create
 
 ### Multiple entities and grouping
 
+Powercalc provides multiple possibilities to create aggregate group sensors, which sums the power of multiple individual power sensors into one sensor.
+
+- Group sensors per domain
+- Manually defining groups by configuration
+
+#### Group sensors per domain
+
+> Available from v0.19 and higher
+
+Powercalc makes it easy to create a group sensors for all entities of a given domain with the `create_domain_groups` option. For example let's assume you want group sensors for all your lights and media players you can use the following configuration.
+
+```yaml
+powercalc:
+  create_domain_groups:
+    - light
+    - media_player
+```
+
+#### Manually defining groups by configuration
+
 > Available from v0.8 and higher
 
-Two new configuration parameters have been introduced `entities` and `create_group`.
 `entities` will allow you to multiple power sensors in one `powercalc` sensor entry.
 `create_group` will also create a group summing all the underlying entities. Which can directly be used in energy dashboard.
 Each entry under `entities` can use the same configuration as when defined directly under `sensor`
@@ -502,7 +521,7 @@ Each group will have power sensors created for the following lights:
 
 > Note: a maximum nesting level of 5 groups is allowed!
 
-#### Dynamically including entities
+##### Dynamically including entities
 
 Powercalc provides several methods to automatically include a bunch of entities in a group with the `include` option.
 > Note: only entities will be included which are in the supported models list (these can be auto configured). You can combine `include` and `entities` to extend the group with custom configured entities.

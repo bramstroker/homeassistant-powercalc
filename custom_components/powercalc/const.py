@@ -1,17 +1,25 @@
 """The Powercalc constants."""
 
+from datetime import timedelta
+
+from homeassistant.components.integration.sensor import TRAPEZOIDAL_METHOD
+from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
+
+
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
 DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
+DATA_DOMAIN_ENTITIES = "domain_entities"
 
 DUMMY_ENTITY_ID = "dummy"
 
 CONF_AREA = "area"
 CONF_CALIBRATE = "calibrate"
 CONF_CREATE_GROUP = "create_group"
+CONF_CREATE_DOMAIN_GROUPS = "create_domain_groups"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"
@@ -51,6 +59,14 @@ CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_OFFSET = "utility_meter_offset"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
 CONF_UTILITY_METER_TARIFFS = "utility_meter_tariffs"
+
+DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
+DEFAULT_POWER_NAME_PATTERN = "{} power"
+DEFAULT_POWER_SENSOR_PRECISION = 2
+DEFAULT_ENERGY_INTEGRATION_METHOD = TRAPEZOIDAL_METHOD
+DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
+DEFAULT_ENERGY_SENSOR_PRECISION = 4
+DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_LIGHT_MODEL = "light_model"
