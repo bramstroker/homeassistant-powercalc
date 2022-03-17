@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import logging
 from decimal import Decimal
+from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -9,6 +11,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
 )
 from homeassistant.const import (
+    CONF_UNIQUE_ID,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_POWER,
     ENERGY_KILO_WATT_HOUR,
@@ -21,11 +24,90 @@ from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc.const import ATTR_ENTITIES, ATTR_IS_GROUP
-from custom_components.powercalc.sensors.energy import EnergySensor
-from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
+    ATTR_IS_GROUP,
+    CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_PRECISION,
+    CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_PRECISION,
+)
+from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
+from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
+from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
+
+_LOGGER = logging.getLogger(__name__)
+
+
+async def create_group_sensors(
+    group_name: str,
+    sensor_config: dict,
+    entities: list[SensorEntity, RealPowerSensor, RealEnergySensor],
+    hass: HomeAssistantType,
+    filters: list[Callable, None] = [],
+) -> list[GroupedSensor]:
+    """Create grouped power and energy sensors."""
+
+    def _get_filtered_entity_ids_by_class(
+        all_entities: list, default_filters: list[Callable], className
+    ) -> list[str]:
+        filters = default_filters.copy()
+        filters.append(lambda elm: not isinstance(elm, GroupedSensor))
+        filters.append(lambda elm: isinstance(elm, className))
+        return list(
+            map(
+                lambda x: x.entity_id,
+                list(
+                    filter(
+                        lambda x: all(f(x) for f in filters),
+                        all_entities,
+                    )
+                ),
+            )
+        )
+
+    group_sensors = []
+
+    power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
+    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
+    name = name_pattern.format(group_name)
+    unique_id = sensor_config.get(CONF_UNIQUE_ID)
+    group_sensors.append(
+        GroupedPowerSensor(
+            name,
+            power_sensor_ids,
+            hass,
+            unique_id=unique_id,
+            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        )
+    )
+    _LOGGER.debug(f"Creating grouped power sensor: %s", name)
+
+    energy_sensor_ids = _get_filtered_entity_ids_by_class(
+        entities, filters, EnergySensor
+    )
+    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
+    name = name_pattern.format(group_name)
+    energy_unique_id = None
+    if unique_id:
+        energy_unique_id = f"{unique_id}_energy"
+    group_energy_sensor = GroupedEnergySensor(
+        name,
+        energy_sensor_ids,
+        hass,
+        unique_id=energy_unique_id,
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+    )
+    group_sensors.append(group_energy_sensor)
+    _LOGGER.debug("Creating grouped energy sensor: %s", name)
+
+    group_sensors.extend(
+        await create_utility_meters(hass, group_energy_sensor, sensor_config)
+    )
+
+    return group_sensors
 
 
 class GroupedSensor(SensorEntity):

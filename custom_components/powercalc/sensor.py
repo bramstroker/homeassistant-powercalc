@@ -69,7 +69,6 @@ from .const import (
     CONF_DISABLE_STANDBY_POWER,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
-    CONF_ENERGY_SENSOR_PRECISION,
     CONF_FIXED,
     CONF_GROUP,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -83,7 +82,6 @@ from .const import (
     CONF_ON_TIME,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
-    CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
@@ -94,6 +92,7 @@ from .const import (
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DOMAIN_ENTITIES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -110,8 +109,8 @@ from .sensors.energy import (
     create_daily_fixed_energy_sensor,
     create_energy_sensor,
 )
-from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
+from .sensors.group import create_group_sensors
+from .sensors.power import RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -447,69 +446,14 @@ async def create_individual_sensors(
             ),
         )
 
+    if not source_entity.domain in hass.data[DOMAIN][DATA_DOMAIN_ENTITIES]:
+        hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain] = []
+
+    hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain].extend(
+        entities_to_add
+    )
+
     return entities_to_add
-
-
-async def create_group_sensors(
-    group_name: str,
-    sensor_config: dict,
-    entities: list[SensorEntity, RealPowerSensor],
-    hass: HomeAssistantType,
-) -> list[GroupedSensor]:
-    """Create grouped power and energy sensors."""
-
-    group_sensors = []
-
-    power_sensors = list(
-        filter(
-            lambda elm: isinstance(elm, PowerSensor)
-            and not isinstance(elm, GroupedPowerSensor),
-            entities,
-        )
-    )
-    power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
-    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
-    name = name_pattern.format(group_name)
-    unique_id = sensor_config.get(CONF_UNIQUE_ID)
-    group_sensors.append(
-        GroupedPowerSensor(
-            name,
-            power_sensor_ids,
-            hass,
-            unique_id=unique_id,
-            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
-        )
-    )
-    _LOGGER.debug(f"Creating grouped power sensor: %s", name)
-
-    energy_sensors = list(
-        filter(
-            lambda elm: isinstance(elm, EnergySensor)
-            and not isinstance(elm, GroupedEnergySensor),
-            entities,
-        )
-    )
-    energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
-    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
-    name = name_pattern.format(group_name)
-    energy_unique_id = None
-    if unique_id:
-        energy_unique_id = f"{unique_id}_energy"
-    group_energy_sensor = GroupedEnergySensor(
-        name,
-        energy_sensor_ids,
-        hass,
-        unique_id=energy_unique_id,
-        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-    )
-    group_sensors.append(group_energy_sensor)
-    _LOGGER.debug("Creating grouped energy sensor: %s", name)
-
-    group_sensors.extend(
-        await create_utility_meters(hass, group_energy_sensor, sensor_config)
-    )
-
-    return group_sensors
 
 
 def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
