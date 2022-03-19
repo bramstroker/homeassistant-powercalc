@@ -71,6 +71,7 @@
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                                |lut              |color_temp   |
 |signify      |LTC012                   |Hue Struana Ceiling Light                                            |lut              |color_temp   |
 |signify      |LTG002                   |Hue White Ambiance GU10 w/ BT                                        |lut              |color_temp   |
+|signify      |LTO001                   |Hue G93 E27 Filament Globe Bulb                                      |lut              |color_temp   |
 |signify      |LTP003                   |Hue Fair Pendant                                                     |lut              |color_temp   |
 |signify      |LTW001                   |Hue White Ambiance A19                                               |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A                         |lut              |color_temp   |
