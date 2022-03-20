@@ -104,10 +104,7 @@ from .errors import (
     SensorConfigurationError,
 )
 from .model_discovery import is_supported_model
-from .sensors.energy import (
-    create_daily_fixed_energy_sensor,
-    create_energy_sensor,
-)
+from .sensors.energy import create_daily_fixed_energy_sensor, create_energy_sensor
 from .sensors.group import create_group_sensors
 from .sensors.power import RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters

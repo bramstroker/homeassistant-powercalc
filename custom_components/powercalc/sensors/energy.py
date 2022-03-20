@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from awesomeversion.awesomeversion import AwesomeVersion
-
-from homeassistant.const import __version__ as HA_VERSION
-
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
 import homeassistant.helpers.entity_registry as er
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
@@ -22,6 +19,7 @@ from homeassistant.const import (
     POWER_WATT,
     TIME_HOURS,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
@@ -41,7 +39,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
-    DEFAULT_ENERGY_INTEGRATION_METHOD
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor

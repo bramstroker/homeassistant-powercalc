@@ -51,7 +51,7 @@ from .const import (
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
-    ENERGY_INTEGRATION_METHODS
+    ENERGY_INTEGRATION_METHODS,
 )
 from .errors import ModelNotSupported
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
