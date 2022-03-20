@@ -1,2 +1,5 @@
 .idea
 __pycache__
+
+# Auto generated on macOS
+.DS_Store

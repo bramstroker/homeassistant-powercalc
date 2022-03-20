@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly plug s",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.18.4:docker"
+    },
+    "name": "Hue G93 E27 Filament Globe Bulb",
+    "standby_power": 0.17,
+    "supported_modes": [
+        "lut"
+    ]
+}
