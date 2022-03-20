@@ -27,7 +27,6 @@ from homeassistant.components import (
     water_heater,
 )
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
-from homeassistant.components.integration.sensor import INTEGRATION_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -97,6 +96,7 @@ from .const import (
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
+    ENERGY_INTEGRATION_METHODS,
 )
 from .errors import (
     PowercalcSetupError,
@@ -105,7 +105,6 @@ from .errors import (
 )
 from .model_discovery import is_supported_model
 from .sensors.energy import (
-    EnergySensor,
     create_daily_fixed_energy_sensor,
     create_energy_sensor,
 )
@@ -182,7 +181,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(INTEGRATION_METHOD),
+    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
