@@ -7,7 +7,6 @@ import logging
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components.integration.sensor import INTEGRATION_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
@@ -52,6 +51,7 @@ from .const import (
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
+    ENERGY_INTEGRATION_METHODS
 )
 from .errors import ModelNotSupported
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
@@ -87,7 +87,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD,
                         default=DEFAULT_ENERGY_INTEGRATION_METHOD,
-                    ): vol.In(INTEGRATION_METHOD),
+                    ): vol.In(ENERGY_INTEGRATION_METHODS),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_PRECISION,
                         default=DEFAULT_ENERGY_SENSOR_PRECISION,
