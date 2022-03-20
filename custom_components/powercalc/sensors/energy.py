@@ -165,7 +165,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         powercalc_source_entity: str,
         powercalc_source_domain: str,
     ):
-        if AwesomeVersion(HA_VERSION) <= AwesomeVersion("2022.3"):
+        if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.4"):
             super().__init__(
                 source_entity=source_entity,
                 name=name,
