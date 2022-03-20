@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION
+
 import logging
 import uuid
 from datetime import timedelta
@@ -454,6 +457,9 @@ async def create_individual_sensors(
 
 def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
     """Attach all the power/energy sensors to the same device as the source entity"""
+
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.2"):
+        return
 
     for entity in entities:
         ent_reg = entity_registry.async_get(hass)

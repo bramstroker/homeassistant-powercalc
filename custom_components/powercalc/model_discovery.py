@@ -9,8 +9,6 @@ from typing import NamedTuple, Optional
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
-from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
