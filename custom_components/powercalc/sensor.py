@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.const import __version__ as HA_VERSION
-
 import logging
 import uuid
 from datetime import timedelta
@@ -12,6 +9,7 @@ from typing import Final, cast
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -47,6 +45,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
     POWER_WATT,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_component import EntityComponent
