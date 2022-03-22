@@ -7,6 +7,7 @@ from typing import Optional
 import voluptuous as vol
 from homeassistant.core import State
 from homeassistant.helpers import entity_registry
+from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
@@ -79,8 +80,8 @@ class WledStrategy(PowerCalculationStrategyInterface):
 
         raise StrategyConfigurationError("{No estimated current entity found")
 
-    def get_entities_to_track(self) -> tuple:
-        return {self._estimated_current_entity}
+    def get_entities_to_track(self) -> list[str, TrackTemplate]:
+        return [self._estimated_current_entity]
 
     def can_calculate_standby(self) -> bool:
         return True

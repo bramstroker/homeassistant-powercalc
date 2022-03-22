@@ -7,6 +7,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components import climate, vacuum
 from homeassistant.core import State
+from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
@@ -70,3 +71,9 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             raise StrategyConfigurationError(
                 "This entity can only work with 'states_power' not 'power'"
             )
+    
+    def get_entities_to_track(self) -> tuple[str, TrackTemplate]:
+        if isinstance(self._power, Template):
+            return [TrackTemplate(self._power, None)]
+        
+        return []

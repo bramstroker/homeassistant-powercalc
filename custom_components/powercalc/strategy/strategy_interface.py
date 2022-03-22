@@ -4,6 +4,7 @@ from typing import Optional
 from homeassistant.core import State
 
 from custom_components.powercalc.common import SourceEntity
+from homeassistant.helpers.event import TrackTemplate
 
 
 class PowerCalculationStrategyInterface:
@@ -15,8 +16,8 @@ class PowerCalculationStrategyInterface:
         """Validate correct setup of the strategy"""
         pass
 
-    def get_entities_to_track(self) -> tuple:
-        return {}
+    def get_entities_to_track(self) -> list[str, TrackTemplate]:
+        return []
 
     def can_calculate_standby(self) -> bool:
         return False
