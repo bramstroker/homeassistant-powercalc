@@ -4,11 +4,20 @@ import inspect
 import logging
 from typing import cast
 
-from homeassistant.components.utility_meter import TariffSelect
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+    from homeassistant.components.utility_meter.select import TariffSelect
+    from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
+else:
+    from homeassistant.components.utility_meter import TariffSelect
+
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
 )
+
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
@@ -60,8 +69,16 @@ async def create_utility_meters(
             utility_meter_component = cast(
                 EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
             )
-            tariff_select = TariffSelect(name, list(tariffs))
-            await utility_meter_component.async_add_entities([tariff_select])
+
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+                select_component = cast(
+                    EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
+                )
+                tariff_select = TariffSelect(name, list(tariffs), utility_meter_component.async_add_entities)
+                await select_component.async_add_entities([tariff_select])
+            else:
+                tariff_select = TariffSelect(name, list(tariffs))
+                await utility_meter_component.async_add_entities([tariff_select])
 
             for tariff in tariffs:
                 utility_meter = await create_utility_meter(
