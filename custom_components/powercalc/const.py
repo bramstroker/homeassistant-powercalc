@@ -108,6 +108,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "OSRAM": "osram",
     "Signify Netherlands B.V.": "signify",
     "Aqara": "aqara",
+    "Lexman": "lexman",
 }
 
 MANUFACTURER_ALIASES = {
@@ -115,6 +116,7 @@ MANUFACTURER_ALIASES = {
     "IKEA": "IKEA of Sweden",
     "Xiaomi": "Aqara",
     "LUMI": "Aqara",
+    "ADEO": "Lexman",
 }
 
 MODEL_DIRECTORY_MAPPING = {
