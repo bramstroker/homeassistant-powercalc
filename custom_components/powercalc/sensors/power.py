@@ -280,14 +280,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             new_state = event.data.get("new_state")
 
             await self._update_power_sensor(self._source_entity, new_state)
-        
+
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
 
         async def home_assistant_startup(event):
             """Add listeners and get initial state."""
-            tracked_entities = [entity for entity in self._power_calculator.get_entities_to_track() if isinstance(entity, str)]
+            tracked_entities = [
+                entity
+                for entity in self._power_calculator.get_entities_to_track()
+                if isinstance(entity, str)
+            ]
             if not tracked_entities:
                 tracked_entities = [self._source_entity]
 
@@ -295,7 +299,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self.hass, tracked_entities, appliance_state_listener
             )
 
-            track_templates = [template for template in self._power_calculator.get_entities_to_track() if isinstance(template, TrackTemplate)]
+            track_templates = [
+                template
+                for template in self._power_calculator.get_entities_to_track()
+                if isinstance(template, TrackTemplate)
+            ]
             if track_templates:
                 result_info = async_track_template_result(
                     self.hass,

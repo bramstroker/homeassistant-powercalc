@@ -71,9 +71,9 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             raise StrategyConfigurationError(
                 "This entity can only work with 'states_power' not 'power'"
             )
-    
+
     def get_entities_to_track(self) -> tuple[str, TrackTemplate]:
         if isinstance(self._power, Template):
             return [TrackTemplate(self._power, None)]
-        
+
         return []
