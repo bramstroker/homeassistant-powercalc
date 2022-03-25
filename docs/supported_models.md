@@ -1,4 +1,4 @@
-# Supported models (92 total)
+# Supported models (93 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
@@ -35,6 +35,7 @@
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                              |lut              |hs,color_temp|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                               |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp   |
+|lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp|
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp|
 |lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |hs,color_temp|
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |hs,color_temp|
