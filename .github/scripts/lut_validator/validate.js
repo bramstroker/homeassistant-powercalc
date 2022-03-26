@@ -37,7 +37,7 @@ const validateMaxBrightness = (parsedCsv) => {
   brightnessValues = parsedCsv['data'].map((row) => row['bri'])
   maxBrightness = Math.max(...brightnessValues)
   if (maxBrightness < 250) {
-    throw new Error('Max brightness level is less than 255. Measurements probably not finished completely')
+    throw new Error('Max brightness level ' + maxBrightness + ' is less than 250. Measurements probably not finished completely')
   }
 }
 
