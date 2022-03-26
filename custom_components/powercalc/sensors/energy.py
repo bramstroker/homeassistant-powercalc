@@ -6,10 +6,8 @@ from decimal import Decimal
 from typing import Any, Optional
 
 import homeassistant.helpers.entity_registry as er
-from homeassistant.components.integration.sensor import (
-    TRAPEZOIDAL_METHOD,
-    IntegrationSensor,
-)
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
 from homeassistant.const import (
@@ -21,6 +19,7 @@ from homeassistant.const import (
     POWER_WATT,
     TIME_HOURS,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
@@ -40,6 +39,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -95,7 +95,7 @@ async def create_energy_sensor(
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
-        or TRAPEZOIDAL_METHOD,
+        or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )
@@ -165,20 +165,33 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         powercalc_source_entity: str,
         powercalc_source_domain: str,
     ):
-        super().__init__(
-            source_entity,
-            name,
-            round_digits,
-            unit_prefix,
-            unit_time,
-            unit_of_measurement,
-            integration_method,
-        )
+        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+            super().__init__(
+                source_entity=source_entity,
+                name=name,
+                round_digits=round_digits,
+                unit_prefix=unit_prefix,
+                unit_time=unit_time,
+                unit_of_measurement=unit_of_measurement,
+                integration_method=integration_method,
+                unique_id=unique_id,
+            )
+        else:
+            super().__init__(
+                source_entity=source_entity,
+                name=name,
+                round_digits=round_digits,
+                unit_prefix=unit_prefix,
+                unit_time=unit_time,
+                unit_of_measurement=unit_of_measurement,
+                integration_method=integration_method,
+            )
+            if unique_id:
+                self._attr_unique_id = unique_id
+
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
-        if unique_id:
-            self._attr_unique_id = unique_id
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

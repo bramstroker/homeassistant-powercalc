@@ -1,4 +1,4 @@
-# Supported models (88 total)
+# Supported models (93 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
@@ -24,6 +24,8 @@
 |ikea         |LED1842G3                |TRADFRI bulb E27 WW clear 250lm                                      |lut              |brightness   |
 |ikea         |LED1923R5                |TRADFRI bulb GU10 CWS 345lm                                          |lut              |color_temp,hs|
 |ikea         |LED1924G9                |TRADFRI bulb E27 CWS 806lm                                           |lut              |color_temp,hs|
+|ikea         |LED1925G6                |TRADFRI LED 470 lm E14 RGB                                           |lut              |color_temp,hs|
+|ikea         |LED1949C5                |TRADFRI LED 470 lm E14 white spectrum, opal white                    |lut              |color_temp   |
 |ikea         |LED2002G5                |TRADFRIbulbE14WSglobeopal470lm                                       |lut              |color_temp   |
 |ikea         |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp   |
 |ikea         |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum            |lut              |color_temp   |
@@ -33,6 +35,7 @@
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                              |lut              |color_temp,hs|
 |innr         |RS 125                   |RS125 GU10 350lm 2700K                                               |lut              |brightness   |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp   |
+|lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |color_temp,hs|
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |color_temp,hs|
 |lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |color_temp,hs|
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |color_temp,hs|
@@ -55,7 +58,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |color_temp,hs|
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs           |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs|
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness|
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs           |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs           |
@@ -69,6 +72,7 @@
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                                |lut              |color_temp   |
 |signify      |LTC012                   |Hue Struana Ceiling Light                                            |lut              |color_temp   |
 |signify      |LTG002                   |Hue White Ambiance GU10 w/ BT                                        |lut              |color_temp   |
+|signify      |LTO001                   |Hue G93 E27 Filament Globe Bulb                                      |lut              |color_temp   |
 |signify      |LTP003                   |Hue Fair Pendant                                                     |lut              |color_temp   |
 |signify      |LTW001                   |Hue White Ambiance A19                                               |lut              |color_temp   |
 |signify      |LTW010                   |Hue White Ambiance A60 E27 806lm 9290012001A                         |lut              |color_temp   |
@@ -88,4 +92,5 @@
 |signify      |LWO003                   |Hue White Filament Bulb G125 E27 w/ BT                               |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp   |
+|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs|
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness   |

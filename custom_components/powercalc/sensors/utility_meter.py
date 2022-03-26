@@ -2,26 +2,34 @@ from __future__ import annotations
 
 import inspect
 import logging
+from typing import cast
 
-from homeassistant.components.sensor import ENTITY_ID_FORMAT
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+    from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
+    from homeassistant.components.utility_meter.select import TariffSelect
+else:
+    from homeassistant.components.utility_meter import TariffSelect
+
 from homeassistant.components.utility_meter.const import (
-    CONF_METER_NET_CONSUMPTION,
-    CONF_METER_TYPE,
-    CONF_SOURCE_SENSOR,
-    CONF_TARIFFS,
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
 )
+from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
-from homeassistant.helpers.entity import async_generate_entity_id
-from homeassistant.helpers.entity_registry import async_get
+from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
+    CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    DEFAULT_ENERGY_SENSOR_PRECISION,
 )
 from custom_components.powercalc.migrate import async_set_unique_id
 from custom_components.powercalc.sensors.energy import EnergySensor
@@ -40,67 +48,146 @@ async def create_utility_meters(
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return []
 
+    if not DATA_UTILITY in hass.data:
+        hass.data[DATA_UTILITY] = {}
+
+    tariffs = sensor_config.get(CONF_UTILITY_METER_TARIFFS)
     meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
     for meter_type in meter_types:
+        tariff_sensors = []
+
         name = f"{energy_sensor.name} {meter_type}"
         entity_id = f"{energy_sensor.entity_id}_{meter_type}"
-        _LOGGER.debug(f"Creating utility_meter sensor: {name} (entity_id={entity_id})")
-
-        if not DATA_UTILITY in hass.data:
-            hass.data[DATA_UTILITY] = {}
-        hass.data[DATA_UTILITY][entity_id] = {
-            CONF_SOURCE_SENSOR: energy_sensor.entity_id,
-            CONF_METER_TYPE: meter_type,
-            CONF_TARIFFS: [],
-            CONF_METER_NET_CONSUMPTION: False,
-        }
-
-        params = {
-            "source_entity": energy_sensor.entity_id,
-            "name": name,
-            "meter_type": meter_type,
-            "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
-            "net_consumption": False,
-        }
-
-        signature = inspect.signature(UtilityMeterSensor.__init__)
-        if "parent_meter" in signature.parameters:
-            params["parent_meter"] = entity_id
-        if "delta_values" in signature.parameters:
-            params["delta_values"] = False
-
-        utility_meter = VirtualUtilityMeter(**params)
-
+        unique_id = None
         if energy_sensor.unique_id:
             unique_id = f"{energy_sensor.unique_id}_{meter_type}"
-            # Set new unique id if this entity already exists in the entity registry
-            async_set_unique_id(hass, entity_id, unique_id)
-            utility_meter.unique_id = unique_id
 
-        # Migrate entity_id to new naming
-        old_entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
-        ent_reg = async_get(hass)
-        if ent_reg.async_get(old_entity_id) and entity_id != old_entity_id:
-            _LOGGER.debug(
-                f"Migrating utility_meter entity_id from {old_entity_id} to {entity_id}"
+        if tariffs:
+            # create tariff selection entity
+            _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
+            utility_meter_component = cast(
+                EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
             )
-            ent_reg.async_update_entity(old_entity_id, new_entity_id=entity_id)
 
-        utility_meter.entity_id = entity_id
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+                select_component = cast(
+                    EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
+                )
+                tariff_select = TariffSelect(
+                    name, list(tariffs), utility_meter_component.async_add_entities
+                )
+                await select_component.async_add_entities([tariff_select])
+            else:
+                tariff_select = TariffSelect(name, list(tariffs))
+                await utility_meter_component.async_add_entities([tariff_select])
 
-        hass.data[DATA_UTILITY][entity_id][DATA_TARIFF_SENSORS] = [utility_meter]
-        utility_meters.append(utility_meter)
+            for tariff in tariffs:
+                utility_meter = await create_utility_meter(
+                    hass,
+                    energy_sensor.entity_id,
+                    entity_id,
+                    name,
+                    sensor_config,
+                    meter_type,
+                    unique_id,
+                    tariff,
+                    tariff_select.entity_id,
+                )
+                tariff_sensors.append(utility_meter)
+                utility_meters.append(utility_meter)
+
+        else:
+            utility_meter = await create_utility_meter(
+                hass,
+                energy_sensor.entity_id,
+                entity_id,
+                name,
+                sensor_config,
+                meter_type,
+                unique_id,
+            )
+            tariff_sensors.append(utility_meter)
+            utility_meters.append(utility_meter)
+
+        hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
 
     return utility_meters
 
 
+async def create_utility_meter(
+    hass: HomeAssistantType,
+    source_entity: str,
+    entity_id: str,
+    name: str,
+    sensor_config: dict,
+    meter_type: str,
+    unique_id: str = None,
+    tariff: str = None,
+    tariff_entity: str = None,
+) -> VirtualUtilityMeter:
+    """Create a utility meter entity, one per tariff"""
+
+    parent_meter = entity_id
+    if tariff:
+        name = f"{name} {tariff}"
+        entity_id = f"{entity_id}_{tariff}"
+        if unique_id:
+            unique_id = f"{unique_id}_{tariff}"
+
+    _LOGGER.debug(f"Creating utility_meter sensor: {name} (entity_id={entity_id})")
+
+    params = {
+        "source_entity": source_entity,
+        "name": name,
+        "meter_type": meter_type,
+        "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
+        "net_consumption": False,
+    }
+
+    if tariff:
+        params["tariff"] = tariff
+        params["tariff_entity"] = tariff_entity
+
+    signature = inspect.signature(UtilityMeterSensor.__init__)
+    if "parent_meter" in signature.parameters:
+        params["parent_meter"] = parent_meter
+    if "delta_values" in signature.parameters:
+        params["delta_values"] = False
+
+    utility_meter = VirtualUtilityMeter(**params)
+    setattr(
+        utility_meter,
+        "rounding_digits",
+        sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+    )
+
+    if unique_id:
+        # Set new unique id if this entity already exists in the entity registry
+        async_set_unique_id(hass, entity_id, unique_id)
+        utility_meter.unique_id = unique_id
+
+    utility_meter.entity_id = entity_id
+
+    return utility_meter
+
+
 class VirtualUtilityMeter(UtilityMeterSensor):
+    rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
+
     @property
     def unique_id(self):
-        """Return the name of the group."""
+        """Return the unique id."""
         return self._attr_unique_id
 
     @unique_id.setter
     def unique_id(self, value):
-        """Set last changed datetime."""
+        """Set unique id."""
         self._attr_unique_id = value
+
+    @property
+    def native_value(self):
+        """Return the state of the sensor."""
+        if self.rounding_digits and self._state:
+            return round(self._state, self.rounding_digits)
+
+        return self._state

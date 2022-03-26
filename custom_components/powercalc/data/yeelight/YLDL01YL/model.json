@@ -4,11 +4,11 @@
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
-        "SLEEP_TIME": 2,
-        "VERSION": "v0.18.4:docker"
+        "SLEEP_TIME": 1,
+        "VERSION": "master"
     },
-    "name": "TRADFRIbulbE14WScandleopal470lm",
-    "standby_power": 0.2,
+    "name": "Yeelight YLDL01YL Downlight",
+    "standby_power": 0.72,
     "supported_modes": [
         "lut"
     ]

@@ -18,6 +18,7 @@ const main = async () => {
     const rules = await csval.readRules(path.join(__dirname, 'rules/' + colorMode + '.json'));
     try {
       await csval.validate(parsed, rules)
+      validateMaxBrightness(parsed)
     } catch (ex) {
       console.log('Invalid')
       console.log(ex)
@@ -31,5 +32,13 @@ const main = async () => {
     exit(1)
   }
 };
+
+const validateMaxBrightness = (parsedCsv) => {
+  brightnessValues = parsedCsv['data'].map((row) => row['bri'])
+  maxBrightness = Math.max(...brightnessValues)
+  if (maxBrightness < 250) {
+    throw new Error('Max brightness level ' + maxBrightness + ' is less than 250. Measurements probably not finished completely')
+  }
+}
 
 main();

@@ -9,6 +9,7 @@ from typing import Final, cast
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -27,7 +28,6 @@ from homeassistant.components import (
     water_heater,
 )
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
-from homeassistant.components.integration.sensor import INTEGRATION_METHOD
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -45,6 +45,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
     POWER_WATT,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_component import EntityComponent
@@ -69,7 +70,6 @@ from .const import (
     CONF_DISABLE_STANDBY_POWER,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
-    CONF_ENERGY_SENSOR_PRECISION,
     CONF_FIXED,
     CONF_GROUP,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -83,20 +83,22 @@ from .const import (
     CONF_ON_TIME,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
-    CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
+    CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DOMAIN_ENTITIES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
+    ENERGY_INTEGRATION_METHODS,
 )
 from .errors import (
     PowercalcSetupError,
@@ -104,13 +106,9 @@ from .errors import (
     SensorConfigurationError,
 )
 from .model_discovery import is_supported_model
-from .sensors.energy import (
-    EnergySensor,
-    create_daily_fixed_energy_sensor,
-    create_energy_sensor,
-)
-from .sensors.group import GroupedEnergySensor, GroupedPowerSensor, GroupedSensor
-from .sensors.power import PowerSensor, RealPowerSensor, create_power_sensor
+from .sensors.energy import create_daily_fixed_energy_sensor, create_energy_sensor
+from .sensors.group import create_group_sensors
+from .sensors.power import RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -169,6 +167,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
+    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
+        cv.ensure_list, [cv.string]
+    ),
     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
         cv.ensure_list, [vol.In(METER_TYPES)]
     ),
@@ -179,7 +180,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY, default=False): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
-    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(INTEGRATION_METHOD),
+    vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
@@ -443,73 +444,21 @@ async def create_individual_sensors(
             ),
         )
 
+    if not source_entity.domain in hass.data[DOMAIN][DATA_DOMAIN_ENTITIES]:
+        hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain] = []
+
+    hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain].extend(
+        entities_to_add
+    )
+
     return entities_to_add
-
-
-async def create_group_sensors(
-    group_name: str,
-    sensor_config: dict,
-    entities: list[SensorEntity, RealPowerSensor],
-    hass: HomeAssistantType,
-) -> list[GroupedSensor]:
-    """Create grouped power and energy sensors."""
-
-    group_sensors = []
-
-    power_sensors = list(
-        filter(
-            lambda elm: isinstance(elm, PowerSensor)
-            and not isinstance(elm, GroupedPowerSensor),
-            entities,
-        )
-    )
-    power_sensor_ids = list(map(lambda x: x.entity_id, power_sensors))
-    name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
-    name = name_pattern.format(group_name)
-    unique_id = sensor_config.get(CONF_UNIQUE_ID)
-    group_sensors.append(
-        GroupedPowerSensor(
-            name,
-            power_sensor_ids,
-            hass,
-            unique_id=unique_id,
-            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
-        )
-    )
-    _LOGGER.debug(f"Creating grouped power sensor: %s", name)
-
-    energy_sensors = list(
-        filter(
-            lambda elm: isinstance(elm, EnergySensor)
-            and not isinstance(elm, GroupedEnergySensor),
-            entities,
-        )
-    )
-    energy_sensor_ids = list(map(lambda x: x.entity_id, energy_sensors))
-    name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
-    name = name_pattern.format(group_name)
-    energy_unique_id = None
-    if unique_id:
-        energy_unique_id = f"{unique_id}_energy"
-    group_energy_sensor = GroupedEnergySensor(
-        name,
-        energy_sensor_ids,
-        hass,
-        unique_id=energy_unique_id,
-        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-    )
-    group_sensors.append(group_energy_sensor)
-    _LOGGER.debug("Creating grouped energy sensor: %s", name)
-
-    group_sensors.extend(
-        await create_utility_meters(hass, group_energy_sensor, sensor_config)
-    )
-
-    return group_sensors
 
 
 def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
     """Attach all the power/energy sensors to the same device as the source entity"""
+
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.2"):
+        return
 
     for entity in entities:
         ent_reg = entity_registry.async_get(hass)

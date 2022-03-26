@@ -3,31 +3,28 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components.integration.sensor import (
-    INTEGRATION_METHOD,
-    TRAPEZOIDAL_METHOD,
-)
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
-from homeassistant.components.utility_meter.const import (
-    DAILY,
-    METER_TYPES,
-    MONTHLY,
-    WEEKLY,
+from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.const import (
+    CONF_ENTITY_ID,
+    CONF_SCAN_INTERVAL,
+    CONF_UNIQUE_ID,
+    EVENT_HOMEASSISTANT_STARTED,
 )
-from homeassistant.const import CONF_ENTITY_ID, CONF_SCAN_INTERVAL
+from homeassistant.core import callback
 from homeassistant.helpers import discovery
+from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import HomeAssistantType
-from pyexpat import model
 
 from .common import create_source_entity, validate_name_pattern
 from .const import (
+    CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
@@ -37,26 +34,29 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
+    CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DOMAIN_ENTITIES,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
+    DEFAULT_ENERGY_NAME_PATTERN,
+    DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_POWER_NAME_PATTERN,
+    DEFAULT_POWER_SENSOR_PRECISION,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_LIGHT_MODEL,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
+    ENERGY_INTEGRATION_METHODS,
 )
 from .errors import ModelNotSupported
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
+from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
-
-DEFAULT_SCAN_INTERVAL = timedelta(minutes=10)
-DEFAULT_POWER_NAME_PATTERN = "{} power"
-DEFAULT_POWER_SENSOR_PRECISION = 2
-DEFAULT_ENERGY_INTEGRATION_METHOD = TRAPEZOIDAL_METHOD
-DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
-DEFAULT_ENERGY_SENSOR_PRECISION = 4
-DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -75,6 +75,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
+                    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
+                        cv.ensure_list, [cv.string]
+                    ),
                     vol.Optional(
                         CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
@@ -84,7 +87,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD,
                         default=DEFAULT_ENERGY_INTEGRATION_METHOD,
-                    ): vol.In(INTEGRATION_METHOD),
+                    ): vol.In(ENERGY_INTEGRATION_METHODS),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_PRECISION,
                         default=DEFAULT_ENERGY_SENSOR_PRECISION,
@@ -93,6 +96,9 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_POWER_SENSOR_PRECISION,
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
+                    vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
+                        cv.ensure_list, [cv.string]
+                    ),
                 }
             ),
         )
@@ -111,6 +117,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+        CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENABLE_AUTODISCOVERY: True,
@@ -122,10 +129,25 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
+        DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: [],
     }
 
     await autodiscover_entities(config, domain_config, hass)
+
+    if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
+
+        async def _create_domain_groups(event: None):
+            await create_domain_groups(
+                hass,
+                domain_config,
+                domain_config.get(CONF_CREATE_DOMAIN_GROUPS),
+            )
+
+        hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STARTED,
+            _create_domain_groups,
+        )
 
     return True
 
@@ -180,3 +202,26 @@ async def autodiscover_entities(
         )
 
     _LOGGER.debug("Done auto discovering entities")
+
+
+async def create_domain_groups(
+    hass: HomeAssistantType, global_config: dict, domains: list[str]
+):
+    """Create group sensors aggregating all power sensors from given domains"""
+    component = EntityComponent(_LOGGER, SENSOR_DOMAIN, hass)
+    sensor_config = global_config.copy()
+    _LOGGER.debug(f"Setting up domain based group sensors..")
+    for domain in domains:
+        if not domain in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
+            _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")
+            continue
+
+        domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
+        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
+        group_name = f"All {domain}"
+
+        entities = await create_group_sensors(
+            group_name, sensor_config, domain_entities, hass
+        )
+        await component.async_add_entities(entities)
+    return []
