@@ -144,6 +144,8 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 400lm": "LED1837R5",
         "TRADFRI bulb GU10 CWS 345lm": "LED1923R5",
         "TRADFRI bulb E27 CWS 806lm": "LED1924G9",
+        "TRADFRI bulb E14 CWS 470lm": "LED1925G6",
+        "TRADFRIbulbE14WScandleopal470lm": "LED1949C5",
         "TRADFRIbulbE14WSglobeopal470lm": "LED2002G5",
         "TRADFRIbulbE27WSglobeopal1055lm": "LED2003G10",
         "TTRADFRIbulbGU10WS345lm": "LED2005R5",
