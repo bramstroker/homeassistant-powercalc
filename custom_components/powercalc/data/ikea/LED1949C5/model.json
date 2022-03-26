@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.18.4:docker"
     },
-    "name": "TRADFRI bulb E14 W Scandle opal 470lm",
+    "name": "TRADFRI bulb E14 WS candle opal 470lm",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
