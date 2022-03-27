@@ -5,7 +5,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
-# Home Assistant Virtual Power Sensors
+# :zap: PowerCalc: Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.
 Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
