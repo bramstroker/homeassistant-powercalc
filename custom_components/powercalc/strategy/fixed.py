@@ -77,7 +77,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
 
         if isinstance(self._power, Template):
             track_templates.append(TrackTemplate(self._power, None))
-        
+
         if self._per_state_power:
             for power in list(self._per_state_power.values()):
                 if isinstance(power, Template):
