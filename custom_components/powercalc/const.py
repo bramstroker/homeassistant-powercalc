@@ -151,7 +151,6 @@ MODEL_DIRECTORY_MAPPING = {
         "TTRADFRIbulbGU10WS345lm": "LED2005R5",
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
-        "30x90 cm) (L1528": "L1528",
     },
     "Signify Netherlands B.V.": {
         "9290022166": "LCA001",
@@ -169,5 +168,6 @@ MODEL_DIRECTORY_MAPPING = {
         "8718699673147": "LWA001",
         "8718696449691": "LWB010",
         "8719514328242": "LTA004",
+        "8718699703424": "LCL001",
     },
 }

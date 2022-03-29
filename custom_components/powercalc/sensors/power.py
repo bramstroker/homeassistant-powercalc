@@ -290,9 +290,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             entities_to_track = self._power_calculator.get_entities_to_track()
 
             track_entities = [
-                entity
-                for entity in entities_to_track
-                if isinstance(entity, str)
+                entity for entity in entities_to_track if isinstance(entity, str)
             ]
             if not track_entities:
                 track_entities = [self._source_entity]
