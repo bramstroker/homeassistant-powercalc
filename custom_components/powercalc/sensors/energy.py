@@ -33,6 +33,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ON_TIME,
@@ -79,6 +80,7 @@ async def create_energy_sensor(
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
+    entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
     unique_id = None
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
@@ -89,6 +91,7 @@ async def create_energy_sensor(
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
+        entity_category=entity_category,
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         unit_prefix="k",
@@ -109,6 +112,7 @@ async def create_daily_fixed_energy_sensor(
     return DailyEnergySensor(
         hass,
         sensor_config.get(CONF_NAME),
+        sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY),
         mode_config.get(CONF_VALUE),
         mode_config.get(CONF_UNIT_OF_MEASUREMENT),
         mode_config.get(CONF_UPDATE_FREQUENCY),
@@ -156,6 +160,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         source_entity,
         unique_id,
         entity_id,
+        entity_category,
         name,
         round_digits,
         unit_prefix,
@@ -192,6 +197,11 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
+        if entity_category:
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
+                from homeassistant.helpers.entity import EntityCategory
+
+                self._attr_entity_category = EntityCategory(entity_category)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -217,6 +227,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self,
         hass: HomeAssistantType,
         name: str,
+        entity_category: str,
         value: float,
         unit_of_measurement: str,
         update_frequency: int,
@@ -226,6 +237,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     ):
         self._hass = hass
         self._attr_name = name
+        self._attr_entity_category = entity_category
         self._value = value
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
