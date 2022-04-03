@@ -31,8 +31,10 @@ from .const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -47,11 +49,13 @@ from .const import (
     DEFAULT_POWER_SENSOR_PRECISION,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_UTILITY_METER_TYPES,
+    DEFAULT_ENTITY_CATEGORY,
     DISCOVERY_LIGHT_MODEL,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
+    ENTITY_CATEGORIES,
 )
 from .errors import ModelNotSupported
 from .model_discovery import get_light_model, is_supported_for_autodiscovery
@@ -70,8 +74,14 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
                     ): validate_name_pattern,
                     vol.Optional(
+                        CONF_POWER_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                    ): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
                     ): validate_name_pattern,
+                    vol.Optional(
+                        CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                    ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
@@ -113,9 +123,11 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     domain_config = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
+        CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
+        CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
