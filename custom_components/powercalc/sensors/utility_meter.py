@@ -143,7 +143,7 @@ async def create_utility_meter(
         "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
         "net_consumption": False,
         "tariff": tariff,
-        "tariff_entity": tariff_entity
+        "tariff_entity": tariff_entity,
     }
 
     signature = inspect.signature(UtilityMeterSensor.__init__)
