@@ -1,4 +1,4 @@
-# Supported models (96 total)
+# Supported models (98 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
@@ -60,7 +60,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |color_temp,hs|
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |color_temp,hs|
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs           |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs|
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness|
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs           |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs           |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs           |
@@ -88,12 +88,14 @@
 |signify      |LWB004                   |Hue Lux E27 750lm                                                    |lut              |brightness   |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                              |lut              |brightness   |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                              |lut              |brightness   |
+|signify      |LWF001                   |Hue white A60 bulb E27                                               |lut              |brightness   |
 |signify      |LWG001                   |Hue White GU10                                                       |lut              |brightness   |
 |signify      |LWG004                   |Hue White GU10 Bluetooth                                             |lut              |brightness   |
 |signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                                |lut              |brightness   |
 |signify      |LWO003                   |Hue White Filament Bulb G125 E27 w/ BT                               |lut              |brightness   |
 |signify      |LWU001                   |Hue P45 light bulb                                                   |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness   |
+|signify      |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp   |
 |yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs|
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness   |
