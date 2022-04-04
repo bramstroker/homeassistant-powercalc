@@ -1,4 +1,4 @@
-# Supported models (95 total)
+# Supported models (96 total)
 |manufacturer |        model id         |                                name                                 |calculation modes| color modes |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|-------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp   |
@@ -92,6 +92,7 @@
 |signify      |LWG004                   |Hue White GU10 Bluetooth                                             |lut              |brightness   |
 |signify      |LWO001                   |Hue White Filament Bulb G93 E27 w/ BT                                |lut              |brightness   |
 |signify      |LWO003                   |Hue White Filament Bulb G125 E27 w/ BT                               |lut              |brightness   |
+|signify      |LWU001                   |Hue P45 light bulb                                                   |lut              |brightness   |
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness   |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp   |
 |yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs|
