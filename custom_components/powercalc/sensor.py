@@ -171,9 +171,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
-    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
-        cv.ensure_list, [cv.string]
-    ),
+    vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
         cv.ensure_list, [vol.In(METER_TYPES)]
     ),
