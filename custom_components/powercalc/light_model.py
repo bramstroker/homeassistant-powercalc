@@ -27,6 +27,7 @@ class LightModel:
         custom_model_directory: str,
     ):
         self._manufacturer = manufacturer
+        model = model.replace("/", "#slash#")
         self._model = model
         self._lut_subdirectory = None
 
@@ -36,6 +37,7 @@ class LightModel:
             self._model = model_parts[0]
             self._lut_subdirectory = model_parts[1]
 
+        self._model = self._model.replace("#slash#", "/")
         self._custom_model_directory = custom_model_directory
         self._hass = hass
         self._directory: str = None
