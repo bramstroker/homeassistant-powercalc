@@ -27,7 +27,6 @@ class LightModel:
         custom_model_directory: str,
     ):
         self._manufacturer = manufacturer
-        model = model.replace("/", "#slash#")
         self._model = model
         self._lut_subdirectory = None
 
