@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Kasa HS110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.19.5:docker"
+    },
+    "name": "Livarno Lux E27 bulb RGB",
+    "standby_power": 0.36,
+    "supported_modes": [
+        "lut"
+    ]
+}
