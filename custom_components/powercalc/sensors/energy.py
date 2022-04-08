@@ -6,10 +6,8 @@ from decimal import Decimal
 from typing import Any, Optional
 
 import homeassistant.helpers.entity_registry as er
-from homeassistant.components.integration.sensor import (
-    TRAPEZOIDAL_METHOD,
-    IntegrationSensor,
-)
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
 from homeassistant.const import (
@@ -21,6 +19,7 @@ from homeassistant.const import (
     POWER_WATT,
     TIME_HOURS,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
@@ -34,12 +33,14 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ON_TIME,
     CONF_POWER_SENSOR_ID,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -79,6 +80,7 @@ async def create_energy_sensor(
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
+    entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
     unique_id = None
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
@@ -89,13 +91,14 @@ async def create_energy_sensor(
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
+        entity_category=entity_category,
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         unit_prefix="k",
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
-        or TRAPEZOIDAL_METHOD,
+        or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
     )
@@ -109,6 +112,7 @@ async def create_daily_fixed_energy_sensor(
     return DailyEnergySensor(
         hass,
         sensor_config.get(CONF_NAME),
+        sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY),
         mode_config.get(CONF_VALUE),
         mode_config.get(CONF_UNIT_OF_MEASUREMENT),
         mode_config.get(CONF_UPDATE_FREQUENCY),
@@ -156,6 +160,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         source_entity,
         unique_id,
         entity_id,
+        entity_category,
         name,
         round_digits,
         unit_prefix,
@@ -165,20 +170,38 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         powercalc_source_entity: str,
         powercalc_source_domain: str,
     ):
-        super().__init__(
-            source_entity,
-            name,
-            round_digits,
-            unit_prefix,
-            unit_time,
-            unit_of_measurement,
-            integration_method,
-        )
+        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+            super().__init__(
+                source_entity=source_entity,
+                name=name,
+                round_digits=round_digits,
+                unit_prefix=unit_prefix,
+                unit_time=unit_time,
+                unit_of_measurement=unit_of_measurement,
+                integration_method=integration_method,
+                unique_id=unique_id,
+            )
+        else:
+            super().__init__(
+                source_entity=source_entity,
+                name=name,
+                round_digits=round_digits,
+                unit_prefix=unit_prefix,
+                unit_time=unit_time,
+                unit_of_measurement=unit_of_measurement,
+                integration_method=integration_method,
+            )
+            if unique_id:
+                self._attr_unique_id = unique_id
+
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
-        if unique_id:
-            self._attr_unique_id = unique_id
+        if entity_category:
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
+                from homeassistant.helpers.entity import EntityCategory
+
+                self._attr_entity_category = EntityCategory(entity_category)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -204,6 +227,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self,
         hass: HomeAssistantType,
         name: str,
+        entity_category: str,
         value: float,
         unit_of_measurement: str,
         update_frequency: int,
@@ -213,6 +237,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     ):
         self._hass = hass
         self._attr_name = name
+        self._attr_entity_category = entity_category
         self._value = value
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency

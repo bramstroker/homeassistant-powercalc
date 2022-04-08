@@ -4,7 +4,15 @@ import inspect
 import logging
 from typing import cast
 
-from homeassistant.components.utility_meter import TariffSelect
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+    from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
+    from homeassistant.components.utility_meter.select import TariffSelect
+else:
+    from homeassistant.components.utility_meter import TariffSelect
+
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
@@ -60,8 +68,18 @@ async def create_utility_meters(
             utility_meter_component = cast(
                 EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
             )
-            tariff_select = TariffSelect(name, list(tariffs))
-            await utility_meter_component.async_add_entities([tariff_select])
+
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+                select_component = cast(
+                    EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
+                )
+                tariff_select = TariffSelect(
+                    name, list(tariffs), utility_meter_component.async_add_entities
+                )
+                await select_component.async_add_entities([tariff_select])
+            else:
+                tariff_select = TariffSelect(name, list(tariffs))
+                await utility_meter_component.async_add_entities([tariff_select])
 
             for tariff in tariffs:
                 utility_meter = await create_utility_meter(
@@ -124,17 +142,19 @@ async def create_utility_meter(
         "meter_type": meter_type,
         "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
         "net_consumption": False,
+        "tariff": tariff,
+        "tariff_entity": tariff_entity,
     }
-
-    if tariff:
-        params["tariff"] = tariff
-        params["tariff_entity"] = tariff_entity
 
     signature = inspect.signature(UtilityMeterSensor.__init__)
     if "parent_meter" in signature.parameters:
         params["parent_meter"] = parent_meter
     if "delta_values" in signature.parameters:
         params["delta_values"] = False
+    if "unique_id" in signature.parameters:
+        params["unique_id"] = unique_id
+    if "cron_pattern" in signature.parameters:
+        params["cron_pattern"] = None
 
     utility_meter = VirtualUtilityMeter(**params)
     setattr(
@@ -143,7 +163,8 @@ async def create_utility_meter(
         sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
 
-    if unique_id:
+    # This is for BC purposes, for HA versions lower than 2022.4. May be removed in the future
+    if not "unique_id" in params and unique_id:
         # Set new unique id if this entity already exists in the entity registry
         async_set_unique_id(hass, entity_id, unique_id)
         utility_meter.unique_id = unique_id

@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.18.4:docker"
     },
-    "name": "TRADFRI LED 470 lm E14 white spectrum, opal white",
+    "name": "TRADFRI bulb E14 WS candle opal 470lm",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"

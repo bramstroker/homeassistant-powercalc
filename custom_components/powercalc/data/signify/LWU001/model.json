@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "master"
+    },
+    "name": "Hue P45 light bulb",
+    "standby_power": 0.2,
+    "supported_modes": [
+        "lut"
+    ]
+}

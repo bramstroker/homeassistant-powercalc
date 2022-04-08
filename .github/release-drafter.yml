@@ -3,6 +3,10 @@ tag-template: 'v$RESOLVED_VERSION'
 change-template: '- #$NUMBER $TITLE @$AUTHOR'
 sort-direction: ascending
 categories:
+  - title: '💡 Light models'
+    labels:
+      - 'lightmodel'
+      
   - title: '🚀 Features'
     labels:
       - 'feature'

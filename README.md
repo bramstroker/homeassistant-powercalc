@@ -5,7 +5,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
-# Home Assistant Virtual Power Sensors
+# :zap: PowerCalc: Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.
 Provides easy configuration to get virtual power consumption sensors in Home Assistant for all your devices which don't have a build in power meter.
 This component estimates power usage by looking at brightness, hue/saturation and color temperature etc using different strategies. They are explained below.
@@ -95,7 +95,9 @@ They are as follows:
 | utility_meter_offset      | string  | **Optional** | Define the offset for utility meters. See [offset](https://www.home-assistant.io/integrations/utility_meter/#offset). |
 | utility_meter_tariffs     | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
 | custom_model_directory    | string  | **Optional** | Directory for a custom light model. Relative from the `config` directory   |
+| power_sensor_category     | string  | **Optional** | Category for the created power sensor. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | power_sensor_naming       | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `power_sensor_naming` |
+| energy_sensor_category     | string  | **Optional** | Category for the created energy sensor. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | energy_sensor_naming      | string  | **Optional** | Change the name (and id) of the sensors. Use the `{}` placeholder for the entity name of your appliance. When set this will override global setting `energy_sensor_naming` |
 | energy_integration_method | string  | **Optional** | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 | mode                      | string  | **Optional** | Calculation mode, one of `lut`, `linear`, `fixed`. The default mode is `lut` |
@@ -133,7 +135,9 @@ All these settings are completely optional. You can skip this section if you don
 | scan_interval             | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
 | create_energy_sensors     | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
 | power_sensor_naming       | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| power_sensor_category     | string  | **Optional** | Category for the created power sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | energy_sensor_naming      | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
+| energy_sensor_category     | string  | **Optional** | Category for the created energy sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | create_utility_meters     | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
 | utility_meter_types       | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
 | utility_meter_tariffs     | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |

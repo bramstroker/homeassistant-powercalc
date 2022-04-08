@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Optional
 
 import homeassistant.helpers.entity_registry as er
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
@@ -20,10 +21,13 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import (
+    TrackTemplate,
     async_track_state_change_event,
+    async_track_template_result,
     async_track_time_interval,
 )
 from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
@@ -42,6 +46,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
@@ -101,6 +106,7 @@ async def create_virtual_power_sensor(
     name = sensor_config.get(CONF_NAME) or source_entity.name
     name = name_pattern.format(name)
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
+    entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
@@ -159,8 +165,9 @@ async def create_virtual_power_sensor(
             standby_power = light_model.standby_power
 
     _LOGGER.debug(
-        "Creating power sensor (entity_id=%s sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
+        "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
         source_entity.entity_id,
+        entity_category,
         name,
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
@@ -173,6 +180,7 @@ async def create_virtual_power_sensor(
         power_calculator=calculation_strategy,
         calculation_mode=mode,
         entity_id=entity_id,
+        entity_category=entity_category,
         name=name,
         source_entity=source_entity.entity_id,
         source_domain=source_entity.domain,
@@ -242,6 +250,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         power_calculator: PowerCalculationStrategyInterface,
         calculation_mode: str,
         entity_id: str,
+        entity_category: str,
         name: str,
         source_entity: str,
         source_domain: str,
@@ -269,6 +278,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._ignore_unavailable_state = ignore_unavailable_state
         self._rounding_digits = rounding_digits
         self.entity_id = entity_id
+        if entity_category:
+            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
+                from homeassistant.helpers.entity import EntityCategory
+
+                self._attr_entity_category = EntityCategory(entity_category)
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -279,17 +293,37 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             await self._update_power_sensor(self._source_entity, new_state)
 
+        async def template_change_listener(*args):
+            state = self.hass.states.get(self._source_entity)
+            await self._update_power_sensor(self._source_entity, state)
+
         async def home_assistant_startup(event):
             """Add listeners and get initial state."""
-            tracked_entities = self._power_calculator.get_entities_to_track()
-            if not tracked_entities:
-                tracked_entities = {self._source_entity}
+            entities_to_track = self._power_calculator.get_entities_to_track()
+
+            track_entities = [
+                entity for entity in entities_to_track if isinstance(entity, str)
+            ]
+            if not track_entities:
+                track_entities = [self._source_entity]
 
             async_track_state_change_event(
-                self.hass, tracked_entities, appliance_state_listener
+                self.hass, track_entities, appliance_state_listener
             )
 
-            for entity_id in tracked_entities:
+            track_templates = [
+                template
+                for template in entities_to_track
+                if isinstance(template, TrackTemplate)
+            ]
+            if track_templates:
+                async_track_template_result(
+                    self.hass,
+                    track_templates=track_templates,
+                    action=template_change_listener,
+                )
+
+            for entity_id in track_entities:
                 new_state = self.hass.states.get(entity_id)
 
                 await self._update_power_sensor(entity_id, new_state)

@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.18.4:docker"
     },
-    "name": "TRADFRI LED 470 lm E14 RGB",
+    "name": "TRADFRI bulb E14 CWS 470lm",
     "standby_power": 0.23,
     "supported_modes": [
         "lut"

@@ -1,7 +1,7 @@
 {
     "name": "Hue White and Color Ambiance A19 E26/E27 (Gen 5)",
     "measure_method": "script",
-    "measure_device": "unknown",
+    "measure_device": "Shelly Plug S",
     "standby_power": 0.33,
     "supported_modes": [
         "lut"
