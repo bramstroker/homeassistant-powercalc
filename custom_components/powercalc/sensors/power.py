@@ -243,7 +243,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
-    _attr_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = POWER_WATT
 
     def __init__(
         self,
