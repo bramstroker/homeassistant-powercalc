@@ -158,7 +158,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     _attr_device_class = DEVICE_CLASS_POWER
     _attr_state_class = STATE_CLASS_MEASUREMENT
-    _attr_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = POWER_WATT
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
@@ -166,4 +166,4 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
-    _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+    _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR

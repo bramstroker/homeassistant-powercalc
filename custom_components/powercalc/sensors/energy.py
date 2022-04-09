@@ -219,7 +219,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = DEVICE_CLASS_ENERGY
     _attr_state_class = STATE_CLASS_TOTAL_INCREASING
-    _attr_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+    _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
     _attr_should_poll = False
     _attr_icon = ENERGY_ICON
 
