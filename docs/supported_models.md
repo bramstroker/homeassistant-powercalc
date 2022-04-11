@@ -1,4 +1,4 @@
-# Supported models (100 total)
+# Supported models (101 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -90,6 +90,7 @@
 |signify      |LWB004                   |Hue Lux E27 750lm                                                    |lut              |brightness              |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                              |lut              |brightness              |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                              |lut              |brightness              |
+|signify      |LWE002                   |Hue White E14 SES Candle 470lm w/ BT                                 |lut              |brightness              |
 |signify      |LWF001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |signify      |LWG001                   |Hue White GU10                                                       |lut              |brightness              |
 |signify      |LWG004                   |Hue White GU10 Bluetooth                                             |lut              |brightness              |
