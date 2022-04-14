@@ -73,9 +73,20 @@ async def create_utility_meters(
                 select_component = cast(
                     EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
                 )
-                tariff_select = TariffSelect(
-                    name, list(tariffs), utility_meter_component.async_add_entities
-                )
+                if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.3"):
+                    select_unique_id = None
+                    if unique_id:
+                        select_unique_id = f"{unique_id}_select"
+                    tariff_select = TariffSelect(
+                        name,
+                        list(tariffs),
+                        utility_meter_component.async_add_entities,
+                        select_unique_id,
+                    )
+                else:
+                    tariff_select = TariffSelect(
+                        name, list(tariffs), utility_meter_component.async_add_entities
+                    )
                 await select_component.async_add_entities([tariff_select])
             else:
                 tariff_select = TariffSelect(name, list(tariffs))
