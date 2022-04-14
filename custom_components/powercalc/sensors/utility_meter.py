@@ -73,7 +73,7 @@ async def create_utility_meters(
                 select_component = cast(
                     EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
                 )
-                if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.3"):
+                if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0"):
                     select_unique_id = None
                     if unique_id:
                         select_unique_id = f"{unique_id}_select"
