@@ -170,7 +170,17 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         powercalc_source_entity: str,
         powercalc_source_domain: str,
     ):
-        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.5.0.dev0"):
+            super().__init__(
+                source_entity=source_entity,
+                name=name,
+                round_digits=round_digits,
+                unit_prefix=unit_prefix,
+                unit_time=unit_time,
+                integration_method=integration_method,
+                unique_id=unique_id,
+            )
+        elif AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
             super().__init__(
                 source_entity=source_entity,
                 name=name,
