@@ -177,7 +177,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
                 round_digits=round_digits,
                 unit_prefix=unit_prefix,
                 unit_time=unit_time,
-                unit_of_measurement=unit_of_measurement,
                 integration_method=integration_method,
                 unique_id=unique_id,
             )
