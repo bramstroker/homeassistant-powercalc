@@ -64,7 +64,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})"
         )
-        if not value:
+        if value is None:
             return None
 
         min_power = min_calibrate[1]
