@@ -275,10 +275,11 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
     if CONF_DAILY_FIXED_ENERGY in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
-    if validate and not CONF_ENTITY_ID in merged_config:
-        raise SensorConfigurationError(
-            "You must supply an entity_id in the configuration, see the README"
-        )
+    if validate:
+        if not CONF_CREATE_GROUP in merged_config and not CONF_ENTITY_ID in merged_config:
+            raise SensorConfigurationError(
+                "You must supply an entity_id in the configuration, see the README"
+            )
 
     return merged_config
 
@@ -312,7 +313,7 @@ async def create_sensors(
     if CONF_ENTITIES in config:
         for entity_config in config[CONF_ENTITIES]:
             # When there are nested entities, combine these with the current entities, resursively
-            if CONF_ENTITIES in entity_config:
+            if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
                 (child_new_sensors, child_existing_sensors) = await create_sensors(
                     hass, entity_config
                 )
