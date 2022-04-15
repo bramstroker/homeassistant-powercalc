@@ -69,8 +69,8 @@ from .const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_STANDBY_POWER,
     CONF_ENERGY_INTEGRATION_METHOD,
-    CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_CATEGORY,
+    CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_GROUP,
@@ -277,7 +277,10 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
     if validate:
-        if not CONF_CREATE_GROUP in merged_config and not CONF_ENTITY_ID in merged_config:
+        if (
+            not CONF_CREATE_GROUP in merged_config
+            and not CONF_ENTITY_ID in merged_config
+        ):
             raise SensorConfigurationError(
                 "You must supply an entity_id in the configuration, see the README"
             )
