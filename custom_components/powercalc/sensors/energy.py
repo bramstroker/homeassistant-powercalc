@@ -62,7 +62,9 @@ async def create_energy_sensor(
 
     # User specified an existing energy sensor with "energy_sensor_id" option. Just return that one
     if CONF_ENERGY_SENSOR_ID in sensor_config:
-        return RealEnergySensor(sensor_config[CONF_ENERGY_SENSOR_ID])
+        ent_reg = er.async_get(hass)
+        entity_entry = ent_reg.async_get(sensor_config[CONF_ENERGY_SENSOR_ID])
+        return RealEnergySensor(entity_entry)
 
     # User specified an existing power sensor with "power_sensor_id" option. Try to find a corresponding energy sensor
     if CONF_POWER_SENSOR_ID in sensor_config and isinstance(
