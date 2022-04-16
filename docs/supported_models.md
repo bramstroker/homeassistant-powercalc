@@ -102,5 +102,5 @@
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness              |
 |signify      |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp              |
-|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |hs,color_temp           |
+|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs           |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness              |
