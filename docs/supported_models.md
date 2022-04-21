@@ -74,6 +74,7 @@
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)             |lut              |hs,color_temp           |
 |signify      |LTA001                   |Hue White Ambiance E27                                               |lut              |color_temp              |
 |signify      |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                         |lut              |color_temp              |
+|signify      |LTA011                   |Hue White Ambiance 1600 E27 with Bluetooth                           |lut              |color_temp              |
 |signify      |LTC001                   |Hue Being Ceiling Light                                              |lut              |color_temp              |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                                |lut              |color_temp              |
 |signify      |LTC012                   |Hue Struana Ceiling Light                                            |lut              |color_temp              |
