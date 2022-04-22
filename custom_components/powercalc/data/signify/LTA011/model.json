@@ -7,8 +7,8 @@
         "SLEEP_TIME": 10,
         "VERSION": "v0.19.7"
     },
-    "name": "Hue White Ambiance 1600 E27 with Bluetooth (9290024719)",
-    "standby_power": 0.28,
+    "name": "Hue White Ambiance 1600 E27 w/ BT",
+    "standby_power": 0.214,
     "supported_modes": [
         "lut"
     ]
