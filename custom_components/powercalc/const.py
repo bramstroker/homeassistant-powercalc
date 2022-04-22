@@ -124,6 +124,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Signify Netherlands B.V.": "signify",
     "Aqara": "aqara",
     "Lexman": "lexman",
+    "Yeelight": "yeelight",
 }
 
 MANUFACTURER_ALIASES = {
@@ -189,4 +190,7 @@ MODEL_DIRECTORY_MAPPING = {
         "8718699671211": "LWE002",
         "9290020399": "LWE002",
     },
+    "Yeelight": {
+        "color2": "YLDP06YL",
+    }
 }

@@ -7,7 +7,7 @@
         "SLEEP_TIME": 10,
         "VERSION": "v0.19.7"
     },
-    "name": "Yeelight Smart LED Bulb II Color (YLDP06YL)",
+    "name": "Yeelight Smart LED Bulb II Color",
     "standby_power": 1.1,
     "supported_modes": [
         "lut"
