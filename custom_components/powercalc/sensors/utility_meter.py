@@ -214,7 +214,7 @@ class VirtualUtilityMeter(UtilityMeterSensor):
     @property
     def native_value(self):
         """Return the state of the sensor."""
-        if self.rounding_digits and self._state:
+        if self.rounding_digits and self._state is not None:
             return round(self._state, self.rounding_digits)
 
         return self._state
