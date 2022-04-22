@@ -103,18 +103,5 @@
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness              |
 |signify      |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp              |
-|yeelight     |color2                   |Yeelight Smart LED Bulb II Color (YLDP06YL)                          |lut              |hs,color_temp           |
-|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |hs,color_temp           |
+|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs           |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness              |
-
-## Note on Yeelight detection
-Presently, Home Assistant (and the underlying python-yeelight library) does not autodetect the specific model of some Yeelight devices, when adding them via the UI. They may detect the general type (such as *'color'*), but not the generation (like *'color2'*, or actual model number). This prevents us from configuring these devices automatically. To work around this, you must configure those lights manually in some way.
-
-If you know how to find your Yeelights' IP addresses, you can do this with Home Assistant directly:
-
-1. Remove the affected lights from the UI (on the Integrations page)
-2. Re-add them to your YAML configuration, according to the [format shown here](https://www.home-assistant.io/integrations/yeelight/#full-configuration), making sure to add the `model` option
-3. Restart Home Assistant and confirm working
-4. (Optional) Remove them from your YAML configuration. If working, they should now persist in Home Assistant after restarts, with correct model retained
-
-You can alternatively configure each of them manually with Powercalc, specifying `manufacturer` and `model` options.
