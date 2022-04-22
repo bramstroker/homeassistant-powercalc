@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
 )
+from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.migrate import async_set_unique_id
 from custom_components.powercalc.sensors.energy import EnergySensor
 
@@ -63,34 +64,7 @@ async def create_utility_meters(
             unique_id = f"{energy_sensor.unique_id}_{meter_type}"
 
         if tariffs:
-            # create tariff selection entity
-            _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
-            utility_meter_component = cast(
-                EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
-            )
-
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
-                select_component = cast(
-                    EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
-                )
-                if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0"):
-                    select_unique_id = None
-                    if unique_id:
-                        select_unique_id = f"{unique_id}_select"
-                    tariff_select = TariffSelect(
-                        name,
-                        list(tariffs),
-                        utility_meter_component.async_add_entities,
-                        select_unique_id,
-                    )
-                else:
-                    tariff_select = TariffSelect(
-                        name, list(tariffs), utility_meter_component.async_add_entities
-                    )
-                await select_component.async_add_entities([tariff_select])
-            else:
-                tariff_select = TariffSelect(name, list(tariffs))
-                await utility_meter_component.async_add_entities([tariff_select])
+            tariff_select = await create_tariff_select(tariffs, hass, name, unique_id)
 
             for tariff in tariffs:
                 utility_meter = await create_utility_meter(
@@ -123,6 +97,45 @@ async def create_utility_meters(
         hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
 
     return utility_meters
+
+
+async def create_tariff_select(tariffs: list, hass: HomeAssistantType, name: str, unique_id: str | None):
+    """Create tariff selection entity"""
+
+    _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
+    utility_meter_component = cast(
+        EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
+    )
+    if utility_meter_component is None:
+        utility_meter_component = hass.data.get("utility_meter_legacy_component") or None
+
+    if utility_meter_component is None:
+        raise SensorConfigurationError("Cannot find utility_meter component")
+
+    if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
+        select_component = cast(
+            EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
+        )
+        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0"):
+            select_unique_id = None
+            if unique_id:
+                select_unique_id = f"{unique_id}_select"
+            tariff_select = TariffSelect(
+                name,
+                list(tariffs),
+                utility_meter_component.async_add_entities,
+                select_unique_id,
+            )
+        else:
+            tariff_select = TariffSelect(
+                name, list(tariffs), utility_meter_component.async_add_entities
+            )
+        await select_component.async_add_entities([tariff_select])
+    else:
+        tariff_select = TariffSelect(name, list(tariffs))
+        await utility_meter_component.async_add_entities([tariff_select])
+    
+    return tariff_select
 
 
 async def create_utility_meter(
