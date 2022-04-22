@@ -779,6 +779,8 @@ See the [README](utils/measure/README.md) for more information.
 
 See the [list](docs/supported_models.md) of supported lights which don't need any manual configuration
 
+Yeelights may not autodetect by default, [see here](docs/yeelight.md) for additional steps to configure them.
+
 ## Debug logging
 
 Add the following to configuration.yaml:
