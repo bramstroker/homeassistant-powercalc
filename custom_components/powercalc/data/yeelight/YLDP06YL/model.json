@@ -8,7 +8,7 @@
         "VERSION": "v0.19.7"
     },
     "name": "Yeelight Smart LED Bulb II Color",
-    "standby_power": 1.1,
+    "standby_power": 1.07,
     "supported_modes": [
         "lut"
     ]
