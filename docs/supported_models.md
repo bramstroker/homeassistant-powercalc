@@ -37,8 +37,8 @@
 |ledvance     |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                           |lut              |hs,color_temp           |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp              |
 |lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp           |
-|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,brightness,color_temp|
-|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,brightness,color_temp|
+|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |brightness,hs,color_temp|
+|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |brightness,hs,color_temp|
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
@@ -64,7 +64,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |hs,color_temp           |
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |hs,color_temp           |
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs                      |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness           |
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs           |
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs                      |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs                      |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs                      |
