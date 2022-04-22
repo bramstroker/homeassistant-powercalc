@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Kasa KP115",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 10,
+        "VERSION": "v0.19.7"
+    },
+    "name": "Hue White Ambiance 1600 E27 w/ BT",
+    "standby_power": 0.21,
+    "supported_modes": [
+        "lut"
+    ]
+}
