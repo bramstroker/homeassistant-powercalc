@@ -1,4 +1,4 @@
-# Supported models (103 total)
+# Supported models (105 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -37,8 +37,8 @@
 |ledvance     |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                           |lut              |hs,color_temp           |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp              |
 |lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp           |
-|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,brightness,color_temp|
-|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,brightness,color_temp|
+|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |brightness,hs,color_temp|
+|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |brightness,hs,color_temp|
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
@@ -74,6 +74,7 @@
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)             |lut              |hs,color_temp           |
 |signify      |LTA001                   |Hue White Ambiance E27                                               |lut              |color_temp              |
 |signify      |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                         |lut              |color_temp              |
+|signify      |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                    |lut              |color_temp              |
 |signify      |LTC001                   |Hue Being Ceiling Light                                              |lut              |color_temp              |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                                |lut              |color_temp              |
 |signify      |LTC012                   |Hue Struana Ceiling Light                                            |lut              |color_temp              |
@@ -102,5 +103,6 @@
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness              |
 |signify      |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp              |
-|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs           |
+|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |hs,color_temp           |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness              |
+|yeelight     |YLDP06YL                 |Yeelight Smart LED Bulb II Color                                     |lut              |hs,color_temp           |
