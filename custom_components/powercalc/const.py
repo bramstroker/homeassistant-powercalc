@@ -193,5 +193,5 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-    }
+    },
 }

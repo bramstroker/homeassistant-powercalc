@@ -99,7 +99,9 @@ async def create_utility_meters(
     return utility_meters
 
 
-async def create_tariff_select(tariffs: list, hass: HomeAssistantType, name: str, unique_id: str | None):
+async def create_tariff_select(
+    tariffs: list, hass: HomeAssistantType, name: str, unique_id: str | None
+):
     """Create tariff selection entity"""
 
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
@@ -107,7 +109,9 @@ async def create_tariff_select(tariffs: list, hass: HomeAssistantType, name: str
         EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
     )
     if utility_meter_component is None:
-        utility_meter_component = hass.data.get("utility_meter_legacy_component") or None
+        utility_meter_component = (
+            hass.data.get("utility_meter_legacy_component") or None
+        )
 
     if utility_meter_component is None:
         raise SensorConfigurationError("Cannot find utility_meter component")
@@ -134,7 +138,7 @@ async def create_tariff_select(tariffs: list, hass: HomeAssistantType, name: str
     else:
         tariff_select = TariffSelect(name, list(tariffs))
         await utility_meter_component.async_add_entities([tariff_select])
-    
+
     return tariff_select
 
 
