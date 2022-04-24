@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.19.11:docker"
     },
-    "name": "CLA60 TW",
+    "name": "CLA60 TW OSRAM",
     "standby_power": 0.5,
     "supported_modes": [
         "lut"
