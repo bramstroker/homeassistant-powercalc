@@ -48,6 +48,7 @@
 |lifx         |LIFX Z                   |LIFX Z                                                               |lut              |hs,color_temp           |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                                 |lut              |color_temp              |
 |osram        |LIGHTIFY Indoor Flex RGBW|LIGHTIFY Indoor Flex RGBW 3P (1.8m)                                  |lut              |hs,color_temp           |
+|osram        |CLA60 TW OSRAM           |Osram Smart+ Classic E27 tunable white                               |lut              |color_temp              |
 |signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                     |lut              |hs,color_temp           |
 |signify      |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)           |lut              |hs,color_temp           |
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                        |lut              |hs,color_temp           |

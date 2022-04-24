@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, 1PM plus",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 3,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.19.11:docker"
+    },
+    "name": "Smart+ Classic E27 tunable white",
+    "standby_power": 0.5,
+    "supported_modes": [
+        "lut"
+    ]
+}
