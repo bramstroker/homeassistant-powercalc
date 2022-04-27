@@ -19,7 +19,7 @@ from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
 from light_controller.hass import HassLightController
 from light_controller.hue import HueLightController
-from powermeter.errors import OutdatedMeasurementError, PowerMeterError
+from powermeter.errors import OutdatedMeasurementError, PowerMeterError, ZeroReadingError
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
 from powermeter.manual import ManualPowerMeter
@@ -110,6 +110,7 @@ if SELECTED_POWER_METER == POWER_METER_MANUAL:
     CT_MIRED_STEPS = 50
 
 CSV_WRITE_BUFFER = 50
+MAX_ALLOWED_0_READINGS = 50
 
 logging.basicConfig(
     level=logging.getLevelName(LOG_LEVEL),
@@ -129,6 +130,7 @@ class Measure:
     def __init__(self, light_controller: LightController, power_meter: PowerMeter):
         self.light_controller = light_controller
         self.power_meter = power_meter
+        self.num_0_readings: int = 0
 
     def start(self):
         answers = prompt(self.get_questions())
@@ -203,6 +205,13 @@ class Measure:
                 time.sleep(SLEEP_TIME)
                 try:
                     power = self.take_power_measurement(variation_start_time)
+                except ZeroReadingError as error:
+                    self.num_0_readings += 1
+                    _LOGGER.warning(f"Discarding measurement: {error}")
+                    if self.num_0_readings > MAX_ALLOWED_0_READINGS:
+                        _LOGGER.error("Aborting measurement session. Received to much 0 readings")
+                        return
+                    continue
                 except PowerMeterError as error:
                     _LOGGER.error(f"Aborting: {error}")
                     return
@@ -270,6 +279,10 @@ class Measure:
                 retry_count += 1
                 time.sleep(SLEEP_TIME)
                 self.take_power_measurement(start_timestamp, retry_count)
+            
+            # Check if we not have a 0 reading
+            if measurement.power == 0:
+                raise ZeroReadingError("0 watt was read from the power meter")
 
             measurements.append(measurement.power)
             time.sleep(SLEEP_TIME_SAMPLE)
