@@ -220,7 +220,7 @@ async def create_domain_groups(
     hass: HomeAssistantType, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
-    component = EntityComponent(_LOGGER, SENSOR_DOMAIN, hass)
+    sensor_component = hass.data[SENSOR_DOMAIN]
     sensor_config = global_config.copy()
     _LOGGER.debug(f"Setting up domain based group sensors..")
     for domain in domains:
@@ -235,5 +235,5 @@ async def create_domain_groups(
         entities = await create_group_sensors(
             group_name, sensor_config, domain_entities, hass
         )
-        await component.async_add_entities(entities)
+        await sensor_component.async_add_entities(entities)
     return []
