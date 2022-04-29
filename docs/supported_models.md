@@ -65,7 +65,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |hs,color_temp           |
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |hs,color_temp           |
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs                      |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs           |
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness           |
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs                      |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs                      |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs                      |
@@ -104,6 +104,6 @@
 |signify      |LWV001                   |Hue White Filament Bulb ST64 E27                                     |lut              |brightness              |
 |signify      |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |sonoff       |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp              |
-|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |color_temp,hs           |
+|yeelight     |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |hs,color_temp           |
 |yeelight     |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                     |lut              |brightness              |
 |yeelight     |YLDP06YL                 |Yeelight Smart LED Bulb II Color                                     |lut              |hs,color_temp           |
