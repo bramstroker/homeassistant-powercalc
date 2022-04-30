@@ -31,9 +31,11 @@ from .const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
@@ -74,10 +76,16 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
                     ): validate_name_pattern,
                     vol.Optional(
+                        CONF_POWER_SENSOR_FRIENDLY_NAMING
+                    ): validate_name_pattern,
+                    vol.Optional(
                         CONF_POWER_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
                         CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
+                    ): validate_name_pattern,
+                    vol.Optional(
+                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING
                     ): validate_name_pattern,
                     vol.Optional(
                         CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
