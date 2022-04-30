@@ -1,4 +1,4 @@
-# Supported models (106 total)
+# Supported models (107 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -37,13 +37,14 @@
 |ledvance     |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                           |lut              |hs,color_temp           |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp              |
 |lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp           |
-|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |brightness,hs,color_temp|
-|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |brightness,hs,color_temp|
+|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,brightness,color_temp|
+|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,brightness,color_temp|
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
 |lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |hs,color_temp           |
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |hs,color_temp           |
+|lifx         |LIFX Mini Color          |LIFX Mini Color                                                      |lut              |hs                      |
 |lifx         |LIFX Original 1000       |LIFX Original 1000                                                   |lut              |hs,color_temp           |
 |lifx         |LIFX Z                   |LIFX Z                                                               |lut              |hs,color_temp           |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                                 |lut              |color_temp              |
