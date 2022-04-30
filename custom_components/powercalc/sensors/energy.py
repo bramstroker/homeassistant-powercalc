@@ -36,6 +36,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ON_TIME,
     CONF_POWER_SENSOR_ID,
@@ -84,7 +85,11 @@ async def create_energy_sensor(
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or source_entity.name
-    name = name_pattern.format(name)
+    if CONF_ENERGY_SENSOR_FRIENDLY_NAMING in sensor_config:
+        friendly_name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_FRIENDLY_NAMING)
+        name = friendly_name_pattern.format(name)
+    else:
+        name = name_pattern.format(name)
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass

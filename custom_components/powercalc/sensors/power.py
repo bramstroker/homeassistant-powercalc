@@ -49,6 +49,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_WLED,
@@ -100,11 +101,15 @@ async def create_virtual_power_sensor(
     discovery_info: DiscoveryInfoType | None = None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity"""
-    calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = sensor_config.get(CONF_NAME) or source_entity.name
-    name = name_pattern.format(name)
+    if CONF_POWER_SENSOR_FRIENDLY_NAMING in sensor_config:
+        friendly_name_pattern = sensor_config.get(CONF_POWER_SENSOR_FRIENDLY_NAMING)
+        name = friendly_name_pattern.format(name)
+    else:
+        name = name_pattern.format(name)
+
     object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
     entity_id = async_generate_entity_id(
@@ -143,6 +148,7 @@ async def create_virtual_power_sensor(
                 "Cannot select a mode (LINEAR, FIXED or LUT, WLED), supply it in the config"
             )
 
+        calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
