@@ -24,6 +24,8 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
+from powermeter.errors import OutdatedMeasurementError, PowerMeterError, ZeroReadingError
+from powermeter.dummy import DummyPowerMeter
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
 from powermeter.manual import ManualPowerMeter
@@ -58,6 +60,7 @@ HS_BRI_STEPS = min(config("HS_BRI_STEPS", default=10, cast=int), 20)
 HS_HUE_STEPS = min(config("HS_HUE_STEPS", default=2000, cast=int), 4000)
 HS_SAT_STEPS = min(config("HS_SAT_STEPS", default=10, cast=int), 20)
 
+POWER_METER_DUMMY = "dummy"
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
 POWER_METER_MANUAL = "manual"
@@ -65,6 +68,7 @@ POWER_METER_SHELLY = "shelly"
 POWER_METER_TASMOTA = "tasmota"
 POWER_METER_TUYA = "tuya"
 POWER_METERS = [
+    POWER_METER_DUMMY,
     POWER_METER_HASS,
     POWER_METER_KASA,
     POWER_METER_MANUAL,
@@ -75,9 +79,14 @@ POWER_METERS = [
 
 SELECTED_POWER_METER = config("POWER_METER", cast=Choices(POWER_METERS))
 
+LIGHT_CONTROLLER_DUMMY = "dummy"
 LIGHT_CONTROLLER_HUE = "hue"
 LIGHT_CONTROLLER_HASS = "hass"
-LIGHT_CONTROLLERS = [LIGHT_CONTROLLER_HUE, LIGHT_CONTROLLER_HASS]
+LIGHT_CONTROLLERS = [
+    LIGHT_CONTROLLER_DUMMY,
+    LIGHT_CONTROLLER_HUE,
+    LIGHT_CONTROLLER_HASS
+]
 
 SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER", cast=Choices(LIGHT_CONTROLLERS))
 
@@ -151,6 +160,21 @@ class Measure:
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
 
+        csv_file_path = f"{export_directory}/{self.color_mode}.csv"
+
+        resume_at = None
+        file_write_mode = "w"
+        write_header_row = True
+        if self.should_resume(csv_file_path):
+            resume_at = self.get_resume_variation(csv_file_path)
+            file_write_mode = "a"
+            write_header_row = False
+
+        variations = list(self.get_variations(self.color_mode, resume_at))
+        num_variations = len(variations)
+
+        _LOGGER.info(f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}")
+
         if answers["generate_model_json"]:
             try:
                 standby_power = self.measure_standby_power()
@@ -165,16 +189,6 @@ class Measure:
                 measure_device=answers["measure_device"],
             )
 
-        csv_file_path = f"{export_directory}/{self.color_mode}.csv"
-
-        resume_at = None
-        file_write_mode = "w"
-        write_header_row = True
-        if self.should_resume(csv_file_path):
-            resume_at = self.get_resume_variation(csv_file_path)
-            file_write_mode = "a"
-            write_header_row = False
-
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
@@ -186,7 +200,11 @@ class Measure:
             time.sleep(SLEEP_INITIAL)
 
             previous_variation = None
-            for variation in self.get_variations(self.color_mode, resume_at):
+            for count, variation in enumerate(variations):
+                if count % 10 == 0:
+                    time_left = self.calculate_time_left(variations, variation, count)
+                    progress_percentage = round(count / num_variations * 100)
+                    _LOGGER.info(f"Progress: {progress_percentage}%, Estimated time left: {time_left}")
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
@@ -289,7 +307,8 @@ class Measure:
                 raise ZeroReadingError("0 watt was read from the power meter")
 
             measurements.append(measurement.power)
-            time.sleep(SLEEP_TIME_SAMPLE)
+            if SAMPLE_COUNT > 1:
+                time.sleep(SLEEP_TIME_SAMPLE)
 
         avg = sum(measurements) / len(measurements) / self.num_lights
         return round(avg, 2)
@@ -351,6 +370,39 @@ class Measure:
             yield i
             i += step
         yield end
+
+    def calculate_time_left(self, variations: list[Variation], current_variation: Variation = None, progress: int = 0) -> str:
+        """Try to guess the remaining time left. This will not account for measuring errors / retries obviously"""
+        num_variations_left = len(variations) - progress
+
+        # Account estimated seconds for the light_controller and power_meter to process
+        estimated_step_delay = 0.15
+
+        time_left = 0
+        if progress == 0:
+            time_left += SLEEP_STANDBY + SLEEP_INITIAL
+        time_left += num_variations_left * (SLEEP_TIME + estimated_step_delay)
+        if SAMPLE_COUNT > 1:
+            time_left += num_variations_left * SAMPLE_COUNT * (SLEEP_TIME_SAMPLE + estimated_step_delay)
+
+        if isinstance(current_variation, HsVariation):
+            sat_steps_left = round((MAX_BRIGHTNESS - current_variation.bri) / HS_BRI_STEPS) - 1
+            time_left += sat_steps_left * SLEEP_TIME_SAT
+            hue_steps_left = round(MAX_HUE / HS_HUE_STEPS * sat_steps_left)
+            time_left += hue_steps_left * SLEEP_TIME_HUE
+
+        if isinstance(current_variation, ColorTempVariation):
+            ct_steps_left = round((MAX_BRIGHTNESS - current_variation.bri) / CT_BRI_STEPS) - 1
+            time_left += ct_steps_left * SLEEP_TIME_CT
+
+        if time_left > 3600:
+            formatted_time = f"{round(time_left / 3600, 1)}h"
+        elif time_left > 60:
+            formatted_time = f"{round(time_left / 60, 1)}m"
+        else:
+            formatted_time = f"{time_left}s"
+
+        return formatted_time
 
     def write_model_json(
         self, directory: str, standby_power: float, name: str, measure_device: str
@@ -488,8 +540,15 @@ class LightControllerFactory:
     def hue(self):
         return HueLightController(HUE_BRIDGE_IP)
 
+    def dummy(self):
+        return LightController()
+
     def create(self) -> LightController:
-        factories = {LIGHT_CONTROLLER_HUE: self.hue, LIGHT_CONTROLLER_HASS: self.hass}
+        factories = {
+            LIGHT_CONTROLLER_DUMMY: self.dummy,
+            LIGHT_CONTROLLER_HUE: self.hue,
+            LIGHT_CONTROLLER_HASS: self.hass
+        }
         factory = factories.get(SELECTED_LIGHT_CONTROLLER)
         if factory is None:
             raise Exception(f"Could not find a factory for {SELECTED_LIGHT_CONTROLLER}")
@@ -499,6 +558,9 @@ class LightControllerFactory:
 
 
 class PowerMeterFactory:
+    def dummy(self):
+        return DummyPowerMeter()
+
     def hass(self):
         return HassPowerMeter(HASS_URL, HASS_TOKEN)
 
@@ -527,6 +589,7 @@ class PowerMeterFactory:
             POWER_METER_SHELLY: self.shelly,
             POWER_METER_TASMOTA: self.tasmota,
             POWER_METER_TUYA: self.tuya,
+            POWER_METER_DUMMY: self.dummy
         }
         factory = factories.get(SELECTED_POWER_METER)
         if factory is None:

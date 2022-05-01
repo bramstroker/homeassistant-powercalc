@@ -36,7 +36,7 @@ class LightController:
         pass
 
     def get_light_info(self) -> LightInfo:
-        return LightInfo()
+        return LightInfo("")
 
     def get_questions(self) -> list[dict]:
         return []
