@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.18.4:docker"
     },
-    "name": "Hue ambiance pendant",
+    "name": "Hue Being Pendant Light",
     "standby_power": 0.38,
     "supported_modes": [
         "lut"
