@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Signify, 1742930P7",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.18.4:docker"
+    },
+    "name": "Hue Outdoor Wall",
+    "standby_power": 0.0,
+    "supported_modes": [
+        "lut"
+    ]
+}
