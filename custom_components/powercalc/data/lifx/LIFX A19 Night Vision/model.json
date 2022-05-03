@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script. TP-link kp125 was having inconsistent readings towards the 0.52 watt and lower range, so I manually smoothed out some of the outliers",
+    "measure_device": "TP-Link KP125",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.19.12:docker"
+    },
+    "name": "LIFX A19 Night Vision",
+    "standby_power": 0.47,
+    "supported_modes": [
+        "lut"
+    ]
+}
