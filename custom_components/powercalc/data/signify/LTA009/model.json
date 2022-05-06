@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Gosuna Smart Plug UP111 (via tuya)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.19.15:docker"
+    },
+    "name": "Hue White Ambiance 1100 E27 Bluetooth",
+    "standby_power": 0.2,
+    "supported_modes": [
+        "lut"
+    ]
+}
