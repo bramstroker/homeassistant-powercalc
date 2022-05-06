@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "tuya",
+    "measure_device": "Gosuna Smart Plug UP111 (via tuya)",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
