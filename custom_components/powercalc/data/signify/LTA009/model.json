@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.19.15:docker"
     },
-    "name": "LTA009",
+    "name": "Hue White Ambiance 1100 E27 Bluetooth",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
