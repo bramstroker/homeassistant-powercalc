@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.19.15:docker"
     },
-    "name": "LTE002",
+    "name": "Hue White Ambiance E14 w/ BT",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
