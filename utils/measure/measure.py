@@ -13,7 +13,7 @@ from datetime import datetime as dt
 from io import TextIOWrapper
 from typing import Iterator, Optional, Any
 
-from decouple import Choices, config
+from decouple import Choices, config, UndefinedValueError
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
@@ -526,17 +526,19 @@ class CsvWriter:
 
 
 def config_key_exists(key: str) -> bool:
+    """Check whether a certain configuration exists in dot env file"""
     try:
         config(key)
         return True
-    except:
+    except UndefinedValueError:
         return False
 
 def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
+    """Check if the question is answered with yes (Y)"""
     if answer_key in answers:
         return answers[answer_key]
     
-    return config(answer_key.upper(), False)
+    return bool(config(answer_key.upper(), False))
 
 @dataclass(frozen=True)
 class Variation:
