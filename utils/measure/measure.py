@@ -11,9 +11,9 @@ import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from io import TextIOWrapper
-from typing import Iterator, Optional
+from typing import Iterator, Optional, Any
 
-from decouple import Choices, config
+from decouple import Choices, config, UndefinedValueError
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
@@ -28,6 +28,7 @@ from powermeter.errors import (
 from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
 from powermeter.manual import ManualPowerMeter
+from powermeter.ocr import OcrPowerMeter
 from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
@@ -63,6 +64,7 @@ POWER_METER_DUMMY = "dummy"
 POWER_METER_HASS = "hass"
 POWER_METER_KASA = "kasa"
 POWER_METER_MANUAL = "manual"
+POWER_METER_OCR = "ocr"
 POWER_METER_SHELLY = "shelly"
 POWER_METER_TASMOTA = "tasmota"
 POWER_METER_TUYA = "tuya"
@@ -71,6 +73,7 @@ POWER_METERS = [
     POWER_METER_HASS,
     POWER_METER_KASA,
     POWER_METER_MANUAL,
+    POWER_METER_OCR,
     POWER_METER_SHELLY,
     POWER_METER_TASMOTA,
     POWER_METER_TUYA,
@@ -145,7 +148,7 @@ class Measure:
         self.num_0_readings: int = 0
 
     def start(self):
-        answers = prompt(self.get_questions())
+        answers = self.ask_questions()
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
         self.color_mode = answers["color_mode"]
@@ -426,57 +429,78 @@ class Measure:
         json_file = open(os.path.join(directory, "model.json"), "w")
         json_file.write(json_data)
         json_file.close()
+    
 
     def get_questions(self) -> list[dict]:
-        return (
-            [
-                {
-                    "type": "list",
-                    "name": "color_mode",
-                    "message": "Select the color mode?",
-                    "default": MODE_HS,
-                    "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
-                },
-                {
-                    "type": "confirm",
-                    "message": "Do you want to generate model.json?",
-                    "name": "generate_model_json",
-                    "default": True,
-                },
-                {
-                    "type": "input",
-                    "name": "model_name",
-                    "message": "Specify the full light model name",
-                    "when": lambda answers: answers["generate_model_json"],
-                },
-                {
-                    "type": "input",
-                    "name": "measure_device",
-                    "message": "Which powermeter (manufacturer, model) do you use to take the measurement?",
-                    "when": lambda answers: answers["generate_model_json"],
-                },
-                {
-                    "type": "confirm",
-                    "message": "Do you want to gzip CSV files?",
-                    "name": "gzip",
-                    "default": True,
-                },
-                {
-                    "type": "confirm",
-                    "name": "multiple_lights",
-                    "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
-                    "default": False
-                },
-                {
-                    "type": "input",
-                    "name": "num_lights",
-                    "message": "How many lights are you measuring?",
-                    "when": lambda answers: answers["multiple_lights"],
-                },
-            ]
-            + self.light_controller.get_questions()
-            + self.power_meter.get_questions()
-        )
+        _LOGGER.info("get questions")
+        questions = [
+            {
+                "type": "list",
+                "name": "color_mode",
+                "message": "Select the color mode?",
+                "default": MODE_HS,
+                "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
+            },
+            {
+                "type": "confirm",
+                "message": "Do you want to generate model.json?",
+                "name": "generate_model_json",
+                "default": True,
+            },
+            {
+                "type": "input",
+                "name": "model_name",
+                "message": "Specify the full light model name",
+                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
+            },
+            {
+                "type": "input",
+                "name": "measure_device",
+                "message": "Which powermeter (manufacturer, model) do you use to take the measurement?",
+                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
+            },
+            {
+                "type": "confirm",
+                "message": "Do you want to gzip CSV files?",
+                "name": "gzip",
+                "default": True,
+            },
+            {
+                "type": "confirm",
+                "name": "multiple_lights",
+                "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
+                "default": False
+            },
+            {
+                "type": "input",
+                "name": "num_lights",
+                "message": "How many lights are you measuring?",
+                "when": lambda answers: is_answer_selected(answers, "multiple_lights"),
+            }
+        ]
+        
+        questions.extend(self.light_controller.get_questions())
+        questions.extend(self.power_meter.get_questions())
+        
+        return questions
+
+    
+    def ask_questions(self) -> dict[str, Any]:
+        """Ask question and return a dictionary with the answers"""
+        all_questions = self.get_questions()
+
+        #Only ask questions which answers are not predefined in .env file
+        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question["name"]).upper())]
+
+        answers = prompt(questions_to_ask)
+
+        for question in all_questions:
+            question_name = str(question["name"])
+            env_var = question_name.upper()
+            if question_name not in answers and config_key_exists(env_var):
+                answers[question_name] = config(env_var)
+
+        return answers
 
 class CsvWriter:
     def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
@@ -500,6 +524,21 @@ class CsvWriter:
             self.csv_file.flush()
             _LOGGER.debug("Flushing CSV buffer")
 
+
+def config_key_exists(key: str) -> bool:
+    """Check whether a certain configuration exists in dot env file"""
+    try:
+        config(key)
+        return True
+    except UndefinedValueError:
+        return False
+
+def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
+    """Check if the question is answered with yes (Y)"""
+    if answer_key in answers:
+        return answers[answer_key]
+    
+    return bool(config(answer_key.upper(), False))
 
 @dataclass(frozen=True)
 class Variation:
@@ -568,6 +607,9 @@ class PowerMeterFactory:
     
     def manual(self):
         return ManualPowerMeter()
+    
+    def ocr(self):
+        return OcrPowerMeter()
 
     def shelly(self):
         return ShellyPowerMeter(SHELLY_IP, SHELLY_TIMEOUT)
@@ -585,6 +627,7 @@ class PowerMeterFactory:
             POWER_METER_HASS: self.hass,
             POWER_METER_KASA: self.kasa,
             POWER_METER_MANUAL: self.manual,
+            POWER_METER_OCR: self.ocr,
             POWER_METER_SHELLY: self.shelly,
             POWER_METER_TASMOTA: self.tasmota,
             POWER_METER_TUYA: self.tuya,

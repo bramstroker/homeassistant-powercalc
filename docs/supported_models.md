@@ -1,4 +1,4 @@
-# Supported models (108 total)
+# Supported models (110 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -37,8 +37,8 @@
 |ledvance     |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                           |lut              |hs,color_temp           |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp              |
 |lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp           |
-|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |brightness,hs,color_temp|
-|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |brightness,hs,color_temp|
+|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp,brightness|
+|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp,brightness|
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
@@ -67,7 +67,7 @@
 |signify      |LCT024                   |Hue Play                                                             |lut              |hs,color_temp           |
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |hs,color_temp           |
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs                      |
-|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |brightness,hs           |
+|signify      |LLC006                   |LivingColors Iris Table Lamp Gen3                                    |lut              |hs,brightness           |
 |signify      |LLC010                   |Hue Iris                                                             |lut              |hs                      |
 |signify      |LLC011                   |Living Colours Bloom 7099760PH                                       |lut              |hs                      |
 |signify      |LLC012                   |Hue Bloom Table Lamp                                                 |lut              |hs                      |
@@ -77,10 +77,12 @@
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)             |lut              |hs,color_temp           |
 |signify      |LTA001                   |Hue White Ambiance E27                                               |lut              |color_temp              |
 |signify      |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                         |lut              |color_temp              |
+|signify      |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                |lut              |color_temp              |
 |signify      |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                    |lut              |color_temp              |
 |signify      |LTC001                   |Hue Being Ceiling Light                                              |lut              |color_temp              |
 |signify      |LTC002                   |Hue Fair Ceiling Lamp                                                |lut              |color_temp              |
 |signify      |LTC012                   |Hue Struana Ceiling Light                                            |lut              |color_temp              |
+|signify      |LTE002                   |Hue White Ambiance E14 w/ BT                                         |lut              |color_temp              |
 |signify      |LTG002                   |Hue White Ambiance GU10 w/ BT                                        |lut              |color_temp              |
 |signify      |LTO001                   |Hue G93 E27 Filament Globe Bulb                                      |lut              |color_temp              |
 |signify      |LTP003                   |Hue Fair Pendant                                                     |lut              |color_temp              |
