@@ -1,4 +1,4 @@
-# Supported models (110 total)
+# Supported models (111 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -42,6 +42,7 @@
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
+|lifx         |LIFX A19                 |LIFX A19                                                             |lut              |hs,color_temp           |
 |lifx         |LIFX A19 Night Vision    |LIFX A19 Night Vision                                                |lut              |hs                      |
 |lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |hs,color_temp           |
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |hs,color_temp           |
