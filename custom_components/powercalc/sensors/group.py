@@ -22,6 +22,7 @@ from homeassistant.const import (
 from homeassistant.core import State, callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
@@ -110,7 +111,7 @@ async def create_group_sensors(
     return group_sensors
 
 
-class GroupedSensor(SensorEntity):
+class GroupedSensor(RestoreEntity, SensorEntity):
     """Base class for grouped sensors"""
 
     _attr_should_poll = False
@@ -136,6 +137,11 @@ class GroupedSensor(SensorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
+        await super().async_added_to_hass()
+
+        if (state := await self.async_get_last_state()) is not None:
+            self._attr_native_value = state.state
+
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
 
     @callback
@@ -149,6 +155,7 @@ class GroupedSensor(SensorEntity):
             for state in states
             if state.state not in ignored_states
         )
+
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
 
