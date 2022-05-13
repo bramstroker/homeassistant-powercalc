@@ -4,7 +4,7 @@ import logging
 from decimal import Decimal
 from typing import Callable
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, RestoreSensor
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
