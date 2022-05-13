@@ -155,7 +155,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             for state in states
             if state.state not in ignored_states
         )
-        _LOGGER.debug(f"Group state changed: {self.entity_id} - {summed}")
+
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
 
