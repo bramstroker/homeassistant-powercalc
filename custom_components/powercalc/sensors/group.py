@@ -147,9 +147,6 @@ class GroupedSensor(RestoreEntity, SensorEntity):
     @callback
     def on_state_change(self, event):
         """Triggered when one of the group entities changes state"""
-
-        _LOGGER.info("%s: Calculating group energy state change", self.entity_id)
-
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
