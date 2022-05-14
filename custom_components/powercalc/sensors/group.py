@@ -166,12 +166,15 @@ class GroupedSensor(RestoreEntity, SensorEntity):
                 err,
             )
 
-        if self._attr_state_class == STATE_CLASS_TOTAL_INCREASING and summed < current_value:
+        if (
+            self._attr_state_class == STATE_CLASS_TOTAL_INCREASING
+            and summed < current_value
+        ):
             _LOGGER.warning(
                 "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
                 self.entity_id,
                 current_value,
-                summed
+                summed,
             )
             return
 
