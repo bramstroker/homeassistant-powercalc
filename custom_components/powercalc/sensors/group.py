@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -147,6 +147,9 @@ class GroupedSensor(RestoreEntity, SensorEntity):
     @callback
     def on_state_change(self, event):
         """Triggered when one of the group entities changes state"""
+
+        _LOGGER.info("%s: Calculating group energy state change", self.entity_id)
+
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
@@ -155,6 +158,25 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             for state in states
             if state.state not in ignored_states
         )
+
+        try:
+            current_value = Decimal(self._attr_native_value)
+        except (DecimalException, ValueError) as err:
+            _LOGGER.warning(
+                "%s: Could not convert to decimal %s: %s",
+                self.entity_id,
+                current_value,
+                err,
+            )
+
+        if self._attr_state_class == STATE_CLASS_TOTAL_INCREASING and summed < current_value:
+            _LOGGER.warning(
+                "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
+                self.entity_id,
+                current_value,
+                summed
+            )
+            return
 
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
