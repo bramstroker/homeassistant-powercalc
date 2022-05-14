@@ -4,8 +4,8 @@ import logging
 from decimal import Decimal
 from typing import Optional
 
+from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
 from homeassistant.const import (
@@ -285,10 +285,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._rounding_digits = rounding_digits
         self.entity_id = entity_id
         if entity_category:
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
-                from homeassistant.helpers.entity import EntityCategory
-
-                self._attr_entity_category = EntityCategory(entity_category)
+            self._attr_entity_category = EntityCategory(entity_category)
 
     async def async_added_to_hass(self):
         """Register callbacks."""

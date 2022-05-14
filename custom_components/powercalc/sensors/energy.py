@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
+from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
@@ -222,10 +223,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
         if entity_category:
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
-                from homeassistant.helpers.entity import EntityCategory
-
-                self._attr_entity_category = EntityCategory(entity_category)
+            self._attr_entity_category = EntityCategory(entity_category)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

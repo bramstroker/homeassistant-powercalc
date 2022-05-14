@@ -4,6 +4,8 @@ from datetime import timedelta
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 
+MIN_HA_VERSION = "2021.11"
+
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
