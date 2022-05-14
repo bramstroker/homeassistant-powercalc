@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -155,6 +155,25 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             for state in states
             if state.state not in ignored_states
         )
+
+        try:
+            current_value = Decimal(self._attr_native_value)
+        except (DecimalException, ValueError) as err:
+            _LOGGER.warning(
+                "%s: Could not convert to decimal %s: %s",
+                self.entity_id,
+                current_value,
+                err,
+            )
+
+        if self._attr_state_class == STATE_CLASS_TOTAL_INCREASING and summed < current_value:
+            _LOGGER.warning(
+                "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
+                self.entity_id,
+                current_value,
+                summed
+            )
+            return
 
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
