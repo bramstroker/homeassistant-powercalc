@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any, Optional
 
-from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
@@ -22,7 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template

@@ -4,7 +4,6 @@ import logging
 from decimal import Decimal
 from typing import Optional
 
-from homeassistant.helpers.entity import EntityCategory
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
@@ -23,7 +22,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
     async_track_state_change_event,
