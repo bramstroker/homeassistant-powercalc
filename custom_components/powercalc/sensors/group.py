@@ -156,8 +156,32 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             if state.state not in ignored_states
         )
 
+        if self._attr_state_class == STATE_CLASS_TOTAL_INCREASING and not self.is_state_value_increasing(summed):
+            return
+
+        self._attr_native_value = round(summed, self._rounding_digits)
+        self.async_schedule_update_ha_state(True)
+
+    def is_state_value_increasing(self, new_value) -> bool:
+        """
+        Check to make sure the new state is higer than the previous state
+        When this is not the case reject the recording of the state and raise a warning.
+        This could happen when an entity of the grouped sensor becomes unavailable for example.
+        When we would record this state change it will cause problems down the road with utility meters
+        """
+        if self._attr_native_value is None:
+            return True
+
         try:
             current_value = Decimal(self._attr_native_value)
+            if (new_value < current_value):
+                _LOGGER.warning(
+                    "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
+                    self.entity_id,
+                    current_value,
+                    new_value,
+                )
+                return False
         except (DecimalException, ValueError) as err:
             _LOGGER.warning(
                 "%s: Could not convert to decimal %s: %s",
@@ -165,21 +189,9 @@ class GroupedSensor(RestoreEntity, SensorEntity):
                 current_value,
                 err,
             )
-
-        if (
-            self._attr_state_class == STATE_CLASS_TOTAL_INCREASING
-            and summed < current_value
-        ):
-            _LOGGER.warning(
-                "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
-                self.entity_id,
-                current_value,
-                summed,
-            )
-            return
-
-        self._attr_native_value = round(summed, self._rounding_digits)
-        self.async_schedule_update_ha_state(True)
+            return False
+        
+        return True
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
