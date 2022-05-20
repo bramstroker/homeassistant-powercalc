@@ -189,7 +189,7 @@ async def autodiscover_entities(
         return
 
     _LOGGER.debug("Start auto discovering entities")
-    entity_registry = await er.async_get_registry(hass)
+    entity_registry = er.async_get(hass)
     for entity_entry in list(entity_registry.entities.values()):
         if entity_entry.disabled:
             continue
