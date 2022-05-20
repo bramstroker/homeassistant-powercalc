@@ -156,7 +156,10 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             if state.state not in ignored_states
         )
 
-        if self._attr_state_class == STATE_CLASS_TOTAL_INCREASING and not self.is_state_value_increasing(summed):
+        if (
+            self._attr_state_class == STATE_CLASS_TOTAL_INCREASING
+            and not self.is_state_value_increasing(summed)
+        ):
             return
 
         self._attr_native_value = round(summed, self._rounding_digits)
@@ -174,7 +177,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
 
         try:
             current_value = Decimal(self._attr_native_value)
-            if (new_value < current_value):
+            if new_value < current_value:
                 _LOGGER.warning(
                     "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
                     self.entity_id,
@@ -190,7 +193,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
                 err,
             )
             return False
-        
+
         return True
 
 
