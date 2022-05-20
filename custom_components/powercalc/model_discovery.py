@@ -70,7 +70,7 @@ async def autodiscover_model(
         )
         return None
 
-    device_registry = await dr.async_get_registry(hass)
+    device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
     model_id = device_entry.model
     if match := re.search("\(([^\(\)]+)\)$", str(device_entry.model)):
@@ -103,7 +103,7 @@ async def is_supported_for_autodiscovery(
     if entity_entry is None:
         return False
 
-    device_registry = await dr.async_get_registry(hass)
+    device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
     if device_entry is None:
         return False
