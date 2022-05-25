@@ -8,6 +8,6 @@
     "VERSION": "v0.20.1:docker"
   },
   "name": "Philips Hue 800 Lumen White and Color A19",
-  "standby_power": 4.03,
+  "standby_power": 0.34,
   "supported_modes": ["lut"]
 }
