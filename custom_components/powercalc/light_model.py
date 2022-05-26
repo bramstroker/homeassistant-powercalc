@@ -5,11 +5,13 @@ from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
 
-from .const import (
+from .aliases import (
     MANUFACTURER_DIRECTORY_MAPPING,
+    MODEL_DIRECTORY_MAPPING
+)
+from .const import (
     MODE_FIXED,
     MODE_LINEAR,
-    MODEL_DIRECTORY_MAPPING,
 )
 from .errors import ModelNotSupported, UnsupportedMode
 
