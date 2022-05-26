@@ -172,7 +172,10 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         This could happen when an entity of the grouped sensor becomes unavailable for example.
         When we would record this state change it will cause problems down the road with utility meters
         """
-        if self._attr_native_value is None or self._attr_native_value in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+        if self._attr_native_value is None or self._attr_native_value in (
+            STATE_UNAVAILABLE,
+            STATE_UNKNOWN,
+        ):
             return True
 
         try:

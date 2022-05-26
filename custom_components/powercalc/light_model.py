@@ -5,14 +5,8 @@ from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
 
-from .aliases import (
-    MANUFACTURER_DIRECTORY_MAPPING,
-    MODEL_DIRECTORY_MAPPING
-)
-from .const import (
-    MODE_FIXED,
-    MODE_LINEAR,
-)
+from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
+from .const import MODE_FIXED, MODE_LINEAR
 from .errors import ModelNotSupported, UnsupportedMode
 
 _LOGGER = logging.getLogger(__name__)

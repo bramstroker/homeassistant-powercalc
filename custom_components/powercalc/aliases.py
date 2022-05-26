@@ -70,7 +70,7 @@ MODEL_DIRECTORY_MAPPING = {
         "3418931P6": "LTC012",
         "3417711P6": "LTW017",
         "8718699673147": "LWA001",
-        "433714": "LWB004",    
+        "433714": "LWB004",
         "8718696449691": "LWB010",
         "9290024406": "LWU001",
         "9290011370B": "LWF001",
@@ -78,10 +78,10 @@ MODEL_DIRECTORY_MAPPING = {
         "8718699703424": "LCL001",
         "8718699671211": "LWE002",
         "9290020399": "LWE002",
-        #US Versions. Alias to EU versions
+        # US Versions. Alias to EU versions
         "LWA003": "LWA001",
         "9290022268": "LWA001",
-        "LWV002": "LWV001", 
+        "LWV002": "LWV001",
         "046677551780": "LWV001",
         "LWO002": "LWO001",
         "9290022415": "LWO001",
@@ -90,7 +90,7 @@ MODEL_DIRECTORY_MAPPING = {
         "LCA007": "LCA006",
         "9290024687": "LCA006",
         "LCA005": "LCA001",
-        "9290022266A": "LCA001"
+        "9290022266A": "LCA001",
     },
     "Yeelight": {
         "color2": "YLDP06YL",
