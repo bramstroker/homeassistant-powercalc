@@ -1,4 +1,4 @@
-# Supported models (117 total)
+# Supported models (118 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -68,6 +68,7 @@
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                              |lut              |color_temp,hs           |
 |signify      |LCT014                   |Philips Hue 800 Lumen White and Color A19                            |lut              |color_temp,hs           |
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)                     |lut              |color_temp,hs           |
+|signify      |LCT016                   |Philips Hue 800 Lumen White and Color A19                            |lut              |color_temp,hs           |
 |signify      |LCT024                   |Hue Play                                                             |lut              |color_temp,hs           |
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |color_temp,hs           |
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs                      |
