@@ -267,11 +267,12 @@ class OCR:
                 except:
                     _LOGGER.error(f"OCR error")
     
-    def write_result(self, text):
+    def write_result(self, text: str):
         if self.file is None:
             self.file = open("ocr_results.txt", "a")
         
-        self.file.write(f"{time.time()};{text}")
+        text = text.strip()
+        self.file.write(f"{time.time()};{text}\n")
         self.file.flush()
 
     def stop_process(self):
