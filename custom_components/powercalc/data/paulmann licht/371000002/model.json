@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Paulmann Licht, 371000002",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.20.1:docker"
+    },
+    "name": "371000002",
+    "standby_power": 1.33,
+    "supported_modes": [
+        "lut"
+    ]
+}
