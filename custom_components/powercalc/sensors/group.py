@@ -24,6 +24,7 @@ from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.util import slugify
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -75,13 +76,14 @@ async def create_group_sensors(
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
+    entity_id = await create_entity_id(hass, name, True)
     group_sensors.append(
         GroupedPowerSensor(
-            name,
-            power_sensor_ids,
-            hass,
+            name=name,
+            entities=power_sensor_ids,
             unique_id=unique_id,
             rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+            entity_id=entity_id
         )
     )
     _LOGGER.debug(f"Creating grouped power sensor: %s", name)
@@ -91,15 +93,16 @@ async def create_group_sensors(
     )
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
+    entity_id = await create_entity_id(hass, name, True)
     energy_unique_id = None
     if unique_id:
         energy_unique_id = f"{unique_id}_energy"
     group_energy_sensor = GroupedEnergySensor(
-        name,
-        energy_sensor_ids,
-        hass,
+        name=name,
+        entities=energy_sensor_ids,
         unique_id=energy_unique_id,
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+        entity_id=entity_id
     )
     group_sensors.append(group_energy_sensor)
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
@@ -109,6 +112,13 @@ async def create_group_sensors(
     )
 
     return group_sensors
+
+async def create_entity_id(hass, name: str, force: bool):
+    if force:
+        name = name.lower()
+        return ENTITY_ID_FORMAT.format(slugify(name))
+
+    return async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
 
 class GroupedSensor(RestoreEntity, SensorEntity):
@@ -120,7 +130,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         self,
         name: str,
         entities: list[str],
-        hass: HomeAssistantType,
+        entity_id: str,
         unique_id: str = None,
         rounding_digits: int = 2,
     ):
@@ -133,7 +143,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         self._rounding_digits = rounding_digits
         if unique_id:
             self._attr_unique_id = unique_id
-        self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
+        self.entity_id = entity_id
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""

@@ -118,7 +118,7 @@ async def create_tariff_select(
 
     if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
         select_component = cast(
-            EntityComponent, hass.data["entity_components"].get(SELECT_DOMAIN)
+            EntityComponent, hass.data[SELECT_DOMAIN]
         )
         if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0"):
             select_unique_id = None
