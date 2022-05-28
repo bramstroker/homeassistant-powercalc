@@ -1,7 +1,6 @@
 {
   "name": "Power calculation",
   "render_readme": true,
-  "domains": ["sensor"],
   "zip_release": true,
   "filename": "powercalc.zip"
 }
