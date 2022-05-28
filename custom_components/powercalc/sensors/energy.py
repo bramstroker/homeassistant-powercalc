@@ -21,7 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers.entity import async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
@@ -222,10 +222,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
         if entity_category:
-            if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2021.11"):
-                from homeassistant.helpers.entity import EntityCategory
-
-                self._attr_entity_category = EntityCategory(entity_category)
+            self._attr_entity_category = EntityCategory(entity_category)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

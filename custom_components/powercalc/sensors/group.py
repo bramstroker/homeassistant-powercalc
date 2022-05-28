@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -22,6 +22,7 @@ from homeassistant.const import (
 from homeassistant.core import State, callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
@@ -110,7 +111,7 @@ async def create_group_sensors(
     return group_sensors
 
 
-class GroupedSensor(SensorEntity):
+class GroupedSensor(RestoreEntity, SensorEntity):
     """Base class for grouped sensors"""
 
     _attr_should_poll = False
@@ -136,6 +137,11 @@ class GroupedSensor(SensorEntity):
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
+        await super().async_added_to_hass()
+
+        if (state := await self.async_get_last_state()) is not None:
+            self._attr_native_value = state.state
+
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
 
     @callback
@@ -149,8 +155,49 @@ class GroupedSensor(SensorEntity):
             for state in states
             if state.state not in ignored_states
         )
+
+        if (
+            self._attr_state_class == STATE_CLASS_TOTAL_INCREASING
+            and not self.is_state_value_increasing(summed)
+        ):
+            return
+
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
+
+    def is_state_value_increasing(self, new_value) -> bool:
+        """
+        Check to make sure the new state is higer than the previous state
+        When this is not the case reject the recording of the state and raise a warning.
+        This could happen when an entity of the grouped sensor becomes unavailable for example.
+        When we would record this state change it will cause problems down the road with utility meters
+        """
+        if self._attr_native_value is None or self._attr_native_value in (
+            STATE_UNAVAILABLE,
+            STATE_UNKNOWN,
+        ):
+            return True
+
+        try:
+            current_value = Decimal(self._attr_native_value)
+            if new_value < current_value:
+                _LOGGER.warning(
+                    "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
+                    self.entity_id,
+                    current_value,
+                    new_value,
+                )
+                return False
+        except (DecimalException, ValueError) as err:
+            _LOGGER.warning(
+                "%s: Could not convert to decimal %s: %s",
+                self.entity_id,
+                current_value,
+                err,
+            )
+            return False
+
+        return True
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):

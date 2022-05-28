@@ -11,12 +11,8 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.typing import HomeAssistantType
 
-from .const import (
-    CONF_CUSTOM_MODEL_DIRECTORY,
-    CONF_MANUFACTURER,
-    CONF_MODEL,
-    MANUFACTURER_ALIASES,
-)
+from .aliases import MANUFACTURER_ALIASES
+from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from .errors import ModelNotSupported
 from .light_model import LightModel
 
@@ -70,7 +66,7 @@ async def autodiscover_model(
         )
         return None
 
-    device_registry = await dr.async_get_registry(hass)
+    device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
     model_id = device_entry.model
     if match := re.search("\(([^\(\)]+)\)$", str(device_entry.model)):
@@ -103,7 +99,7 @@ async def is_supported_for_autodiscovery(
     if entity_entry is None:
         return False
 
-    device_registry = await dr.async_get_registry(hass)
+    device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
     if device_entry is None:
         return False

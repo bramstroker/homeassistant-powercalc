@@ -11,9 +11,9 @@ import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from io import TextIOWrapper
-from typing import Iterator, Optional, Any
+from typing import Any, Iterator, Optional
 
-from decouple import Choices, config, UndefinedValueError
+from decouple import Choices, UndefinedValueError, config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError

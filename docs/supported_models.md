@@ -1,4 +1,4 @@
-# Supported models (110 total)
+# Supported models (118 total)
 |manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |
 |-------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|
 |aqara        |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |
@@ -30,6 +30,7 @@
 |ikea         |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp              |
 |ikea         |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum            |lut              |color_temp              |
 |ikea         |T1820                    |LEPTITER Recessed spot light                                         |lut              |color_temp              |
+|innr         |AE 280 C                 |Smart Bulb Color E27                                                 |lut              |hs,color_temp           |
 |innr         |BY 265                   |BY 265 806lm B22 2700k                                               |lut              |brightness              |
 |innr         |RB 175 W                 |RB175W E27 806lm 2200K-2700K automatic warm dimming                  |lut              |brightness              |
 |innr         |RB 285 C                 |RB 285 C 806lm E27 RGBW                                              |lut              |hs,color_temp           |
@@ -37,15 +38,16 @@
 |ledvance     |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                           |lut              |hs,color_temp           |
 |ledvance     |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                 |lut              |color_temp              |
 |lexman       |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                              |lut              |hs,color_temp           |
-|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp,brightness|
-|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp,brightness|
+|lidl         |HG06106B                 |Livarno Lux E14 candle RGB                                           |lut              |brightness,hs,color_temp|
+|lidl         |HG06106C                 |Livarno Lux E27 bulb RGB                                             |lut              |brightness,hs,color_temp|
 |lidl         |HG06492B                 |Livarno Lux E14 candle CCT                                           |lut              |color_temp              |
 |lidl         |HG07834B                 |Livarno Lux E14 candle RGB                                           |lut              |hs,color_temp           |
 |lidl         |HG07834C                 |Livarno Lux E27 bulb RGB                                             |lut              |hs,color_temp           |
+|lifx         |LIFX A19                 |LIFX A19                                                             |lut              |hs,color_temp           |
 |lifx         |LIFX A19 Night Vision    |LIFX A19 Night Vision                                                |lut              |hs                      |
 |lifx         |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                               |lut              |hs,color_temp           |
 |lifx         |LIFX Candle              |LIFX Candle                                                          |lut              |hs,color_temp           |
-|lifx         |LIFX Mini Color          |LIFX Mini Color                                                      |lut              |hs                      |
+|lifx         |LIFX Mini Color          |LIFX Mini Color                                                      |lut              |hs,color_temp           |
 |lifx         |LIFX Original 1000       |LIFX Original 1000                                                   |lut              |hs,color_temp           |
 |lifx         |LIFX Z                   |LIFX Z                                                               |lut              |hs,color_temp           |
 |mueller-licht|ZBT-ColorTemperature     |tint GU10 Spot 350lm                                                 |lut              |color_temp              |
@@ -53,6 +55,7 @@
 |osram        |LIGHTIFY Indoor Flex RGBW|LIGHTIFY Indoor Flex RGBW 3P (1.8m)                                  |lut              |hs,color_temp           |
 |signify      |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                     |lut              |hs,color_temp           |
 |signify      |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)           |lut              |hs,color_temp           |
+|signify      |LCA009                   |Hue color lamp (LCA009)                                              |lut              |hs,color_temp           |
 |signify      |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                        |lut              |hs,color_temp           |
 |signify      |LCF002                   |Hue Calla Outdoor Pedestal                                           |lut              |hs,color_temp           |
 |signify      |LCG002                   |Hue White and Color Ambiance GU10 BT                                 |lut              |hs,color_temp           |
@@ -63,7 +66,9 @@
 |signify      |LCT007                   |Hue White and Color E27 Gen2 (2015)                                  |lut              |hs,color_temp           |
 |signify      |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)                         |lut              |hs,color_temp           |
 |signify      |LCT012                   |Hue White and Color Ambiance Candle E12                              |lut              |hs,color_temp           |
+|signify      |LCT014                   |Philips Hue 800 Lumen White and Color A19                            |lut              |hs,color_temp           |
 |signify      |LCT015                   |Hue White and Color Ambiance A19 E26/E27 (Gen 4)                     |lut              |hs,color_temp           |
+|signify      |LCT016                   |Philips Hue 800 Lumen White and Color A19                            |lut              |hs,color_temp           |
 |signify      |LCT024                   |Hue Play                                                             |lut              |hs,color_temp           |
 |signify      |LCT026                   |Hue Go 2.0                                                           |lut              |hs,color_temp           |
 |signify      |LLC001                   |Philips Living Color Iris                                            |lut              |hs                      |
@@ -76,6 +81,7 @@
 |signify      |LST002                   |Hue LightStrip Plus (2m)                                             |lut              |hs,color_temp           |
 |signify      |LST004                   |Hue White and Color Ambiance LED Outdoor Lightstrip (5m)             |lut              |hs,color_temp           |
 |signify      |LTA001                   |Hue White Ambiance E27                                               |lut              |color_temp              |
+|signify      |LTA003                   |Hue White Ambiance E26                                               |lut              |color_temp              |
 |signify      |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                         |lut              |color_temp              |
 |signify      |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                |lut              |color_temp              |
 |signify      |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                    |lut              |color_temp              |
@@ -93,11 +99,13 @@
 |signify      |LTW017                   |Hue Adore Bathroom Mirror Light                                      |lut              |color_temp              |
 |signify      |LWA001                   |Hue White Ambiance Bulb A60 E27                                      |lut              |brightness              |
 |signify      |LWA004                   |Hue White Filament Bulb A60 E27                                      |lut              |brightness              |
+|signify      |LWA005                   |Hue Filament E26                                                     |lut              |brightness              |
 |signify      |LWA009                   |Hue White 1600 A67 E27 1600lm                                        |lut              |brightness              |
 |signify      |LWA017                   |Hue white A60 bulb E27 1050lm with Bluetooth                         |lut              |brightness              |
 |signify      |LWB004                   |Hue Lux E27 750lm                                                    |lut              |brightness              |
 |signify      |LWB006                   |Hue White A60 E27 800lm                                              |lut              |brightness              |
 |signify      |LWB010                   |Hue White A60 E27 806lm                                              |lut              |brightness              |
+|signify      |LWB014                   |Philips Hue 840 Lumen White A19                                      |lut              |brightness              |
 |signify      |LWE002                   |Hue White E14 SES Candle 470lm w/ BT (LWE002)                        |lut              |brightness              |
 |signify      |LWF001                   |Hue white A60 bulb E27                                               |lut              |brightness              |
 |signify      |LWG001                   |Hue White GU10                                                       |lut              |brightness              |
