@@ -16,7 +16,7 @@ def main():
                                help="path to the cmd root of tesseract install (see docs for further help)",
                                metavar='', required=True)
     parser.add_argument("-s", "--src", help="SRC video source for video capture",
-                        default=0, type=int)
+                        default=0, type=str)
 
     args = parser.parse_args()
 

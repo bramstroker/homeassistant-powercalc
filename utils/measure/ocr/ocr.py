@@ -287,7 +287,7 @@ class OCR:
         return frame
 
 
-def ocr_stream(source: int = 0):
+def ocr_stream(source: str = "0"):
     """
     Begins the video stream and text OCR in two threads, then shows the video in a CV2 frame with the OCR
     boxes overlaid in real-time.
