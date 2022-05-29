@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import time
+
 import requests
 
-from .powermeter import PowerMeasurementResult, PowerMeter
 from .errors import PowerMeterError
+from .powermeter import PowerMeasurementResult, PowerMeter
 
 
 class TasmotaPowerMeter(PowerMeter):
