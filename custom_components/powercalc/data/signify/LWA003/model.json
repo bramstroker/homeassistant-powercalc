@@ -1,0 +1,11 @@
+{
+    "name": "Hue White A19 E26 Bluetooth",
+    "supported_modes": [
+        "lut"
+    ],
+    "measure_method": "script",
+    "measure_device": "Shelly PM",
+    "standby_power": 0.4,
+    "measure_description": "Used script utils/measure_shelly.py from repository, estimated standby",
+    "linked_lut": "signify/LWA001"
+}
