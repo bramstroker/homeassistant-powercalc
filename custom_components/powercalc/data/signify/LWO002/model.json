@@ -1,0 +1,11 @@
+{
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_description": "Measured with utils/measure, SAMPLE_COUNT=3",
+    "name": "Hue White G25 E26 Edison Filament Globe Bluetooth",
+    "standby_power": 0.35,
+    "supported_modes": [
+        "lut"
+    ],
+    "linked_lut": "signify/LWO001"
+}
