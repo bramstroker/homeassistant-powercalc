@@ -4,6 +4,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 sys.path.insert(
     1,
@@ -92,7 +93,7 @@ def get_aliases(manufacturer_dir: str, model: str) -> list:
     return aliases
 
 
-def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
+def get_manufacturer_by_directory_name(search_directory: str) -> Optional[str]:
     for manufacturer, directory in MANUFACTURER_DIRECTORY_MAPPING.items():
         if search_directory == directory:
             return manufacturer
