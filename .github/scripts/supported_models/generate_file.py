@@ -3,6 +3,11 @@ import glob
 import json
 import os
 import sys
+from pathlib import Path
+
+sys.path.insert(1, os.path.abspath(os.path.join(Path(__file__), "../../../../custom_components/powercalc")))
+
+from aliases import MODEL_DIRECTORY_MAPPING, MANUFACTURER_DIRECTORY_MAPPING
 
 from pytablewriter import MarkdownTableWriter
 
@@ -15,6 +20,7 @@ def generate_supported_model_list():
         "name",
         "calculation modes",
         "color modes",
+        "aliases"
     ]
 
     """Generate static file containing the supported models."""
@@ -36,6 +42,7 @@ def generate_supported_model_list():
                 supported_modes = model_data["supported_modes"]
                 name = model_data["name"]
                 color_modes = get_color_modes(model_directory)
+                aliases = get_aliases(manufacturer, model)
                 rows.append(
                     [
                         manufacturer,
@@ -43,6 +50,7 @@ def generate_supported_model_list():
                         name,
                         ",".join(supported_modes),
                         ",".join(color_modes),
+                        ",".join(aliases)
                     ]
                 )
 
@@ -50,9 +58,10 @@ def generate_supported_model_list():
         writer.value_matrix = rows
         writer.table_name = f"Supported models ({len(rows)} total)"
         writer.dump(md_file)
+    print("Generated supported_models.md")
 
 
-def get_color_modes(model_directory) -> list:
+def get_color_modes(model_directory: str) -> list:
     color_modes = set()
     for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):
         filename = os.path.basename(path)
@@ -61,5 +70,27 @@ def get_color_modes(model_directory) -> list:
         color_modes.add(color_mode)
     return color_modes
 
+def get_aliases(manufacturer_dir: str, model: str) -> list:
+    manufacturer = get_manufacturer_by_directory_name(manufacturer_dir)
+    if manufacturer is None:
+        return []
+
+    model_aliases = MODEL_DIRECTORY_MAPPING.get(manufacturer)
+    if model_aliases is None:
+        return []
+    
+    aliases = list()
+    for alias, model_id in model_aliases.items():
+        if model == model_id:
+            aliases.append(alias)
+    
+    return aliases
+
+def get_manufacturer_by_directory_name(search_directory: str) -> str|None:
+    for manufacturer, directory in MANUFACTURER_DIRECTORY_MAPPING.items():
+        if search_directory == directory:
+            return manufacturer
+    
+    return None
 
 generate_supported_model_list()
