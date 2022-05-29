@@ -37,7 +37,7 @@ To update to the latest version of the script:
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. version 3.8 or higher is advised.
+- Make sure you have Python 3 running on your system. Currently the script works with version 3.8 and 3.9. You cannot use Python 3.10 yet as this will cause errors. Support for that will be added in the future.
 
 Setup requirements for the script. It is advised to run in a virtual environment.
 ```
