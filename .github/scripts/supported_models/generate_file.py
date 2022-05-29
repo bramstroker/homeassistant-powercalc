@@ -32,11 +32,12 @@ def generate_supported_model_list():
     project_root = os.path.realpath(
         os.path.join(os.path.abspath(__file__), "../../../../")
     )
+    data_dir = f"{project_root}/custom_components/powercalc/data"
     with open(os.path.join(project_root, "docs/supported_models.md"), "w") as md_file:
 
         rows = []
         for json_path in glob.glob(
-            f"{project_root}/custom_components/powercalc/data/*/*/model.json",
+            f"{data_dir}/*/*/model.json",
             recursive=True,
         ):
             with open(json_path) as json_file:
@@ -46,7 +47,7 @@ def generate_supported_model_list():
                 manufacturer = os.path.basename(os.path.dirname(model_directory))
                 supported_modes = model_data["supported_modes"]
                 name = model_data["name"]
-                color_modes = get_color_modes(model_directory)
+                color_modes = get_color_modes(model_directory, data_dir, model_data)
                 aliases = get_aliases(manufacturer, model)
                 rows.append(
                     [
@@ -66,7 +67,10 @@ def generate_supported_model_list():
     print("Generated supported_models.md")
 
 
-def get_color_modes(model_directory: str) -> list:
+def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> list:
+    if "linked_lut" in model_data:
+        model_directory = os.path.join(data_dir, model_data["linked_lut"])
+
     color_modes = set()
     for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):
         filename = os.path.basename(path)
