@@ -4,12 +4,23 @@ import json
 import os
 import sys
 from pathlib import Path
+<<<<<<< HEAD
 from typing import Optional
 
 sys.path.insert(1, os.path.abspath(os.path.join(Path(__file__), "../../../../custom_components/powercalc")))
 
 from aliases import MODEL_DIRECTORY_MAPPING, MANUFACTURER_DIRECTORY_MAPPING
+=======
+>>>>>>> master
 
+sys.path.insert(
+    1,
+    os.path.abspath(
+        os.path.join(Path(__file__), "../../../../custom_components/powercalc")
+    ),
+)
+
+from aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
 from pytablewriter import MarkdownTableWriter
 
 
@@ -21,7 +32,11 @@ def generate_supported_model_list():
         "name",
         "calculation modes",
         "color modes",
+<<<<<<< HEAD
         "aliases"
+=======
+        "aliases",
+>>>>>>> master
     ]
 
     """Generate static file containing the supported models."""
@@ -51,7 +66,7 @@ def generate_supported_model_list():
                         name,
                         ",".join(supported_modes),
                         ",".join(color_modes),
-                        ",".join(aliases)
+                        ",".join(aliases),
                     ]
                 )
 
@@ -93,5 +108,30 @@ def get_manufacturer_by_directory_name(search_directory: str) -> Optional[str]:
             return manufacturer
     
     return None
+
+def get_aliases(manufacturer_dir: str, model: str) -> list:
+    manufacturer = get_manufacturer_by_directory_name(manufacturer_dir)
+    if manufacturer is None:
+        return []
+
+    model_aliases = MODEL_DIRECTORY_MAPPING.get(manufacturer)
+    if model_aliases is None:
+        return []
+
+    aliases = list()
+    for alias, model_id in model_aliases.items():
+        if model == model_id:
+            aliases.append(alias)
+
+    return aliases
+
+
+def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
+    for manufacturer, directory in MANUFACTURER_DIRECTORY_MAPPING.items():
+        if search_directory == directory:
+            return manufacturer
+
+    return None
+
 
 generate_supported_model_list()
