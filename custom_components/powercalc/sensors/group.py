@@ -20,11 +20,11 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import State, callback
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
-from homeassistant.util import slugify
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -33,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    DOMAIN
 )
 from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -76,7 +77,7 @@ async def create_group_sensors(
     name_pattern = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     name = name_pattern.format(group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
-    entity_id = await create_entity_id(hass, name, True)
+    entity_id = await create_entity_id(hass, name, unique_id)
     group_sensors.append(
         GroupedPowerSensor(
             name=name,
@@ -93,10 +94,10 @@ async def create_group_sensors(
     )
     name_pattern = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     name = name_pattern.format(group_name)
-    entity_id = await create_entity_id(hass, name, True)
     energy_unique_id = None
     if unique_id:
         energy_unique_id = f"{unique_id}_energy"
+    entity_id = await create_entity_id(hass, name, energy_unique_id)
     group_energy_sensor = GroupedEnergySensor(
         name=name,
         entities=energy_sensor_ids,
@@ -113,10 +114,15 @@ async def create_group_sensors(
 
     return group_sensors
 
-async def create_entity_id(hass, name: str, force: bool):
-    if force:
-        name = name.lower()
-        return ENTITY_ID_FORMAT.format(slugify(name))
+async def create_entity_id(hass: HomeAssistantType, name: str, unique_id: str|None):
+    """
+    Check if we already have an entity id based on the unique id of the group sensor
+    When this is not the case we generate one using same algorithm as HA add entity routine
+    """
+    if unique_id is not None:
+        ent_reg = entity_registry.async_get(hass)
+        if entity_id := ent_reg.async_get_entity_id(SENSOR_DOMAIN, SENSOR_DOMAIN, unique_id):
+            return entity_id
 
     return async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
 
