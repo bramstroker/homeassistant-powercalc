@@ -7,7 +7,7 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.20.1:docker"
     },
-    "name": "Amaris LED panels 595x295mm",
+    "name": "Amaris RGBW LED Panels 595x295mm",
     "standby_power": 1.33,
     "supported_modes": [
         "lut"
