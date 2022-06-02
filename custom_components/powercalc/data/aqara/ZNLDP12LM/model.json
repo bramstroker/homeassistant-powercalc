@@ -8,7 +8,7 @@
         "VERSION": "v0.10.4"
     },
     "name": "Aqara LED light bulb (tunable white)",
-    "standby_power": 0.05,
+    "standby_power": 0.41,
     "supported_modes": [
         "lut"
     ]
