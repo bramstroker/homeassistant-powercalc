@@ -326,7 +326,11 @@ class Measure:
         start_time = time.time()
         _LOGGER.info(f"Measuring standby power. Waiting for {SLEEP_STANDBY} seconds...")
         time.sleep(SLEEP_STANDBY)
-        return self.take_power_measurement(start_time)
+        try:
+            return self.take_power_measurement(start_time)
+        except ZeroReadingError:
+            _LOGGER.error("Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load.")
+            return 0
 
     def get_variations(self, color_mode: str, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
         if color_mode == MODE_HS:

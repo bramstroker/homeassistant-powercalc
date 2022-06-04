@@ -44,23 +44,29 @@ class ShellyPowerMeter(PowerMeter):
         self.api = self.detect_api_type()
 
     def get_power(self) -> PowerMeasurementResult:
-        r = requests.get("http://{}{}".format(self.ip_address, self.api.meter_endpoint), timeout=self.timeout)
+        try:
+            r = requests.get("http://{}{}".format(self.ip_address, self.api.meter_endpoint), timeout=self.timeout)
+        except requests.RequestException as e:
+            _LOGGER.error("Problem connecting to Shelly plug: %s", e)
+            raise ConnectionError("Could not connect to Shelly Plug")
+
         json = r.json()
         power = self.api.parse_json(json)
         return PowerMeasurementResult(power[0], power[1])
 
     def detect_api_type(self) -> ShellyApi:
         for api in (ShellyApiGen1(), ShellyApiGen2()):
+            return api
             try:
                 uri = "http://{}{}".format(self.ip_address, api.status_endpoint)
                 _LOGGER.debug(f"Checking API connection: {uri}")
                 response = requests.get(uri, timeout=self.timeout)
             except requests.RequestException:
-                _LOGGER.debug("Connection could not be established")
+                _LOGGER.error("Connection could not be established")
                 continue
 
             if response.status_code != 200:
-                _LOGGER.debug(f"Unexpected status code {response.status_code}")
+                _LOGGER.error(f"Unexpected status code {response.status_code}")
                 continue
         
             _LOGGER.debug(f"Shelly API version {api.api_version} detected")
