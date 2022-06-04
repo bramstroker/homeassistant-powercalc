@@ -56,7 +56,6 @@ class ShellyPowerMeter(PowerMeter):
 
     def detect_api_type(self) -> ShellyApi:
         for api in (ShellyApiGen1(), ShellyApiGen2()):
-            return api
             try:
                 uri = "http://{}{}".format(self.ip_address, api.status_endpoint)
                 _LOGGER.debug(f"Checking API connection: {uri}")
