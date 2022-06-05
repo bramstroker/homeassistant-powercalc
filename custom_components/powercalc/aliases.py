@@ -91,4 +91,7 @@ MODEL_DIRECTORY_MAPPING = {
         "color2": "YLDP06YL",
 	"color4": "YLDP13YL",
     },
+    "MLI": {
+        "45327": "45318",
+    },
 }
