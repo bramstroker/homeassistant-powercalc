@@ -49,8 +49,8 @@ MIN_BRIGHTNESS = min(max(
     ), 1), 255
 )
 MAX_BRIGHTNESS = 255
-MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 254)
-MAX_SAT = min(max(config("MAX_SAT", default=254, cast=int), 1), 254)
+MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
+MAX_SAT = min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
 MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
 MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
 CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
