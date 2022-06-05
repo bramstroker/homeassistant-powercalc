@@ -8,7 +8,7 @@
         "VERSION": "v0.20.3:docker"
     },
     "name": "M\u00fcller Licht E14 Kerze white+color",
-    "standby_power": 0.39,
+    "standby_power": 0.31,
     "supported_modes": [
         "lut"
     ]
