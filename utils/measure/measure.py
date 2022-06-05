@@ -50,16 +50,31 @@ MIN_BRIGHTNESS = min(max(
     ), 1), 255
 )
 MAX_BRIGHTNESS = 255
-MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 254)
-MAX_SAT = min(max(config("MAX_SAT", default=254, cast=int), 1), 254)
+MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
+MAX_SAT = min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
 MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
 MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
 CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
 CT_MIRED_STEPS = min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
 BRI_BRI_STEPS = 1
-HS_BRI_STEPS = min(config("HS_BRI_STEPS", default=10, cast=int), 20)
-HS_HUE_STEPS = min(config("HS_HUE_STEPS", default=2000, cast=int), 4000)
-HS_SAT_STEPS = min(config("HS_SAT_STEPS", default=10, cast=int), 20)
+
+HS_BRI_PRECISION = config("HS_BRI_PRECISION", default=1, cast=float)
+HS_BRI_PRECISION = min(HS_BRI_PRECISION, 4)
+HS_BRI_PRECISION = max(HS_BRI_PRECISION, 0.5)
+HS_BRI_STEPS = round(32 / HS_BRI_PRECISION)
+del HS_BRI_PRECISION
+
+HS_HUE_PRECISION = config("HS_HUE_PRECISION", default=1, cast=float)
+HS_HUE_PRECISION = min(HS_HUE_PRECISION, 4)
+HS_HUE_PRECISION = max(HS_HUE_PRECISION, 0.5)
+HS_HUE_STEPS = round(2731 / HS_HUE_PRECISION)
+del HS_HUE_PRECISION
+
+HS_SAT_PRECISION = config("HS_SAT_PRECISION", default=1, cast=float)
+HS_SAT_PRECISION = min(HS_SAT_PRECISION, 4)
+HS_SAT_PRECISION = max(HS_SAT_PRECISION, 0.5)
+HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
+del HS_SAT_PRECISION
 
 POWER_METER_DUMMY = "dummy"
 POWER_METER_HASS = "hass"
