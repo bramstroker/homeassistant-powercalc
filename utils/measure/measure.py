@@ -114,6 +114,7 @@ HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
+DUMMY_LOAD_VALUE = config("DUMMY_LOAD_VALUE", default=0, cast=float)
 
 CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
 
@@ -312,8 +313,10 @@ class Measure:
             if SAMPLE_COUNT > 1:
                 time.sleep(SLEEP_TIME_SAMPLE)
 
-        avg = sum(measurements) / len(measurements) / self.num_lights
-        return round(avg, 2)
+        value = sum(measurements) / len(measurements) / self.num_lights
+        value = value - DUMMY_LOAD_VALUE
+
+        return round(value, 2)
 
     def gzip_csv(self, csv_file_path: str):
         with open(csv_file_path, "rb") as csv_file:
