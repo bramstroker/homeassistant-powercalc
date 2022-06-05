@@ -18,6 +18,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Aqara": "aqara",
     "Lexman": "lexman",
     "Yeelight": "yeelight",
+    "TuYa": "tuya",
 }
 
 MODEL_DIRECTORY_MAPPING = {
@@ -86,6 +87,9 @@ MODEL_DIRECTORY_MAPPING = {
         # US Versions. Alias to EU versions
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
+    },
+    "TuYa": {
+        "TS0505B": "NO66-ZB/length_5",
     },
     "Yeelight": {
         "color2": "YLDP06YL",
