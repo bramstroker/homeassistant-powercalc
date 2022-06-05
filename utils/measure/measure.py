@@ -271,6 +271,10 @@ class Measure:
         if not os.path.exists(csv_file_path):
             return False
         
+        size = os.path.getsize(csv_file_path) 
+        if size == 0:
+            return False
+
         answers = prompt([{
             "type": "confirm",
             "message": "CSV File already exists. Do you want to resume measurements?",
