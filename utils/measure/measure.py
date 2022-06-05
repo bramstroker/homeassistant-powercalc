@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from io import TextIOWrapper
 from typing import Any, Iterator, Optional
+from pathlib import Path
 
 from decouple import Choices, UndefinedValueError, config
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
@@ -114,7 +115,6 @@ HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
-DUMMY_LOAD_VALUE = config("DUMMY_LOAD_VALUE", default=0, cast=float)
 
 CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
 
@@ -154,6 +154,10 @@ class Measure:
         self.power_meter.process_answers(answers)
         self.color_mode = answers["color_mode"]
         self.num_lights = int(answers.get("num_lights", 1))
+        self.is_dummy_load_connected = bool(answers.get("dummy_load"))
+        if self.is_dummy_load_connected:
+            self.dummy_load_value = self.get_dummy_load_value()
+            _LOGGER.info(f"Using {self.dummy_load_value}W as dummy load value")
 
         self.light_info = self.light_controller.get_light_info()
 
@@ -314,7 +318,8 @@ class Measure:
                 time.sleep(SLEEP_TIME_SAMPLE)
 
         value = sum(measurements) / len(measurements) / self.num_lights
-        value = value - DUMMY_LOAD_VALUE
+        if self.is_dummy_load_connected:
+            value = value - self.dummy_load_value
 
         return round(value, 2)
 
@@ -474,6 +479,12 @@ class Measure:
             },
             {
                 "type": "confirm",
+                "name": "dummy_load",
+                "message": "Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                "default": False
+            },
+            {
+                "type": "confirm",
                 "name": "multiple_lights",
                 "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
                 "default": False
@@ -508,6 +519,34 @@ class Measure:
                 answers[question_name] = config(env_var)
 
         return answers
+    
+    def get_dummy_load_value(self) -> float:
+        """Get the previously measured dummy load value"""
+
+        #dummy_load_file = Path(".persistent/dummy_load").resolve()
+        dummy_load_file = os.path.join(Path(__file__).parent.absolute(), ".persistent/dummy_load")
+        if not os.path.exists(dummy_load_file):
+            return self.measure_dummy_load(dummy_load_file)
+
+        with open(dummy_load_file, "r") as f:
+            return float(f.read())
+    
+    def measure_dummy_load(self, file_path: str) -> float:
+        """Measure the dummy load and persist the value for future measurement session"""
+        input("Only connect your dummy load to your smart plug, not the light! Press enter to start measuring the dummy load..")
+        values = []
+        for i in range(1):
+            result = self.power_meter.get_power()
+            values.append(result.power)
+            _LOGGER.info(f"Dummy load watt: {result.power}")
+            time.sleep(SLEEP_TIME)
+        average = sum(values) / len(values)
+
+        with open(file_path, "w") as f:
+            f.write(str(average))
+
+        input("Connect your light now and press enter to start measuring..")
+        return average
 
 class CsvWriter:
     def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
