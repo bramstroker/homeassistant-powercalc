@@ -5,6 +5,7 @@ import gzip
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import time
@@ -496,13 +497,13 @@ class Measure:
             inquirer.Text(
                 name="model_name",
                 message="Specify the full light model name",
-                ignore=lambda answers: not is_answer_selected(answers, "generate_model_json"),
+                ignore=lambda answers: not answers.get("generate_model_json"),
                 validate=validate_required,
             ),
             inquirer.Text(
                 name="measure_device",
                 message="Which powermeter (manufacturer, model) do you use to take the measurement?",
-                ignore=lambda answers: not is_answer_selected(answers, "generate_model_json"),
+                ignore=lambda answers: not answers.get("generate_model_json"),
                 validate=validate_required,
             ),
             inquirer.Confirm(
@@ -523,8 +524,8 @@ class Measure:
             inquirer.Text(
                 name="num_lights",
                 message="How many lights are you measuring?",
-                default="1",
-                ignore=lambda answers: not is_answer_selected(answers, "multiple_lights"),
+                ignore=lambda answers: not answers.get("multiple_lights"),
+                validate=lambda _, current: re.match('\d+', current),
             ),
         ]
 
@@ -616,13 +617,6 @@ def config_key_exists(key: str) -> bool:
         return True
     except UndefinedValueError:
         return False
-
-def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
-    """Check if the question is answered with yes (Y)"""
-    if answer_key in answers:
-        return answers[answer_key]
-    
-    return bool(config(answer_key.upper(), False))
 
 def validate_required(_, val):
     """Validation function for the inquirer question, checks if the input has a not empty value"""
