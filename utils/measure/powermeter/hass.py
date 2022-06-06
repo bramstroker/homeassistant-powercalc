@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import Any
+
 import inquirer
 from dateutil.parser import parse
 from homeassistant_api import Client
-from typing import Any
 
 from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import os
+from typing import Any
 
 import inquirer
-from typing import Any
 from phue import Bridge, PhueRegistrationException
 
 from .controller import LightController, LightInfo

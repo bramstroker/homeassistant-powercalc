@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 import inquirer
 from homeassistant_api import Client
-from typing import Any
 
 from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
 from .controller import LightController, LightInfo

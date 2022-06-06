@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from .const import MAX_MIRED, MIN_MIRED
 from typing import Any
+
+from .const import MAX_MIRED, MIN_MIRED
 
 
 class LightInfo:

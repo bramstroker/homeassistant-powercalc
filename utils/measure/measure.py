@@ -12,10 +12,13 @@ from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from distutils.util import strtobool
 from io import TextIOWrapper
-from typing import Any, Iterator, Optional
 from pathlib import Path
+from typing import Any, Iterator, Optional
 
+import inquirer
 from decouple import Choices, UndefinedValueError, config
+from inquirer.errors import ValidationError
+from inquirer.questions import Question
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
@@ -35,9 +38,6 @@ from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
-import inquirer
-from inquirer.questions import Question
-from inquirer.errors import ValidationError
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
