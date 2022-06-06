@@ -268,7 +268,7 @@ class Measure:
 
             csv_file.close()
 
-        if answers["gzip"] or True:
+        if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
 
     def should_resume(self, csv_file_path: str) -> bool:
