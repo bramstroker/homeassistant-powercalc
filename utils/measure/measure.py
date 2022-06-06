@@ -11,7 +11,6 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
-from distutils.util import strtobool
 from io import TextIOWrapper
 from pathlib import Path
 from typing import Any, Iterator, Optional
@@ -549,7 +548,7 @@ class Measure:
             if config_key_exists(env_var):
                 conf_value = config(env_var)
                 if isinstance(question, inquirer.Confirm):
-                    conf_value = bool(strtobool(conf_value))
+                    conf_value = bool(str_to_bool(conf_value))
                 predefined_answers[question_name] = conf_value
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
@@ -623,6 +622,12 @@ def validate_required(_, val):
     if len(val) == 0:
         raise ValidationError("", reason="This question cannot be empty, please put in a value")
     return True
+
+def str_to_bool(value: Any) -> bool:
+    """Return whether the provided string (or any value really) represents true."""
+    if not value:
+        return False
+    return str(value).lower() in ("y", "yes", "t", "true", "on", "1")
 
 @dataclass(frozen=True)
 class Variation:
