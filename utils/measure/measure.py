@@ -34,7 +34,7 @@ from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
-from PyInquirer import prompt
+import inquirer
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -188,6 +188,7 @@ class Measure:
         file_write_mode = "w"
         write_header_row = True
         if self.should_resume(csv_file_path):
+            _LOGGER.info("Resuming measurements")
             resume_at = self.get_resume_variation(csv_file_path)
             file_write_mode = "a"
             write_header_row = False
@@ -274,15 +275,16 @@ class Measure:
         size = os.path.getsize(csv_file_path) 
         if size == 0:
             return False
+        
+        with open(csv_file_path, "r") as csv_file:
+            rows = csv.reader(csv_file)
+            if len(list(rows)) == 1:
+                return False
 
-        answers = prompt([{
-            "type": "confirm",
-            "message": "CSV File already exists. Do you want to resume measurements?",
-            "name": "resume",
-            "default": True,
-        },])
-
-        return answers["resume"]
+        return inquirer.confirm(
+            message="CSV File already exists. Do you want to resume measurements?",
+            default=True
+        )
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
@@ -462,6 +464,60 @@ class Measure:
         json_file.close()
     
 
+    def get_questions2(self) -> list:
+        """Build list of questions to ask"""
+        questions = [
+            inquirer.List(
+                name="color_mode",
+                message="Select the color mode",
+                choices=[MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
+                default=MODE_HS
+            ),
+            inquirer.Confirm(
+                name="generate_model_json",
+                message="Do you want to generate model.json?",
+                default=True
+            ),
+            inquirer.Text(
+                name="model_name",
+                message="Specify the full light model name",
+                ignore=lambda answers: not is_answer_selected(answers, "generate_model_json"),
+                validate=validate_required,
+            ),
+            inquirer.Text(
+                name="measure_device",
+                message="Which powermeter (manufacturer, model) do you use to take the measurement?",
+                ignore=lambda answers: not is_answer_selected(answers, "generate_model_json"),
+                validate=validate_required,
+            ),
+            inquirer.Confirm(
+                name="gzip",
+                message="Do you want to gzip CSV files?",
+                default=True
+            ),
+            inquirer.Confirm(
+                name="dummy_load",
+                message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                default=False
+            ),
+            inquirer.Confirm(
+                name="multiple_lights",
+                message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
+                default=False
+            ),
+            inquirer.Text(
+                name="num_lights",
+                message="How many lights are you measuring?",
+                default="1",
+                ignore=lambda answers: not is_answer_selected(answers, "multiple_lights"),
+            ),
+        ]
+
+        questions.extend(self.light_controller.get_questions())
+        questions.extend(self.power_meter.get_questions())
+
+        return questions
+
     def get_questions(self) -> list[dict]:
         _LOGGER.info("get questions")
         questions = [
@@ -524,15 +580,15 @@ class Measure:
     
     def ask_questions(self) -> dict[str, Any]:
         """Ask question and return a dictionary with the answers"""
-        all_questions = self.get_questions()
+        all_questions = self.get_questions2()
 
         #Only ask questions which answers are not predefined in .env file
-        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question["name"]).upper())]
+        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question.name).upper())]
 
-        answers = prompt(questions_to_ask)
+        answers = inquirer.prompt(questions_to_ask)
 
         for question in all_questions:
-            question_name = str(question["name"])
+            question_name = str(question.name)
             env_var = question_name.upper()
             if question_name not in answers and config_key_exists(env_var):
                 answers[question_name] = config(env_var)
@@ -604,6 +660,11 @@ def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
         return answers[answer_key]
     
     return bool(config(answer_key.upper(), False))
+
+def validate_required(_, val):
+    if len(val) == 0:
+        raise inquirer.errors.ValidationError("", reason="This question cannot be empty, please put in a value")
+    return True
 
 @dataclass(frozen=True)
 class Variation:
