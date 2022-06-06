@@ -5,16 +5,21 @@ import gzip
 import json
 import logging
 import os
+import re
 import shutil
 import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
+from distutils.util import strtobool
 from io import TextIOWrapper
-from typing import Any, Iterator, Optional
 from pathlib import Path
+from typing import Any, Iterator, Optional
 
+import inquirer
 from decouple import Choices, UndefinedValueError, config
+from inquirer.errors import ValidationError
+from inquirer.questions import Question
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
@@ -34,7 +39,6 @@ from powermeter.powermeter import PowerMeter
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
-from PyInquirer import prompt
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -164,6 +168,7 @@ class Measure:
         self.num_0_readings: int = 0
 
     def start(self):
+        """Starts the measurement session"""
         answers = self.ask_questions()
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
@@ -188,6 +193,7 @@ class Measure:
         file_write_mode = "w"
         write_header_row = True
         if self.should_resume(csv_file_path):
+            _LOGGER.info("Resuming measurements")
             resume_at = self.get_resume_variation(csv_file_path)
             file_write_mode = "a"
             write_header_row = False
@@ -264,28 +270,31 @@ class Measure:
 
             csv_file.close()
 
-        if answers["gzip"] or True:
+        if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
 
     def should_resume(self, csv_file_path: str) -> bool:
+        """Check whether we are able to resume a previous measurement session"""
         if not os.path.exists(csv_file_path):
             return False
         
         size = os.path.getsize(csv_file_path) 
         if size == 0:
             return False
+        
+        with open(csv_file_path, "r") as csv_file:
+            rows = csv.reader(csv_file)
+            if len(list(rows)) == 1:
+                return False
 
-        answers = prompt([{
-            "type": "confirm",
-            "message": "CSV File already exists. Do you want to resume measurements?",
-            "name": "resume",
-            "default": True,
-        },])
-
-        return answers["resume"]
+        return inquirer.confirm(
+            message="CSV File already exists. Do you want to resume measurements?",
+            default=True
+        )
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
+        """Determine the variation where we have to resume the measurements"""
         with open(csv_file_path, "r") as csv_file:
             rows = csv.reader(csv_file)
             last_row = list(rows)[-1]
@@ -303,6 +312,7 @@ class Measure:
 
 
     def take_power_measurement(self, start_timestamp: float, retry_count: int=0) -> float:
+        """Request a power reading from the configured power meter"""
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(1, SAMPLE_COUNT + 1):
@@ -343,12 +353,14 @@ class Measure:
         return round(value, 2)
 
     def gzip_csv(self, csv_file_path: str):
+        """Gzip the CSV file"""
         with open(csv_file_path, "rb") as csv_file:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
 
 
     def measure_standby_power(self) -> float:
+        """Measures the standby power (when the light is OFF)"""
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
         _LOGGER.info(f"Measuring standby power. Waiting for {SLEEP_STANDBY} seconds...")
@@ -360,6 +372,7 @@ class Measure:
             return 0
 
     def get_variations(self, color_mode: str, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
+        """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == MODE_HS:
             variations = self.get_hs_variations()
         elif color_mode == MODE_COLOR_TEMP:
@@ -381,6 +394,7 @@ class Measure:
             yield from variations
 
     def get_ct_variations(self) -> Iterator[ColorTempVariation]:
+        """Get color_temp variations"""
         min_mired = self.light_info.min_mired
         max_mired = self.light_info.max_mired
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
@@ -388,16 +402,19 @@ class Measure:
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
+        """Get hue/sat variations"""
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
             for sat in self.inclusive_range(MIN_SAT, MAX_SAT, HS_SAT_STEPS):
                 for hue in self.inclusive_range(MIN_HUE, MAX_HUE, HS_HUE_STEPS):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
+        """Get brightness variations"""
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
+        """Get an iterator including the min and max, with steps in between"""
         i = start
         while i < end:
             yield i
@@ -440,6 +457,7 @@ class Measure:
     def write_model_json(
         self, directory: str, standby_power: float, name: str, measure_device: str
     ):
+        """Write model.json manifest file"""
         json_data = json.dumps(
             {
                 "measure_device": measure_device,
@@ -462,63 +480,58 @@ class Measure:
         json_file.close()
     
 
-    def get_questions(self) -> list[dict]:
-        _LOGGER.info("get questions")
+    def get_questions(self) -> list[Question]:
+        """Build list of questions to ask"""
         questions = [
-            {
-                "type": "list",
-                "name": "color_mode",
-                "message": "Select the color mode?",
-                "default": MODE_HS,
-                "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
-            },
-            {
-                "type": "confirm",
-                "message": "Do you want to generate model.json?",
-                "name": "generate_model_json",
-                "default": True,
-            },
-            {
-                "type": "input",
-                "name": "model_name",
-                "message": "Specify the full light model name",
-                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
-            },
-            {
-                "type": "input",
-                "name": "measure_device",
-                "message": "Which powermeter (manufacturer, model) do you use to take the measurement?",
-                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
-            },
-            {
-                "type": "confirm",
-                "message": "Do you want to gzip CSV files?",
-                "name": "gzip",
-                "default": True,
-            },
-            {
-                "type": "confirm",
-                "name": "dummy_load",
-                "message": "Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
-                "default": False
-            },
-            {
-                "type": "confirm",
-                "name": "multiple_lights",
-                "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
-                "default": False
-            },
-            {
-                "type": "input",
-                "name": "num_lights",
-                "message": "How many lights are you measuring?",
-                "when": lambda answers: is_answer_selected(answers, "multiple_lights"),
-            }
+            inquirer.List(
+                name="color_mode",
+                message="Select the color mode",
+                choices=[MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
+                default=MODE_HS
+            ),
+            inquirer.Confirm(
+                name="generate_model_json",
+                message="Do you want to generate model.json?",
+                default=True
+            ),
+            inquirer.Text(
+                name="model_name",
+                message="Specify the full light model name",
+                ignore=lambda answers: not answers.get("generate_model_json"),
+                validate=validate_required,
+            ),
+            inquirer.Text(
+                name="measure_device",
+                message="Which powermeter (manufacturer, model) do you use to take the measurement?",
+                ignore=lambda answers: not answers.get("generate_model_json"),
+                validate=validate_required,
+            ),
+            inquirer.Confirm(
+                name="gzip",
+                message="Do you want to gzip CSV files?",
+                default=True
+            ),
+            inquirer.Confirm(
+                name="dummy_load",
+                message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                default=False
+            ),
+            inquirer.Confirm(
+                name="multiple_lights",
+                message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
+                default=False
+            ),
+            inquirer.Text(
+                name="num_lights",
+                message="How many lights are you measuring?",
+                ignore=lambda answers: not answers.get("multiple_lights"),
+                validate=lambda _, current: re.match('\d+', current),
+            ),
         ]
-        
+
         questions.extend(self.light_controller.get_questions())
         questions.extend(self.power_meter.get_questions())
-        
+
         return questions
 
     
@@ -527,15 +540,21 @@ class Measure:
         all_questions = self.get_questions()
 
         #Only ask questions which answers are not predefined in .env file
-        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question["name"]).upper())]
+        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question.name).upper())]
 
-        answers = prompt(questions_to_ask)
-
+        predefined_answers = {}
         for question in all_questions:
-            question_name = str(question["name"])
+            question_name = str(question.name)
             env_var = question_name.upper()
-            if question_name not in answers and config_key_exists(env_var):
-                answers[question_name] = config(env_var)
+            if config_key_exists(env_var):
+                conf_value = config(env_var)
+                if isinstance(question, inquirer.Confirm):
+                    conf_value = bool(strtobool(conf_value))
+                predefined_answers[question_name] = conf_value
+
+        answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
+
+        _LOGGER.debug("Answers: %s", answers)
 
         return answers
     
@@ -579,6 +598,7 @@ class CsvWriter:
             self.writer.writerow(header_row)
     
     def write_measurement(self, variation: Variation, power: float):
+        """Write row with measurement to the CSV"""
         row = variation.to_csv_row()
         row.append(power)
         if CSV_ADD_DATETIME_COLUMN:
@@ -598,12 +618,11 @@ def config_key_exists(key: str) -> bool:
     except UndefinedValueError:
         return False
 
-def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
-    """Check if the question is answered with yes (Y)"""
-    if answer_key in answers:
-        return answers[answer_key]
-    
-    return bool(config(answer_key.upper(), False))
+def validate_required(_, val):
+    """Validation function for the inquirer question, checks if the input has a not empty value"""
+    if len(val) == 0:
+        raise ValidationError("", reason="This question cannot be empty, please put in a value")
+    return True
 
 @dataclass(frozen=True)
 class Variation:
@@ -647,6 +666,7 @@ class LightControllerFactory:
         return LightController()
 
     def create(self) -> LightController:
+        """Create the light controller object"""
         factories = {
             LIGHT_CONTROLLER_DUMMY: self.dummy,
             LIGHT_CONTROLLER_HUE: self.hue,
@@ -688,6 +708,7 @@ class PowerMeterFactory:
         )
 
     def create(self) -> PowerMeter:
+        """Create the power meter object"""
         factories = {
             POWER_METER_HASS: self.hass,
             POWER_METER_KASA: self.kasa,
@@ -713,19 +734,13 @@ def main():
 
     try:
         power_meter = power_meter_factory.create()
-    except PowerMeterError as e:
-        _LOGGER.error(f"Aborting: {e}")
-        return
-
-    try:
         light_controller = light_controller_factory.create()
-    except LightControllerError as e:
+    
+        measure = Measure(light_controller, power_meter)
+        measure.start()
+    except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
-        return
-
-    measure = Measure(light_controller, power_meter)
-
-    measure.start()
+        exit(1)
 
 if __name__ == "__main__":
     main()

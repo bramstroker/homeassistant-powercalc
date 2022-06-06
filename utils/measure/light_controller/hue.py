@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+from typing import Any
 
+import inquirer
 from phue import Bridge, PhueRegistrationException
-from PyInquirer import Separator
 
 from .controller import LightController, LightInfo
 from .errors import LightControllerError, ModelNotDiscoveredError
@@ -15,6 +16,8 @@ TYPE_GROUP = "group"
 class HueLightController(LightController):
     def __init__(self, bridge_ip: str):
         self.bridge = self.initialize_hue_bridge(bridge_ip)
+        self.lights = {light.light_id: light.name for light in self.bridge.lights}
+        self.groups = {group.group_id: group.name for group in self.bridge.groups}
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         kwargs["on"] = on
@@ -71,31 +74,25 @@ class HueLightController(LightController):
 
     def get_questions(self) -> list[dict]:
 
-        def get_light_list(answers):
-            light_list = []
-            for light in self.bridge.lights:
-                light_list.append(
-                    {"value": f"{TYPE_LIGHT}:{light.light_id}", "name": light.name}
-                )
-            if answers["multiple_lights"]:
-                light_list.append(Separator())
-                for group in self.bridge.groups:
-                    light_list.append(
-                        {"value": f"{TYPE_GROUP}:{group.group_id}", "name": group.name}
-                    )
+        def get_message(answers) -> str:
+            if answers.get("multiple_lights"):
+                return "Select the lightgroup"
+            return "Select the light"
 
-            return light_list
+        def get_light_list(answers) -> list:
+            if answers.get("multiple_lights"):
+                return [(name, f"{TYPE_GROUP}:{id}") for id, name in self.groups.items()]
+            return [(name, f"{TYPE_LIGHT}:{id}") for id, name in self.lights.items()]
 
         return [
-            {
-                "type": "list",
-                "name": "light",
-                "message": "Select the light?",
-                "choices": get_light_list,
-            },
+            inquirer.List(
+                name="light",
+                message=get_message,
+                choices=get_light_list
+            ),
         ]
 
-    def process_answers(self, answers):
+    def process_answers(self, answers: dict[str, Any]):
         light_type, light_id = answers["light"].split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)

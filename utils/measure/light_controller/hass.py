@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Any
+
+import inquirer
 from homeassistant_api import Client
 
 from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
@@ -42,21 +45,19 @@ class HassLightController(LightController):
         light_list = sorted([entity.entity_id for entity in lights])
 
         return [
-            {
-                "type": "list",
-                "name": "light_entity_id",
-                "message": "Select the light?",
-                "choices": light_list,
-            },
-            {
-                "type": "input",
-                "name": "light_model_id",
-                "message": "What model is your light? Ex: LED1837R5",
-                "validate": lambda val: len(val) > 0 or "This is required",
-            },
+            inquirer.List(
+                name="light_entity_id",
+                message="Select the light",
+                choices=light_list
+            ),
+            inquirer.Text(
+                name="light_model_id",
+                message="What model is your light? Ex: LED1837R5",
+                validate=lambda _, x: len(x) > 0,
+            )
         ]
 
-    def process_answers(self, answers):
+    def process_answers(self, answers: dict[str, Any]):
         self._entity_id = answers["light_entity_id"]
         self._model_id = answers["light_model_id"]
 

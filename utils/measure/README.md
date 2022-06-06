@@ -14,7 +14,7 @@ The recommended way is with docker as all the needed dependencies are bundled.
 - Start up the command line and verify docker is running: `docker version`
 - Create a new directory. for example `powercalc-measure`
 - Go to this directory and copy the `.env.dist` file to `.env`. You can find it [here](https://github.com/bramstroker/homeassistant-powercalc/blob/master/utils/measure/.env.dist)
-- Modify the `.env` file to your needs 
+- Modify the `.env` file to your needs. Selecting the `POWER_METER` and `LIGHT_CONTROLLER` here is mandatory
 
 #### Start measurements
 
@@ -37,13 +37,22 @@ To update to the latest version of the script:
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. Currently the script works with version 3.8 and 3.9. You cannot use Python 3.10 yet as this will cause errors. Support for that will be added in the future.
+- Make sure you have Python 3 running on your system. Currently the script is tested with version 3.8, 3.9 and 3.10.
 
-Setup requirements for the script. It is advised to run in a virtual environment.
+Setup requirements for the script.
+ It is advised to run in a virtual environment.
 ```
 cd utils/measure
 python3 -m venv measure
 source measure/bin/activate
+pip install -r requirements.txt
+```
+
+Alternatively use pyenv (https://github.com/pyenv/pyenv)
+```
+cd utils/measure
+pyenv virtualenv 3.10.4 measure
+pyenv activate measure
 pip install -r requirements.txt
 ```
 
@@ -52,9 +61,6 @@ When this is not working on your machine (i.e. windows) just install globally.
 cd utils/measure
 pip install -r requirements.txt
 ```
-
-Copy the `.env.dist` file to `.env` and modify the configuration parameters according to your needs.
-You will need to select a `POWER_METER` and `LIGHT_CONTROLLER`
 
 #### Start measurements
 
@@ -69,3 +75,7 @@ After the measurements are finished you will find the files in `export` director
 ## More information about measuring
 
 See the WIKI article for further documentation https://github.com/bramstroker/homeassistant-powercalc/wiki/Contributing-new-lights
+
+## Building and running docker image locally
+docker build -t measure .
+docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it measure

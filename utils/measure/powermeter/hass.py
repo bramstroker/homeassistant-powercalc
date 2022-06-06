@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Any
+
+import inquirer
 from dateutil.parser import parse
 from homeassistant_api import Client
 
@@ -20,13 +23,14 @@ class HassPowerMeter(PowerMeter):
         return PowerMeasurementResult(float(state.get("state")), last_updated)
 
     def get_questions(self) -> list[dict]:
+        power_sensor_list = self.get_power_sensors()
+
         return [
-            {
-                "type": "list",
-                "name": "powermeter_entity_id",
-                "message": "Select the powermeter?",
-                "choices": self.get_power_sensors(),
-            },
+            inquirer.List(
+                name="powermeter_entity_id",
+                message="Select the powermeter",
+                choices=power_sensor_list
+            )
         ]
 
     def get_power_sensors(self) -> list[str]:
@@ -40,5 +44,5 @@ class HassPowerMeter(PowerMeter):
         ]
         return sorted(power_sensors)
 
-    def process_answers(self, answers):
+    def process_answers(self, answers: dict[str, Any]):
         self._entity_id = answers["powermeter_entity_id"]
