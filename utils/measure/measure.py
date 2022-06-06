@@ -35,6 +35,8 @@ from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
 import inquirer
+from inquirer.questions import Question
+from inquirer.errors import ValidationError
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -164,6 +166,7 @@ class Measure:
         self.num_0_readings: int = 0
 
     def start(self):
+        """Starts the measurement session"""
         answers = self.ask_questions()
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
@@ -269,6 +272,7 @@ class Measure:
             self.gzip_csv(csv_file_path)
 
     def should_resume(self, csv_file_path: str) -> bool:
+        """Check whether we are able to resume a previous measurement session"""
         if not os.path.exists(csv_file_path):
             return False
         
@@ -288,6 +292,7 @@ class Measure:
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
+        """Determine the variation where we have to resume the measurements"""
         with open(csv_file_path, "r") as csv_file:
             rows = csv.reader(csv_file)
             last_row = list(rows)[-1]
@@ -305,6 +310,7 @@ class Measure:
 
 
     def take_power_measurement(self, start_timestamp: float, retry_count: int=0) -> float:
+        """Request a power reading from the configured power meter"""
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(1, SAMPLE_COUNT + 1):
@@ -345,12 +351,14 @@ class Measure:
         return round(value, 2)
 
     def gzip_csv(self, csv_file_path: str):
+        """Gzip the CSV file"""
         with open(csv_file_path, "rb") as csv_file:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
 
 
     def measure_standby_power(self) -> float:
+        """Measures the standby power (when the light is OFF)"""
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
         _LOGGER.info(f"Measuring standby power. Waiting for {SLEEP_STANDBY} seconds...")
@@ -362,6 +370,7 @@ class Measure:
             return 0
 
     def get_variations(self, color_mode: str, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
+        """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == MODE_HS:
             variations = self.get_hs_variations()
         elif color_mode == MODE_COLOR_TEMP:
@@ -383,6 +392,7 @@ class Measure:
             yield from variations
 
     def get_ct_variations(self) -> Iterator[ColorTempVariation]:
+        """Get color_temp variations"""
         min_mired = self.light_info.min_mired
         max_mired = self.light_info.max_mired
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
@@ -390,16 +400,19 @@ class Measure:
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
+        """Get hue/sat variations"""
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
             for sat in self.inclusive_range(MIN_SAT, MAX_SAT, HS_SAT_STEPS):
                 for hue in self.inclusive_range(MIN_HUE, MAX_HUE, HS_HUE_STEPS):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
+        """Get brightness variations"""
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
     def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
+        """Get an iterator including the min and max, with steps in between"""
         i = start
         while i < end:
             yield i
@@ -442,6 +455,7 @@ class Measure:
     def write_model_json(
         self, directory: str, standby_power: float, name: str, measure_device: str
     ):
+        """Write model.json manifest file"""
         json_data = json.dumps(
             {
                 "measure_device": measure_device,
@@ -464,7 +478,7 @@ class Measure:
         json_file.close()
     
 
-    def get_questions(self) -> list:
+    def get_questions(self) -> list[Question]:
         """Build list of questions to ask"""
         questions = [
             inquirer.List(
@@ -526,13 +540,16 @@ class Measure:
         #Only ask questions which answers are not predefined in .env file
         questions_to_ask = [question for question in all_questions if not config_key_exists(str(question.name).upper())]
 
-        answers = inquirer.prompt(questions_to_ask)
-
+        predefined_answers = {}
         for question in all_questions:
             question_name = str(question.name)
             env_var = question_name.upper()
-            if question_name not in answers and config_key_exists(env_var):
-                answers[question_name] = config(env_var)
+            if config_key_exists(env_var):
+                predefined_answers[question_name] = config(env_var)
+
+        answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
+
+        _LOGGER.info("Answers: %s", answers)
 
         return answers
     
@@ -576,6 +593,7 @@ class CsvWriter:
             self.writer.writerow(header_row)
     
     def write_measurement(self, variation: Variation, power: float):
+        """Write row with measurement to the CSV"""
         row = variation.to_csv_row()
         row.append(power)
         if CSV_ADD_DATETIME_COLUMN:
@@ -603,8 +621,9 @@ def is_answer_selected(answers: list[dict], answer_key: str) -> bool:
     return bool(config(answer_key.upper(), False))
 
 def validate_required(_, val):
+    """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
-        raise inquirer.errors.ValidationError("", reason="This question cannot be empty, please put in a value")
+        raise ValidationError("", reason="This question cannot be empty, please put in a value")
     return True
 
 @dataclass(frozen=True)
@@ -649,6 +668,7 @@ class LightControllerFactory:
         return LightController()
 
     def create(self) -> LightController:
+        """Create the light controller object"""
         factories = {
             LIGHT_CONTROLLER_DUMMY: self.dummy,
             LIGHT_CONTROLLER_HUE: self.hue,
@@ -690,6 +710,7 @@ class PowerMeterFactory:
         )
 
     def create(self) -> PowerMeter:
+        """Create the power meter object"""
         factories = {
             POWER_METER_HASS: self.hass,
             POWER_METER_KASA: self.kasa,
