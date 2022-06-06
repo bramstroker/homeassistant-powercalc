@@ -464,7 +464,7 @@ class Measure:
         json_file.close()
     
 
-    def get_questions2(self) -> list:
+    def get_questions(self) -> list:
         """Build list of questions to ask"""
         questions = [
             inquirer.List(
@@ -518,69 +518,10 @@ class Measure:
 
         return questions
 
-    def get_questions(self) -> list[dict]:
-        _LOGGER.info("get questions")
-        questions = [
-            {
-                "type": "list",
-                "name": "color_mode",
-                "message": "Select the color mode?",
-                "default": MODE_HS,
-                "choices": [MODE_HS, MODE_COLOR_TEMP, MODE_BRIGHTNESS],
-            },
-            {
-                "type": "confirm",
-                "message": "Do you want to generate model.json?",
-                "name": "generate_model_json",
-                "default": True,
-            },
-            {
-                "type": "input",
-                "name": "model_name",
-                "message": "Specify the full light model name",
-                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
-            },
-            {
-                "type": "input",
-                "name": "measure_device",
-                "message": "Which powermeter (manufacturer, model) do you use to take the measurement?",
-                "when": lambda answers: is_answer_selected(answers, "generate_model_json"),
-            },
-            {
-                "type": "confirm",
-                "message": "Do you want to gzip CSV files?",
-                "name": "gzip",
-                "default": True,
-            },
-            {
-                "type": "confirm",
-                "name": "dummy_load",
-                "message": "Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
-                "default": False
-            },
-            {
-                "type": "confirm",
-                "name": "multiple_lights",
-                "message": "Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
-                "default": False
-            },
-            {
-                "type": "input",
-                "name": "num_lights",
-                "message": "How many lights are you measuring?",
-                "when": lambda answers: is_answer_selected(answers, "multiple_lights"),
-            }
-        ]
-        
-        questions.extend(self.light_controller.get_questions())
-        questions.extend(self.power_meter.get_questions())
-        
-        return questions
-
     
     def ask_questions(self) -> dict[str, Any]:
         """Ask question and return a dictionary with the answers"""
-        all_questions = self.get_questions2()
+        all_questions = self.get_questions()
 
         #Only ask questions which answers are not predefined in .env file
         questions_to_ask = [question for question in all_questions if not config_key_exists(str(question.name).upper())]
