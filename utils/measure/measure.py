@@ -554,7 +554,7 @@ class Measure:
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
 
-        _LOGGER.info("Answers: %s", answers)
+        _LOGGER.debug("Answers: %s", answers)
 
         return answers
     
