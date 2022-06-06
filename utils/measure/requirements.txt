@@ -48,4 +48,3 @@ urllib3==1.26.6
 wcwidth==0.2.5
 yarl==1.6.3
 zipp==3.5.0
-zwave-js-server-python==0.30.0
