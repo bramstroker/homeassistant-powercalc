@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 import inquirer
+from typing import Any
 from phue import Bridge, PhueRegistrationException
 
 from .controller import LightController, LightInfo
@@ -96,7 +97,7 @@ class HueLightController(LightController):
             ),
         ]
 
-    def process_answers(self, answers: dict):
+    def process_answers(self, answers: dict[str, Any]):
         light_type, light_id = answers["light"].split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)

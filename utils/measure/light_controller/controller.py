@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .const import MAX_MIRED, MIN_MIRED
+from typing import Any
 
 
 class LightInfo:
@@ -41,5 +42,5 @@ class LightController:
     def get_questions(self) -> list[dict]:
         return []
 
-    def process_answers(self, answers: dict):
+    def process_answers(self, answers: dict[str, Any]):
         pass

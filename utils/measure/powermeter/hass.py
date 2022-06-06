@@ -3,6 +3,7 @@ from __future__ import annotations
 import inquirer
 from dateutil.parser import parse
 from homeassistant_api import Client
+from typing import Any
 
 from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter
@@ -42,5 +43,5 @@ class HassPowerMeter(PowerMeter):
         ]
         return sorted(power_sensors)
 
-    def process_answers(self, answers: dict):
+    def process_answers(self, answers: dict[str, Any]):
         self._entity_id = answers["powermeter_entity_id"]

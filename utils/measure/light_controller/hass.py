@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inquirer
 from homeassistant_api import Client
+from typing import Any
 
 from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
 from .controller import LightController, LightInfo
@@ -55,7 +56,7 @@ class HassLightController(LightController):
             )
         ]
 
-    def process_answers(self, answers: dict):
+    def process_answers(self, answers: dict[str, Any]):
         self._entity_id = answers["light_entity_id"]
         self._model_id = answers["light_model_id"]
 
