@@ -74,25 +74,20 @@ class HueLightController(LightController):
 
     def get_questions(self) -> list[dict]:
 
-        def get_light_list(answers):
-            light_list = []
-            for id, name in self.lights.items():
-                light_list.append(
-                    (name, f"{TYPE_LIGHT}:{id}")
-                )
-            if answers["multiple_lights"]:
-                #light_list.append(Separator())
-                for id, name in self.groups.items():
-                    light_list.append(
-                        (name, f"{TYPE_GROUP}:{id}")
-                    )
+        def get_message(answers) -> str:
+            if answers.get("multiple_lights"):
+                return "Select the lightgroup"
+            return "Select the light"
 
-            return light_list
+        def get_light_list(answers) -> list:
+            if answers.get("multiple_lights"):
+                return [(name, f"{TYPE_GROUP}:{id}") for id, name in self.groups.items()]
+            return [(name, f"{TYPE_LIGHT}:{id}") for id, name in self.lights.items()]
 
         return [
             inquirer.List(
                 name="light",
-                message="Select the light",
+                message=get_message,
                 choices=get_light_list
             ),
         ]

@@ -10,6 +10,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
+from distutils.util import strtobool
 from io import TextIOWrapper
 from typing import Any, Iterator, Optional
 from pathlib import Path
@@ -545,7 +546,10 @@ class Measure:
             question_name = str(question.name)
             env_var = question_name.upper()
             if config_key_exists(env_var):
-                predefined_answers[question_name] = config(env_var)
+                conf_value = config(env_var)
+                if isinstance(question, inquirer.Confirm):
+                    conf_value = bool(strtobool(conf_value))
+                predefined_answers[question_name] = conf_value
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
 
@@ -736,19 +740,13 @@ def main():
 
     try:
         power_meter = power_meter_factory.create()
-    except PowerMeterError as e:
-        _LOGGER.error(f"Aborting: {e}")
-        return
-
-    try:
         light_controller = light_controller_factory.create()
-    except LightControllerError as e:
+    
+        measure = Measure(light_controller, power_meter)
+        measure.start()
+    except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
-        return
-
-    measure = Measure(light_controller, power_meter)
-
-    measure.start()
+        exit(1)
 
 if __name__ == "__main__":
     main()
