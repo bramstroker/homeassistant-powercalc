@@ -9,11 +9,13 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
     CONF_ENTITY_ID,
+    CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
@@ -61,7 +63,7 @@ from .const import (
     MIN_HA_VERSION,
 )
 from .errors import ModelNotSupported
-from .model_discovery import get_light_model, is_supported_for_autodiscovery
+from .model_discovery import get_light_model, has_manufacturer_and_model_information
 from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
 
@@ -194,20 +196,23 @@ async def autodiscover_entities(
         if entity_entry.disabled:
             continue
 
-        if entity_entry.domain != LIGHT_DOMAIN:
+        if not entity_entry.domain in (LIGHT_DOMAIN, SWITCH_DOMAIN):
             continue
 
-        if not await is_supported_for_autodiscovery(hass, entity_entry):
+        if not await has_manufacturer_and_model_information(hass, entity_entry):
             continue
+
+        manual_configuration  = get_manual_configuration(config, entity_entry.entity_id)
 
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
             light_model = await get_light_model(hass, {}, source_entity.entity_entry)
-            if not light_model.is_autodiscovery_allowed:
-                _LOGGER.debug(
-                    f"{entity_entry.entity_id}: Model found in database, but needs manual configuration"
-                )
-                continue
+            if light_model.is_additional_configuration_required:
+                if not manual_configuration:
+                    _LOGGER.warning(
+                        f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
+                    )
+                    continue
         except ModelNotSupported:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping auto configuration",
@@ -230,6 +235,13 @@ async def autodiscover_entities(
         )
 
     _LOGGER.debug("Done auto discovering entities")
+
+def get_manual_configuration(config: dict, entity_id: str) -> dict|None:
+    sensor_config = config.get(SENSOR_DOMAIN)
+    for item in sensor_config:
+        if item.get(CONF_PLATFORM) == DOMAIN and item.get(CONF_ENTITY_ID) == entity_id:
+            return item
+    return None
 
 
 async def create_domain_groups(

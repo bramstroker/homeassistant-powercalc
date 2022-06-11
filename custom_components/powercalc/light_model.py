@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from enum import Enum
 from typing import Optional
 
 from homeassistant.helpers.typing import HomeAssistantType
@@ -13,6 +14,9 @@ _LOGGER = logging.getLogger(__name__)
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
+class DeviceType(Enum):
+    LIGHT = "light"
+    SMART_SWITCH = "smart_switch"
 
 class LightModel:
     def __init__(
@@ -164,9 +168,15 @@ class LightModel:
             )
         return self._json_data.get("fixed_config")
 
-    @property
-    def is_autodiscovery_allowed(self) -> bool:
-        return self._lut_subdirectory is None
-
     def is_mode_supported(self, mode: str) -> bool:
         return mode in self.supported_modes
+    
+    @property
+    def is_additional_configuration_required(self) -> bool:
+        if self._lut_subdirectory is not None:
+            return True
+        return self._json_data.get("requires_additional_configuration") or False
+    
+    @property
+    def device_type(self) -> str:
+        return self._json_data.get("device_type") or DeviceType.LIGHT

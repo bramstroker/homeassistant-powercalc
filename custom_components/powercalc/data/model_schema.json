@@ -48,6 +48,18 @@
       "type": "string",
       "description": "Use LUT data files from another model"
     },
+    "requires_additional_configuration": {
+      "type": "boolean",
+      "description": "Defines whether this model needs additional configuration by the user. Used for smart switches and lights where we can only know the standby power, but not the power of connected light bulb"
+    },
+    "device_type": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["light", "smart_switch"]
+      },
+      "description": "Supported calculation modes"
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation mode",

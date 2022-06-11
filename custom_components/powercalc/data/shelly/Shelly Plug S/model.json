@@ -1,0 +1,8 @@
+{
+    "name": "Shelly Plus S",
+    "measure_method": "manual",
+    "measure_device": "Zhurui 10",
+    "standby_power": 0.33,
+    "requires_additional_configuration": true,
+    "device_type": "smart_switch"
+}

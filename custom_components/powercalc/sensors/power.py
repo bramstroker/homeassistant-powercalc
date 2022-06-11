@@ -123,12 +123,8 @@ async def create_virtual_power_sensor(
     try:
         mode = select_calculation_mode(sensor_config)
 
-        if (
-            sensor_config.get(CONF_LINEAR) is None
-            and sensor_config.get(CONF_FIXED) is None
-            and sensor_config.get(CONF_WLED) is None
-        ):
-            # When the user did not manually configured a model and a model was auto discovered we can load it.
+        # When the user did not manually configured a model and a model was auto discovered we can load it.
+        try:
             if (
                 discovery_info
                 and sensor_config.get(CONF_MODEL) is None
@@ -141,6 +137,10 @@ async def create_virtual_power_sensor(
                 )
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
+        except (ModelNotSupported) as err:
+            if not is_fully_configured(sensor_config):
+                _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
+                raise err
 
         if mode is None:
             raise UnsupportedMode(
@@ -152,7 +152,7 @@ async def create_virtual_power_sensor(
             sensor_config, mode, light_model, source_entity
         )
         await calculation_strategy.validate_config(source_entity)
-    except (ModelNotSupported, UnsupportedMode) as err:
+    except (UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
     except StrategyConfigurationError as err:
@@ -235,6 +235,15 @@ def select_calculation_mode(config: dict) -> Optional[str]:
         return MODE_WLED
 
     return None
+
+def is_fully_configured(config) -> bool:
+    if config.get(CONF_FIXED):
+        return True
+    if config.get(CONF_LINEAR):
+        return True
+    if config.get(CONF_WLED):
+        return True
+    return False
 
 
 class PowerSensor:

@@ -44,12 +44,12 @@ async def get_light_model(
     return LightModel(hass, manufacturer, model, custom_model_directory)
 
 
-async def is_supported_model(
+async def is_autoconfigurable(
     hass: HomeAssistantType, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
         light_model = await get_light_model(hass, sensor_config, entry)
-        return bool(light_model and light_model.is_autodiscovery_allowed)
+        return bool(light_model and not light_model.is_additional_configuration_required)
     except ModelNotSupported:
         return False
 
@@ -59,8 +59,8 @@ async def autodiscover_model(
 ) -> Optional[ModelInfo]:
     """Try to auto discover manufacturer and model from the known device information"""
 
-    if not await is_supported_for_autodiscovery(hass, entity_entry):
-        _LOGGER.error(
+    if not await has_manufacturer_and_model_information(hass, entity_entry):
+        _LOGGER.debug(
             "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
             entity_entry.entity_id,
         )
@@ -91,7 +91,7 @@ async def autodiscover_model(
     return model_info
 
 
-async def is_supported_for_autodiscovery(
+async def has_manufacturer_and_model_information(
     hass: HomeAssistantType, entity_entry: er.RegistryEntry | None
 ):
     """See if we have enough information in device registry to automatically setup the power sensor"""
