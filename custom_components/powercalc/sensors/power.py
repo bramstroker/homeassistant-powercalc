@@ -163,11 +163,14 @@ async def create_virtual_power_sensor(
         )
         raise err
 
-    standby_power = None
+    standby_power = Decimal(0)
+    standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        standby_power = sensor_config.get(CONF_STANDBY_POWER)
-        if standby_power is None and light_model is not None:
-            standby_power = light_model.standby_power
+        if CONF_STANDBY_POWER in sensor_config:
+            standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
+        elif light_model is not None:
+            standby_power = Decimal(light_model.standby_power)
+            standby_power_on = Decimal(light_model.standby_power_on)
 
     _LOGGER.debug(
         "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
@@ -191,6 +194,7 @@ async def create_virtual_power_sensor(
         source_domain=source_entity.domain,
         unique_id=unique_id,
         standby_power=standby_power,
+        standby_power_on=standby_power_on,
         scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
@@ -269,7 +273,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         source_entity: str,
         source_domain: str,
         unique_id: str,
-        standby_power: float | None,
+        standby_power: Decimal,
+        standby_power_on: Decimal,
         scan_interval,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
@@ -284,6 +289,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._name = name
         self._power = None
         self._standby_power = standby_power
+        self._standby_power_on = standby_power_on
         self._attr_force_update = True
         self._attr_unique_id = unique_id
         self._scan_interval = scan_interval
@@ -387,10 +393,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Calculate power consumption using configured strategy."""
 
         if state.state in OFF_STATES:
-            standby_power = 0
-            if self._standby_power:
-                standby_power = self._standby_power
-            elif self._power_calculator.can_calculate_standby():
+            standby_power = self._standby_power
+            if self._power_calculator.can_calculate_standby():
                 standby_power = await self._power_calculator.calculate(state)
 
             if self._multiply_factor_standby and self._multiply_factor:
@@ -403,6 +407,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if self._multiply_factor:
             power *= Decimal(self._multiply_factor)
+        
+        if self._standby_power_on:
+            standby_power = self._standby_power_on
+            if self._multiply_factor_standby and self._multiply_factor:
+                standby_power *= self._multiply_factor
+            power += standby_power
 
         return Decimal(power)
 

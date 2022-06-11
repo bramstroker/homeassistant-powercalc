@@ -3,6 +3,7 @@
     "measure_method": "manual",
     "measure_device": "Zhurui PR10",
     "standby_power": 0.33,
+    "standby_power_on": 0.50,
     "requires_additional_configuration": true,
     "device_type": "smart_switch"
 }

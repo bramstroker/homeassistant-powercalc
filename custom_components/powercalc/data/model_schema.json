@@ -19,6 +19,11 @@
       "minimum": 0.05,
       "description": "Power draw when the light is turned of. When you are not able to measure set to 0.4"
     },
+    "standby_power_on": {
+      "type": "number",
+      "minimum": 0.05,
+      "description": "Power draw when the light is turned on."
+    },
     "supported_modes": {
       "type": "array",
       "items": {

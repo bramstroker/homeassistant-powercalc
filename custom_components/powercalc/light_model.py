@@ -143,6 +143,10 @@ class LightModel:
     @property
     def standby_power(self) -> float:
         return self._json_data.get("standby_power") or 0
+    
+    @property
+    def standby_power_on(self) -> float:
+        return self._json_data.get("standby_power_on") or 0
 
     @property
     def supported_modes(self) -> list:
