@@ -309,17 +309,20 @@ class OCR:
             return False
 
         if self.measurement:
-            deviation = abs(100 * (measurement-self.measurement)/self.measurement)
-            if deviation > 120:
-                _LOGGER.info("Deviation between measurements is too high, this must be wrong")
-                return False
-
-            deviation = abs(100 * (self.measurement-measurement)/measurement)
-            if deviation > 120:
-                _LOGGER.info("Deviation between measurements is too high, this must be wrong")
+            diff_percentage = self.get_percentage_change(self.measurement, measurement)
+            if diff_percentage > 120:
+                _LOGGER.info("Difference between measurements is too high, this must be wrong")
                 return False
         
         return True
+    
+    def get_percentage_change(self, current: Decimal, previous: Decimal) -> float:
+        if current == previous:
+            return 0
+        try:
+            return (abs(current - previous) / previous) * 100.0
+        except ZeroDivisionError:
+            return float('inf')
 
 
 def ocr_stream(source: str = "0"):
