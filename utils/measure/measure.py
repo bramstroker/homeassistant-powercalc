@@ -335,7 +335,6 @@ class Measure:
                 error = ZeroReadingError("0 watt was read from the power meter")
 
             if error:
-                _LOGGER.error(error)
                 # Prevent endless recursion. Throw error when max retries is reached
                 if retry_count == MAX_RETRIES:
                     raise error
