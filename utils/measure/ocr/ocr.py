@@ -214,8 +214,10 @@ class OcrRegionSelection:
             cv2.rectangle(frame, (self.selection[0], self.selection[1]), (self.selection[2], self.selection[3]), (0, 255, 0), 2)
         else:
             (h, w) = frame.shape[:2]
-            cv2.putText(frame, "Start drawing the OCR region", (100, h//2), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255))
-            cv2.putText(frame, "Click, drag, and click another time to confirm", (100, h//2+50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255))
+            y_center = h//2
+            cv2.rectangle(frame, (100, y_center - 40), (1400, y_center + 90), (0,0,0), -1)
+            cv2.putText(frame, "Start drawing the OCR region", (100, h//2), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
+            cv2.putText(frame, "Click, drag, and click another time to confirm", (100, h//2+50), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
         return frame
     
     def has_selection(self):
@@ -246,7 +248,6 @@ class OCR:
     def do_ocr(self):
         """
         Creates a process where frames are continuously grabbed from the exchange and processed by pytesseract OCR.
-        Output data from pytesseract is stored in the self.boxes attribute.
         """
         while not self.stopped:
             if self.video_stream is not None and self.region_selection.has_selection():
@@ -296,7 +297,9 @@ class OCR:
         self.stopped = True
     
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
-        frame = cv2.putText(frame, str(self.measurement), (100, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (200, 200, 200))
+        if self.measurement is None:
+            return frame
+        frame = cv2.putText(frame, str(self.measurement), (100, 100), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
         return frame
     
     def validate_measurement(self, measurement: Decimal) -> bool:
@@ -352,13 +355,11 @@ def ocr_stream(source: str = "0"):
             print("OCR stream stopped\n")
             break
 
-        frame = video_stream.frame  # Grabs the most recent frame read by the VideoStream class
+        frame = video_stream.frame
 
-        # # # All display frame additions go here # # # CUSTOMIZABLE
         frame = cps1.render(frame, cps1.rate())
         frame = ocr.render(frame)
         frame = region_selection.render(frame)
-        # # # # # # # # # # # # # # # # # # # # # # # #
 
         cv2.imshow(WINDOW_NAME, frame)
-        cps1.increment()  # Incrementation for rate counter
+        cps1.increment()
