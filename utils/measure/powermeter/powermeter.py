@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 
 class PowerMeter:
@@ -10,7 +10,7 @@ class PowerMeter:
     def get_questions(self) -> list[dict]:
         return []
 
-    def process_answers(self, answers):
+    def process_answers(self, answers: dict[str, Any]):
         pass
 
 

@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.20.1:docker"
+    },
+    "name": "Amaris RGBW LED Panels 595x295mm",
+    "standby_power": 1.33,
+    "supported_modes": [
+        "lut"
+    ]
+}

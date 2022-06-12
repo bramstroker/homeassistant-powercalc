@@ -1,0 +1,11 @@
+{
+    "measure_device": "Nous A1 with TASMOTA 9.5.0",
+    "measure_method": "script",
+    "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
+    "name": "Hue White and Color Ambiance A19 E26 1100lm",
+    "standby_power": 0.4,
+    "supported_modes": [
+        "lut"
+    ],
+    "linked_lut": "signify/LCA006"
+}

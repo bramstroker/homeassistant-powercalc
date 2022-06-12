@@ -18,6 +18,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Aqara": "aqara",
     "Lexman": "lexman",
     "Yeelight": "yeelight",
+    "TuYa": "tuya",
 }
 
 MODEL_DIRECTORY_MAPPING = {
@@ -56,6 +57,7 @@ MODEL_DIRECTORY_MAPPING = {
     "Signify Netherlands B.V.": {
         "9290022166": "LCA001",
         "929003053401": "LCA001",
+        "9290024687": "LCA007",
         "929001953101": "LCG002",
         "1741430P7": "LCS001",
         "1741530P7": "LCS001",
@@ -70,29 +72,27 @@ MODEL_DIRECTORY_MAPPING = {
         "3418931P6": "LTC012",
         "3417711P6": "LTW017",
         "8718699673147": "LWA001",
+        "9290022268": "LWA003",
+        "9290023351": "LWA008",
         "433714": "LWB004",
         "8718696449691": "LWB010",
+        "9290022415": "LWO002",
         "9290024406": "LWU001",
         "9290011370B": "LWF001",
+        "046677551780": "LWV002",
         "8719514328242": "LTA004",
         "8718699703424": "LCL001",
         "8718699671211": "LWE002",
         "9290020399": "LWE002",
         # US Versions. Alias to EU versions
-        "LWA003": "LWA001",
-        "9290022268": "LWA001",
-        "LWV002": "LWV001",
-        "046677551780": "LWV001",
-        "LWO002": "LWO001",
-        "9290022415": "LWO001",
-        "LWA008": "LWA009",
-        "9290023351": "LWA009",
-        "LCA007": "LCA006",
-        "9290024687": "LCA006",
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
     },
+    "TuYa": {
+        "TS0505B": "NO66-ZB/length_5",
+    },
     "Yeelight": {
         "color2": "YLDP06YL",
+	"color4": "YLDP13YL",
     },
 }

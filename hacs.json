@@ -1,6 +1,6 @@
 {
   "name": "Power calculation",
-  "render_readme": true,
+  "render_readme": false,
   "zip_release": true,
   "filename": "powercalc.zip",
   "homeassistant": "2021.11.0"

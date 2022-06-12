@@ -16,6 +16,7 @@
     },
     "standby_power": {
       "type": "number",
+      "minimum": 0.05,
       "description": "Power draw when the light is turned of. When you are not able to measure set to 0.4"
     },
     "supported_modes": {
@@ -42,6 +43,10 @@
     "measure_settings": {
       "type": "object",
       "description": "Settings used for measure script"
+    },
+    "linked_lut": {
+      "type": "string",
+      "description": "Use LUT data files from another model"
     },
     "linear_config": {
       "type": "object",
