@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 import time
 import threading
+from decimal import Decimal, DecimalException
 from threading import Thread
 
 import cv2
@@ -103,6 +104,9 @@ class VideoStream:
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
+        if self.frame is None:
+            self.stopped = True
+            print("Could not find video stream")
         self.stopped = False
         cv2.namedWindow(WINDOW_NAME)
 
@@ -225,7 +229,7 @@ class OCR:
     """Class for creating a pytesseract OCR process in a dedicated thread"""
 
     def __init__(self, video_stream: VideoStream, region_selection: OcrRegionSelection):
-        self.ocr_match: str = None
+        self.measurement: Decimal = None
         self.stopped: bool = False
         self.region_selection = region_selection
         self.video_stream = video_stream
@@ -257,22 +261,32 @@ class OCR:
                     match = pytesseract.image_to_string(
                         frame,
                         config="-c tessedit_char_whitelist='0123456789.'"
-                        #config='outputbase nobatch digits'
                     )
-                    _LOGGER.debug(f"OCR match: {match}")
+                    _LOGGER.debug(f"OCR match: {match.strip()}")
                     if len(match) > 0:
-                        self.ocr_match = match
-                        self.write_result(self.ocr_match)
+                        try:
+                            measurement = Decimal(match)
+                            _LOGGER.info(f"Measurement: {str(measurement)}")
+                        except DecimalException:
+                            _LOGGER.error("Cannot convert OCR match to decimal")
+                            continue
+                        if not self.validate_measurement(measurement):
+                            continue
+                        self.measurement = measurement
+                        self.write_result(self.measurement)
                     time.sleep(OCR_SLEEP)
-                except:
-                    _LOGGER.error(f"OCR error")
+                except Exception as e:
+                    _LOGGER.error(f"OCR error: {e}")
     
-    def write_result(self, text: str):
+    def write_result(self, measurement: Decimal):
         if self.file is None:
-            self.file = open("ocr_results.txt", "a")
+            file_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "ocr_results.txt"
+            )
+            self.file = open(file_path, "a")
         
-        text = text.strip()
-        self.file.write(f"{time.time()};{text}\n")
+        self.file.write(f"{time.time()};{str(measurement)}\n")
         self.file.flush()
 
     def stop_process(self):
@@ -282,9 +296,30 @@ class OCR:
         self.stopped = True
     
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
-        #video_dimensions = self.video_stream.get_video_dimensions()
-        frame = cv2.putText(frame, self.ocr_match, (100, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (200, 200, 200))
+        frame = cv2.putText(frame, str(self.measurement), (100, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (200, 200, 200))
         return frame
+    
+    def validate_measurement(self, measurement: Decimal) -> bool:
+        if measurement > 100:
+            _LOGGER.info("Measurement was too high, discarding")
+            return False
+
+        if measurement < 0.05:
+            _LOGGER.info("Measurement was too low, discarding")
+            return False
+
+        if self.measurement:
+            deviation = abs(100 * (measurement-self.measurement)/self.measurement)
+            if deviation > 120:
+                _LOGGER.info("Deviation between measurements is too high, this must be wrong")
+                return False
+
+            deviation = abs(100 * (self.measurement-measurement)/measurement)
+            if deviation > 120:
+                _LOGGER.info("Deviation between measurements is too high, this must be wrong")
+                return False
+        
+        return True
 
 
 def ocr_stream(source: str = "0"):
@@ -321,9 +356,6 @@ def ocr_stream(source: str = "0"):
         frame = ocr.render(frame)
         frame = region_selection.render(frame)
         # # # # # # # # # # # # # # # # # # # # # # # #
-
-        if ocr.ocr_match is not None and i % 100 == 0:
-            print(ocr.ocr_match)
 
         cv2.imshow(WINDOW_NAME, frame)
         cps1.increment()  # Incrementation for rate counter

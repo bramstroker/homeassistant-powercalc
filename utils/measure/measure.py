@@ -202,7 +202,7 @@ class Measure:
 
         _LOGGER.info(f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}")
 
-        if answers["generate_model_json"]:
+        if answers["generate_model_json"] and not resume_at:
             try:
                 standby_power = self.measure_standby_power()
             except PowerMeterError as error:
@@ -219,7 +219,8 @@ class Measure:
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
-            self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
+            if resume_at is None:
+                self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
@@ -268,6 +269,7 @@ class Measure:
                 csv_writer.write_measurement(variation, power)
 
             csv_file.close()
+            _LOGGER.info(f"Hooray! measurements finished. Exported CSV file {csv_file_path}")
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
