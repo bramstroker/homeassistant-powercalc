@@ -330,18 +330,17 @@ class Measure:
                 self.take_power_measurement(start_timestamp, retry_count)
 
             # Check if measurement is not outdated
-            if measurement.updated < start_timestamp:
+            if measurement.updated < start_timestamp or measurement.power == 0:
                 # Prevent endless recursion and raise exception
                 if retry_count == MAX_RETRIES:
                     raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} retries")
+                # Check if we not have a 0 reading
+                elif measurement.power == 0:
+                    raise ZeroReadingError("0 watt was read from the power meter")
 
                 retry_count += 1
                 time.sleep(SLEEP_TIME)
                 self.take_power_measurement(start_timestamp, retry_count)
-            
-            # Check if we not have a 0 reading
-            if measurement.power == 0:
-                raise ZeroReadingError("0 watt was read from the power meter")
 
             measurements.append(measurement.power)
             if SAMPLE_COUNT > 1:
