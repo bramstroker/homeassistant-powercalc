@@ -95,7 +95,7 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-        "color4": "YLDP13YL" # may also refer to "YLDP04YL"
+        "color4": "YLDP13YL", # may also refer to "YLDP04YL"
         "ceiling10": "YLDL01YL",
         "mono1": "YLDP01YL",
         "strip6": "YLDD05YL",
