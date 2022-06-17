@@ -111,7 +111,8 @@ They are as follows:
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 | energy_sensor_id           | string  | **Optional** | Entity id of an existing energy sensor. Mostly used in conjunction with `power_sensor_id`.
-| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off.
+| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off. |
+| calculation_enabled_condition | template | **Optional** | The configured power calculation strategy will only be executed when this template results in True, otherwise the power sensor will display 0  |
 
 **Minimalistic example creating two power sensors:**
 
@@ -215,6 +216,7 @@ Power consumpion is calculated by ratio. So when you have your fan running at 50
 #### Configuration options
 | Name              | Type    | Requirement  | Description                                 |
 | ----------------- | ------- | ------------ | ------------------------------------------- |
+| attribute         | string  | **Optional** | State attribute to use for the linear range. When not supplied will be `brightness` for lights, and `percentage` for fans     |
 | min_power         | float   | **Optional** | Power usage for lowest brightness level     |
 | max_power         | float   | **Optional** | Power usage for highest brightness level    |
 | calibrate         | string  | **Optional** | Calibration values                          |
@@ -267,6 +269,22 @@ sensor:
       calibrate:
         - 1 -> 200
         - 100 -> 1650
+```
+
+You could also use this to setup a power profile for your robot vacuum cleaner, which only consumes power when it is docked into the charching port. You need to use this in conjunction with the `calculation_enabled_condition` to only activate the power calculation when the device is docked.
+
+```yaml
+- platform: powercalc
+  entity_id: vacuum.my_robot_cleaner
+  calculation_enabled_condition: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}"
+  linear:
+    attribute: battery_level
+    calibrate:
+        - 1 -> 20
+        - 79 -> 20
+        - 80 -> 15
+        - 99 -> 8
+        - 100 -> 1.5
 ```
 
 ### Fixed mode

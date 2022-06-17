@@ -87,6 +87,7 @@ from .const import (
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
@@ -196,6 +197,7 @@ SENSOR_CONFIG = {
         }
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): cv.boolean,
+    vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): cv.template
 }
 
 
