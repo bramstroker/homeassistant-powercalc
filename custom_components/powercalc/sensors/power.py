@@ -20,8 +20,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import callback
+from homeassistant.core import callback, State
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -29,6 +28,7 @@ from homeassistant.helpers.event import (
     async_track_template_result,
     async_track_time_interval,
 )
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
@@ -196,6 +197,7 @@ async def create_virtual_power_sensor(
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        sensor_config=sensor_config
     )
 
 
@@ -266,6 +268,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
         rounding_digits: int,
+        sensor_config: dict,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -283,6 +286,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._ignore_unavailable_state = ignore_unavailable_state
         self._rounding_digits = rounding_digits
         self.entity_id = entity_id
+        self._sensor_config = sensor_config
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
 
@@ -341,7 +345,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             EVENT_HOMEASSISTANT_START, home_assistant_startup
         )
 
-    async def _update_power_sensor(self, trigger_entity_id: str, state) -> bool:
+    async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
         """Update power sensor based on new dependant entity state."""
         if (
             state is None
@@ -374,8 +378,15 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_write_ha_state()
         return True
 
-    async def calculate_power(self, state) -> Optional[Decimal]:
+    async def calculate_power(self, state: State) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
+
+        if CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
+            template: Template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+            template.hass = self.hass
+            calculation_enabled = bool(template.async_render())
+            if not calculation_enabled:
+                return 0
 
         if state.state in OFF_STATES:
             standby_power = 0
