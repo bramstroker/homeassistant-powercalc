@@ -105,8 +105,8 @@ class VideoStream:
         self.stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
         if self.frame is None:
-            self.stopped = True
-            print("Could not find video stream")
+            print("Could not find camera")
+            #exit(1)
         self.stopped = False
         cv2.namedWindow(WINDOW_NAME)
 
@@ -313,19 +313,19 @@ class OCR:
 
         if self.measurement:
             diff_percentage = self.get_percentage_change(self.measurement, measurement)
+            _LOGGER.debug(f"Percentage diff: {diff_percentage}")
             if diff_percentage > 120:
                 _LOGGER.info("Difference between measurements is too high, this must be wrong")
                 return False
         
         return True
     
-    def get_percentage_change(self, current: Decimal, previous: Decimal) -> float:
-        if current == previous:
-            return 0
+    def get_percentage_change(self, current: Decimal, previous: Decimal) -> Decimal:
         try:
-            return (abs(current - previous) / previous) * 100.0
+            percentage = abs(previous - current)/max(previous, current) * 100
         except ZeroDivisionError:
-            return float('inf')
+            percentage = float('inf')
+        return percentage
 
 
 def ocr_stream(source: str = "0"):
@@ -347,6 +347,7 @@ def ocr_stream(source: str = "0"):
     i = 0
     while True:
         i += 1
+
         # Quit condition:
         pressed_key = cv2.waitKey(1) & 0xFF
         if pressed_key == ord('q'):
