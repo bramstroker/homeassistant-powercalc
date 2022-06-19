@@ -94,7 +94,7 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-	"color4": "YLDP13YL",
+        "color4": "YLDP13YL",
     },
     "Müller Licht": {
         "45327": "45318",

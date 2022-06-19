@@ -20,7 +20,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import callback, State
+from homeassistant.core import State, callback
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_DISABLE_STANDBY_POWER,
     CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -51,7 +52,6 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
-    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
@@ -197,7 +197,7 @@ async def create_virtual_power_sensor(
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
-        sensor_config=sensor_config
+        sensor_config=sensor_config,
     )
 
 
@@ -382,7 +382,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Calculate power consumption using configured strategy."""
 
         if CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
-            template: Template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+            template: Template = self._sensor_config.get(
+                CONF_CALCULATION_ENABLED_CONDITION
+            )
             template.hass = self.hass
             calculation_enabled = bool(template.async_render())
             if not calculation_enabled:
