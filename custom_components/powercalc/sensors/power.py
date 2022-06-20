@@ -419,6 +419,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
         if isinstance(template, str):
+            template = template.replace('[[entity]]', self.source_entity)
             template = Template(template)
 
         template.hass = self.hass
