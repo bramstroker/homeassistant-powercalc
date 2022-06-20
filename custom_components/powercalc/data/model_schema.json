@@ -48,6 +48,10 @@
       "type": "string",
       "description": "Use LUT data files from another model"
     },
+    "calculation_enabled_condition": {
+      "type": "string",
+      "description": "Template which can be evaluated."
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation mode",

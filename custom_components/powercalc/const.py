@@ -3,6 +3,12 @@
 from datetime import timedelta
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
+from homeassistant.const import (
+    STATE_NOT_HOME,
+    STATE_OFF,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE,
+)
 
 MIN_HA_VERSION = "2021.11"
 
@@ -119,3 +125,10 @@ CALCULATION_MODES = [
     MODE_LUT,
     MODE_WLED,
 ]
+
+OFF_STATES = (
+    STATE_OFF,
+    STATE_NOT_HOME,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE
+)
