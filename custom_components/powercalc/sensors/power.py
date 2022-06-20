@@ -14,13 +14,10 @@ from homeassistant.const import (
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
-    STATE_NOT_HOME,
-    STATE_OFF,
-    STATE_STANDBY,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback
+from homeassistant.core import callback, State
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -37,7 +34,6 @@ from custom_components.powercalc.const import (
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
-    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_DISABLE_STANDBY_POWER,
     CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -52,6 +48,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
@@ -59,6 +56,7 @@ from custom_components.powercalc.const import (
     MODE_FIXED,
     MODE_LINEAR,
     MODE_WLED,
+    OFF_STATES
 )
 from custom_components.powercalc.errors import (
     ModelNotSupported,
@@ -70,9 +68,9 @@ from custom_components.powercalc.model_discovery import get_light_model
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
-OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -148,7 +146,7 @@ async def create_virtual_power_sensor(
                 "Cannot select a mode (LINEAR, FIXED or LUT, WLED), supply it in the config"
             )
 
-        calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+        calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
@@ -169,6 +167,12 @@ async def create_virtual_power_sensor(
         standby_power = sensor_config.get(CONF_STANDBY_POWER)
         if standby_power is None and light_model is not None:
             standby_power = light_model.standby_power
+    
+    if (not CONF_CALCULATION_ENABLED_CONDITION in sensor_config 
+        and light_model is not None 
+        and light_model.calculation_enabled_condition
+    ):
+        sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = light_model.calculation_enabled_condition
 
     _LOGGER.debug(
         "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
@@ -197,7 +201,7 @@ async def create_virtual_power_sensor(
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
-        sensor_config=sensor_config,
+        sensor_config=sensor_config
     )
 
 
@@ -381,14 +385,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_power(self, state: State) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
 
-        if CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
-            template: Template = self._sensor_config.get(
-                CONF_CALCULATION_ENABLED_CONDITION
-            )
-            template.hass = self.hass
-            calculation_enabled = bool(template.async_render())
-            if not calculation_enabled:
-                return 0
+        if not await self.is_calculation_enabled():
+            return 0
 
         if state.state in OFF_STATES:
             standby_power = 0
@@ -409,6 +407,17 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             power *= Decimal(self._multiply_factor)
 
         return Decimal(power)
+    
+    async def is_calculation_enabled(self) -> bool:
+        if not CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
+            return True
+
+        template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+        if isinstance(template, str):
+            template = Template(template)
+
+        template.hass = self.hass
+        return bool(template.async_render())
 
     @property
     def source_entity(self):
