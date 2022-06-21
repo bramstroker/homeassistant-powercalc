@@ -49,7 +49,9 @@ async def is_autoconfigurable(
 ) -> bool:
     try:
         light_model = await get_light_model(hass, sensor_config, entry)
-        return bool(light_model and not light_model.is_additional_configuration_required)
+        return bool(
+            light_model and not light_model.is_additional_configuration_required
+        )
     except ModelNotSupported:
         return False
 

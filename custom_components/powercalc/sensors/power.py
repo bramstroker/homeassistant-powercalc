@@ -138,7 +138,9 @@ async def create_virtual_power_sensor(
                 mode = light_model.supported_modes[0]
         except (ModelNotSupported) as err:
             if not is_fully_configured(sensor_config):
-                _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
+                _LOGGER.error(
+                    "Skipping sensor setup %s: %s", source_entity.entity_id, err
+                )
                 raise err
 
         if mode is None:
@@ -250,6 +252,7 @@ def select_calculation_mode(config: dict) -> Optional[str]:
         return MODE_WLED
 
     return None
+
 
 def is_fully_configured(config) -> bool:
     if config.get(CONF_FIXED):
@@ -423,7 +426,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if self._multiply_factor:
             power *= Decimal(self._multiply_factor)
-        
+
         if self._standby_power_on:
             standby_power = self._standby_power_on
             if self._multiply_factor_standby and self._multiply_factor:
@@ -438,7 +441,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
         if isinstance(template, str):
-            template = template.replace('[[entity]]', self.source_entity)
+            template = template.replace("[[entity]]", self.source_entity)
             template = Template(template)
 
         template.hass = self.hass

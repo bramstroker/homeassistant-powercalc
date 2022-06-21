@@ -9,8 +9,8 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.const import (
@@ -202,7 +202,7 @@ async def autodiscover_entities(
         if not await has_manufacturer_and_model_information(hass, entity_entry):
             continue
 
-        manual_configuration  = get_manual_configuration(config, entity_entry.entity_id)
+        manual_configuration = get_manual_configuration(config, entity_entry.entity_id)
 
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
@@ -236,7 +236,8 @@ async def autodiscover_entities(
 
     _LOGGER.debug("Done auto discovering entities")
 
-def get_manual_configuration(config: dict, entity_id: str) -> dict|None:
+
+def get_manual_configuration(config: dict, entity_id: str) -> dict | None:
     sensor_config = config.get(SENSOR_DOMAIN)
     for item in sensor_config:
         if item.get(CONF_PLATFORM) == DOMAIN and item.get(CONF_ENTITY_ID) == entity_id:
