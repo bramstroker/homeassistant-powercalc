@@ -3,6 +3,12 @@
 from datetime import timedelta
 
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
+from homeassistant.const import (
+    STATE_NOT_HOME,
+    STATE_OFF,
+    STATE_STANDBY,
+    STATE_UNAVAILABLE,
+)
 
 MIN_HA_VERSION = "2021.11"
 
@@ -59,6 +65,7 @@ CONF_VOLTAGE = "voltage"
 CONF_WLED = "wled"
 CONF_STATES_POWER = "states_power"
 CONF_STANDBY_POWER = "standby_power"
+CONF_CALCULATION_ENABLED_CONDITION = "calculation_enabled_condition"
 CONF_DISABLE_STANDBY_POWER = "disable_standby_power"
 CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_OFFSET = "utility_meter_offset"
@@ -118,3 +125,5 @@ CALCULATION_MODES = [
     MODE_LUT,
     MODE_WLED,
 ]
+
+OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)

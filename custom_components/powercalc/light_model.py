@@ -157,6 +157,10 @@ class LightModel:
         return self._json_data.get("linked_lut")
 
     @property
+    def calculation_enabled_condition(self) -> Optional[str]:
+        return self._json_data.get("calculation_enabled_condition")
+
+    @property
     def linear_mode_config(self) -> Optional[dict]:
         if not self.is_mode_supported(MODE_LINEAR):
             raise UnsupportedMode(

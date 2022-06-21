@@ -61,6 +61,7 @@ from .common import create_source_entity, validate_name_pattern
 from .const import (
     CALCULATION_MODES,
     CONF_AREA,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -196,6 +197,7 @@ SENSOR_CONFIG = {
         }
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): cv.boolean,
+    vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): cv.template,
 }
 
 

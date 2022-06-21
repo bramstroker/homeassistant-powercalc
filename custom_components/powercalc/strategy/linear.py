@@ -9,6 +9,7 @@ import voluptuous as vol
 from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import State
 from homeassistant.helpers.typing import HomeAssistantType
 
@@ -32,6 +33,7 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
+        vol.Optional(CONF_ATTRIBUTE): cv.string,
     }
 )
 
@@ -123,23 +125,17 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
-        attrs = entity_state.attributes
 
-        if entity_state.domain == light.DOMAIN:
-            value = attrs.get(ATTR_BRIGHTNESS)
-            # Some integrations set a higher brightness value than 255, causing powercalc to misbehave
-            if value > 255:
+        attribute = self.get_attribute(entity_state)
+        if attribute:
+            value = entity_state.attributes.get(attribute)
+            if value is None:
+                _LOGGER.error(
+                    f"No {attribute} attribute for entity: {entity_state.entity_id}"
+                )
+                return None
+            if attribute == ATTR_BRIGHTNESS and value > 255:
                 value = 255
-            if value is None:
-                _LOGGER.error(f"No brightness for entity: {entity_state.entity_id}")
-                return None
-            return value
-
-        if entity_state.domain == fan.DOMAIN:
-            value = attrs.get(ATTR_PERCENTAGE)
-            if value is None:
-                _LOGGER.error(f"No percentage for entity: {entity_state.entity_id}")
-                return None
             return value
 
         try:
@@ -149,6 +145,20 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 f"Expecting state to be a number for entity: {entity_state.entity_id}"
             )
             return None
+
+    def get_attribute(self, entity_state: State) -> str | None:
+        """Returns the attribute which needs to be read for the linear calculation"""
+
+        if CONF_ATTRIBUTE in self._config:
+            return self._config.get(CONF_ATTRIBUTE)
+
+        if entity_state.domain == light.DOMAIN:
+            return ATTR_BRIGHTNESS
+
+        if entity_state.domain == fan.DOMAIN:
+            return ATTR_PERCENTAGE
+
+        return None
 
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""

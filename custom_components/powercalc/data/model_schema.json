@@ -61,6 +61,10 @@
       "enum": ["light", "smart_switch"],
       "description": "Type of device"
     },
+    "calculation_enabled_condition": {
+      "type": "string",
+      "description": "Template which can be evaluated."
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation mode",

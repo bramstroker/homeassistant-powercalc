@@ -14,14 +14,10 @@ from homeassistant.const import (
     DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
-    STATE_NOT_HOME,
-    STATE_OFF,
-    STATE_STANDBY,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import callback
+from homeassistant.core import State, callback
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -29,6 +25,7 @@ from homeassistant.helpers.event import (
     async_track_template_result,
     async_track_time_interval,
 )
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
@@ -37,6 +34,7 @@ from custom_components.powercalc.const import (
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_DISABLE_STANDBY_POWER,
     CONF_FIXED,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -58,6 +56,7 @@ from custom_components.powercalc.const import (
     MODE_FIXED,
     MODE_LINEAR,
     MODE_WLED,
+    OFF_STATES,
 )
 from custom_components.powercalc.errors import (
     ModelNotSupported,
@@ -66,12 +65,12 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.model_discovery import get_light_model
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
-OFF_STATES = [STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -147,7 +146,9 @@ async def create_virtual_power_sensor(
                 "Cannot select a mode (LINEAR, FIXED or LUT, WLED), supply it in the config"
             )
 
-        calculation_strategy_factory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+        calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[
+            DOMAIN
+        ][DATA_CALCULATOR_FACTORY]
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
@@ -171,6 +172,15 @@ async def create_virtual_power_sensor(
         elif light_model is not None:
             standby_power = Decimal(light_model.standby_power)
             standby_power_on = Decimal(light_model.standby_power_on)
+
+    if (
+        not CONF_CALCULATION_ENABLED_CONDITION in sensor_config
+        and light_model is not None
+        and light_model.calculation_enabled_condition
+    ):
+        sensor_config[
+            CONF_CALCULATION_ENABLED_CONDITION
+        ] = light_model.calculation_enabled_condition
 
     _LOGGER.debug(
         "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
@@ -200,6 +210,7 @@ async def create_virtual_power_sensor(
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        sensor_config=sensor_config,
     )
 
 
@@ -280,6 +291,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
         rounding_digits: int,
+        sensor_config: dict,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -298,6 +310,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._ignore_unavailable_state = ignore_unavailable_state
         self._rounding_digits = rounding_digits
         self.entity_id = entity_id
+        self._sensor_config = sensor_config
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
 
@@ -356,7 +369,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             EVENT_HOMEASSISTANT_START, home_assistant_startup
         )
 
-    async def _update_power_sensor(self, trigger_entity_id: str, state) -> bool:
+    async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
         """Update power sensor based on new dependant entity state."""
         if (
             state is None
@@ -389,8 +402,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_write_ha_state()
         return True
 
-    async def calculate_power(self, state) -> Optional[Decimal]:
+    async def calculate_power(self, state: State) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
+
+        if not await self.is_calculation_enabled():
+            return 0
 
         if state.state in OFF_STATES:
             standby_power = self._standby_power
@@ -415,6 +431,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             power += standby_power
 
         return Decimal(power)
+
+    async def is_calculation_enabled(self) -> bool:
+        if not CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
+            return True
+
+        template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+        if isinstance(template, str):
+            template = template.replace('[[entity]]', self.source_entity)
+            template = Template(template)
+
+        template.hass = self.hass
+        return bool(template.async_render())
 
     @property
     def source_entity(self):

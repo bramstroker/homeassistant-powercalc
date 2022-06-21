@@ -11,10 +11,13 @@ from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE
+from custom_components.powercalc.const import (
+    CONF_POWER_FACTOR,
+    CONF_VOLTAGE,
+    OFF_STATES,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import evaluate_power
-from custom_components.powercalc.sensors.power import OFF_STATES
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

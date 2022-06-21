@@ -6,13 +6,14 @@ MANUFACTURER_ALIASES = {
     "Xiaomi": "Aqara",
     "LUMI": "Aqara",
     "ADEO": "Lexman",
+    "MLI": "Müller Licht",
 }
 
 MANUFACTURER_DIRECTORY_MAPPING = {
     "IKEA of Sweden": "ikea",
     "Feibit Inc co.  ": "jiawen",
     "LEDVANCE": "ledvance",
-    "MLI": "mueller-licht",
+    "Müller Licht": "mueller-licht",
     "OSRAM": "osram",
     "Signify Netherlands B.V.": "signify",
     "Aqara": "aqara",
@@ -93,6 +94,9 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-	"color4": "YLDP13YL",
+        "color4": "YLDP13YL",
+    },
+    "Müller Licht": {
+        "45327": "45318",
     },
 }
