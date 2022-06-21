@@ -122,12 +122,8 @@ async def create_virtual_power_sensor(
     try:
         mode = select_calculation_mode(sensor_config)
 
-        if (
-            sensor_config.get(CONF_LINEAR) is None
-            and sensor_config.get(CONF_FIXED) is None
-            and sensor_config.get(CONF_WLED) is None
-        ):
-            # When the user did not manually configured a model and a model was auto discovered we can load it.
+        # When the user did not manually configured a model and a model was auto discovered we can load it.
+        try:
             if (
                 discovery_info
                 and sensor_config.get(CONF_MODEL) is None
@@ -140,6 +136,10 @@ async def create_virtual_power_sensor(
                 )
             if mode is None and light_model:
                 mode = light_model.supported_modes[0]
+        except (ModelNotSupported) as err:
+            if not is_fully_configured(sensor_config):
+                _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
+                raise err
 
         if mode is None:
             raise UnsupportedMode(
@@ -153,7 +153,7 @@ async def create_virtual_power_sensor(
             sensor_config, mode, light_model, source_entity
         )
         await calculation_strategy.validate_config(source_entity)
-    except (ModelNotSupported, UnsupportedMode) as err:
+    except (UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
     except StrategyConfigurationError as err:
@@ -164,11 +164,14 @@ async def create_virtual_power_sensor(
         )
         raise err
 
-    standby_power = None
+    standby_power = Decimal(0)
+    standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        standby_power = sensor_config.get(CONF_STANDBY_POWER)
-        if standby_power is None and light_model is not None:
-            standby_power = light_model.standby_power
+        if CONF_STANDBY_POWER in sensor_config:
+            standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
+        elif light_model is not None:
+            standby_power = Decimal(light_model.standby_power)
+            standby_power_on = Decimal(light_model.standby_power_on)
 
     if (
         not CONF_CALCULATION_ENABLED_CONDITION in sensor_config
@@ -201,6 +204,7 @@ async def create_virtual_power_sensor(
         source_domain=source_entity.domain,
         unique_id=unique_id,
         standby_power=standby_power,
+        standby_power_on=standby_power_on,
         scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
@@ -247,6 +251,15 @@ def select_calculation_mode(config: dict) -> Optional[str]:
 
     return None
 
+def is_fully_configured(config) -> bool:
+    if config.get(CONF_FIXED):
+        return True
+    if config.get(CONF_LINEAR):
+        return True
+    if config.get(CONF_WLED):
+        return True
+    return False
+
 
 class PowerSensor:
     """Class which all power sensors should extend from"""
@@ -271,7 +284,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         source_entity: str,
         source_domain: str,
         unique_id: str,
-        standby_power: float | None,
+        standby_power: Decimal,
+        standby_power_on: Decimal,
         scan_interval,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
@@ -287,6 +301,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._name = name
         self._power = None
         self._standby_power = standby_power
+        self._standby_power_on = standby_power_on
         self._attr_force_update = True
         self._attr_unique_id = unique_id
         self._scan_interval = scan_interval
@@ -394,10 +409,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return 0
 
         if state.state in OFF_STATES:
-            standby_power = 0
-            if self._standby_power:
-                standby_power = self._standby_power
-            elif self._power_calculator.can_calculate_standby():
+            standby_power = self._standby_power
+            if self._power_calculator.can_calculate_standby():
                 standby_power = await self._power_calculator.calculate(state)
 
             if self._multiply_factor_standby and self._multiply_factor:
@@ -410,6 +423,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if self._multiply_factor:
             power *= Decimal(self._multiply_factor)
+        
+        if self._standby_power_on:
+            standby_power = self._standby_power_on
+            if self._multiply_factor_standby and self._multiply_factor:
+                standby_power *= self._multiply_factor
+            power += standby_power
 
         return Decimal(power)
 

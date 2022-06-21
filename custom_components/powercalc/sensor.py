@@ -110,7 +110,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .model_discovery import is_supported_model
+from .model_discovery import is_autoconfigurable
 from .sensors.energy import create_daily_fixed_energy_sensor, create_energy_sensor
 from .sensors.group import create_group_sensors
 from .sensors.power import RealPowerSensor, create_power_sensor
@@ -336,7 +336,7 @@ async def create_sensors(
         sensor_configs = {
             entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
             for entity in entities
-            if entity and await is_supported_model(hass, entity)
+            if entity and await is_autoconfigurable(hass, entity)
         } | sensor_configs
 
     # Create sensors for each entity

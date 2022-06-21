@@ -5,7 +5,6 @@
   "required": [
     "name",
     "standby_power",
-    "supported_modes",
     "measure_method",
     "measure_device"
   ],
@@ -18,6 +17,11 @@
       "type": "number",
       "minimum": 0.05,
       "description": "Power draw when the light is turned of. When you are not able to measure set to 0.4"
+    },
+    "standby_power_on": {
+      "type": "number",
+      "minimum": 0.05,
+      "description": "Power draw when the light is turned on."
     },
     "supported_modes": {
       "type": "array",
@@ -47,6 +51,15 @@
     "linked_lut": {
       "type": "string",
       "description": "Use LUT data files from another model"
+    },
+    "requires_additional_configuration": {
+      "type": "boolean",
+      "description": "Defines whether this model needs additional configuration by the user. Used for smart switches and lights where we can only know the standby power, but not the power of connected light bulb"
+    },
+    "device_type": {
+      "type": "string",
+      "enum": ["light", "smart_switch"],
+      "description": "Type of device"
     },
     "calculation_enabled_condition": {
       "type": "string",
