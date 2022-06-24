@@ -394,8 +394,8 @@ class Measure:
 
     def get_ct_variations(self) -> Iterator[ColorTempVariation]:
         """Get color_temp variations"""
-        min_mired = self.light_info.min_mired
-        max_mired = self.light_info.max_mired
+        min_mired = round(self.light_info.min_mired)
+        max_mired = round(self.light_info.max_mired)
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
             for mired in self.inclusive_range(min_mired, max_mired, CT_MIRED_STEPS):
                 yield ColorTempVariation(bri=bri, ct=mired)
