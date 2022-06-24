@@ -95,7 +95,6 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-        "color4": "YLDP13YL", # may also refer to "YLDP04YL"
         "ceiling10": "YLDL01YL",
         "mono1": "YLDP01YL",
         "strip6": "YLDD05YL",
@@ -103,12 +102,9 @@ MODEL_DIRECTORY_MAPPING = {
         ### No profiles yet ###
 
         # "mono": "YLTD03YL",
-        # "color1": "YLDP02YL_YLDP03YL",
         # "color6": "YLDP13AYL",
         # "colorb": "YLDP005",
         # "colorc": "YLDP004-A",
-        # "strip1": "YLDD01YL_YLDD02YL",
-        # "bslamp1": "MJCTD01YL_MJCTD02YL",
         # "RGBW": "MJDP02YL",
         # "lamp": "MJTD02YL",
         # "lamp1": "MJTD01YL",
@@ -119,6 +115,18 @@ MODEL_DIRECTORY_MAPPING = {
         # "ceiling4": "YLXD02YL",
         # "ceiling13": "YLXD01YL",
         # "ceil26": "YLXD76YL",
+        
+        # not a unique match, as it also may refer to "YLDP04YL"
+        # "color4": "YLDP13YL", 
+        
+        # not a unique match, as it also may refer to "YLDP03YL"
+        # "color1": "YLDP02YL",
+        
+        # not a unique match, as it also may refer to "YLDD02YL"
+        # "strip1": "YLDD01YL",
+        
+        # not a unique match, as it also may refer to "MJCTD02YL"
+        # "bslamp1": "MJCTD01YL",
     },
     "Müller Licht": {
         "45327": "45318",
