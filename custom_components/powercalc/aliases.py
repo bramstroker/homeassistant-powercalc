@@ -101,9 +101,7 @@ MODEL_DIRECTORY_MAPPING = {
         "ceiling10": "YLDL01YL",
         "mono1": "YLDP01YL",
         "strip6": "YLDD05YL",
-
         ### No profiles yet ###
-
         # "mono": "YLTD03YL",
         # "color6": "YLDP13AYL",
         # "colorb": "YLDP005",
@@ -118,16 +116,12 @@ MODEL_DIRECTORY_MAPPING = {
         # "ceiling4": "YLXD02YL",
         # "ceiling13": "YLXD01YL",
         # "ceil26": "YLXD76YL",
-        
         # not a unique match, as it also may refer to "YLDP04YL"
-        # "color4": "YLDP13YL", 
-        
+        # "color4": "YLDP13YL",
         # not a unique match, as it also may refer to "YLDP03YL"
         # "color1": "YLDP02YL",
-        
         # not a unique match, as it also may refer to "YLDD02YL"
         # "strip1": "YLDD01YL",
-        
         # not a unique match, as it also may refer to "MJCTD02YL"
         # "bslamp1": "MJCTD01YL",
     },
