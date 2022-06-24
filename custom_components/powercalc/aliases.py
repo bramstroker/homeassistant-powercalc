@@ -56,6 +56,9 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
+    "Müller Licht": {
+        "45327": "45318",
+    },
     "Signify Netherlands B.V.": {
         "9290022166": "LCA001",
         "929003053401": "LCA001",
@@ -127,8 +130,5 @@ MODEL_DIRECTORY_MAPPING = {
         
         # not a unique match, as it also may refer to "MJCTD02YL"
         # "bslamp1": "MJCTD01YL",
-    },
-    "Müller Licht": {
-        "45327": "45318",
     },
 }
