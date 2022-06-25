@@ -7,8 +7,8 @@ from typing import Callable
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
-    SensorStateClass,
     SensorEntity,
+    SensorStateClass,
 )
 from homeassistant.const import (
     CONF_UNIQUE_ID,

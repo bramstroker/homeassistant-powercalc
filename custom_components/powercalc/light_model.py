@@ -191,10 +191,10 @@ class LightModel:
     @property
     def device_type(self) -> str:
         return self._json_data.get("device_type") or DeviceType.LIGHT
-    
+
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
         if domain == LIGHT_DOMAIN and self.device_type != DeviceType.LIGHT:
             return False
-        
+
         return True
