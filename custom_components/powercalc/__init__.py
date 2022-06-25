@@ -223,6 +223,9 @@ async def autodiscover_entities(
         if not light_model:
             continue
 
+        if not light_model.is_entity_domain_supported(source_entity.domain):
+            continue
+
         discovery_info = {
             CONF_ENTITY_ID: entity_entry.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,

@@ -26,6 +26,7 @@ MODEL_DIRECTORY_MAPPING = {
     "IKEA of Sweden": {
         "FLOALT panel WS 30x30": "L1527",
         "FLOALT panel WS 60x60": "L1529",
+        "Slagsida": "L1616",
         "TRADFRI bulb E14 WS opal 400lm": "LED1536G5",
         "TRADFRI bulb GU10 WS 400lm": "LED1537R6",
         "TRADFRI bulb E27 WS opal 980lm": "LED1545G12",
@@ -54,6 +55,9 @@ MODEL_DIRECTORY_MAPPING = {
         "TTRADFRIbulbGU10WS345lm": "LED2005R5",
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
+    },
+    "Müller Licht": {
+        "45327": "45318",
     },
     "Signify Netherlands B.V.": {
         "9290022166": "LCA001",
@@ -94,9 +98,31 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "Yeelight": {
         "color2": "YLDP06YL",
-        "color4": "YLDP13YL",
-    },
-    "Müller Licht": {
-        "45327": "45318",
+        "ceiling10": "YLDL01YL",
+        "mono1": "YLDP01YL",
+        "strip6": "YLDD05YL",
+        ### No profiles yet ###
+        # "mono": "YLTD03YL",
+        # "color6": "YLDP13AYL",
+        # "colorb": "YLDP005",
+        # "colorc": "YLDP004-A",
+        # "RGBW": "MJDP02YL",
+        # "lamp": "MJTD02YL",
+        # "lamp1": "MJTD01YL",
+        # "lamp15": "YLTD003",
+        # "ceiling1": "YLXD01YL",
+        # "ceiling2": "YLXD03YL",
+        # "ceiling3": "YLXD05YL",
+        # "ceiling4": "YLXD02YL",
+        # "ceiling13": "YLXD01YL",
+        # "ceil26": "YLXD76YL",
+        # not a unique match, as it also may refer to "YLDP04YL"
+        # "color4": "YLDP13YL",
+        # not a unique match, as it also may refer to "YLDP03YL"
+        # "color1": "YLDP02YL",
+        # not a unique match, as it also may refer to "YLDD02YL"
+        # "strip1": "YLDD01YL",
+        # not a unique match, as it also may refer to "MJCTD02YL"
+        # "bslamp1": "MJCTD01YL",
     },
 }

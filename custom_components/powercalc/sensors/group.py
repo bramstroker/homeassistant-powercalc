@@ -6,14 +6,12 @@ from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
-    STATE_CLASS_MEASUREMENT,
-    STATE_CLASS_TOTAL_INCREASING,
+    SensorDeviceClass,
+    SensorStateClass,
     SensorEntity,
 )
 from homeassistant.const import (
     CONF_UNIQUE_ID,
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_POWER,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
     STATE_UNAVAILABLE,
@@ -33,7 +31,6 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
-    DOMAIN,
 )
 from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -176,7 +173,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         )
 
         if (
-            self._attr_state_class == STATE_CLASS_TOTAL_INCREASING
+            self._attr_state_class == SensorStateClass.TOTAL_INCREASING
             and not self.is_state_value_increasing(summed)
         ):
             return
@@ -222,14 +219,14 @@ class GroupedSensor(RestoreEntity, SensorEntity):
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
     """Grouped power sensor. Sums all values of underlying individual power sensors"""
 
-    _attr_device_class = DEVICE_CLASS_POWER
-    _attr_state_class = STATE_CLASS_MEASUREMENT
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
 
-    _attr_device_class = DEVICE_CLASS_ENERGY
-    _attr_state_class = STATE_CLASS_TOTAL_INCREASING
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR

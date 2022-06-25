@@ -9,12 +9,15 @@ from config.custom_components.powercalc.const import CONF_FIXED, CONF_POWER
 from config.custom_components.powercalc.sensors.power import VirtualPowerSensor, create_virtual_power_sensor
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass, 
+    SensorEntity
+)
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
-    DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
 )
@@ -82,8 +85,8 @@ async def create_daily_fixed_energy_power_sensor(
     )
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
-    _attr_device_class = DEVICE_CLASS_ENERGY
-    _attr_state_class = STATE_CLASS_TOTAL_INCREASING
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
     _attr_should_poll = False
     _attr_icon = ENERGY_ICON

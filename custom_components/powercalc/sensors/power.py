@@ -7,12 +7,15 @@ from config.custom_components.powercalc.const import DUMMY_ENTITY_ID
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import STATE_CLASS_MEASUREMENT, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass,
+    SensorEntity,
+)
 from homeassistant.const import (
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
-    DEVICE_CLASS_POWER,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
     STATE_ON,
@@ -276,8 +279,8 @@ class PowerSensor:
 class VirtualPowerSensor(SensorEntity, PowerSensor):
     """Virtual power sensor"""
 
-    _attr_device_class = DEVICE_CLASS_POWER
-    _attr_state_class = STATE_CLASS_MEASUREMENT
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
 
     def __init__(
@@ -395,6 +398,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self._power = await self.calculate_power(state)
 
+        if self._power is not None:
+            self._power = round(self._power, self._rounding_digits)
+
         _LOGGER.debug(
             '%s: State changed to "%s". Power:%s',
             state.entity_id,
@@ -406,16 +412,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self.async_write_ha_state()
             return False
 
-        self._power = round(self._power, self._rounding_digits)
-
         self.async_write_ha_state()
         return True
 
     async def calculate_power(self, state: State) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
-
-        if not await self.is_calculation_enabled():
-            return 0
 
         if state.state in OFF_STATES:
             standby_power = self._standby_power
@@ -425,6 +426,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             if self._multiply_factor_standby and self._multiply_factor:
                 standby_power *= self._multiply_factor
             return Decimal(standby_power)
+
+        if not await self.is_calculation_enabled():
+            return 0
 
         power = await self._power_calculator.calculate(state)
         if power is None:

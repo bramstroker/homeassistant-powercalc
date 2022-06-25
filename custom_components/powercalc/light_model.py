@@ -4,6 +4,7 @@ import os
 from enum import Enum
 from typing import Optional
 
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
@@ -190,3 +191,10 @@ class LightModel:
     @property
     def device_type(self) -> str:
         return self._json_data.get("device_type") or DeviceType.LIGHT
+    
+    def is_entity_domain_supported(self, domain: str) -> bool:
+        """Check whether this power profile supports a given entity domain"""
+        if domain == LIGHT_DOMAIN and self.device_type != DeviceType.LIGHT:
+            return False
+        
+        return True

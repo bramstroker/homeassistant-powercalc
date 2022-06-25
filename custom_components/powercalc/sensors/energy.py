@@ -6,10 +6,10 @@ from typing import Any, Optional
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import (
     CONF_NAME,
-    DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     TIME_HOURS,
 )
@@ -120,7 +120,7 @@ def find_related_real_energy_sensor(
         for entry in er.async_entries_for_device(
             ent_reg, device_id=power_sensor.device_id
         )
-        if entry.device_class == DEVICE_CLASS_ENERGY
+        if entry.device_class == SensorDeviceClass.ENERGY
         or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
     ]
     if not energy_sensors:
