@@ -389,6 +389,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self._power = await self.calculate_power(state)
 
+        if self._power is not None:
+            self._power = round(self._power, self._rounding_digits)
+
         _LOGGER.debug(
             '%s: State changed to "%s". Power:%s',
             state.entity_id,
@@ -400,16 +403,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self.async_write_ha_state()
             return False
 
-        self._power = round(self._power, self._rounding_digits)
-
         self.async_write_ha_state()
         return True
 
     async def calculate_power(self, state: State) -> Optional[Decimal]:
         """Calculate power consumption using configured strategy."""
-
-        if not await self.is_calculation_enabled():
-            return 0
 
         if state.state in OFF_STATES:
             standby_power = self._standby_power
@@ -419,6 +417,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             if self._multiply_factor_standby and self._multiply_factor:
                 standby_power *= self._multiply_factor
             return Decimal(standby_power)
+        
+        if not await self.is_calculation_enabled():
+            return 0
 
         power = await self._power_calculator.calculate(state)
         if power is None:
