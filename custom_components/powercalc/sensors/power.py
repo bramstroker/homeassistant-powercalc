@@ -417,7 +417,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             if self._multiply_factor_standby and self._multiply_factor:
                 standby_power *= self._multiply_factor
             return Decimal(standby_power)
-        
+
         if not await self.is_calculation_enabled():
             return 0
 

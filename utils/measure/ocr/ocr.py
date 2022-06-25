@@ -1,16 +1,16 @@
+import logging
 import os
-from pathlib import Path
 import sys
-from datetime import datetime
-import time
 import threading
+import time
+from datetime import datetime
 from decimal import Decimal, DecimalException
+from pathlib import Path
 from threading import Thread
 
 import cv2
 import numpy
 import pytesseract
-import logging
 
 logging.basicConfig(
     level=logging.getLevelName("DEBUG"),
