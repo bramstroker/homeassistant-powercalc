@@ -111,10 +111,10 @@ from .errors import (
 )
 from .model_discovery import is_autoconfigurable
 from .sensors.daily_energy import (
+    DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
-from .sensors.daily_energy import DAILY_FIXED_ENERGY_SCHEMA
 from .sensors.energy import create_energy_sensor
 from .sensors.group import create_group_sensors
 from .sensors.power import RealPowerSensor, create_power_sensor

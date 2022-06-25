@@ -3,16 +3,10 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
-from config.custom_components.powercalc.sensors.power import VirtualPowerSensor
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_FIXED, CONF_POWER
-from custom_components.powercalc.sensors.power import (
-    create_virtual_power_sensor,
-)
+from config.custom_components.powercalc.sensors.power import VirtualPowerSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -33,15 +27,19 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_FIXED,
     CONF_ON_TIME,
+    CONF_POWER,
     CONF_START_TIME,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
+from custom_components.powercalc.sensors.power import create_virtual_power_sensor
 
 from .energy import EnergySensor
 
@@ -116,6 +114,7 @@ async def create_daily_fixed_energy_power_sensor(
 
     return await create_virtual_power_sensor(hass, power_sensor_config, source_entity)
 
+
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
@@ -133,7 +132,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         update_frequency: int,
         unique_id: str = None,
         on_time: timedelta = None,
-        start_time = None,
+        start_time=None,
         rounding_digits: int = 4,
     ):
         self._hass = hass
