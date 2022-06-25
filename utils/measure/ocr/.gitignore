@@ -1,0 +1,4 @@
+ocr/**
+images
+ocr_results.txt
+*.log

@@ -202,7 +202,7 @@ class Measure:
 
         _LOGGER.info(f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}")
 
-        if answers["generate_model_json"]:
+        if answers["generate_model_json"] and not resume_at:
             try:
                 standby_power = self.measure_standby_power()
             except PowerMeterError as error:
@@ -219,7 +219,8 @@ class Measure:
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
-            self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
+            if resume_at is None:
+                self.light_controller.change_light_state(MODE_BRIGHTNESS, on=True, bri=1)
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
@@ -268,6 +269,7 @@ class Measure:
                 csv_writer.write_measurement(variation, power)
 
             csv_file.close()
+            _LOGGER.info(f"Hooray! measurements finished. Exported CSV file {csv_file_path}")
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
@@ -316,30 +318,29 @@ class Measure:
         # Take multiple samples to reduce noise
         for i in range(1, SAMPLE_COUNT + 1):
             _LOGGER.debug(f"Taking sample {i}")
+            error = None
             try:
                 measurement = self.power_meter.get_power()
                 updated_at = dt.fromtimestamp(measurement.updated).strftime("%d-%m-%Y, %H:%M:%S")
                 _LOGGER.debug(f"Measurement received (update_time={updated_at})")
             except PowerMeterError as err:
-                if retry_count == MAX_RETRIES:
-                    raise err
-
-                retry_count += 1
-                self.take_power_measurement(start_timestamp, retry_count)
+                error = err
 
             # Check if measurement is not outdated
             if measurement.updated < start_timestamp:
-                # Prevent endless recursion and raise exception
-                if retry_count == MAX_RETRIES:
-                    raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} retries")
+                error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} retries")
 
+            # Check if we not have a 0 measurument
+            if measurement.power == 0:
+                error = ZeroReadingError("0 watt was read from the power meter")
+
+            if error:
+                # Prevent endless recursion. Throw error when max retries is reached
+                if retry_count == MAX_RETRIES:
+                    raise error
                 retry_count += 1
                 time.sleep(SLEEP_TIME)
                 self.take_power_measurement(start_timestamp, retry_count)
-            
-            # Check if we not have a 0 reading
-            if measurement.power == 0:
-                raise ZeroReadingError("0 watt was read from the power meter")
 
             measurements.append(measurement.power)
             if SAMPLE_COUNT > 1:
