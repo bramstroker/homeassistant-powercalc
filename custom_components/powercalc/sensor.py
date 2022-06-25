@@ -47,7 +47,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers import area_registry, device_registry, entity_registry
+from homeassistant.helpers import area_registry, device_registry, entity_registry, entity_platform
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
@@ -104,6 +104,7 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
+    SERVICE_RESET_ENERGY,
 )
 from .errors import (
     PowercalcSetupError,
@@ -239,6 +240,13 @@ async def async_setup_platform(
     discovery_info: DiscoveryInfoType | None = None,
 ):
     """Set up the virtual power sensors."""
+
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        SERVICE_RESET_ENERGY,
+        {},
+        "async_reset_energy",
+    )
 
     try:
         entities = await create_sensors(hass, config, discovery_info)
