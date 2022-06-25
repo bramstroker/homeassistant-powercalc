@@ -7,6 +7,7 @@ MANUFACTURER_ALIASES = {
     "LUMI": "Aqara",
     "ADEO": "Lexman",
     "MLI": "Müller Licht",
+    "LightZone": "MeLiTec",
 }
 
 MANUFACTURER_DIRECTORY_MAPPING = {
@@ -20,6 +21,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Lexman": "lexman",
     "Yeelight": "yeelight",
     "TuYa": "tuya",
+    "MeLiTec": "melitec",
 }
 
 MODEL_DIRECTORY_MAPPING = {
