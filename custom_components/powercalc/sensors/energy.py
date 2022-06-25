@@ -9,12 +9,15 @@ import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.sensor import STATE_CLASS_TOTAL_INCREASING, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorStateClass,
+    SensorEntity
+)
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
-    DEVICE_CLASS_ENERGY,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
     TIME_HOURS,
@@ -151,7 +154,7 @@ def find_related_real_energy_sensor(
         for entry in er.async_entries_for_device(
             ent_reg, device_id=power_sensor.device_id
         )
-        if entry.device_class == DEVICE_CLASS_ENERGY
+        if entry.device_class == SensorDeviceClass.ENERGY
         or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
     ]
     if not energy_sensors:
@@ -238,8 +241,8 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
-    _attr_device_class = DEVICE_CLASS_ENERGY
-    _attr_state_class = STATE_CLASS_TOTAL_INCREASING
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_state_class = SensorStateClass.TOTAL_INCREASING
     _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
     _attr_should_poll = False
     _attr_icon = ENERGY_ICON
