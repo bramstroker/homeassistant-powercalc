@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Gosund SP111 with Tasmota",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.22.0:docker"
+    },
+    "name": "Livarno Lux LED Outdoor Floodlight RGBW",
+    "standby_power": 0.35,
+    "supported_modes": [
+        "lut"
+    ]
+}
