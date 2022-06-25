@@ -6,13 +6,9 @@ from typing import Any, Optional
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.const import (
-    CONF_NAME,
-    ENERGY_KILO_WATT_HOUR,
-    TIME_HOURS,
-)
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id

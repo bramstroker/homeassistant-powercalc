@@ -111,7 +111,10 @@ from .errors import (
     SensorConfigurationError,
 )
 from .model_discovery import is_autoconfigurable
-from .sensors.daily_energy import create_daily_fixed_energy_sensor, create_daily_fixed_energy_power_sensor
+from .sensors.daily_energy import (
+    create_daily_fixed_energy_power_sensor,
+    create_daily_fixed_energy_sensor,
+)
 from .sensors.energy import create_energy_sensor
 from .sensors.group import create_group_sensors
 from .sensors.power import RealPowerSensor, create_power_sensor
@@ -414,7 +417,9 @@ async def create_individual_sensors(
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
         entities_to_add.append(energy_sensor)
-        power_sensor = await create_daily_fixed_energy_power_sensor(hass, sensor_config, source_entity)
+        power_sensor = await create_daily_fixed_energy_power_sensor(
+            hass, sensor_config, source_entity
+        )
         if power_sensor:
             entities_to_add.append(power_sensor)
 

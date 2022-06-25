@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Optional
-from custom_components.powercalc.const import DUMMY_ENTITY_ID
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -57,8 +56,8 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
-    DUMMY_ENTITY_ID,
     DOMAIN,
+    DUMMY_ENTITY_ID,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_WLED,

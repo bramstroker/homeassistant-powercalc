@@ -3,15 +3,18 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
+
 from config.custom_components.powercalc.common import SourceEntity
 from config.custom_components.powercalc.const import CONF_FIXED, CONF_POWER
-from config.custom_components.powercalc.sensors.power import VirtualPowerSensor, create_virtual_power_sensor
-
+from config.custom_components.powercalc.sensors.power import (
+    VirtualPowerSensor,
+    create_virtual_power_sensor,
+)
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
-    SensorStateClass, 
-    SensorEntity
+    SensorEntity,
+    SensorStateClass,
 )
 from homeassistant.const import (
     CONF_NAME,
@@ -35,6 +38,7 @@ from custom_components.powercalc.const import (
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
+
 from .energy import EnergySensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
@@ -60,28 +64,26 @@ async def create_daily_fixed_energy_sensor(
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
 
+
 async def create_daily_fixed_energy_power_sensor(
     hass: HomeAssistantType, sensor_config: dict, source_entity: SourceEntity
-) -> VirtualPowerSensor|None:
+) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
         return None
-    
+
     if mode_config.get(CONF_ON_TIME) != timedelta(days=1):
         return None
 
     power_sensor_config = sensor_config.copy()
-    power_sensor_config[CONF_FIXED] = {
-        CONF_POWER: mode_config.get(CONF_VALUE)
-    }
+    power_sensor_config[CONF_FIXED] = {CONF_POWER: mode_config.get(CONF_VALUE)}
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if unique_id:
         power_sensor_config[CONF_UNIQUE_ID] = f"{unique_id}_power"
 
-    return await create_virtual_power_sensor(
-        hass, power_sensor_config, source_entity
-    )
+    return await create_virtual_power_sensor(hass, power_sensor_config, source_entity)
+
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
