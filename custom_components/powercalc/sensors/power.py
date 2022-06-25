@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Optional
-from config.custom_components.powercalc.const import DUMMY_ENTITY_ID
+from custom_components.powercalc.const import DUMMY_ENTITY_ID
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -364,7 +364,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             for entity_id in track_entities:
                 if entity_id == DUMMY_ENTITY_ID:
-                    new_state = STATE_ON
+                    new_state = State(entity_id, STATE_ON)
                 else:
                     new_state = self.hass.states.get(entity_id)
 

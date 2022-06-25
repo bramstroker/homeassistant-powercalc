@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Optional
 
 import logging
 from datetime import datetime, timedelta
