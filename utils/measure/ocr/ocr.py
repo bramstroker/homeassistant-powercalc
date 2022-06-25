@@ -320,12 +320,16 @@ class OCR:
         
         return True
     
-    def get_percentage_change(self, current: Decimal, previous: Decimal) -> Decimal:
+    def get_percentage_change(self, current: Decimal, previous: Decimal) -> int:
         try:
-            percentage = abs(previous - current)/max(previous, current) * 100
+            if current == previous:
+                return 0
+            elif(current > previous):
+                return int((abs(current - previous) / previous) * 100)
+            else:
+                return int((abs(previous - current) / current) * 100)
         except ZeroDivisionError:
-            percentage = float('inf')
-        return percentage
+            return 100000
 
 
 def ocr_stream(source: str = "0"):
