@@ -35,6 +35,7 @@ This component estimates power usage by looking at brightness, hue/saturation an
     - [Multiply Factor](#multiply-factor)
     - [Utility Meters](#utility-meters)
     - [Use real power sensor](#use-real-power-sensor)
+    - [Resetting energy sensor](#resetting-energy-sensor)
 - [Light model library](#light-model-library)
     - [LUT data files](#lut-data-files)
       - [Measuring lights](#creating-lut-files)
@@ -685,6 +686,13 @@ Use the following configuration to use an existing power sensor and let powercal
   entity_id: light.toilet
   power_sensor_id: sensor.toilet_light_power
 ```
+
+### Resetting energy sensor
+
+> Available from v0.23 and higher
+
+Powercalc provides a service `powercalc.reset_energy` which you can call to reset energy sensors to 0 kWh.
+You can call this service from the GUI (Developer tools -> Services)
 
 <hr>
 

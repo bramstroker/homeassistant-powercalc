@@ -159,3 +159,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def native_value(self):
         """Return the state of the sensor."""
         return round(self._state, self._rounding_digits)
+    
+    @callback
+    def async_reset_energy(self) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
+        self._state = 0
+        self.async_write_ha_state()

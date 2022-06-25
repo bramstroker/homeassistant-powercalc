@@ -1,0 +1,6 @@
+reset_energy:
+  name: Reset energy sensor
+  description: Reset an energy sensor to zero kWh
+  target:
+    entity:
+      domain: sensor

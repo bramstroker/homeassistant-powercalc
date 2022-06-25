@@ -113,6 +113,8 @@ ATTR_IS_GROUP = "is_group"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
+SERVICE_RESET_ENERGY = "reset_energy"
+
 MODE_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"

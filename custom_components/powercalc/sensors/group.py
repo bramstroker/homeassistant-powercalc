@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 from typing import Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -172,48 +172,8 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             if state.state not in ignored_states
         )
 
-        if (
-            self._attr_state_class == SensorStateClass.TOTAL_INCREASING
-            and not self.is_state_value_increasing(summed)
-        ):
-            return
-
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
-
-    def is_state_value_increasing(self, new_value) -> bool:
-        """
-        Check to make sure the new state is higer than the previous state
-        When this is not the case reject the recording of the state and raise a warning.
-        This could happen when an entity of the grouped sensor becomes unavailable for example.
-        When we would record this state change it will cause problems down the road with utility meters
-        """
-        if self._attr_native_value is None or self._attr_native_value in (
-            STATE_UNAVAILABLE,
-            STATE_UNKNOWN,
-        ):
-            return True
-
-        try:
-            current_value = Decimal(self._attr_native_value)
-            if new_value < current_value:
-                _LOGGER.warning(
-                    "%s: State value of grouped energy sensor may never be lower than last value, skipping. old_value=%s. new_value=%s",
-                    self.entity_id,
-                    current_value,
-                    new_value,
-                )
-                return False
-        except (DecimalException, ValueError) as err:
-            _LOGGER.warning(
-                "%s: Could not convert to decimal %s: %s",
-                self.entity_id,
-                current_value,
-                err,
-            )
-            return False
-
-        return True
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
@@ -228,5 +188,5 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
     """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
 
     _attr_device_class = SensorDeviceClass.ENERGY
-    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_state_class = SensorStateClass.TOTAL
     _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
