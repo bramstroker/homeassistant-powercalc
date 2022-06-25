@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import timedelta
 from typing import Final, cast
 
 import homeassistant.helpers.config_validation as cv
@@ -40,10 +39,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    CONF_UNIT_OF_MEASUREMENT,
-    ENERGY_KILO_WATT_HOUR,
     EVENT_HOMEASSISTANT_STARTED,
-    POWER_WATT,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
@@ -88,17 +84,14 @@ from .const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
-    CONF_ON_TIME,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
-    CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
-    CONF_VALUE,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
@@ -121,6 +114,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
+from .sensors.daily_energy import DAILY_FIXED_ENERGY_SCHEMA
 from .sensors.energy import create_energy_sensor
 from .sensors.group import create_group_sensors
 from .sensors.power import RealPowerSensor, create_power_sensor
@@ -149,21 +143,7 @@ SUPPORTED_ENTITY_DOMAINS = (
     water_heater.DOMAIN,
 )
 
-DEFAULT_DAILY_UPDATE_FREQUENCY = 1800
 MAX_GROUP_NESTING_LEVEL = 5
-
-DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
-            [ENERGY_KILO_WATT_HOUR, POWER_WATT]
-        ),
-        vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
-        vol.Optional(
-            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
-        ): vol.Coerce(int),
-    }
-)
 
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,

@@ -3,11 +3,14 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
+from config.custom_components.powercalc.sensors.power import VirtualPowerSensor
 
-from config.custom_components.powercalc.common import SourceEntity
-from config.custom_components.powercalc.const import CONF_FIXED, CONF_POWER
-from config.custom_components.powercalc.sensors.power import (
-    VirtualPowerSensor,
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
+
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_FIXED, CONF_POWER
+from custom_components.powercalc.sensors.power import (
     create_virtual_power_sensor,
 )
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -35,6 +38,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ON_TIME,
+    CONF_START_TIME,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
@@ -44,6 +48,21 @@ from .energy import EnergySensor
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
+DEFAULT_DAILY_UPDATE_FREQUENCY = 1800
+DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
+            [ENERGY_KILO_WATT_HOUR, POWER_WATT]
+        ),
+        vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
+        vol.Optional(CONF_START_TIME): cv.time,
+        vol.Optional(
+            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
+        ): vol.Coerce(int),
+    }
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -51,6 +70,12 @@ async def create_daily_fixed_energy_sensor(
     hass: HomeAssistantType, sensor_config: dict
 ) -> DailyEnergySensor:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+
+    _LOGGER.debug(
+        "Creating daily_fixed_energy energy sensor (name=%s unique_id=%s)",
+        sensor_config.get(CONF_NAME),
+        sensor_config.get(CONF_UNIQUE_ID),
+    )
 
     return DailyEnergySensor(
         hass,
@@ -61,6 +86,7 @@ async def create_daily_fixed_energy_sensor(
         mode_config.get(CONF_UPDATE_FREQUENCY),
         unique_id=sensor_config.get(CONF_UNIQUE_ID),
         on_time=mode_config.get(CONF_ON_TIME),
+        start_time=mode_config.get(CONF_START_TIME),
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
 
@@ -82,8 +108,13 @@ async def create_daily_fixed_energy_power_sensor(
     if unique_id:
         power_sensor_config[CONF_UNIQUE_ID] = f"{unique_id}_power"
 
-    return await create_virtual_power_sensor(hass, power_sensor_config, source_entity)
+    _LOGGER.debug(
+        "Creating daily_fixed_energy power sensor (name=%s unique_id=%s)",
+        sensor_config.get(CONF_NAME),
+        unique_id,
+    )
 
+    return await create_virtual_power_sensor(hass, power_sensor_config, source_entity)
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
@@ -102,6 +133,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         update_frequency: int,
         unique_id: str = None,
         on_time: timedelta = None,
+        start_time = None,
         rounding_digits: int = 4,
     ):
         self._hass = hass
@@ -111,6 +143,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._unit_of_measurement = unit_of_measurement
         self._update_frequency = update_frequency
         self._on_time = on_time or timedelta(days=1)
+        self._start_time = start_time
         self._rounding_digits = rounding_digits
         self._attr_unique_id = unique_id
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
