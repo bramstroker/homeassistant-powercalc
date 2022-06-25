@@ -11,8 +11,8 @@ from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
+    SensorEntity,
     SensorStateClass,
-    SensorEntity
 )
 from homeassistant.const import (
     CONF_NAME,
