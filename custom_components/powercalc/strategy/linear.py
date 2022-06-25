@@ -100,6 +100,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
+            if not self._source_entity.domain in ALLOWED_DOMAINS:
+                return list
             full_range = self.get_entity_value_range()
             min = full_range[0]
             max = full_range[1]
@@ -163,17 +165,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     async def validate_config(self, source_entity: SourceEntity):
         """Validate correct setup of the strategy"""
 
-        if (
-            not CONF_CALIBRATE in self._config
-            and source_entity.domain not in ALLOWED_DOMAINS
-        ):
-            raise StrategyConfigurationError(
-                "Entity domain not supported for linear mode. Must be one of: {}".format(
-                    ",".join(ALLOWED_DOMAINS)
+        if not CONF_CALIBRATE in self._config:
+            if source_entity.domain not in ALLOWED_DOMAINS:
+                raise StrategyConfigurationError(
+                    "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
+                        ",".join(ALLOWED_DOMAINS)
+                    )
                 )
-            )
-
-        if not CONF_CALIBRATE in self._config and not CONF_MAX_POWER in self._config:
-            raise StrategyConfigurationError(
-                "Linear strategy must have at least 'max power' or 'calibrate' defined"
-            )
+            if not CONF_MAX_POWER in self._config:
+                raise StrategyConfigurationError(
+                    "Linear strategy must have at least 'max power' or 'calibrate' defined"
+                )
