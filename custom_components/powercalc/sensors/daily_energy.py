@@ -6,7 +6,7 @@ from decimal import Decimal
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from config.custom_components.powercalc.sensors.power import VirtualPowerSensor
+
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -42,6 +42,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.power import create_virtual_power_sensor
 
 from .energy import EnergySensor
+from .power import VirtualPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
