@@ -20,7 +20,7 @@ DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 
-DUMMY_ENTITY_ID = "dummy"
+DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_AREA = "area"
 CONF_CALIBRATE = "calibrate"

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Optional
+from custom_components.powercalc.const import DUMMY_ENTITY_ID
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -17,6 +18,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_START,
     POWER_WATT,
+    STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
@@ -55,6 +57,7 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
+    DUMMY_ENTITY_ID,
     DOMAIN,
     MODE_FIXED,
     MODE_LINEAR,
@@ -360,7 +363,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 )
 
             for entity_id in track_entities:
-                new_state = self.hass.states.get(entity_id)
+                if entity_id == DUMMY_ENTITY_ID:
+                    new_state = State(entity_id, STATE_ON)
+                else:
+                    new_state = self.hass.states.get(entity_id)
 
                 await self._update_power_sensor(entity_id, new_state)
 
