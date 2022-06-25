@@ -47,7 +47,12 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers import area_registry, device_registry, entity_registry, entity_platform
+from homeassistant.helpers import (
+    area_registry,
+    device_registry,
+    entity_platform,
+    entity_registry,
+)
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template

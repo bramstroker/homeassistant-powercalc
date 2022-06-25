@@ -200,7 +200,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     @property
     def icon(self):
         return ENERGY_ICON
-    
+
     @callback
     def async_reset_energy(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
