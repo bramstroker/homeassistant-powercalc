@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from decimal import Decimal
 
 import homeassistant.helpers.config_validation as cv
@@ -26,6 +26,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.util.dt import now, get_time_zone
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -133,7 +134,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         update_frequency: int,
         unique_id: str = None,
         on_time: timedelta = None,
-        start_time=None,
+        start_time: time = None,
         rounding_digits: int = 4,
     ):
         self._hass = hass
@@ -144,6 +145,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._update_frequency = update_frequency
         self._on_time = on_time or timedelta(days=1)
         self._start_time = start_time
+        
         self._rounding_digits = rounding_digits
         self._attr_unique_id = unique_id
         self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
@@ -156,7 +158,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             delta = self.calculate_delta(
                 round(datetime.now().timestamp() - state.last_changed.timestamp())
             )
-            self._state = self._state + delta
+            if delta:
+                self._state = self._state + delta
             self.async_schedule_update_ha_state()
         else:
             self._state = Decimal(0)
@@ -166,7 +169,10 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         @callback
         def refresh(event_time=None):
             """Update the energy sensor state."""
-            self._state = self._state + self.calculate_delta(self._update_frequency)
+            delta = self.calculate_delta(self._update_frequency)
+            if delta is None:
+                return
+            self._state = self._state + delta
             _LOGGER.debug(
                 f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}"
             )
@@ -176,7 +182,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self.hass, refresh, timedelta(seconds=self._update_frequency)
         )
 
-    def calculate_delta(self, elapsedSeconds: int) -> Decimal:
+    def calculate_delta(self, elapsedSeconds: int) -> Decimal | None:
         value = self._value
         if isinstance(value, Template):
             value = value.render()
@@ -186,7 +192,36 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         elif self._unit_of_measurement == POWER_WATT:
             kwhPerDay = (value * (self._on_time.total_seconds() / 3600)) / 1000
 
-        return Decimal((kwhPerDay / 86400) * elapsedSeconds)
+        #start_time = 11:00
+        #value = 2000
+        #on_time = 3600
+        #kwhPerDay = 2
+
+        kwhPerSecond = kwhPerDay / 86400
+
+        if self._start_time:
+            current_datetime = now()
+            (start, end) = self.get_on_time_period()
+            if current_datetime < start:
+                _LOGGER.debug("Period not started yet, don't increase")
+                return None
+            if current_datetime > end:
+                _LOGGER.debug("Period ended, add remainder if any")
+                return None
+            kwhPerSecond = kwhPerDay / self._on_time.total_seconds()
+
+        return Decimal(kwhPerSecond * elapsedSeconds)
+    
+    def get_on_time_period(self) -> tuple:
+        current_datetime = now()
+        start = current_datetime.replace(
+            hour=self._start_time.hour, minute=self._start_time.minute, second=0
+        )
+        time_zone = get_time_zone(self._hass.config.time_zone)
+        start.astimezone(time_zone)
+        end = start + self._on_time
+        return (start, end)
+
 
     @property
     def native_value(self):
