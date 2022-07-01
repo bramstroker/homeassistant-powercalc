@@ -391,7 +391,9 @@ async def create_individual_sensors(
     if (used_unique_ids := hass.data.get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DATA_USED_UNIQUE_IDS] = []
     try:
-        check_entity_not_already_configured(sensor_config, source_entity, hass, used_unique_ids)
+        check_entity_not_already_configured(
+            sensor_config, source_entity, hass, used_unique_ids
+        )
     except SensorAlreadyConfiguredError as error:
         if discovery_info:
             return []
@@ -470,7 +472,7 @@ def check_entity_not_already_configured(
     sensor_config: dict,
     source_entity: SourceEntity,
     hass: HomeAssistantType,
-    used_unique_ids: list[str]
+    used_unique_ids: list[str],
 ):
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -478,8 +480,11 @@ def check_entity_not_already_configured(
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id and unique_id in used_unique_ids:
         raise SensorAlreadyConfiguredError(source_entity.entity_id)
-    
-    if (unique_id is None and source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]):
+
+    if (
+        unique_id is None
+        and source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
+    ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id)
 
 
