@@ -348,7 +348,7 @@ async def create_sensors(
         sensor_configs = {
             entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
             for entity in entities
-            if entity and await is_autoconfigurable(hass, entity)
+            if await is_autoconfigurable(hass, entity)
         } | sensor_configs
 
     # Create sensors for each entity

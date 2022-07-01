@@ -335,39 +335,39 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
 
-        async def home_assistant_startup(event):
-            """Add listeners and get initial state."""
-            entities_to_track = self._power_calculator.get_entities_to_track()
+        #async def home_assistant_startup(event):
+        """Add listeners and get initial state."""
+        entities_to_track = self._power_calculator.get_entities_to_track()
 
-            track_entities = [
-                entity for entity in entities_to_track if isinstance(entity, str)
-            ]
-            if not track_entities:
-                track_entities = [self._source_entity]
+        track_entities = [
+            entity for entity in entities_to_track if isinstance(entity, str)
+        ]
+        if not track_entities:
+            track_entities = [self._source_entity]
 
-            async_track_state_change_event(
-                self.hass, track_entities, appliance_state_listener
+        async_track_state_change_event(
+            self.hass, track_entities, appliance_state_listener
+        )
+
+        track_templates = [
+            template
+            for template in entities_to_track
+            if isinstance(template, TrackTemplate)
+        ]
+        if track_templates:
+            async_track_template_result(
+                self.hass,
+                track_templates=track_templates,
+                action=template_change_listener,
             )
 
-            track_templates = [
-                template
-                for template in entities_to_track
-                if isinstance(template, TrackTemplate)
-            ]
-            if track_templates:
-                async_track_template_result(
-                    self.hass,
-                    track_templates=track_templates,
-                    action=template_change_listener,
-                )
+        for entity_id in track_entities:
+            if entity_id == DUMMY_ENTITY_ID:
+                new_state = State(entity_id, STATE_ON)
+            else:
+                new_state = self.hass.states.get(entity_id)
 
-            for entity_id in track_entities:
-                if entity_id == DUMMY_ENTITY_ID:
-                    new_state = State(entity_id, STATE_ON)
-                else:
-                    new_state = self.hass.states.get(entity_id)
-
-                await self._update_power_sensor(entity_id, new_state)
+            await self._update_power_sensor(entity_id, new_state)
 
         @callback
         def async_update(event_time=None):
@@ -376,9 +376,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
 
-        self.hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_START, home_assistant_startup
-        )
+        # self.hass.bus.async_listen_once(
+        #     EVENT_HOMEASSISTANT_START, home_assistant_startup
+        # )
 
     async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
         """Update power sensor based on new dependant entity state."""

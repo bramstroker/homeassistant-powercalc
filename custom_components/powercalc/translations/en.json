@@ -1,12 +1,25 @@
 {
     "config": {
         "step": {
+            "fixed": {
+                "data": {
+                    "fixed_raw": "Raw YAML config",
+                    "power": "Power",
+                    "power_template": "Power template"
+                },
+                "description": "Supply either a fixed power value or template. If you want to used states_power or any advanced options use the raw yaml config option (see the readme)",
+                "title": "Fixed mode config"
+            },
             "user": {
                 "data": {
+                    "create_energy_sensor": "Create energy sensor",
+                    "create_utility_meters": "Create utility meters",
                     "disable_standby_power": "Disable standby power",
+                    "entity_id": "Entity",
                     "mode": "Calculation mode",
                     "name": "Name",
-                    "standby_power": "Standby power"
+                    "standby_power": "Standby power",
+                    "unique_id": "Unique id"
                 },
                 "title": "Main configuration"
             }

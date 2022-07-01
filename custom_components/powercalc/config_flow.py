@@ -22,15 +22,14 @@ from .const import (
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
-    CONF_STATES_POWER
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema({
     vol.Required(CONF_NAME): str,
-    vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
+    vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODE, default=MODE_FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
             options=CALCULATION_MODES,
@@ -38,15 +37,14 @@ CONFIG_SCHEMA = vol.Schema({
         )
     ),
     vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
-    vol.Optional(CONF_DISABLE_STANDBY_POWER, default=False): cv.boolean,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS, default=True): cv.boolean
 })
 
 FIXED_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_POWER_TEMPLATE): selector.TemplateSelector(),
         vol.Optional(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_POWER_TEMPLATE): selector.TemplateSelector(),
         vol.Optional(CONF_FIXED_RAW): selector.ObjectSelector()
     }
 )
