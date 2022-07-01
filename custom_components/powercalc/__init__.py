@@ -241,6 +241,8 @@ async def autodiscover_entities(
 
 
 def get_manual_configuration(config: dict, entity_id: str) -> dict | None:
+    if not SENSOR_DOMAIN in config:
+        return None
     sensor_config = config.get(SENSOR_DOMAIN)
     for item in sensor_config:
         if item.get(CONF_PLATFORM) == DOMAIN and item.get(CONF_ENTITY_ID) == entity_id:
