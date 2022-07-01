@@ -10,6 +10,13 @@
             "standby_power": "Standby power",
             "disable_standby_power": "Disable standby power"
           }
+        },
+        "fixed": {
+            "data": {
+                "power": "Power",
+                "power_template": "Power template",
+                "fixed_raw": "Raw YAML config"
+            }
         }
       }
     }
