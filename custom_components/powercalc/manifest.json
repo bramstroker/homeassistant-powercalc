@@ -5,11 +5,6 @@
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "config_flow": true,
   "dependencies": [
-    "device_tracker",
-    "hue",
-    "fan",
-    "switch",
-    "binary_sensor",
     "light",
     "group",
     "template",
