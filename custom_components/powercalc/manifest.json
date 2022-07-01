@@ -4,6 +4,9 @@
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "dependencies": [
+    "light",
+    "group",
+    "template",
     "select"
   ],
   "after_dependencies": [

@@ -46,6 +46,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
+    DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_ENERGY_SENSOR_PRECISION,
@@ -161,6 +162,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: [],
+        DATA_USED_UNIQUE_IDS: [],
     }
 
     await autodiscover_entities(config, domain_config, hass)
