@@ -54,7 +54,7 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRIbulbE14WScandleopal470lm": "LED1949C5",
         "TRADFRIbulbE14WSglobeopal470lm": "LED2002G5",
         "TRADFRIbulbE27WSglobeopal1055lm": "LED2003G10",
-        "TTRADFRIbulbGU10WS345lm": "LED2005R5",
+        "TRADFRIbulbGU10WS345lm": "LED2005R5",
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
