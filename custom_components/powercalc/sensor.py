@@ -26,6 +26,7 @@ from homeassistant.components import (
     vacuum,
     water_heater,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -236,6 +237,18 @@ async def async_setup_platform(
 
     try:
         entities = await create_sensors(hass, config, discovery_info)
+    except SensorConfigurationError as err:
+        _LOGGER.error(err)
+        return
+
+    if entities:
+        async_add_entities(
+            [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
+        )
+
+async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
+    try:
+        entities = await create_sensors(hass, entry.data)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return

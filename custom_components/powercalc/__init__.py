@@ -184,6 +184,10 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     return True
 
 
+async def async_setup_entry(hass, entry) -> bool:
+    hass.config_entries.async_setup_platforms(entry, ["sensor"])
+    return True
+
 async def autodiscover_entities(
     config: dict, domain_config: dict, hass: HomeAssistantType
 ):
