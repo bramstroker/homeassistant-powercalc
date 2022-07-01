@@ -3,6 +3,7 @@
   "name": "Powercalc",
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
+  "config_flow": true,
   "dependencies": [
     "device_tracker",
     "hue",
@@ -11,7 +12,8 @@
     "binary_sensor",
     "light",
     "group",
-    "template"
+    "template",
+    "select"
   ],
   "after_dependencies": [
     "integration",
