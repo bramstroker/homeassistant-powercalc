@@ -4,6 +4,14 @@
             "already_configured": "Sensor is already configured"
         },
         "step": {
+            "daily_energy": {
+                "data": {
+                    "on_time": "On time",
+                    "start_time": "Start time",
+                    "unit_of_measurement": "Unit of measurement",
+                    "value": "Value"
+                }
+            },
             "fixed": {
                 "data": {
                     "fixed_raw": "Raw YAML config",
@@ -22,7 +30,7 @@
                 },
                 "title": "Linear mode config"
             },
-            "user": {
+            "power": {
                 "data": {
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
@@ -34,6 +42,11 @@
                     "unique_id": "Unique id"
                 },
                 "title": "Main configuration"
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Sensor type"
+                }
             }
         }
     }

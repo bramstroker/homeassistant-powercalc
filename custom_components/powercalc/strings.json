@@ -5,6 +5,20 @@
     },
     "step": {
       "user": {
+        "data": {
+          "sensor_type": "Sensor type"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "value": "Value",
+          "on_time": "On time (defaults to 1 day)",
+          "start_time": "Start time",
+          "unit_of_measurement": "Unit of measurement",
+          "update_frequency": "Update frequency"
+        }
+      },
+      "power": {
         "title": "Main configuration",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
