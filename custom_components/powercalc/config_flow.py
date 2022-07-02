@@ -1,4 +1,5 @@
 """Config flow for Adaptive Lighting integration."""
+from datetime import timedelta
 import logging
 
 import voluptuous as vol
@@ -22,6 +23,7 @@ from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
     CONF_CREATE_UTILITY_METERS,
+    CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_FIXED_RAW,
     CONF_POWER_TEMPLATE,
@@ -33,12 +35,14 @@ from .const import (
     CONF_SENSOR_TYPE,
     CONF_ON_TIME,
     CONF_START_TIME,
+    CONF_VALUE_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     DOMAIN,
     CONF_MODE,
     CONF_VALUE,
     CONF_STANDBY_POWER,
     CALCULATION_MODES,
+    DUMMY_ENTITY_ID,
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
@@ -68,13 +72,15 @@ SCHEMA_INITIAL = vol.Schema({
 
 SCHEMA_DAILY_ENERGY = vol.Schema(
     {
+        vol.Required(CONF_NAME): str,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
         vol.Optional(CONF_VALUE): vol.Coerce(float),
-        #vol.Optional(CONF_VALUE_TEMPLATE): selector.TemplateSelector(),
+        vol.Optional(CONF_VALUE_TEMPLATE): selector.TemplateSelector(),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
         ),
         vol.Optional(CONF_ON_TIME): selector.DurationSelector({"enable_day": False}),
-        vol.Optional(CONF_START_TIME): selector.TimeSelector(),
+        #vol.Optional(CONF_START_TIME): selector.TimeSelector(),
         vol.Optional(
             CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
         ): vol.Coerce(int),
@@ -169,13 +175,41 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     async def async_step_daily_energy(self, user_input: dict[str,str] = None) -> FlowResult:
         if user_input is not None:
-            return
+            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
+            await self.async_set_unique_id(unique_id)
+            self._abort_if_unique_id_configured()
+
+            self.name = user_input.get(CONF_NAME)
+            sensor_config = {
+                CONF_NAME: self.name,
+                CONF_UNIQUE_ID: user_input.get(CONF_UNIQUE_ID),
+                CONF_DAILY_FIXED_ENERGY: self.build_daily_energy_config(user_input)
+            }
+
+            self.sensor_config.update(sensor_config)
+            return self.async_create_entry(
+                title=self.name, data=self.sensor_config
+            )
             
         return self.async_show_form(
             step_id="daily_energy",
             data_schema=SCHEMA_DAILY_ENERGY,
             errors={},
         )
+
+    def build_daily_energy_config(self, user_input: dict[str,str] = None) -> dict[str, Any]:
+        config = {
+            CONF_UPDATE_FREQUENCY: user_input[CONF_UPDATE_FREQUENCY],
+            #CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_VALUE: user_input.get(CONF_VALUE) or user_input.get(CONF_VALUE_TEMPLATE)
+        }
+        
+        if CONF_ON_TIME in user_input:
+            on_time = user_input[CONF_ON_TIME]
+            config[CONF_ON_TIME] = (on_time["hours"] * 3600) + (on_time["minutes"] * 60) + on_time["seconds"]
+        else:
+            config[CONF_ON_TIME] = 86400
+        return config
     
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
         if user_input is not None:

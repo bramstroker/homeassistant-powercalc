@@ -237,7 +237,7 @@ async def async_setup_entry(
 ):
     """Setup sensors from config entry (GUI config flow)"""
 
-    await _async_setup_entities(hass, entry.data, async_add_entities)
+    await _async_setup_entities(hass, dict(entry.data), async_add_entities)
 
 async def _async_setup_entities(
     hass: HomeAssistantType,
