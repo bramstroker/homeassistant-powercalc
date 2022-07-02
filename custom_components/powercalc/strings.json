@@ -22,6 +22,15 @@
           "power_template": "Power template",
           "fixed_raw": "Raw YAML config"
         }
+      },
+      "linear": {
+        "title": "Linear mode config",
+        "data": {
+          "min_power": "Min power",
+          "max_power": "Max power",
+          "gamma_curve": "Gamma curve",
+          "attribute": "Attribute"
+        }
       }
     }
   }

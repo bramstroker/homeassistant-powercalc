@@ -10,6 +10,15 @@
                 "description": "Supply either a fixed power value or template. If you want to used states_power or any advanced options use the raw yaml config option (see the readme)",
                 "title": "Fixed mode config"
             },
+            "linear": {
+                "data": {
+                    "attribute": "Attribute",
+                    "gamma_curve": "Gamma curve",
+                    "max_power": "Max power",
+                    "min_power": "Min power"
+                },
+                "title": "Linear mode config"
+            },
             "user": {
                 "data": {
                     "create_energy_sensor": "Create energy sensor",

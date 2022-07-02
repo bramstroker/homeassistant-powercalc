@@ -3,8 +3,14 @@ import logging
 
 import voluptuous as vol
 
+from typing import Any
 from homeassistant import config_entries
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import (
+    CONF_ATTRIBUTE,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_UNIQUE_ID,
+)
 from homeassistant.helpers import selector
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
@@ -14,14 +20,19 @@ from .const import (
     CONF_FIXED,
     CONF_FIXED_RAW,
     CONF_POWER_TEMPLATE,
+    CONF_CALIBRATE,
+    CONF_LINEAR,
+    CONF_MIN_POWER,
+    CONF_MAX_POWER,
+    CONF_GAMMA_CURVE,
     DOMAIN,
     CONF_MODE,
     CONF_STANDBY_POWER,
-    CONF_DISABLE_STANDBY_POWER,
     CALCULATION_MODES,
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
+    MODE_LINEAR,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,6 +60,15 @@ FIXED_SCHEMA = vol.Schema(
     }
 )
 
+LINEAR_SCHEMA = {
+    # vol.Optional(CONF_CALIBRATE): vol.All(
+    #     cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
+    # ),
+    vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
+    vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
+    vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
+}
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Adaptive Lighting."""
 
@@ -56,9 +76,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def __init__(self):
         """Initialize options flow."""
-        #self.config_entry = config_entry
-        self.sensor_config = dict()
+        self.sensor_config: dict[str, Any] = dict()
         self.name: str = None
+        self.entity_id: str = None
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""
@@ -69,9 +89,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self.sensor_config.update(user_input)
         self.name = user_input[CONF_NAME]
+        self.entity_id = user_input[CONF_ENTITY_ID]
 
         if user_input.get(CONF_MODE) == MODE_FIXED:
             return await self.async_step_fixed()
+        
+        if user_input.get(CONF_MODE) == MODE_LINEAR:
+            return await self.async_step_linear()
 
         return self.async_show_form(
             step_id="user",
@@ -97,10 +121,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=FIXED_SCHEMA,
             errors={},
         )
+    
+    async def async_step_linear(self, user_input: dict[str,str] = None) -> FlowResult:
+        if user_input is not None:
+            linear_config = user_input
+            self.sensor_config.update({CONF_LINEAR: linear_config})
+            return self.async_create_entry(
+                title=self.name, data=self.sensor_config
+            )
 
-    def build_sensor_config(self, user_input: dict[str, str]) -> dict[str, str]:
-        sensor_config = {
-            k: v
-            for k, v in user_input.items()
-        }
-        return sensor_config
+        config_schema = vol.Schema(
+            {
+                **LINEAR_SCHEMA,
+                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig({CONF_ENTITY_ID: self.entity_id}))
+            }
+        )
+        return self.async_show_form(
+            step_id="linear",
+            data_schema=config_schema,
+            errors={},
+        )
