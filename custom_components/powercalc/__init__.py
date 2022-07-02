@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from homeassistant.config_entries import ConfigEntry
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -19,6 +20,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
+    Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.helpers import discovery
@@ -67,6 +69,10 @@ from .errors import ModelNotSupported
 from .model_discovery import get_light_model, has_manufacturer_and_model_information
 from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
+
+PLATFORMS = [
+    Platform.SENSOR
+]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -184,8 +190,9 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     return True
 
 
-async def async_setup_entry(hass, entry) -> bool:
-    hass.config_entries.async_setup_platforms(entry, ["sensor"])
+async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool:
+    """Set up Powercalc integration from a config entry."""
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     return True
 
 async def autodiscover_entities(
