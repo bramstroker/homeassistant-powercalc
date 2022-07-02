@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import Final, cast
+from typing import Any, Final, cast
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -226,7 +226,26 @@ async def async_setup_platform(
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
 ):
-    """Set up the virtual power sensors."""
+    """Setup sensors from YAML config sensor entries"""
+
+    await _async_setup_entities(hass, config, async_add_entities, discovery_info)
+
+async def async_setup_entry(
+    hass: HomeAssistantType,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback
+):
+    """Setup sensors from config entry (GUI config flow)"""
+
+    await _async_setup_entities(hass, entry.data, async_add_entities)
+
+async def _async_setup_entities(
+    hass: HomeAssistantType,
+    config: dict[str, Any],
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None
+):
+    """Main routine to setup power/energy sensors from provided configuration"""
 
     platform = entity_platform.async_get_current_platform()
     platform.async_register_entity_service(
@@ -245,19 +264,6 @@ async def async_setup_platform(
         async_add_entities(
             [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
         )
-
-async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
-    try:
-        entities = await create_sensors(hass, entry.data)
-    except SensorConfigurationError as err:
-        _LOGGER.error(err)
-        return
-
-    if entities:
-        async_add_entities(
-            [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
-        )
-
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
