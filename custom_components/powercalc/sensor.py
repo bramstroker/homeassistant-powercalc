@@ -331,9 +331,14 @@ async def create_sensors(
         for entity_config in config[CONF_ENTITIES]:
             # When there are nested entities, combine these with the current entities, resursively
             if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
-                (child_new_sensors, child_existing_sensors) = await create_sensors(
-                    hass, entity_config
-                )
+                try:
+                    (child_new_sensors, child_existing_sensors) = await create_sensors(
+                        hass, entity_config
+                    )
+                except SensorConfigurationError as err:
+                    _LOGGER.error(err)
+                    continue
+                
                 new_sensors.extend(child_new_sensors)
                 existing_sensors.extend(child_existing_sensors)
                 continue
