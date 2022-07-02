@@ -11,7 +11,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.helpers import selector
+from homeassistant.helpers import selector, entity_registry
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
 
@@ -34,12 +34,13 @@ from .const import (
     CONF_POWER,
     MODE_LINEAR,
 )
+from .common import SourceEntity, create_source_entity
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema({
-    vol.Required(CONF_NAME): str,
     vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
+    vol.Optional(CONF_NAME): str,
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODE, default=MODE_FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
@@ -78,6 +79,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Initialize options flow."""
         self.sensor_config: dict[str, Any] = dict()
         self.name: str = None
+        self.source_entity: SourceEntity = None
         self.entity_id: str = None
 
     async def async_step_user(self, user_input=None) -> FlowResult:
@@ -88,8 +90,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         self.sensor_config.update(user_input)
-        self.name = user_input[CONF_NAME]
         self.entity_id = user_input[CONF_ENTITY_ID]
+        self.source_entity = await create_source_entity(self.entity_id, self.hass)
+        if CONF_NAME in user_input:
+            self.name = user_input[CONF_NAME]
+        else:
+            self.name = self.source_entity.name
+
+        unique_id = user_input.get(CONF_UNIQUE_ID) or self.source_entity.unique_id or self.entity_id
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
 
         if user_input.get(CONF_MODE) == MODE_FIXED:
             return await self.async_step_fixed()
