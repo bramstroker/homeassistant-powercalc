@@ -5,6 +5,7 @@
     },
     "step": {
       "user": {
+        "title": "Choose your sensor type",
         "data": {
           "sensor_type": "Sensor type"
         }
@@ -25,7 +26,7 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
-      "power": {
+      "virtual_power": {
         "title": "Main configuration",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
@@ -71,6 +72,15 @@
     },
     "error": {
       "linear_mandatory": "You must supply at least one of max_power or calibrate"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "value": "Value"
+        }
+      }
     }
   }
 }

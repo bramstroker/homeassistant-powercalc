@@ -46,7 +46,13 @@
                 },
                 "title": "Linear mode config"
             },
-            "power": {
+            "user": {
+                "data": {
+                    "sensor_type": "Sensor type"
+                },
+                "title": "Choose your sensor type"
+            },
+            "virtual_power": {
                 "data": {
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
@@ -59,17 +65,21 @@
                 },
                 "title": "Main configuration"
             },
-            "user": {
-                "data": {
-                    "sensor_type": "Sensor type"
-                }
-            },
             "wled": {
                 "data": {
                     "power_factor": "Power factor",
                     "voltage": "Voltage"
                 },
                 "title": "WLED mode config"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "value": "Value"
+                }
             }
         }
     }
