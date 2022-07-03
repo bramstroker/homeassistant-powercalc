@@ -3,13 +3,20 @@
         "abort": {
             "already_configured": "Sensor is already configured"
         },
+        "errors": {
+            "linear_mandatory": "You must supply at least one of max_power or calibrate"
+        },
         "step": {
             "daily_energy": {
                 "data": {
-                    "on_time": "On time",
+                    "name": "Name",
+                    "on_time": "On time (defaults to 1 day)",
                     "start_time": "Start time",
+                    "unique_id": "Unique id",
                     "unit_of_measurement": "Unit of measurement",
-                    "value": "Value"
+                    "update_frequency": "Update frequency (in seconds)",
+                    "value": "Value",
+                    "value_template": "Value template"
                 }
             },
             "fixed": {
@@ -24,9 +31,13 @@
             "linear": {
                 "data": {
                     "attribute": "Attribute",
+                    "calibrate": "Calibration values",
                     "gamma_curve": "Gamma curve",
                     "max_power": "Max power",
                     "min_power": "Min power"
+                },
+                "data_description": {
+                    "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200"
                 },
                 "title": "Linear mode config"
             },
@@ -47,6 +58,13 @@
                 "data": {
                     "sensor_type": "Sensor type"
                 }
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Power factor",
+                    "voltage": "Voltage"
+                },
+                "title": "WLED mode config"
             }
         }
     }

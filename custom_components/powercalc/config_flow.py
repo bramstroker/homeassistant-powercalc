@@ -1,12 +1,11 @@
 """Config flow for Adaptive Lighting integration."""
-from datetime import timedelta
+
 import logging
 
 import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
-from homeassistant.backports.enum import StrEnum
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
@@ -16,7 +15,7 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
 )
-from homeassistant.helpers import selector, entity_registry
+from homeassistant.helpers import selector
 from homeassistant.config_entries import data_entry_flow
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
@@ -37,28 +36,24 @@ from .const import (
     CONF_START_TIME,
     CONF_VALUE_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
+    CONF_WLED,
     DOMAIN,
     CONF_MODE,
     CONF_VALUE,
     CONF_STANDBY_POWER,
     CALCULATION_MODES,
-    DUMMY_ENTITY_ID,
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
     MODE_LINEAR,
+    MODE_WLED,
+    SensorType
 )
 from .common import SourceEntity, create_source_entity
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
 _LOGGER = logging.getLogger(__name__)
-
-class SensorType(StrEnum):
-    """Possible modes for a number selector."""
-
-    DAILY_ENERGY = "daily_energy"
-    VIRTUAL_POWER = "virtual_power"
-    GROUP = "group"
 
 SCHEMA_INITIAL = vol.Schema({
     vol.Required(CONF_SENSOR_TYPE, default=SensorType.VIRTUAL_POWER): vol.In(
@@ -79,7 +74,7 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
         ),
-        vol.Optional(CONF_ON_TIME): selector.DurationSelector({"enable_day": False}),
+        vol.Optional(CONF_ON_TIME): selector.DurationSelector(selector.DurationSelectorConfig(enable_day=False)),
         #vol.Optional(CONF_START_TIME): selector.TimeSelector(),
         vol.Optional(
             CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
@@ -99,7 +94,7 @@ SCHEMA_POWER = vol.Schema({
     ),
     vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
     vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): cv.boolean,
-    vol.Optional(CONF_CREATE_UTILITY_METERS, default=True): cv.boolean
+    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean
 })
 
 SCHEMA_POWER_FIXED = vol.Schema(
@@ -111,12 +106,13 @@ SCHEMA_POWER_FIXED = vol.Schema(
 )
 
 SCHEMA_POWER_LINEAR = {
-    vol.Optional(CONF_CALIBRATE): vol.All(
-        cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
-    ),
+    # vol.Optional(CONF_CALIBRATE): vol.All(
+    #     cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
+    # ),
     vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
     vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
+    vol.Optional(CONF_CALIBRATE): selector.TextSelector(selector.TextSelectorConfig(multiline=True))
 }
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -133,6 +129,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""
+
         if not user_input:
             return self.async_show_form(
                 step_id="user", data_schema=SCHEMA_INITIAL,
@@ -152,10 +149,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(user_input)
             self.entity_id = user_input[CONF_ENTITY_ID]
             self.source_entity = await create_source_entity(self.entity_id, self.hass)
-            if CONF_NAME in user_input:
-                self.name = user_input[CONF_NAME]
-            else:
-                self.name = self.source_entity.name
+            self.name = user_input.get(CONF_NAME) or self.source_entity.name
 
             unique_id = user_input.get(CONF_UNIQUE_ID) or self.source_entity.unique_id or self.entity_id
             await self.async_set_unique_id(unique_id)
@@ -166,6 +160,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             
             if user_input.get(CONF_MODE) == MODE_LINEAR:
                 return await self.async_step_linear()
+            
+            if user_input.get(CONF_MODE) == MODE_WLED:
+                return await self.async_step_wled()
             
         return self.async_show_form(
             step_id="power",
@@ -200,7 +197,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def build_daily_energy_config(self, user_input: dict[str,str] = None) -> dict[str, Any]:
         config = {
             CONF_UPDATE_FREQUENCY: user_input[CONF_UPDATE_FREQUENCY],
-            #CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_UNIT_OF_MEASUREMENT: user_input[CONF_UNIT_OF_MEASUREMENT],
             CONF_VALUE: user_input.get(CONF_VALUE) or user_input.get(CONF_VALUE_TEMPLATE)
         }
         
@@ -231,7 +228,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_linear(self, user_input: dict[str,str] = None) -> FlowResult:
-        if user_input is not None:
+        errors = _validate_linear_input(user_input)
+
+        if user_input is not None and not errors:
             linear_config = user_input
             self.sensor_config.update({CONF_LINEAR: linear_config})
             return self.async_create_entry(
@@ -241,11 +240,34 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_schema = vol.Schema(
             {
                 **SCHEMA_POWER_LINEAR,
-                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig({CONF_ENTITY_ID: self.entity_id}))
+                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=self.entity_id))
             }
         )
         return self.async_show_form(
             step_id="linear",
             data_schema=config_schema,
+            errors=errors,
+        )
+    
+    async def async_step_wled(self, user_input: dict[str,str] = None) -> FlowResult:
+        if user_input is not None:
+            self.sensor_config.update({CONF_WLED: user_input})
+            return self.async_create_entry(
+                title=self.name, data=self.sensor_config
+            )
+
+        return self.async_show_form(
+            step_id="wled",
+            data_schema=SCHEMA_POWER_WLED,
             errors={},
         )
+
+def _validate_linear_input(linear_input: dict[str, str] = None) -> dict:
+    if not linear_input:
+        return {}
+    errors = {}
+
+    if not CONF_MAX_POWER in linear_input or not CONF_CALIBRATE in linear_input:
+        errors["base"] = "linear_mandatory"
+    
+    return errors

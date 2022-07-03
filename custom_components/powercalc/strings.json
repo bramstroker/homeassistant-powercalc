@@ -11,11 +11,18 @@
       },
       "daily_energy": {
         "data": {
+          "name": "[%key:common::config_flow::data::name%]",
+          "unique_id": "Unique id",
           "value": "Value",
-          "on_time": "On time (defaults to 1 day)",
+          "value_template": "Value template",
+          "on_time": "On time",
           "start_time": "Start time",
           "unit_of_measurement": "Unit of measurement",
           "update_frequency": "Update frequency"
+        },
+        "data_description": {
+          "on_time": "When left empty defaults to 1 day. always on",
+          "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
       "power": {
@@ -43,12 +50,27 @@
       "linear": {
         "title": "Linear mode config",
         "data": {
+          "calibrate": "Calibration values",
           "min_power": "Min power",
           "max_power": "Max power",
           "gamma_curve": "Gamma curve",
           "attribute": "Attribute"
+        },
+        "data_description": {
+          "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200",
+          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans"
+        }
+      },
+      "wled": {
+        "title": "WLED mode config",
+        "data": {
+          "voltage": "Voltage",
+          "power_factor": "Power factor"
         }
       }
+    },
+    "errors": {
+      "linear_mandatory": "You must supply at least one of max_power or calibrate"
     }
   }
 }

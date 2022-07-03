@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 
+from homeassistant.backports.enum import StrEnum
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
     STATE_NOT_HOME,
@@ -121,13 +122,11 @@ ATTR_SOURCE_DOMAIN = "source_domain"
 
 SERVICE_RESET_ENERGY = "reset_energy"
 
-MODE_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
 MODE_WLED = "wled"
 CALCULATION_MODES = [
-    MODE_DAILY_FIXED_ENERGY,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
@@ -135,3 +134,10 @@ CALCULATION_MODES = [
 ]
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
+
+class SensorType(StrEnum):
+    """Possible modes for a number selector."""
+
+    DAILY_ENERGY = "daily_energy"
+    VIRTUAL_POWER = "virtual_power"
+    GROUP = "group"
