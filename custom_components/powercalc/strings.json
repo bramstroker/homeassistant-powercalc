@@ -69,7 +69,7 @@
         }
       }
     },
-    "errors": {
+    "error": {
       "linear_mandatory": "You must supply at least one of max_power or calibrate"
     }
   }

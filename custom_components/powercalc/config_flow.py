@@ -1,11 +1,13 @@
 """Config flow for Adaptive Lighting integration."""
 
+from __future__ import annotations
 import logging
 
 import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
+from homeassistant.core import callback
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
@@ -16,7 +18,7 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.helpers import selector
-from homeassistant.config_entries import data_entry_flow
+from homeassistant.config_entries import data_entry_flow, ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
 
@@ -65,10 +67,8 @@ SCHEMA_INITIAL = vol.Schema({
     ),
 })
 
-SCHEMA_DAILY_ENERGY = vol.Schema(
+SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): cv.string,
         vol.Optional(CONF_VALUE): vol.Coerce(float),
         vol.Optional(CONF_VALUE_TEMPLATE): selector.TemplateSelector(),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
@@ -81,6 +81,12 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
         ): vol.Coerce(int),
     }
 )
+SCHEMA_DAILY_ENERGY = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
+    }
+).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
 SCHEMA_POWER = vol.Schema({
     vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
@@ -126,6 +132,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.name: str = None
         self.source_entity: SourceEntity = None
         self.entity_id: str = None
+    
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Get the options flow for this handler."""
+        return OptionsFlowHandler(config_entry)
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""
@@ -262,12 +274,34 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors={},
         )
 
+
+class OptionsFlowHandler(OptionsFlow):
+    """Handle an option flow for PowerCalc."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle options flow."""
+        if user_input is not None:
+            # save config entry here
+            return
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=SCHEMA_DAILY_ENERGY_OPTIONS,
+            errors={},
+        )
+
 def _validate_linear_input(linear_input: dict[str, str] = None) -> dict:
     if not linear_input:
         return {}
     errors = {}
 
-    if not CONF_MAX_POWER in linear_input or not CONF_CALIBRATE in linear_input:
+    if not CONF_MAX_POWER in linear_input and not CONF_CALIBRATE in linear_input:
         errors["base"] = "linear_mandatory"
     
     return errors

@@ -3,20 +3,24 @@
         "abort": {
             "already_configured": "Sensor is already configured"
         },
-        "errors": {
+        "error": {
             "linear_mandatory": "You must supply at least one of max_power or calibrate"
         },
         "step": {
             "daily_energy": {
                 "data": {
                     "name": "Name",
-                    "on_time": "On time (defaults to 1 day)",
+                    "on_time": "On time",
                     "start_time": "Start time",
                     "unique_id": "Unique id",
                     "unit_of_measurement": "Unit of measurement",
-                    "update_frequency": "Update frequency (in seconds)",
+                    "update_frequency": "Update frequency",
                     "value": "Value",
                     "value_template": "Value template"
+                },
+                "data_description": {
+                    "on_time": "When left empty defaults to 1 day. always on",
+                    "update_frequency": "time in seconds between state updates of the sensor"
                 }
             },
             "fixed": {
@@ -37,6 +41,7 @@
                     "min_power": "Min power"
                 },
                 "data_description": {
+                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
                     "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200"
                 },
                 "title": "Linear mode config"
