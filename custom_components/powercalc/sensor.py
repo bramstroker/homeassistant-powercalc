@@ -1,7 +1,9 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
+from datetime import timedelta
 
+import copy
 import logging
 import uuid
 from typing import Any, Final, cast
@@ -85,6 +87,7 @@ from .const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_ON_TIME,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
@@ -237,7 +240,8 @@ async def async_setup_entry(
 ):
     """Setup sensors from config entry (GUI config flow)"""
 
-    await _async_setup_entities(hass, dict(entry.data), async_add_entities)
+    sensor_config = convert_config_entry_to_sensor_config(entry)
+    await _async_setup_entities(hass, sensor_config, async_add_entities)
 
 async def _async_setup_entities(
     hass: HomeAssistantType,
@@ -264,6 +268,26 @@ async def _async_setup_entities(
         async_add_entities(
             [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
         )
+
+def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
+    """Convert the config entry structure to the sensor config which we use to create the entities"""
+    sensor_config = dict(config_entry.data.copy())
+
+    if CONF_DAILY_FIXED_ENERGY in sensor_config:
+        daily_fixed_config = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))
+        if CONF_ON_TIME in daily_fixed_config:
+            on_time = daily_fixed_config[CONF_ON_TIME]
+            daily_fixed_config[CONF_ON_TIME] = timedelta(
+                hours=on_time["hours"],
+                minutes=on_time["minutes"],
+                seconds=on_time["seconds"]
+            )
+        else:
+            daily_fixed_config[CONF_ON_TIME] = timedelta(days=1)
+        sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
+    
+    return sensor_config
+
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
     """Merges configuration from multiple levels (sensor, group, global) into a single dict"""

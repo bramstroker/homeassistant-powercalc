@@ -149,15 +149,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_virtual_power(self, user_input: dict[str,str] = None) -> FlowResult:
         if user_input is not None:
-            self.selected_sensor_type = SensorType.VIRTUAL_POWER
-            self.sensor_config.update(user_input)
             self.entity_id = user_input[CONF_ENTITY_ID]
             self.source_entity = await create_source_entity(self.entity_id, self.hass)
-            self.name = user_input.get(CONF_NAME) or self.source_entity.name
-
             unique_id = user_input.get(CONF_UNIQUE_ID) or self.source_entity.unique_id or self.entity_id
+
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
+
+            self.name = user_input.get(CONF_NAME) or self.source_entity.name
+            self.selected_sensor_type = SensorType.VIRTUAL_POWER
+            self.sensor_config.update(user_input)
 
             if user_input.get(CONF_MODE) == MODE_FIXED:
                 return await self.async_step_fixed()
@@ -182,13 +183,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             self.selected_sensor_type = SensorType.DAILY_ENERGY
             self.name = user_input.get(CONF_NAME)
-            sensor_config = {
-                CONF_NAME: self.name,
-                CONF_UNIQUE_ID: user_input.get(CONF_UNIQUE_ID),
-                CONF_DAILY_FIXED_ENERGY: self.build_daily_energy_config(user_input)
-            }
 
-            self.sensor_config.update(sensor_config)
+            self.sensor_config.update({CONF_DAILY_FIXED_ENERGY: self.build_daily_energy_config(user_input)})
             return self.create_config_entry()
             
         return self.async_show_form(
@@ -198,17 +194,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     def build_daily_energy_config(self, user_input: dict[str,str] = None) -> dict[str, Any]:
-        config = {
-            CONF_UPDATE_FREQUENCY: user_input[CONF_UPDATE_FREQUENCY],
-            CONF_UNIT_OF_MEASUREMENT: user_input[CONF_UNIT_OF_MEASUREMENT],
-            CONF_VALUE: user_input.get(CONF_VALUE) or user_input.get(CONF_VALUE_TEMPLATE)
-        }
-        
-        if CONF_ON_TIME in user_input:
-            on_time = user_input[CONF_ON_TIME]
-            config[CONF_ON_TIME] = (on_time["hours"] * 3600) + (on_time["minutes"] * 60) + on_time["seconds"]
-        else:
-            config[CONF_ON_TIME] = 86400
+        config = user_input
+        config.update({CONF_VALUE: user_input.get(CONF_VALUE, user_input.get(CONF_VALUE_TEMPLATE))})
         return config
     
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
@@ -262,6 +249,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def create_config_entry(self):
         self.sensor_config.update({"sensor_type": self.selected_sensor_type})
+        if self.name:
+            self.sensor_config.update({CONF_NAME: self.name})
+        if self.entity_id:
+            self.sensor_config.update({CONF_ENTITY_ID: self.entity_id})
+        if self.unique_id:
+            self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
         return self.async_create_entry(
             title=self.name, data=self.sensor_config
         )
