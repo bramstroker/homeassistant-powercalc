@@ -71,7 +71,9 @@
       }
     },
     "error": {
-      "linear_mandatory": "You must supply at least one of max_power or calibrate"
+      "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
+      "fixed_mandatory": "You must supply at least one of Power or Power template"
     }
   },
   "options": {

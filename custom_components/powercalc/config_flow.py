@@ -176,7 +176,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_daily_energy(self, user_input: dict[str,str] = None) -> FlowResult:
-        if user_input is not None:
+        errors = _validate_daily_energy_input(user_input)
+
+        if user_input is not None and not errors:
             unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
@@ -184,19 +186,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.selected_sensor_type = SensorType.DAILY_ENERGY
             self.name = user_input.get(CONF_NAME)
 
-            self.sensor_config.update({CONF_DAILY_FIXED_ENERGY: self.build_daily_energy_config(user_input)})
+            self.sensor_config.update({CONF_DAILY_FIXED_ENERGY: _build_daily_energy_config(user_input)})
             return self.create_config_entry()
             
         return self.async_show_form(
             step_id="daily_energy",
             data_schema=SCHEMA_DAILY_ENERGY,
-            errors={},
+            errors=errors,
         )
-
-    def build_daily_energy_config(self, user_input: dict[str,str] = None) -> dict[str, Any]:
-        config = user_input
-        config.update({CONF_VALUE: user_input.get(CONF_VALUE, user_input.get(CONF_VALUE_TEMPLATE))})
-        return config
     
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
         if user_input is not None:
@@ -271,11 +268,22 @@ class OptionsFlowHandler(OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
-        if user_input is not None:
-            # save config entry here
-            return
 
         sensor_type = self.config_entry.data.get("sensor_type") or SensorType.VIRTUAL_POWER
+
+        if user_input is not None:
+            options = dict(self.config_entry.data)
+            if sensor_type == SensorType.DAILY_ENERGY:
+                daily_energy_config = _build_daily_energy_config(user_input)
+                options.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
+            
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data=options
+            )
+
+            return self.async_create_entry(title="", data={})
+
         if sensor_type == SensorType.VIRTUAL_POWER:
             data_schema = SCHEMA_POWER_OPTIONS
             config_options = self.config_entry.data
@@ -290,6 +298,21 @@ class OptionsFlowHandler(OptionsFlow):
             data_schema=data_schema,
             errors={},
         )
+
+def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
+    config = user_input
+    config.update({CONF_VALUE: user_input.get(CONF_VALUE, user_input.get(CONF_VALUE_TEMPLATE))})
+    return config
+
+def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
+    if not user_input:
+        return {}
+    errors = {}
+
+    if not CONF_VALUE in user_input and not CONF_VALUE_TEMPLATE in user_input:
+        errors["base"] = "daily_energy_mandatory"
+    
+    return errors
 
 def _validate_linear_input(linear_input: dict[str, str] = None) -> dict:
     if not linear_input:
