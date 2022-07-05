@@ -3,6 +3,7 @@
 from __future__ import annotations
 import logging
 import copy
+from numpy import isin
 
 import voluptuous as vol
 
@@ -353,20 +354,13 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
     # Make a copy of the schema with suggested values set to saved options
     schema = {}
     for key, val in data_schema.schema.items():
-
-        if isinstance(key, vol.Marker):
-            # Exclude advanced field
-            if (
-                key.description
-                and key.description.get("advanced")
-            ):
-                continue
-
         new_key = key
-        if key in options and isinstance(key, vol.Marker):
-            # Copy the marker to not modify the flow schema
-            new_key = copy.copy(key)
-            new_key.description = {"suggested_value": options.get(key)}
+        if key in options:
+            if isinstance(key, vol.Optional):
+                new_key = vol.Optional(key.schema, default=options.get(key))
+            elif isinstance(key, vol.Marker):
+                new_key = copy.copy(key)
+                new_key.description = {"suggested_value": options.get(key)}
         schema[new_key] = val
     data_schema = vol.Schema(schema)
     return data_schema
