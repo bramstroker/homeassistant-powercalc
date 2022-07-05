@@ -22,6 +22,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Yeelight": "yeelight",
     "TuYa": "tuya",
     "MeLiTec": "melitec",
+    "WiZ": "wiz",
 }
 
 MODEL_DIRECTORY_MAPPING = {
