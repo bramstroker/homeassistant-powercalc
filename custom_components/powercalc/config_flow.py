@@ -297,10 +297,12 @@ class OptionsFlowHandler(OptionsFlow):
             )
             strategy_schema = self.get_strategy_schema()
             strategy_config_key = self.get_strategy_config_key()
+            strategy_options = {}
             for key in strategy_schema.schema.keys():
-                if key in user_input:
-                    self.current_config[strategy_config_key][key] = user_input.get(key)
-        
+                strategy_options[str(key)] = user_input.get(key)
+
+            self.current_config.update({strategy_config_key: strategy_options})
+
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data=self.current_config
@@ -377,10 +379,10 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
         new_key = key
         if key in options:
             if isinstance(key, vol.Marker):
-                if isinstance(key, vol.Optional):
-                    new_key = vol.Optional(key.schema, default=options.get(key))
-                else:
-                    new_key = copy.copy(key)
+                # if isinstance(key, vol.Optional):
+                #     new_key = vol.Optional(key.schema, default=options.get(key))
+                # else:
+                new_key = copy.copy(key)
                 new_key.description = {"suggested_value": options.get(key)}
         schema[new_key] = val
     data_schema = vol.Schema(schema)
