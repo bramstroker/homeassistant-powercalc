@@ -312,6 +312,9 @@ class OptionsFlowHandler(OptionsFlow):
             if CONF_LINEAR in self.current_config:
                 data_schema = data_schema.extend(SCHEMA_POWER_LINEAR.schema)
                 strategy_options = self.current_config[CONF_LINEAR]
+            if CONF_WLED in self.current_config:
+                data_schema = data_schema.extend(SCHEMA_POWER_WLED.schema)
+                strategy_options = self.current_config[CONF_WLED]
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
