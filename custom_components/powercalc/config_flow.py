@@ -297,10 +297,9 @@ class OptionsFlowHandler(OptionsFlow):
             )
             strategy_schema = self.get_strategy_schema()
             strategy_config_key = self.get_strategy_config_key()
-            for key, val in strategy_schema.schema.items():
-                new_key = str(key)
-                if new_key in user_input:
-                    self.current_config[strategy_config_key][new_key] = user_input.get(new_key)
+            for key in strategy_schema.schema.keys():
+                if key in user_input:
+                    self.current_config[strategy_config_key][key] = user_input.get(key)
         
         self.hass.config_entries.async_update_entry(
             self.config_entry,
