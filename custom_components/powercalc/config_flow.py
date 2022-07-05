@@ -13,6 +13,7 @@ from homeassistant.core import callback
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
+    CONF_IF,
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
@@ -294,28 +295,48 @@ class OptionsFlowHandler(OptionsFlow):
                     CONF_STANDBY_POWER: user_input.get(CONF_STANDBY_POWER)
                 }
             )
-            #self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
+            strategy_schema = self.get_strategy_schema()
+            strategy_config_key = self.get_strategy_config_key()
+            for key, val in strategy_schema.schema.items():
+                new_key = str(key)
+                if new_key in user_input:
+                    self.current_config[strategy_config_key][new_key] = user_input.get(new_key)
         
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data=self.current_config
         )
 
+    def get_strategy_schema(self) -> vol.Schema:
+        strategy = self.current_config.get(CONF_MODE)
+        if strategy == MODE_FIXED:
+            return SCHEMA_POWER_FIXED
+        if strategy == MODE_LINEAR:
+            return SCHEMA_POWER_LINEAR
+        if strategy == MODE_WLED:
+            return SCHEMA_POWER_WLED
+        return SCHEMA_POWER_FIXED
+    
+    def get_strategy_config_key(self) -> str:
+        strategy = self.current_config.get(CONF_MODE)
+        if strategy == MODE_FIXED:
+            return CONF_FIXED
+        if strategy == MODE_LINEAR:
+            return CONF_LINEAR
+        if strategy == MODE_WLED:
+            return CONF_WLED
+        return CONF_FIXED
+
     def build_options_schema(self) -> vol.Schema:
         """Build the options schema. depending on the selected sensor type"""
 
         strategy_options = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            data_schema = SCHEMA_POWER_OPTIONS
-            if CONF_FIXED in self.current_config:
-                data_schema = data_schema.extend(SCHEMA_POWER_FIXED.schema)
-                strategy_options = self.current_config[CONF_FIXED]
-            if CONF_LINEAR in self.current_config:
-                data_schema = data_schema.extend(SCHEMA_POWER_LINEAR.schema)
-                strategy_options = self.current_config[CONF_LINEAR]
-            if CONF_WLED in self.current_config:
-                data_schema = data_schema.extend(SCHEMA_POWER_WLED.schema)
-                strategy_options = self.current_config[CONF_WLED]
+            base_power_schema = SCHEMA_POWER_OPTIONS
+            strategy_schema = self.get_strategy_schema()
+            data_schema = base_power_schema.extend(strategy_schema.schema)
+            strategy_config_key = self.get_strategy_config_key()
+            strategy_options = self.current_config.get(strategy_config_key)
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
@@ -356,10 +377,11 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
     for key, val in data_schema.schema.items():
         new_key = key
         if key in options:
-            if isinstance(key, vol.Optional):
-                new_key = vol.Optional(key.schema, default=options.get(key))
-            elif isinstance(key, vol.Marker):
-                new_key = copy.copy(key)
+            if isinstance(key, vol.Marker):
+                if isinstance(key, vol.Optional):
+                    new_key = vol.Optional(key.schema, default=options.get(key))
+                else:
+                    new_key = copy.copy(key)
                 new_key.description = {"suggested_value": options.get(key)}
         schema[new_key] = val
     data_schema = vol.Schema(schema)
