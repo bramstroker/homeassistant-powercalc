@@ -58,7 +58,6 @@
                 "data": {
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
-                    "disable_standby_power": "Disable standby power",
                     "entity_id": "Entity",
                     "mode": "Calculation mode",
                     "name": "Name",
@@ -80,7 +79,22 @@
         "step": {
             "init": {
                 "data": {
+                    "attribute": "Attribute",
+                    "calibrate": "Calibration values",
+                    "create_energy_sensor": "Create energy sensor",
+                    "create_utility_meters": "Create utility meters",
+                    "fixed_raw": "Raw YAML config",
+                    "gamma_curve": "Gamma curve",
+                    "max_power": "Max power",
+                    "min_power": "Min power",
+                    "power": "Power",
+                    "power_template": "Power template",
+                    "standby_power": "Standby power",
                     "value": "Value"
+                },
+                "data_description": {
+                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+                    "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200"
                 }
             }
         }

@@ -103,15 +103,13 @@ SCHEMA_POWER = vol.Schema({
     ),
 }).extend(SCHEMA_POWER_OPTIONS.schema)
 
-SCHEMA_POWER_FIXED = vol.Schema(
-    {
-        vol.Optional(CONF_POWER): vol.Coerce(float),
-        vol.Optional(CONF_POWER_TEMPLATE): selector.TemplateSelector(),
-        vol.Optional(CONF_FIXED_RAW): selector.ObjectSelector()
-    }
-)
+SCHEMA_POWER_FIXED = vol.Schema({
+    vol.Optional(CONF_POWER): vol.Coerce(float),
+    vol.Optional(CONF_POWER_TEMPLATE): selector.TemplateSelector(),
+    vol.Optional(CONF_FIXED_RAW): selector.ObjectSelector()
+})
 
-SCHEMA_POWER_LINEAR = {
+SCHEMA_POWER_LINEAR = vol.Schema({
     # vol.Optional(CONF_CALIBRATE): vol.All(
     #     cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
     # ),
@@ -119,7 +117,7 @@ SCHEMA_POWER_LINEAR = {
     vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
     vol.Optional(CONF_CALIBRATE): selector.TextSelector(selector.TextSelectorConfig(multiline=True))
-}
+})
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Adaptive Lighting."""
@@ -220,9 +218,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_LINEAR: linear_config})
             return self.create_config_entry()
 
-        config_schema = vol.Schema(
+        config_schema = SCHEMA_POWER_LINEAR.extend(
             {
-                **SCHEMA_POWER_LINEAR,
                 vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=self.entity_id))
             }
         )
@@ -263,41 +260,66 @@ class OptionsFlowHandler(OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
+        self.current_config: dict = dict(config_entry.data)
+        self.sensor_type: SensorType = self.current_config.get("sensor_type") or SensorType.VIRTUAL_POWER
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
 
-        sensor_type = self.config_entry.data.get("sensor_type") or SensorType.VIRTUAL_POWER
+        self.current_config = dict(self.config_entry.data)
 
         if user_input is not None:
-            options = dict(self.config_entry.data)
-            if sensor_type == SensorType.DAILY_ENERGY:
-                daily_energy_config = _build_daily_energy_config(user_input)
-                options.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
-            
-            self.hass.config_entries.async_update_entry(
-                self.config_entry,
-                data=options
-            )
-
+            self.save_options(user_input)
             return self.async_create_entry(title="", data={})
-
-        if sensor_type == SensorType.VIRTUAL_POWER:
-            data_schema = SCHEMA_POWER_OPTIONS
-            config_options = self.config_entry.data
-        if sensor_type == SensorType.DAILY_ENERGY:
-            data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
-            config_options = self.config_entry.data[CONF_DAILY_FIXED_ENERGY]
-        
-        data_schema = _fill_schema_defaults(data_schema, config_options)
 
         return self.async_show_form(
             step_id="init",
-            data_schema=data_schema,
+            data_schema=self.build_options_schema(),
             errors={},
         )
+
+    def save_options(self, user_input):
+        if self.sensor_type == SensorType.DAILY_ENERGY:
+            daily_energy_config = _build_daily_energy_config(user_input)
+            self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
+        
+        if self.sensor_type == SensorType.VIRTUAL_POWER:
+            self.current_config.update(
+                {
+                    CONF_CREATE_ENERGY_SENSOR: user_input.get(CONF_CREATE_ENERGY_SENSOR),
+                    CONF_CREATE_UTILITY_METERS: user_input.get(CONF_CREATE_UTILITY_METERS),
+                    CONF_STANDBY_POWER: user_input.get(CONF_STANDBY_POWER)
+                }
+            )
+            #self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
+        
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            data=self.current_config
+        )
+
+    def build_options_schema(self) -> vol.Schema:
+        """Build the options schema. depending on the selected sensor type"""
+
+        strategy_options = {}
+        if self.sensor_type == SensorType.VIRTUAL_POWER:
+            data_schema = SCHEMA_POWER_OPTIONS
+            if CONF_FIXED in self.current_config:
+                data_schema = data_schema.extend(SCHEMA_POWER_FIXED.schema)
+                strategy_options = self.current_config[CONF_FIXED]
+            if CONF_LINEAR in self.current_config:
+                data_schema = data_schema.extend(SCHEMA_POWER_LINEAR.schema)
+                strategy_options = self.current_config[CONF_LINEAR]
+
+        if self.sensor_type == SensorType.DAILY_ENERGY:
+            data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
+            strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
+        
+        data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
+        return data_schema
+
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
     config = user_input
@@ -341,7 +363,7 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
         if key in options and isinstance(key, vol.Marker):
             # Copy the marker to not modify the flow schema
             new_key = copy.copy(key)
-            new_key.description = {"suggested_value": options[key]}
+            new_key.description = {"suggested_value": options.get(key)}
         schema[new_key] = val
     data_schema = vol.Schema(schema)
     return data_schema
