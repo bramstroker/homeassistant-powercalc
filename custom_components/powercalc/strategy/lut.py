@@ -95,7 +95,13 @@ class LutRegistry:
 
 
 class LutStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, lut_registry: LutRegistry, model: LightModel) -> None:
+    def __init__(
+        self,
+        source_entity: SourceEntity,
+        lut_registry: LutRegistry,
+        model: LightModel
+    ) -> None:
+        self._source_entity = source_entity
         self._lut_registry = lut_registry
         self._model = model
 
@@ -226,20 +232,20 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
 
-    async def validate_config(self, source_entity: SourceEntity):
-        if source_entity.domain != light.DOMAIN:
+    async def validate_config(self):
+        if self._source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError("Only light entities can use the LUT mode")
 
         if self._model.manufacturer is None:
             _LOGGER.error(
-                "Manufacturer not supplied for entity: %s", source_entity.entity_id
+                "Manufacturer not supplied for entity: %s", self._source_entity.entity_id
             )
 
         if self._model.model is None:
-            _LOGGER.error("Model not supplied for entity: %s", source_entity.entity_id)
+            _LOGGER.error("Model not supplied for entity: %s", self._source_entity.entity_id)
             return
 
-        for color_mode in source_entity.supported_color_modes:
+        for color_mode in self._source_entity.supported_color_modes:
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(

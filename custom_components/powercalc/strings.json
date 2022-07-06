@@ -71,6 +71,7 @@
     },
     "error": {
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_min_higher_as_max": "Max power cannot be lower than min power",
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
       "fixed_mandatory": "You must supply at least one of Power or Power template"
     }
@@ -97,6 +98,10 @@
           "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans"
         }
       }
+    },
+    "error": {
+      "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_min_higher_as_max": "Max power cannot be lower than min power"
     }
   }
 }

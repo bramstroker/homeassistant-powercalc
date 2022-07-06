@@ -89,5 +89,5 @@ class WledStrategy(PowerCalculationStrategyInterface):
     def can_calculate_standby(self) -> bool:
         return True
 
-    async def validate_config(self, source_entity: SourceEntity):
+    async def validate_config(self):
         self._estimated_current_entity = await self.find_estimated_current_entity()

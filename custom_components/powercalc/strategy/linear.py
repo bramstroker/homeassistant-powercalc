@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Optional
+from homeassistant.components.mqtt.number import CONF_MAX
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -52,10 +53,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration = self.create_calibrate_list()
+        self._calibration: list[tuple] = None 
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the current power consumption"""
+
+        if self._calibration is None:
+            self._calibration = self.create_calibrate_list()
+
         value = self.get_current_state_value(entity_state)
 
         min_calibrate = self.get_min_calibrate(value)
@@ -162,17 +167,25 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         return None
 
-    async def validate_config(self, source_entity: SourceEntity):
+    async def validate_config(self):
         """Validate correct setup of the strategy"""
 
-        if not CONF_CALIBRATE in self._config:
-            if source_entity.domain not in ALLOWED_DOMAINS:
+        if not self._config.get(CONF_CALIBRATE):
+            if self._source_entity.domain not in ALLOWED_DOMAINS:
                 raise StrategyConfigurationError(
                     "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
                         ",".join(ALLOWED_DOMAINS)
-                    )
+                    ),
+                    "linear_unsupported_domain"
                 )
-            if not CONF_MAX_POWER in self._config:
+            if not self._config.get(CONF_MAX_POWER):
                 raise StrategyConfigurationError(
-                    "Linear strategy must have at least 'max power' or 'calibrate' defined"
+                    "Linear strategy must have at least 'max power' or 'calibrate' defined", "linear_mandatory"
                 )
+        
+        min_power = self._config.get(CONF_MIN_POWER)
+        max_power = self._config.get(CONF_MAX_POWER)
+        if min_power >= max_power:
+            raise StrategyConfigurationError(
+                "Max power cannot be lower than min power", "linear_min_higher_as_max"
+            )

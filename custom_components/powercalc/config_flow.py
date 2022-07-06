@@ -1,6 +1,7 @@
 """Config flow for Adaptive Lighting integration."""
 
 from __future__ import annotations
+import imp
 import logging
 import copy
 from numpy import isin
@@ -24,6 +25,7 @@ from homeassistant.helpers import selector
 from homeassistant.config_entries import data_entry_flow, ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_UTILITY_METERS,
@@ -56,7 +58,10 @@ from .const import (
 )
 from .common import SourceEntity, create_source_entity
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
+from .strategy.strategy_interface import PowerCalculationStrategyInterface
+from .errors import StrategyConfigurationError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -112,9 +117,6 @@ SCHEMA_POWER_FIXED = vol.Schema({
 })
 
 SCHEMA_POWER_LINEAR = vol.Schema({
-    # vol.Optional(CONF_CALIBRATE): vol.All(
-    #     cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
-    # ),
     vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
     vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
@@ -132,7 +134,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.selected_sensor_type: str = None
         self.name: str = None
         self.source_entity: SourceEntity = None
-        self.entity_id: str = None
+        self.source_entity_id: str = None
     
     @staticmethod
     @callback
@@ -149,9 +151,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_virtual_power(self, user_input: dict[str,str] = None) -> FlowResult:
         if user_input is not None:
-            self.entity_id = user_input[CONF_ENTITY_ID]
-            self.source_entity = await create_source_entity(self.entity_id, self.hass)
-            unique_id = user_input.get(CONF_UNIQUE_ID) or self.source_entity.unique_id or self.entity_id
+            self.source_entity_id = user_input[CONF_ENTITY_ID]
+            self.source_entity = await create_source_entity(self.source_entity_id, self.hass)
+            unique_id = user_input.get(CONF_UNIQUE_ID) or self.source_entity.unique_id or self.source_entity_id
 
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
@@ -213,16 +215,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_linear(self, user_input: dict[str,str] = None) -> FlowResult:
-        errors = _validate_linear_input(user_input)
-
-        if user_input is not None and not errors:
+        errors = {}
+        if user_input is not None:
             linear_config = user_input
             self.sensor_config.update({CONF_LINEAR: linear_config})
-            return self.create_config_entry()
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return self.create_config_entry()
 
         config_schema = SCHEMA_POWER_LINEAR.extend(
             {
-                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=self.entity_id))
+                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=self.source_entity_id))
             }
         )
         return self.async_show_form(
@@ -242,13 +245,22 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors={},
         )
     
+    async def validate_strategy_config(self) -> dict:
+        strategy_name = self.sensor_config.get(CONF_MODE)
+        strategy = _create_strategy_object(self.hass, strategy_name, self.sensor_config, self.source_entity)
+        try:
+            await strategy.validate_config()
+        except StrategyConfigurationError as error:
+            return {"base": error.get_config_flow_translate_key()}
+        return {}
+    
     @callback
     def create_config_entry(self):
         self.sensor_config.update({"sensor_type": self.selected_sensor_type})
         if self.name:
             self.sensor_config.update({CONF_NAME: self.name})
-        if self.entity_id:
-            self.sensor_config.update({CONF_ENTITY_ID: self.entity_id})
+        if self.source_entity_id:
+            self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
         if self.unique_id:
             self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
         return self.async_create_entry(
@@ -264,6 +276,8 @@ class OptionsFlowHandler(OptionsFlow):
         self.config_entry = config_entry
         self.current_config: dict = dict(config_entry.data)
         self.sensor_type: SensorType = self.current_config.get("sensor_type") or SensorType.VIRTUAL_POWER
+        self.source_entity_id: str = self.current_config.get(CONF_ENTITY_ID)
+        self.source_entity: SourceEntity = None
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -271,18 +285,23 @@ class OptionsFlowHandler(OptionsFlow):
         """Handle options flow."""
 
         self.current_config = dict(self.config_entry.data)
-
+        if self.source_entity_id:
+            self.source_entity = await create_source_entity(self.source_entity_id, self.hass)
+        
+        errors = {}
         if user_input is not None:
-            self.save_options(user_input)
-            return self.async_create_entry(title="", data={})
+            errors = await self.save_options(user_input)
+            if not errors:
+                return self.async_create_entry(title="", data={})
 
         return self.async_show_form(
             step_id="init",
             data_schema=self.build_options_schema(),
-            errors={},
+            errors=errors,
         )
 
-    def save_options(self, user_input):
+    async def save_options(self, user_input) -> dict:
+        """Save options, and return errors when validation fails"""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
             self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
@@ -295,18 +314,25 @@ class OptionsFlowHandler(OptionsFlow):
                     CONF_STANDBY_POWER: user_input.get(CONF_STANDBY_POWER)
                 }
             )
+            strategy = self.current_config.get(CONF_MODE)
             strategy_schema = self.get_strategy_schema()
             strategy_config_key = self.get_strategy_config_key()
             strategy_options = {}
             for key in strategy_schema.schema.keys():
                 strategy_options[str(key)] = user_input.get(key)
-
+            
             self.current_config.update({strategy_config_key: strategy_options})
+            strategy_object = _create_strategy_object(self.hass, strategy, self.current_config, self.source_entity)
+            try:
+                await strategy_object.validate_config()
+            except StrategyConfigurationError as error:
+                return {"base": error.get_config_flow_translate_key()}
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data=self.current_config
         )
+        return {}
 
     def get_strategy_schema(self) -> vol.Schema:
         strategy = self.current_config.get(CONF_MODE)
@@ -346,6 +372,14 @@ class OptionsFlowHandler(OptionsFlow):
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
 
+def _create_strategy_object(
+    hass: HomeAssistantType,
+    strategy: str,
+    config: dict,
+    source_entity: SourceEntity
+) -> PowerCalculationStrategyInterface:
+    factory = PowerCalculatorStrategyFactory(hass)
+    return factory.create(config, strategy, None, source_entity)
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
     config = user_input
@@ -369,6 +403,11 @@ def _validate_linear_input(linear_input: dict[str, str] = None) -> dict:
 
     if not CONF_MAX_POWER in linear_input and not CONF_CALIBRATE in linear_input:
         errors["base"] = "linear_mandatory"
+    
+    min_power = linear_input.get(CONF_MIN_POWER)
+    max_power = linear_input.get(CONF_MAX_POWER)
+    if min_power > max_power:
+        errors["base"] = "linear_min_higher_as_max"
     
     return errors
 

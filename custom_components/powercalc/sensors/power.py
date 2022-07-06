@@ -159,7 +159,7 @@ async def create_virtual_power_sensor(
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
-        await calculation_strategy.validate_config(source_entity)
+        await calculation_strategy.validate_config()
     except (UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
