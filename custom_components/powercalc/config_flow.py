@@ -379,11 +379,11 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
         new_key = key
         if key in options:
             if isinstance(key, vol.Marker):
-                # if isinstance(key, vol.Optional):
-                #     new_key = vol.Optional(key.schema, default=options.get(key))
-                # else:
-                new_key = copy.copy(key)
-                new_key.description = {"suggested_value": options.get(key)}
+                if isinstance(key, vol.Optional) and callable(key.default) and key.default():
+                    new_key = vol.Optional(key.schema, default=options.get(key))
+                else:
+                    new_key = copy.copy(key)
+                    new_key.description = {"suggested_value": options.get(key)}
         schema[new_key] = val
     data_schema = vol.Schema(schema)
     return data_schema
