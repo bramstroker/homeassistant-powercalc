@@ -1,10 +1,8 @@
 """Config flow for Adaptive Lighting integration."""
 
 from __future__ import annotations
-import imp
 import logging
 import copy
-from numpy import isin
 
 import voluptuous as vol
 
@@ -14,7 +12,6 @@ from homeassistant.core import callback
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
-    CONF_IF,
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
@@ -22,7 +19,7 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.helpers import selector
-from homeassistant.config_entries import data_entry_flow, ConfigEntry, OptionsFlow
+from homeassistant.config_entries import ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import HomeAssistantType
