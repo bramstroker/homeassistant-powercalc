@@ -1,7 +1,7 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Sensor is already configured"
+      "already_configured": "Sensor is already configured, specify a unique_id"
     },
     "step": {
       "user": {
@@ -73,35 +73,38 @@
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "Max power cannot be lower than min power",
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-      "fixed_mandatory": "You must supply at least one of Power or Power template"
+      "fixed_mandatory": "You must supply at least one of Power or Power template",
+      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'"
     }
   },
   "options": {
     "step": {
       "init": {
         "data": {
-          "value": "Value",
-          "standby_power": "Standby power",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "power": "Power",
-          "power_template": "Power template",
-          "fixed_raw": "Raw YAML config",
-          "calibrate": "Calibration values",
-          "min_power": "Min power",
-          "max_power": "Max power",
-          "gamma_curve": "Gamma curve",
-          "attribute": "Attribute"
+          "value": "[%key:component::powercalc::config::step::daily_energy::data::value%]",
+          "standby_power": "[%key:component::powercalc::config::step::virtual_power::data::standby_power%]",
+          "create_energy_sensor": "[%key:component::powercalc::config::step::virtual_power::data::create_energy_sensor%]",
+          "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]",
+          "power": "[%key:component::powercalc::config::step::fixed::data::power%]",
+          "power_template": "[%key:component::powercalc::config::step::fixed::data::power_template%]",
+          "fixed_raw": "[%key:component::powercalc::config::step::fixed::data::fixed_raw%]",
+          "calibrate": "[%key:component::powercalc::config::step::linear::data::calibrate%]",
+          "min_power": "[%key:component::powercalc::config::step::linear::data::min_power%]",
+          "max_power": "[%key:component::powercalc::config::step::linear::data::max_power%]",
+          "gamma_curve": "[%key:component::powercalc::config::step::linear::data::gamma_curve%]",
+          "attribute": "[%key:component::powercalc::config::step::linear::data::attribute%]"
         },
         "data_description": {
-          "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200",
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans"
+          "calibrate": "[%key:component::powercalc::config::step::linear::data_description::calibrate%]",
+          "attribute": "[%key:component::powercalc::config::step::linear::data_description::attribute%]"
         }
       }
     },
     "error": {
-      "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power"
+      "linear_mandatory": "[%key:component::powercalc::config::error::linear_mandatory%]",
+      "linear_min_higher_as_max": "[%key:component::powercalc::config::error::linear_min_higher_as_max%]",
+      "fixed_mandatory": "[%key:component::powercalc::config::error::fixed_mandatory%]",
+      "fixed_states_power_only": "[%key:component::powercalc::config::error::fixed_states_power_only%]"
     }
   }
 }

@@ -198,6 +198,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
+        errors = {}
         if user_input is not None:
             if CONF_FIXED_RAW in user_input:
                 fixed_config = user_input[CONF_FIXED_RAW]
@@ -206,12 +207,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 fixed_config = {CONF_POWER: power}
 
             self.sensor_config.update({CONF_FIXED: fixed_config})
-            return self.create_config_entry()
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return self.create_config_entry()
 
         return self.async_show_form(
             step_id="fixed",
             data_schema=SCHEMA_POWER_FIXED,
-            errors={},
+            errors=errors,
         )
     
     async def async_step_linear(self, user_input: dict[str,str] = None) -> FlowResult:
@@ -235,14 +238,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
     
     async def async_step_wled(self, user_input: dict[str,str] = None) -> FlowResult:
+        errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_WLED: user_input})
-            return self.create_config_entry()
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return self.create_config_entry()
 
         return self.async_show_form(
             step_id="wled",
             data_schema=SCHEMA_POWER_WLED,
-            errors={},
+            errors=errors,
         )
     
     async def validate_strategy_config(self) -> dict:
@@ -256,7 +262,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     @callback
     def create_config_entry(self):
-        self.sensor_config.update({"sensor_type": self.selected_sensor_type})
+        self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         if self.name:
             self.sensor_config.update({CONF_NAME: self.name})
         if self.source_entity_id:
@@ -275,7 +281,7 @@ class OptionsFlowHandler(OptionsFlow):
         """Initialize options flow."""
         self.config_entry = config_entry
         self.current_config: dict = dict(config_entry.data)
-        self.sensor_type: SensorType = self.current_config.get("sensor_type") or SensorType.VIRTUAL_POWER
+        self.sensor_type: SensorType = self.current_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         self.source_entity_id: str = self.current_config.get(CONF_ENTITY_ID)
         self.source_entity: SourceEntity = None
 
@@ -393,21 +399,6 @@ def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
 
     if not CONF_VALUE in user_input and not CONF_VALUE_TEMPLATE in user_input:
         errors["base"] = "daily_energy_mandatory"
-    
-    return errors
-
-def _validate_linear_input(linear_input: dict[str, str] = None) -> dict:
-    if not linear_input:
-        return {}
-    errors = {}
-
-    if not CONF_MAX_POWER in linear_input and not CONF_CALIBRATE in linear_input:
-        errors["base"] = "linear_mandatory"
-    
-    min_power = linear_input.get(CONF_MIN_POWER)
-    max_power = linear_input.get(CONF_MAX_POWER)
-    if min_power > max_power:
-        errors["base"] = "linear_min_higher_as_max"
     
     return errors
 

@@ -1,11 +1,12 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Sensor is already configured"
+            "already_configured": "Sensor is already configured, specify a unique_id"
         },
         "error": {
             "daily_energy_mandatory": "You must supply at least one of Value or Value template",
             "fixed_mandatory": "You must supply at least one of Power or Power template",
+            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
             "linear_mandatory": "You must supply at least one of max_power or calibrate",
             "linear_min_higher_as_max": "Max power cannot be lower than min power"
         },
@@ -78,6 +79,8 @@
     },
     "options": {
         "error": {
+            "fixed_mandatory": "You must supply at least one of Power or Power template",
+            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
             "linear_mandatory": "You must supply at least one of max_power or calibrate",
             "linear_min_higher_as_max": "Max power cannot be lower than min power"
         },
