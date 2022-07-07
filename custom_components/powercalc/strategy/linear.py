@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from decimal import Decimal
 from typing import Optional
-from homeassistant.components.mqtt.number import CONF_MAX
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
