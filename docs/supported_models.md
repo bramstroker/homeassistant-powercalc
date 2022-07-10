@@ -1,4 +1,4 @@
-# Supported models (138 total)
+# Supported models (140 total)
 | manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|-----------------------------------------------------------------------------------------------|
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |                                                                                               |
@@ -25,6 +25,8 @@
 |ikea          |LED1923R5                |TRADFRI bulb GU10 CWS 345lm                                          |lut              |hs,color_temp           |TRADFRI bulb GU10 CWS 345lm                                                                    |
 |ikea          |LED1924G9                |TRADFRI bulb E27 CWS 806lm                                           |lut              |hs,color_temp           |TRADFRI bulb E27 CWS 806lm                                                                     |
 |ikea          |LED1925G6                |TRADFRI bulb E14 CWS 470lm                                           |lut              |hs,color_temp           |TRADFRI bulb E14 CWS 470lm                                                                     |
+|ikea          |LED1934G3                |TRADFRIbulbE27WWclear250lm                                           |lut              |brightness              |                                                                                               |
+|ikea          |LED1935C3                |TRADFRIbulbE14WWclear250lm                                           |lut              |brightness              |                                                                                               |
 |ikea          |LED1949C5                |TRADFRI bulb E14 WS candle opal 470lm                                |lut              |color_temp              |TRADFRIbulbE14WScandleopal470lm                                                                |
 |ikea          |LED2002G5                |TRADFRIbulbE14WSglobeopal470lm                                       |lut              |color_temp              |TRADFRIbulbE14WSglobeopal470lm                                                                 |
 |ikea          |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white|lut              |color_temp              |TRADFRIbulbE27WSglobeopal1055lm                                                                |
