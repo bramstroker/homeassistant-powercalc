@@ -19,7 +19,7 @@ class SourceEntity(NamedTuple):
     domain: str
     unique_id: str | None = None
     name: str | None = None
-    supported_color_modes: list | None = None
+    supported_color_modes: list[str] | None = None
     entity_entry: er.RegistryEntry | None = None
     device_entry: dr.DeviceEntry | None = None
 

@@ -437,8 +437,8 @@ async def create_individual_sensors(
     else:
         source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
-    if (used_unique_ids := hass.data.get(DATA_USED_UNIQUE_IDS)) is None:
-        used_unique_ids = hass.data[DATA_USED_UNIQUE_IDS] = []
+    if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
+        used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
     try:
         check_entity_not_already_configured(
             sensor_config, source_entity, hass, used_unique_ids

@@ -193,7 +193,25 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
 async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
+
+async def async_update_entry(hass: HomeAssistantType, entry: ConfigEntry) -> None:
+    """Update a given config entry."""
+    await hass.config_entries.async_reload(entry.entry_id)
+
+async def async_unload_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    if unload_ok:
+        used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
+        try:
+            used_unique_ids.remove(entry.unique_id)
+        except ValueError:
+            return unload_ok
+    
+    return unload_ok
 
 async def autodiscover_entities(
     config: dict, domain_config: dict, hass: HomeAssistantType
