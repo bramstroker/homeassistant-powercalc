@@ -258,7 +258,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return {}
     
     @callback
-    def create_config_entry(self):
+    def create_config_entry(self) -> FlowResult:
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         if self.name:
             self.sensor_config.update({CONF_NAME: self.name})
@@ -303,7 +303,7 @@ class OptionsFlowHandler(OptionsFlow):
             errors=errors,
         )
 
-    async def save_options(self, user_input) -> dict:
+    async def save_options(self, user_input: dict[str, Any] | None = None) -> dict:
         """Save options, and return errors when validation fails"""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
