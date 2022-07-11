@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured 3 bulbs simultaneously with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "name": "RB 250 C 470lm E14 RGBW",
+    "standby_power": 0.4,
+    "supported_modes": [
+        "lut"
+    ]
+}

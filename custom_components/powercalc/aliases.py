@@ -22,6 +22,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     "Yeelight": "yeelight",
     "TuYa": "tuya",
     "MeLiTec": "melitec",
+    "WiZ": "wiz",
 }
 
 MODEL_DIRECTORY_MAPPING = {
@@ -65,6 +66,7 @@ MODEL_DIRECTORY_MAPPING = {
         "9290022166": "LCA001",
         "929003053401": "LCA001",
         "9290024687": "LCA007",
+        "929002471601": "LCA008",
         "929001953101": "LCG002",
         "1741430P7": "LCS001",
         "1741530P7": "LCS001",
