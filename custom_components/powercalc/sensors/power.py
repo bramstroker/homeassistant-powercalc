@@ -15,7 +15,6 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_START,
     POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
@@ -174,7 +173,7 @@ async def create_virtual_power_sensor(
     standby_power = Decimal(0)
     standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        if CONF_STANDBY_POWER in sensor_config:
+        if sensor_config.get(CONF_STANDBY_POWER):
             standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
         elif light_model is not None:
             standby_power = Decimal(light_model.standby_power)
@@ -197,7 +196,7 @@ async def create_virtual_power_sensor(
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
-        standby_power,
+        round(standby_power, 2),
         unique_id,
     )
 
