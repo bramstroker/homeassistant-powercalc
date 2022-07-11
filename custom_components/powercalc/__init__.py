@@ -200,16 +200,22 @@ async def async_update_entry(hass: HomeAssistantType, entry: ConfigEntry) -> Non
     """Update a given config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
 
-async def async_unload_entry(hass: HomeAssistantType, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistantType, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
 
     if unload_ok:
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
         try:
-            used_unique_ids.remove(entry.unique_id)
+            used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
             return unload_ok
+        
+        entity_registry = er.async_get(hass)
+        entries = er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
+        for entry in entries:
+            entity_registry.async_remove(entry.entity_id)
+            _LOGGER.debug(f"Removing {entry.entity_id}")
     
     return unload_ok
 
