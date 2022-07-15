@@ -67,6 +67,7 @@ from .const import (
     CALCULATION_MODES,
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -300,6 +301,17 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
             fixed_config[CONF_POWER] = fixed_config[CONF_POWER_TEMPLATE]
             del fixed_config[CONF_POWER_TEMPLATE]
         sensor_config[CONF_FIXED] = fixed_config
+    
+    if CONF_LINEAR in sensor_config:
+        linear_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_LINEAR))
+        if CONF_CALIBRATE in linear_config:
+            calibrate_dict: dict[str, float] = linear_config.get(CONF_CALIBRATE)
+            new_calibrate_list = []
+            for item in calibrate_dict.items():
+                new_calibrate_list.append(f"{item[0]} -> {item[1]}")
+            linear_config[CONF_CALIBRATE] = new_calibrate_list
+            
+        sensor_config[CONF_LINEAR] = linear_config
     
     return sensor_config
 

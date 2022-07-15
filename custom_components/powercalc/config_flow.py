@@ -116,7 +116,7 @@ SCHEMA_POWER_LINEAR = vol.Schema({
     vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
     vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
-    vol.Optional(CONF_CALIBRATE): selector.TextSelector(selector.TextSelectorConfig(multiline=True))
+    vol.Optional(CONF_CALIBRATE): selector.ObjectSelector()
 })
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
