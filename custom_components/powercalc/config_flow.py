@@ -3,6 +3,7 @@
 from __future__ import annotations
 import logging
 import copy
+from select import select
 
 import voluptuous as vol
 
@@ -69,7 +70,7 @@ SENSOR_TYPE_MENU = {
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
     {
-        vol.Optional(CONF_VALUE): vol.Coerce(float),
+        vol.Optional(CONF_VALUE): selector.NumberSelector(selector.NumberSelectorConfig(min=1, mode=selector.NumberSelectorMode.BOX)),
         vol.Optional(CONF_VALUE_TEMPLATE): selector.TemplateSelector(),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
             [ENERGY_KILO_WATT_HOUR, POWER_WATT]
@@ -78,7 +79,7 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
         #vol.Optional(CONF_START_TIME): selector.TimeSelector(),
         vol.Optional(
             CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
-        ): vol.Coerce(int),
+        ): selector.NumberSelector(selector.NumberSelectorConfig(min=10, unit_of_measurement="sec", mode=selector.NumberSelectorMode.BOX)),
     }
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(

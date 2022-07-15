@@ -39,7 +39,7 @@
                     "states_power": "One 'state: power' pair on each row, see example above"
                 },
                 "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
-                "title": "Fixed mode config"
+                "title": "Fixed config"
             },
             "linear": {
                 "data": {
@@ -53,7 +53,7 @@
                     "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
                     "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
                 },
-                "title": "Linear mode config"
+                "title": "Linear config"
             },
             "user": {
                 "data": {
@@ -66,7 +66,7 @@
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
                     "entity_id": "Source entity",
-                    "mode": "Calculation mode",
+                    "mode": "Calculation strategy",
                     "name": "Name",
                     "standby_power": "Standby power",
                     "unique_id": "Unique id"
@@ -87,7 +87,7 @@
                     "power_factor": "Power factor",
                     "voltage": "Voltage"
                 },
-                "title": "WLED mode config"
+                "title": "WLED config"
             }
         }
     },
@@ -108,11 +108,15 @@
                     "gamma_curve": "Gamma curve",
                     "max_power": "Max power",
                     "min_power": "Min power",
+                    "on_time": "On time",
                     "power": "Power",
                     "power_template": "Power template",
                     "standby_power": "Standby power",
                     "states_power": "States power",
-                    "value": "Value"
+                    "unit_of_measurement": "Unit of measurement",
+                    "update_frequency": "Update frequency",
+                    "value": "Value",
+                    "value_template": "Value template"
                 },
                 "data_description": {
                     "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
