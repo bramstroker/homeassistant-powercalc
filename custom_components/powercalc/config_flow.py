@@ -90,14 +90,14 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
 
 SCHEMA_POWER_OPTIONS = vol.Schema({
     vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
-    vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): cv.boolean,
-    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean
+    vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): selector.BooleanSelector()
 })
 
 SCHEMA_POWER = vol.Schema({
     vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
-    vol.Optional(CONF_NAME): str,
-    vol.Optional(CONF_UNIQUE_ID): cv.string,
+    vol.Optional(CONF_NAME): selector.TextSelector(),
+    vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     vol.Optional(CONF_MODE, default=MODE_FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
             options=CALCULATION_MODES,
