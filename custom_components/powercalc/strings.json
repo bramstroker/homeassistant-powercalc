@@ -31,7 +31,7 @@
         "description": "Create a virtual power sensor, see the readme for more information about the possible strategies and configuration options",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
-          "mode": "Calculation mode",
+          "mode": "Calculation strategy",
           "entity_id": "Source entity",
           "unique_id": "Unique id",
           "standby_power": "Standby power",
@@ -48,7 +48,7 @@
         }
       },
       "fixed": {
-        "title": "Fixed mode config",
+        "title": "Fixed config",
         "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
         "data": {
           "power": "Power",
@@ -62,7 +62,7 @@
         }
       },
       "linear": {
-        "title": "Linear mode config",
+        "title": "Linear config",
         "data": {
           "calibrate": "Calibration values",
           "min_power": "Min power",
@@ -76,7 +76,7 @@
         }
       },
       "wled": {
-        "title": "WLED mode config",
+        "title": "WLED config",
         "data": {
           "voltage": "Voltage",
           "power_factor": "Power factor"
