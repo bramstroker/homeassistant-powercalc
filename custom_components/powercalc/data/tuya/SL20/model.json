@@ -1,0 +1,9 @@
+{
+    "name": "Treatlife SL20",
+    "standby_power": 0,
+    "supported_modes": [
+        "lut"
+    ],
+    "measure_method": "manual",
+    "measure_device": "Sonoff SL31 with Home Assistant"
+}
