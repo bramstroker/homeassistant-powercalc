@@ -38,6 +38,7 @@ from .const import (
     CONF_SENSOR_TYPE,
     CONF_ON_TIME,
     CONF_START_TIME,
+    CONF_STATES_POWER,
     CONF_VALUE_TEMPLATE,
     CONF_UPDATE_FREQUENCY,
     CONF_WLED,
@@ -110,7 +111,7 @@ SCHEMA_POWER = vol.Schema({
 SCHEMA_POWER_FIXED = vol.Schema({
     vol.Optional(CONF_POWER): vol.Coerce(float),
     vol.Optional(CONF_POWER_TEMPLATE): selector.TemplateSelector(),
-    vol.Optional(CONF_FIXED_RAW): selector.ObjectSelector()
+    vol.Optional(CONF_STATES_POWER): selector.ObjectSelector()
 })
 
 SCHEMA_POWER_LINEAR = vol.Schema({
@@ -121,7 +122,7 @@ SCHEMA_POWER_LINEAR = vol.Schema({
 })
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Adaptive Lighting."""
+    """Handle a config flow for PowerCalc."""
 
     VERSION = 1
 
@@ -197,13 +198,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
         errors = {}
         if user_input is not None:
-            if CONF_FIXED_RAW in user_input:
-                fixed_config = user_input[CONF_FIXED_RAW]
-            else:
-                power = user_input.get(CONF_POWER) or user_input.get(CONF_POWER_TEMPLATE)
-                fixed_config = {CONF_POWER: power}
-
-            self.sensor_config.update({CONF_FIXED: fixed_config})
+            self.sensor_config.update({CONF_FIXED: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
                 return self.create_config_entry()
@@ -217,8 +212,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_linear(self, user_input: dict[str,str] = None) -> FlowResult:
         errors = {}
         if user_input is not None:
-            linear_config = user_input
-            self.sensor_config.update({CONF_LINEAR: linear_config})
+            self.sensor_config.update({CONF_LINEAR: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
                 return self.create_config_entry()
@@ -318,11 +312,9 @@ class OptionsFlowHandler(OptionsFlow):
                 }
             )
             strategy = self.current_config.get(CONF_MODE)
-            strategy_schema = self.get_strategy_schema()
             strategy_config_key = self.get_strategy_config_key()
-            strategy_options = {}
-            for key in strategy_schema.schema.keys():
-                strategy_options[str(key)] = user_input.get(key)
+
+            strategy_options = _build_strategy_config(strategy, user_input)
             
             self.current_config.update({strategy_config_key: strategy_options})
             strategy_object = _create_strategy_object(self.hass, strategy, self.current_config, self.source_entity)
@@ -336,16 +328,6 @@ class OptionsFlowHandler(OptionsFlow):
             data=self.current_config
         )
         return {}
-
-    def get_strategy_schema(self) -> vol.Schema:
-        strategy = self.current_config.get(CONF_MODE)
-        if strategy == MODE_FIXED:
-            return SCHEMA_POWER_FIXED
-        if strategy == MODE_LINEAR:
-            return SCHEMA_POWER_LINEAR
-        if strategy == MODE_WLED:
-            return SCHEMA_POWER_WLED
-        return SCHEMA_POWER_FIXED
     
     def get_strategy_config_key(self) -> str:
         strategy = self.current_config.get(CONF_MODE)
@@ -363,7 +345,7 @@ class OptionsFlowHandler(OptionsFlow):
         strategy_options = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             base_power_schema = SCHEMA_POWER_OPTIONS
-            strategy_schema = self.get_strategy_schema()
+            strategy_schema = _get_strategy_schema(self.current_config.get(CONF_MODE))
             data_schema = base_power_schema.extend(strategy_schema.schema)
             strategy_config_key = self.get_strategy_config_key()
             strategy_options = self.current_config.get(strategy_config_key)
@@ -383,6 +365,24 @@ def _create_strategy_object(
 ) -> PowerCalculationStrategyInterface:
     factory = PowerCalculatorStrategyFactory(hass)
     return factory.create(config, strategy, None, source_entity)
+
+def _get_strategy_schema(strategy: str) -> vol.Schema:
+    if strategy == MODE_FIXED:
+        return SCHEMA_POWER_FIXED
+    if strategy == MODE_LINEAR:
+        return SCHEMA_POWER_LINEAR
+    if strategy == MODE_WLED:
+        return SCHEMA_POWER_WLED
+    return SCHEMA_POWER_FIXED
+
+def _build_strategy_config(strategy: str, user_input: dict[str,str] = None) -> dict[str, Any]:
+    strategy_schema = _get_strategy_schema(strategy)
+    strategy_options = {}
+    for key in strategy_schema.schema.keys():
+        if user_input.get(key) is None:
+            continue
+        strategy_options[str(key)] = user_input.get(key)
+    return strategy_options
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
     config = user_input

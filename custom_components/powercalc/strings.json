@@ -40,11 +40,16 @@
       },
       "fixed": {
         "title": "Fixed mode config",
-        "description": "Supply either a fixed power value or template. If you want to used states_power or any advanced options use the raw yaml config option (see the readme)",
+        "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
         "data": {
           "power": "Power",
           "power_template": "Power template",
-          "fixed_raw": "Raw YAML config"
+          "states_power": "States power"
+        },
+        "data_description": {
+          "power": "A fix power value in Watt when the entity is ON",
+          "power_template": "Template will be evaluated to get the power value in W",
+          "states_power": "One 'state: power' pair on each row, see example above"
         }
       },
       "linear": {
@@ -87,7 +92,7 @@
           "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]",
           "power": "[%key:component::powercalc::config::step::fixed::data::power%]",
           "power_template": "[%key:component::powercalc::config::step::fixed::data::power_template%]",
-          "fixed_raw": "[%key:component::powercalc::config::step::fixed::data::fixed_raw%]",
+          "states_power": "[%key:component::powercalc::config::step::fixed::data::states_power%]",
           "calibrate": "[%key:component::powercalc::config::step::linear::data::calibrate%]",
           "min_power": "[%key:component::powercalc::config::step::linear::data::min_power%]",
           "max_power": "[%key:component::powercalc::config::step::linear::data::max_power%]",
