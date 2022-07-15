@@ -62,7 +62,7 @@
           "attribute": "Attribute"
         },
         "data_description": {
-          "calibrate": "Put a calibration value on each line. Example\n\n1 > 20\n10 > 40\n40 -> 200",
+          "calibrate": "Put a calibration value on each line. Example\n\n1: 20",
           "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans"
         }
       },

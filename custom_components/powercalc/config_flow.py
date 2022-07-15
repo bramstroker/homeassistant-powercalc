@@ -215,14 +215,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not errors:
                 return self.create_config_entry()
 
-        config_schema = SCHEMA_POWER_LINEAR.extend(
-            {
-                vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=self.source_entity_id))
-            }
-        )
         return self.async_show_form(
             step_id="linear",
-            data_schema=config_schema,
+            data_schema=_create_linear_schema(self.source_entity_id),
             errors=errors,
         )
     
@@ -312,7 +307,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy = self.current_config.get(CONF_MODE)
             strategy_config_key = self.get_strategy_config_key()
 
-            strategy_options = _build_strategy_config(strategy, user_input)
+            strategy_options = _build_strategy_config(strategy, self.source_entity_id, user_input)
             
             self.current_config.update({strategy_config_key: strategy_options})
             strategy_object = _create_strategy_object(self.hass, strategy, self.current_config, self.source_entity)
@@ -343,7 +338,7 @@ class OptionsFlowHandler(OptionsFlow):
         strategy_options = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             base_power_schema = SCHEMA_POWER_OPTIONS
-            strategy_schema = _get_strategy_schema(self.current_config.get(CONF_MODE))
+            strategy_schema = _get_strategy_schema(self.current_config.get(CONF_MODE), self.source_entity_id)
             data_schema = base_power_schema.extend(strategy_schema.schema)
             strategy_config_key = self.get_strategy_config_key()
             strategy_options = self.current_config.get(strategy_config_key)
@@ -364,17 +359,24 @@ def _create_strategy_object(
     factory = PowerCalculatorStrategyFactory(hass)
     return factory.create(config, strategy, None, source_entity)
 
-def _get_strategy_schema(strategy: str) -> vol.Schema:
+def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     if strategy == MODE_FIXED:
         return SCHEMA_POWER_FIXED
     if strategy == MODE_LINEAR:
-        return SCHEMA_POWER_LINEAR
+        return _create_linear_schema(source_entity_id)
     if strategy == MODE_WLED:
         return SCHEMA_POWER_WLED
     return SCHEMA_POWER_FIXED
 
-def _build_strategy_config(strategy: str, user_input: dict[str,str] = None) -> dict[str, Any]:
-    strategy_schema = _get_strategy_schema(strategy)
+def _create_linear_schema(source_entity_id: str) -> vol.Schema:
+    return SCHEMA_POWER_LINEAR.extend(
+        {
+            vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=source_entity_id))
+        }
+    )
+
+def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dict[str,str] = None) -> dict[str, Any]:
+    strategy_schema = _get_strategy_schema(strategy, source_entity_id)
     strategy_options = {}
     for key in strategy_schema.schema.keys():
         if user_input.get(key) is None:
