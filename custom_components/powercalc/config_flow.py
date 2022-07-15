@@ -100,7 +100,7 @@ SCHEMA_POWER = vol.Schema({
     vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     vol.Optional(CONF_MODE, default=MODE_FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=CALCULATION_MODES,
+            options=[MODE_FIXED, MODE_LINEAR, MODE_WLED],
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     ),
