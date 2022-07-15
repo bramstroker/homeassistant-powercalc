@@ -28,7 +28,6 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
-    CONF_FIXED_RAW,
     CONF_POWER_TEMPLATE,
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -385,8 +384,12 @@ def _build_strategy_config(strategy: str, user_input: dict[str,str] = None) -> d
     return strategy_options
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
-    config = user_input
-    config.update({CONF_VALUE: user_input.get(CONF_VALUE, user_input.get(CONF_VALUE_TEMPLATE))})
+    schema = SCHEMA_DAILY_ENERGY_OPTIONS
+    config = {}
+    for key in schema.schema.keys():
+        if user_input.get(key) is None:
+            continue
+        config[str(key)] = user_input.get(key)
     return config
 
 def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:

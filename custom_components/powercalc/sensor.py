@@ -98,6 +98,8 @@ from .const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    CONF_VALUE,
+    CONF_VALUE_TEMPLATE,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
@@ -277,6 +279,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         daily_fixed_config = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))
+        if CONF_VALUE_TEMPLATE in daily_fixed_config:
+            daily_fixed_config[CONF_VALUE] = daily_fixed_config[CONF_VALUE_TEMPLATE]
+            del daily_fixed_config[CONF_VALUE_TEMPLATE]
         if CONF_ON_TIME in daily_fixed_config:
             on_time = daily_fixed_config[CONF_ON_TIME]
             daily_fixed_config[CONF_ON_TIME] = timedelta(
