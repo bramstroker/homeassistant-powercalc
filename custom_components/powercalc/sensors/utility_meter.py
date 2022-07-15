@@ -20,8 +20,8 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -39,7 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_utility_meters(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     energy_sensor: EnergySensor,
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
@@ -100,7 +100,7 @@ async def create_utility_meters(
 
 
 async def create_tariff_select(
-    tariffs: list, hass: HomeAssistantType, name: str, unique_id: str | None
+    tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None
 ):
     """Create tariff selection entity"""
 
@@ -141,7 +141,7 @@ async def create_tariff_select(
 
 
 async def create_utility_meter(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     source_entity: str,
     entity_id: str,
     name: str,

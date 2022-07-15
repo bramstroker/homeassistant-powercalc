@@ -10,8 +10,7 @@ from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import CONF_ATTRIBUTE
-from homeassistant.core import State
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import State, HomeAssistant
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -44,7 +43,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
         config: dict,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: Optional[float],
     ) -> None:

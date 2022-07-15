@@ -8,7 +8,7 @@ import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_ENTITY_ID,
@@ -22,7 +22,6 @@ from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.typing import HomeAssistantType
 
 from .const import (
     CONF_CREATE_UTILITY_METERS,
@@ -357,7 +356,7 @@ class OptionsFlowHandler(OptionsFlow):
         return data_schema
 
 def _create_strategy_object(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     strategy: str,
     config: dict,
     source_entity: SourceEntity

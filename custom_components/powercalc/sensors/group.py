@@ -17,12 +17,11 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback
+from homeassistant.core import State, callback, HomeAssistant
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -45,7 +44,7 @@ async def create_group_sensors(
     group_name: str,
     sensor_config: dict,
     entities: list[SensorEntity, RealPowerSensor, RealEnergySensor],
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     filters: list[Callable, None] = [],
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
@@ -112,7 +111,7 @@ async def create_group_sensors(
     return group_sensors
 
 
-async def create_entity_id(hass: HomeAssistantType, name: str, unique_id: str | None):
+async def create_entity_id(hass: HomeAssistant, name: str, unique_id: str | None):
     """
     Check if we already have an entity id based on the unique id of the group sensor
     When this is not the case we generate one using same algorithm as HA add entity routine

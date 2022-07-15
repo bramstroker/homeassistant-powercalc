@@ -11,6 +11,7 @@ from typing import Any, Final, cast
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.core import HomeAssistant
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -52,13 +53,13 @@ from homeassistant.helpers import (
     entity_platform,
     entity_registry,
 )
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import (
     ConfigType,
     DiscoveryInfoType,
-    HomeAssistantType,
 )
 
 from .common import SourceEntity, create_source_entity, validate_name_pattern
@@ -228,7 +229,7 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 
 async def async_setup_platform(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     config: ConfigType,
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
@@ -238,7 +239,7 @@ async def async_setup_platform(
     await _async_setup_entities(hass, config, async_add_entities, discovery_info)
 
 async def async_setup_entry(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback
 ):
@@ -248,7 +249,7 @@ async def async_setup_entry(
     await _async_setup_entities(hass, sensor_config, async_add_entities)
 
 async def _async_setup_entities(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     config: dict[str, Any],
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None
@@ -346,7 +347,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
 
 
 async def create_sensors(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> tuple(list[SensorEntity, RealPowerSensor], list[SensorEntity, RealPowerSensor]):
@@ -440,7 +441,7 @@ async def create_sensors(
 
 
 async def create_individual_sensors(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> list[SensorEntity, RealPowerSensor]:
@@ -534,7 +535,7 @@ async def create_individual_sensors(
 def check_entity_not_already_configured(
     sensor_config: dict,
     source_entity: SourceEntity,
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     used_unique_ids: list[str],
 ):
     if source_entity.entity_id == DUMMY_ENTITY_ID:
@@ -551,7 +552,7 @@ def check_entity_not_already_configured(
         raise SensorAlreadyConfiguredError(source_entity.entity_id)
 
 
-def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
+def bind_entities_to_devices(hass: HomeAssistant, entities: list[Entity], device_id: str):
     """Attach all the power/energy sensors to the same device as the source entity"""
 
     if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.2"):
@@ -573,7 +574,7 @@ def bind_entities_to_devices(hass: HomeAssistantType, entities, device_id: str):
 
 @callback
 def resolve_include_entities(
-    hass: HomeAssistantType, include_config: dict
+    hass: HomeAssistant, include_config: dict
 ) -> list[entity_registry.RegistryEntry]:
     entities = {}
     entity_reg = entity_registry.async_get(hass)
@@ -620,7 +621,7 @@ def resolve_include_entities(
 
 @callback
 def resolve_include_groups(
-    hass: HomeAssistantType, group_id: str
+    hass: HomeAssistant, group_id: str
 ) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given group"""
     entity_reg = entity_registry.async_get(hass)
@@ -647,7 +648,7 @@ def resolve_include_groups(
 
 @callback
 def resolve_area_entities(
-    hass: HomeAssistantType, area_id_or_name: str
+    hass: HomeAssistant, area_id_or_name: str
 ) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)

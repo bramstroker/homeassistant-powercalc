@@ -10,9 +10,8 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
 from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
-from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -37,7 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_energy_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     power_sensor: PowerSensor,
     source_entity: SourceEntity,
@@ -103,7 +102,7 @@ async def create_energy_sensor(
 
 @callback
 def find_related_real_energy_sensor(
-    hass: HomeAssistantType, power_sensor: RealPowerSensor
+    hass: HomeAssistant, power_sensor: RealPowerSensor
 ) -> Optional[RealEnergySensor]:
     """See if a corresponding energy sensor exists in the HA installation for the power sensor"""
 

@@ -19,12 +19,11 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
 )
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -38,10 +37,9 @@ from custom_components.powercalc.const import (
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
-from custom_components.powercalc.sensors.power import create_virtual_power_sensor
 
 from .energy import EnergySensor
-from .power import VirtualPowerSensor
+from .power import VirtualPowerSensor, create_virtual_power_sensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -65,7 +63,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_daily_fixed_energy_sensor(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistant, sensor_config: dict
 ) -> DailyEnergySensor:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
@@ -94,7 +92,7 @@ async def create_daily_fixed_energy_sensor(
 
 
 async def create_daily_fixed_energy_power_sensor(
-    hass: HomeAssistantType, sensor_config: dict, source_entity: SourceEntity
+    hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity
 ) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
@@ -128,7 +126,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     def __init__(
         self,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         name: str,
         entity_category: str,
         value: float,

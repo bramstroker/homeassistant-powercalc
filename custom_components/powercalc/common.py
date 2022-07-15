@@ -7,8 +7,7 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
-from homeassistant.core import split_entity_id
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import split_entity_id, HomeAssistant
 
 from .const import DUMMY_ENTITY_ID
 
@@ -24,7 +23,7 @@ class SourceEntity(NamedTuple):
     device_entry: dr.DeviceEntry | None = None
 
 
-async def create_source_entity(entity_id: str, hass: HomeAssistantType) -> SourceEntity:
+async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity"""
 
     if entity_id == DUMMY_ENTITY_ID:

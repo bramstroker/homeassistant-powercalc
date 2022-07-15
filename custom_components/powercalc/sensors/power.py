@@ -20,7 +20,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback
+from homeassistant.core import State, callback, HomeAssistant
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -29,7 +29,7 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -80,7 +80,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -97,7 +97,7 @@ async def create_power_sensor(
 
 
 async def create_virtual_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -221,7 +221,7 @@ async def create_virtual_power_sensor(
 
 
 async def create_real_power_sensor(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistant, sensor_config: dict
 ) -> RealPowerSensor:
     """Create reference to an existing power sensor"""
 
