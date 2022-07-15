@@ -305,11 +305,10 @@ class OptionsFlowHandler(OptionsFlow):
                 }
             )
             strategy = self.current_config.get(CONF_MODE)
-            strategy_config_key = self.get_strategy_config_key()
 
             strategy_options = _build_strategy_config(strategy, self.source_entity_id, user_input)
             
-            self.current_config.update({strategy_config_key: strategy_options})
+            self.current_config.update({strategy: strategy_options})
             strategy_object = _create_strategy_object(self.hass, strategy, self.current_config, self.source_entity)
             try:
                 await strategy_object.validate_config()
@@ -322,26 +321,16 @@ class OptionsFlowHandler(OptionsFlow):
         )
         return {}
     
-    def get_strategy_config_key(self) -> str:
-        strategy = self.current_config.get(CONF_MODE)
-        if strategy == MODE_FIXED:
-            return CONF_FIXED
-        if strategy == MODE_LINEAR:
-            return CONF_LINEAR
-        if strategy == MODE_WLED:
-            return CONF_WLED
-        return CONF_FIXED
-
     def build_options_schema(self) -> vol.Schema:
         """Build the options schema. depending on the selected sensor type"""
 
         strategy_options = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             base_power_schema = SCHEMA_POWER_OPTIONS
-            strategy_schema = _get_strategy_schema(self.current_config.get(CONF_MODE), self.source_entity_id)
+            strategy: str = self.current_config.get(CONF_MODE)
+            strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
             data_schema = base_power_schema.extend(strategy_schema.schema)
-            strategy_config_key = self.get_strategy_config_key()
-            strategy_options = self.current_config.get(strategy_config_key)
+            strategy_options = self.current_config.get(strategy)
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
@@ -349,6 +338,13 @@ class OptionsFlowHandler(OptionsFlow):
         
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
+    
+    def get_current_strategy_options(self, strategy: str) -> dict[str, Any]:
+        strategy_options: dict[str, Any] = self.current_config.get(strategy)
+        if strategy == MODE_LINEAR and CONF_CALIBRATE in strategy_options:
+            calibrate_options: dict = strategy_options[CONF_CALIBRATE]
+            strategy_options[CONF_CALIBRATE] = {int(key): value for (key, value) in calibrate_options.items()}
+        return strategy_options
 
 def _create_strategy_object(
     hass: HomeAssistant,
