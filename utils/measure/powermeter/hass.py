@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import inquirer
+import time
 from dateutil.parser import parse
 from homeassistant_api import Client
 
@@ -11,13 +12,18 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 
 
 class HassPowerMeter(PowerMeter):
-    def __init__(self, api_url: str, token: str):
+    def __init__(self, api_url: str, token: str, call_update_entity: bool):
+        self._call_update_entity = call_update_entity
         try:
             self.client = Client(api_url, token)
         except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}")
 
     def get_power(self) -> PowerMeasurementResult:
+        if self._call_update_entity:
+            self.client.trigger_service("homeassistant", "update_entity", entity_id=self._entity_id)
+            time.sleep(1)
+
         state = self.client.get_state(self._entity_id)
         last_updated = parse(state.get("last_updated")).timestamp()
         return PowerMeasurementResult(float(state.get("state")), last_updated)

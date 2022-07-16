@@ -131,6 +131,7 @@ TUYA_DEVICE_VERSION = config("TUYA_DEVICE_VERSION", default="3.3")
 HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
 HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
+HASS_CALL_UPDATE_ENTITY_SERVICE = config("HASS_CALL_UPDATE_ENTITY_SERVICE", default=False, cast=bool)
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 
@@ -691,7 +692,7 @@ class PowerMeterFactory:
         return DummyPowerMeter()
 
     def hass(self):
-        return HassPowerMeter(HASS_URL, HASS_TOKEN)
+        return HassPowerMeter(HASS_URL, HASS_TOKEN, HASS_CALL_UPDATE_ENTITY_SERVICE)
 
     def kasa(self):
         return KasaPowerMeter(KASA_DEVICE_IP)
