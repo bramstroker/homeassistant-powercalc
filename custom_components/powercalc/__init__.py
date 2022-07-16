@@ -35,6 +35,7 @@ from .const import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -62,6 +63,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
+    UnitPrefix,
 )
 from .errors import ModelNotSupported
 from .model_discovery import get_light_model, has_manufacturer_and_model_information
@@ -118,6 +120,10 @@ CONFIG_SCHEMA = vol.Schema(
                         CONF_POWER_SENSOR_PRECISION,
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
+                    vol.Optional(
+                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
+                        default=UnitPrefix.KILO
+                    ): vol.In([cls.value for cls in UnitPrefix]),
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
                         cv.ensure_list, [cv.string]
                     ),
@@ -147,6 +153,7 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
+        CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,

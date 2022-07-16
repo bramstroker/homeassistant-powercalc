@@ -74,6 +74,7 @@ from .const import (
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -104,6 +105,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     SERVICE_RESET_ENERGY,
+    UnitPrefix,
 )
 from .errors import (
     PowercalcSetupError,
@@ -178,6 +180,10 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
     vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
+    vol.Optional(
+        CONF_ENERGY_SENSOR_UNIT_PREFIX,
+        default=UnitPrefix.KILO
+    ): vol.In([cls.value for cls in UnitPrefix]),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
