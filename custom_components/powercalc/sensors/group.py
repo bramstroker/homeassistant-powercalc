@@ -11,6 +11,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
@@ -18,8 +19,6 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import State, callback
-from homeassistant.helpers import entity_registry
-from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
@@ -27,10 +26,10 @@ from homeassistant.helpers.typing import HomeAssistantType
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
-    CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
-    CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    DOMAIN,
+    SERVICE_RESET_ENERGY,
 )
 from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -181,3 +180,16 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL
     _attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+
+    @callback
+    def async_reset_energy(self) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
+        for entity_id in self._entities:
+            _LOGGER.debug(f"Resetting {entity_id}")
+            self.hass.async_create_task(
+                self.hass.services.async_call(
+                    DOMAIN,
+                    SERVICE_RESET_ENERGY,
+                    {ATTR_ENTITY_ID: entity_id},
+                )
+            )
