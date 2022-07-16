@@ -3,7 +3,7 @@ from typing import Any
 from homeassistant.const import (
     CONF_NAME
 )
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.helpers.entity import async_generate_entity_id
 from custom_components.powercalc.common import SourceEntity
@@ -51,18 +51,30 @@ def _generate_sensor_name(
     return name
 
 @callback
-def generate_power_sensor_entity_id(hass, sensor_config: dict[str, Any], source_entity: SourceEntity | None = None) -> str:
+def generate_power_sensor_entity_id(
+    hass: HomeAssistant,
+    sensor_config: dict[str, Any],
+    source_entity: SourceEntity | None = None,
+    name: str | None = None
+) -> str:
+    """Generates the entity_id to use for a power sensor"""
     name_pattern: str = sensor_config.get(CONF_POWER_SENSOR_NAMING)
-    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
+    object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
     return entity_id
 
 @callback
-def generate_energy_sensor_entity_id(hass, sensor_config: dict[str, Any], source_entity: SourceEntity | None = None) -> str:
+def generate_energy_sensor_entity_id(
+    hass: HomeAssistant,
+    sensor_config: dict[str, Any],
+    source_entity: SourceEntity | None = None,
+    name: str | None = None
+) -> str:
+    """Generates the entity_id to use for an energy sensor"""
     name_pattern: str = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
-    object_id = sensor_config.get(CONF_NAME) or source_entity.object_id
+    object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
