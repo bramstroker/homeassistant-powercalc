@@ -86,13 +86,17 @@ ENERGY_INTEGRATION_METHODS = [
     ENERGY_INTEGRATION_METHOD_RIGHT,
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
 ]
+
+
 class UnitPrefix(StrEnum):
     """Possible unit prefixes."""
+
     NONE = "none"
     KILO = "k"
     MEGA = "M"
     GIGA = "G"
     TERRA = "T"
+
 
 ENTITY_CATEGORY_CONFIG = "config"
 ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"

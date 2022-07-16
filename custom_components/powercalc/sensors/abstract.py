@@ -1,43 +1,57 @@
 from typing import Any
 
-from homeassistant.const import (
-    CONF_NAME
-)
-from homeassistant.core import callback, HomeAssistant
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.const import CONF_NAME
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import async_generate_entity_id
+
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
-    CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
 )
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
+
 def generate_power_sensor_name(
     sensor_config: dict[str, Any],
     name: str | None,
-    source_entity: SourceEntity | None = None
+    source_entity: SourceEntity | None = None,
 ) -> str:
     """Generates the name to use for a power sensor"""
-    return _generate_sensor_name(sensor_config, name, CONF_POWER_SENSOR_NAMING, CONF_POWER_SENSOR_FRIENDLY_NAMING, source_entity)
+    return _generate_sensor_name(
+        sensor_config,
+        name,
+        CONF_POWER_SENSOR_NAMING,
+        CONF_POWER_SENSOR_FRIENDLY_NAMING,
+        source_entity,
+    )
+
 
 def generate_energy_sensor_name(
     sensor_config: dict[str, Any],
     name: str | None,
-    source_entity: SourceEntity | None = None
+    source_entity: SourceEntity | None = None,
 ) -> str:
     """Generates the name to use for an energy sensor"""
-    return _generate_sensor_name(sensor_config, name, CONF_ENERGY_SENSOR_NAMING, CONF_ENERGY_SENSOR_FRIENDLY_NAMING, source_entity)
+    return _generate_sensor_name(
+        sensor_config,
+        name,
+        CONF_ENERGY_SENSOR_NAMING,
+        CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+        source_entity,
+    )
+
 
 def _generate_sensor_name(
     sensor_config: dict[str, Any],
     name: str | None,
     naming_conf_key: str,
     friendly_naming_conf_key: str,
-    source_entity: SourceEntity | None = None
+    source_entity: SourceEntity | None = None,
 ):
     """Generates the name to use for an sensor"""
     name_pattern: str = sensor_config.get(naming_conf_key)
@@ -50,12 +64,13 @@ def _generate_sensor_name(
         name = name_pattern.format(name)
     return name
 
+
 @callback
 def generate_power_sensor_entity_id(
     hass: HomeAssistant,
     sensor_config: dict[str, Any],
     source_entity: SourceEntity | None = None,
-    name: str | None = None
+    name: str | None = None,
 ) -> str:
     """Generates the entity_id to use for a power sensor"""
     name_pattern: str = sensor_config.get(CONF_POWER_SENSOR_NAMING)
@@ -65,12 +80,13 @@ def generate_power_sensor_entity_id(
     )
     return entity_id
 
+
 @callback
 def generate_energy_sensor_entity_id(
     hass: HomeAssistant,
     sensor_config: dict[str, Any],
     source_entity: SourceEntity | None = None,
-    name: str | None = None
+    name: str | None = None,
 ) -> str:
     """Generates the entity_id to use for an energy sensor"""
     name_pattern: str = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)

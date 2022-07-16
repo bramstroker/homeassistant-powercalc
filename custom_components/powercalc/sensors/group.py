@@ -24,7 +24,6 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.typing import HomeAssistantType
 
-from .abstract import generate_energy_sensor_entity_id, generate_power_sensor_entity_id, generate_power_sensor_name, generate_energy_sensor_name
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -36,6 +35,13 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
 from custom_components.powercalc.sensors.utility_meter import create_utility_meters
+
+from .abstract import (
+    generate_energy_sensor_entity_id,
+    generate_energy_sensor_name,
+    generate_power_sensor_entity_id,
+    generate_power_sensor_name,
+)
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -75,7 +81,7 @@ async def create_group_sensors(
     name = generate_power_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     entity_id = generate_power_sensor_entity_id(hass, sensor_config, name=group_name)
-    #entity_id = await create_entity_id(hass, name, unique_id)
+    # entity_id = await create_entity_id(hass, name, unique_id)
     group_sensors.append(
         GroupedPowerSensor(
             name=name,

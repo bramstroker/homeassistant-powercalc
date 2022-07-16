@@ -180,10 +180,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
     vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
-    vol.Optional(
-        CONF_ENERGY_SENSOR_UNIT_PREFIX,
-        default=UnitPrefix.KILO
-    ): vol.In([cls.value for cls in UnitPrefix]),
+    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX, default=UnitPrefix.KILO): vol.In(
+        [cls.value for cls in UnitPrefix]
+    ),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
     vol.Optional(CONF_INCLUDE, default={}): vol.Schema(
         {
@@ -331,7 +330,7 @@ async def create_sensors(
                 except SensorConfigurationError as err:
                     _LOGGER.error(err)
                     continue
-                
+
                 new_sensors.extend(child_new_sensors)
                 existing_sensors.extend(child_existing_sensors)
                 continue

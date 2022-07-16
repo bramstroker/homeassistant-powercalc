@@ -121,8 +121,7 @@ CONFIG_SCHEMA = vol.Schema(
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
-                        default=UnitPrefix.KILO
+                        CONF_ENERGY_SENSOR_UNIT_PREFIX, default=UnitPrefix.KILO
                     ): vol.In([cls.value for cls in UnitPrefix]),
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
                         cv.ensure_list, [cv.string]
