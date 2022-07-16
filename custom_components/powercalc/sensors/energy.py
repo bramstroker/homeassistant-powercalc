@@ -11,7 +11,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback
-from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import HomeAssistantType
 
 from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
@@ -23,8 +23,10 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
+    UnitPrefix
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
@@ -73,6 +75,10 @@ async def create_energy_sensor(
         unique_id = f"{power_sensor.unique_id}_energy"
         async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id)
 
+    unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
+    if unit_prefix == UnitPrefix.NONE:
+        unit_prefix = None
+
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
         source_entity=power_sensor.entity_id,
@@ -81,7 +87,7 @@ async def create_energy_sensor(
         entity_category=entity_category,
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-        unit_prefix="k",
+        unit_prefix=unit_prefix,
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
