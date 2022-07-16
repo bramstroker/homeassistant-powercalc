@@ -39,6 +39,7 @@ CONF_ENERGY_SENSOR_ID = "energy_sensor_id"
 CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_ENERGY_SENSOR_FRIENDLY_NAMING = "energy_sensor_friendly_naming"
 CONF_ENERGY_SENSOR_PRECISION = "energy_sensor_precision"
+CONF_ENERGY_SENSOR_UNIT_PREFIX = "energy_sensor_unit_prefix"
 CONF_FIXED = "fixed"
 CONF_GROUP = "group"
 CONF_GAMMA_CURVE = "gamma_curve"
@@ -88,6 +89,17 @@ ENERGY_INTEGRATION_METHODS = [
     ENERGY_INTEGRATION_METHOD_RIGHT,
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
 ]
+
+
+class UnitPrefix(StrEnum):
+    """Possible unit prefixes."""
+
+    NONE = "none"
+    KILO = "k"
+    MEGA = "M"
+    GIGA = "G"
+    TERRA = "T"
+
 
 ENTITY_CATEGORY_CONFIG = "config"
 ENTITY_CATEGORY_DIAGNOSTIC = "diagnostic"

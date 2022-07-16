@@ -22,11 +22,15 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
+    UnitPrefix,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
 from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
+
+from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -64,13 +68,21 @@ async def create_energy_sensor(
         )
 
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.
-    name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME), source_entity)
+    name = generate_energy_sensor_name(
+        sensor_config, sensor_config.get(CONF_NAME), source_entity
+    )
     entity_id = generate_energy_sensor_entity_id(hass, sensor_config, source_entity)
     entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
     unique_id = None
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
-        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id)
+        async_migrate_entity_id(
+            hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id
+        )
+
+    unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
+    if unit_prefix == UnitPrefix.NONE:
+        unit_prefix = None
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
@@ -80,7 +92,7 @@ async def create_energy_sensor(
         entity_category=entity_category,
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-        unit_prefix="k",
+        unit_prefix=unit_prefix,
         unit_of_measurement=None,
         unit_time=TIME_HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)

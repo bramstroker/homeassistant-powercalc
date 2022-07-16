@@ -25,7 +25,6 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 
-from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
@@ -38,9 +37,10 @@ from custom_components.powercalc.const import (
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
-from custom_components.powercalc.sensors.power import create_virtual_power_sensor
 from custom_components.powercalc.migrate import async_migrate_entity_id
+from custom_components.powercalc.sensors.power import create_virtual_power_sensor
 
+from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
 from .power import VirtualPowerSensor, create_virtual_power_sensor
 
@@ -72,8 +72,12 @@ async def create_daily_fixed_energy_sensor(
 
     name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
     entity_id = generate_energy_sensor_entity_id(hass, sensor_config)
-    old_entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass)
-    async_migrate_entity_id(hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id)
+    old_entity_id = async_generate_entity_id(
+        ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass
+    )
+    async_migrate_entity_id(
+        hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id
+    )
 
     _LOGGER.debug(
         "Creating daily_fixed_energy energy sensor (name=%s, entity_id=%s, unique_id=%s)",
