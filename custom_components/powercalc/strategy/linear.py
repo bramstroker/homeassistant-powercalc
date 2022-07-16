@@ -183,7 +183,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         
         min_power = self._config.get(CONF_MIN_POWER)
         max_power = self._config.get(CONF_MAX_POWER)
-        if min_power >= max_power:
+        if min_power and max_power and min_power >= max_power:
             raise StrategyConfigurationError(
                 "Max power cannot be lower than min power", "linear_min_higher_as_max"
             )

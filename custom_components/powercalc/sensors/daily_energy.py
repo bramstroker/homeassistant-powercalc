@@ -25,6 +25,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 
+from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
@@ -37,6 +38,8 @@ from custom_components.powercalc.const import (
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
 )
+from custom_components.powercalc.sensors.power import create_virtual_power_sensor
+from custom_components.powercalc.migrate import async_migrate_entity_id
 
 from .energy import EnergySensor
 from .power import VirtualPowerSensor, create_virtual_power_sensor
@@ -67,9 +70,15 @@ async def create_daily_fixed_energy_sensor(
 ) -> DailyEnergySensor:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
+    name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
+    entity_id = generate_energy_sensor_entity_id(hass, sensor_config)
+    old_entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass)
+    async_migrate_entity_id(hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id)
+
     _LOGGER.debug(
-        "Creating daily_fixed_energy energy sensor (name=%s unique_id=%s)",
-        sensor_config.get(CONF_NAME),
+        "Creating daily_fixed_energy energy sensor (name=%s, entity_id=%s, unique_id=%s)",
+        name,
+        entity_id,
         sensor_config.get(CONF_UNIQUE_ID),
     )
 
@@ -79,7 +88,8 @@ async def create_daily_fixed_energy_sensor(
 
     return DailyEnergySensor(
         hass,
-        sensor_config.get(CONF_NAME),
+        name,
+        entity_id,
         sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY),
         mode_config.get(CONF_VALUE),
         mode_config.get(CONF_UNIT_OF_MEASUREMENT),
@@ -109,7 +119,7 @@ async def create_daily_fixed_energy_power_sensor(
         power_sensor_config[CONF_UNIQUE_ID] = f"{unique_id}_power"
 
     _LOGGER.debug(
-        "Creating daily_fixed_energy power sensor (name=%s unique_id=%s)",
+        "Creating daily_fixed_energy power sensor (base_name=%s unique_id=%s)",
         sensor_config.get(CONF_NAME),
         unique_id,
     )
@@ -128,6 +138,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self,
         hass: HomeAssistant,
         name: str,
+        entity_id: str,
         entity_category: str,
         value: float,
         unit_of_measurement: str,
@@ -147,7 +158,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._start_time = start_time
         self._rounding_digits = rounding_digits
         self._attr_unique_id = unique_id
-        self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
+        self.entity_id = entity_id
 
     async def async_added_to_hass(self):
         """Handle entity which will be added."""
