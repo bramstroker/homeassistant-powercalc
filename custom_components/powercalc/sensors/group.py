@@ -193,4 +193,3 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     {ATTR_ENTITY_ID: entity_id},
                 )
             )
-        self.async_write_ha_state()
