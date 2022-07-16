@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Optional
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant
 
 from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
 from .const import MODE_FIXED, MODE_LINEAR
@@ -24,7 +24,7 @@ class DeviceType(Enum):
 class LightModel:
     def __init__(
         self,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         manufacturer: str,
         model: str,
         custom_model_directory: str,

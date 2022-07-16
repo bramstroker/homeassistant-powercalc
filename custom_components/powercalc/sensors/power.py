@@ -15,13 +15,12 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_START,
     POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback
+from homeassistant.core import State, callback, HomeAssistant
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -30,7 +29,7 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -81,7 +80,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -98,7 +97,7 @@ async def create_power_sensor(
 
 
 async def create_virtual_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -159,7 +158,7 @@ async def create_virtual_power_sensor(
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
-        await calculation_strategy.validate_config(source_entity)
+        await calculation_strategy.validate_config()
     except (UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
@@ -174,7 +173,7 @@ async def create_virtual_power_sensor(
     standby_power = Decimal(0)
     standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        if CONF_STANDBY_POWER in sensor_config:
+        if sensor_config.get(CONF_STANDBY_POWER):
             standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
         elif light_model is not None:
             standby_power = Decimal(light_model.standby_power)
@@ -197,7 +196,7 @@ async def create_virtual_power_sensor(
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
-        standby_power,
+        round(standby_power, 2),
         unique_id,
     )
 
@@ -222,7 +221,7 @@ async def create_virtual_power_sensor(
 
 
 async def create_real_power_sensor(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistant, sensor_config: dict
 ) -> RealPowerSensor:
     """Create reference to an existing power sensor"""
 
@@ -335,39 +334,39 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
 
-        async def home_assistant_startup(event):
-            """Add listeners and get initial state."""
-            entities_to_track = self._power_calculator.get_entities_to_track()
+        #async def home_assistant_startup(event):
+        """Add listeners and get initial state."""
+        entities_to_track = self._power_calculator.get_entities_to_track()
 
-            track_entities = [
-                entity for entity in entities_to_track if isinstance(entity, str)
-            ]
-            if not track_entities:
-                track_entities = [self._source_entity]
+        track_entities = [
+            entity for entity in entities_to_track if isinstance(entity, str)
+        ]
+        if not track_entities:
+            track_entities = [self._source_entity]
 
-            async_track_state_change_event(
-                self.hass, track_entities, appliance_state_listener
+        async_track_state_change_event(
+            self.hass, track_entities, appliance_state_listener
+        )
+
+        track_templates = [
+            template
+            for template in entities_to_track
+            if isinstance(template, TrackTemplate)
+        ]
+        if track_templates:
+            async_track_template_result(
+                self.hass,
+                track_templates=track_templates,
+                action=template_change_listener,
             )
 
-            track_templates = [
-                template
-                for template in entities_to_track
-                if isinstance(template, TrackTemplate)
-            ]
-            if track_templates:
-                async_track_template_result(
-                    self.hass,
-                    track_templates=track_templates,
-                    action=template_change_listener,
-                )
+        for entity_id in track_entities:
+            if entity_id == DUMMY_ENTITY_ID:
+                new_state = State(entity_id, STATE_ON)
+            else:
+                new_state = self.hass.states.get(entity_id)
 
-            for entity_id in track_entities:
-                if entity_id == DUMMY_ENTITY_ID:
-                    new_state = State(entity_id, STATE_ON)
-                else:
-                    new_state = self.hass.states.get(entity_id)
-
-                await self._update_power_sensor(entity_id, new_state)
+            await self._update_power_sensor(entity_id, new_state)
 
         @callback
         def async_update(event_time=None):
@@ -376,9 +375,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
 
-        self.hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_START, home_assistant_startup
-        )
+        # self.hass.bus.async_listen_once(
+        #     EVENT_HOMEASSISTANT_START, home_assistant_startup
+        # )
 
     async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
         """Update power sensor based on new dependant entity state."""

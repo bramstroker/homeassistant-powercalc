@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 
+from homeassistant.backports.enum import StrEnum
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
     STATE_NOT_HOME,
@@ -56,12 +57,15 @@ CONF_POWER_SENSOR_FRIENDLY_NAMING = "power_sensor_friendly_naming"
 CONF_POWER_SENSOR_PRECISION = "power_sensor_precision"
 CONF_POWER = "power"
 CONF_POWER_SENSOR_ID = "power_sensor_id"
+CONF_POWER_TEMPLATE = "power_template"
 CONF_MIN_POWER = "min_power"
 CONF_MAX_POWER = "max_power"
 CONF_ON_TIME = "on_time"
 CONF_TEMPLATE = "template"
+CONF_SENSOR_TYPE = "sensor_type"
 CONF_UPDATE_FREQUENCY = "update_frequency"
 CONF_VALUE = "value"
+CONF_VALUE_TEMPLATE = "value_template"
 CONF_VOLTAGE = "voltage"
 CONF_WLED = "wled"
 CONF_STATES_POWER = "states_power"
@@ -117,13 +121,11 @@ ATTR_SOURCE_DOMAIN = "source_domain"
 
 SERVICE_RESET_ENERGY = "reset_energy"
 
-MODE_DAILY_FIXED_ENERGY = "daily_fixed_energy"
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
 MODE_WLED = "wled"
 CALCULATION_MODES = [
-    MODE_DAILY_FIXED_ENERGY,
     MODE_FIXED,
     MODE_LINEAR,
     MODE_LUT,
@@ -131,3 +133,10 @@ CALCULATION_MODES = [
 ]
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
+
+class SensorType(StrEnum):
+    """Possible modes for a number selector."""
+
+    DAILY_ENERGY = "daily_energy"
+    VIRTUAL_POWER = "virtual_power"
+    GROUP = "group"

@@ -5,10 +5,9 @@ from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol
-from homeassistant.core import State
+from homeassistant.core import State, HomeAssistant
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
-from homeassistant.helpers.typing import HomeAssistantType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -36,7 +35,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self,
         config: dict,
         light_entity: SourceEntity,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         standby_power: Optional[float],
     ) -> None:
         self._hass = hass
@@ -89,5 +88,5 @@ class WledStrategy(PowerCalculationStrategyInterface):
     def can_calculate_standby(self) -> bool:
         return True
 
-    async def validate_config(self, source_entity: SourceEntity):
+    async def validate_config(self):
         self._estimated_current_entity = await self.find_estimated_current_entity()
