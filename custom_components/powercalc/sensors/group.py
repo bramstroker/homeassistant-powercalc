@@ -112,21 +112,6 @@ async def create_group_sensors(
     return group_sensors
 
 
-async def create_entity_id(hass: HomeAssistantType, name: str, unique_id: str | None):
-    """
-    Check if we already have an entity id based on the unique id of the group sensor
-    When this is not the case we generate one using same algorithm as HA add entity routine
-    """
-    if unique_id is not None:
-        ent_reg = entity_registry.async_get(hass)
-        if entity_id := ent_reg.async_get_entity_id(
-            SENSOR_DOMAIN, SENSOR_DOMAIN, unique_id
-        ):
-            return entity_id
-
-    return async_generate_entity_id(ENTITY_ID_FORMAT, name, hass=hass)
-
-
 class GroupedSensor(RestoreEntity, SensorEntity):
     """Base class for grouped sensors"""
 
