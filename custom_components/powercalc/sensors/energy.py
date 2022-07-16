@@ -71,7 +71,7 @@ async def create_energy_sensor(
     unique_id = None
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
-        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id, entity_id)
+        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id)
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(

@@ -110,7 +110,7 @@ async def create_virtual_power_sensor(
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id:
-        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id, entity_id)
+        async_migrate_entity_id(hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id)
 
     light_model = None
     try:

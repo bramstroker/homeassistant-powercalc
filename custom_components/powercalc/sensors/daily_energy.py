@@ -20,6 +20,7 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.core import callback
+from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
@@ -39,6 +40,7 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
 )
 from custom_components.powercalc.sensors.power import create_virtual_power_sensor
+from custom_components.powercalc.migrate import async_migrate_entity_id
 
 from .energy import EnergySensor
 from .power import VirtualPowerSensor
@@ -71,6 +73,9 @@ async def create_daily_fixed_energy_sensor(
 
     name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
     entity_id = generate_energy_sensor_entity_id(hass, sensor_config)
+    old_entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass)
+    async_migrate_entity_id(hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id)
+
     _LOGGER.debug(
         "Creating daily_fixed_energy energy sensor (name=%s, entity_id=%s, unique_id=%s)",
         name,
@@ -91,7 +96,6 @@ async def create_daily_fixed_energy_sensor(
         start_time=mode_config.get(CONF_START_TIME),
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
-
 
 async def create_daily_fixed_energy_power_sensor(
     hass: HomeAssistantType, sensor_config: dict, source_entity: SourceEntity
