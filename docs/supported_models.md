@@ -1,8 +1,9 @@
-# Supported models (144 total)
+# Supported models (145 total)
 | manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|-----------------------------------------------------------------------------------------------|
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |                                                                                               |
 |belkin        |F7C033                   |WeMo smart LED bulb                                                  |lut              |brightness              |                                                                                               |
+|elgato        |elgato key light air     |Elgato Key Light Air                                                 |lut              |color_temp              |                                                                                               |
 |ikea          |L1527                    |FLOALT panel WS 30x30                                                |lut              |color_temp              |FLOALT panel WS 30x30                                                                          |
 |ikea          |L1528                    |FLOALT panel WS 30x90                                                |lut              |color_temp              |                                                                                               |
 |ikea          |L1529                    |FLOALT panel WS 60x60                                                |lut              |color_temp              |FLOALT panel WS 60x60                                                                          |
