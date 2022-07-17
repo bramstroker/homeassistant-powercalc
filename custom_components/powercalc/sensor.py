@@ -96,6 +96,7 @@ from .const import (
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_TEMPLATE,
+    CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
     CONF_UTILITY_METER_OFFSET,
@@ -115,6 +116,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     SERVICE_RESET_ENERGY,
+    SensorType,
     UnitPrefix,
 )
 from .errors import (
@@ -129,7 +131,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import create_energy_sensor
-from .sensors.group import create_group_sensors
+from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry
 from .sensors.power import RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -252,6 +254,18 @@ async def async_setup_entry(
     """Setup sensors from config entry (GUI config flow)"""
 
     sensor_config = convert_config_entry_to_sensor_config(entry)
+    sensor_type = entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type == SensorType.GROUP:
+        global_config: dict = hass.data[DOMAIN][DOMAIN_CONFIG]
+        merged_sensor_config = get_merged_sensor_configuration(global_config, sensor_config)
+        entities = await create_group_sensors_from_config_entry(
+            hass=hass,
+            entry=entry,
+            sensor_config=merged_sensor_config
+        )
+        async_add_entities(entities)
+        return
+
     await _async_setup_entities(hass, sensor_config, async_add_entities)
 
 async def _async_setup_entities(
@@ -283,6 +297,9 @@ async def _async_setup_entities(
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
     """Convert the config entry structure to the sensor config which we use to create the entities"""
     sensor_config = dict(config_entry.data.copy())
+
+    if sensor_config.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
+        sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         daily_fixed_config = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))

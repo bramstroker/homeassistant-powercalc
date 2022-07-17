@@ -18,7 +18,9 @@ from homeassistant.const import (
     CONF_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
+    Platform,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
@@ -28,6 +30,8 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
+    CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_POWER_TEMPLATE,
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -45,10 +49,10 @@ from .const import (
     CONF_MODE,
     CONF_VALUE,
     CONF_STANDBY_POWER,
-    CALCULATION_MODES,
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
+    CONF_SUB_GROUPS,
     MODE_LINEAR,
     MODE_WLED,
     SensorType
@@ -65,7 +69,7 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_TYPE_MENU = {
     SensorType.DAILY_ENERGY: "Daily energy",
     SensorType.VIRTUAL_POWER: "Virtual power",
-    #SensorType.GROUP: "Group"
+    SensorType.GROUP: "Group"
 }
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
@@ -84,8 +88,8 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): cv.string,
+        vol.Required(CONF_NAME): selector.TextSelector(),
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     }
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
@@ -119,6 +123,20 @@ SCHEMA_POWER_LINEAR = vol.Schema({
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
     vol.Optional(CONF_CALIBRATE): selector.ObjectSelector()
 })
+
+SCHEMA_GROUP = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.POWER, multiple=True)
+        ),
+        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.ENERGY, multiple=True)
+        ),
+        #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+    }
+)
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -191,6 +209,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="daily_energy",
             data_schema=SCHEMA_DAILY_ENERGY,
+            errors=errors,
+        )
+    
+    async def async_step_group(self, user_input: dict[str,str] = None) -> FlowResult:
+        self.selected_sensor_type = SensorType.GROUP
+        errors =  _validate_group_input(user_input)
+        if user_input is not None:
+            self.name = user_input.get(CONF_NAME)
+            self.sensor_config.update(user_input)
+            if not errors:
+                return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="group",
+            data_schema=_create_group_schema(self.hass),
             errors=errors,
         )
     
@@ -315,6 +348,9 @@ class OptionsFlowHandler(OptionsFlow):
                 await strategy_object.validate_config()
             except StrategyConfigurationError as error:
                 return {"base": error.get_config_flow_translate_key()}
+            
+        if self.sensor_type == SensorType.GROUP:
+            self.current_config.update(user_input)
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
@@ -337,6 +373,9 @@ class OptionsFlowHandler(OptionsFlow):
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
         
+        if self.sensor_type == SensorType.GROUP:
+            data_schema = _create_group_schema(self.hass)
+        
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
     
@@ -353,10 +392,12 @@ def _create_strategy_object(
     config: dict,
     source_entity: SourceEntity
 ) -> PowerCalculationStrategyInterface:
+    """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
     return factory.create(config, strategy, None, source_entity)
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
+    """Get the config schema for a given power calculation strategy"""
     if strategy == MODE_FIXED:
         return SCHEMA_POWER_FIXED
     if strategy == MODE_LINEAR:
@@ -365,7 +406,39 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return SCHEMA_POWER_WLED
     return SCHEMA_POWER_FIXED
 
+def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
+    """Create config schema for groups"""
+    sub_groups = [
+        selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME))
+        for config_entry in hass.config_entries.async_entries(DOMAIN)
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+    ]
+
+    sub_group_selector = selector.SelectSelector(
+        selector.SelectSelectorConfig(options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN)
+    )
+    return SCHEMA_GROUP.extend(
+        {
+            vol.Optional(CONF_SUB_GROUPS): sub_group_selector
+        }
+    )
+
+def _validate_group_input(user_input: dict[str, str] = None) -> dict:
+    """Validate the group form"""
+    if not user_input:
+        return {}
+    errors = {}
+
+    if (not CONF_SUB_GROUPS in user_input and  
+        not CONF_GROUP_POWER_ENTITIES in user_input and
+        not CONF_GROUP_ENERGY_ENTITIES in user_input
+    ):
+        errors["base"] = "group_mandatory"
+    
+    return errors
+
 def _create_linear_schema(source_entity_id: str) -> vol.Schema:
+    """Create the config schema for linear strategy"""
     return SCHEMA_POWER_LINEAR.extend(
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=source_entity_id))
@@ -373,6 +446,7 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     )
 
 def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dict[str,str] = None) -> dict[str, Any]:
+    """Build the config dict needed for the configured strategy"""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
     strategy_options = {}
     for key in strategy_schema.schema.keys():
@@ -382,6 +456,7 @@ def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dic
     return strategy_options
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
+    """Build the config under daily_energy: key"""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
     config = {}
     for key in schema.schema.keys():
@@ -391,6 +466,7 @@ def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, An
     return config
 
 def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
+    """Validates the daily energy form"""
     if not user_input:
         return {}
     errors = {}
@@ -401,7 +477,7 @@ def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
     return errors
 
 def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
-    # Make a copy of the schema with suggested values set to saved options
+    """Make a copy of the schema with suggested values set to saved options"""
     schema = {}
     for key, val in data_schema.schema.items():
         new_key = key
