@@ -289,7 +289,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         model_info = await autodiscover_model(self.hass, self.source_entity.entity_entry)
         if model_info:
-            schema.extend({vol.Optional("confirm_autodisovered_model", default=False): selector.BooleanSelector()})
+            schema = schema.extend({vol.Optional("confirm_autodisovered_model", default=False): bool})
 
         return self.async_show_form(
             step_id="lut_manufacturer",
@@ -500,7 +500,7 @@ def _create_lut_schema_manufacturer(hass: HomeAssistant) -> vol.Schema:
         for manufacturer in library.get_manufacturer_listing()
     ]
     return vol.Schema({
-        vol.Required(CONF_MANUFACTURER): selector.SelectSelector(selector.SelectSelectorConfig(options=manufacturers, mode=selector.SelectSelectorMode.DROPDOWN))
+        vol.Optional(CONF_MANUFACTURER): selector.SelectSelector(selector.SelectSelectorConfig(options=manufacturers, mode=selector.SelectSelectorMode.DROPDOWN))
     })
 
 def _create_lut_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Schema:
