@@ -59,6 +59,7 @@ from .const import (
 from .common import SourceEntity, create_source_entity
 from .library import ProfileLibrary
 from .light_model import LightModel
+from .model_discovery import autodiscover_model
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
@@ -278,12 +279,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_lut_manufacturer(self, user_input: dict[str,str] = None) -> FlowResult:
         errors = {}
         if user_input is not None:
+            if user_input.get("confirm_autodisovered_model"):
+                return self.create_config_entry()
+
             self.sensor_config.update({CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)})
             return await self.async_step_lut_model()
 
+        schema = _create_lut_schema_manufacturer(self.hass)
+
+        model_info = await autodiscover_model(self.hass, self.source_entity.entity_entry)
+        if model_info:
+            schema.extend({vol.Optional("confirm_autodisovered_model", default=False): selector.BooleanSelector()})
+
         return self.async_show_form(
             step_id="lut_manufacturer",
-            data_schema=_create_lut_schema_manufacturer(self.hass),
+            data_schema=schema,
             errors=errors,
         )
 
