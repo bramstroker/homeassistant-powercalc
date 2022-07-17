@@ -18,39 +18,39 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 def generate_power_sensor_name(
     sensor_config: dict[str, Any],
-    name: str | None,
+    name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
     """Generates the name to use for a power sensor"""
     return _generate_sensor_name(
         sensor_config,
-        name,
         CONF_POWER_SENSOR_NAMING,
         CONF_POWER_SENSOR_FRIENDLY_NAMING,
+        name,
         source_entity,
     )
 
 
 def generate_energy_sensor_name(
     sensor_config: dict[str, Any],
-    name: str | None,
+    name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
     """Generates the name to use for an energy sensor"""
     return _generate_sensor_name(
         sensor_config,
-        name,
         CONF_ENERGY_SENSOR_NAMING,
         CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+        name,
         source_entity,
     )
 
 
 def _generate_sensor_name(
     sensor_config: dict[str, Any],
-    name: str | None,
     naming_conf_key: str,
     friendly_naming_conf_key: str,
+    name: str | None = None,
     source_entity: SourceEntity | None = None,
 ):
     """Generates the name to use for an sensor"""
