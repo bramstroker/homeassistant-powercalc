@@ -4,6 +4,7 @@ import logging
 from decimal import Decimal
 from typing import Any, Callable
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -257,3 +258,5 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     {ATTR_ENTITY_ID: entity_id},
                 )
             )
+        self._attr_last_reset = dt_util.utcnow()
+        self.async_write_ha_state()
