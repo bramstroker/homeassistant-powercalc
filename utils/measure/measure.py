@@ -260,7 +260,7 @@ class Measure:
                     self.num_0_readings += 1
                     _LOGGER.warning(f"Discarding measurement: {error}")
                     if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                        _LOGGER.error("Aborting measurement session. Received to much 0 readings")
+                        _LOGGER.error("Aborting measurement session. Received too many 0 readings")
                         return
                     continue
                 except PowerMeterError as error:
