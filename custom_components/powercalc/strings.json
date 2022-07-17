@@ -96,6 +96,18 @@
           "voltage": "Voltage",
           "power_factor": "Power factor"
         }
+      },
+      "lut_manufacturer": {
+        "title": "LUT config",
+        "data": {
+          "manufacturer": "Manufacturer"
+        }
+      },
+      "lut_model": {
+        "title": "LUT config",
+        "data": {
+          "model": "Model ID"
+        }
       }
     },
     "error": {

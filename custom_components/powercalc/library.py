@@ -26,7 +26,7 @@ class ProfileLibrary:
         """Get listing of available manufacturers"""
         manufacturers: list[str] = []
         for data_dir in self._data_directories:
-            manufacturers.extend(os.listdir(data_dir))
+            manufacturers.extend(next(os.walk(data_dir))[1])
         return sorted(manufacturers)
     
     def get_model_listing(self, manufacturer: str) -> list[str]:

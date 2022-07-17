@@ -71,6 +71,18 @@
                 },
                 "title": "Linear config"
             },
+            "lut_manufacturer": {
+                "data": {
+                    "manufacturer": "Manufacturer"
+                },
+                "title": "LUT config"
+            },
+            "lut_model": {
+                "data": {
+                    "model": "Model ID"
+                },
+                "title": "LUT config"
+            },
             "user": {
                 "data": {
                     "sensor_type": "Sensor type"
