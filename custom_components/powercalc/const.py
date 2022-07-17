@@ -89,13 +89,11 @@ ENERGY_INTEGRATION_METHODS = [
 
 
 class UnitPrefix(StrEnum):
-    """Possible unit prefixes."""
+    """Allowed unit prefixes."""
 
     NONE = "none"
     KILO = "k"
     MEGA = "M"
-    GIGA = "G"
-    TERRA = "T"
 
 
 ENTITY_CATEGORY_CONFIG = "config"
