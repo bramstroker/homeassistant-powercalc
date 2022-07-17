@@ -28,7 +28,7 @@ class LightModel:
         hass: HomeAssistant,
         manufacturer: str,
         model: str,
-        custom_model_directory: str,
+        custom_model_directory: str | None,
     ):
         self._manufacturer = manufacturer
         self._model = model

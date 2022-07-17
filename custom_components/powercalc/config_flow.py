@@ -3,7 +3,6 @@
 from __future__ import annotations
 import logging
 import copy
-from select import select
 
 import voluptuous as vol
 
@@ -59,6 +58,7 @@ from .const import (
 )
 from .common import SourceEntity, create_source_entity
 from .library import ProfileLibrary
+from .light_model import LightModel
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
@@ -372,7 +372,9 @@ class OptionsFlowHandler(OptionsFlow):
 
             strategy_options = _build_strategy_config(strategy, self.source_entity_id, user_input)
             
-            self.current_config.update({strategy: strategy_options})
+            if strategy != CalculationStrategy.LUT:
+                self.current_config.update({strategy: strategy_options})
+                
             strategy_object = _create_strategy_object(self.hass, strategy, self.current_config, self.source_entity)
             try:
                 await strategy_object.validate_config()
@@ -397,7 +399,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy: str = self.current_config.get(CONF_MODE)
             strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
             data_schema = base_power_schema.extend(strategy_schema.schema)
-            strategy_options = self.current_config.get(strategy)
+            strategy_options = self.current_config.get(strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
@@ -424,7 +426,10 @@ def _create_strategy_object(
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
-    return factory.create(config, strategy, None, source_entity)
+    light_model = None
+    if strategy == CalculationStrategy.LUT:
+        light_model = LightModel(hass, config.get(CONF_MANUFACTURER), config.get(CONF_MODEL), None)
+    return factory.create(config, strategy, light_model, source_entity)
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     """Get the config schema for a given power calculation strategy"""
@@ -434,6 +439,8 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return _create_linear_schema(source_entity_id)
     if strategy == CalculationStrategy.WLED:
         return SCHEMA_POWER_WLED
+    if strategy == CalculationStrategy.LUT:
+        return vol.Schema({})
     return SCHEMA_POWER_FIXED
 
 def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Schema:
