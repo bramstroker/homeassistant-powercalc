@@ -32,6 +32,8 @@ from .const import (
     CONF_FIXED,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER_TEMPLATE,
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -56,6 +58,7 @@ from .const import (
     SensorType
 )
 from .common import SourceEntity, create_source_entity
+from .library import ProfileLibrary
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
@@ -103,7 +106,7 @@ SCHEMA_POWER = vol.Schema({
     vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     vol.Optional(CONF_MODE, default=CalculationStrategy.FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=[CalculationStrategy.FIXED, CalculationStrategy.LINEAR, CalculationStrategy.WLED],
+            options=[CalculationStrategy.FIXED, CalculationStrategy.LINEAR, CalculationStrategy.WLED, CalculationStrategy.LUT],
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     ),
@@ -186,6 +189,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if user_input.get(CONF_MODE) == CalculationStrategy.WLED:
                 return await self.async_step_wled()
             
+            if user_input.get(CONF_MODE) == CalculationStrategy.LUT:
+                return await self.async_step_lut_manufacturer()
+            
         return self.async_show_form(
             step_id="virtual_power",
             data_schema=SCHEMA_POWER,
@@ -266,6 +272,30 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="wled",
             data_schema=SCHEMA_POWER_WLED,
+            errors=errors,
+        )
+    
+    async def async_step_lut_manufacturer(self, user_input: dict[str,str] = None) -> FlowResult:
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)})
+            return await self.async_step_lut_model()
+
+        return self.async_show_form(
+            step_id="lut_manufacturer",
+            data_schema=_create_lut_schema_manufacturer(self.hass),
+            errors=errors,
+        )
+
+    async def async_step_lut_model(self, user_input: dict[str,str] = None) -> FlowResult:
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
+            return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="lut_model",
+            data_schema=_create_lut_schema_model(self.hass, self.sensor_config.get(CONF_MANUFACTURER)),
             errors=errors,
         )
     
@@ -444,6 +474,28 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=source_entity_id))
         }
     )
+
+def _create_lut_schema_manufacturer(hass: HomeAssistant) -> vol.Schema:
+    """Create LUT schema"""
+    library = ProfileLibrary(hass)
+    manufacturers = [
+        selector.SelectOptionDict(value=manufacturer, label=manufacturer) 
+        for manufacturer in library.get_manufacturer_listing()
+    ]
+    return vol.Schema({
+        vol.Required(CONF_MANUFACTURER): selector.SelectSelector(selector.SelectSelectorConfig(options=manufacturers, mode=selector.SelectSelectorMode.DROPDOWN))
+    })
+
+def _create_lut_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Schema:
+    """Create LUT schema"""
+    library = ProfileLibrary(hass)
+    models = [
+        selector.SelectOptionDict(value=model, label=model) 
+        for model in library.get_model_listing(manufacturer)
+    ]
+    return vol.Schema({
+        vol.Required(CONF_MODEL): selector.SelectSelector(selector.SelectSelectorConfig(options=models, mode=selector.SelectSelectorMode.DROPDOWN))
+    })
 
 def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dict[str,str] = None) -> dict[str, Any]:
     """Build the config dict needed for the configured strategy"""
