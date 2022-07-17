@@ -4,6 +4,7 @@ import logging
 from typing import Any, Optional
 
 import homeassistant.helpers.entity_registry as er
+import homeassistant.util.dt as dt_util
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -206,6 +207,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     def async_reset_energy(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
+        self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
 
