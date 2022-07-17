@@ -129,8 +129,11 @@ SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
-        vol.Required(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
             selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.POWER, multiple=True)
+        ),
+        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.ENERGY, multiple=True)
         ),
         #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
     }
@@ -221,7 +224,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="group",
-            data_schema=SCHEMA_GROUP,
+            data_schema=_create_group_schema(self.hass),
             errors=errors,
         )
     
@@ -401,6 +404,22 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     if strategy == MODE_WLED:
         return SCHEMA_POWER_WLED
     return SCHEMA_POWER_FIXED
+
+def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
+    sub_groups = [
+        selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME))
+        for config_entry in hass.config_entries.async_entries(DOMAIN)
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+    ]
+
+    sub_group_selector = selector.SelectSelector(
+        selector.SelectSelectorConfig(options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN)
+    )
+    return SCHEMA_GROUP.extend(
+        {
+            vol.Optional("sub_groups"): sub_group_selector
+        }
+    )
 
 def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     return SCHEMA_POWER_LINEAR.extend(
