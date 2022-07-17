@@ -44,6 +44,7 @@
             },
             "group": {
                 "data": {
+                    "create_utility_meters": "Create utility meters",
                     "group_energy_entities": "Member energy entities",
                     "group_power_entities": "Member power entities",
                     "name": "Name",

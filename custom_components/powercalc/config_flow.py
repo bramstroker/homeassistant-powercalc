@@ -129,6 +129,7 @@ SCHEMA_GROUP_OPTIONS = vol.Schema({
     vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
         selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.ENERGY, multiple=True)
     ),
+    vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): selector.BooleanSelector()
     #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
 })
 

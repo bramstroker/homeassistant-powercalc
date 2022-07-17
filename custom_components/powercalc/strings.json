@@ -32,7 +32,8 @@
           "unique_id": "Unique id",
           "group_power_entities": "Member power entities",
           "group_energy_entities": "Member energy entities",
-          "sub_groups": "Sub groups"
+          "sub_groups": "Sub groups",
+          "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]"
         },
         "data_description": {
           "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
