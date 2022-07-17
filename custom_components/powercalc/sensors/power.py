@@ -34,6 +34,7 @@ from homeassistant.helpers.typing import DiscoveryInfoType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
+    ATTR_ENERGY_SENSOR_ENTITY_ID,
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
@@ -47,9 +48,7 @@ from custom_components.powercalc.const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_CATEGORY,
-    CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_ID,
-    CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_WLED,
@@ -57,9 +56,6 @@ from custom_components.powercalc.const import (
     DISCOVERY_LIGHT_MODEL,
     DOMAIN,
     DUMMY_ENTITY_ID,
-    MODE_FIXED,
-    MODE_LINEAR,
-    MODE_WLED,
     OFF_STATES,
     CalculationStrategy,
 )
@@ -315,6 +311,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._sensor_config = sensor_config
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
+        self._attr_extra_state_attributes = {
+            ATTR_CALCULATION_MODE: calculation_mode,
+            ATTR_INTEGRATION: DOMAIN,
+            ATTR_SOURCE_ENTITY: source_entity,
+            ATTR_SOURCE_DOMAIN: source_domain,
+        }
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -369,10 +371,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self.async_schedule_update_ha_state(True)
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
-
-        # self.hass.bus.async_listen_once(
-        #     EVENT_HOMEASSISTANT_START, home_assistant_startup
-        # )
 
     async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
         """Update power sensor based on new dependant entity state."""
@@ -454,16 +452,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._source_entity
 
     @property
-    def extra_state_attributes(self):
-        """Return entity state attributes."""
-        return {
-            ATTR_CALCULATION_MODE: self._calculation_mode,
-            ATTR_INTEGRATION: DOMAIN,
-            ATTR_SOURCE_ENTITY: self._source_entity,
-            ATTR_SOURCE_DOMAIN: self._source_domain,
-        }
-
-    @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
@@ -477,6 +465,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+    
+    def set_energy_sensor_attribute(self, entity_id: str):
+        """Set the energy sensor on the state attributes"""
+        self._attr_extra_state_attributes.update({ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id})
 
 
 class RealPowerSensor(PowerSensor):

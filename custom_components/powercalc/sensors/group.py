@@ -29,6 +29,7 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from custom_components.powercalc.const import (
+    ATTR_ENERGY_SENSOR_ENTITY_ID,
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -116,7 +117,7 @@ async def create_group_sensors_from_config_entry(
 
     group_name = entry.data.get(CONF_NAME)
 
-    power_sensor_ids = set(
+    power_sensor_ids: set[str] = set(
         (entry.data.get(CONF_GROUP_POWER_ENTITIES) or []) + 
         resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_POWER_ENTITIES)
     
@@ -127,7 +128,7 @@ async def create_group_sensors_from_config_entry(
         )
         group_sensors.append(power_sensor)
 
-    energy_sensor_ids = set(
+    energy_sensor_ids: set[str] = set(
             (entry.data.get(CONF_GROUP_ENERGY_ENTITIES) or []) + 
             resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_ENERGY_ENTITIES)
         )

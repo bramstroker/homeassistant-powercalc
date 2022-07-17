@@ -126,6 +126,7 @@ DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_LIGHT_MODEL = "light_model"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
+ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"
 ATTR_ENTITIES = "entities"
 ATTR_INTEGRATION = "integration"
 ATTR_IS_GROUP = "is_group"

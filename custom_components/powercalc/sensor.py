@@ -132,7 +132,7 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import create_energy_sensor
 from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry
-from .sensors.power import RealPowerSensor, create_power_sensor
+from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
@@ -525,6 +525,8 @@ async def create_individual_sensors(
                 hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
+            if isinstance(power_sensor, VirtualPowerSensor) and isinstance(energy_sensor, SensorEntity):
+                power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
 
     if energy_sensor:
         entities_to_add.extend(
