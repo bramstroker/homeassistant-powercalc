@@ -26,6 +26,13 @@
           "update_frequency": "time in seconds between state updates of the sensor"
         }
       },
+      "group": {
+        "data": {
+          "name": "[%key:common::config_flow::data::name%]",
+          "unique_id": "Unique id",
+          "group_power_entities": "Member power entities"
+        }
+      },
       "virtual_power": {
         "title": "Main configuration",
         "description": "Create a virtual power sensor, see the readme for more information about the possible strategies and configuration options",
@@ -110,7 +117,8 @@
           "min_power": "[%key:component::powercalc::config::step::linear::data::min_power%]",
           "max_power": "[%key:component::powercalc::config::step::linear::data::max_power%]",
           "gamma_curve": "[%key:component::powercalc::config::step::linear::data::gamma_curve%]",
-          "attribute": "[%key:component::powercalc::config::step::linear::data::attribute%]"
+          "attribute": "[%key:component::powercalc::config::step::linear::data::attribute%]",
+          "group_power_entities": "[%key:component::powercalc::config::step::group::data::group_power_entities%]"
         },
         "data_description": {
           "calibrate": "[%key:component::powercalc::config::step::linear::data_description::calibrate%]",

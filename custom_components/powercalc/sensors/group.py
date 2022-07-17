@@ -10,9 +10,11 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_NAME,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
@@ -31,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_POWER_SENSOR_PRECISION,
     DOMAIN,
     SERVICE_RESET_ENERGY,
@@ -99,6 +102,17 @@ async def create_group_sensors(
         await create_utility_meters(hass, energy_sensor, sensor_config)
     )
 
+    return group_sensors
+
+async def create_group_sensors_from_config_entry(hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict) -> list[GroupedSensor]:
+    group_sensors = []
+
+    group_name = entry.data.get(CONF_NAME)
+    power_sensor_ids = entry.data.get(CONF_GROUP_POWER_ENTITIES)
+    power_sensor = create_grouped_power_sensor(
+        hass, group_name, sensor_config, power_sensor_ids
+    )
+    group_sensors.append(power_sensor)
     return group_sensors
 
 

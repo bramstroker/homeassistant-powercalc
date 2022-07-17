@@ -96,6 +96,7 @@ from .const import (
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_TEMPLATE,
+    CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
     CONF_UTILITY_METER_OFFSET,
@@ -115,6 +116,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     SERVICE_RESET_ENERGY,
+    SensorType,
     UnitPrefix,
 )
 from .errors import (
@@ -129,7 +131,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import create_energy_sensor
-from .sensors.group import create_group_sensors
+from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry
 from .sensors.power import RealPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -250,6 +252,17 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback
 ):
     """Setup sensors from config entry (GUI config flow)"""
+
+    sensor_type = entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type == SensorType.GROUP:
+        global_config: dict = hass.data[DOMAIN][DOMAIN_CONFIG]
+        entities = await create_group_sensors_from_config_entry(
+            hass=hass,
+            entry=entry,
+            sensor_config=global_config
+        )
+        async_add_entities(entities)
+        return
 
     sensor_config = convert_config_entry_to_sensor_config(entry)
     await _async_setup_entities(hass, sensor_config, async_add_entities)

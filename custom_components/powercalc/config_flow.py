@@ -12,13 +12,16 @@ from homeassistant import config_entries
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.const import (
     CONF_ATTRIBUTE,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
+    Platform,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 import homeassistant.helpers.config_validation as cv
@@ -28,6 +31,8 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
+    CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_POWER_TEMPLATE,
     CONF_CALIBRATE,
     CONF_LINEAR,
@@ -65,7 +70,7 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_TYPE_MENU = {
     SensorType.DAILY_ENERGY: "Daily energy",
     SensorType.VIRTUAL_POWER: "Virtual power",
-    #SensorType.GROUP: "Group"
+    SensorType.GROUP: "Group"
 }
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
@@ -84,8 +89,8 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): cv.string,
+        vol.Required(CONF_NAME): selector.TextSelector(),
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     }
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
@@ -119,6 +124,17 @@ SCHEMA_POWER_LINEAR = vol.Schema({
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
     vol.Optional(CONF_CALIBRATE): selector.ObjectSelector()
 })
+
+SCHEMA_GROUP = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+        vol.Required(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.POWER, multiple=True)
+        ),
+        #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+    }
+)
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -191,6 +207,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="daily_energy",
             data_schema=SCHEMA_DAILY_ENERGY,
+            errors=errors,
+        )
+    
+    async def async_step_group(self, user_input: dict[str,str] = None) -> FlowResult:
+        self.selected_sensor_type = SensorType.GROUP
+        errors = {}
+        if user_input is not None:
+            self.name = user_input.get(CONF_NAME)
+            self.sensor_config.update(user_input)
+            if not errors:
+                return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="group",
+            data_schema=SCHEMA_GROUP,
             errors=errors,
         )
     
@@ -315,6 +346,9 @@ class OptionsFlowHandler(OptionsFlow):
                 await strategy_object.validate_config()
             except StrategyConfigurationError as error:
                 return {"base": error.get_config_flow_translate_key()}
+            
+        if self.sensor_type == SensorType.GROUP:
+            self.current_config.update(user_input)
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
@@ -336,6 +370,9 @@ class OptionsFlowHandler(OptionsFlow):
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
+        
+        if self.sensor_type == SensorType.GROUP:
+            data_schema = SCHEMA_GROUP
         
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
