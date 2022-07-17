@@ -173,7 +173,7 @@ class Measure:
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
         self.color_mode = answers["color_mode"]
-        self.num_lights = int(answers.get("num_lights", 1))
+        self.num_lights = int(answers.get("num_lights") or 1)
         self.is_dummy_load_connected = bool(answers.get("dummy_load"))
         if self.is_dummy_load_connected:
             self.dummy_load_value = self.get_dummy_load_value()
