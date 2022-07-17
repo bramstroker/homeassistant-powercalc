@@ -11,6 +11,7 @@
         }
       },
       "daily_energy": {
+        "title": "Create a daily fixed sensor",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
           "unique_id": "Unique id",
@@ -27,6 +28,7 @@
         }
       },
       "group": {
+        "title": "Create a group sensor",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
           "unique_id": "Unique id",
@@ -40,8 +42,8 @@
         }
       },
       "virtual_power": {
-        "title": "Main configuration",
-        "description": "Create a virtual power sensor, see the readme for more information about the possible strategies and configuration options",
+        "title": "Create a virtual power sensor",
+        "description": "See the readme for more information about the possible strategies and configuration options",
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
           "mode": "Calculation strategy",
