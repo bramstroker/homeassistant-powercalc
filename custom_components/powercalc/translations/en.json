@@ -49,6 +49,9 @@
                     "name": "Name",
                     "sub_groups": "Sub groups",
                     "unique_id": "Unique id"
+                },
+                "data_description": {
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
                 }
             },
             "linear": {
@@ -121,6 +124,7 @@
                     "group_power_entities": "Member power entities",
                     "max_power": "Max power",
                     "min_power": "Min power",
+                    "name": "Name",
                     "on_time": "On time",
                     "power": "Power",
                     "power_template": "Power template",
@@ -136,7 +140,8 @@
                     "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
                     "calibrate": "Put a calibration value on each line. Example\n\n1: 20",
                     "power_template": "Template will be evaluated to get the power value in W",
-                    "states_power": "One 'state: power' pair on each row, see example above"
+                    "states_power": "One 'state: power' pair on each row, see example above",
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
                 }
             }
         }

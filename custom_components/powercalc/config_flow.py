@@ -124,19 +124,20 @@ SCHEMA_POWER_LINEAR = vol.Schema({
     vol.Optional(CONF_CALIBRATE): selector.ObjectSelector()
 })
 
-SCHEMA_GROUP = vol.Schema(
-    {
-        vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
-        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.POWER, multiple=True)
-        ),
-        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.ENERGY, multiple=True)
-        ),
-        #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
-    }
-)
+SCHEMA_GROUP_OPTIONS = vol.Schema({
+    vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+        selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.POWER, multiple=True)
+    ),
+    vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+        selector.EntitySelectorConfig(domain=Platform.SENSOR, device_class=SensorDeviceClass.ENERGY, multiple=True)
+    ),
+    #vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+})
+
+SCHEMA_GROUP = vol.Schema({
+    vol.Required(CONF_NAME): str,
+    vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+}).extend(SCHEMA_GROUP_OPTIONS.schema)
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -223,7 +224,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="group",
-            data_schema=_create_group_schema(self.hass),
+            data_schema=_create_group_schema(self.hass, SCHEMA_GROUP),
             errors=errors,
         )
     
@@ -374,7 +375,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
         
         if self.sensor_type == SensorType.GROUP:
-            data_schema = _create_group_schema(self.hass)
+            data_schema = _create_group_schema(self.hass, SCHEMA_GROUP_OPTIONS)
         
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
@@ -406,7 +407,7 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return SCHEMA_POWER_WLED
     return SCHEMA_POWER_FIXED
 
-def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
+def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Schema:
     """Create config schema for groups"""
     sub_groups = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME))
@@ -417,7 +418,7 @@ def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
     sub_group_selector = selector.SelectSelector(
         selector.SelectSelectorConfig(options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN)
     )
-    return SCHEMA_GROUP.extend(
+    return base_schema.extend(
         {
             vol.Optional(CONF_SUB_GROUPS): sub_group_selector
         }
