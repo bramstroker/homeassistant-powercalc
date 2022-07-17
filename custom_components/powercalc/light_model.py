@@ -8,8 +8,8 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
 
 from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
-from .const import MODE_FIXED, MODE_LINEAR
 from .errors import ModelNotSupported, UnsupportedMode
+from .const import CalculationStrategy
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -165,7 +165,7 @@ class LightModel:
 
     @property
     def linear_mode_config(self) -> Optional[dict]:
-        if not self.is_mode_supported(MODE_LINEAR):
+        if not self.is_mode_supported(CalculationStrategy.LINEAR):
             raise UnsupportedMode(
                 f"Mode linear is not supported by model: {self._model}"
             )
@@ -173,7 +173,7 @@ class LightModel:
 
     @property
     def fixed_mode_config(self) -> Optional[dict]:
-        if not self.is_mode_supported(MODE_FIXED):
+        if not self.is_mode_supported(CalculationStrategy.FIXED):
             raise UnsupportedMode(
                 f"Mode fixed is not supported by model: {self._model}"
             )

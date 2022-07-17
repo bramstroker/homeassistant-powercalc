@@ -11,10 +11,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     CONF_WLED,
-    MODE_FIXED,
-    MODE_LINEAR,
-    MODE_LUT,
-    MODE_WLED,
+    CalculationStrategy
 )
 from custom_components.powercalc.errors import (
     StrategyConfigurationError,
@@ -43,16 +40,16 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration"""
-        if strategy == MODE_LINEAR:
+        if strategy == CalculationStrategy.LINEAR:
             return self._create_linear(source_entity, config, light_model)
 
-        if strategy == MODE_FIXED:
+        if strategy == CalculationStrategy.FIXED:
             return self._create_fixed(source_entity, config, light_model)
 
-        if strategy == MODE_LUT:
+        if strategy == CalculationStrategy.LUT:
             return self._create_lut(source_entity, light_model)
 
-        if strategy == MODE_WLED:
+        if strategy == CalculationStrategy.WLED:
             return self._create_wled(source_entity, config)
 
         raise UnsupportedMode("Invalid calculation mode", strategy)

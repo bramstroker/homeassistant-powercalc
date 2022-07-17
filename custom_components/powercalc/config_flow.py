@@ -49,12 +49,10 @@ from .const import (
     CONF_MODE,
     CONF_VALUE,
     CONF_STANDBY_POWER,
-    MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
     CONF_SUB_GROUPS,
-    MODE_LINEAR,
-    MODE_WLED,
+    CalculationStrategy,
     SensorType
 )
 from .common import SourceEntity, create_source_entity
@@ -103,9 +101,9 @@ SCHEMA_POWER = vol.Schema({
     vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
     vol.Optional(CONF_NAME): selector.TextSelector(),
     vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
-    vol.Optional(CONF_MODE, default=MODE_FIXED): selector.SelectSelector(
+    vol.Optional(CONF_MODE, default=CalculationStrategy.FIXED): selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=[MODE_FIXED, MODE_LINEAR, MODE_WLED],
+            options=[CalculationStrategy.FIXED, CalculationStrategy.LINEAR, CalculationStrategy.WLED],
             mode=selector.SelectSelectorMode.DROPDOWN,
         )
     ),
@@ -178,13 +176,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.selected_sensor_type = SensorType.VIRTUAL_POWER
             self.sensor_config.update(user_input)
 
-            if user_input.get(CONF_MODE) == MODE_FIXED:
+            if user_input.get(CONF_MODE) == CalculationStrategy.FIXED:
                 return await self.async_step_fixed()
             
-            if user_input.get(CONF_MODE) == MODE_LINEAR:
+            if user_input.get(CONF_MODE) == CalculationStrategy.LINEAR:
                 return await self.async_step_linear()
             
-            if user_input.get(CONF_MODE) == MODE_WLED:
+            if user_input.get(CONF_MODE) == CalculationStrategy.WLED:
                 return await self.async_step_wled()
             
         return self.async_show_form(
@@ -382,7 +380,7 @@ class OptionsFlowHandler(OptionsFlow):
     
     def get_current_strategy_options(self, strategy: str) -> dict[str, Any]:
         strategy_options: dict[str, Any] = self.current_config.get(strategy)
-        if strategy == MODE_LINEAR and CONF_CALIBRATE in strategy_options:
+        if strategy == CalculationStrategy.LINEAR and CONF_CALIBRATE in strategy_options:
             calibrate_options: dict = strategy_options[CONF_CALIBRATE]
             strategy_options[CONF_CALIBRATE] = {int(key): value for (key, value) in calibrate_options.items()}
         return strategy_options
@@ -399,11 +397,11 @@ def _create_strategy_object(
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     """Get the config schema for a given power calculation strategy"""
-    if strategy == MODE_FIXED:
+    if strategy == CalculationStrategy.FIXED:
         return SCHEMA_POWER_FIXED
-    if strategy == MODE_LINEAR:
+    if strategy == CalculationStrategy.LINEAR:
         return _create_linear_schema(source_entity_id)
-    if strategy == MODE_WLED:
+    if strategy == CalculationStrategy.WLED:
         return SCHEMA_POWER_WLED
     return SCHEMA_POWER_FIXED
 

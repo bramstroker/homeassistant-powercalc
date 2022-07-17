@@ -64,7 +64,6 @@ from homeassistant.helpers.typing import (
 
 from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
-    CALCULATION_MODES,
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
@@ -116,6 +115,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     SERVICE_RESET_ENERGY,
+    CalculationStrategy,
     SensorType,
     UnitPrefix,
 )
@@ -166,7 +166,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
-    vol.Optional(CONF_MODE): vol.In(CALCULATION_MODES),
+    vol.Optional(CONF_MODE): vol.In([cls.value for cls in CalculationStrategy]),
     vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
     vol.Optional(CONF_DISABLE_STANDBY_POWER, default=False): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,

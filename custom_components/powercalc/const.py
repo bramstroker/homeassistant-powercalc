@@ -138,14 +138,16 @@ MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
 MODE_WLED = "wled"
-CALCULATION_MODES = [
-    MODE_FIXED,
-    MODE_LINEAR,
-    MODE_LUT,
-    MODE_WLED,
-]
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
+
+class CalculationStrategy(StrEnum):
+    """Possible virtual power calculation strategies."""
+
+    LUT = "lut"
+    LINEAR = "linear"
+    FIXED = "fixed"
+    WLED = "wled"
 
 class SensorType(StrEnum):
     """Possible modes for a number selector."""

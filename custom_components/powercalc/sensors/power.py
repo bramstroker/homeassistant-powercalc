@@ -61,6 +61,7 @@ from custom_components.powercalc.const import (
     MODE_LINEAR,
     MODE_WLED,
     OFF_STATES,
+    CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
     ModelNotSupported,
@@ -118,7 +119,7 @@ async def create_virtual_power_sensor(
 
     light_model = None
     try:
-        mode = select_calculation_mode(sensor_config)
+        mode = select_calculation_strategy(sensor_config)
 
         # When the user did not manually configured a model and a model was auto discovered we can load it.
         try:
@@ -234,20 +235,20 @@ async def create_real_power_sensor(
     )
 
 
-def select_calculation_mode(config: dict) -> Optional[str]:
-    """Select the calculation mode"""
+def select_calculation_strategy(config: dict) -> Optional[str]:
+    """Select the calculation strategy"""
     config_mode = config.get(CONF_MODE)
     if config_mode:
         return config_mode
 
     if config.get(CONF_LINEAR):
-        return MODE_LINEAR
+        return CalculationStrategy.LINEAR
 
     if config.get(CONF_FIXED):
-        return MODE_FIXED
+        return CalculationStrategy.FIXED
 
     if config.get(CONF_WLED):
-        return MODE_WLED
+        return CalculationStrategy.WLED
 
     return None
 
