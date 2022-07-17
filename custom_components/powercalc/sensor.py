@@ -253,18 +253,19 @@ async def async_setup_entry(
 ):
     """Setup sensors from config entry (GUI config flow)"""
 
+    sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.GROUP:
         global_config: dict = hass.data[DOMAIN][DOMAIN_CONFIG]
+        merged_sensor_config = get_merged_sensor_configuration(global_config, sensor_config)
         entities = await create_group_sensors_from_config_entry(
             hass=hass,
             entry=entry,
-            sensor_config=global_config
+            sensor_config=merged_sensor_config
         )
         async_add_entities(entities)
         return
 
-    sensor_config = convert_config_entry_to_sensor_config(entry)
     await _async_setup_entities(hass, sensor_config, async_add_entities)
 
 async def _async_setup_entities(
@@ -296,6 +297,9 @@ async def _async_setup_entities(
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
     """Convert the config entry structure to the sensor config which we use to create the entities"""
     sensor_config = dict(config_entry.data.copy())
+
+    if sensor_config.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
+        sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         daily_fixed_config = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))

@@ -30,7 +30,9 @@
         "data": {
           "name": "[%key:common::config_flow::data::name%]",
           "unique_id": "Unique id",
-          "group_power_entities": "Member power entities"
+          "group_power_entities": "Member power entities",
+          "group_energy_entities": "Member energy entities",
+          "sub_groups": "Sub groups"
         }
       },
       "virtual_power": {
@@ -95,7 +97,8 @@
       "linear_min_higher_as_max": "Max power cannot be lower than min power",
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
       "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'"
+      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
+      "group_mandatory": "You must define at least subgroups or power and energy-entities"
     }
   },
   "options": {
@@ -118,7 +121,9 @@
           "max_power": "[%key:component::powercalc::config::step::linear::data::max_power%]",
           "gamma_curve": "[%key:component::powercalc::config::step::linear::data::gamma_curve%]",
           "attribute": "[%key:component::powercalc::config::step::linear::data::attribute%]",
-          "group_power_entities": "[%key:component::powercalc::config::step::group::data::group_power_entities%]"
+          "group_power_entities": "[%key:component::powercalc::config::step::group::data::group_power_entities%]",
+          "group_energy_entities": "[%key:component::powercalc::config::step::group::data::group_energy_entities%]",
+          "sub_groups": "[%key:component::powercalc::config::step::group::data::sub_groups%]"
         },
         "data_description": {
           "calibrate": "[%key:component::powercalc::config::step::linear::data_description::calibrate%]",
@@ -132,7 +137,8 @@
       "linear_mandatory": "[%key:component::powercalc::config::error::linear_mandatory%]",
       "linear_min_higher_as_max": "[%key:component::powercalc::config::error::linear_min_higher_as_max%]",
       "fixed_mandatory": "[%key:component::powercalc::config::error::fixed_mandatory%]",
-      "fixed_states_power_only": "[%key:component::powercalc::config::error::fixed_states_power_only%]"
+      "fixed_states_power_only": "[%key:component::powercalc::config::error::fixed_states_power_only%]",
+      "group_mandatory": "[%key:component::powercalc::config::error::group_mandatory%]"
     }
   }
 }

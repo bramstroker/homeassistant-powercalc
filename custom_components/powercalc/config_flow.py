@@ -12,7 +12,6 @@ from homeassistant import config_entries
 from homeassistant.core import callback, HomeAssistant
 from homeassistant.const import (
     CONF_ATTRIBUTE,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -50,10 +49,10 @@ from .const import (
     CONF_MODE,
     CONF_VALUE,
     CONF_STANDBY_POWER,
-    CALCULATION_MODES,
     MODE_FIXED,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_POWER,
+    CONF_SUB_GROUPS,
     MODE_LINEAR,
     MODE_WLED,
     SensorType
@@ -215,7 +214,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     async def async_step_group(self, user_input: dict[str,str] = None) -> FlowResult:
         self.selected_sensor_type = SensorType.GROUP
-        errors = {}
+        errors =  _validate_group_input(user_input)
         if user_input is not None:
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
@@ -375,7 +374,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
         
         if self.sensor_type == SensorType.GROUP:
-            data_schema = SCHEMA_GROUP
+            data_schema = _create_group_schema(self.hass)
         
         data_schema = _fill_schema_defaults(data_schema, self.current_config | strategy_options)
         return data_schema
@@ -393,10 +392,12 @@ def _create_strategy_object(
     config: dict,
     source_entity: SourceEntity
 ) -> PowerCalculationStrategyInterface:
+    """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
     return factory.create(config, strategy, None, source_entity)
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
+    """Get the config schema for a given power calculation strategy"""
     if strategy == MODE_FIXED:
         return SCHEMA_POWER_FIXED
     if strategy == MODE_LINEAR:
@@ -406,6 +407,7 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     return SCHEMA_POWER_FIXED
 
 def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
+    """Create config schema for groups"""
     sub_groups = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME))
         for config_entry in hass.config_entries.async_entries(DOMAIN)
@@ -417,11 +419,26 @@ def _create_group_schema(hass: HomeAssistant) -> vol.Schema:
     )
     return SCHEMA_GROUP.extend(
         {
-            vol.Optional("sub_groups"): sub_group_selector
+            vol.Optional(CONF_SUB_GROUPS): sub_group_selector
         }
     )
 
+def _validate_group_input(user_input: dict[str, str] = None) -> dict:
+    """Validate the group form"""
+    if not user_input:
+        return {}
+    errors = {}
+
+    if (not CONF_SUB_GROUPS in user_input and  
+        not CONF_GROUP_POWER_ENTITIES in user_input and
+        not CONF_GROUP_ENERGY_ENTITIES in user_input
+    ):
+        errors["base"] = "group_mandatory"
+    
+    return errors
+
 def _create_linear_schema(source_entity_id: str) -> vol.Schema:
+    """Create the config schema for linear strategy"""
     return SCHEMA_POWER_LINEAR.extend(
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(selector.AttributeSelectorConfig(entity_id=source_entity_id))
@@ -429,6 +446,7 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     )
 
 def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dict[str,str] = None) -> dict[str, Any]:
+    """Build the config dict needed for the configured strategy"""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
     strategy_options = {}
     for key in strategy_schema.schema.keys():
@@ -438,6 +456,7 @@ def _build_strategy_config(strategy: str, source_entity_id: str, user_input: dic
     return strategy_options
 
 def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, Any]:
+    """Build the config under daily_energy: key"""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
     config = {}
     for key in schema.schema.keys():
@@ -447,6 +466,7 @@ def _build_daily_energy_config(user_input: dict[str,str] = None) -> dict[str, An
     return config
 
 def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
+    """Validates the daily energy form"""
     if not user_input:
         return {}
     errors = {}
@@ -457,7 +477,7 @@ def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
     return errors
 
 def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
-    # Make a copy of the schema with suggested values set to saved options
+    """Make a copy of the schema with suggested values set to saved options"""
     schema = {}
     for key, val in data_schema.schema.items():
         new_key = key
