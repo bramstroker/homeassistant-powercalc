@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Any
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.util.dt as dt_util
 import voluptuous as vol
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -234,4 +235,5 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def async_reset_energy(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
+        self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
