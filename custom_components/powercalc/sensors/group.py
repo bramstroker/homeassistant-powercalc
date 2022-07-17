@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
-from typing import Callable, Any
+from typing import Any, Callable
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -81,13 +81,17 @@ async def create_group_sensors(
     group_sensors = []
 
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
-    power_sensor = create_grouped_power_sensor(hass, group_name, sensor_config, power_sensor_ids)
+    power_sensor = create_grouped_power_sensor(
+        hass, group_name, sensor_config, power_sensor_ids
+    )
     group_sensors.append(power_sensor)
 
     energy_sensor_ids = _get_filtered_entity_ids_by_class(
         entities, filters, EnergySensor
     )
-    energy_sensor = create_grouped_energy_sensor(hass, group_name, sensor_config, energy_sensor_ids)
+    energy_sensor = create_grouped_energy_sensor(
+        hass, group_name, sensor_config, energy_sensor_ids
+    )
     group_sensors.append(energy_sensor)
 
     group_sensors.extend(
@@ -95,6 +99,7 @@ async def create_group_sensors(
     )
 
     return group_sensors
+
 
 @callback
 def create_grouped_power_sensor(
@@ -117,6 +122,7 @@ def create_grouped_power_sensor(
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
         entity_id=entity_id,
     )
+
 
 @callback
 def create_grouped_energy_sensor(
@@ -185,23 +191,21 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         available_states = [
-            state for state in all_states 
-            if state.state not in ignored_states
+            state for state in all_states if state.state not in ignored_states
         ]
-        
+
         # Remove members with an incompatible unit of measurement for now
         # Maybe we will convert these units in the future
         for state in available_states:
             unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
             if unit_of_measurement != self._attr_native_unit_of_measurement:
-                _LOGGER.error(f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum.")
+                _LOGGER.error(
+                    f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
+                )
                 available_states.remove(state)
                 self._entities.remove(state.entity_id)
 
-        summed = sum(
-            Decimal(state.state)
-            for state in available_states
-        )
+        summed = sum(Decimal(state.state) for state in available_states)
 
         self._attr_native_value = round(summed, self._rounding_digits)
         self.async_schedule_update_ha_state(True)
@@ -230,7 +234,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         unique_id: str = None,
         rounding_digits: int = 2,
     ):
-        super().__init__(name, entities, entity_id, sensor_config, unique_id, rounding_digits)
+        super().__init__(
+            name, entities, entity_id, sensor_config, unique_id, rounding_digits
+        )
         unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
         if unit_prefix == UnitPrefix.KILO:
             self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR

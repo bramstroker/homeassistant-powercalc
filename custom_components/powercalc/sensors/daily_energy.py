@@ -22,7 +22,7 @@ from homeassistant.const import (
     ENERGY_WATT_HOUR,
     POWER_WATT,
 )
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -210,7 +210,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             whPerDay = value * 1000
         elif self._user_unit_of_measurement == POWER_WATT:
-            whPerDay = (value * (self._on_time.total_seconds() / 3600))
+            whPerDay = value * (self._on_time.total_seconds() / 3600)
 
         # Convert Wh to the native measurement unit
         energyPerDay = whPerDay

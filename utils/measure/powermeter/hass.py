@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import inquirer
-import time
 from dateutil.parser import parse
 from homeassistant_api import Client
 
