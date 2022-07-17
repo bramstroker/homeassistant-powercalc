@@ -1,4 +1,4 @@
-# Supported models (143 total)
+# Supported models (144 total)
 | manufacturer |        model id         |                                name                                 |calculation modes|      color modes       |                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------|-----------------|------------------------|-----------------------------------------------------------------------------------------------|
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                 |lut              |color_temp              |                                                                                               |
@@ -138,6 +138,7 @@
 |signify       |LWW001                   |Hue white A60 bulb E27                                               |lut              |brightness              |                                                                                               |
 |sonoff        |B02BA60                  |Sonoff B02 Light with dimmer and temperature                         |lut              |color_temp              |                                                                                               |
 |tuya          |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                     |lut              |hs,color_temp           |                                                                                               |
+|tuya          |SL20                     |Treatlife SL20                                                       |lut              |color_temp              |                                                                                               |
 |wiz           |9290023839               |WiZ Globe G95 E27 Color (type SHRGB1C, model 9290023839)             |lut              |hs,color_temp           |                                                                                               |
 |yeelight      |YLDD05YL                 |Yeelight LED Light Strip 1S                                          |lut              |hs,color_temp           |strip6                                                                                         |
 |yeelight      |YLDL01YL                 |Yeelight YLDL01YL Downlight                                          |lut              |hs,color_temp           |ceiling10                                                                                      |
