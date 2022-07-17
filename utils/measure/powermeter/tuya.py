@@ -29,6 +29,6 @@ class TuyaPowerMeter(PowerMeter):
         )
 
         if err != STATUS_OK:
-            raise PowerMeterError("Could not get a succesfull power reading")
+            raise PowerMeterError("Could not get a succesful power reading")
 
         return PowerMeasurementResult(w, time.time())
