@@ -591,9 +591,6 @@ def check_entity_not_already_configured(
 def bind_entities_to_devices(hass: HomeAssistant, entities: list[Entity], device_id: str):
     """Attach all the power/energy sensors to the same device as the source entity"""
 
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.2"):
-        return
-
     for entity in entities:
         ent_reg = entity_registry.async_get(hass)
         entity_entry = ent_reg.async_get(entity.entity_id)
