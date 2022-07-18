@@ -95,7 +95,7 @@ async def autodiscover_model(
 
 async def has_manufacturer_and_model_information(
     hass: HomeAssistant, entity_entry: er.RegistryEntry | None
-):
+) -> bool:
     """See if we have enough information in device registry to automatically setup the power sensor"""
 
     if entity_entry is None:
