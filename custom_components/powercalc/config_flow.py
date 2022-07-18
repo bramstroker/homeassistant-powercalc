@@ -57,9 +57,9 @@ from .const import (
     SensorType
 )
 from .common import SourceEntity, create_source_entity
-from .library import ProfileLibrary
-from .light_model import LightModel
-from .model_discovery import autodiscover_model
+from .power_profile.library import ProfileLibrary
+from .power_profile.light_model import LightModel
+from .power_profile.model_discovery import autodiscover_model
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED

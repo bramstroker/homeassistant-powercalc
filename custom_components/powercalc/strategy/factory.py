@@ -17,7 +17,7 @@ from custom_components.powercalc.errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from custom_components.powercalc.light_model import LightModel
+from custom_components.powercalc.power_profile.light_model import LightModel
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 from custom_components.powercalc.strategy.linear import LinearStrategy
 from custom_components.powercalc.strategy.lut import LutRegistry, LutStrategy

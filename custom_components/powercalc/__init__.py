@@ -68,7 +68,7 @@ from .const import (
     UnitPrefix,
 )
 from .errors import ModelNotSupported
-from .model_discovery import get_light_model, has_manufacturer_and_model_information
+from .power_profile.model_discovery import get_light_model, has_manufacturer_and_model_information
 from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
 

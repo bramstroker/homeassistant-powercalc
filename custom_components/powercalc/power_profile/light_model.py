@@ -7,9 +7,8 @@ from typing import Optional
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
 
-from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
-from .errors import ModelNotSupported, UnsupportedMode
-from .const import CalculationStrategy
+from ..errors import ModelNotSupported, UnsupportedMode
+from ..const import CalculationStrategy
 from .library import ProfileLibrary
 
 _LOGGER = logging.getLogger(__name__)

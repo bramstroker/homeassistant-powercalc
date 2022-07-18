@@ -124,7 +124,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .model_discovery import is_autoconfigurable
+from .power_profile.model_discovery import is_autoconfigurable
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,

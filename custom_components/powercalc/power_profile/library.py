@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from homeassistant.core import HomeAssistant
-from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
+from ..aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
@@ -16,8 +16,8 @@ class ProfileLibrary:
             dir for dir 
             in (
                 os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
-                os.path.join(os.path.dirname(__file__), "custom_data"),
-                os.path.join(os.path.dirname(__file__), "data"),
+                os.path.join(os.path.dirname(__file__), "../custom_data"),
+                os.path.join(os.path.dirname(__file__), "../data"),
             )
             if os.path.exists(dir)
         )

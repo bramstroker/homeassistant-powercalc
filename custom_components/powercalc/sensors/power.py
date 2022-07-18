@@ -21,7 +21,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import State, callback, HomeAssistant
-from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
     async_track_state_change_event,
@@ -65,7 +65,7 @@ from custom_components.powercalc.errors import (
     UnsupportedMode,
 )
 from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.model_discovery import get_light_model
+from custom_components.powercalc.power_profile.model_discovery import get_light_model
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
