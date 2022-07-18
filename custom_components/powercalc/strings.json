@@ -104,7 +104,7 @@
           "confirm_autodisovered_model": "Confirm model"
         },
         "data_description": {
-          "confirm_autodisovered_model": "When you don't confirm you can input the manufacturer and model yourself"
+          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
         }
       },
       "lut_manufacturer": {
