@@ -36,7 +36,7 @@
                     "states_power": "States power"
                 },
                 "data_description": {
-                    "power": "A fix power value in Watt when the entity is ON",
+                    "power": "A fixed power value in Watts when the entity is ON",
                     "power_template": "Template will be evaluated to get the power value in W",
                     "states_power": "One 'state: power' pair on each row, see example above"
                 },
