@@ -1,5 +1,4 @@
 """Errors for the power component."""
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.exceptions import HomeAssistantError
 
 

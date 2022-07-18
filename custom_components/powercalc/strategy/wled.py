@@ -9,14 +9,14 @@ from homeassistant.core import State, HomeAssistant
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
     OFF_STATES,
 )
-from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.helpers import evaluate_power
+from ..errors import StrategyConfigurationError
+from ..helpers import evaluate_power
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

@@ -15,8 +15,8 @@ from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
 
 from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_ENERGY_INTEGRATION_METHOD,
@@ -28,9 +28,9 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
 )
-from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
+from ..migrate import async_migrate_entity_id
 
+from .power import PowerSensor, RealPowerSensor
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 
 ENERGY_ICON = "mdi:lightning-bolt"

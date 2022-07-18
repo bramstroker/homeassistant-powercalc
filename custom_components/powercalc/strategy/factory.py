@@ -3,8 +3,8 @@ from typing import Optional
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_POWER,
@@ -13,18 +13,18 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     CalculationStrategy
 )
-from custom_components.powercalc.errors import (
+from ..errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from custom_components.powercalc.power_profile.light_model import LightModel
-from custom_components.powercalc.strategy.fixed import FixedStrategy
-from custom_components.powercalc.strategy.linear import LinearStrategy
-from custom_components.powercalc.strategy.lut import LutRegistry, LutStrategy
-from custom_components.powercalc.strategy.strategy_interface import (
+from ..power_profile.light_model import LightModel
+from .fixed import FixedStrategy
+from .linear import LinearStrategy
+from .lut import LutRegistry, LutStrategy
+from .strategy_interface import (
     PowerCalculationStrategyInterface,
 )
-from custom_components.powercalc.strategy.wled import WledStrategy
+from .wled import WledStrategy
 
 
 class PowerCalculatorStrategyFactory:

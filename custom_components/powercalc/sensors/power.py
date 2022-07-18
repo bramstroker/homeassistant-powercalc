@@ -31,8 +31,8 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENERGY_SENSOR_ENTITY_ID,
     ATTR_INTEGRATION,
@@ -59,15 +59,15 @@ from custom_components.powercalc.const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from custom_components.powercalc.errors import (
+from ..errors import (
     ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.power_profile.model_discovery import get_light_model
-from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.strategy_interface import (
+from ..migrate import async_migrate_entity_id
+from ..power_profile.model_discovery import get_light_model
+from ..strategy.factory import PowerCalculatorStrategyFactory
+from ..strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 

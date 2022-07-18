@@ -22,7 +22,6 @@ from homeassistant.const import (
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
-import homeassistant.helpers.config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import (

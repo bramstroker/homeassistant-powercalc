@@ -28,8 +28,7 @@ from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from custom_components.powercalc.const import (
-    ATTR_ENERGY_SENSOR_ENTITY_ID,
+from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -42,9 +41,9 @@ from custom_components.powercalc.const import (
     SERVICE_RESET_ENERGY,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
-from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
+from .energy import EnergySensor, RealEnergySensor
+from .power import PowerSensor, RealPowerSensor
+from .utility_meter import create_utility_meters
 
 from .abstract import (
     generate_energy_sensor_entity_id,

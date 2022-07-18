@@ -25,14 +25,14 @@ from homeassistant.components.light import (
 )
 from homeassistant.core import State
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.errors import (
+from ..common import SourceEntity
+from ..errors import (
     LutFileNotFound,
     ModelNotSupported,
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from custom_components.powercalc.power_profile.light_model import LightModel
+from ..power_profile.light_model import LightModel
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

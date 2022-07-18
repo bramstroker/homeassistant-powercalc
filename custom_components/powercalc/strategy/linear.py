@@ -12,14 +12,14 @@ from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import State, HomeAssistant
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     CONF_CALIBRATE,
     CONF_GAMMA_CURVE,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
 )
-from custom_components.powercalc.errors import StrategyConfigurationError
+from ..errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
 

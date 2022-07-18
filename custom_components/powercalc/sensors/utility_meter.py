@@ -23,7 +23,7 @@ from homeassistant.const import __short_version__
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 
-from custom_components.powercalc.const import (
+from ..const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
@@ -31,9 +31,9 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
 )
-from custom_components.powercalc.errors import SensorConfigurationError
-from custom_components.powercalc.migrate import async_set_unique_id
-from custom_components.powercalc.sensors.energy import EnergySensor
+from ..errors import SensorConfigurationError
+from ..migrate import async_set_unique_id
+from .energy import EnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
