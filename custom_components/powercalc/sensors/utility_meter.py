@@ -5,6 +5,8 @@ import logging
 from typing import cast
 
 from awesomeversion.awesomeversion import AwesomeVersion
+from numpy import isin
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import __version__ as HA_VERSION
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
@@ -40,14 +42,18 @@ _LOGGER = logging.getLogger(__name__)
 
 async def create_utility_meters(
     hass: HomeAssistant,
-    energy_sensor: EnergySensor,
+    energy_sensor: SensorEntity,
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
-    utility_meters = []
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return []
+
+    if not isinstance(energy_sensor, EnergySensor):
+        return []
+
+    utility_meters = []
 
     if not DATA_UTILITY in hass.data:
         hass.data[DATA_UTILITY] = {}
