@@ -211,7 +211,6 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         if isinstance(value, Template):
             value.hass = self.hass
             value = value.async_render()
-            _LOGGER.debug(f"Template value {value}")
 
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             whPerDay = value * 1000
