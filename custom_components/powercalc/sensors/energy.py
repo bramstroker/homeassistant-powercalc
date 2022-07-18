@@ -12,7 +12,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
+from homeassistant.helpers.entity import EntityCategory
 
 from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
 from ..common import SourceEntity
