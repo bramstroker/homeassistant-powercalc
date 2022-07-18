@@ -143,7 +143,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         hass: HomeAssistant,
         name: str,
         entity_id: str,
-        value: float,
+        value: float | Template,
         user_unit_of_measurement: str,
         update_frequency: int,
         sensor_config: dict[str, Any],
@@ -206,7 +206,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def calculate_delta(self, elapsedSeconds: int) -> Decimal:
         value = self._value
         if isinstance(value, Template):
-            value = value.render()
+            value.hass = self.hass
+            value = value.async_render()
 
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             whPerDay = value * 1000
