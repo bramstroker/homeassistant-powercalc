@@ -97,14 +97,26 @@
           "power_factor": "Power factor"
         }
       },
+      "lut": {
+        "title": "LUT config",
+        "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
+        "data": {
+          "confirm_autodisovered_model": "Confirm model"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "When you don't confirm you can input the manufacturer and model yourself"
+        }
+      },
       "lut_manufacturer": {
         "title": "LUT config",
+        "description": "Select the device manufacturer",
         "data": {
           "manufacturer": "Manufacturer"
         }
       },
       "lut_model": {
         "title": "LUT config",
+        "description": "Select the device model",
         "data": {
           "model": "Model ID"
         }

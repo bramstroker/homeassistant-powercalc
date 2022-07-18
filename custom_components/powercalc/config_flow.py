@@ -68,6 +68,8 @@ from .errors import StrategyConfigurationError
 
 _LOGGER = logging.getLogger(__name__)
 
+CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
+
 SENSOR_TYPE_MENU = {
     SensorType.DAILY_ENERGY: "Daily energy",
     SensorType.VIRTUAL_POWER: "Virtual power",
@@ -124,6 +126,10 @@ SCHEMA_POWER_LINEAR = vol.Schema({
     vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
     vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
     vol.Optional(CONF_CALIBRATE): selector.ObjectSelector()
+})
+
+SCHEMA_POWER_LUT_AUTODISCOVERED = vol.Schema({
+    vol.Optional(CONF_CONFIRM_AUTODISCOVERED_MODEL, default=True): bool
 })
 
 SCHEMA_GROUP_OPTIONS = vol.Schema({
@@ -191,7 +197,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_wled()
             
             if user_input.get(CONF_MODE) == CalculationStrategy.LUT:
-                return await self.async_step_lut_manufacturer()
+                return await self.async_step_lut()
             
         return self.async_show_form(
             step_id="virtual_power",
@@ -275,30 +281,43 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=SCHEMA_POWER_WLED,
             errors=errors,
         )
-    
-    async def async_step_lut_manufacturer(self, user_input: dict[str,str] = None) -> FlowResult:
-        errors = {}
+
+    async def async_step_lut(self, user_input: dict[str,str] = None) -> FlowResult:
+        """Try to autodiscover manufacturer/model first. Ask the user to confirm this or forward to manual configuration"""
         if user_input is not None:
-            if user_input.get("confirm_autodisovered_model"):
+            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL):
                 return self.create_config_entry()
 
+            return await self.async_step_lut_manufacturer()
+
+        model_info = await autodiscover_model(self.hass, self.source_entity.entity_entry)
+        if model_info:
+            return self.async_show_form(
+                step_id="lut",
+                description_placeholders={
+                    "manufacturer": model_info.manufacturer,
+                    "model": model_info.model,
+                },
+                data_schema=SCHEMA_POWER_LUT_AUTODISCOVERED,
+                errors={},
+            )
+
+        return await self.async_step_lut_manufacturer()
+
+    async def async_step_lut_manufacturer(self, user_input: dict[str,str] = None) -> FlowResult:
+        """Ask the user to select the manufacturer"""
+        if user_input is not None:
             self.sensor_config.update({CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)})
             return await self.async_step_lut_model()
 
         schema = _create_lut_schema_manufacturer(self.hass)
-
-        model_info = await autodiscover_model(self.hass, self.source_entity.entity_entry)
-        if model_info:
-            schema = schema.extend({vol.Optional("confirm_autodisovered_model", default=False): bool})
-
         return self.async_show_form(
             step_id="lut_manufacturer",
             data_schema=schema,
-            errors=errors,
+            errors={},
         )
 
     async def async_step_lut_model(self, user_input: dict[str,str] = None) -> FlowResult:
-        errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
             return self.create_config_entry()
@@ -306,7 +325,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="lut_model",
             data_schema=_create_lut_schema_model(self.hass, self.sensor_config.get(CONF_MANUFACTURER)),
-            errors=errors,
+            errors={},
         )
     
     async def validate_strategy_config(self) -> dict:
@@ -500,7 +519,7 @@ def _create_lut_schema_manufacturer(hass: HomeAssistant) -> vol.Schema:
         for manufacturer in library.get_manufacturer_listing()
     ]
     return vol.Schema({
-        vol.Optional(CONF_MANUFACTURER): selector.SelectSelector(selector.SelectSelectorConfig(options=manufacturers, mode=selector.SelectSelectorMode.DROPDOWN))
+        vol.Required(CONF_MANUFACTURER): selector.SelectSelector(selector.SelectSelectorConfig(options=manufacturers, mode=selector.SelectSelectorMode.DROPDOWN))
     })
 
 def _create_lut_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Schema:

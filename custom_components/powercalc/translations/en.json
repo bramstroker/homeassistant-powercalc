@@ -71,16 +71,28 @@
                 },
                 "title": "Linear config"
             },
+            "lut": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirm model"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "When you don't confirm you can input the manufacturer and model yourself"
+                },
+                "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
+                "title": "LUT config"
+            },
             "lut_manufacturer": {
                 "data": {
                     "manufacturer": "Manufacturer"
                 },
+                "description": "Select the device manufacturer",
                 "title": "LUT config"
             },
             "lut_model": {
                 "data": {
                     "model": "Model ID"
                 },
+                "description": "Select the device model",
                 "title": "LUT config"
             },
             "user": {
