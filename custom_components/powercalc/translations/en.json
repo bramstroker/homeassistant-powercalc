@@ -36,7 +36,7 @@
                     "states_power": "States power"
                 },
                 "data_description": {
-                    "power": "A fix power value in Watt when the entity is ON",
+                    "power": "A fixed power value in Watts when the entity is ON",
                     "power_template": "Template will be evaluated to get the power value in W",
                     "states_power": "One 'state: power' pair on each row, see example above"
                 },
@@ -76,7 +76,7 @@
                     "confirm_autodisovered_model": "Confirm model"
                 },
                 "data_description": {
-                    "confirm_autodisovered_model": "When you don't confirm you can input the manufacturer and model yourself"
+                    "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
                 },
                 "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
                 "title": "LUT config"
