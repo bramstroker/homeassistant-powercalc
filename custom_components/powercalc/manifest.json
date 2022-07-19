@@ -7,7 +7,8 @@
     "light",
     "group",
     "template",
-    "select"
+    "select",
+    "hue"
   ],
   "after_dependencies": [
     "integration",

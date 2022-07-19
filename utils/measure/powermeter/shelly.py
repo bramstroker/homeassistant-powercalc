@@ -61,11 +61,11 @@ class ShellyPowerMeter(PowerMeter):
                 _LOGGER.debug(f"Checking API connection: {uri}")
                 response = requests.get(uri, timeout=self.timeout)
             except requests.RequestException:
-                _LOGGER.error("Connection could not be established")
+                _LOGGER.debug("Connection could not be established")
                 continue
 
             if response.status_code != 200:
-                _LOGGER.error(f"Unexpected status code {response.status_code}")
+                _LOGGER.debug(f"Unexpected status code {response.status_code}")
                 continue
         
             _LOGGER.debug(f"Shelly API version {api.api_version} detected")
