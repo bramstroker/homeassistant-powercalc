@@ -358,10 +358,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             )
 
         for entity_id in track_entities:
-            if entity_id == DUMMY_ENTITY_ID:
-                new_state = State(entity_id, STATE_ON)
-            else:
-                new_state = self.hass.states.get(entity_id)
+            new_state = self.hass.states.get(entity_id)
 
             await self._update_power_sensor(entity_id, new_state)
 
@@ -372,13 +369,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
 
-    async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
+    async def _update_power_sensor(self, trigger_entity_id: str, state: State | None) -> bool:
         """Update power sensor based on new dependant entity state."""
-        if (
-            state is None
-            or state.state == STATE_UNKNOWN
-            or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
-        ):
+        if self.source_entity == DUMMY_ENTITY_ID:
+            state = State(self.source_entity, STATE_ON)
+
+        if not self._has_valid_state(state):
             _LOGGER.debug(
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
@@ -404,6 +400,22 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return False
 
         self.async_write_ha_state()
+        return True
+    
+    def _has_valid_state(self, state: State | None) -> bool:
+        """Check if the state is valid, we can use it for power calculation"""
+        if self.source_entity == DUMMY_ENTITY_ID:
+            return True
+
+        if state is None:
+            return False
+        
+        if state.state == STATE_UNKNOWN:
+            return False
+            
+        if not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE:
+            return False
+            
         return True
 
     async def calculate_power(self, state: State) -> Optional[Decimal]:
@@ -447,7 +459,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return bool(template.async_render())
 
     @property
-    def source_entity(self):
+    def source_entity(self) -> str:
         """The source entity this power sensor calculates power for."""
         return self._source_entity
 
