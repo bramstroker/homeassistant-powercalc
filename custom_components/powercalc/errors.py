@@ -1,5 +1,4 @@
 """Errors for the power component."""
-from homeassistant.components.sensor import SensorEntity
 from homeassistant.exceptions import HomeAssistantError
 
 
@@ -22,6 +21,13 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
 
 class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""
+
+    def __init__(self, message: str, config_flow_trans_key: str = None):
+        super().__init__(message)
+        self._config_flow_trans_key = config_flow_trans_key
+
+    def get_config_flow_translate_key(self) -> str:
+        return self._config_flow_trans_key
 
 
 class ModelNotSupported(StrategyConfigurationError):

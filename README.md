@@ -320,6 +320,16 @@ sensor:
       power: "{{states('input_number.bathroom_watts')}}"
 ```
 
+When you don't have a source entity or helper (ex. `input_boolean`) to bind on and you just want the power sensor to reflect the template value you can use `sensor.dummy` as the entity_id
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: sensor.dummy
+    fixed:
+      power: "{{states('input_number.bathroom_watts')}}"
+```
+
 #### Power per state
 The `states_power` setting allows you to specify a power per entity state. This can be useful for example on Sonos devices which have a different power consumption in different states.
 
@@ -451,6 +461,18 @@ powercalc:
 will create:
 - sensor.patio_power (Patio power)
 - sensor.patio_kwh_consumed (Patio kWh consumed)
+
+### Friendly naming
+This option allows you to separately change only the name (shown in GUI), it will not have effect on the entity id
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kwh"
+  energy_sensor_friendly_naming: "{} Energy consumed
+```
+
+will create:
+- sensor.patio_kwh (Patio Energy consumed)
 
 ### Change name
 You can also change the sensor name with the `name` option

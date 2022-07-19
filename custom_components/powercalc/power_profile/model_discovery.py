@@ -9,18 +9,18 @@ from typing import NamedTuple, Optional
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant
 
-from .aliases import MANUFACTURER_ALIASES
-from .const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
-from .errors import ModelNotSupported
+from ..aliases import MANUFACTURER_ALIASES
+from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
+from ..errors import ModelNotSupported
 from .light_model import LightModel
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def get_light_model(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     config: dict,
     entity_entry: Optional[er.RegistryEntry] = None,
 ) -> Optional[LightModel]:
@@ -45,7 +45,7 @@ async def get_light_model(
 
 
 async def is_autoconfigurable(
-    hass: HomeAssistantType, entry: er.RegistryEntry, sensor_config: dict = {}
+    hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
         light_model = await get_light_model(hass, sensor_config, entry)
@@ -57,7 +57,7 @@ async def is_autoconfigurable(
 
 
 async def autodiscover_model(
-    hass: HomeAssistantType, entity_entry: er.RegistryEntry
+    hass: HomeAssistant, entity_entry: er.RegistryEntry
 ) -> Optional[ModelInfo]:
     """Try to auto discover manufacturer and model from the known device information"""
 
@@ -94,8 +94,8 @@ async def autodiscover_model(
 
 
 async def has_manufacturer_and_model_information(
-    hass: HomeAssistantType, entity_entry: er.RegistryEntry | None
-):
+    hass: HomeAssistant, entity_entry: er.RegistryEntry | None
+) -> bool:
     """See if we have enough information in device registry to automatically setup the power sensor"""
 
     if entity_entry is None:
