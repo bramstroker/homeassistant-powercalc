@@ -462,6 +462,18 @@ will create:
 - sensor.patio_power (Patio power)
 - sensor.patio_kwh_consumed (Patio kWh consumed)
 
+### Friendly naming
+This option allows you to separately change only the name (shown in GUI), it will not have effect on the entity id
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kwh"
+  energy_sensor_friendly_naming: "{} Energy consumed
+```
+
+will create:
+- sensor.patio_kwh (Patio Energy consumed)
+
 ### Change name
 You can also change the sensor name with the `name` option
 
