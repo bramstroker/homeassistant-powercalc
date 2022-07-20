@@ -674,6 +674,8 @@ def resolve_include_groups(
         entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
     else:
         group_state = hass.states.get(group_id)
+        if group_state is None:
+            raise SensorConfigurationError(f"Group state {group_id} not found")
         entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
 
     return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}

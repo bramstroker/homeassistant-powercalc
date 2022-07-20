@@ -104,7 +104,7 @@ class LightModel:
 
     def get_lut_directory(self) -> str:
         if self.linked_lut:
-            return os.path.join(os.path.dirname(__file__), "data", self.linked_lut)
+            return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
         model_directory = self.get_directory()
         if self._lut_subdirectory:
