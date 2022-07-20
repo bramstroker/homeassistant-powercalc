@@ -191,8 +191,9 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         """Triggered when one of the group entities changes state"""
         ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
+        states: list[State] = list(filter(None, all_states))
         available_states = [
-            state for state in all_states if state.state not in ignored_states
+            state for state in states if state.state not in ignored_states
         ]
 
         # Remove members with an incompatible unit of measurement for now
