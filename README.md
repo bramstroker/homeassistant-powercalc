@@ -71,13 +71,15 @@ When your appliance is not supported you have extensive options for manual confi
 
 ## Configuration
 
-To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
-Additionally some settings can be applied on global level and will apply to all your virtual power sensors.
-After changing the configuration you need to restart HA to get your power sensors to appear.
+To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`, or you can use the GUI configuration ("Settings" -> "Devices & Services" -> "Add integration" -> "Powercalc") and follow the instructions.
+
+Additionally some settings can be applied on global level and will apply to all your virtual power sensors. This global configuration cannot be configured using the GUI yet.
+
+After changing the configuration you need to restart HA to get your power sensors to appear. This is only necessary for changes in the YAML files. 
 
 ### Sensor configuration
 
-For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml`.
+For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml` or use the GUI config flow. Not all configuration params listed below are available in the GUI, when you want to use the "advanced" options you need to use YAML configuration.
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
