@@ -134,7 +134,7 @@ async def create_daily_fixed_energy_power_sensor(
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
-    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_state_class = SensorStateClass.TOTAL
     _attr_should_poll = False
     _attr_icon = ENERGY_ICON
 
