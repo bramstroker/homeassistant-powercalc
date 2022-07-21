@@ -6,7 +6,9 @@ from datetime import timedelta
 import copy
 import logging
 import uuid
-from typing import Any, Final, cast
+from typing import Any, Final, cast, NamedTuple
+
+from numpy import source
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -252,7 +254,6 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback
 ):
     """Setup sensors from config entry (GUI config flow)"""
-
     sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.GROUP:
@@ -291,7 +292,7 @@ async def _async_setup_entities(
 
     if entities:
         async_add_entities(
-            [entity for entity in entities[0] if isinstance(entity, SensorEntity)]
+            [entity for entity in entities.new if isinstance(entity, SensorEntity)]
         )
 
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
@@ -384,7 +385,7 @@ async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
-) -> tuple(list[SensorEntity, RealPowerSensor], list[SensorEntity, RealPowerSensor]):
+) -> EntitiesBucket:
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
@@ -397,10 +398,9 @@ async def create_sensors(
         if discovery_info:
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
-        new_sensors = await create_individual_sensors(
+        return await create_individual_sensors(
             hass, merged_sensor_config, discovery_info
         )
-        return (new_sensors, [])
 
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
@@ -408,7 +408,7 @@ async def create_sensors(
     existing_sensors = []
     if CONF_ENTITIES in config:
         for entity_config in config[CONF_ENTITIES]:
-            # When there are nested entities, combine these with the current entities, resursively
+            # When there are nested entities, combine these with the current entities, recursively
             if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
                 try:
                     (child_new_sensors, child_existing_sensors) = await create_sensors(
@@ -441,9 +441,16 @@ async def create_sensors(
             global_config, config, sensor_config
         )
         try:
-            new_sensors.extend(
-                await create_individual_sensors(hass, merged_sensor_config)
-            )
+            new_entities = await create_individual_sensors(hass, merged_sensor_config)
+            new_sensors.extend(new_entities.new)
+        except SensorAlreadyConfiguredError as error:
+            # When no specific configuration is done for the entity, 
+            # and the same entity was configured before (either by manual configuration or autodisovery)
+            # we may return the existing power/energy sensors.
+            if error.get_existing_entities() and len(sensor_config) == 1:
+                existing_sensors.extend(error.get_existing_entities())
+                break
+            _LOGGER.error(error)
         except SensorConfigurationError as error:
             _LOGGER.error(error)
 
@@ -471,14 +478,14 @@ async def create_sensors(
         )
         new_sensors.extend(group_sensors)
 
-    return (new_sensors, existing_sensors)
+    return EntitiesBucket(new=new_sensors, existing=existing_sensors)
 
 
 async def create_individual_sensors(
     hass: HomeAssistant,
     sensor_config: dict,
     discovery_info: DiscoveryInfoType | None = None,
-) -> list[SensorEntity, RealPowerSensor]:
+) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
     if discovery_info:
@@ -494,7 +501,7 @@ async def create_individual_sensors(
         )
     except SensorAlreadyConfiguredError as error:
         if discovery_info:
-            return []
+            return EntitiesBucket()
         raise error
 
     entities_to_add = []
@@ -515,7 +522,7 @@ async def create_individual_sensors(
                 hass, sensor_config, source_entity, discovery_info
             )
         except PowercalcSetupError:
-            return []
+            return EntitiesBucket()
 
         entities_to_add.append(power_sensor)
 
@@ -565,7 +572,7 @@ async def create_individual_sensors(
     if unique_id:
         used_unique_ids.append(unique_id)
 
-    return entities_to_add
+    return EntitiesBucket(new=entities_to_add, existing=[])
 
 
 def check_entity_not_already_configured(
@@ -577,15 +584,18 @@ def check_entity_not_already_configured(
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
 
+    configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
+    existing_entities = configured_entities.get(source_entity.entity_id) or []
+
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id and unique_id in used_unique_ids:
-        raise SensorAlreadyConfiguredError(source_entity.entity_id)
+        raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
     if (
         unique_id is None
         and source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
     ):
-        raise SensorAlreadyConfiguredError(source_entity.entity_id)
+        raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 
 def bind_entities_to_devices(hass: HomeAssistant, entities: list[Entity], device_id: str):
@@ -631,7 +641,7 @@ def resolve_include_entities(
     # Include entities from a certain group
     if CONF_GROUP in include_config:
         group_id = include_config.get(CONF_GROUP)
-        _LOGGER.debug("Including entities from area: %s", group_id)
+        _LOGGER.debug("Including entities from group: %s", group_id)
         entities = entities | resolve_include_groups(hass, group_id)
 
     # Include entities by evaluating a template
@@ -717,3 +727,7 @@ def resolve_area_entities(
     return {
         entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN
     }
+
+class EntitiesBucket(NamedTuple):
+    new: list[Entity, RealPowerSensor] = []
+    existing: list[Entity, RealPowerSensor] = []
