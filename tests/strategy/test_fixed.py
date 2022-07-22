@@ -40,7 +40,7 @@ async def test_template_power(hass: HomeAssistant):
 
     assert 42 == await strategy.calculate(State("switch.test", STATE_ON))
 
-async def test_states_power(hass: HomeAssistant):
+async def test_states_power():
     entity_id = "media_player.sonos_living"
     source_entity = SourceEntity(
         "sonos_living",
