@@ -6,6 +6,7 @@ from decimal import Decimal
 from typing import Any
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.util.dt as dt_util
 import voluptuous as vol
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -28,8 +29,8 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -42,12 +43,10 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     UnitPrefix,
 )
-from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.sensors.power import create_virtual_power_sensor
-
+from ..migrate import async_migrate_entity_id
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
-from .power import VirtualPowerSensor
+from .power import VirtualPowerSensor, create_virtual_power_sensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -91,6 +90,10 @@ async def create_daily_fixed_energy_sensor(
         sensor_config.get(CONF_UNIQUE_ID),
     )
 
+    on_time = mode_config.get(CONF_ON_TIME)
+    if not isinstance(on_time, timedelta):
+        on_time = timedelta(seconds=on_time)
+
     return DailyEnergySensor(
         hass,
         name,
@@ -133,7 +136,7 @@ async def create_daily_fixed_energy_power_sensor(
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     _attr_device_class = SensorDeviceClass.ENERGY
-    _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_state_class = SensorStateClass.TOTAL
     _attr_should_poll = False
     _attr_icon = ENERGY_ICON
 
@@ -142,7 +145,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         hass: HomeAssistant,
         name: str,
         entity_id: str,
-        value: float,
+        value: float | Template,
         user_unit_of_measurement: str,
         update_frequency: int,
         sensor_config: dict[str, Any],
@@ -205,7 +208,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def calculate_delta(self, elapsedSeconds: int) -> Decimal:
         value = self._value
         if isinstance(value, Template):
-            value = value.render()
+            value.hass = self.hass
+            value = value.async_render()
 
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
             whPerDay = value * 1000
@@ -230,4 +234,5 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     def async_reset_energy(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
+        self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()

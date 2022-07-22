@@ -3,6 +3,7 @@
   "name": "Powercalc",
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
+  "config_flow": true,
   "dependencies": [
     "light",
     "group",

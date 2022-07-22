@@ -13,16 +13,18 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
+    Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
-from homeassistant.helpers.typing import HomeAssistantType
 
 from .common import create_source_entity, validate_name_pattern
 from .const import (
@@ -66,9 +68,14 @@ from .const import (
     UnitPrefix,
 )
 from .errors import ModelNotSupported
-from .model_discovery import get_light_model, has_manufacturer_and_model_information
+from .power_profile.model_discovery import (
+    get_light_model,
+    has_manufacturer_and_model_information,
+)
 from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
+
+PLATFORMS = [Platform.SENSOR]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -136,7 +143,7 @@ CONFIG_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
         _LOGGER.critical(
             "Your HA version is outdated for this version of powercalc. Minimum required HA version is %s",
@@ -190,9 +197,43 @@ async def async_setup(hass: HomeAssistantType, config: dict) -> bool:
     return True
 
 
-async def autodiscover_entities(
-    config: dict, domain_config: dict, hass: HomeAssistantType
-):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Powercalc integration from a config entry."""
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    entry.async_on_unload(entry.add_update_listener(async_update_entry))
+    return True
+
+
+async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update a given config entry."""
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
+
+    if unload_ok:
+        used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
+        try:
+            used_unique_ids.remove(config_entry.unique_id)
+        except ValueError:
+            return unload_ok
+
+        entity_registry = er.async_get(hass)
+        entries = er.async_entries_for_config_entry(
+            entity_registry, config_entry.entry_id
+        )
+        for entry in entries:
+            entity_registry.async_remove(entry.entity_id)
+            _LOGGER.debug(f"Removing {entry.entity_id}")
+
+    return unload_ok
+
+
+async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAssistant):
     """Discover entities supported for powercalc autoconfiguration in HA instance"""
 
     if not domain_config.get(CONF_ENABLE_AUTODISCOVERY):
@@ -259,7 +300,7 @@ def get_manual_configuration(config: dict, entity_id: str) -> dict | None:
 
 
 async def create_domain_groups(
-    hass: HomeAssistantType, global_config: dict, domains: list[str]
+    hass: HomeAssistant, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
     sensor_component = hass.data[SENSOR_DOMAIN]

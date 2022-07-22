@@ -53,6 +53,9 @@ def async_migrate_entity_id(
     else:
         old_entity_id = entity_registry.async_get_entity_id(platform, DOMAIN, unique_id)
 
+    if old_entity_id.startswith(new_entity_id):
+        return
+
     if old_entity_id is None or old_entity_id == new_entity_id:
         return
 
@@ -64,6 +67,11 @@ def async_migrate_entity_id(
     try:
         entity_registry.async_update_entity(old_entity_id, new_entity_id=new_entity_id)
     except ValueError as e:
+        _LOGGER.error(
+            "Migrating entity from old entity ID '%s' to new entity ID '%s'",
+            old_entity_id,
+            new_entity_id,
+        )
         _LOGGER.error(e)
         entity_registry.async_remove(new_entity_id)
 

@@ -173,7 +173,7 @@ class Measure:
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
         self.color_mode = answers["color_mode"]
-        self.num_lights = int(answers.get("num_lights", 1))
+        self.num_lights = int(answers.get("num_lights") or 1)
         self.is_dummy_load_connected = bool(answers.get("dummy_load"))
         if self.is_dummy_load_connected:
             self.dummy_load_value = self.get_dummy_load_value()
@@ -260,7 +260,7 @@ class Measure:
                     self.num_0_readings += 1
                     _LOGGER.warning(f"Discarding measurement: {error}")
                     if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                        _LOGGER.error("Aborting measurement session. Received to much 0 readings")
+                        _LOGGER.error("Aborting measurement session. Received too many 0 readings")
                         return
                     continue
                 except PowerMeterError as error:
