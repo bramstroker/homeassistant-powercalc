@@ -11,9 +11,11 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_NAME,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
@@ -26,19 +28,22 @@ from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from custom_components.powercalc.const import (
+from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SUB_GROUPS,
     DOMAIN,
     SERVICE_RESET_ENERGY,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.energy import EnergySensor, RealEnergySensor
-from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
-from custom_components.powercalc.sensors.utility_meter import create_utility_meters
+from .energy import EnergySensor, RealEnergySensor
+from .power import PowerSensor, RealPowerSensor
+from .utility_meter import create_utility_meters
 
 from .abstract import (
     generate_energy_sensor_entity_id,
@@ -83,7 +88,7 @@ async def create_group_sensors(
 
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
     power_sensor = create_grouped_power_sensor(
-        hass, group_name, sensor_config, power_sensor_ids
+        hass, group_name, sensor_config, set(power_sensor_ids)
     )
     group_sensors.append(power_sensor)
 
@@ -101,13 +106,64 @@ async def create_group_sensors(
 
     return group_sensors
 
+async def create_group_sensors_from_config_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    sensor_config: dict
+) -> list[GroupedSensor]:
+    """Create group sensors based on an config_entry"""
+    group_sensors = []
+
+    group_name = entry.data.get(CONF_NAME)
+
+    power_sensor_ids: set[str] = set(
+        (entry.data.get(CONF_GROUP_POWER_ENTITIES) or []) + 
+        resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_POWER_ENTITIES)
+    
+    )
+    if power_sensor_ids:
+        power_sensor = create_grouped_power_sensor(
+            hass, group_name, sensor_config, power_sensor_ids
+        )
+        group_sensors.append(power_sensor)
+
+    energy_sensor_ids: set[str] = set(
+            (entry.data.get(CONF_GROUP_ENERGY_ENTITIES) or []) + 
+            resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_ENERGY_ENTITIES)
+        )
+    if energy_sensor_ids:
+        energy_sensor = create_grouped_energy_sensor(
+            hass, group_name, sensor_config, energy_sensor_ids
+        )
+        group_sensors.append(energy_sensor)
+    
+        group_sensors.extend(
+            await create_utility_meters(hass, energy_sensor, sensor_config)
+        )
+
+    return group_sensors
+
+@callback
+def resolve_sub_group_entity_ids(hass: HomeAssistant, entry: ConfigEntry, conf_key: str = CONF_GROUP_POWER_ENTITIES) -> list[str]:
+    subgroups = entry.data.get(CONF_SUB_GROUPS)
+    if not subgroups:
+        return []
+    all_sensor_ids = []
+    for subgroup_entry_id in subgroups:
+        subgroup_entry = hass.config_entries.async_get_entry(subgroup_entry_id)
+        if subgroup_entry is None:
+            _LOGGER.error(f"Subgroup config entry not found: {subgroup_entry_id}")
+            continue
+        all_sensor_ids.extend(subgroup_entry.data.get(conf_key) or [])
+    return all_sensor_ids
+
 
 @callback
 def create_grouped_power_sensor(
     hass: HomeAssistant,
     group_name: str,
     sensor_config: dict,
-    power_sensor_ids: list[str],
+    power_sensor_ids: set[str],
 ) -> GroupedPowerSensor:
     name = generate_power_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
@@ -193,7 +249,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [
-            state for state in states if state.state not in ignored_states
+            state for state in states if state and state.state not in ignored_states
         ]
 
         # Remove members with an incompatible unit of measurement for now
