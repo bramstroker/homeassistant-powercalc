@@ -60,3 +60,23 @@ async def test_states_power(hass: HomeAssistant):
     assert 2.25 == await strategy.calculate(State(entity_id, "paused"))
     assert 1.5 == await strategy.calculate(State(entity_id, "idle"))
     assert 20 == await strategy.calculate(State(entity_id, "whatever"))
+
+async def test_states_power_with_attributes():
+    entity_id = "media_player.sonos_living"
+    source_entity = SourceEntity(
+        "sonos_living",
+        entity_id,
+        "media_player"
+    )
+    strategy = FixedStrategy(
+        source_entity,
+        power=12,
+        per_state_power={
+            "media_content_id|Spotify": 5,
+            "media_content_id|Youtube": 10
+        }
+    )
+
+    assert 5 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Spotify"}))
+    assert 10 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Youtube"}))
+    assert 12 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Netflix"}))
