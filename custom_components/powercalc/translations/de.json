@@ -8,7 +8,7 @@
             "fixed_mandatory": "Sie müssen mindestens Leistung, Leistung-Template oder Leistung je Zustand angeben",
             "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
             "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
-            "linear_mandatory": "Sie müssen mindestens max_power oder Kalibrierungswert angeben",
+            "linear_mandatory": "Sie müssen mindestens Minimale Leistung oder Kalibrierungswert angeben",
             "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung"
         },
         "step": {
