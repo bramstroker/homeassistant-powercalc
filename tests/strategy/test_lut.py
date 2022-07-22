@@ -28,24 +28,55 @@ async def test_colortemp_lut(hass: HomeAssistant):
         light_model=LightModel(hass, "signify", "LCT010", None),
         source_entity=source_entity
     )
-    state = State(
-        source_entity.entity_id, STATE_ON,
+
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(brightness=100, color_temp=300),
+        expected_power=2.5
+    )
+
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(brightness=144, color_temp=450),
+        expected_power=3.01
+    )
+
+async def test_brightness_lut(hass: HomeAssistant):
+    source_entity = create_source_entity("light")
+
+    strategy_factory = PowerCalculatorStrategyFactory(hass)
+    strategy = strategy_factory.create(
+        config={},
+        strategy=CalculationStrategy.LUT,
+        light_model=LightModel(hass, "signify", "LWB010", None),
+        source_entity=source_entity
+    )
+
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_brightness_state(100),
+        expected_power=2.05
+    )
+
+def _create_light_brightness_state(brightness: int) -> State:
+    return State(
+        "light.test", STATE_ON,
         {
-            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_BRIGHTNESS: 100,
-            ATTR_COLOR_TEMP: 300
+            ATTR_COLOR_MODE: ColorMode.BRIGHTNESS,
+            ATTR_BRIGHTNESS: brightness,
         }
     )
-    assert 2.5 == await strategy.calculate(state)
 
-    state = State(
-        source_entity.entity_id, STATE_ON,
+def _create_light_color_temp_state(brightness: int, color_temp: int) -> State:
+    return State(
+        "light.test", STATE_ON,
         {
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_BRIGHTNESS: 144,
-            ATTR_COLOR_TEMP: 450
+            ATTR_BRIGHTNESS: brightness,
+            ATTR_COLOR_TEMP: color_temp
         }
     )
-    val = round(await strategy.calculate(state), 2)
-    assert round(Decimal(3.01), 2) == val
 
+async def _calculate_and_assert_power(strategy: LutStrategy, state: State, expected_power: float):
+    power = await strategy.calculate(state)
+    assert round(Decimal(expected_power), 2) == round(power, 2)
