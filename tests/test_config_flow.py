@@ -1,3 +1,5 @@
+import pytest
+
 from unittest.mock import patch, MagicMock
 from typing import Any
 
@@ -30,14 +32,16 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.MENU
     assert result["step_id"] == "user"
 
-async def test_virtual_power_sensor_form_displayed(hass: HomeAssistant):
-    await _select_sensor_type(hass, SensorType.VIRTUAL_POWER)
-
-async def test_daily_energy_sensor_form_displayed(hass: HomeAssistant):
-    await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
-
-async def test_group_sensor_form_displayed(hass: HomeAssistant):
-    await _select_sensor_type(hass, SensorType.GROUP)
+@pytest.mark.parametrize(
+    "sensor_type",
+    [
+        SensorType.VIRTUAL_POWER,
+        SensorType.DAILY_ENERGY,
+        SensorType.GROUP
+    ],
+)
+async def test_sensor_type_form_displayed(hass: HomeAssistant, sensor_type: SensorType):
+    await _select_sensor_type(hass, sensor_type)
 
 async def test_create_fixed_sensor_entry(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
