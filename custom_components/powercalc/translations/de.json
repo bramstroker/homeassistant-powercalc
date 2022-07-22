@@ -1,7 +1,7 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine unique_id an"
+            "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine Unique-Id an"
         },
         "error": {
             "daily_energy_mandatory": "Sie müssen mindestens Value oder Valuetemplate angeben",
@@ -9,7 +9,7 @@
             "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
             "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
             "linear_mandatory": "Sie müssen mindestens max_power oder Kalibrierungswert angeben",
-            "linear_min_higher_as_max": "max_power kann nicht niedriger sein als min_power"
+            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung"
         },
         "step": {
             "daily_energy": {
@@ -17,7 +17,7 @@
                     "name": "Name",
                     "on_time": "Dauer",
                     "start_time": "Startzeit",
-                    "unique_id": "Unique id",
+                    "unique_id": "Unique-Id",
                     "unit_of_measurement": "Maßeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
                     "value": "Wert",
@@ -45,12 +45,12 @@
             },
             "group": {
                 "data": {
-                    "create_utility_meters": "Utility meters erstellen",
+                    "create_utility_meters": "Utilitymeter erstellen",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
-                    "group_power_entities": "Leistung-Entitäten der Gruppe",
+                    "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
-                    "unique_id": "Unique id"
+                    "unique_id": "Unique-Id"
                 },
                 "data_description": {
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
@@ -90,7 +90,7 @@
             },
             "lut_model": {
                 "data": {
-                    "model": "Model ID"
+                    "model": "Modelnummer"
                 },
                 "description": "Wählen Sie das Gerätemodell",
                 "title": "LUT Konfiguration"
@@ -103,13 +103,13 @@
             },
             "virtual_power": {
                 "data": {
-                    "create_energy_sensor": "Energiesensore erstellen",
+                    "create_energy_sensor": "Energiesensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "entity_id": "Quell-Entität",
                     "mode": "Berechnungsstrategie",
                     "name": "Name",
                     "standby_power": "Standby-Leistung",
-                    "unique_id": "Unique id"
+                    "unique_id": "Unique-Id"
                 },
                 "data_description": {
                     "create_energy_sensor": "Ob powercalc einen kWh-Sensor erstellen soll",
@@ -124,7 +124,7 @@
             },
             "wled": {
                 "data": {
-                    "power_factor": "Leistung-Factor",
+                    "power_factor": "Leistungs-Faktor",
                     "voltage": "Volt"
                 },
                 "title": "WLED Konfiguration"
@@ -144,11 +144,11 @@
                 "data": {
                     "attribute": "Attribute",
                     "calibrate": "Kalibrierungswerte",
-                    "create_energy_sensor": "Wnergy sensor erstellen",
-                    "create_utility_meters": "Utility meters erstellen",
+                    "create_energy_sensor": "Energiessensor erstellen",
+                    "create_utility_meters": "Utilitymeter erstellen",
                     "gamma_curve": "Gammakurve",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
-                    "group_power_entities": "Leistung-Entititäten der Gruppe",
+                    "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "max_power": "Maximale Leistung",
                     "min_power": "Minimale Leistung",
                     "name": "Name",
