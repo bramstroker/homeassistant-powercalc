@@ -7,7 +7,7 @@
         "SLEEP_TIME": 3,
         "VERSION": "v0.22.1:docker"
     },
-    "name": "genio_a60_9w_led_gls_bk",
+    "name": "Genio  A60 9w LED GLS BK",
     "standby_power": 0.7,
     "supported_modes": [
         "lut"
