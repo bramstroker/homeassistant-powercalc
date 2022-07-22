@@ -1,3 +1,4 @@
+from typing import Optional
 from homeassistant.setup import async_setup_component
 from homeassistant.core import State
 from homeassistant.const import (
@@ -19,15 +20,12 @@ from .common import create_source_entity
 from decimal import Decimal
 
 async def test_colortemp_lut(hass: HomeAssistant):
-    source_entity = create_source_entity("light")
+    """Test LUT lookup in color_temp mode"""
 
-    strategy_factory = PowerCalculatorStrategyFactory(hass)
-    strategy = strategy_factory.create(
-        config={},
-        strategy=CalculationStrategy.LUT,
-        light_model=LightModel(hass, "signify", "LCT010", None),
-        source_entity=source_entity
-    )
+    source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP])
+
+    strategy = _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    await strategy.validate_config()
 
     await _calculate_and_assert_power(
         strategy,
@@ -42,20 +40,58 @@ async def test_colortemp_lut(hass: HomeAssistant):
     )
 
 async def test_brightness_lut(hass: HomeAssistant):
-    source_entity = create_source_entity("light")
+    """Test LUT lookup in brightness mode"""
 
-    strategy_factory = PowerCalculatorStrategyFactory(hass)
-    strategy = strategy_factory.create(
-        config={},
-        strategy=CalculationStrategy.LUT,
-        light_model=LightModel(hass, "signify", "LWB010", None),
-        source_entity=source_entity
-    )
+    source_entity = create_source_entity("light", [ColorMode.BRIGHTNESS])
+
+    strategy = _create_lut_strategy(hass, "signify", "LWB010", source_entity)
+    await strategy.validate_config()
 
     await _calculate_and_assert_power(
         strategy,
         state=_create_light_brightness_state(100),
         expected_power=2.05
+    )
+
+    # Out of bounds brightness. Power for bri 255 should be returned and no error
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_brightness_state(450),
+        expected_power=9.65
+    )
+
+async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
+    """When brightness attribute is not available on state return no power"""
+    strategy = _create_lut_strategy(hass, "signify", "LCT010")
+
+    state = State(
+        "light.test", STATE_ON,
+        {
+            ATTR_COLOR_MODE: ColorMode.BRIGHTNESS
+        }
+    )
+    assert not await strategy.calculate(state)
+
+async def test_no_power_when_colormode_unknown(hass: HomeAssistant):
+    strategy = _create_lut_strategy(hass, "signify", "LCT010")
+
+    state = State(
+        "light.test", STATE_ON,
+        {
+            ATTR_COLOR_MODE: ColorMode.UNKNOWN
+        }
+    )
+    assert not await strategy.calculate(state)
+
+def _create_lut_strategy(hass: HomeAssistant, manufacturer: str, model: str, source_entity: Optional[SourceEntity]) -> LutStrategy:
+    if not source_entity:
+        source_entity = create_source_entity("light")
+    strategy_factory = PowerCalculatorStrategyFactory(hass)
+    return strategy_factory.create(
+        config={},
+        strategy=CalculationStrategy.LUT,
+        light_model=LightModel(hass, manufacturer, model, None),
+        source_entity=source_entity
     )
 
 def _create_light_brightness_state(brightness: int) -> State:
