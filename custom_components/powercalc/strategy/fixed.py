@@ -14,7 +14,6 @@ from ..common import SourceEntity
 from ..const import CONF_POWER, CONF_STATES_POWER
 from ..errors import StrategyConfigurationError
 from ..helpers import evaluate_power
-
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
@@ -75,7 +74,8 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             and self._per_state_power is None
         ):
             raise StrategyConfigurationError(
-                "This entity can only work with 'states_power' not 'power'", "fixed_states_power_only"
+                "This entity can only work with 'states_power' not 'power'",
+                "fixed_states_power_only",
             )
 
     def get_entities_to_track(self) -> list[str, TrackTemplate]:

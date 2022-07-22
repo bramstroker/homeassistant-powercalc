@@ -33,7 +33,6 @@ from ..errors import (
     UnsupportedMode,
 )
 from ..power_profile.light_model import LightModel
-
 from .strategy_interface import PowerCalculationStrategyInterface
 
 LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
@@ -96,10 +95,7 @@ class LutRegistry:
 
 class LutStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self,
-        source_entity: SourceEntity,
-        lut_registry: LutRegistry,
-        model: LightModel
+        self, source_entity: SourceEntity, lut_registry: LutRegistry, model: LightModel
     ) -> None:
         self._source_entity = source_entity
         self._lut_registry = lut_registry
@@ -238,11 +234,14 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         if self._model.manufacturer is None:
             _LOGGER.error(
-                "Manufacturer not supplied for entity: %s", self._source_entity.entity_id
+                "Manufacturer not supplied for entity: %s",
+                self._source_entity.entity_id,
             )
 
         if self._model.model is None:
-            _LOGGER.error("Model not supplied for entity: %s", self._source_entity.entity_id)
+            _LOGGER.error(
+                "Model not supplied for entity: %s", self._source_entity.entity_id
+            )
             return
 
         for color_mode in self._source_entity.supported_color_modes:

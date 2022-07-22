@@ -10,17 +10,11 @@ from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import CONF_ATTRIBUTE
-from homeassistant.core import State, HomeAssistant
+from homeassistant.core import HomeAssistant, State
 
 from ..common import SourceEntity
-from ..const import (
-    CONF_CALIBRATE,
-    CONF_GAMMA_CURVE,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER,
-)
+from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
 from ..errors import StrategyConfigurationError
-
 from .strategy_interface import PowerCalculationStrategyInterface
 
 ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
@@ -51,7 +45,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration: list[tuple] = None 
+        self._calibration: list[tuple] = None
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the current power consumption"""
@@ -174,13 +168,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                     "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
                         ",".join(ALLOWED_DOMAINS)
                     ),
-                    "linear_unsupported_domain"
+                    "linear_unsupported_domain",
                 )
             if not self._config.get(CONF_MAX_POWER):
                 raise StrategyConfigurationError(
-                    "Linear strategy must have at least 'max power' or 'calibrate' defined", "linear_mandatory"
+                    "Linear strategy must have at least 'max power' or 'calibrate' defined",
+                    "linear_mandatory",
                 )
-        
+
         min_power = self._config.get(CONF_MIN_POWER)
         max_power = self._config.get(CONF_MAX_POWER)
         if min_power and max_power and min_power >= max_power:

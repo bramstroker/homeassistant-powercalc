@@ -20,7 +20,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback, HomeAssistant
+from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -59,18 +59,11 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from ..errors import (
-    ModelNotSupported,
-    StrategyConfigurationError,
-    UnsupportedMode,
-)
+from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from ..migrate import async_migrate_entity_id
 from ..power_profile.model_discovery import get_light_model
 from ..strategy.factory import PowerCalculatorStrategyFactory
-from ..strategy.strategy_interface import (
-    PowerCalculationStrategyInterface,
-)
-
+from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 from .abstract import generate_power_sensor_entity_id, generate_power_sensor_name
 
 _LOGGER = logging.getLogger(__name__)
@@ -112,7 +105,6 @@ async def create_virtual_power_sensor(
         async_migrate_entity_id(
             hass, SENSOR_DOMAIN, unique_id=unique_id, new_entity_id=entity_id
         )
-        
 
     light_model = None
     try:
@@ -333,7 +325,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
 
-        #async def home_assistant_startup(event):
+        # async def home_assistant_startup(event):
         """Add listeners and get initial state."""
         entities_to_track = self._power_calculator.get_entities_to_track()
 
@@ -371,7 +363,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
 
-    async def _update_power_sensor(self, trigger_entity_id: str, state: State | None) -> bool:
+    async def _update_power_sensor(
+        self, trigger_entity_id: str, state: State | None
+    ) -> bool:
         """Update power sensor based on new dependant entity state."""
         if self.source_entity == DUMMY_ENTITY_ID:
             state = State(self.source_entity, STATE_ON)
@@ -403,7 +397,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self.async_write_ha_state()
         return True
-    
+
     def _has_valid_state(self, state: State | None) -> bool:
         """Check if the state is valid, we can use it for power calculation"""
         if self.source_entity == DUMMY_ENTITY_ID:
@@ -411,13 +405,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if state is None:
             return False
-        
+
         if state.state == STATE_UNKNOWN:
             return False
-            
+
         if not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE:
             return False
-            
+
         return True
 
     async def calculate_power(self, state: State) -> Optional[Decimal]:
@@ -479,10 +473,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
-    
+
     def set_energy_sensor_attribute(self, entity_id: str):
         """Set the energy sensor on the state attributes"""
-        self._attr_extra_state_attributes.update({ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id})
+        self._attr_extra_state_attributes.update(
+            {ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id}
+        )
 
 
 class RealPowerSensor(PowerSensor):

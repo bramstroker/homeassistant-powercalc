@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from homeassistant.config_entries import ConfigEntry
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -14,6 +13,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_PLATFORM,
@@ -68,13 +68,14 @@ from .const import (
     UnitPrefix,
 )
 from .errors import ModelNotSupported
-from .power_profile.model_discovery import get_light_model, has_manufacturer_and_model_information
+from .power_profile.model_discovery import (
+    get_light_model,
+    has_manufacturer_and_model_information,
+)
 from .sensors.group import create_group_sensors
 from .strategy.factory import PowerCalculatorStrategyFactory
 
-PLATFORMS = [
-    Platform.SENSOR
-]
+PLATFORMS = [Platform.SENSOR]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -202,13 +203,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
 
+
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
 
+
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
 
     if unload_ok:
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
@@ -216,18 +221,19 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
             return unload_ok
-        
+
         entity_registry = er.async_get(hass)
-        entries = er.async_entries_for_config_entry(entity_registry, config_entry.entry_id)
+        entries = er.async_entries_for_config_entry(
+            entity_registry, config_entry.entry_id
+        )
         for entry in entries:
             entity_registry.async_remove(entry.entity_id)
             _LOGGER.debug(f"Removing {entry.entity_id}")
-    
+
     return unload_ok
 
-async def autodiscover_entities(
-    config: dict, domain_config: dict, hass: HomeAssistant
-):
+
+async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAssistant):
     """Discover entities supported for powercalc autoconfiguration in HA instance"""
 
     if not domain_config.get(CONF_ENABLE_AUTODISCOVERY):

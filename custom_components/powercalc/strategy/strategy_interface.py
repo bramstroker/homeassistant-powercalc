@@ -4,6 +4,7 @@ from typing import Optional
 from homeassistant.core import State
 from homeassistant.helpers.event import TrackTemplate
 
+
 class PowerCalculationStrategyInterface:
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate power consumption based on entity state"""
