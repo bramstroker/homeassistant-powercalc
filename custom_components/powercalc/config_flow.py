@@ -242,6 +242,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_fixed(self, user_input: dict[str,str] = None) -> FlowResult:
         errors = {}
         if user_input is not None:
+            if user_input.get(CONF_POWER_TEMPLATE):
+                user_input[CONF_POWER] = user_input.get(CONF_POWER_TEMPLATE)
             self.sensor_config.update({CONF_FIXED: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
