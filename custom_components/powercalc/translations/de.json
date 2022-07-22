@@ -18,7 +18,7 @@
                     "on_time": "Dauer",
                     "start_time": "Startzeit",
                     "unique_id": "Unique-Id",
-                    "unit_of_measurement": "Maßeinheit",
+                    "unit_of_measurement": "Maßeinheit (kWh oder W)",
                     "update_frequency": "Aktualisierungsfrequenz",
                     "value": "Wert",
                     "value_template": "Wert-Template"
