@@ -3,3 +3,5 @@ flake8
 freezegun
 pytest-homeassistant-custom-component==0.10.7
 types-pytz
+types-croniter
+numpy
