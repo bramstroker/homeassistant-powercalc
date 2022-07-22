@@ -62,8 +62,8 @@
                     "attribute": "Attribute",
                     "calibrate": "Kalibrierungswert",
                     "gamma_curve": "Gammakurve",
-                    "max_power": "Maximale Energie",
-                    "min_power": "Minimale Energie"
+                    "max_power": "Maximale Leistung",
+                    "min_power": "Minimale Leistung"
                 },
                 "data_description": {
                     "attribute": "Geben Sie das Attribut an. Wenn es leer gelassen wird, wird Helligkeit für Lichter und Prozentsatz für Ventilatoren verwendet",
