@@ -1,4 +1,3 @@
-from homeassistant.setup import async_setup_component
 from homeassistant.core import State
 from homeassistant.const import (
     STATE_ON,

@@ -5,21 +5,17 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
-from custom_components.powercalc.common import SourceEntity
 from homeassistant.components import (
     input_number
 )
 
 from custom_components.powercalc.strategy.fixed import FixedStrategy
+from .common import create_source_entity
 
 async def test_simple_power():
-    source_entity = SourceEntity(
-        "test",
-        "switch.test",
-        "switch"
-    )
+    source_entity = create_source_entity("switch")
     strategy = FixedStrategy(source_entity, power=50, per_state_power=None)
-    assert 50 == await strategy.calculate(State("switch.test", STATE_ON))
+    assert 50 == await strategy.calculate(State(source_entity.entity_id, STATE_ON))
 
 async def test_template_power(hass: HomeAssistant):
     assert await async_setup_component(
@@ -28,25 +24,17 @@ async def test_template_power(hass: HomeAssistant):
     
     await hass.async_block_till_done()
 
-    source_entity = SourceEntity(
-        "test",
-        "switch.test",
-        "switch"
-    )
+    source_entity = create_source_entity("switch")
     strategy = FixedStrategy(
         source_entity,
         power=Template("{{states('input_number.test')}}", hass),
         per_state_power=None)
 
-    assert 42 == await strategy.calculate(State("switch.test", STATE_ON))
+    assert 42 == await strategy.calculate(State(source_entity.entity_id, STATE_ON))
 
 async def test_states_power():
-    entity_id = "media_player.sonos_living"
-    source_entity = SourceEntity(
-        "sonos_living",
-        entity_id,
-        "media_player"
-    )
+    source_entity = create_source_entity("media_player")
+    
     strategy = FixedStrategy(
         source_entity,
         power=20,
@@ -56,18 +44,14 @@ async def test_states_power():
             "idle": 1.5
         }
     )
-    assert 8.3 == await strategy.calculate(State(entity_id, "playing"))
-    assert 2.25 == await strategy.calculate(State(entity_id, "paused"))
-    assert 1.5 == await strategy.calculate(State(entity_id, "idle"))
-    assert 20 == await strategy.calculate(State(entity_id, "whatever"))
+    assert 8.3 == await strategy.calculate(State(source_entity.entity_id, "playing"))
+    assert 2.25 == await strategy.calculate(State(source_entity.entity_id, "paused"))
+    assert 1.5 == await strategy.calculate(State(source_entity.entity_id, "idle"))
+    assert 20 == await strategy.calculate(State(source_entity.entity_id, "whatever"))
 
 async def test_states_power_with_attributes():
-    entity_id = "media_player.sonos_living"
-    source_entity = SourceEntity(
-        "sonos_living",
-        entity_id,
-        "media_player"
-    )
+    source_entity = create_source_entity("media_player")
+
     strategy = FixedStrategy(
         source_entity,
         power=12,
@@ -77,6 +61,6 @@ async def test_states_power_with_attributes():
         }
     )
 
-    assert 5 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Spotify"}))
-    assert 10 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Youtube"}))
-    assert 12 == await strategy.calculate(State(entity_id, "playing", {"media_content_id": "Netflix"}))
+    assert 5 == await strategy.calculate(State(source_entity.entity_id, "playing", {"media_content_id": "Spotify"}))
+    assert 10 == await strategy.calculate(State(source_entity.entity_id, "playing", {"media_content_id": "Youtube"}))
+    assert 12 == await strategy.calculate(State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"}))
