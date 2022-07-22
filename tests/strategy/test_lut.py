@@ -83,7 +83,7 @@ async def test_no_power_when_colormode_unknown(hass: HomeAssistant):
     )
     assert not await strategy.calculate(state)
 
-def _create_lut_strategy(hass: HomeAssistant, manufacturer: str, model: str, source_entity: Optional[SourceEntity]) -> LutStrategy:
+def _create_lut_strategy(hass: HomeAssistant, manufacturer: str, model: str, source_entity: Optional[SourceEntity] = None) -> LutStrategy:
     if not source_entity:
         source_entity = create_source_entity("light")
     strategy_factory = PowerCalculatorStrategyFactory(hass)
