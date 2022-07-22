@@ -4,11 +4,11 @@
             "already_configured": "Sensor ist bereits konfiguriert, geben Sie eine unique_id an"
         },
         "error": {
-            "daily_energy_mandatory": "Sie m¸ssen mindestens Value oder Valuetemplate angeben",
-            "fixed_mandatory": "Sie m¸ssen mindestens Power, Power template oder States power angeben",
-            "fixed_states_power_only": "Diese Entit‰t kann nur mit states_power und nicht mit power arbeiten",
-            "group_mandatory": "Sie m¸ssen mindestens Untergruppen oder Power- und Energie-Entit‰ten definieren",
-            "linear_mandatory": "Sie m¸ssen mindestens max_power oder Kalibrierungswert angeben",
+            "daily_energy_mandatory": "Sie m√ºssen mindestens Value oder Valuetemplate angeben",
+            "fixed_mandatory": "Sie m√ºssen mindestens Leistung, Leistung-Template oder Leistung je Zustand angeben",
+            "fixed_states_power_only": "Diese Entit√§t kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
+            "group_mandatory": "Sie m√ºssen mindestens Untergruppen oder Leistung- und Energie-Entit√§ten definieren",
+            "linear_mandatory": "Sie m√ºssen mindestens max_power oder Kalibrierungswert angeben",
             "linear_min_higher_as_max": "max_power kann nicht niedriger sein als min_power"
         },
         "step": {
@@ -18,42 +18,42 @@
                     "on_time": "Dauer",
                     "start_time": "Startzeit",
                     "unique_id": "Unique id",
-                    "unit_of_measurement": "Maﬂeinheit",
+                    "unit_of_measurement": "Ma√üeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
-                    "value": "Value",
-                    "value_template": "Value template"
+                    "value": "Wert",
+                    "value_template": "Wert-Template"
                 },
                 "data_description": {
                     "on_time": "Wenn leer, ist der Standardwert 1 Tag, d.h. immer an",
                     "update_frequency": "Zeit in Sekunden zwischen den Zustandsaktualisierungen des Sensors"
                 },
-                "title": "Einen daily fixed sensor erstellen"
+                "title": "Einen daily fixed-Sensor erstellen"
             },
             "fixed": {
                 "data": {
-                    "power": "Power",
-                    "power_template": "Power template",
-                    "states_power": "States power"
+                    "power": "Leistung",
+                    "power_template": "Leistung-Template",
+                    "states_power": "Leistung je Zustand"
                 },
                 "data_description": {
                     "power": "Ein fester Leistungswert in Watt, wenn die Einheit eingeschaltet ist",
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben"
                 },
-                "description": "Definieren Sie einen festen Leistungswert f¸r Ihre Entit‰t. Alternativ kˆnnen Sie auch einen Leistungswert pro State definieren. Zum Beispiel:\n\n`playing: 8.3`\n`paused: 2.25`",
+                "description": "Definieren Sie einen festen Leistungswert f√ºr Ihre Entit√§t. Alternativ k√∂nnen Sie auch einen Leistungswert pro State definieren. Zum Beispiel:\n\n`playing: 8.3`\n`paused: 2.25`",
                 "title": "Fixed Konfiguration"
             },
             "group": {
                 "data": {
                     "create_utility_meters": "Utility meters erstellen",
-                    "group_energy_entities": "energy entities der Gruppe",
-                    "group_power_entities": "power entities der Gruppe",
+                    "group_energy_entities": "Energie-Entit√§ten der Gruppe",
+                    "group_power_entities": "Leistung-Entit√§ten der Gruppe",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
                     "unique_id": "Unique id"
                 },
                 "data_description": {
-                    "sub_groups": "Alle Sensoren aus den ausgew‰hlten Untergruppen werden ebenfalls zu dieser Gruppe hinzugef¸gt"
+                    "sub_groups": "Alle Sensoren aus den ausgew√§hlten Untergruppen werden ebenfalls zu dieser Gruppe hinzugef√ºgt"
                 },
                 "title": "Einen Gruppensensor erstellen"
             },
@@ -62,69 +62,69 @@
                     "attribute": "Attribute",
                     "calibrate": "Kalibrierungswert",
                     "gamma_curve": "Gammakurve",
-                    "max_power": "max_power",
-                    "min_power": "min_power"
+                    "max_power": "Maximale Energie",
+                    "min_power": "Minimale Energie"
                 },
                 "data_description": {
-                    "attribute": "Geben Sie das Attribut an. Wenn es leer gelassen wird, wird Helligkeit f¸r Lichter und Prozentsatz f¸r Ventilatoren verwendet",
+                    "attribute": "Geben Sie das Attribut an. Wenn es leer gelassen wird, wird Helligkeit f√ºr Lichter und Prozentsatz f√ºr Ventilatoren verwendet",
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20"
                 },
                 "title": "Linear Konfiguration"
             },
             "lut": {
                 "data": {
-                    "confirm_autodisovered_model": "Best‰tigen Sie das Modell"
+                    "confirm_autodisovered_model": "Best√§tigen Sie das Modell"
                 },
                 "data_description": {
-                    "confirm_autodisovered_model": "Wenn Sie nicht best‰tigen mˆchten, kˆnnen Sie den Hersteller und das Modell selbst eingeben"
+                    "confirm_autodisovered_model": "Wenn Sie nicht best√§tigen m√∂chten, k√∂nnen Sie den Hersteller und das Modell selbst eingeben"
                 },
-                "description": "Hersteller '({manufacturer})' und Modell '({model})' wurden f¸r Ihre Leuchte automatisch erkannt",
+                "description": "Hersteller '({manufacturer})' und Modell '({model})' wurden f√ºr Ihre Leuchte automatisch erkannt",
                 "title": "LUT Konfiguration"
             },
             "lut_manufacturer": {
                 "data": {
                     "manufacturer": "Hersteller"
                 },
-                "description": "W‰hlen Sie den Ger‰tehersteller",
+                "description": "W√§hlen Sie den Ger√§tehersteller",
                 "title": "LUT Konfiguration"
             },
             "lut_model": {
                 "data": {
                     "model": "Model ID"
                 },
-                "description": "W‰hlen Sie das Ger‰temodell",
+                "description": "W√§hlen Sie das Ger√§temodell",
                 "title": "LUT Konfiguration"
             },
             "user": {
                 "data": {
                     "sensor_type": "Sensortyp"
                 },
-                "title": "W‰hlen Sie Ihren Sensortyp"
+                "title": "W√§hlen Sie Ihren Sensortyp"
             },
             "virtual_power": {
                 "data": {
-                    "create_energy_sensor": "Energy sensor erstellen",
-                    "create_utility_meters": "Utility meters erstellen",
-                    "entity_id": "Quell entity",
+                    "create_energy_sensor": "Energiesensore erstellen",
+                    "create_utility_meters": "Utilitymeter erstellen",
+                    "entity_id": "Quell-Entit√§t",
                     "mode": "Berechnungsstrategie",
                     "name": "Name",
-                    "standby_power": "Standby power",
+                    "standby_power": "Standby-Leistung",
                     "unique_id": "Unique id"
                 },
                 "data_description": {
                     "create_energy_sensor": "Ob powercalc einen kWh-Sensor erstellen soll",
-                    "create_utility_meters": "Powercalc soll utility meters erstellen, die t‰glich, st¸ndlich usw. zyklisch sind",
-                    "entity_id": "Entit‰t, auf der die virtuelle Leistung basiert; der power sensor wird auf Zustands‰nderungen dieser Entit‰t reagieren, um aktualisiert zu werden",
-                    "name": "Leer lassen wird den Namen von der Quell-Entit‰t ¸bernehmen",
-                    "standby_power": "Definieren Sie die Strommenge, die das Ger‰t im ausgeschalteten Zustand verbraucht",
-                    "unique_id": "Geben Sie eine eindeutige ID an. Dies ermˆglicht die Einrichtung mehrerer Leistungssensoren f¸r dieselbe Entit‰t. Wenn nicht angegeben, wird die unique_id der Quell-Entit‰t verwendet."
+                    "create_utility_meters": "Powercalc soll utility-Meter erstellen, die t√§glich, st√ºndlich usw. zyklisch sind",
+                    "entity_id": "Entit√§t, auf der die virtuelle Leistung basiert; der Leistungssensore wird auf Zustands√§nderungen dieser Entit√§t reagieren, um aktualisiert zu werden",
+                    "name": "Leer lassen wird den Namen von der Quell-Entit√§t √ºbernehmen",
+                    "standby_power": "Definieren Sie die Leistung, die das Ger√§t im ausgeschalteten Zustand verbraucht",
+                    "unique_id": "Geben Sie eine eindeutige ID an. Dies erm√∂glicht die Einrichtung mehrerer Leistungssensoren f√ºr dieselbe Entit√§t. Wenn nicht angegeben, wird die unique_id der Quell-Entit√§t verwendet."
                 },
-                "description": "Weitere Informationen zu den mˆglichen Strategien und Konfigurationsoptionen finden Sie in der Readme-Datei",
-                "title": "Virtual power sensor erstellen"
+                "description": "Weitere Informationen zu den m√∂glichen Strategien und Konfigurationsoptionen finden Sie in der Readme-Datei",
+                "title": "Virtuellen Leistung/Energie-Sensor erstellen"
             },
             "wled": {
                 "data": {
-                    "power_factor": "Power factor",
+                    "power_factor": "Leistung-Factor",
                     "voltage": "Volt"
                 },
                 "title": "WLED Konfiguration"
@@ -133,11 +133,11 @@
     },
     "options": {
         "error": {
-            "fixed_mandatory": "Sie m¸ssen mindestens eines von Power, Power template oder States power angeben",
-            "fixed_states_power_only": "Diese Entit‰t kann nur mit states_power und nicht mit power arbeiten",
-            "group_mandatory": "Sie m¸ssen mindestens Untergruppen oder Power- und Energie-Entit‰ten definieren",
-            "linear_mandatory": "Sie m¸ssen mindestens max_power oder calibrate angeben",
-            "linear_min_higher_as_max": "max_power kann nicht niedriger sein als min_power"
+            "fixed_mandatory": "Sie m√ºssen mindestens eines von Leistung, Leistung-Template oder Leistung je Zustand angeben",
+            "fixed_states_power_only": "Diese Entit√§t kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
+            "group_mandatory": "Sie m√ºssen mindestens Untergruppen oder Leistung- und Energie-Entit√§ten definieren",
+            "linear_mandatory": "Sie m√ºssen mindestens Maximale Leistung oder Kalibrierung angeben",
+            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung"
         },
         "step": {
             "init": {
@@ -147,28 +147,28 @@
                     "create_energy_sensor": "Wnergy sensor erstellen",
                     "create_utility_meters": "Utility meters erstellen",
                     "gamma_curve": "Gammakurve",
-                    "group_energy_entities": "Energy entities der Gruppe",
-                    "group_power_entities": "Power entities der Gruppe",
-                    "max_power": "max_power",
-                    "min_power": "min_power",
+                    "group_energy_entities": "Energie-Entit√§ten der Gruppe",
+                    "group_power_entities": "Leistung-Entitit√§ten der Gruppe",
+                    "max_power": "Maximale Leistung",
+                    "min_power": "Minimale Leistung",
                     "name": "Name",
                     "on_time": "Dauer",
-                    "power": "Power",
-                    "power_template": "Power template",
-                    "standby_power": "Standby power",
-                    "states_power": "States power",
+                    "power": "Leistung",
+                    "power_template": "Leistung-Template",
+                    "standby_power": "Standby-Leistung",
+                    "states_power": "Leistung je Zustand",
                     "sub_groups": "Untergruppen",
-                    "unit_of_measurement": "Maﬂeinheit",
+                    "unit_of_measurement": "Ma√üeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
-                    "value": "Value",
-                    "value_template": "Value template"
+                    "value": "Wert",
+                    "value_template": "Wert-Template"
                 },
                 "data_description": {
-                    "attribute": "Geben Sie das Attribut an. Bleibt es leer, wird die Helligkeit f¸r Lichter und der Prozentsatz f¸r Ventilatoren angegeben",
+                    "attribute": "Geben Sie das Attribut an. Bleibt es leer, wird die Helligkeit f√ºr Lichter und der Prozentsatz f√ºr Ventilatoren angegeben",
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20",
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
-                    "sub_groups": "Alle Sensoren aus den ausgew‰hlten Untergruppen werden ebenfalls zu dieser Gruppe hinzugef¸gt"
+                    "sub_groups": "Alle Sensoren aus den ausgew√§hlten Untergruppen werden ebenfalls zu dieser Gruppe hinzugef√ºgt"
                 }
             }
         }
