@@ -60,7 +60,7 @@ powercalc:
 
 ### Setup power sensors
 
-Powercalc has a build-in library of more than 100 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
+Powercalc has a build-in library of more than 150 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
 
 Starting from 0.12.0 Powercalc can automatically discover entities in your HA instance which are supported for automatic configuration.
 After intallation and restarting HA power and energy sensors should appear. When this is not the case please check the logs for any errors.
@@ -71,13 +71,15 @@ When your appliance is not supported you have extensive options for manual confi
 
 ## Configuration
 
-To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`.
-Additionally some settings can be applied on global level and will apply to all your virtual power sensors.
-After changing the configuration you need to restart HA to get your power sensors to appear.
+To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`, or you can use the GUI configuration ("Settings" -> "Devices & Services" -> "Add integration" -> "Powercalc") and follow the instructions.
+
+Additionally some settings can be applied on global level and will apply to all your virtual power sensors. This global configuration cannot be configured using the GUI yet.
+
+After changing the configuration you need to restart HA to get your power sensors to appear. This is only necessary for changes in the YAML files. 
 
 ### Sensor configuration
 
-For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml`.
+For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml` or use the GUI config flow. Not all configuration params listed below are available in the GUI, when you want to use the "advanced" options you need to use YAML configuration.
 Each virtual power sensor have it's own configuration possibilities.
 They are as follows:
 
@@ -320,6 +322,16 @@ sensor:
       power: "{{states('input_number.bathroom_watts')}}"
 ```
 
+When you don't have a source entity or helper (ex. `input_boolean`) to bind on and you just want the power sensor to reflect the template value you can use `sensor.dummy` as the entity_id
+
+```yaml
+sensor:
+  - platform: powercalc
+    entity_id: sensor.dummy
+    fixed:
+      power: "{{states('input_number.bathroom_watts')}}"
+```
+
 #### Power per state
 The `states_power` setting allows you to specify a power per entity state. This can be useful for example on Sonos devices which have a different power consumption in different states.
 
@@ -451,6 +463,18 @@ powercalc:
 will create:
 - sensor.patio_power (Patio power)
 - sensor.patio_kwh_consumed (Patio kWh consumed)
+
+### Friendly naming
+This option allows you to separately change only the name (shown in GUI), it will not have effect on the entity id
+
+```yaml
+powercalc:
+  energy_sensor_naming: "{} kwh"
+  energy_sensor_friendly_naming: "{} Energy consumed
+```
+
+will create:
+- sensor.patio_kwh (Patio Energy consumed)
 
 ### Change name
 You can also change the sensor name with the `name` option

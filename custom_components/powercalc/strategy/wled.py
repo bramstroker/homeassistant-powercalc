@@ -5,20 +5,14 @@ from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol
-from homeassistant.core import State
+from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
-from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
-    CONF_POWER_FACTOR,
-    CONF_VOLTAGE,
-    OFF_STATES,
-)
-from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.helpers import evaluate_power
-
+from ..common import SourceEntity
+from ..const import CONF_POWER_FACTOR, CONF_VOLTAGE, OFF_STATES
+from ..errors import StrategyConfigurationError
+from ..helpers import evaluate_power
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
@@ -36,7 +30,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self,
         config: dict,
         light_entity: SourceEntity,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         standby_power: Optional[float],
     ) -> None:
         self._hass = hass
@@ -89,5 +83,5 @@ class WledStrategy(PowerCalculationStrategyInterface):
     def can_calculate_standby(self) -> bool:
         return True
 
-    async def validate_config(self, source_entity: SourceEntity):
+    async def validate_config(self):
         self._estimated_current_entity = await self.find_estimated_current_entity()

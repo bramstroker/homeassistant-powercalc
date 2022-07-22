@@ -5,7 +5,9 @@ import logging
 from typing import cast
 
 from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import __version__ as HA_VERSION
+from numpy import isin
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
     from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
@@ -20,10 +22,10 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.const import __short_version__
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.helpers.typing import HomeAssistantType
 
-from custom_components.powercalc.const import (
+from ..const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
@@ -31,23 +33,27 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
 )
-from custom_components.powercalc.errors import SensorConfigurationError
-from custom_components.powercalc.migrate import async_set_unique_id
-from custom_components.powercalc.sensors.energy import EnergySensor
+from ..errors import SensorConfigurationError
+from ..migrate import async_set_unique_id
+from .energy import EnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def create_utility_meters(
-    hass: HomeAssistantType,
-    energy_sensor: EnergySensor,
+    hass: HomeAssistant,
+    energy_sensor: SensorEntity,
     sensor_config: dict,
 ) -> list[UtilityMeterSensor]:
     """Create the utility meters"""
-    utility_meters = []
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return []
+
+    if not isinstance(energy_sensor, EnergySensor):
+        return []
+
+    utility_meters = []
 
     if not DATA_UTILITY in hass.data:
         hass.data[DATA_UTILITY] = {}
@@ -100,7 +106,7 @@ async def create_utility_meters(
 
 
 async def create_tariff_select(
-    tariffs: list, hass: HomeAssistantType, name: str, unique_id: str | None
+    tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None
 ):
     """Create tariff selection entity"""
 
@@ -141,7 +147,7 @@ async def create_tariff_select(
 
 
 async def create_utility_meter(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     source_entity: str,
     entity_id: str,
     name: str,

@@ -15,14 +15,13 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_START,
     POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import State, callback
-from homeassistant.helpers.entity import EntityCategory, async_generate_entity_id
+from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
     async_track_state_change_event,
@@ -30,11 +29,12 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import DiscoveryInfoType, HomeAssistantType
+from homeassistant.helpers.typing import DiscoveryInfoType
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
+from ..common import SourceEntity
+from ..const import (
     ATTR_CALCULATION_MODE,
+    ATTR_ENERGY_SENSOR_ENTITY_ID,
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
@@ -48,9 +48,7 @@ from custom_components.powercalc.const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER_SENSOR_CATEGORY,
-    CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_ID,
-    CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
     CONF_WLED,
@@ -58,30 +56,21 @@ from custom_components.powercalc.const import (
     DISCOVERY_LIGHT_MODEL,
     DOMAIN,
     DUMMY_ENTITY_ID,
-    MODE_FIXED,
-    MODE_LINEAR,
-    MODE_WLED,
     OFF_STATES,
+    CalculationStrategy,
 )
-from custom_components.powercalc.errors import (
-    ModelNotSupported,
-    StrategyConfigurationError,
-    UnsupportedMode,
-)
-from custom_components.powercalc.migrate import async_migrate_entity_id
-from custom_components.powercalc.model_discovery import get_light_model
-from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.strategy_interface import (
-    PowerCalculationStrategyInterface,
-)
-
+from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
+from ..migrate import async_migrate_entity_id
+from ..power_profile.model_discovery import get_light_model
+from ..strategy.factory import PowerCalculatorStrategyFactory
+from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 from .abstract import generate_power_sensor_entity_id, generate_power_sensor_name
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def create_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -98,7 +87,7 @@ async def create_power_sensor(
 
 
 async def create_virtual_power_sensor(
-    hass: HomeAssistantType,
+    hass: HomeAssistant,
     sensor_config: dict,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
@@ -119,7 +108,7 @@ async def create_virtual_power_sensor(
 
     light_model = None
     try:
-        mode = select_calculation_mode(sensor_config)
+        mode = select_calculation_strategy(sensor_config)
 
         # When the user did not manually configured a model and a model was auto discovered we can load it.
         try:
@@ -153,7 +142,7 @@ async def create_virtual_power_sensor(
         calculation_strategy = calculation_strategy_factory.create(
             sensor_config, mode, light_model, source_entity
         )
-        await calculation_strategy.validate_config(source_entity)
+        await calculation_strategy.validate_config()
     except (UnsupportedMode) as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
@@ -168,7 +157,7 @@ async def create_virtual_power_sensor(
     standby_power = Decimal(0)
     standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        if CONF_STANDBY_POWER in sensor_config:
+        if sensor_config.get(CONF_STANDBY_POWER):
             standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
         elif light_model is not None:
             standby_power = Decimal(light_model.standby_power)
@@ -191,7 +180,7 @@ async def create_virtual_power_sensor(
         calculation_strategy.__class__.__name__,
         light_model.manufacturer if light_model else "",
         light_model.model if light_model else "",
-        standby_power,
+        round(standby_power, 2),
         unique_id,
     )
 
@@ -216,7 +205,7 @@ async def create_virtual_power_sensor(
 
 
 async def create_real_power_sensor(
-    hass: HomeAssistantType, sensor_config: dict
+    hass: HomeAssistant, sensor_config: dict
 ) -> RealPowerSensor:
     """Create reference to an existing power sensor"""
 
@@ -235,20 +224,20 @@ async def create_real_power_sensor(
     )
 
 
-def select_calculation_mode(config: dict) -> Optional[str]:
-    """Select the calculation mode"""
+def select_calculation_strategy(config: dict) -> Optional[str]:
+    """Select the calculation strategy"""
     config_mode = config.get(CONF_MODE)
     if config_mode:
         return config_mode
 
     if config.get(CONF_LINEAR):
-        return MODE_LINEAR
+        return CalculationStrategy.LINEAR
 
     if config.get(CONF_FIXED):
-        return MODE_FIXED
+        return CalculationStrategy.FIXED
 
     if config.get(CONF_WLED):
-        return MODE_WLED
+        return CalculationStrategy.WLED
 
     return None
 
@@ -275,6 +264,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
+    _attr_should_poll: bool = False
 
     def __init__(
         self,
@@ -315,6 +305,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._sensor_config = sensor_config
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
+        self._attr_extra_state_attributes = {
+            ATTR_CALCULATION_MODE: calculation_mode,
+            ATTR_INTEGRATION: DOMAIN,
+            ATTR_SOURCE_ENTITY: source_entity,
+            ATTR_SOURCE_DOMAIN: source_domain,
+        }
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -329,39 +325,36 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
 
-        async def home_assistant_startup(event):
-            """Add listeners and get initial state."""
-            entities_to_track = self._power_calculator.get_entities_to_track()
+        # async def home_assistant_startup(event):
+        """Add listeners and get initial state."""
+        entities_to_track = self._power_calculator.get_entities_to_track()
 
-            track_entities = [
-                entity for entity in entities_to_track if isinstance(entity, str)
-            ]
-            if not track_entities:
-                track_entities = [self._source_entity]
+        track_entities = [
+            entity for entity in entities_to_track if isinstance(entity, str)
+        ]
+        if not track_entities:
+            track_entities = [self._source_entity]
 
-            async_track_state_change_event(
-                self.hass, track_entities, appliance_state_listener
+        async_track_state_change_event(
+            self.hass, track_entities, appliance_state_listener
+        )
+
+        track_templates = [
+            template
+            for template in entities_to_track
+            if isinstance(template, TrackTemplate)
+        ]
+        if track_templates:
+            async_track_template_result(
+                self.hass,
+                track_templates=track_templates,
+                action=template_change_listener,
             )
 
-            track_templates = [
-                template
-                for template in entities_to_track
-                if isinstance(template, TrackTemplate)
-            ]
-            if track_templates:
-                async_track_template_result(
-                    self.hass,
-                    track_templates=track_templates,
-                    action=template_change_listener,
-                )
+        for entity_id in track_entities:
+            new_state = self.hass.states.get(entity_id)
 
-            for entity_id in track_entities:
-                if entity_id == DUMMY_ENTITY_ID:
-                    new_state = State(entity_id, STATE_ON)
-                else:
-                    new_state = self.hass.states.get(entity_id)
-
-                await self._update_power_sensor(entity_id, new_state)
+            await self._update_power_sensor(entity_id, new_state)
 
         @callback
         def async_update(event_time=None):
@@ -370,17 +363,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._scan_interval)
 
-        self.hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_START, home_assistant_startup
-        )
-
-    async def _update_power_sensor(self, trigger_entity_id: str, state: State) -> bool:
+    async def _update_power_sensor(
+        self, trigger_entity_id: str, state: State | None
+    ) -> bool:
         """Update power sensor based on new dependant entity state."""
-        if (
-            state is None
-            or state.state == STATE_UNKNOWN
-            or (not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE)
-        ):
+        if self.source_entity == DUMMY_ENTITY_ID:
+            state = State(self.source_entity, STATE_ON)
+
+        if not self._has_valid_state(state):
             _LOGGER.debug(
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
@@ -406,6 +396,22 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return False
 
         self.async_write_ha_state()
+        return True
+
+    def _has_valid_state(self, state: State | None) -> bool:
+        """Check if the state is valid, we can use it for power calculation"""
+        if self.source_entity == DUMMY_ENTITY_ID:
+            return True
+
+        if state is None:
+            return False
+
+        if state.state == STATE_UNKNOWN:
+            return False
+
+        if not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE:
+            return False
+
         return True
 
     async def calculate_power(self, state: State) -> Optional[Decimal]:
@@ -449,19 +455,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return bool(template.async_render())
 
     @property
-    def source_entity(self):
+    def source_entity(self) -> str:
         """The source entity this power sensor calculates power for."""
         return self._source_entity
-
-    @property
-    def extra_state_attributes(self):
-        """Return entity state attributes."""
-        return {
-            ATTR_CALCULATION_MODE: self._calculation_mode,
-            ATTR_INTEGRATION: DOMAIN,
-            ATTR_SOURCE_ENTITY: self._source_entity,
-            ATTR_SOURCE_DOMAIN: self._source_domain,
-        }
 
     @property
     def name(self):
@@ -477,6 +473,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def available(self):
         """Return True if entity is available."""
         return self._power is not None
+
+    def set_energy_sensor_attribute(self, entity_id: str):
+        """Set the energy sensor on the state attributes"""
+        self._attr_extra_state_attributes.update(
+            {ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id}
+        )
 
 
 class RealPowerSensor(PowerSensor):
