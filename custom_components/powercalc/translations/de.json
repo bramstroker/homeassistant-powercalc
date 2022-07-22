@@ -1,7 +1,7 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Sensor ist bereits konfiguriert, geben Sie eine unique_id an"
+            "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine unique_id an"
         },
         "error": {
             "daily_energy_mandatory": "Sie müssen mindestens Value oder Valuetemplate angeben",
