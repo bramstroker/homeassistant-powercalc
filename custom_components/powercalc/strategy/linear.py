@@ -97,8 +97,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
-            if not self._source_entity.domain in ALLOWED_DOMAINS:
-                return list
             full_range = self.get_entity_value_range()
             min = full_range[0]
             max = full_range[1]
