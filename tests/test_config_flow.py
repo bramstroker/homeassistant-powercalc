@@ -16,10 +16,8 @@ from homeassistant.components import (
     sensor
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform, MockConfigEntry, mock_registry
 from custom_components.powercalc.config_flow import (
     ConfigFlow, DOMAIN, CONF_CONFIRM_AUTODISCOVERED_MODEL
 )
