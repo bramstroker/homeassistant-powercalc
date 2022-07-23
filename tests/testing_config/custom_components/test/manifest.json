@@ -1,7 +1,7 @@
 {
   "domain": "test",
   "name": "Test Components",
-  "iot_class": "polling",
+  "iot_class": "assumed_state",
   "documentation": "https://example.com",
   "requirements": [],
   "dependencies": [],
