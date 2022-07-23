@@ -1,3 +1,5 @@
+import logging
+import pytest
 from typing import Optional
 from homeassistant.setup import async_setup_component
 from homeassistant.core import State
@@ -11,6 +13,7 @@ from homeassistant.components.light import (
 )
 from homeassistant.helpers.template import Template
 from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.const import CalculationStrategy
 from custom_components.powercalc.power_profile.light_model import LightModel
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
@@ -84,16 +87,24 @@ async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
     )
     assert not await strategy.calculate(state)
 
-async def test_no_power_when_colormode_unknown(hass: HomeAssistant):
+async def test_color_mode_unknown_is_handled_gracefully(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.at_level(logging.ERROR)
     strategy = _create_lut_strategy(hass, "signify", "LCT010")
 
     state = State(
         "light.test", STATE_ON,
         {
-            ATTR_COLOR_MODE: ColorMode.UNKNOWN
+            ATTR_COLOR_MODE: ColorMode.UNKNOWN,
+            ATTR_BRIGHTNESS: 100
         }
     )
     assert not await strategy.calculate(state)
+    assert "color mode unknown" in caplog.text
+
+async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
+    with pytest.raises(StrategyConfigurationError):
+        strategy = _create_lut_strategy(hass, "signify", "LCT010", source_entity=create_source_entity("sensor"))
+        await strategy.validate_config()
 
 def _create_lut_strategy(hass: HomeAssistant, manufacturer: str, model: str, source_entity: Optional[SourceEntity] = None) -> LutStrategy:
     if not source_entity:
