@@ -5,6 +5,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_ENTITIES,
     STATE_ON,
+    STATE_OFF,
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
     DEVICE_CLASS_ENERGY,
@@ -83,6 +84,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
 
 async def test_utility_meter_is_created(hass: HomeAssistant):
+    """Test that utility meters are succesfully created when `create_utility_meter: true`"""
     assert await async_setup_component(
         hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
     )
@@ -182,6 +184,15 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
         "sensor.test2_power",
     }
     assert group2.state == "50.00"
+
+    hass.states.async_set("input_boolean.test2", STATE_OFF)
+    await hass.async_block_till_done()
+
+    group1 = hass.states.get("sensor.testgroup1_power")
+    assert group1.state == "100.00"
+
+    group2 = hass.states.get("sensor.testgroup2_power")
+    assert group2.state == "0.00"
 
 async def test_light_lut_strategy(hass: HomeAssistant):
     light_entity = test_light_platform.MockLight(
