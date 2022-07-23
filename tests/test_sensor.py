@@ -1,3 +1,6 @@
+import pytest
+import logging
+
 from homeassistant.core import HomeAssistant
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -5,12 +8,11 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_ENTITIES,
     CONF_NAME,
+    CONF_UNIQUE_ID,
     STATE_ON,
     STATE_OFF,
     ATTR_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
-    DEVICE_CLASS_ENERGY,
-    DEVICE_CLASS_POWER
 )
 from homeassistant.setup import async_setup_component
 from homeassistant.components import (
@@ -51,6 +53,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy
 )
 import custom_components.test.light as test_light_platform
+from .common import create_mock_light_entity
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     source_entity = "input_boolean.test"
@@ -212,7 +215,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
     light_entity.manufacturer = "signify"
     light_entity.model = "LWB010"
 
-    light_entity_id = await _create_mock_light_entity(hass, light_entity)
+    light_entity_id = await create_mock_light_entity(hass, light_entity)
 
     await _run_powercalc_setup_yaml_config(
         hass,
@@ -246,7 +249,65 @@ async def test_daily_energy_sensor(hass: HomeAssistant):
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
 
-async def _run_powercalc_setup_yaml_config(hass: HomeAssistant, config: ConfigType):
+async def test_error_when_configuring_same_entity_twice(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    await _create_input_boolean_entity(hass, "test")
+
+    await _run_powercalc_setup_yaml_config(
+        hass,
+        [{
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        },
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 100
+            }
+        }]
+    )
+
+    assert "This entity has already configured a power sensor" in caplog.text
+    assert hass.states.get("sensor.test_power")
+    assert hass.states.get("sensor.test_energy")
+
+async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    await _create_input_boolean_entity(hass, "test")
+
+    await _run_powercalc_setup_yaml_config(
+        hass,
+        [{
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_UNIQUE_ID: "111",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        },
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_UNIQUE_ID: "222",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 100
+            }
+        }]
+    )
+
+    assert hass.states.get("sensor.test_power")
+    assert hass.states.get("sensor.test_energy")
+    assert hass.states.get("sensor.test_power_2")
+    assert hass.states.get("sensor.test_energy_2")
+
+async def _run_powercalc_setup_yaml_config(hass: HomeAssistant, config: list[ConfigType] | ConfigType):
     await async_setup_component(
         hass,
         sensor.DOMAIN,
@@ -254,33 +315,9 @@ async def _run_powercalc_setup_yaml_config(hass: HomeAssistant, config: ConfigTy
     )
     await hass.async_block_till_done()
 
-async def _create_mock_light_entity(
-    hass: HomeAssistant,
-    light_entity: test_light_platform.MockLight
-) -> str:
-    """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
-    entity_registry = mock_registry(hass)
-    device_registry = mock_device_registry(hass)
-    platform: test_light_platform = getattr(hass.components, "test.light")
-    platform.init(empty=True)
-
-    platform.ENTITIES.append(light_entity)
-
+async def _create_input_boolean_entity(hass: HomeAssistant, name: str):
     assert await async_setup_component(
-        hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}}
-    )
-    await hass.async_block_till_done()
-
-    config_entry = MockConfigEntry(domain="test")
-    config_entry.add_to_hass(hass)
-    device_entry = device_registry.async_get_or_create(
-        config_entry_id=config_entry.entry_id,
-        connections={("dummy", light_entity.unique_id)},
-        manufacturer=light_entity.manufacturer,
-        model=light_entity.model
+        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
     )
     
-    entity_entry = entity_registry.async_get_or_create(
-        "light", "test", light_entity.unique_id, device_id=device_entry.id
-    )
-    return entity_entry.entity_id
+    await hass.async_block_till_done()
