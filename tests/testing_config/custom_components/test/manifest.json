@@ -1,7 +1,8 @@
 {
   "domain": "test",
   "name": "Test Components",
-  "documentation": "http://example.com",
+  "iot_class": "polling",
+  "documentation": "https://example.com",
   "requirements": [],
   "dependencies": [],
   "codeowners": [],
