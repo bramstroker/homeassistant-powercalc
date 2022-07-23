@@ -1,6 +1,6 @@
 import pytest
 from homeassistant.core import State, HomeAssistant
-from homeassistant.const import STATE_ON, CONF_PLATFORM
+from homeassistant.const import STATE_ON, STATE_OFF, CONF_PLATFORM
 from decimal import Decimal
 
 from custom_components.test.light import MockLight
@@ -27,7 +27,7 @@ async def test_can_calculate_power(hass: HomeAssistant):
     platform.init(empty=True)
     estimated_current_entity = platform.MockSensor(
         name="test_estimated_current",
-        native_value="5.0",
+        native_value="50.0",
         unique_id="abc"
     )
     platform.ENTITIES[0] = estimated_current_entity
@@ -45,4 +45,13 @@ async def test_can_calculate_power(hass: HomeAssistant):
         standby_power=0.1
     )
     await strategy.validate_config()
-    assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(State("sensor.test_estimated_current", "50.0")))
+    assert strategy.can_calculate_standby()
+
+    state = State("sensor.test_estimated_current", "50.0")
+    assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
+
+    state = State("light.test", STATE_OFF)
+    assert 0.1 == await strategy.calculate(state)
+
+    state = State("light.test", STATE_ON)
+    assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
