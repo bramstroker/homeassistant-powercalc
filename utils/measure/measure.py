@@ -287,12 +287,15 @@ class Measure:
         with open(csv_file_path, "r") as csv_file:
             rows = csv.reader(csv_file)
             if len(list(rows)) == 1:
-                return False
+                return False 
 
-        return inquirer.confirm(
-            message="CSV File already exists. Do you want to resume measurements?",
-            default=True
-        )
+        try:
+            return config("RESUME", cast=bool)
+        except UndefinedValueError:
+            return inquirer.confirm(
+                message="CSV File already exists. Do you want to resume measurements?",
+                default=True
+            )
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
