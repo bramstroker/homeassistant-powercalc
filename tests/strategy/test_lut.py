@@ -60,6 +60,18 @@ async def test_brightness_lut(hass: HomeAssistant):
         expected_power=9.65
     )
 
+async def test_sub_lut_loaded(hass: HomeAssistant):
+    source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP, ColorMode.HS])
+
+    strategy = _create_lut_strategy(hass, "yeelight", "YLDL01YL/ambilight", source_entity)
+    await strategy.validate_config()
+
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(255, 588),
+        expected_power=6.31
+    )
+
 async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
     """When brightness attribute is not available on state return no power"""
     strategy = _create_lut_strategy(hass, "signify", "LCT010")
