@@ -1,4 +1,6 @@
-python3 -m pip install -r requirements.test.txt
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-cd ../custom_components
+python3 -m pip install -r ${SCRIPTPATH}/../requirements.test.txt
+
+cd "$SCRIPTPATH/../custom_components"
 ln -sf ../tests/testing_config/custom_components/test test
