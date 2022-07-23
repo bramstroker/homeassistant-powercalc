@@ -142,7 +142,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
 
 async def test_create_wled_sensor_entry(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
-    (__, device_id) = await create_mock_light_entity(hass, light_entity)
+    await create_mock_light_entity(hass, light_entity)
 
     platform: test_sensor_platform = getattr(hass.components, "test.sensor")
     platform.init(empty=True)
@@ -155,12 +155,6 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant):
 
     assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}})
     await hass.async_block_till_done()
-
-    # Set wled estimated_current sensor entity to same device as the light entity
-    ent_reg = entity_registry.async_get(hass)
-    ent_reg.async_update_entity(
-        entity_id="sensor.test_estimated_current", device_id=device_id
-    )
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
 
