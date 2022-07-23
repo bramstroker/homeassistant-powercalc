@@ -1,6 +1,5 @@
 import pytest
 
-from unittest.mock import patch, MagicMock
 from typing import Any
 
 from homeassistant import config_entries, data_entry_flow

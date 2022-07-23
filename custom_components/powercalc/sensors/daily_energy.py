@@ -28,6 +28,7 @@ from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
+from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import (
@@ -70,7 +71,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_daily_fixed_energy_sensor(
-    hass: HomeAssistant, sensor_config: dict
+    hass: HomeAssistant, sensor_config: ConfigType
 ) -> DailyEnergySensor:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
