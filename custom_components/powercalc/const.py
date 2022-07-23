@@ -142,6 +142,7 @@ MODE_WLED = "wled"
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
 
+
 class CalculationStrategy(StrEnum):
     """Possible virtual power calculation strategies."""
 
@@ -149,6 +150,7 @@ class CalculationStrategy(StrEnum):
     LINEAR = "linear"
     FIXED = "fixed"
     WLED = "wled"
+
 
 class SensorType(StrEnum):
     """Possible modes for a number selector."""

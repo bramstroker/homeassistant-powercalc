@@ -1,19 +1,16 @@
 """Platform for sensor integration."""
 
 from __future__ import annotations
-from datetime import timedelta
 
 import copy
 import logging
 import uuid
-from typing import Any, Final, cast, NamedTuple
-
-from numpy import source
+from datetime import timedelta
+from typing import Any, Final, NamedTuple, cast
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.core import HomeAssistant
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -31,13 +28,13 @@ from homeassistant.components import (
     vacuum,
     water_heater,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_DOMAIN,
@@ -48,7 +45,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
 )
 from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     area_registry,
     device_registry,
@@ -59,10 +56,8 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import (
-    ConfigType,
-    DiscoveryInfoType,
-)
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from numpy import source
 
 from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
@@ -248,32 +243,32 @@ async def async_setup_platform(
 
     await _async_setup_entities(hass, config, async_add_entities, discovery_info)
 
+
 async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     """Setup sensors from config entry (GUI config flow)"""
     sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.GROUP:
         global_config: dict = hass.data[DOMAIN][DOMAIN_CONFIG]
-        merged_sensor_config = get_merged_sensor_configuration(global_config, sensor_config)
+        merged_sensor_config = get_merged_sensor_configuration(
+            global_config, sensor_config
+        )
         entities = await create_group_sensors_from_config_entry(
-            hass=hass,
-            entry=entry,
-            sensor_config=merged_sensor_config
+            hass=hass, entry=entry, sensor_config=merged_sensor_config
         )
         async_add_entities(entities)
         return
 
     await _async_setup_entities(hass, sensor_config, async_add_entities)
 
+
 async def _async_setup_entities(
     hass: HomeAssistant,
     config: dict[str, Any],
     async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None
+    discovery_info: DiscoveryInfoType | None = None,
 ):
     """Main routine to setup power/energy sensors from provided configuration"""
 
@@ -295,6 +290,7 @@ async def _async_setup_entities(
             [entity for entity in entities.new if isinstance(entity, SensorEntity)]
         )
 
+
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
     """Convert the config entry structure to the sensor config which we use to create the entities"""
     sensor_config = dict(config_entry.data.copy())
@@ -312,19 +308,19 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
             daily_fixed_config[CONF_ON_TIME] = timedelta(
                 hours=on_time["hours"],
                 minutes=on_time["minutes"],
-                seconds=on_time["seconds"]
+                seconds=on_time["seconds"],
             )
         else:
             daily_fixed_config[CONF_ON_TIME] = timedelta(days=1)
         sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
-    
+
     if CONF_FIXED in sensor_config:
         fixed_config = copy.copy(sensor_config.get(CONF_FIXED))
         if CONF_POWER_TEMPLATE in fixed_config:
             fixed_config[CONF_POWER] = fixed_config[CONF_POWER_TEMPLATE]
             del fixed_config[CONF_POWER_TEMPLATE]
         sensor_config[CONF_FIXED] = fixed_config
-    
+
     if CONF_LINEAR in sensor_config:
         linear_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_LINEAR))
         if CONF_CALIBRATE in linear_config:
@@ -333,9 +329,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
             for item in calibrate_dict.items():
                 new_calibrate_list.append(f"{item[0]} -> {item[1]}")
             linear_config[CONF_CALIBRATE] = new_calibrate_list
-            
+
         sensor_config[CONF_LINEAR] = linear_config
-    
+
     return sensor_config
 
 
@@ -444,7 +440,7 @@ async def create_sensors(
             new_entities = await create_individual_sensors(hass, merged_sensor_config)
             new_sensors.extend(new_entities.new)
         except SensorAlreadyConfiguredError as error:
-            # When no specific configuration is done for the entity, 
+            # When no specific configuration is done for the entity,
             # and the same entity was configured before (either by manual configuration or autodisovery)
             # we may return the existing power/energy sensors.
             if error.get_existing_entities() and len(sensor_config) == 1:
@@ -532,7 +528,9 @@ async def create_individual_sensors(
                 hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
-            if isinstance(power_sensor, VirtualPowerSensor) and isinstance(energy_sensor, SensorEntity):
+            if isinstance(power_sensor, VirtualPowerSensor) and isinstance(
+                energy_sensor, SensorEntity
+            ):
                 power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
 
     if energy_sensor:
@@ -584,7 +582,9 @@ def check_entity_not_already_configured(
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
 
-    configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
+    configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
+        DATA_CONFIGURED_ENTITIES
+    ]
     existing_entities = configured_entities.get(source_entity.entity_id) or []
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
@@ -598,7 +598,9 @@ def check_entity_not_already_configured(
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 
-def bind_entities_to_devices(hass: HomeAssistant, entities: list[Entity], device_id: str):
+def bind_entities_to_devices(
+    hass: HomeAssistant, entities: list[Entity], device_id: str
+):
     """Attach all the power/energy sensors to the same device as the source entity"""
 
     for entity in entities:
@@ -727,6 +729,7 @@ def resolve_area_entities(
     return {
         entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN
     }
+
 
 class EntitiesBucket(NamedTuple):
     new: list[Entity, RealPowerSensor] = []

@@ -7,7 +7,7 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
-from homeassistant.core import split_entity_id, HomeAssistant
+from homeassistant.core import HomeAssistant, split_entity_id
 
 from .const import DUMMY_ENTITY_ID
 

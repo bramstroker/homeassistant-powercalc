@@ -41,16 +41,15 @@ from ..const import (
     SERVICE_RESET_ENERGY,
     UnitPrefix,
 )
-from .energy import EnergySensor, RealEnergySensor
-from .power import PowerSensor, RealPowerSensor
-from .utility_meter import create_utility_meters
-
 from .abstract import (
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
+from .energy import EnergySensor, RealEnergySensor
+from .power import PowerSensor, RealPowerSensor
+from .utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -106,10 +105,9 @@ async def create_group_sensors(
 
     return group_sensors
 
+
 async def create_group_sensors_from_config_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    sensor_config: dict
+    hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict
 ) -> list[GroupedSensor]:
     """Create group sensors based on an config_entry"""
     group_sensors = []
@@ -117,9 +115,8 @@ async def create_group_sensors_from_config_entry(
     group_name = entry.data.get(CONF_NAME)
 
     power_sensor_ids: set[str] = set(
-        (entry.data.get(CONF_GROUP_POWER_ENTITIES) or []) + 
-        resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_POWER_ENTITIES)
-    
+        (entry.data.get(CONF_GROUP_POWER_ENTITIES) or [])
+        + resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_POWER_ENTITIES)
     )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
@@ -128,23 +125,26 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(power_sensor)
 
     energy_sensor_ids: set[str] = set(
-            (entry.data.get(CONF_GROUP_ENERGY_ENTITIES) or []) + 
-            resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_ENERGY_ENTITIES)
-        )
+        (entry.data.get(CONF_GROUP_ENERGY_ENTITIES) or [])
+        + resolve_sub_group_entity_ids(hass, entry, CONF_GROUP_ENERGY_ENTITIES)
+    )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
             hass, group_name, sensor_config, energy_sensor_ids
         )
         group_sensors.append(energy_sensor)
-    
+
         group_sensors.extend(
             await create_utility_meters(hass, energy_sensor, sensor_config)
         )
 
     return group_sensors
 
+
 @callback
-def resolve_sub_group_entity_ids(hass: HomeAssistant, entry: ConfigEntry, conf_key: str = CONF_GROUP_POWER_ENTITIES) -> list[str]:
+def resolve_sub_group_entity_ids(
+    hass: HomeAssistant, entry: ConfigEntry, conf_key: str = CONF_GROUP_POWER_ENTITIES
+) -> list[str]:
     subgroups = entry.data.get(CONF_SUB_GROUPS)
     if not subgroups:
         return []

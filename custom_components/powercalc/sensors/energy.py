@@ -11,10 +11,9 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
 from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 
-from .abstract import generate_energy_sensor_name, generate_energy_sensor_entity_id
 from ..common import SourceEntity
 from ..const import (
     ATTR_SOURCE_DOMAIN,
@@ -29,9 +28,8 @@ from ..const import (
     UnitPrefix,
 )
 from ..migrate import async_migrate_entity_id
-
-from .power import PowerSensor, RealPowerSensor
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
+from .power import PowerSensor, RealPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"

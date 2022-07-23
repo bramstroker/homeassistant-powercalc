@@ -7,8 +7,8 @@ from typing import Optional
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
 
-from ..errors import ModelNotSupported, UnsupportedMode
 from ..const import CalculationStrategy
+from ..errors import ModelNotSupported, UnsupportedMode
 from .library import ProfileLibrary
 
 _LOGGER = logging.getLogger(__name__)
@@ -93,11 +93,13 @@ class LightModel:
         if self._custom_model_directory:
             return self._custom_model_directory
 
-        library_directory = self._profile_library.get_model_directory(self._manufacturer, self._model)
+        library_directory = self._profile_library.get_model_directory(
+            self._manufacturer, self._model
+        )
         if library_directory:
             self._directory = library_directory
             return self._directory
-  
+
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
         )

@@ -60,7 +60,7 @@ powercalc:
 
 ### Setup power sensors
 
-Powercalc has a build-in library of more than 100 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
+Powercalc has a build-in library of more than 150 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
 
 Starting from 0.12.0 Powercalc can automatically discover entities in your HA instance which are supported for automatic configuration.
 After intallation and restarting HA power and energy sensors should appear. When this is not the case please check the logs for any errors.

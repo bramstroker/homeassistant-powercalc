@@ -44,7 +44,6 @@ from ..const import (
     UnitPrefix,
 )
 from ..migrate import async_migrate_entity_id
-
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
 from .power import VirtualPowerSensor, create_virtual_power_sensor
