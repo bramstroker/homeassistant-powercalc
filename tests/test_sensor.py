@@ -4,6 +4,7 @@ from homeassistant.const import (
     CONF_PLATFORM,
     CONF_ENTITY_ID,
     CONF_ENTITIES,
+    CONF_NAME,
     STATE_ON,
     STATE_OFF,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -26,6 +27,9 @@ from homeassistant.components.utility_meter.sensor import (
     HOURLY
 )
 
+from homeassistant.components.sensor import (
+    SensorDeviceClass
+)
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_registry,
@@ -37,10 +41,12 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
     CONF_UTILITY_METER_TYPES,
+    CONF_VALUE,
     DOMAIN,
     CalculationStrategy
 )
@@ -75,10 +81,10 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "50.00"
     assert power_state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
-    assert power_state.attributes.get(ATTR_DEVICE_CLASS) == DEVICE_CLASS_POWER
+    assert power_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
 
     energy_state = hass.states.get("sensor.test_energy")
-    assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == DEVICE_CLASS_ENERGY
+    assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
     assert energy_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_power"
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
@@ -219,8 +225,26 @@ async def test_light_lut_strategy(hass: HomeAssistant):
     state = hass.states.get("sensor.test1_power")
     assert state
     assert state.state == "2.67"
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
     assert state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.LUT
     assert state.attributes.get(ATTR_SOURCE_ENTITY) == light_entity_id
+
+async def test_daily_energy_sensor(hass: HomeAssistant):
+    await _run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 0.05
+            }
+        }
+    )
+
+    state = hass.states.get("sensor.ip_camera_upstairs_energy")
+    assert state
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
 
 async def _run_powercalc_setup_yaml_config(hass: HomeAssistant, config: ConfigType):
     await async_setup_component(
