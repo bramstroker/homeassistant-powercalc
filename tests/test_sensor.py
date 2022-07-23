@@ -215,7 +215,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
     light_entity.manufacturer = "signify"
     light_entity.model = "LWB010"
 
-    light_entity_id = await create_mock_light_entity(hass, light_entity)
+    (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
 
     await _run_powercalc_setup_yaml_config(
         hass,

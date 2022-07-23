@@ -18,7 +18,7 @@ import custom_components.test.light as test_light_platform
 async def create_mock_light_entity(
     hass: HomeAssistant,
     light_entity: test_light_platform.MockLight
-) -> str:
+) -> tuple[str, str]:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = mock_registry(hass)
     device_registry = mock_device_registry(hass)
@@ -44,4 +44,4 @@ async def create_mock_light_entity(
     entity_entry = entity_registry.async_get_or_create(
         "light", "test", light_entity.unique_id, device_id=device_entry.id
     )
-    return entity_entry.entity_id
+    return (entity_entry.entity_id, device_entry.id)

@@ -7,25 +7,33 @@ from typing import Any
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import (
     CONF_NAME,
+    CONF_PLATFORM,
     CONF_UNIQUE_ID,
     CONF_ENTITY_ID,
     STATE_ON,
 )
+from homeassistant.components import (
+    sensor
+)
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform, MockConfigEntry, mock_registry
-from custom_components.powercalc.config_flow import ConfigFlow, DOMAIN
+from custom_components.powercalc.config_flow import (
+    ConfigFlow, DOMAIN, CONF_CONFIRM_AUTODISCOVERED_MODEL
+)
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, CONF_FIXED, CONF_LINEAR, CONF_MANUFACTURER, CONF_MODEL, CONF_MAX_POWER, CONF_POWER_FACTOR, 
     CONF_POWER_TEMPLATE, CONF_MIN_POWER, CONF_MODE, CONF_POWER, CONF_SENSOR_TYPE, CONF_STATES_POWER, CONF_VOLTAGE, CONF_WLED, CalculationStrategy, SensorType
 )
 from custom_components.test.light import MockLight
+import custom_components.test.sensor as test_sensor_platform
 from .common import create_mock_light_entity
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
-# @patch("custom_components.volkswagencarnet.config_flow.Connection")
 async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     """Test a menu is diplayed with sensor type selection"""
 
@@ -132,27 +140,48 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
     assert result["errors"]["base"] == "linear_mandatory"
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
-# async def test_create_wled_sensor_entry(hass: HomeAssistant):
-#     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
+async def test_create_wled_sensor_entry(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    (__, device_id) = await create_mock_light_entity(hass, light_entity)
 
-#     result = await hass.config_entries.flow.async_configure(
-#         result["flow_id"], {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8}
-#     )
+    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
+    platform.init(empty=True)
+    estimated_current_entity = platform.MockSensor(
+        name="test_estimated_current",
+        native_value="5.0",
+        unique_id=DEFAULT_UNIQUE_ID
+    )
+    platform.ENTITIES[0] = estimated_current_entity
 
-#     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-#     _assert_default_virtual_power_entry_data(
-#         CalculationStrategy.LINEAR,
-#         result["data"],
-#         {
-#             CONF_WLED: {
-#                 CONF_VOLTAGE: 8,
-#                 CONF_POWER_FACTOR: 0.8
-#             }
-#         }
-#     )
+    assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}})
+    await hass.async_block_till_done()
+
+    # Set wled estimated_current sensor entity to same device as the light entity
+    ent_reg = entity_registry.async_get(hass)
+    ent_reg.async_update_entity(
+        entity_id="sensor.test_estimated_current", device_id=device_id
+    )
+
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    _assert_default_virtual_power_entry_data(
+        CalculationStrategy.WLED,
+        result["data"],
+        {
+            CONF_WLED: {
+                CONF_VOLTAGE: 12,
+                CONF_POWER_FACTOR: 0.8
+            }
+        }
+    )
 
 async def test_lut_manual_flow(hass: HomeAssistant):
-    light_entity = MockLight("test", STATE_ON, "234438")
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
@@ -185,6 +214,51 @@ async def test_lut_manual_flow(hass: HomeAssistant):
             CONF_MODEL: "LCT010"
         }
     )
+
+async def test_lut_autodiscover_flow(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    light_entity.manufacturer = "ikea"
+    light_entity.model = "LED1545G12"
+    await create_mock_light_entity(hass, light_entity)
+
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "lut"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], 
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    _assert_default_virtual_power_entry_data(
+        CalculationStrategy.LUT,
+        result["data"],
+        {}
+    )
+
+async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
+    """
+    When manufacturer and model are auto detected and user chooses to not accept it,
+    make sure he/she is forwarded to the manufacturer listing
+    """
+    light_entity = MockLight("test", STATE_ON, "234438")
+    light_entity.manufacturer = "ikea"
+    light_entity.model = "LED1545G12"
+    await create_mock_light_entity(hass, light_entity)
+
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "lut"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], 
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "lut_manufacturer"
+
 
 def _assert_default_virtual_power_entry_data(
     strategy: CalculationStrategy,
