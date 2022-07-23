@@ -6,6 +6,11 @@ from homeassistant import loader
 def auto_enable_custom_integrations(enable_custom_integrations):
     yield
 
+@pytest.fixture
+def enable_custom_integrations(hass):
+    """Enable custom integrations defined in the test dir."""
+    hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
+
 # def mock_integration(hass, module, built_in=True):
 #     """Mock an integration."""
 #     integration = loader.Integration(

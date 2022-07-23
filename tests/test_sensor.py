@@ -1,3 +1,5 @@
+import sys
+import importlib
 from homeassistant.core import HomeAssistant, CoreState
 from homeassistant.const import (
     CONF_PLATFORM,
@@ -6,12 +8,13 @@ from homeassistant.const import (
     SERVICE_TURN_ON,
     CONF_ENTITIES,
     CONF_UNIQUE_ID,
-    STATE_ON
+    STATE_ON,
 )
+from homeassistant.loader import DATA_COMPONENTS, DATA_INTEGRATIONS
 from homeassistant.setup import async_setup_component
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components import (
+    light,
     input_boolean,
     sensor
 )
@@ -125,3 +128,37 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
         "sensor.test2_power",
     }
     assert group2.state == "50.00"
+
+async def test_light(hass: HomeAssistant, enable_custom_integrations):
+    platform = getattr(hass.components, "test.light")
+    platform.init(empty=True)
+
+    platform.ENTITIES.append(platform.MockLight("test1", STATE_ON))
+    platform.ENTITIES.append(platform.MockLight("test2", STATE_ON))
+    assert await async_setup_component(
+        hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}}
+    )
+    await hass.async_block_till_done()
+
+    state = hass.states.get("light.test1")
+    assert state
+    assert state.state == STATE_ON
+
+    await async_setup_component(
+        hass,
+        sensor.DOMAIN,
+        {sensor.DOMAIN: {
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "light.test1",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        }}
+    )
+
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test1_power")
+    assert state
+    assert state.state == "50.00"

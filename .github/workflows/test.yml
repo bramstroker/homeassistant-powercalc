@@ -18,6 +18,7 @@ jobs:
       - name: Install requirements
         run: python3 -m pip install -r requirements.test.txt
       - name: Run tests
+        run: bash tests/setup.sh
         run: |
           pytest \
             -qq \
