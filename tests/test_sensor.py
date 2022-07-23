@@ -1,39 +1,51 @@
-import imp
-import sys
-import importlib
-from homeassistant.core import HomeAssistant, CoreState
+from homeassistant.core import HomeAssistant
 from homeassistant.const import (
+    ATTR_DEVICE_CLASS,
     CONF_PLATFORM,
     CONF_ENTITY_ID,
-    ATTR_ENTITY_ID,
-    SERVICE_TURN_ON,
     CONF_ENTITIES,
-    CONF_UNIQUE_ID,
     STATE_ON,
+    ATTR_UNIT_OF_MEASUREMENT,
+    ENERGY_KILO_WATT_HOUR,
+    DEVICE_CLASS_ENERGY,
+    DEVICE_CLASS_POWER
 )
-from homeassistant.helpers import config_validation as device_registry
-from homeassistant.loader import DATA_COMPONENTS, DATA_INTEGRATIONS
 from homeassistant.setup import async_setup_component
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components import (
     light,
     input_boolean,
-    sensor
+    sensor,
 )
-from homeassistant.helpers.entity_platform import split_entity_id
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.typing import ConfigType
+
+from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
+from homeassistant.components.utility_meter.sensor import (
+    ATTR_PERIOD,
+    DAILY, 
+    HOURLY
+)
 
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    MockEntityPlatform,
-    MockPlatform,
     mock_registry,
     mock_device_registry
 )
-from custom_components.powercalc.const import ATTR_CALCULATION_MODE, ATTR_ENTITIES, ATTR_SOURCE_ENTITY, CONF_CREATE_GROUP, CONF_FIXED, CONF_MODE, CONF_POWER, DOMAIN, CalculationStrategy
+from custom_components.powercalc.const import (
+    ATTR_CALCULATION_MODE,
+    ATTR_ENTITIES,
+    ATTR_SOURCE_ENTITY,
+    CONF_CREATE_GROUP,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_FIXED,
+    CONF_MODE,
+    CONF_POWER,
+    CONF_UTILITY_METER_TYPES,
+    DOMAIN,
+    CalculationStrategy
+)
 import custom_components.test.light as test_light_platform
 
-async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant, enable_custom_integrations):
+async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     source_entity = "input_boolean.test"
     assert await async_setup_component(
         hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
@@ -41,31 +53,66 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant, enable_custom_i
     
     await hass.async_block_till_done()
 
-    await async_setup_component(
+    await _run_powercalc_setup_yaml_config(
         hass,
-        sensor.DOMAIN,
-        {sensor.DOMAIN: {
+        {
             CONF_PLATFORM: DOMAIN,
             CONF_ENTITY_ID: source_entity,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {
                 CONF_POWER: 50
             }
-        }}
+        }
     )
-    await hass.async_block_till_done()
-    
+
     state = hass.states.get("sensor.test_power")
     assert state.state == "0.00"
 
     hass.states.async_set(source_entity, STATE_ON)
     await hass.async_block_till_done()
 
-    state = hass.states.get("sensor.test_power")
-    assert state.state == "50.00"
-    assert state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "50.00"
+    assert power_state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
+    assert power_state.attributes.get(ATTR_DEVICE_CLASS) == DEVICE_CLASS_POWER
 
-    assert hass.states.get("sensor.test_energy")
+    energy_state = hass.states.get("sensor.test_energy")
+    assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == DEVICE_CLASS_ENERGY
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+    assert energy_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_power"
+    assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
+
+async def test_utility_meter_is_created(hass: HomeAssistant):
+    assert await async_setup_component(
+        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
+    )
+    await hass.async_block_till_done()
+
+    await _run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TYPES: [DAILY, HOURLY],
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        }
+    )
+
+    daily_state = hass.states.get("sensor.test_energy_daily")
+    assert daily_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_energy"
+    assert daily_state.attributes.get(ATTR_PERIOD) == DAILY
+
+    hourly_state = hass.states.get("sensor.test_energy_hourly")
+    assert hourly_state
+    assert hourly_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_energy"
+    assert hourly_state.attributes.get(ATTR_PERIOD) == HOURLY
+
+    monthly_state = hass.states.get("sensor.test_energy_monthly")
+    assert not monthly_state
 
 async def test_create_nested_group_sensor(hass: HomeAssistant):
     assert await async_setup_component(
@@ -80,45 +127,41 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
 
     await hass.async_block_till_done()
 
-    await async_setup_component(
+    await _run_powercalc_setup_yaml_config(
         hass,
-        sensor.DOMAIN,
         {
-            sensor.DOMAIN: {
-                CONF_PLATFORM: DOMAIN,
-                CONF_CREATE_GROUP: "TestGroup1",
-                CONF_ENTITIES: [
-                    {
-                        CONF_ENTITY_ID: "input_boolean.test",
-                        CONF_MODE: CalculationStrategy.FIXED,
-                        CONF_FIXED: {
-                            CONF_POWER: 50
-                        }
-                    },
-                    {
-                        CONF_ENTITY_ID: "input_boolean.test1", 
-                        CONF_MODE: CalculationStrategy.FIXED,
-                        CONF_FIXED: {
-                            CONF_POWER: 50
-                        }
-                    },
-                    {
-                        CONF_CREATE_GROUP: "TestGroup2",
-                        CONF_ENTITIES: [
-                            {
-                                CONF_ENTITY_ID: "input_boolean.test2", 
-                                CONF_MODE: CalculationStrategy.FIXED,
-                                CONF_FIXED: {
-                                    CONF_POWER: 50
-                                }
-                            },
-                        ]
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup1",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {
+                        CONF_POWER: 50
                     }
-                ]
-            }
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test1", 
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {
+                        CONF_POWER: 50
+                    }
+                },
+                {
+                    CONF_CREATE_GROUP: "TestGroup2",
+                    CONF_ENTITIES: [
+                        {
+                            CONF_ENTITY_ID: "input_boolean.test2", 
+                            CONF_MODE: CalculationStrategy.FIXED,
+                            CONF_FIXED: {
+                                CONF_POWER: 50
+                            }
+                        },
+                    ]
+                }
+            ]
         }
     )
-    await hass.async_block_till_done()
 
     hass.states.async_set("input_boolean.test", STATE_ON)
     hass.states.async_set("input_boolean.test1", STATE_ON)
@@ -154,22 +197,27 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 
     light_entity_id = await _create_mock_light_entity(hass, light_entity)
 
-    await async_setup_component(
+    await _run_powercalc_setup_yaml_config(
         hass,
-        sensor.DOMAIN,
-        {sensor.DOMAIN: {
+        {
             CONF_PLATFORM: DOMAIN,
             CONF_ENTITY_ID: light_entity_id
-        }}
+        }
     )
-
-    await hass.async_block_till_done()
 
     state = hass.states.get("sensor.test1_power")
     assert state
     assert state.state == "2.67"
     assert state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.LUT
     assert state.attributes.get(ATTR_SOURCE_ENTITY) == light_entity_id
+
+async def _run_powercalc_setup_yaml_config(hass: HomeAssistant, config: ConfigType):
+    await async_setup_component(
+        hass,
+        sensor.DOMAIN,
+        {sensor.DOMAIN: config}
+    )
+    await hass.async_block_till_done()
 
 async def _create_mock_light_entity(
     hass: HomeAssistant,
