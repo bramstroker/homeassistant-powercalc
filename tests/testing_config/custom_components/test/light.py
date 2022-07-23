@@ -32,6 +32,9 @@ async def async_setup_platform(
     """Return mock entities."""
     async_add_entities_callback(ENTITIES)
 
+async def async_setup_entry(hass, entry, async_add_entities) -> bool:
+    async_add_entities(ENTITIES)
+    return True
 
 class MockLight(MockToggleEntity, LightEntity):
     """Mock light class."""
@@ -50,6 +53,12 @@ class MockLight(MockToggleEntity, LightEntity):
     rgbww_color = None
     xy_color = None
     white_value = None
+    manufacturer: str | None = None
+    model: str | None = None
+
+    def __init__(self, name, state, unique_id=None):
+        super().__init__(name, state)
+        self._attr_unique_id = unique_id
 
     def turn_on(self, **kwargs):
         """Turn the entity on."""
@@ -68,3 +77,12 @@ class MockLight(MockToggleEntity, LightEntity):
                 setattr(self, key, value)
             if key == "white":
                 setattr(self, "brightness", value)
+    
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {("hue", "1234")},
+            "name": self.name,
+            "manufacturer": self.manufacturer,
+            "model": self.model,
+        }
