@@ -164,7 +164,7 @@ async def create_virtual_power_sensor(
             standby_power_on = Decimal(light_model.standby_power_on)
 
     if (
-        not CONF_CALCULATION_ENABLED_CONDITION in sensor_config
+        CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
         and light_model is not None
         and light_model.calculation_enabled_condition
     ):
@@ -443,7 +443,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return Decimal(power)
 
     async def is_calculation_enabled(self) -> bool:
-        if not CONF_CALCULATION_ENABLED_CONDITION in self._sensor_config:
+        if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
             return True
 
         template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
