@@ -30,8 +30,13 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-      - name: Coveralls
+      - name: Covert Coverage Results
+        run: |
+          pip install coveragepy-lcov
+          coveragepy-lcov --data_file_path coverage.xml --output_file_path lcov.info
+
+      - name: Upload Coverage Results
         uses: coverallsapp/github-action@master
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path--to-lcov: coverage.xml
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: lcov.info
