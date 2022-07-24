@@ -54,6 +54,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             self._calibration = self.create_calibrate_list()
 
         value = self.get_current_state_value(entity_state)
+        if value is None:
+            return None
 
         min_calibrate = self.get_min_calibrate(value)
         max_calibrate = self.get_max_calibrate(value)
@@ -63,8 +65,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})"
         )
-        if value is None:
-            return None
 
         min_power = min_calibrate[1]
         max_power = max_calibrate[1]
@@ -97,8 +97,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
-            if not self._source_entity.domain in ALLOWED_DOMAINS:
-                return list
             full_range = self.get_entity_value_range()
             min = full_range[0]
             max = full_range[1]

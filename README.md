@@ -4,6 +4,7 @@
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+[![Coverage Status](https://coveralls.io/repos/github/bramstroker/homeassistant-powercalc/badge.svg?branch=feature/tests)](https://coveralls.io/github/bramstroker/homeassistant-powercalc?branch=master)
 
 # :zap: PowerCalc: Home Assistant Virtual Power Sensors
 Custom component to calculate estimated power consumption of lights and other appliances.

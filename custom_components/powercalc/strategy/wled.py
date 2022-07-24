@@ -41,7 +41,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         if entity_state.entity_id == self._light_entity.entity_id:
-            light_state = entity_state.state
+            light_state = entity_state
         else:
             light_state = self._hass.states.get(self._light_entity.entity_id)
 
@@ -49,7 +49,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
             return self._standby_power
 
         if entity_state.entity_id != self._estimated_current_entity:
-            return None
+            entity_state = self._hass.states.get(self._estimated_current_entity)
 
         _LOGGER.debug(
             f"{self._light_entity.entity_id}: Estimated current {entity_state.state} (voltage={self._voltage}, power_factor={self._power_factor})"
