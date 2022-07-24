@@ -101,7 +101,7 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant):
 async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
 
-    template = "{states(input.my_boolean} | float"
+    template = "{states(input_number.my_number} | float"
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_POWER_TEMPLATE: template}
     )
