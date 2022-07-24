@@ -101,8 +101,9 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant):
 async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
 
+    template = "{states(input.my_boolean} | float"
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_POWER_TEMPLATE: "{states(input.my_boolean} | float"}
+        result["flow_id"], {CONF_POWER_TEMPLATE: template}
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -111,8 +112,8 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
         result["data"],
         {
             CONF_FIXED: {
-                CONF_POWER: "{states(input.my_boolean} | float",
-                CONF_POWER_TEMPLATE: "{states(input.my_boolean} | float"
+                CONF_POWER: template,
+                CONF_POWER_TEMPLATE: template
             }
         }
     )
