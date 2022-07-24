@@ -102,7 +102,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             max_value = full_range[1]
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
-            calibration_list.append((max_value, float(self._config.get(CONF_MAX_POWER))))
+            calibration_list.append(
+                (max_value, float(self._config.get(CONF_MAX_POWER)))
+            )
             return calibration_list
 
         for line in calibrate:
