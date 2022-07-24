@@ -580,9 +580,9 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     errors = {}
 
     if (
-        CONF_SUB_GROUPS not in user_input
-        and CONF_GROUP_POWER_ENTITIES not in user_input
-        and CONF_GROUP_ENERGY_ENTITIES not in user_input
+        CONF_SUB_GROUPS not in user_input and
+        CONF_GROUP_POWER_ENTITIES not in user_input and 
+        CONF_GROUP_ENERGY_ENTITIES not in user_input
     ):
         errors["base"] = "group_mandatory"
 
@@ -680,9 +680,9 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
         if key in options:
             if isinstance(key, vol.Marker):
                 if (
-                    isinstance(key, vol.Optional)
-                    and callable(key.default)
-                    and key.default()
+                    isinstance(key, vol.Optional) and
+                    callable(key.default) and 
+                    key.default()
                 ):
                     new_key = vol.Optional(key.schema, default=options.get(key))
                 else:
