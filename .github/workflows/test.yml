@@ -19,6 +19,7 @@ jobs:
         run: bash tests/setup.sh
       - name: Run tests
         run: |
+          pip install pytest-cov
           pytest \
             -qq \
             --timeout=9 \
