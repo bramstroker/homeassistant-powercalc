@@ -38,7 +38,7 @@ async def test_template_power(hass: HomeAssistant):
 
     track_entity = strategy.get_entities_to_track()[0]
     assert isinstance(track_entity, TrackTemplate)
-    track_entity.template == template
+    assert track_entity.template.template == template
 
 
 async def test_states_power():
@@ -84,9 +84,9 @@ async def test_states_power_with_template(hass: HomeAssistant):
 
     track_entity = strategy.get_entities_to_track()
     assert isinstance(track_entity[0], TrackTemplate)
-    track_entity[0].template == "{{states('input_number.test_number42')}}"
+    assert track_entity[0].template.template == "{{states('input_number.test_number42')}}"
     assert isinstance(track_entity[1], TrackTemplate)
-    track_entity[1].template == "{{states('input_number.test_number60')}}"
+    assert track_entity[1].template.template == "{{states('input_number.test_number60')}}"
 
 async def test_states_power_with_attributes():
     source_entity = create_source_entity("media_player")
