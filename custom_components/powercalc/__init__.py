@@ -220,7 +220,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         try:
             used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
-            return unload_ok
+            return True
 
         entity_registry = er.async_get(hass)
         entries = er.async_entries_for_config_entry(
@@ -245,7 +245,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
         if entity_entry.disabled:
             continue
 
-        if not entity_entry.domain in (LIGHT_DOMAIN, SWITCH_DOMAIN):
+        if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
             continue
 
         if not await has_manufacturer_and_model_information(hass, entity_entry):
@@ -290,7 +290,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
 
 
 def get_manual_configuration(config: dict, entity_id: str) -> dict | None:
-    if not SENSOR_DOMAIN in config:
+    if SENSOR_DOMAIN not in config:
         return None
     sensor_config = config.get(SENSOR_DOMAIN)
     for item in sensor_config:
@@ -307,7 +307,7 @@ async def create_domain_groups(
     sensor_config = global_config.copy()
     _LOGGER.debug(f"Setting up domain based group sensors..")
     for domain in domains:
-        if not domain in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
+        if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
             _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")
             continue
 

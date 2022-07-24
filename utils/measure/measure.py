@@ -287,12 +287,15 @@ class Measure:
         with open(csv_file_path, "r") as csv_file:
             rows = csv.reader(csv_file)
             if len(list(rows)) == 1:
-                return False
+                return False 
 
-        return inquirer.confirm(
-            message="CSV File already exists. Do you want to resume measurements?",
-            default=True
-        )
+        try:
+            return config("RESUME", cast=bool)
+        except UndefinedValueError:
+            return inquirer.confirm(
+                message="CSV File already exists. Do you want to resume measurements?",
+                default=True
+            )
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
@@ -562,7 +565,6 @@ class Measure:
     def get_dummy_load_value(self) -> float:
         """Get the previously measured dummy load value"""
 
-        #dummy_load_file = Path(".persistent/dummy_load").resolve()
         dummy_load_file = os.path.join(Path(__file__).parent.absolute(), ".persistent/dummy_load")
         if not os.path.exists(dummy_load_file):
             return self.measure_dummy_load(dummy_load_file)

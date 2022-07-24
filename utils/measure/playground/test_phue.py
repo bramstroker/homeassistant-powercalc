@@ -11,7 +11,7 @@ def initialize_hue_bridge() -> Bridge:
     try:
         bridge = Bridge("192.168.178.44")
         # bridge.connect()
-    except PhueRegistrationException as err:
+    except PhueRegistrationException:
         print("Please click the link button on the bridge, than hit enter..")
         input()
         bridge = Bridge("192.168.178.44")

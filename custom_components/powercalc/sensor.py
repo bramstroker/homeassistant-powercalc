@@ -357,7 +357,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
 
         merged_config.update(config_copy)
 
-    if not CONF_CREATE_ENERGY_SENSOR in merged_config:
+    if CONF_CREATE_ENERGY_SENSOR not in merged_config:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
             CONF_CREATE_ENERGY_SENSORS
         )
@@ -365,14 +365,14 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
     if CONF_DAILY_FIXED_ENERGY in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
-    if validate:
-        if (
-            not CONF_CREATE_GROUP in merged_config
-            and not CONF_ENTITY_ID in merged_config
-        ):
-            raise SensorConfigurationError(
-                "You must supply an entity_id in the configuration, see the README"
-            )
+    if (
+        validate
+        and CONF_CREATE_GROUP not in merged_config
+        and CONF_ENTITY_ID not in merged_config
+    ):
+        raise SensorConfigurationError(
+            "You must supply an entity_id in the configuration, see the README"
+        )
 
     return merged_config
 
@@ -558,7 +558,7 @@ async def create_individual_sensors(
             {source_entity.entity_id: entities_to_add}
         )
 
-    if not source_entity.domain in hass.data[DOMAIN][DATA_DOMAIN_ENTITIES]:
+    if source_entity.domain not in hass.data[DOMAIN][DATA_DOMAIN_ENTITIES]:
         hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain] = []
 
     hass.data[DOMAIN][DATA_DOMAIN_ENTITIES][source_entity.domain].extend(
