@@ -9,8 +9,10 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
+    CONF_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
     STATE_ON,
+    POWER_WATT
 )
 from homeassistant.components import (
     sensor
@@ -22,8 +24,27 @@ from custom_components.powercalc.config_flow import (
     ConfigFlow, DOMAIN, CONF_CONFIRM_AUTODISCOVERED_MODEL
 )
 from custom_components.powercalc.const import (
-    CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS, CONF_FIXED, CONF_LINEAR, CONF_MANUFACTURER, CONF_MODEL, CONF_MAX_POWER, CONF_POWER_FACTOR, 
-    CONF_POWER_TEMPLATE, CONF_MIN_POWER, CONF_MODE, CONF_POWER, CONF_SENSOR_TYPE, CONF_STATES_POWER, CONF_VOLTAGE, CONF_WLED, CalculationStrategy, SensorType
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_DAILY_FIXED_ENERGY,
+    CONF_FIXED,
+    CONF_LINEAR,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
+    CONF_MAX_POWER,
+    CONF_POWER_FACTOR, 
+    CONF_POWER_TEMPLATE,
+    CONF_MIN_POWER,
+    CONF_MODE,
+    CONF_POWER,
+    CONF_SENSOR_TYPE,
+    CONF_STATES_POWER,
+    CONF_UPDATE_FREQUENCY,
+    CONF_VALUE,
+    CONF_VOLTAGE,
+    CONF_WLED,
+    CalculationStrategy,
+    SensorType,
 )
 from custom_components.test.light import MockLight
 import custom_components.test.sensor as test_sensor_platform
@@ -251,6 +272,45 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_manufacturer"
 
+async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):
+    result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
+
+    user_input = {
+        CONF_NAME: "My daily energy sensor"
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], 
+        user_input
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"]
+    assert result["errors"] == {"base": "daily_energy_mandatory"}
+
+async def test_create_daily_energy_entry(hass: HomeAssistant):
+    result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
+
+    user_input = {
+        CONF_NAME: "My daily energy sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_VALUE: 20,
+        CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], 
+        user_input
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+        CONF_NAME: "My daily energy sensor",
+        CONF_DAILY_FIXED_ENERGY: {
+            CONF_UPDATE_FREQUENCY: 1800,
+            CONF_VALUE: 20,
+            CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+        },
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+    }
 
 def _assert_default_virtual_power_entry_data(
     strategy: CalculationStrategy,

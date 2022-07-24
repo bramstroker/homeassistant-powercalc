@@ -7,6 +7,7 @@ from homeassistant.components.light import LightEntity
 from homeassistant.const import STATE_OFF, STATE_ON
 
 from pytest_homeassistant_custom_component.common import MockToggleEntity
+import uuid
 
 ENTITIES = []
 
@@ -56,8 +57,12 @@ class MockLight(MockToggleEntity, LightEntity):
     manufacturer: str | None = None
     model: str | None = None
 
-    def __init__(self, name, state, unique_id=None):
+    def __init__(self, name: str, state: str | None = None, unique_id: str | None = None):
+        if state is None:
+            state = STATE_ON
         super().__init__(name, state)
+        if unique_id is None:
+            unique_id = str(uuid.uuid4())[:8]
         self._attr_unique_id = unique_id
 
     def turn_on(self, **kwargs):
