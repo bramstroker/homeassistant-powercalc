@@ -365,9 +365,10 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
     if CONF_DAILY_FIXED_ENERGY in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
-    if (validate and 
-        CONF_CREATE_GROUP not in merged_config and
-        CONF_ENTITY_ID not in merged_config
+    if (
+        validate
+        and CONF_CREATE_GROUP not in merged_config
+        and CONF_ENTITY_ID not in merged_config
     ):
         raise SensorConfigurationError(
             "You must supply an entity_id in the configuration, see the README"
