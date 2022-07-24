@@ -196,7 +196,7 @@ async def create_utility_meter(
     )
 
     # This is for BC purposes, for HA versions lower than 2022.4. May be removed in the future
-    if not "unique_id" in params and unique_id:
+    if "unique_id" not in params and unique_id:
         # Set new unique id if this entity already exists in the entity registry
         async_set_unique_id(hass, entity_id, unique_id)
         utility_meter.unique_id = unique_id

@@ -580,9 +580,9 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     errors = {}
 
     if (
-        not CONF_SUB_GROUPS in user_input
-        and not CONF_GROUP_POWER_ENTITIES in user_input
-        and not CONF_GROUP_ENERGY_ENTITIES in user_input
+        CONF_SUB_GROUPS not in user_input
+        and CONF_GROUP_POWER_ENTITIES not in user_input
+        and CONF_GROUP_ENERGY_ENTITIES not in user_input
     ):
         errors["base"] = "group_mandatory"
 
@@ -666,7 +666,7 @@ def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
         return {}
     errors = {}
 
-    if not CONF_VALUE in user_input and not CONF_VALUE_TEMPLATE in user_input:
+    if CONF_VALUE not in user_input and CONF_VALUE_TEMPLATE not in user_input:
         errors["base"] = "daily_energy_mandatory"
 
     return errors
