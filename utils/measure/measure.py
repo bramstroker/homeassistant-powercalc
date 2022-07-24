@@ -565,7 +565,6 @@ class Measure:
     def get_dummy_load_value(self) -> float:
         """Get the previously measured dummy load value"""
 
-        #dummy_load_file = Path(".persistent/dummy_load").resolve()
         dummy_load_file = os.path.join(Path(__file__).parent.absolute(), ".persistent/dummy_load")
         if not os.path.exists(dummy_load_file):
             return self.measure_dummy_load(dummy_load_file)
