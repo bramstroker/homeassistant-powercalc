@@ -199,7 +199,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.sensor_config: dict[str, Any] = dict()
         self.selected_sensor_type: str = None
         self.name: str = None
-        self.source_entity: SourceEntity = None
+        self.source_entity: SourceEntity | None = None
         self.source_entity_id: str = None
 
     @staticmethod
@@ -424,8 +424,8 @@ class OptionsFlowHandler(OptionsFlow):
         self.sensor_type: SensorType = (
             self.current_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         )
-        self.source_entity_id: str = self.current_config.get(CONF_ENTITY_ID)
-        self.source_entity: SourceEntity = None
+        self.source_entity_id: str | None = self.current_config.get(CONF_ENTITY_ID)
+        self.source_entity: SourceEntity | None = None
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
