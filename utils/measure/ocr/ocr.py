@@ -256,7 +256,6 @@ class OCR:
 
                     #Convert to grayscale for easier OCR detection
                     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-                    # frame = cv2.adaptiveThreshold(frame, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
                     
                     match = pytesseract.image_to_string(
                         frame,
