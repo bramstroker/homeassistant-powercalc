@@ -25,7 +25,7 @@ jobs:
             --durations=10 \
             -n auto \
             --cov custom_components.powercalc \
-            --cov-report xml
+            --cov-report xml \ 
             -o console_output_style=count \
             -p no:sugar \
             tests
