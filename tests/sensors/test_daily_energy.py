@@ -1,4 +1,5 @@
 from datetime import timedelta
+
 import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
@@ -16,18 +17,20 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
-    DOMAIN,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ON_TIME,
     CONF_VALUE,
+    DOMAIN,
     UnitPrefix,
 )
 from custom_components.powercalc.sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
+
 from ..common import run_powercalc_setup_yaml_config
+
 
 async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
     sensor_config = {
@@ -49,13 +52,11 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
     [
         (UnitPrefix.NONE, ENERGY_WATT_HOUR),
         (UnitPrefix.KILO, ENERGY_KILO_WATT_HOUR),
-        (UnitPrefix.MEGA, ENERGY_MEGA_WATT_HOUR)
+        (UnitPrefix.MEGA, ENERGY_MEGA_WATT_HOUR),
     ],
 )
 async def test_create_daily_energy_sensor_unit_prefix_watt(
-    hass: HomeAssistant,
-    unit_prefix: str,
-    unit_of_measurement: str
+    hass: HomeAssistant, unit_prefix: str, unit_of_measurement: str
 ):
     """Test that setting the unit_prefix results in the correct unit_of_measurement"""
     sensor_config = {
@@ -69,15 +70,14 @@ async def test_create_daily_energy_sensor_unit_prefix_watt(
     assert sensor.name == "My sensor Energy"
     assert sensor._attr_native_unit_of_measurement == unit_of_measurement
 
+
 async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
-            CONF_DAILY_FIXED_ENERGY: {
-                CONF_VALUE: 0.05
-            },
+            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 0.05},
         },
     )
 
@@ -85,6 +85,7 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
     assert state
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+
 
 async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant):
     """
@@ -98,7 +99,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 15,
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
             },
         },
     )
@@ -113,6 +114,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
     assert state.state == "15.00"
     assert state.name == "IP camera upstairs power"
 
+
 @pytest.mark.parametrize(
     "daily_fixed_options,elapsed_seconds,expected_delta",
     [
@@ -120,20 +122,20 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
             {
                 CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
                 CONF_ON_TIME: timedelta(days=1),
-                CONF_VALUE: 12
+                CONF_VALUE: 12,
             },
             3600,
-            0.5
+            0.5,
         ),
         (
             # Consume 1500 x 2 hour = 3 kWh a day
             {
                 CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
                 CONF_ON_TIME: timedelta(hours=2),
-                CONF_VALUE: 2000
+                CONF_VALUE: 2000,
             },
-            1200, # Simulate 20 minutes
-            0.0555
+            1200,  # Simulate 20 minutes
+            0.0555,
         ),
         (
             {
@@ -150,7 +152,7 @@ async def test_calculate_delta(
     hass: HomeAssistant,
     daily_fixed_options: ConfigType,
     elapsed_seconds: int,
-    expected_delta: float
+    expected_delta: float,
 ):
     sensor_config = {
         CONF_ENERGY_SENSOR_NAMING: "{} Energy",
