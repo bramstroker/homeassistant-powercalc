@@ -19,6 +19,7 @@ from homeassistant.components import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 from custom_components.powercalc.config_flow import (
     ConfigFlow, DOMAIN, CONF_CONFIRM_AUTODISCOVERED_MODEL
@@ -49,7 +50,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.test.light import MockLight
 import custom_components.test.sensor as test_sensor_platform
-from .common import create_mock_light_entity
+from .common import create_mock_light_entity, MockConfigEntry
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -372,6 +373,53 @@ async def test_create_group_entry(hass: HomeAssistant):
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
+
+async def test_fixed_power_options_flow(hass: HomeAssistant):
+    entry_data = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MODE: CalculationStrategy.FIXED,
+        CONF_FIXED: {
+            CONF_POWER: 40
+        }
+    }
+    entry = _create_mock_entry(hass, entry_data)
+
+    result = await _initialize_options_flow(hass, entry)
+
+    user_input = {
+        CONF_POWER: 50
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_FIXED][CONF_POWER] == 50
+
+
+def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data=entry_data
+    )
+    entry.add_to_hass(hass)
+
+    assert not entry.options
+    return entry
+
+async def _initialize_options_flow(hass: HomeAssistant, entry: config_entries.ConfigEntry) -> FlowResult:
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "init"
+    return result
 
 def _assert_default_virtual_power_entry_data(
     strategy: CalculationStrategy,
