@@ -1,9 +1,12 @@
+import pytest
+
 from homeassistant.components import input_number
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 from homeassistant.setup import async_setup_component
+from custom_components.powercalc.errors import StrategyConfigurationError
 
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
@@ -81,6 +84,7 @@ async def test_states_power_with_template(hass: HomeAssistant):
     )
     assert 42 == await strategy.calculate(State(source_entity.entity_id, "heat"))
     assert 60 == await strategy.calculate(State(source_entity.entity_id, "cool"))
+    assert not await strategy.calculate(State(source_entity.entity_id, "not_defined"))
 
     track_entity = strategy.get_entities_to_track()
     assert isinstance(track_entity[0], TrackTemplate)
@@ -106,3 +110,21 @@ async def test_states_power_with_attributes():
     assert 12 == await strategy.calculate(
         State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"})
     )
+
+async def test_validation_error_when_no_power_supplied():
+    with pytest.raises(StrategyConfigurationError):
+        strategy = FixedStrategy(
+            power=None,
+            per_state_power=None,
+            source_entity=create_source_entity("media_player"),
+        )
+        await strategy.validate_config()
+
+async def test_validation_error_state_power_only_entity_domain():
+    with pytest.raises(StrategyConfigurationError):
+        strategy = FixedStrategy(
+            power=20,
+            per_state_power=None,
+            source_entity=create_source_entity("climate"),
+        )
+        await strategy.validate_config()
