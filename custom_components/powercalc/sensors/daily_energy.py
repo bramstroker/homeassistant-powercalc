@@ -106,7 +106,7 @@ async def create_daily_fixed_energy_sensor(
         mode_config.get(CONF_UNIT_OF_MEASUREMENT),
         mode_config.get(CONF_UPDATE_FREQUENCY),
         sensor_config,
-        on_time=mode_config.get(CONF_ON_TIME),
+        on_time=on_time,
         start_time=mode_config.get(CONF_START_TIME),
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
     )
