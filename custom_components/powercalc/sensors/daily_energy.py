@@ -211,25 +211,25 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self.hass, refresh, timedelta(seconds=self._update_frequency)
         )
 
-    def calculate_delta(self, elapsedSeconds: int) -> Decimal:
+    def calculate_delta(self, elapsed_seconds: int) -> Decimal:
         value = self._value
         if isinstance(value, Template):
             value.hass = self.hass
             value = value.async_render()
 
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            whPerDay = value * 1000
+            wh_per_day = value * 1000
         elif self._user_unit_of_measurement == POWER_WATT:
-            whPerDay = value * (self._on_time.total_seconds() / 3600)
+            wh_per_day = value * (self._on_time.total_seconds() / 3600)
 
         # Convert Wh to the native measurement unit
-        energyPerDay = whPerDay
+        energy_per_day = wh_per_day
         if self._attr_native_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            energyPerDay = whPerDay / 1000
+            energy_per_day = wh_per_day / 1000
         elif self._attr_native_unit_of_measurement == ENERGY_MEGA_WATT_HOUR:
-            energyPerDay = whPerDay / 1000000
+            energy_per_day = wh_per_day / 1000000
 
-        return Decimal((energyPerDay / 86400) * elapsedSeconds)
+        return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
     @property
     def native_value(self):
