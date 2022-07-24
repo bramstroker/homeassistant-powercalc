@@ -15,12 +15,14 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util import dt
 
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ON_TIME,
+    CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
     DOMAIN,
     UnitPrefix,
@@ -28,6 +30,8 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
+
+from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from ..common import run_powercalc_setup_yaml_config
 
@@ -72,19 +76,37 @@ async def test_create_daily_energy_sensor_unit_prefix_watt(
 
 
 async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
+    update_frequency = 1800
     await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
-            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 0.05},
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_UPDATE_FREQUENCY: update_frequency,
+                CONF_VALUE: 12,
+            },
         },
     )
 
-    state = hass.states.get("sensor.ip_camera_upstairs_energy")
+    sensor_entity_id = "sensor.ip_camera_upstairs_energy"
+    state = hass.states.get(sensor_entity_id)
     assert state
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+
+    # Trigger calculation in the future
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=update_frequency))
+    await hass.async_block_till_done()
+
+    state = hass.states.get(sensor_entity_id)
+    assert state.state == "0.2500"
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=update_frequency))
+    await hass.async_block_till_done()
+
+    state = hass.states.get(sensor_entity_id)
+    assert state.state == "0.5000"
 
 
 async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant):
