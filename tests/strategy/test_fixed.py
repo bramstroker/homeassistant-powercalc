@@ -80,7 +80,11 @@ async def test_states_power_with_template(hass: HomeAssistant):
     assert 42 == await strategy.calculate(State(source_entity.entity_id, "heat"))
     assert 60 == await strategy.calculate(State(source_entity.entity_id, "cool"))
 
-
+    track_entity = strategy.get_entities_to_track()
+    assert isinstance(track_entity[0], TrackTemplate)
+    track_entity[0].template == "{{states('input_number.test_number42')}}"
+    assert isinstance(track_entity[1], TrackTemplate)
+    track_entity[1].template == "{{states('input_number.test_number60')}}"
 
 async def test_states_power_with_attributes():
     source_entity = create_source_entity("media_player")
