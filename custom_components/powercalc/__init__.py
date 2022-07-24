@@ -220,7 +220,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         try:
             used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
-            return unload_ok
+            return True
 
         entity_registry = er.async_get(hass)
         entries = er.async_entries_for_config_entry(
