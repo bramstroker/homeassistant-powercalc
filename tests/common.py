@@ -1,10 +1,9 @@
-from homeassistant.components import light
+from homeassistant.components import light, sensor
 from homeassistant.const import CONF_PLATFORM
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
-from homeassistant.components import sensor
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -50,6 +49,7 @@ async def create_mock_light_entity(
         )
 
     return (entity_entry.entity_id, device_entry.id)
+
 
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant, config: list[ConfigType] | ConfigType
