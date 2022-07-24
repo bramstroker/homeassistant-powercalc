@@ -176,7 +176,6 @@ class OcrRegionSelection:
         self.stream = video_stream
     
     def start(self):
-        #return self
         """
         Creates a thread targeted at get(), which reads frames from CV2 VideoCapture
 
