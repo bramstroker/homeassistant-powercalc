@@ -20,6 +20,7 @@ jobs:
       - name: Run tests
         run: |
           pip install pytest-cov
+          pip install coverage
           pytest \
             -qq \
             --timeout=9 \
@@ -30,13 +31,10 @@ jobs:
             -o console_output_style=count \
             -p no:sugar \
             tests
-      - name: Covert Coverage Results
-        run: |
-          pip install coveragepy-lcov
-          coveragepy-lcov --data_file_path coverage.xml --output_file_path lcov.info
-
+          coverage lcov
+      
       - name: Upload Coverage Results
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-          path-to-lcov: lcov.info
+          path-to-lcov: coverage.lcov
