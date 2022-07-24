@@ -1,13 +1,12 @@
 import pytest
-
 from homeassistant.components import input_number
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 from homeassistant.setup import async_setup_component
-from custom_components.powercalc.errors import StrategyConfigurationError
 
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
 from .common import create_source_entity
@@ -88,9 +87,14 @@ async def test_states_power_with_template(hass: HomeAssistant):
 
     track_entity = strategy.get_entities_to_track()
     assert isinstance(track_entity[0], TrackTemplate)
-    assert track_entity[0].template.template == "{{states('input_number.test_number42')}}"
+    assert (
+        track_entity[0].template.template == "{{states('input_number.test_number42')}}"
+    )
     assert isinstance(track_entity[1], TrackTemplate)
-    assert track_entity[1].template.template == "{{states('input_number.test_number60')}}"
+    assert (
+        track_entity[1].template.template == "{{states('input_number.test_number60')}}"
+    )
+
 
 async def test_states_power_with_attributes():
     source_entity = create_source_entity("media_player")
@@ -111,6 +115,7 @@ async def test_states_power_with_attributes():
         State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"})
     )
 
+
 async def test_validation_error_when_no_power_supplied():
     with pytest.raises(StrategyConfigurationError):
         strategy = FixedStrategy(
@@ -119,6 +124,7 @@ async def test_validation_error_when_no_power_supplied():
             source_entity=create_source_entity("media_player"),
         )
         await strategy.validate_config()
+
 
 async def test_validation_error_state_power_only_entity_domain():
     with pytest.raises(StrategyConfigurationError):
