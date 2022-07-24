@@ -1,32 +1,45 @@
 """Aliases for manufacturers and model IDs."""
 
+MANUFACTURER_SIGNIFY = "Signify Netherlands B.V."
+MANUFACTURER_IKEA = "IKEA of Sweden"
+MANUFACTURER_MULLER_LIGHT = "Müller Licht"
+MANUFACTURER_YEELIGHT = "Yeelight"
+MANUFACTURER_TUYA = "TuYa"
+MANUFACTURER_AQARA = "Aqara"
+MANUFACTURER_LEXMAN = "Lexman"
+MANUFACTURER_MELITECH = "MeLiTec"
+MANUFACTURER_WIZ = "WiZ"
+MANUFACTURER_OSRAM = "OSRAM"
+MANUFACTURER_LEDVANCE = "LEDVANCE"
+MANUFACTURER_FEIBIT = "Feibit Inc co.  "
+
 MANUFACTURER_ALIASES = {
-    "Philips": "Signify Netherlands B.V.",
-    "IKEA": "IKEA of Sweden",
-    "Xiaomi": "Aqara",
-    "LUMI": "Aqara",
-    "ADEO": "Lexman",
-    "MLI": "Müller Licht",
-    "LightZone": "MeLiTec",
+    "Philips": MANUFACTURER_SIGNIFY,
+    "IKEA": MANUFACTURER_IKEA,
+    "Xiaomi": MANUFACTURER_AQARA,
+    "LUMI": MANUFACTURER_AQARA,
+    "ADEO": MANUFACTURER_LEXMAN,
+    "MLI": MANUFACTURER_MULLER_LIGHT,
+    "LightZone": MANUFACTURER_MELITECH,
 }
 
 MANUFACTURER_DIRECTORY_MAPPING = {
-    "IKEA of Sweden": "ikea",
-    "Feibit Inc co.  ": "jiawen",
-    "LEDVANCE": "ledvance",
-    "Müller Licht": "mueller-licht",
-    "OSRAM": "osram",
-    "Signify Netherlands B.V.": "signify",
-    "Aqara": "aqara",
-    "Lexman": "lexman",
-    "Yeelight": "yeelight",
-    "TuYa": "tuya",
-    "MeLiTec": "melitec",
-    "WiZ": "wiz",
+    MANUFACTURER_IKEA: "ikea",
+    MANUFACTURER_FEIBIT: "jiawen",
+    MANUFACTURER_LEDVANCE: "ledvance",
+    MANUFACTURER_MULLER_LIGHT: "mueller-licht",
+    MANUFACTURER_OSRAM: "osram",
+    MANUFACTURER_SIGNIFY: "signify",
+    MANUFACTURER_AQARA: "aqara",
+    MANUFACTURER_LEXMAN: "lexman",
+    MANUFACTURER_YEELIGHT: "yeelight",
+    MANUFACTURER_TUYA: "tuya",
+    MANUFACTURER_MELITECH: "melitec",
+    MANUFACTURER_WIZ: "wiz",
 }
 
 MODEL_DIRECTORY_MAPPING = {
-    "IKEA of Sweden": {
+    MANUFACTURER_IKEA: {
         "FLOALT panel WS 30x30": "L1527",
         "FLOALT panel WS 60x60": "L1529",
         "Slagsida": "L1616",
@@ -61,10 +74,10 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
-    "Müller Licht": {
+    MANUFACTURER_MULLER_LIGHT: {
         "45327": "45318",
     },
-    "Signify Netherlands B.V.": {
+    MANUFACTURER_SIGNIFY: {
         "9290022166": "LCA001",
         "929003053401": "LCA001",
         "9290024687": "LCA007",
@@ -101,10 +114,10 @@ MODEL_DIRECTORY_MAPPING = {
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
     },
-    "TuYa": {
+    MANUFACTURER_TUYA: {
         "TS0505B": "NO66-ZB/length_5",
     },
-    "Yeelight": {
+    MANUFACTURER_YEELIGHT: {
         "color2": "YLDP06YL",
         "ceiling10": "YLDL01YL",
         "mono1": "YLDP01YL",
