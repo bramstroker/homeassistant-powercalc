@@ -346,10 +346,7 @@ def ocr_stream(source: str = "0"):
 
     # Main display loop
     print("\nPUSH q TO VIEW VIDEO STREAM\n")
-    i = 0
     while True:
-        i += 1
-
         # Quit condition:
         pressed_key = cv2.waitKey(1) & 0xFF
         if pressed_key == ord('q'):
