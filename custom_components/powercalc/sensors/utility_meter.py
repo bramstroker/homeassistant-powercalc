@@ -54,7 +54,7 @@ async def create_utility_meters(
 
     utility_meters = []
 
-    if not DATA_UTILITY in hass.data:
+    if DATA_UTILITY not in hass.data:
         hass.data[DATA_UTILITY] = {}
 
     tariffs = sensor_config.get(CONF_UTILITY_METER_TARIFFS)
