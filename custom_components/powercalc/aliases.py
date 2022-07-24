@@ -57,7 +57,6 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb E27 WS opal 1000lm": "LED1732G11",
         "TRADFRI bulb E14 WS opal 600lm": "LED1733G7",
         "TRADFRI bulb E27 WS clear 806lm": "LED1736G9",
-        "TRADFRI bulb E14 WS opal 600lm": "LED1738G7",
         "TRADFRI bulb E14 WS 470lm": "LED1835C6",
         "TRADFRI bulb E27 WW 806lm": "LED1836G9",
         "TRADFRI bulb E27 WW clear 250lm": "LED1842G3",
