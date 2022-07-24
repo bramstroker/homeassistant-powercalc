@@ -111,6 +111,7 @@ MODEL_DIRECTORY_MAPPING = {
         "9290020399": "LWE002",
         "915005106701": "LST002",
         "7299355PH": "LST001",
+        "9290024684": "LTA009",
         # US Versions. Alias to EU versions
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
