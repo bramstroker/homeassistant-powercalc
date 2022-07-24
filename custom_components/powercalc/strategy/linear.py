@@ -137,7 +137,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         try:
             return int(float(entity_state.state))
-        except ValueError as e:
+        except ValueError:
             _LOGGER.error(
                 f"Expecting state to be a number for entity: {entity_state.entity_id}"
             )
