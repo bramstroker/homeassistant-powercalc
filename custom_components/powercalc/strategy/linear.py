@@ -45,7 +45,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration: list[tuple] = None
+        self._calibration: list[tuple] | None = None
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the current power consumption"""
@@ -93,23 +93,23 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def create_calibrate_list(self) -> list[tuple]:
         """Build a table of calibration values"""
-        list = []
+        calibration_list = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
             full_range = self.get_entity_value_range()
-            min = full_range[0]
-            max = full_range[1]
+            min_value = full_range[0]
+            max_value = full_range[1]
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
-            list.append((min, float(min_power)))
-            list.append((max, float(self._config.get(CONF_MAX_POWER))))
-            return list
+            calibration_list.append((min_value, float(min_power)))
+            calibration_list.append((max_value, float(self._config.get(CONF_MAX_POWER))))
+            return calibration_list
 
         for line in calibrate:
             parts = line.split(" -> ")
-            list.append((int(parts[0]), float(parts[1])))
+            calibration_list.append((int(parts[0]), float(parts[1])))
 
-        sorted_list = sorted(list, key=lambda tup: tup[0])
+        sorted_list = sorted(calibration_list, key=lambda tup: tup[0])
         return sorted_list
 
     def get_entity_value_range(self) -> tuple:
