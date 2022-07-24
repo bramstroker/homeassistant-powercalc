@@ -7,7 +7,6 @@ from typing import cast
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import __version__ as HA_VERSION
-from numpy import isin
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
     from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
