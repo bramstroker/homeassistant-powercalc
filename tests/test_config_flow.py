@@ -178,20 +178,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 async def test_create_wled_sensor_entry(hass: HomeAssistant):
-    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
-    await create_mock_light_entity(hass, light_entity)
-
-    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
-    platform.init(empty=True)
-    estimated_current_entity = platform.MockSensor(
-        name="test_estimated_current",
-        native_value="5.0",
-        unique_id=DEFAULT_UNIQUE_ID
-    )
-    platform.ENTITIES[0] = estimated_current_entity
-
-    assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}})
-    await hass.async_block_till_done()
+    await _create_wled_entities(hass)
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
 
@@ -374,16 +361,18 @@ async def test_create_group_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
-async def test_fixed_power_options_flow(hass: HomeAssistant):
-    entry_data = {
-        CONF_ENTITY_ID: "light.test",
-        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_MODE: CalculationStrategy.FIXED,
-        CONF_FIXED: {
-            CONF_POWER: 40
+async def test_fixed_options_flow(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass, 
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {
+                CONF_POWER: 40
+            }
         }
-    }
-    entry = _create_mock_entry(hass, entry_data)
+    )
 
     result = await _initialize_options_flow(hass, entry)
 
@@ -397,6 +386,88 @@ async def test_fixed_power_options_flow(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
+
+async def test_wled_options_flow(hass: HomeAssistant):
+    await _create_wled_entities(hass)
+
+    entry = _create_mock_entry(
+        hass, 
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.WLED,
+            CONF_WLED: {
+                CONF_VOLTAGE: 5
+            }
+        }
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    user_input = {
+        CONF_VOLTAGE: 12
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_WLED][CONF_VOLTAGE] == 12
+
+async def test_linear_options_flow(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass, 
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.LINEAR,
+            CONF_LINEAR: {
+                CONF_MIN_POWER: 10,
+                CONF_MAX_POWER: 40
+            }
+        }
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    user_input = {
+        CONF_MAX_POWER: 50
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_LINEAR][CONF_MAX_POWER] == 50
+
+async def test_daily_energy_options_flow(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass, 
+        {
+            CONF_NAME: "My daily energy sensor",
+            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 50
+            }
+        }
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    user_input = {
+        CONF_VALUE: 75,
+        CONF_UNIT_OF_MEASUREMENT: POWER_WATT
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == POWER_WATT
+    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
@@ -477,3 +548,19 @@ async def _select_sensor_type(hass: HomeAssistant, sensor_type: SensorType) -> F
     assert result["step_id"] == sensor_type
 
     return result
+
+async def _create_wled_entities(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    await create_mock_light_entity(hass, light_entity)
+
+    platform: test_sensor_platform = getattr(hass.components, "test.sensor")
+    platform.init(empty=True)
+    estimated_current_entity = platform.MockSensor(
+        name="test_estimated_current",
+        native_value="5.0",
+        unique_id=DEFAULT_UNIQUE_ID
+    )
+    platform.ENTITIES[0] = estimated_current_entity
+
+    assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}})
+    await hass.async_block_till_done()
