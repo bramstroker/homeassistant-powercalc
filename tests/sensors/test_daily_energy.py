@@ -135,6 +135,15 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
             1200, # Simulate 20 minutes
             0.0555
         ),
+        (
+            {
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_ON_TIME: 3600, # Test that on time can be passed as seconds
+                CONF_VALUE: 2400
+            },
+            1800, # Simulate 30 minutes
+            0.05
+        ),
     ],
 )
 async def test_calculate_delta(
@@ -150,6 +159,22 @@ async def test_calculate_delta(
     }
     sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
 
-    # Calculate delta after 1 hour
     delta = sensor.calculate_delta(elapsed_seconds)
     assert expected_delta == pytest.approx(float(delta), 0.001)
+
+async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant):
+    sensor_config = {
+        CONF_ENERGY_SENSOR_NAMING: "{} Energy",
+        CONF_NAME: "My sensor",
+        CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.MEGA,
+        CONF_DAILY_FIXED_ENERGY: {
+            CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+            CONF_ON_TIME: timedelta(days=1),
+            CONF_VALUE: 12
+        },
+    }
+    sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+
+    # Calculate delta after 1 hour
+    delta = sensor.calculate_delta(3600)
+    assert 0.0005 == pytest.approx(float(delta), 0.001)
