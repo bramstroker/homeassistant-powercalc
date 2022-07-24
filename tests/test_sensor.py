@@ -12,19 +12,15 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
+    CONF_UNIT_OF_MEASUREMENT,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
+    POWER_WATT,
     STATE_OFF,
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    mock_device_registry,
-    mock_registry,
-)
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -43,7 +39,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 
-from .common import create_mock_light_entity
+from .common import create_mock_light_entity, run_powercalc_setup_yaml_config
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
@@ -54,7 +50,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
 
     await hass.async_block_till_done()
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
@@ -93,7 +89,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
@@ -131,7 +127,7 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
 
     await hass.async_block_till_done()
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
@@ -205,7 +201,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 
     (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass, {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id}
     )
 
@@ -217,29 +213,13 @@ async def test_light_lut_strategy(hass: HomeAssistant):
     assert state.attributes.get(ATTR_SOURCE_ENTITY) == light_entity_id
 
 
-async def test_daily_energy_sensor(hass: HomeAssistant):
-    await _run_powercalc_setup_yaml_config(
-        hass,
-        {
-            CONF_PLATFORM: DOMAIN,
-            CONF_NAME: "IP camera upstairs",
-            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 0.05},
-        },
-    )
-
-    state = hass.states.get("sensor.ip_camera_upstairs_energy")
-    assert state
-    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
-
-
 async def test_error_when_configuring_same_entity_twice(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
     await _create_input_boolean_entity(hass, "test")
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass,
         [
             {
@@ -267,7 +247,7 @@ async def test_can_create_same_entity_twice_with_unique_id(
 ):
     await _create_input_boolean_entity(hass, "test")
 
-    await _run_powercalc_setup_yaml_config(
+    await run_powercalc_setup_yaml_config(
         hass,
         [
             {
@@ -293,16 +273,9 @@ async def test_can_create_same_entity_twice_with_unique_id(
     assert hass.states.get("sensor.test_energy_2")
 
 
-async def _run_powercalc_setup_yaml_config(
-    hass: HomeAssistant, config: list[ConfigType] | ConfigType
-):
-    await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: config})
-    await hass.async_block_till_done()
-
-
 async def _create_input_boolean_entity(hass: HomeAssistant, name: str):
     assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
+        hass, input_boolean.DOMAIN, {"input_boolean": {name: None}}
     )
 
     await hass.async_block_till_done()
