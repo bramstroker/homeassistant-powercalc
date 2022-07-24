@@ -73,8 +73,14 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
+    MANUFACTURER_LEDVANCE: {
+        "4058075168572": "Tibea TW Z3"
+    },
     MANUFACTURER_MULLER_LIGHT: {
         "45327": "45318",
+    },
+    MANUFACTURER_OSRAM: {
+        "AC03642": "CLA60 TW"
     },
     MANUFACTURER_SIGNIFY: {
         "9290022166": "LCA001",
