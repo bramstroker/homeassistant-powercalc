@@ -173,7 +173,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     def set_native_unit_of_measurement(self):
         """Set the native unit of measurement"""
-        unit_prefix = self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
+        unit_prefix = (
+            self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
+        )
         if unit_prefix == UnitPrefix.KILO:
             self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
         elif unit_prefix == UnitPrefix.NONE:

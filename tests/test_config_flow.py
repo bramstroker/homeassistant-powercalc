@@ -1,28 +1,29 @@
 from selectors import SelectSelector
-import pytest
-import voluptuous as vol
-
 from typing import Any
 
+import pytest
+import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
+from homeassistant.components import sensor
 from homeassistant.const import (
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
-    CONF_ENTITY_ID,
+    POWER_WATT,
     STATE_ON,
-    POWER_WATT
-)
-from homeassistant.components import (
-    sensor
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
+
+import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.config_flow import (
-    ConfigFlow, DOMAIN, CONF_CONFIRM_AUTODISCOVERED_MODEL
+    CONF_CONFIRM_AUTODISCOVERED_MODEL,
+    DOMAIN,
+    ConfigFlow,
 )
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -32,13 +33,13 @@ from custom_components.powercalc.const import (
     CONF_GROUP_POWER_ENTITIES,
     CONF_LINEAR,
     CONF_MANUFACTURER,
-    CONF_MODEL,
     CONF_MAX_POWER,
-    CONF_POWER_FACTOR, 
-    CONF_POWER_TEMPLATE,
     CONF_MIN_POWER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_FACTOR,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STATES_POWER,
     CONF_UPDATE_FREQUENCY,
@@ -49,11 +50,12 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.test.light import MockLight
-import custom_components.test.sensor as test_sensor_platform
-from .common import create_mock_light_entity, MockConfigEntry
+
+from .common import MockConfigEntry, create_mock_light_entity
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
+
 
 async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     """Test a menu is diplayed with sensor type selection"""
@@ -65,16 +67,14 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.MENU
     assert result["step_id"] == "user"
 
+
 @pytest.mark.parametrize(
     "sensor_type",
-    [
-        SensorType.VIRTUAL_POWER,
-        SensorType.DAILY_ENERGY,
-        SensorType.GROUP
-    ],
+    [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY, SensorType.GROUP],
 )
 async def test_sensor_type_form_displayed(hass: HomeAssistant, sensor_type: SensorType):
     await _select_sensor_type(hass, sensor_type)
+
 
 async def test_create_fixed_sensor_entry(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
@@ -85,18 +85,13 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.FIXED,
-        result["data"],
-        {
-            CONF_FIXED: {
-                CONF_POWER: 20
-            }
-        }
+        CalculationStrategy.FIXED, result["data"], {CONF_FIXED: {CONF_POWER: 20}}
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
@@ -110,17 +105,13 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.FIXED,
         result["data"],
-        {
-            CONF_FIXED: {
-                CONF_POWER: template,
-                CONF_POWER_TEMPLATE: template
-            }
-        }
+        {CONF_FIXED: {CONF_POWER: template, CONF_POWER_TEMPLATE: template}},
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
@@ -131,18 +122,13 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.FIXED,
-        result["data"],
-        {
-            CONF_FIXED: {
-                CONF_STATES_POWER: ""
-            }
-        }
+        CalculationStrategy.FIXED, result["data"], {CONF_FIXED: {CONF_STATES_POWER: ""}}
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_create_linear_sensor_entry(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
@@ -155,17 +141,13 @@ async def test_create_linear_sensor_entry(hass: HomeAssistant):
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.LINEAR,
         result["data"],
-        {
-            CONF_LINEAR: {
-                CONF_MIN_POWER: 1,
-                CONF_MAX_POWER: 40
-            }
-        }
+        {CONF_LINEAR: {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40}},
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
@@ -177,6 +159,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
     assert result["errors"]
     assert result["errors"]["base"] == "linear_mandatory"
     assert result["type"] == data_entry_flow.FlowResultType.FORM
+
 
 async def test_create_wled_sensor_entry(hass: HomeAssistant):
     await _create_wled_entities(hass)
@@ -191,17 +174,13 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant):
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.WLED,
         result["data"],
-        {
-            CONF_WLED: {
-                CONF_VOLTAGE: 12,
-                CONF_POWER_FACTOR: 0.8
-            }
-        }
+        {CONF_WLED: {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8}},
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_lut_manual_flow(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
@@ -216,8 +195,10 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert {"value": "belkin", "label": "belkin"} in manufacturer_options
     assert {"value": "signify", "label": "signify"} in manufacturer_options
 
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_MANUFACTURER: "signify"})
-    
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MANUFACTURER: "signify"}
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_model"
     data_schema: vol.Schema = result["data_schema"]
@@ -226,21 +207,21 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert {"value": "LCT010", "label": "LCT010"} in model_options
     assert {"value": "LWB010", "label": "LWB010"} in model_options
 
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_MODEL: "LCT010"})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MODEL: "LCT010"}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.LUT,
         result["data"],
-        {
-            CONF_MANUFACTURER: "signify",
-            CONF_MODEL: "LCT010"
-        }
+        {CONF_MANUFACTURER: "signify", CONF_MODEL: "LCT010"},
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_lut_autodiscover_flow(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
@@ -253,20 +234,18 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert result["step_id"] == "lut"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], 
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.LUT,
-        result["data"],
-        {}
+        CalculationStrategy.LUT, result["data"], {}
     )
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
 
 async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     """
@@ -283,26 +262,24 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     assert result["step_id"] == "lut"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], 
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False}
+        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: False}
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_manufacturer"
 
+
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
 
-    user_input = {
-        CONF_NAME: "My daily energy sensor"
-    }
+    user_input = {CONF_NAME: "My daily energy sensor"}
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], 
-        user_input
+        result["flow_id"], user_input
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
     assert result["errors"] == {"base": "daily_energy_mandatory"}
+
 
 async def test_create_daily_energy_entry(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
@@ -314,8 +291,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
         CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], 
-        user_input
+        result["flow_id"], user_input
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -333,28 +309,22 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_daily_energy_sensor_energy")
 
+
 async def test_create_group_entry(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-        CONF_GROUP_POWER_ENTITIES: [
-            "sensor.balcony_power",
-            "sensor.bedroom1_power"
-        ],
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], 
-        user_input
+        result["flow_id"], user_input
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_NAME: "My group sensor",
-        CONF_GROUP_POWER_ENTITIES: [
-            "sensor.balcony_power",
-            "sensor.bedroom1_power"
-        ],
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_CREATE_UTILITY_METERS: False,
     }
@@ -362,24 +332,21 @@ async def test_create_group_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
+
 async def test_fixed_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
-        hass, 
+        hass,
         {
             CONF_ENTITY_ID: "light.test",
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
-            CONF_FIXED: {
-                CONF_POWER: 40
-            }
-        }
+            CONF_FIXED: {CONF_POWER: 40},
+        },
     )
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {
-        CONF_POWER: 50
-    }
+    user_input = {CONF_POWER: 50}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -388,26 +355,23 @@ async def test_fixed_options_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
 
+
 async def test_wled_options_flow(hass: HomeAssistant):
     await _create_wled_entities(hass)
 
     entry = _create_mock_entry(
-        hass, 
+        hass,
         {
             CONF_ENTITY_ID: "light.test",
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.WLED,
-            CONF_WLED: {
-                CONF_VOLTAGE: 5
-            }
-        }
+            CONF_WLED: {CONF_VOLTAGE: 5},
+        },
     )
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {
-        CONF_VOLTAGE: 12
-    }
+    user_input = {CONF_VOLTAGE: 12}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -416,25 +380,21 @@ async def test_wled_options_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_WLED][CONF_VOLTAGE] == 12
 
+
 async def test_linear_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
-        hass, 
+        hass,
         {
             CONF_ENTITY_ID: "light.test",
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.LINEAR,
-            CONF_LINEAR: {
-                CONF_MIN_POWER: 10,
-                CONF_MAX_POWER: 40
-            }
-        }
+            CONF_LINEAR: {CONF_MIN_POWER: 10, CONF_MAX_POWER: 40},
+        },
     )
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {
-        CONF_MAX_POWER: 50
-    }
+    user_input = {CONF_MAX_POWER: 50}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -443,24 +403,20 @@ async def test_linear_options_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_LINEAR][CONF_MAX_POWER] == 50
 
+
 async def test_daily_energy_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
-        hass, 
+        hass,
         {
             CONF_NAME: "My daily energy sensor",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
-            CONF_DAILY_FIXED_ENERGY: {
-                CONF_VALUE: 50
-            }
-        }
+            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 50},
+        },
     )
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {
-        CONF_VALUE: 75,
-        CONF_UNIT_OF_MEASUREMENT: POWER_WATT
-    }
+    user_input = {CONF_VALUE: 75, CONF_UNIT_OF_MEASUREMENT: POWER_WATT}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -472,16 +428,16 @@ async def test_daily_energy_options_flow(hass: HomeAssistant):
 
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data=entry_data
-    )
+    entry = MockConfigEntry(domain=DOMAIN, data=entry_data)
     entry.add_to_hass(hass)
 
     assert not entry.options
     return entry
 
-async def _initialize_options_flow(hass: HomeAssistant, entry: config_entries.ConfigEntry) -> FlowResult:
+
+async def _initialize_options_flow(
+    hass: HomeAssistant, entry: config_entries.ConfigEntry
+) -> FlowResult:
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     result = await hass.config_entries.options.async_init(
@@ -493,29 +449,35 @@ async def _initialize_options_flow(hass: HomeAssistant, entry: config_entries.Co
     assert result["step_id"] == "init"
     return result
 
+
 def _assert_default_virtual_power_entry_data(
     strategy: CalculationStrategy,
     config_entry_data: dict,
-    expected_strategy_options = dict[str, Any]
+    expected_strategy_options=dict[str, Any],
 ):
-    assert config_entry_data == {
-        CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_MODE: strategy,
-        CONF_CREATE_ENERGY_SENSOR: True,
-        CONF_CREATE_UTILITY_METERS: False,
-        CONF_NAME: "test",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-    } | expected_strategy_options
+    assert (
+        config_entry_data
+        == {
+            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: strategy,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_NAME: "test",
+            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        }
+        | expected_strategy_options
+    )
+
 
 async def _goto_virtual_power_strategy_step(
     hass: HomeAssistant,
     strategy: CalculationStrategy,
-    user_input: dict[str, Any] | None = None
+    user_input: dict[str, Any] | None = None,
 ) -> FlowResult:
     """
-     - Select the virtual power sensor type
-     - Select the given calculation strategy and put in default configuration options
+    - Select the virtual power sensor type
+    - Select the given calculation strategy and put in default configuration options
     """
 
     if user_input is None:
@@ -526,7 +488,9 @@ async def _goto_virtual_power_strategy_step(
         }
 
     result = await _select_sensor_type(hass, "virtual_power")
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], user_input)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input
+    )
 
     # Lut has alternate flows depending on auto discovery, don't need to assert here
     if strategy != CalculationStrategy.LUT:
@@ -535,7 +499,10 @@ async def _goto_virtual_power_strategy_step(
 
     return result
 
-async def _select_sensor_type(hass: HomeAssistant, sensor_type: SensorType) -> FlowResult:
+
+async def _select_sensor_type(
+    hass: HomeAssistant, sensor_type: SensorType
+) -> FlowResult:
     """Select a sensor type from the menu"""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -550,6 +517,7 @@ async def _select_sensor_type(hass: HomeAssistant, sensor_type: SensorType) -> F
 
     return result
 
+
 async def _create_wled_entities(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
@@ -557,11 +525,11 @@ async def _create_wled_entities(hass: HomeAssistant):
     platform: test_sensor_platform = getattr(hass.components, "test.sensor")
     platform.init(empty=True)
     estimated_current_entity = platform.MockSensor(
-        name="test_estimated_current",
-        native_value="5.0",
-        unique_id=DEFAULT_UNIQUE_ID
+        name="test_estimated_current", native_value="5.0", unique_id=DEFAULT_UNIQUE_ID
     )
     platform.ENTITIES[0] = estimated_current_entity
 
-    assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}})
+    assert await async_setup_component(
+        hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}}
+    )
     await hass.async_block_till_done()

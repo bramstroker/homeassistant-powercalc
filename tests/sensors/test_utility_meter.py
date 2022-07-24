@@ -1,25 +1,20 @@
-from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
 from homeassistant.components import input_boolean, sensor, utility_meter
-from homeassistant.const import (
-    CONF_PLATFORM,
-    CONF_ENTITY_ID,
-)
+from homeassistant.components.utility_meter.select import ATTR_OPTIONS
 from homeassistant.components.utility_meter.sensor import (
     ATTR_SOURCE_ID,
     ATTR_STATUS,
     ATTR_TARIFF,
     COLLECTING,
-    PAUSED
+    PAUSED,
 )
-from homeassistant.components.utility_meter.select import (
-    ATTR_OPTIONS
-)
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
+from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
-    CONF_MODE,
     CONF_FIXED,
+    CONF_MODE,
     CONF_POWER,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -27,11 +22,12 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 
+
 async def test_tariff_sensors_are_created(hass: HomeAssistant):
     assert await async_setup_component(
         hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
     )
-    
+
     assert await async_setup_component(hass, utility_meter.DOMAIN, {})
 
     await hass.async_block_till_done()
@@ -39,22 +35,19 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     await async_setup_component(
         hass,
         sensor.DOMAIN,
-        {sensor.DOMAIN: [{
-            CONF_PLATFORM: DOMAIN,
-            CONF_ENTITY_ID: "input_boolean.test",
-            CONF_MODE: CalculationStrategy.FIXED,
-            CONF_FIXED: {
-                CONF_POWER: 50
-            },
-            CONF_CREATE_UTILITY_METERS: True,
-            CONF_UTILITY_METER_TARIFFS: [
-                "peak",
-                "offpeak"
-            ],
-            CONF_UTILITY_METER_TYPES: [
-                "daily"
+        {
+            sensor.DOMAIN: [
+                {
+                    CONF_PLATFORM: DOMAIN,
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 50},
+                    CONF_CREATE_UTILITY_METERS: True,
+                    CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+                    CONF_UTILITY_METER_TYPES: ["daily"],
+                }
             ]
-        }]}
+        },
     )
     await hass.async_block_till_done()
 

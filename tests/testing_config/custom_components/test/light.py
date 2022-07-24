@@ -3,11 +3,11 @@ Provide a mock light platform.
 
 Call init before using it in your tests to ensure clean test data.
 """
+import uuid
+
 from homeassistant.components.light import LightEntity
 from homeassistant.const import STATE_OFF, STATE_ON
-
 from pytest_homeassistant_custom_component.common import MockToggleEntity
-import uuid
 
 ENTITIES = []
 
@@ -33,9 +33,11 @@ async def async_setup_platform(
     """Return mock entities."""
     async_add_entities_callback(ENTITIES)
 
+
 async def async_setup_entry(hass, entry, async_add_entities) -> bool:
     async_add_entities(ENTITIES)
     return True
+
 
 class MockLight(MockToggleEntity, LightEntity):
     """Mock light class."""
@@ -57,7 +59,9 @@ class MockLight(MockToggleEntity, LightEntity):
     manufacturer: str | None = None
     model: str | None = None
 
-    def __init__(self, name: str, state: str | None = None, unique_id: str | None = None):
+    def __init__(
+        self, name: str, state: str | None = None, unique_id: str | None = None
+    ):
         if state is None:
             state = STATE_ON
         super().__init__(name, state)
@@ -82,7 +86,7 @@ class MockLight(MockToggleEntity, LightEntity):
                 setattr(self, key, value)
             if key == "white":
                 setattr(self, "brightness", value)
-    
+
     @property
     def device_info(self):
         return {
