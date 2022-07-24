@@ -1,9 +1,9 @@
 from homeassistant.components import input_number
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 from homeassistant.setup import async_setup_component
-from homeassistant.helpers.event import TrackTemplate
 
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
@@ -54,13 +54,15 @@ async def test_states_power():
     assert 1.5 == await strategy.calculate(State(source_entity.entity_id, "idle"))
     assert 20 == await strategy.calculate(State(source_entity.entity_id, "whatever"))
 
+
 async def test_states_power_with_template(hass: HomeAssistant):
     assert await async_setup_component(
         hass,
-        input_number.DOMAIN, {
+        input_number.DOMAIN,
+        {
             input_number.DOMAIN: {
                 "test_number42": {"min": "0", "max": "100", "initial": "42"},
-                "test_number60": {"min": "0", "max": "100", "initial": "60"}
+                "test_number60": {"min": "0", "max": "100", "initial": "60"},
             }
         },
     )
