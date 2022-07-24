@@ -197,8 +197,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize options flow."""
         self.sensor_config: dict[str, Any] = dict()
-        self.selected_sensor_type: str = None
-        self.name: str = None
+        self.selected_sensor_type: str | None = None
+        self.name: str | None = None
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str = None
 
