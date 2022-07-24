@@ -118,7 +118,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness > 255:
             brightness = 255
 
-        if color_mode is COLOR_MODE_UNKNOWN:
+        if color_mode == COLOR_MODE_UNKNOWN:
             _LOGGER.debug(
                 "%s: Could not calculate power. color mode unknown",
                 entity_state.entity_id,

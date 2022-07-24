@@ -7,7 +7,6 @@ from typing import cast
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import __version__ as HA_VERSION
-from numpy import isin
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
     from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
@@ -55,7 +54,7 @@ async def create_utility_meters(
 
     utility_meters = []
 
-    if not DATA_UTILITY in hass.data:
+    if DATA_UTILITY not in hass.data:
         hass.data[DATA_UTILITY] = {}
 
     tariffs = sensor_config.get(CONF_UTILITY_METER_TARIFFS)
@@ -196,7 +195,7 @@ async def create_utility_meter(
     )
 
     # This is for BC purposes, for HA versions lower than 2022.4. May be removed in the future
-    if not "unique_id" in params and unique_id:
+    if "unique_id" not in params and unique_id:
         # Set new unique id if this entity already exists in the entity registry
         async_set_unique_id(hass, entity_id, unique_id)
         utility_meter.unique_id = unique_id
