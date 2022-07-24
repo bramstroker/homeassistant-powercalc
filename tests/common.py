@@ -1,24 +1,20 @@
+from homeassistant.components import light
+from homeassistant.const import CONF_PLATFORM
 from homeassistant.core import HomeAssistant
-from homeassistant.const import (
-    CONF_PLATFORM,
-)
-from homeassistant.setup import async_setup_component
-from homeassistant.components import (
-    light
-)
 from homeassistant.helpers import entity_registry as er
-
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    mock_device_registry,
     mock_registry,
-    mock_device_registry
 )
 
 import custom_components.test.light as test_light_platform
 
+
 async def create_mock_light_entity(
     hass: HomeAssistant,
-    entities: test_light_platform.MockLight | list[test_light_platform.MockLight]
+    entities: test_light_platform.MockLight | list[test_light_platform.MockLight],
 ) -> tuple[str, str]:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
@@ -44,9 +40,9 @@ async def create_mock_light_entity(
             config_entry_id=config_entry.entry_id,
             connections={("dummy", entity.unique_id)},
             manufacturer=entity.manufacturer,
-            model=entity.model
+            model=entity.model,
         )
-        
+
         entity_entry = entity_registry.async_get_or_create(
             "light", "test", entity.unique_id, device_id=device_entry.id
         )

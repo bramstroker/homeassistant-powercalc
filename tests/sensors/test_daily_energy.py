@@ -1,31 +1,24 @@
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, ENERGY_WATT_HOUR
 from homeassistant.core import HomeAssistant
-
-from homeassistant.const import (
-    CONF_NAME,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-)
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorStateClass,
-)
 
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ON_TIME,
-    UnitPrefix
+    UnitPrefix,
 )
 from custom_components.powercalc.sensors.daily_energy import (
-    create_daily_fixed_energy_sensor
+    create_daily_fixed_energy_sensor,
 )
+
 
 async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
     sensor_config = {
         CONF_ENERGY_SENSOR_NAMING: "{} Energy",
         CONF_NAME: "My sensor",
-        CONF_DAILY_FIXED_ENERGY: {}
+        CONF_DAILY_FIXED_ENERGY: {},
     }
     sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
     assert sensor
@@ -35,12 +28,13 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
     assert sensor.device_class == SensorDeviceClass.ENERGY
     assert sensor.state_class == SensorStateClass.TOTAL
 
+
 async def test_create_daily_energy_sensor_unit_prefix_watt(hass: HomeAssistant):
     sensor_config = {
         CONF_ENERGY_SENSOR_NAMING: "{} Energy",
         CONF_NAME: "My sensor",
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
-        CONF_DAILY_FIXED_ENERGY: {}
+        CONF_DAILY_FIXED_ENERGY: {},
     }
     sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
     assert sensor

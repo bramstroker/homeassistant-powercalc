@@ -20,7 +20,6 @@ from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS,
     VOLUME_CUBIC_METERS,
 )
-
 from pytest_homeassistant_custom_component.common import MockEntity
 
 DEVICE_CLASSES.append("none")
