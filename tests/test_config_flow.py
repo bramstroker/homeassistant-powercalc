@@ -28,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODEL,
@@ -310,6 +311,32 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
             CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
         },
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+    }
+
+async def test_create_group_entry(hass: HomeAssistant):
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_GROUP_POWER_ENTITIES: [
+            "sensor.balcony_power",
+            "sensor.bedroom1_power"
+        ],
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], 
+        user_input
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_GROUP_POWER_ENTITIES: [
+            "sensor.balcony_power",
+            "sensor.bedroom1_power"
+        ],
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_CREATE_UTILITY_METERS: False,
     }
 
 def _assert_default_virtual_power_entry_data(
