@@ -4,6 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
+from homeassistant.components import input_boolean
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -56,3 +57,12 @@ async def run_powercalc_setup_yaml_config(
 ):
     await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: config})
     await hass.async_block_till_done()
+
+async def create_input_boolean(hass: HomeAssistant, name: str):
+    assert await async_setup_component(
+        hass, input_boolean.DOMAIN, {"input_boolean": {name: None}}
+    )
+    await hass.async_block_till_done()
+
+async def create_input_booleans(hass: HomeAssistant, names: list[str]):
+    [await create_input_boolean(hass, name) for name in names]
