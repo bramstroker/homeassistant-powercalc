@@ -62,12 +62,17 @@ async def create_mock_light_entity(
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant, config: list[ConfigType] | ConfigType
 ):
-    if CONF_PLATFORM not in config:
+    if isinstance(config, list):
+        for entry in config:
+            if CONF_PLATFORM not in entry:
+                entry[CONF_PLATFORM] = DOMAIN
+    elif CONF_PLATFORM not in config:
         config[CONF_PLATFORM] = DOMAIN
+
     await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: config})
     await hass.async_block_till_done()
 
-async def create_input_boolean(hass: HomeAssistant, name: str):
+async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
     assert await async_setup_component(
         hass, input_boolean.DOMAIN, {"input_boolean": {name: None}}
     )
