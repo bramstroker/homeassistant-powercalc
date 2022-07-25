@@ -95,7 +95,7 @@ async def create_group_sensors(
         entities, filters, EnergySensor
     )
     energy_sensor = create_grouped_energy_sensor(
-        hass, group_name, sensor_config, energy_sensor_ids
+        hass, group_name, sensor_config, set(energy_sensor_ids)
     )
     group_sensors.append(energy_sensor)
 
@@ -186,7 +186,7 @@ def create_grouped_energy_sensor(
     hass: HomeAssistant,
     group_name: str,
     sensor_config: dict,
-    energy_sensor_ids: list[str],
+    energy_sensor_ids: set[str],
 ) -> GroupedEnergySensor:
     name = generate_energy_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
@@ -215,7 +215,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
     def __init__(
         self,
         name: str,
-        entities: list[str],
+        entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
         unique_id: str = None,
