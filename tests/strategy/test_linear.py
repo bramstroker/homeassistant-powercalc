@@ -1,4 +1,5 @@
 import logging
+from turtle import st
 
 import pytest
 from homeassistant.components.fan import ATTR_PERCENTAGE
@@ -129,6 +130,21 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
             create_source_entity("light"),
             {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100},
         )
+
+async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant):
+    strategy = await _create_strategy_instance(
+        hass,
+        create_source_entity("light"),
+        {
+            CONF_CALIBRATE: [
+                "50 -> 5",
+                "100 -> 8",
+                "255 -> 15",
+            ]
+        },
+    )
+    state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 20})
+    assert 3.52 == pytest.approx(float(await strategy.calculate(state)), 0.01)
 
 
 async def _create_strategy_instance(
