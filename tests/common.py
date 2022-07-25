@@ -16,6 +16,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
+    DOMAIN,
     CalculationStrategy,
 )
 
@@ -61,6 +62,8 @@ async def create_mock_light_entity(
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant, config: list[ConfigType] | ConfigType
 ):
+    if CONF_PLATFORM not in config:
+        config[CONF_PLATFORM] = DOMAIN
     await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: config})
     await hass.async_block_till_done()
 
