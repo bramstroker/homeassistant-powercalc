@@ -1,5 +1,5 @@
 from homeassistant.components import light, sensor
-from homeassistant.const import CONF_PLATFORM
+from homeassistant.const import CONF_PLATFORM, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
@@ -12,6 +12,12 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 import custom_components.test.light as test_light_platform
+from custom_components.powercalc.const import (
+    CONF_FIXED,
+    CONF_MODE,
+    CONF_POWER,
+    CalculationStrategy,
+)
 
 
 async def create_mock_light_entity(
@@ -66,3 +72,10 @@ async def create_input_boolean(hass: HomeAssistant, name: str):
 
 async def create_input_booleans(hass: HomeAssistant, names: list[str]):
     [await create_input_boolean(hass, name) for name in names]
+
+def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
+    return {
+        CONF_ENTITY_ID: entity_id,
+        CONF_MODE: CalculationStrategy.FIXED,
+        CONF_FIXED: {CONF_POWER: power},
+    }
