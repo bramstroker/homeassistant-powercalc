@@ -69,10 +69,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         min_power = min_calibrate[1]
         max_power = max_calibrate[1]
 
-        value_range = max_value - min_value
-        if value_range == 0:
-            return Decimal(min_power)
-
         power_range = max_power - min_power
 
         gamma_curve = self._config.get(CONF_GAMMA_CURVE) or 1
