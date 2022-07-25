@@ -14,6 +14,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     ENERGY_KILO_WATT_HOUR,
+    ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
 )
 from homeassistant.core import HomeAssistant, State
@@ -259,3 +260,18 @@ async def test_restore_state(hass: HomeAssistant):
     })
 
     assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
+
+async def test_mega_watt_hour(hass: HomeAssistant):
+    await create_input_boolean(hass, "test1")
+
+    await run_powercalc_setup_yaml_config(hass, {
+        CONF_CREATE_GROUP: "TestGroup",
+        CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.MEGA,
+        CONF_ENTITIES: [
+            get_simple_fixed_config("input_boolean.test1"),
+        ],
+    })
+
+    state = hass.states.get("sensor.testgroup_energy")
+
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_MEGA_WATT_HOUR

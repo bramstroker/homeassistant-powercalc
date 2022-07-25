@@ -1,7 +1,7 @@
 import logging
 
 import pytest
-from homeassistant.components import input_boolean, light, sensor
+from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
@@ -10,17 +10,13 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
-    CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
-    CONF_UNIT_OF_MEASUREMENT,
     ENERGY_KILO_WATT_HOUR,
-    POWER_WATT,
     STATE_OFF,
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -29,32 +25,31 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
-    CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
     CONF_UTILITY_METER_TYPES,
-    CONF_VALUE,
     DOMAIN,
     CalculationStrategy,
 )
 
-from .common import create_mock_light_entity, run_powercalc_setup_yaml_config
+from .common import (
+    create_mock_light_entity,
+    create_input_boolean,
+    create_input_booleans,
+    run_powercalc_setup_yaml_config
+)
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
-    source_entity = "input_boolean.test"
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
+    await create_input_boolean(hass)
 
     await hass.async_block_till_done()
 
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
-            CONF_ENTITY_ID: source_entity,
+            CONF_ENTITY_ID: "input_boolean.test",
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
@@ -63,7 +58,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     state = hass.states.get("sensor.test_power")
     assert state.state == "0.00"
 
-    hass.states.async_set(source_entity, STATE_ON)
+    hass.states.async_set("input_boolean.test", STATE_ON)
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.test_power")
@@ -84,15 +79,11 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
 
 async def test_utility_meter_is_created(hass: HomeAssistant):
     """Test that utility meters are succesfully created when `create_utility_meter: true`"""
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
-    await hass.async_block_till_done()
+    await create_input_boolean(hass)
 
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_ENTITY_ID: "input_boolean.test",
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_CREATE_UTILITY_METERS: True,
@@ -115,22 +106,11 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
 
 
 async def test_create_nested_group_sensor(hass: HomeAssistant):
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test1": None}}
-    )
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test2": None}}
-    )
-
-    await hass.async_block_till_done()
+    await create_input_booleans(hass, ["test", "test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup1",
             CONF_ENTITIES: [
                 {
@@ -217,19 +197,17 @@ async def test_error_when_configuring_same_entity_twice(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
-    await _create_input_boolean_entity(hass, "test")
+    await create_input_boolean(hass)
 
     await run_powercalc_setup_yaml_config(
         hass,
         [
             {
-                CONF_PLATFORM: DOMAIN,
                 CONF_ENTITY_ID: "input_boolean.test",
                 CONF_MODE: CalculationStrategy.FIXED,
                 CONF_FIXED: {CONF_POWER: 50},
             },
             {
-                CONF_PLATFORM: DOMAIN,
                 CONF_ENTITY_ID: "input_boolean.test",
                 CONF_MODE: CalculationStrategy.FIXED,
                 CONF_FIXED: {CONF_POWER: 100},
@@ -242,23 +220,19 @@ async def test_error_when_configuring_same_entity_twice(
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_can_create_same_entity_twice_with_unique_id(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
-    await _create_input_boolean_entity(hass, "test")
+async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
+    await create_input_boolean(hass)
 
     await run_powercalc_setup_yaml_config(
         hass,
         [
             {
-                CONF_PLATFORM: DOMAIN,
                 CONF_ENTITY_ID: "input_boolean.test",
                 CONF_UNIQUE_ID: "111",
                 CONF_MODE: CalculationStrategy.FIXED,
                 CONF_FIXED: {CONF_POWER: 50},
             },
             {
-                CONF_PLATFORM: DOMAIN,
                 CONF_ENTITY_ID: "input_boolean.test",
                 CONF_UNIQUE_ID: "222",
                 CONF_MODE: CalculationStrategy.FIXED,
@@ -271,11 +245,3 @@ async def test_can_create_same_entity_twice_with_unique_id(
     assert hass.states.get("sensor.test_energy")
     assert hass.states.get("sensor.test_power_2")
     assert hass.states.get("sensor.test_energy_2")
-
-
-async def _create_input_boolean_entity(hass: HomeAssistant, name: str):
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {name: None}}
-    )
-
-    await hass.async_block_till_done()
