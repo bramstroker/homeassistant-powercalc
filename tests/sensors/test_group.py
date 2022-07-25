@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_GROUP,
     CONF_FIXED,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_POWER_ENTITIES,
     CONF_MODE,
     CONF_POWER,
@@ -102,7 +103,10 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
             CONF_NAME: "GroupA",
             CONF_GROUP_POWER_ENTITIES: [
                 "sensor.test1_power"
-            ]
+            ],
+            CONF_GROUP_ENERGY_ENTITIES: [
+                "sensor.test1_energy"
+            ],
         }
     )
     config_entry_groupa.add_to_hass(hass)
@@ -117,6 +121,9 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
             CONF_GROUP_POWER_ENTITIES: [
                 "sensor.test2_power"
             ],
+            CONF_GROUP_ENERGY_ENTITIES: [
+                "sensor.test2_energy"
+            ],
             CONF_SUB_GROUPS: [
                 config_entry_groupa.entry_id,
                 "464354354543" # Non existing entry_id, should not break setup
@@ -127,14 +134,26 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
     assert await hass.config_entries.async_setup(config_entry_groupb.entry_id)
     await hass.async_block_till_done()
 
-    groupa_state = hass.states.get("sensor.groupa_power")
-    assert groupa_state
-    assert groupa_state.attributes.get(ATTR_ENTITIES) == {
+    groupa_power_state = hass.states.get("sensor.groupa_power")
+    assert groupa_power_state
+    assert groupa_power_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_power",
     }
-    groupb_state = hass.states.get("sensor.groupb_power")
-    assert groupb_state
-    assert groupb_state.attributes.get(ATTR_ENTITIES) == {
+    groupa_energy_state = hass.states.get("sensor.groupa_energy")
+    assert groupa_energy_state
+    assert groupa_energy_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_energy",
+    }
+
+    groupb_power_state = hass.states.get("sensor.groupb_power")
+    assert groupb_power_state
+    assert groupb_power_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_power",
         "sensor.test2_power",
+    }
+    groupb_energy_state = hass.states.get("sensor.groupb_energy")
+    assert groupb_energy_state
+    assert groupb_energy_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_energy",
+        "sensor.test2_energy",
     }
