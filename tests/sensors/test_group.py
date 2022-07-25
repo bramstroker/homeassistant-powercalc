@@ -5,6 +5,7 @@ from homeassistant.components.utility_meter.sensor import SensorDeviceClass, Sen
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_UNIT_OF_MEASUREMENT,
+    ATTR_ENTITY_ID,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -16,10 +17,10 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry
 )
+from homeassistant.helpers import entity_registry as er
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -33,21 +34,25 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DOMAIN,
+    SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
     UnitPrefix,
 )
 from ..common import (
     create_input_booleans,
+    get_simple_fixed_config,
     run_powercalc_setup_yaml_config
 )
 
 async def test_grouped_power_sensor(hass: HomeAssistant):
+    ent_reg = er.async_get(hass)
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(hass, {
         CONF_PLATFORM: DOMAIN,
         CONF_CREATE_GROUP: "TestGroup",
+        CONF_UNIQUE_ID: "group_unique_id",
         CONF_ENTITIES: [
             {
                 CONF_ENTITY_ID: "input_boolean.test1",
@@ -55,11 +60,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
                 CONF_MODE: CalculationStrategy.FIXED,
                 CONF_FIXED: {CONF_POWER: 10.5},
             },
-            {
-                CONF_ENTITY_ID: "input_boolean.test2",
-                CONF_MODE: CalculationStrategy.FIXED,
-                CONF_FIXED: {CONF_POWER: 50},
-            },
+            get_simple_fixed_config("input_boolean.test2", 50),
         ],
     })
 
@@ -67,6 +68,10 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     hass.states.async_set("input_boolean.test2", STATE_ON)
 
     await hass.async_block_till_done()
+
+    power_entry = ent_reg.async_get("sensor.testgroup_power")
+    assert power_entry
+    assert power_entry.unique_id == "group_unique_id"
 
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state
@@ -78,6 +83,10 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
         "sensor.test2_power",
     }
     assert power_state.state == "60.50"
+
+    energy_entry = ent_reg.async_get("sensor.testgroup_energy")
+    assert energy_entry
+    assert energy_entry.unique_id == "group_unique_id_energy"
 
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state
@@ -194,3 +203,37 @@ async def test_entities_with_incompatible_unit_of_measurement_are_removed(
     }
 
     assert "Removing this entity from the total sum" in caplog.text
+
+async def test_reset_service(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup_yaml_config(hass, {
+        CONF_PLATFORM: DOMAIN,
+        CONF_CREATE_GROUP: "TestGroup",
+        CONF_ENTITIES: [
+            get_simple_fixed_config("input_boolean.test1"),
+            get_simple_fixed_config("input_boolean.test2"),
+        ],
+    })
+
+    # Set the individual entities to some initial values
+    hass.states.async_set("sensor.test1_energy", "0.8", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR})
+    hass.states.async_set("sensor.test2_energy", "1.2", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "2.0000"
+
+    # Reset the group sensor and underlying group members
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_RESET_ENERGY,
+        {
+            ATTR_ENTITY_ID: "sensor.testgroup_energy",
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "0"
+    assert hass.states.get("sensor.test1_energy").state == "0"
+    assert hass.states.get("sensor.test2_energy").state == "0"
