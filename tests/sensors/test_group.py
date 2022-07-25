@@ -16,9 +16,10 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     POWER_WATT,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry
+    MockConfigEntry,
+    mock_restore_cache
 )
 from homeassistant.helpers import entity_registry as er
 
@@ -40,6 +41,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from ..common import (
+    create_input_boolean,
     create_input_booleans,
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config
@@ -169,7 +171,6 @@ async def test_entities_with_incompatible_unit_of_measurement_are_removed(
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(hass, {
-        CONF_PLATFORM: DOMAIN,
         CONF_CREATE_GROUP: "TestGroup",
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
         CONF_ENTITIES: [
@@ -208,7 +209,6 @@ async def test_reset_service(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(hass, {
-        CONF_PLATFORM: DOMAIN,
         CONF_CREATE_GROUP: "TestGroup",
         CONF_ENTITIES: [
             get_simple_fixed_config("input_boolean.test1"),
@@ -237,3 +237,25 @@ async def test_reset_service(hass: HomeAssistant):
     assert hass.states.get("sensor.testgroup_energy").state == "0"
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
+
+async def test_restore_state(hass: HomeAssistant):
+    await create_input_boolean(hass, "test1")
+
+    mock_restore_cache(
+        hass,
+        [
+            State(
+                "sensor.testgroup_energy",
+                "0.5000",
+            ),
+        ],
+    )
+
+    await run_powercalc_setup_yaml_config(hass, {
+        CONF_CREATE_GROUP: "TestGroup",
+        CONF_ENTITIES: [
+            get_simple_fixed_config("input_boolean.test1"),
+        ],
+    })
+
+    assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
