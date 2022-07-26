@@ -1,6 +1,6 @@
 from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_PLATFORM
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform
@@ -12,10 +12,11 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
+    CONF_POWER_SENSOR_PRECISION,
     DOMAIN,
     CalculationStrategy,
 )
-
+from ..common import create_input_boolean, run_powercalc_setup_yaml_config, get_simple_fixed_config
 
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
     assert await async_setup_component(
@@ -60,3 +61,27 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
         "sensor.existing_power",
         "sensor.test_power",
     }
+
+async def test_rounding_precision(hass: HomeAssistant):
+    await create_input_boolean(hass)
+
+    config = {
+        CONF_POWER_SENSOR_PRECISION: 4
+    }
+    await async_setup_component(
+        hass, DOMAIN, {DOMAIN: config}
+    )
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        get_simple_fixed_config("input_boolean.test", 50),
+    )
+
+    state = hass.states.get("sensor.test_power")
+    assert state.state == "0.0000"
+
+    hass.states.async_set("input_boolean.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "50.0000"

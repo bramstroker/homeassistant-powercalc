@@ -1,11 +1,16 @@
 from homeassistant.const import STATE_ON
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, EVENT_HOMEASSISTANT_START
 from homeassistant.setup import async_setup_component
 
-from custom_components.powercalc.const import CONF_ENABLE_AUTODISCOVERY, DOMAIN
+from custom_components.powercalc.const import CONF_CREATE_DOMAIN_GROUPS, CONF_ENABLE_AUTODISCOVERY, DOMAIN
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity
+from .common import (
+    create_mock_light_entity,
+    create_input_boolean,
+    get_simple_fixed_config,
+    run_powercalc_setup_yaml_config
+)
 
 
 async def test_autodiscovery(hass: HomeAssistant):
@@ -46,3 +51,28 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.testa_power")
+
+async def test_domain_groups(hass: HomeAssistant):
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        get_simple_fixed_config("input_boolean_test", 100)
+    )
+
+    config = {
+        CONF_ENABLE_AUTODISCOVERY: False,
+        CONF_CREATE_DOMAIN_GROUPS: [
+            "light"
+        ]
+    }
+    await async_setup_component(
+        hass, DOMAIN, {DOMAIN: config}
+    )
+    await hass.async_block_till_done()
+
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
+    await hass.async_block_till_done()
+    return
+    assert hass.states.get("sensor.all_light_power")
+

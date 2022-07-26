@@ -37,22 +37,17 @@ from .common import (
     create_mock_light_entity,
     create_input_boolean,
     create_input_booleans,
-    run_powercalc_setup_yaml_config
+    run_powercalc_setup_yaml_config,
+    get_simple_fixed_config
 )
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     await create_input_boolean(hass)
-
-    await hass.async_block_till_done()
-
+    
     await run_powercalc_setup_yaml_config(
         hass,
-        {
-            CONF_ENTITY_ID: "input_boolean.test",
-            CONF_MODE: CalculationStrategy.FIXED,
-            CONF_FIXED: {CONF_POWER: 50},
-        },
+        get_simple_fixed_config("input_boolean.test"),
     )
 
     state = hass.states.get("sensor.test_power")
@@ -113,24 +108,12 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
         {
             CONF_CREATE_GROUP: "TestGroup1",
             CONF_ENTITIES: [
-                {
-                    CONF_ENTITY_ID: "input_boolean.test",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 50},
-                },
-                {
-                    CONF_ENTITY_ID: "input_boolean.test1",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 50},
-                },
+                get_simple_fixed_config("input_boolean.test", 50),
+                get_simple_fixed_config("input_boolean.test1", 50),
                 {
                     CONF_CREATE_GROUP: "TestGroup2",
                     CONF_ENTITIES: [
-                        {
-                            CONF_ENTITY_ID: "input_boolean.test2",
-                            CONF_MODE: CalculationStrategy.FIXED,
-                            CONF_FIXED: {CONF_POWER: 50},
-                        },
+                        get_simple_fixed_config("input_boolean.test2", 50),
                     ],
                 },
             ],
@@ -202,16 +185,8 @@ async def test_error_when_configuring_same_entity_twice(
     await run_powercalc_setup_yaml_config(
         hass,
         [
-            {
-                CONF_ENTITY_ID: "input_boolean.test",
-                CONF_MODE: CalculationStrategy.FIXED,
-                CONF_FIXED: {CONF_POWER: 50},
-            },
-            {
-                CONF_ENTITY_ID: "input_boolean.test",
-                CONF_MODE: CalculationStrategy.FIXED,
-                CONF_FIXED: {CONF_POWER: 100},
-            },
+            get_simple_fixed_config("input_boolean.test", 50),
+            get_simple_fixed_config("input_boolean.test", 100),
         ],
     )
 
