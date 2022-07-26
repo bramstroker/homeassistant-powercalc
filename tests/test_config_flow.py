@@ -26,6 +26,7 @@ from custom_components.powercalc.config_flow import (
     ConfigFlow,
 )
 from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
@@ -425,6 +426,63 @@ async def test_daily_energy_options_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == POWER_WATT
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
+
+async def test_lut_options_flow(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.LUT,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010"
+        },
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+    
+    user_input = {CONF_CREATE_ENERGY_SENSOR: False}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_CREATE_ENERGY_SENSOR] == False
+    
+
+async def test_group_options_flow(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Kitchen",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_POWER_ENTITIES: ["sensor.fridge_power"]
+        },
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    new_entities = [
+        "sensor.fridge_power",
+        "sensor.kitchen_lights_power"
+    ]
+    user_input = {
+        CONF_GROUP_POWER_ENTITIES: new_entities
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    await hass.async_block_till_done()
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_GROUP_POWER_ENTITIES] == new_entities
+
+    #assert hass.states.get("sensor.kitchen_power").attributes.get(ATTR_ENTITIES) == new_entities
 
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
