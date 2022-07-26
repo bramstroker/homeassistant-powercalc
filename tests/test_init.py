@@ -1,9 +1,16 @@
-from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, EVENT_HOMEASSISTANT_START
 from homeassistant.setup import async_setup_component
+from homeassistant.components import input_boolean, light
 
-from custom_components.powercalc.const import CONF_CREATE_DOMAIN_GROUPS, CONF_ENABLE_AUTODISCOVERY, DOMAIN
+from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
+    CONF_CREATE_DOMAIN_GROUPS,
+    CONF_ENABLE_AUTODISCOVERY,
+    DOMAIN,
+    DOMAIN_CONFIG,
+)
 from custom_components.test.light import MockLight
+from custom_components.powercalc import create_domain_groups
 
 from .common import (
     create_mock_light_entity,
@@ -55,24 +62,35 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
 async def test_domain_groups(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
-        hass,
-        get_simple_fixed_config("input_boolean_test", 100)
-    )
-
-    config = {
+    domain_config = {
         CONF_ENABLE_AUTODISCOVERY: False,
         CONF_CREATE_DOMAIN_GROUPS: [
-            "light"
+            input_boolean.DOMAIN,
+            light.DOMAIN # No light entities were created, so this group should not be created
         ]
     }
-    await async_setup_component(
-        hass, DOMAIN, {DOMAIN: config}
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        get_simple_fixed_config("input_boolean.test", 100),
+        domain_config
+    )
+    
+    # Triggering start even does not trigger create_domain_groups
+    # Need to further investigate this
+    # For now just call create_domain_groups manually
+    #hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
+    
+    await create_domain_groups(
+        hass,
+        hass.data[DOMAIN][DOMAIN_CONFIG],
+        [input_boolean.DOMAIN, light.DOMAIN]
     )
     await hass.async_block_till_done()
 
-    hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
-    await hass.async_block_till_done()
-    return
-    assert hass.states.get("sensor.all_light_power")
+    group_state = hass.states.get("sensor.all_input_boolean_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
+
+    assert not hass.states.get("sensor.all_light_power")
 

@@ -4,6 +4,7 @@ import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
+    ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
     CONF_PLATFORM,
@@ -13,7 +14,7 @@ from homeassistant.const import (
     ENERGY_WATT_HOUR,
     POWER_WATT,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 
@@ -25,15 +26,25 @@ from custom_components.powercalc.const import (
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
     DOMAIN,
+    SERVICE_RESET_ENERGY,
     UnitPrefix,
 )
 from custom_components.powercalc.sensors.daily_energy import (
+    DEFAULT_DAILY_UPDATE_FREQUENCY,
     create_daily_fixed_energy_sensor,
 )
 
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
+from pytest_homeassistant_custom_component.common import (
+    async_fire_time_changed,
+    mock_restore_cache
+)
 
-from ..common import run_powercalc_setup_yaml_config
+from ..common import (
+    assert_entity_state,
+    run_powercalc_setup_yaml_config,
+    create_input_number,
+    assert_entity_state
+)
 
 
 async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
@@ -74,16 +85,13 @@ async def test_create_daily_energy_sensor_unit_prefix_watt(
     assert sensor.name == "My sensor Energy"
     assert sensor._attr_native_unit_of_measurement == unit_of_measurement
 
-
 async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
-    update_frequency = 1800
     await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
-                CONF_UPDATE_FREQUENCY: update_frequency,
                 CONF_VALUE: 12,
             },
         },
@@ -92,21 +100,24 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
     sensor_entity_id = "sensor.ip_camera_upstairs_energy"
     state = hass.states.get(sensor_entity_id)
     assert state
+    assert state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
 
-    # Trigger calculation in the future
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=update_frequency))
-    await hass.async_block_till_done()
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "0.2500")
 
-    state = hass.states.get(sensor_entity_id)
-    assert state.state == "0.2500"
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "0.5000")
 
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=update_frequency))
-    await hass.async_block_till_done()
+    await _trigger_periodic_update(hass, 2)
+    assert_entity_state(hass, sensor_entity_id, "1.0000")
 
-    state = hass.states.get(sensor_entity_id)
-    assert state.state == "0.5000"
+    # Trigger remaining updates to get a full day
+    # Default update frequency is 1800 seconds (half an hour)
+    # So 48 - 4 = 44 updates makes for a full day
+    await _trigger_periodic_update(hass, 44)
+    assert_entity_state(hass, sensor_entity_id, "12.0000")
 
 
 async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant):
@@ -117,7 +128,6 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 15,
@@ -136,6 +146,21 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
     assert state.state == "15.00"
     assert state.name == "IP camera upstairs power"
 
+async def test_power_sensor_not_created_when_not_on_whole_day(hass: HomeAssistant):
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 15,
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_ON_TIME: timedelta(hours=4)
+            },
+        },
+    )
+
+    assert hass.states.get("sensor.ip_camera_upstairs_energy")
+    assert not hass.states.get("sensor.ip_camera_upstairs_power")
 
 @pytest.mark.parametrize(
     "daily_fixed_options,elapsed_seconds,expected_delta",
@@ -203,3 +228,106 @@ async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant):
     # Calculate delta after 1 hour
     delta = sensor.calculate_delta(3600)
     assert 0.0005 == pytest.approx(float(delta), 0.001)
+
+async def test_template_value(hass: HomeAssistant):
+    await create_input_number(hass, "test", 50)
+
+    update_frequency = 1800
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "Router",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: "{{states('input_number.test')}}",
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UPDATE_FREQUENCY: update_frequency
+            },
+        },
+    )
+
+    # Trigger calculation in the future
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=43200))
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.router_energy")
+    assert state.state == "0.0250"
+
+
+async def test_reset_service(hass: HomeAssistant):
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 15,
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+            },
+        },
+    )
+
+    entity_id = "sensor.ip_camera_upstairs_energy"
+
+    # Set the individual entities to some initial values
+    hass.states.async_set(entity_id, "0.8", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR})
+    await hass.async_block_till_done()
+
+    assert hass.states.get(entity_id).state == "0.8"
+
+    # Reset the group sensor and underlying group members
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_RESET_ENERGY,
+        {
+            ATTR_ENTITY_ID: entity_id,
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(entity_id).state == "0"
+
+async def test_restore_state(hass: HomeAssistant):
+    mock_restore_cache(
+        hass,
+        [
+            State(
+                "sensor.my_daily_energy",
+                "0.5",
+            ),
+        ],
+    )
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "My daily",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 1.5,
+            },
+        },
+    )
+
+    assert hass.states.get("sensor.my_daily_energy").state == "0.5000"
+
+async def test_small_update_frequency_updates_correctly(hass: HomeAssistant):
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "Router",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_UPDATE_FREQUENCY: 60, # Update each minute
+                CONF_VALUE: 0.24,
+            },
+        },
+    )
+
+    await _trigger_periodic_update(hass, 10)
+    assert_entity_state(hass, "sensor.router_energy", "0.0017")
+
+    await _trigger_periodic_update(hass, 50)
+    assert_entity_state(hass, "sensor.router_energy", "0.0100")
+
+async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1):
+    for i in range(0, number_of_updates):
+        async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=DEFAULT_DAILY_UPDATE_FREQUENCY))
+        await hass.async_block_till_done()
