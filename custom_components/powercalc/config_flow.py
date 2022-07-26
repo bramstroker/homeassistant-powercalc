@@ -540,7 +540,6 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return SCHEMA_POWER_WLED
     if strategy == CalculationStrategy.LUT:
         return vol.Schema({})
-    return SCHEMA_POWER_FIXED
 
 
 def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Schema:
