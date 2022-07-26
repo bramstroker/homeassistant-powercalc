@@ -516,18 +516,6 @@ class OptionsFlowHandler(OptionsFlow):
         )
         return data_schema
 
-    def get_current_strategy_options(self, strategy: str) -> dict[str, Any]:
-        strategy_options: dict[str, Any] = self.current_config.get(strategy)
-        if (
-            strategy == CalculationStrategy.LINEAR
-            and CONF_CALIBRATE in strategy_options
-        ):
-            calibrate_options: dict = strategy_options[CONF_CALIBRATE]
-            strategy_options[CONF_CALIBRATE] = {
-                int(key): value for (key, value) in calibrate_options.items()
-            }
-        return strategy_options
-
 
 def _create_strategy_object(
     hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity
