@@ -333,6 +333,18 @@ async def test_create_group_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
+async def test_group_error_mandatory(hass: HomeAssistant):
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"]
+    assert result["errors"]["base"] == "group_mandatory"
 
 async def test_fixed_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
