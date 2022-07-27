@@ -25,6 +25,7 @@
     },
     "supported_modes": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string",
         "enum": ["lut", "linear", "fixed"]

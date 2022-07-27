@@ -4,6 +4,7 @@ on:
   pull_request_target:
     paths:
        - '**/model.json'
+       - 'custom_components/data/model_schema.json'
 
 permissions:
   issues: write
