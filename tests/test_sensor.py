@@ -7,6 +7,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
+    ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -25,9 +26,13 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
+    CONF_POWER_SENSOR_NAMING,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     CalculationStrategy,
@@ -193,6 +198,29 @@ async def test_error_when_configuring_same_entity_twice(
     assert "This entity has already configured a power sensor" in caplog.text
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
+async def test_alternate_naming_strategy(hass: HomeAssistant):
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        [
+            get_simple_fixed_config("input_boolean.test", 50),
+        ],
+        {
+            CONF_POWER_SENSOR_NAMING: "{} Power consumption",
+            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
+            CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
+            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly"
+        }
+    )
+
+    power_state = hass.states.get("sensor.test_power_consumption")
+    assert power_state
+    assert power_state.attributes.get(ATTR_FRIENDLY_NAME) == "test Power friendly"
+    energy_state = hass.states.get("sensor.test_energy_kwh")
+    assert energy_state
+    assert energy_state.attributes.get(ATTR_FRIENDLY_NAME) == "test Energy friendly"
 
 
 async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
