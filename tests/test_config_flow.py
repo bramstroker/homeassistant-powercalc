@@ -333,18 +333,17 @@ async def test_create_group_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
+
 async def test_group_error_mandatory(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.GROUP)
-    user_input = {
-        CONF_NAME: "My group sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID
-    }
+    user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], user_input
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
     assert result["errors"]["base"] == "group_mandatory"
+
 
 async def test_fixed_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
@@ -439,6 +438,7 @@ async def test_daily_energy_options_flow(hass: HomeAssistant):
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == POWER_WATT
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
+
 async def test_lut_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
         hass,
@@ -448,12 +448,12 @@ async def test_lut_options_flow(hass: HomeAssistant):
             CONF_MODE: CalculationStrategy.LUT,
             CONF_CREATE_ENERGY_SENSOR: True,
             CONF_MANUFACTURER: "signify",
-            CONF_MODEL: "LCT010"
+            CONF_MODEL: "LCT010",
         },
     )
 
     result = await _initialize_options_flow(hass, entry)
-    
+
     user_input = {CONF_CREATE_ENERGY_SENSOR: False}
 
     result = await hass.config_entries.options.async_configure(
@@ -463,7 +463,7 @@ async def test_lut_options_flow(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_CREATE_ENERGY_SENSOR] == False
-    
+
 
 async def test_group_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
@@ -471,19 +471,14 @@ async def test_group_options_flow(hass: HomeAssistant):
         {
             CONF_NAME: "Kitchen",
             CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_GROUP_POWER_ENTITIES: ["sensor.fridge_power"]
+            CONF_GROUP_POWER_ENTITIES: ["sensor.fridge_power"],
         },
     )
 
     result = await _initialize_options_flow(hass, entry)
 
-    new_entities = [
-        "sensor.fridge_power",
-        "sensor.kitchen_lights_power"
-    ]
-    user_input = {
-        CONF_GROUP_POWER_ENTITIES: new_entities
-    }
+    new_entities = ["sensor.fridge_power", "sensor.kitchen_lights_power"]
+    user_input = {CONF_GROUP_POWER_ENTITIES: new_entities}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -494,7 +489,8 @@ async def test_group_options_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_POWER_ENTITIES] == new_entities
 
-    #assert hass.states.get("sensor.kitchen_power").attributes.get(ATTR_ENTITIES) == new_entities
+    # assert hass.states.get("sensor.kitchen_power").attributes.get(ATTR_ENTITIES) == new_entities
+
 
 async def test_linear_options_flow_error(hass: HomeAssistant):
     entry = _create_mock_entry(
@@ -509,10 +505,7 @@ async def test_linear_options_flow_error(hass: HomeAssistant):
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {
-        CONF_MIN_POWER: 55, 
-        CONF_MAX_POWER: 50
-    }
+    user_input = {CONF_MIN_POWER: 55, CONF_MAX_POWER: 50}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -521,6 +514,7 @@ async def test_linear_options_flow_error(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
     assert result["errors"]["base"] == "linear_min_higher_as_max"
+
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
     entry = MockConfigEntry(domain=DOMAIN, data=entry_data)

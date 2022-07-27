@@ -219,7 +219,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         if self._last_delta_calculate is None:
             self._last_delta_calculate = self._last_updated
 
-        elapsed_seconds = (self._last_delta_calculate - self._last_updated) + elapsed_seconds
+        elapsed_seconds = (
+            self._last_delta_calculate - self._last_updated
+        ) + elapsed_seconds
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
         value = self._value

@@ -39,17 +39,17 @@ from custom_components.powercalc.const import (
 )
 
 from .common import (
-    create_mock_light_entity,
     create_input_boolean,
     create_input_booleans,
+    create_mock_light_entity,
+    get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
-    get_simple_fixed_config
 )
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     await create_input_boolean(hass)
-    
+
     await run_powercalc_setup_yaml_config(
         hass,
         get_simple_fixed_config("input_boolean.test"),
@@ -199,6 +199,7 @@ async def test_error_when_configuring_same_entity_twice(
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 
+
 async def test_alternate_naming_strategy(hass: HomeAssistant):
     await create_input_boolean(hass)
 
@@ -211,8 +212,8 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
             CONF_POWER_SENSOR_NAMING: "{} Power consumption",
             CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
             CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
-            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly"
-        }
+            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+        },
     )
 
     power_state = hass.states.get("sensor.test_power_consumption")

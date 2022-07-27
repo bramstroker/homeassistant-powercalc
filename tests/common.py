@@ -1,13 +1,12 @@
-from homeassistant.components import light, sensor
-from homeassistant.const import CONF_PLATFORM, CONF_ENTITY_ID
+from homeassistant.components import input_boolean, input_number, light, sensor
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from homeassistant.components import input_boolean, input_number
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_device_registry
+    mock_device_registry,
 )
 
 import custom_components.test.light as test_light_platform
@@ -59,7 +58,9 @@ async def create_mock_light_entity(
 
 
 async def run_powercalc_setup_yaml_config(
-    hass: HomeAssistant, sensor_config: list[ConfigType] | ConfigType, domain_config: ConfigType = {}
+    hass: HomeAssistant,
+    sensor_config: list[ConfigType] | ConfigType,
+    domain_config: ConfigType = {},
 ):
     if isinstance(sensor_config, list):
         for entry in sensor_config:
@@ -70,8 +71,11 @@ async def run_powercalc_setup_yaml_config(
 
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
     await hass.async_block_till_done()
-    assert await async_setup_component(hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config})
+    assert await async_setup_component(
+        hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
+    )
     await hass.async_block_till_done()
+
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
     assert await async_setup_component(
@@ -79,14 +83,19 @@ async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
     )
     await hass.async_block_till_done()
 
+
 async def create_input_booleans(hass: HomeAssistant, names: list[str]):
     [await create_input_boolean(hass, name) for name in names]
 
+
 async def create_input_number(hass: HomeAssistant, name: str, initial_value: int):
     assert await async_setup_component(
-        hass, input_number.DOMAIN, {"input_number": {name: {"min": 0, "max": 99999, "initial": initial_value}}},
+        hass,
+        input_number.DOMAIN,
+        {"input_number": {name: {"min": 0, "max": 99999, "initial": initial_value}}},
     )
     await hass.async_block_till_done()
+
 
 def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
     return {
@@ -94,6 +103,7 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
         CONF_MODE: CalculationStrategy.FIXED,
         CONF_FIXED: {CONF_POWER: power},
     }
+
 
 def assert_entity_state(hass: HomeAssistant, entity_id: str, expected_state: StateType):
     state = hass.states.get(entity_id)

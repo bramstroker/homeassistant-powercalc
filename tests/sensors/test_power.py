@@ -16,7 +16,13 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
-from ..common import create_input_boolean, run_powercalc_setup_yaml_config, get_simple_fixed_config
+
+from ..common import (
+    create_input_boolean,
+    get_simple_fixed_config,
+    run_powercalc_setup_yaml_config,
+)
+
 
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
     assert await async_setup_component(
@@ -62,15 +68,12 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
         "sensor.test_power",
     }
 
+
 async def test_rounding_precision(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    config = {
-        CONF_POWER_SENSOR_PRECISION: 4
-    }
-    await async_setup_component(
-        hass, DOMAIN, {DOMAIN: config}
-    )
+    config = {CONF_POWER_SENSOR_PRECISION: 4}
+    await async_setup_component(hass, DOMAIN, {DOMAIN: config})
 
     await run_powercalc_setup_yaml_config(
         hass,

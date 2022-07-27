@@ -131,6 +131,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
             {CONF_MIN_POWER: 150, CONF_MAX_POWER: 100},
         )
 
+
 async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant):
     strategy = await _create_strategy_instance(
         hass,
