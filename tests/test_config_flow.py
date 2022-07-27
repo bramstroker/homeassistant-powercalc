@@ -484,6 +484,31 @@ async def test_group_options_flow(hass: HomeAssistant):
 
     #assert hass.states.get("sensor.kitchen_power").attributes.get(ATTR_ENTITIES) == new_entities
 
+async def test_linear_options_flow_error(hass: HomeAssistant):
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.LINEAR,
+            CONF_LINEAR: {CONF_MIN_POWER: 40, CONF_MAX_POWER: 50},
+        },
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    user_input = {
+        CONF_MIN_POWER: 55, 
+        CONF_MAX_POWER: 50
+    }
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"]
+    assert result["errors"]["base"] == "linear_min_higher_as_max"
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
     entry = MockConfigEntry(domain=DOMAIN, data=entry_data)
