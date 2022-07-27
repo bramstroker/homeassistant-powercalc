@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "model.json described a light model",
+  "description": "model.json described a light model ",
   "type": "object",
   "required": [
     "name",
