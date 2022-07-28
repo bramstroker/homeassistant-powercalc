@@ -174,7 +174,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
-        DATA_DISCOVERED_ENTITIES: [],
+        DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
     }
 

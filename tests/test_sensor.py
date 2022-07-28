@@ -5,6 +5,7 @@ from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
+from homeassistant.components.light import ColorMode
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
@@ -26,10 +27,13 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_MANUFACTURER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -45,6 +49,8 @@ from .common import (
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
 )
+
+from custom_components.test.light import MockLight
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
@@ -249,3 +255,41 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
     assert hass.states.get("sensor.test_power_2")
     assert hass.states.get("sensor.test_energy_2")
+
+async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    """Test that models are automatically discovered and power sensors created"""
+
+    caplog.set_level(logging.ERROR)
+
+    lighta = MockLight("testa")
+    lighta.manufacturer = "lidl"
+    lighta.model = "HG06106C"
+    lighta.supported_color_modes = [ColorMode.BRIGHTNESS]
+    lighta.brightness = 125
+
+    await create_mock_light_entity(hass, [lighta])
+    await hass.async_block_till_done()
+
+    hass.states.async_set("light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS})
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "GroupA",
+                CONF_ENTITIES: [
+                    {CONF_ENTITY_ID: "light.testa"}
+                ]
+            },
+        ],
+        {
+            CONF_ENABLE_AUTODISCOVERY: True
+        }
+    )
+
+    assert len(caplog.records) == 0
+
+    assert hass.states.get("sensor.testa_power")
+    group_state = hass.states.get("sensor.groupa_power")
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.testa_power"}
