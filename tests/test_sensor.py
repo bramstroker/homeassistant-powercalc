@@ -26,12 +26,14 @@ from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENTITIES,
     ATTR_SOURCE_ENTITY,
+    CONF_AREA,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_GROUP,
     CONF_INCLUDE,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -315,7 +317,7 @@ async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, are
         {
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
-                "area": "bathroom"
+                CONF_AREA: "bathroom"
             }
             
         },
@@ -358,7 +360,7 @@ async def test_include_light_group(hass: HomeAssistant):
         {
             CONF_CREATE_GROUP: "Test include lightgroup",
             CONF_INCLUDE: {
-                "group": "light.bathroom"
+                CONF_GROUP: "light.bathroom"
             }
         },
     )
