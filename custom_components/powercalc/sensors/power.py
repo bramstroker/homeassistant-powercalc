@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Optional, cast
 
 import homeassistant.helpers.entity_registry as er
@@ -444,7 +444,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 standby_power *= Decimal(self._multiply_factor)
             power += standby_power
 
-        return Decimal(power)
+        try:
+            return Decimal(power)
+        except DecimalException:
+            _LOGGER.error(f"{state.entity_id}: Could not convert value '{power}' to decimal")
+            return None
 
     async def is_calculation_enabled(self) -> bool:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
