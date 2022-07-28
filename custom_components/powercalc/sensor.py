@@ -465,8 +465,6 @@ async def create_sensors(
     if CONF_CREATE_GROUP in config:
         group_entities = new_sensors + existing_sensors
         group_name = config.get(CONF_CREATE_GROUP)
-        if not group_entities:
-            _LOGGER.error("Could not create group %s, no entities resolved", group_name)
         group_sensors = await create_group_sensors(
             group_name,
             get_merged_sensor_configuration(global_config, config, validate=False),
