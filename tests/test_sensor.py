@@ -3,9 +3,9 @@ import logging
 import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
+from homeassistant.components.light import ColorMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
-from homeassistant.components.light import ColorMode
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
@@ -41,6 +41,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
+from custom_components.test.light import MockLight
 
 from .common import (
     create_input_boolean,
@@ -49,8 +50,6 @@ from .common import (
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
 )
-
-from custom_components.test.light import MockLight
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
@@ -256,7 +255,10 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power_2")
     assert hass.states.get("sensor.test_energy_2")
 
-async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+
+async def test_can_include_autodiscovered_entity_in_group(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     """Test that models are automatically discovered and power sensors created"""
 
     caplog.set_level(logging.ERROR)
@@ -270,7 +272,9 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
     await create_mock_light_entity(hass, [lighta])
     await hass.async_block_till_done()
 
-    hass.states.async_set("light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS})
+    hass.states.async_set(
+        "light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS}
+    )
     await hass.async_block_till_done()
 
     await run_powercalc_setup_yaml_config(
@@ -278,14 +282,10 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
         [
             {
                 CONF_CREATE_GROUP: "GroupA",
-                CONF_ENTITIES: [
-                    {CONF_ENTITY_ID: "light.testa"}
-                ]
+                CONF_ENTITIES: [{CONF_ENTITY_ID: "light.testa"}],
             },
         ],
-        {
-            CONF_ENABLE_AUTODISCOVERY: True
-        }
+        {CONF_ENABLE_AUTODISCOVERY: True},
     )
 
     assert len(caplog.records) == 0
