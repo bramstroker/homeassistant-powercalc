@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_INCLUDE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -51,6 +52,9 @@ from .common import (
 )
 
 from custom_components.test.light import MockLight
+from homeassistant.helpers.area_registry import AreaRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.device_registry import DeviceRegistry
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
@@ -293,3 +297,31 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
     assert hass.states.get("sensor.testa_power")
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.testa_power"}
+
+async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry, area_reg: AreaRegistry):
+    await create_input_boolean(hass)
+
+    lighta = MockLight("bathroom_mirror")
+    lighta.manufacturer = "lidl"
+    lighta.model = "HG06106C"
+    await create_mock_light_entity(hass, lighta)
+
+    area = area_reg.async_get_or_create("bathroom")
+    await hass.async_block_till_done()
+    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                "area": "bathroom"
+            }
+            
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
