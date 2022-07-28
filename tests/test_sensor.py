@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -298,9 +299,7 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.testa_power"}
 
-async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry, area_reg: AreaRegistry):
-    await create_input_boolean(hass)
-
+async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry):
     lighta = MockLight("bathroom_mirror")
     lighta.manufacturer = "lidl"
     lighta.model = "HG06106C"
@@ -323,5 +322,50 @@ async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, dev
     )
 
     group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+async def test_include_light_group(hass: HomeAssistant):
+    discoverable_light = MockLight("bathroom_mirror")
+    discoverable_light.manufacturer = "lidl"
+    discoverable_light.model = "HG06106C"
+
+    non_discoverable_light = MockLight("bathroom_spots")
+
+    await create_mock_light_entity(hass, [discoverable_light, non_discoverable_light])
+
+    # Ugly hack, maybe I can figure out something better in the future.
+    # Light domain is already setup for platform test, remove the component so we can setup light group
+    if light.DOMAIN in hass.config.components:
+        hass.config.components.remove(light.DOMAIN)
+
+    await async_setup_component(
+        hass,
+        light.DOMAIN,
+        {
+            light.DOMAIN: {
+                "platform": "group",
+                "name": "Bathroom",
+                "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
+                "all": "true",
+            }
+        },
+    )
+    await hass.async_block_till_done()
+    
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include lightgroup",
+            CONF_INCLUDE: {
+                "group": "light.bathroom"
+            }
+        },
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}

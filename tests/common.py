@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
 async def create_mock_light_entity(
     hass: HomeAssistant,
     entities: test_light_platform.MockLight | list[test_light_platform.MockLight],
+    setup_light_component: bool = False,
 ) -> tuple[str, str]:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
@@ -34,7 +35,7 @@ async def create_mock_light_entity(
         entities = [entities]
 
     platform.ENTITIES.extend(entities)
-
+    
     assert await async_setup_component(
         hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}}
     )
