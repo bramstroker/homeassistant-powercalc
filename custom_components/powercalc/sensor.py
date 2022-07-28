@@ -411,7 +411,6 @@ async def create_sensors(
     existing_sensors = []
     if CONF_ENTITIES in config:
         for entity_config in config[CONF_ENTITIES]:
-            context = CreationContext(group=context.group, entity_config=entity_config)
             # When there are nested entities, combine these with the current entities, recursively
             if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
                 try:
@@ -441,6 +440,7 @@ async def create_sensors(
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
+        context = CreationContext(group=context.group, entity_config=sensor_config)
         merged_sensor_config = get_merged_sensor_configuration(
             global_config, config, sensor_config
         )
