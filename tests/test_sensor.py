@@ -264,6 +264,21 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power_2")
     assert hass.states.get("sensor.test_energy_2")
 
+async def test_unsupported_model_is_skipped_from_autodiscovery(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    light = test_light_platform.MockLight("test", STATE_ON)
+    light.manufacturer = "lidl"
+    light.model = "non_existing_model"
+
+    await create_mock_light_entity(
+        hass,
+        light
+    )
+
+    # Run powercalc setup with autodiscovery
+    await run_powercalc_setup_yaml_config(hass, {}, {})
+
+    assert "Model not found in library, skipping auto configuration" in caplog.text
+
 async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
     """Test that models are automatically discovered and power sensors created"""
 
