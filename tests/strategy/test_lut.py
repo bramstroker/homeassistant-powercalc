@@ -76,14 +76,14 @@ async def test_sub_lut_loaded(hass: HomeAssistant):
         strategy, state=_create_light_color_temp_state(255, 588), expected_power=6.31
     )
 
+
 async def test_linked_profile_loaded(hass: HomeAssistant):
     source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP, ColorMode.HS])
-    strategy = _create_lut_strategy(
-        hass, "signify", "LCA007", source_entity
-    )
+    strategy = _create_lut_strategy(hass, "signify", "LCA007", source_entity)
     await _calculate_and_assert_power(
         strategy, state=_create_light_color_temp_state(255, 588), expected_power=5.21
     )
+
 
 async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
     """When brightness attribute is not available on state return no power"""
