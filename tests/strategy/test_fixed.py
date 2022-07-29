@@ -1,29 +1,25 @@
 import pytest
 from homeassistant.components import input_number
-from homeassistant.const import STATE_ON, CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.const import (
     CONF_FIXED,
-    CONF_SENSOR_TYPE,
-    DOMAIN,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
-    SensorType
+    CONF_SENSOR_TYPE,
+    DOMAIN,
+    SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-
+from ..common import create_input_boolean, create_input_number
 from .common import create_source_entity
-from ..common import (
-    create_input_number,
-    create_input_boolean 
-)
 
 
 async def test_simple_power():
@@ -149,6 +145,7 @@ async def test_validation_error_state_power_only_entity_domain():
         )
         await strategy.validate_config()
 
+
 async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant):
     await create_input_boolean(hass, "test")
     await create_input_number(hass, "test", 30)
@@ -162,7 +159,7 @@ async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant
             CONF_FIXED: {
                 CONF_POWER: template,
                 CONF_POWER_TEMPLATE: template,
-            }
+            },
         },
     )
     config_entry.add_to_hass(hass)
