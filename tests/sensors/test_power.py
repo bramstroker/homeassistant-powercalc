@@ -3,11 +3,11 @@ from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
-    CONF_PLATFORM,
     CONF_NAME,
-    STATE_ON
+    CONF_PLATFORM,
+    STATE_ON,
 )
-from homeassistant.core import HomeAssistant, CoreState, EVENT_HOMEASSISTANT_START
+from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform
 
@@ -19,7 +19,6 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
-    CONF_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -98,22 +97,21 @@ async def test_rounding_precision(hass: HomeAssistant):
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "50.0000"
 
+
 async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
     """
     The initial state of the power sensor should be calculated after HA startup completes.
     When we do it already during powercalc setup some entities referred in template could be unknown yet
     """
     hass.state = CoreState.not_running
-    
+
     await run_powercalc_setup_yaml_config(
         hass,
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "Henkie",
-            CONF_FIXED: {
-                CONF_POWER: "{{states('input_number.test')}}"
-            }
-        }
+            CONF_FIXED: {CONF_POWER: "{{states('input_number.test')}}"},
+        },
     )
 
     await create_input_number(hass, "test", 30)

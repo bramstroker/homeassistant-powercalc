@@ -330,7 +330,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
-        
+
         async def initial_update(event):
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
