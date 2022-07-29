@@ -21,6 +21,7 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.helpers import start
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -307,6 +308,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._rounding_digits = rounding_digits
         self.entity_id = entity_id
         self._sensor_config = sensor_config
+        self._track_entities: list = []
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
         self._attr_extra_state_attributes = {
@@ -328,8 +330,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity)
             await self._update_power_sensor(self._source_entity, state)
+        
+        async def initial_update(event):
+            for entity_id in self._track_entities:
+                new_state = self.hass.states.get(entity_id)
 
-        # async def home_assistant_startup(event):
+                await self._update_power_sensor(entity_id, new_state)
+
         """Add listeners and get initial state."""
         entities_to_track = self._power_calculator.get_entities_to_track()
 
@@ -338,6 +345,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         ]
         if not track_entities:
             track_entities = [self._source_entity]
+        self._track_entities = track_entities
 
         async_track_state_change_event(
             self.hass, track_entities, appliance_state_listener
@@ -355,10 +363,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 action=template_change_listener,
             )
 
-        for entity_id in track_entities:
-            new_state = self.hass.states.get(entity_id)
-
-            await self._update_power_sensor(entity_id, new_state)
+        self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
         @callback
         def async_update(event_time=None):
