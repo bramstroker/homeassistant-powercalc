@@ -1,5 +1,6 @@
 from homeassistant.components import input_boolean, input_number, light, sensor
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
+from homeassistant.components.light import ColorMode
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import device_registry as dr
@@ -23,7 +24,6 @@ from custom_components.powercalc.const import (
 async def create_mock_light_entity(
     hass: HomeAssistant,
     entities: test_light_platform.MockLight | list[test_light_platform.MockLight],
-    setup_light_component: bool = False,
 ) -> tuple[str, str]:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
@@ -58,6 +58,13 @@ async def create_mock_light_entity(
 
     return (entity_entry.entity_id, device_entry.id)
 
+def create_discoverable_light(name: str, unique_id: str = "99f899fefes") -> test_light_platform.MockLight:
+    light = test_light_platform.MockLight(name, STATE_ON, unique_id)
+    light.manufacturer = "lidl"
+    light.model = "HG06106C"
+    light.supported_color_modes = [ColorMode.BRIGHTNESS]
+    light.brightness = 125
+    return light
 
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant,

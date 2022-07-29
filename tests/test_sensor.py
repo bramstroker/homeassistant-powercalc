@@ -49,6 +49,7 @@ from custom_components.powercalc.const import (
 from .common import (
     create_input_boolean,
     create_input_booleans,
+    create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
@@ -268,14 +269,10 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
 
     caplog.set_level(logging.ERROR)
 
-    lighta = MockLight("testa")
-    lighta.manufacturer = "lidl"
-    lighta.model = "HG06106C"
-    lighta.supported_color_modes = [ColorMode.BRIGHTNESS]
-    lighta.brightness = 125
-
-    await create_mock_light_entity(hass, [lighta])
-    await hass.async_block_till_done()
+    await create_mock_light_entity(
+        hass,
+        create_discoverable_light("testa")
+    )
 
     hass.states.async_set("light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS})
     await hass.async_block_till_done()
@@ -302,12 +299,12 @@ async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, c
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.testa_power"}
 
 async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry):
-    lighta = MockLight("bathroom_mirror")
-    lighta.manufacturer = "lidl"
-    lighta.model = "HG06106C"
-    await create_mock_light_entity(hass, lighta)
+    await create_mock_light_entity(
+        hass,
+        create_discoverable_light("bathroom_mirror")
+    )
 
-    area = area_reg.async_get_or_create("bathroom")
+    area = area_reg.async_get_or_create("Bathroom 1")
     await hass.async_block_till_done()
     entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
     await hass.async_block_till_done()
@@ -317,7 +314,7 @@ async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, are
         {
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
-                CONF_AREA: "bathroom"
+                CONF_AREA: "bathroom_1"
             }
             
         },
@@ -327,11 +324,35 @@ async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, are
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
-async def test_include_light_group(hass: HomeAssistant):
-    discoverable_light = MockLight("bathroom_mirror")
-    discoverable_light.manufacturer = "lidl"
-    discoverable_light.model = "HG06106C"
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include area by name",
+            CONF_INCLUDE: {
+                CONF_AREA: "Bathroom 1"
+            }
+            
+        },
+    )
 
+    assert hass.states.get("sensor.test_include_area_by_name_power")
+
+async def test_include_area_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test area not found",
+            CONF_INCLUDE: {
+                CONF_AREA: "hallway"
+            }
+            
+        },
+    )
+    assert "No area with id or name" in caplog.text
+
+async def test_include_light_group(hass: HomeAssistant):
+    discoverable_light = create_discoverable_light("bathroom_mirror")
     non_discoverable_light = MockLight("bathroom_spots")
 
     await create_mock_light_entity(hass, [discoverable_light, non_discoverable_light])
@@ -349,7 +370,6 @@ async def test_include_light_group(hass: HomeAssistant):
                 "platform": "group",
                 "name": "Bathroom",
                 "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
-                "all": "true",
             }
         },
     )
