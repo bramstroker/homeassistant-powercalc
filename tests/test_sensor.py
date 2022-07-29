@@ -3,9 +3,9 @@ import logging
 import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
-from homeassistant.components.light import ColorMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
+from homeassistant.components.light import ColorMode
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
@@ -19,18 +19,22 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENTITIES,
     ATTR_SOURCE_ENTITY,
+    CONF_AREA,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
+    CONF_GROUP,
+    CONF_INCLUDE,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -41,15 +45,20 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
-from custom_components.test.light import MockLight
 
 from .common import (
     create_input_boolean,
     create_input_booleans,
+    create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
 )
+
+from custom_components.test.light import MockLight
+from homeassistant.helpers.area_registry import AreaRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.device_registry import DeviceRegistry
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
@@ -255,26 +264,32 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power_2")
     assert hass.states.get("sensor.test_energy_2")
 
+async def test_unsupported_model_is_skipped_from_autodiscovery(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    light = test_light_platform.MockLight("test", STATE_ON)
+    light.manufacturer = "lidl"
+    light.model = "non_existing_model"
 
-async def test_can_include_autodiscovered_entity_in_group(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
+    await create_mock_light_entity(
+        hass,
+        light
+    )
+
+    # Run powercalc setup with autodiscovery
+    await run_powercalc_setup_yaml_config(hass, {}, {})
+
+    assert "Model not found in library, skipping auto configuration" in caplog.text
+
+async def test_can_include_autodiscovered_entity_in_group(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
     """Test that models are automatically discovered and power sensors created"""
 
     caplog.set_level(logging.ERROR)
 
-    lighta = MockLight("testa")
-    lighta.manufacturer = "lidl"
-    lighta.model = "HG06106C"
-    lighta.supported_color_modes = [ColorMode.BRIGHTNESS]
-    lighta.brightness = 125
-
-    await create_mock_light_entity(hass, [lighta])
-    await hass.async_block_till_done()
-
-    hass.states.async_set(
-        "light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS}
+    await create_mock_light_entity(
+        hass,
+        create_discoverable_light("testa")
     )
+
+    hass.states.async_set("light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS})
     await hass.async_block_till_done()
 
     await run_powercalc_setup_yaml_config(
@@ -282,10 +297,14 @@ async def test_can_include_autodiscovered_entity_in_group(
         [
             {
                 CONF_CREATE_GROUP: "GroupA",
-                CONF_ENTITIES: [{CONF_ENTITY_ID: "light.testa"}],
+                CONF_ENTITIES: [
+                    {CONF_ENTITY_ID: "light.testa"}
+                ]
             },
         ],
-        {CONF_ENABLE_AUTODISCOVERY: True},
+        {
+            CONF_ENABLE_AUTODISCOVERY: True
+        }
     )
 
     assert len(caplog.records) == 0
@@ -293,3 +312,97 @@ async def test_can_include_autodiscovered_entity_in_group(
     assert hass.states.get("sensor.testa_power")
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.testa_power"}
+
+async def test_include_area(hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry):
+    await create_mock_light_entity(
+        hass,
+        create_discoverable_light("bathroom_mirror")
+    )
+
+    area = area_reg.async_get_or_create("Bathroom 1")
+    await hass.async_block_till_done()
+    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bathroom_1"
+            }
+            
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include area by name",
+            CONF_INCLUDE: {
+                CONF_AREA: "Bathroom 1"
+            }
+            
+        },
+    )
+
+    assert hass.states.get("sensor.test_include_area_by_name_power")
+
+async def test_include_area_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test area not found",
+            CONF_INCLUDE: {
+                CONF_AREA: "hallway"
+            }
+            
+        },
+    )
+    assert "No area with id or name" in caplog.text
+
+async def test_include_light_group(hass: HomeAssistant):
+    discoverable_light = create_discoverable_light("bathroom_mirror")
+    non_discoverable_light = MockLight("bathroom_spots")
+
+    await create_mock_light_entity(hass, [discoverable_light, non_discoverable_light])
+
+    # Ugly hack, maybe I can figure out something better in the future.
+    # Light domain is already setup for platform test, remove the component so we can setup light group
+    if light.DOMAIN in hass.config.components:
+        hass.config.components.remove(light.DOMAIN)
+
+    await async_setup_component(
+        hass,
+        light.DOMAIN,
+        {
+            light.DOMAIN: {
+                "platform": "group",
+                "name": "Bathroom",
+                "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
+            }
+        },
+    )
+    await hass.async_block_till_done()
+    
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include lightgroup",
+            CONF_INCLUDE: {
+                CONF_GROUP: "light.bathroom"
+            }
+        },
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.test_include_lightgroup_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}

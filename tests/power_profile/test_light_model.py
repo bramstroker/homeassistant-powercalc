@@ -45,6 +45,25 @@ async def test_load_linear_profile(hass: HomeAssistant):
     with pytest.raises(UnsupportedMode):
         light_model.fixed_mode_config
 
+async def test_load_linked_profile(hass: HomeAssistant):
+    light_model = LightModel(
+        hass, "signify", "LCA007", get_test_profile_dir("linked_profile")
+    )
+    assert light_model.supported_modes == [CalculationStrategy.LUT]
+    assert light_model.manufacturer == "signify"
+    assert light_model.model == "LCA007"
+    assert light_model.name == "Linked profile"
+
+async def test_load_sub_lut(hass: HomeAssistant):
+    light_model = LightModel(
+        hass, "yeelight", "YLDL01YL/ambilight", None
+    )
+    assert light_model.supported_modes == [CalculationStrategy.LUT]
+    assert light_model.manufacturer == "yeelight"
+    assert light_model.model == "YLDL01YL"
+    assert light_model.name == "Yeelight YLDL01YL Downlight"
+    assert light_model._lut_subdirectory == "ambilight"
+    assert light_model.is_additional_configuration_required == True
 
 async def test_error_loading_model_manifest(hass: HomeAssistant):
     with pytest.raises(ModelNotSupported):
@@ -54,7 +73,6 @@ async def test_error_loading_model_manifest(hass: HomeAssistant):
             "dummy_model",
             get_test_profile_dir("no-model-json"),
         )
-
 
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(

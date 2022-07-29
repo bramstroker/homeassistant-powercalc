@@ -1,7 +1,9 @@
 from homeassistant.components import input_boolean, input_number, light, sensor
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
+from homeassistant.components.light import ColorMode
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
@@ -25,7 +27,7 @@ async def create_mock_light_entity(
 ) -> tuple[str, str]:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
-    device_registry = mock_device_registry(hass)
+    device_registry = dr.async_get(hass)
     platform: test_light_platform = getattr(hass.components, "test.light")
     platform.init(empty=True)
 
@@ -33,7 +35,7 @@ async def create_mock_light_entity(
         entities = [entities]
 
     platform.ENTITIES.extend(entities)
-
+    
     assert await async_setup_component(
         hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}}
     )
@@ -56,27 +58,36 @@ async def create_mock_light_entity(
 
     return (entity_entry.entity_id, device_entry.id)
 
+def create_discoverable_light(name: str, unique_id: str = "99f899fefes") -> test_light_platform.MockLight:
+    light = test_light_platform.MockLight(name, STATE_ON, unique_id)
+    light.manufacturer = "lidl"
+    light.model = "HG06106C"
+    light.supported_color_modes = [ColorMode.BRIGHTNESS]
+    light.brightness = 125
+    return light
 
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant,
     sensor_config: list[ConfigType] | ConfigType,
     domain_config: ConfigType = {},
 ):
-    if isinstance(sensor_config, list):
-        for entry in sensor_config:
-            if CONF_PLATFORM not in entry:
-                entry[CONF_PLATFORM] = DOMAIN
-    elif CONF_PLATFORM not in sensor_config:
-        sensor_config[CONF_PLATFORM] = DOMAIN
-
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
     await hass.async_block_till_done()
-    if "sensor" in hass.config.components:
-        hass.config.components.remove("sensor")
-    assert await async_setup_component(
-        hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
-    )
-    await hass.async_block_till_done()
+
+    if sensor_config:
+        if isinstance(sensor_config, list):
+            for entry in sensor_config:
+                if CONF_PLATFORM not in entry:
+                    entry[CONF_PLATFORM] = DOMAIN
+        elif CONF_PLATFORM not in sensor_config:
+            sensor_config[CONF_PLATFORM] = DOMAIN
+
+        if "sensor" in hass.config.components:
+            hass.config.components.remove("sensor")
+        assert await async_setup_component(
+            hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
+        )
+        await hass.async_block_till_done()
 
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
