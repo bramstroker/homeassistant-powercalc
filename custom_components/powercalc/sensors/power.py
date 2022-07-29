@@ -447,7 +447,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         try:
             return Decimal(power)
         except DecimalException:
-            _LOGGER.error(f"{state.entity_id}: Could not convert value '{power}' to decimal")
+            _LOGGER.error(
+                f"{state.entity_id}: Could not convert value '{power}' to decimal"
+            )
             return None
 
     async def is_calculation_enabled(self) -> bool:

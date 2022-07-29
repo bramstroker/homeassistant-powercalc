@@ -6,7 +6,7 @@ import copy
 import logging
 import uuid
 from datetime import timedelta
-from typing import Any, Final, NamedTuple, cast, Optional
+from typing import Any, Final, NamedTuple, Optional, cast
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -387,8 +387,7 @@ async def create_sensors(
 
     if context is None:
         context = CreationContext(
-            group=CONF_CREATE_GROUP in config,
-            entity_config = config
+            group=CONF_CREATE_GROUP in config, entity_config=config
         )
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
@@ -445,7 +444,9 @@ async def create_sensors(
             global_config, config, sensor_config
         )
         try:
-            new_entities = await create_individual_sensors(hass, merged_sensor_config, context=context)
+            new_entities = await create_individual_sensors(
+                hass, merged_sensor_config, context=context
+            )
             new_sensors.extend(new_entities.new)
             existing_sensors.extend(new_entities.existing)
         except SensorConfigurationError as error:
@@ -582,7 +583,7 @@ def check_entity_not_already_configured(
     sensor_config: dict,
     source_entity: SourceEntity,
     hass: HomeAssistant,
-    used_unique_ids: list[str]
+    used_unique_ids: list[str],
 ):
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -593,16 +594,17 @@ def check_entity_not_already_configured(
     discovered_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
         DATA_DISCOVERED_ENTITIES
     ]
-    existing_entities = configured_entities.get(source_entity.entity_id) or discovered_entities.get(source_entity.entity_id) or []
+    existing_entities = (
+        configured_entities.get(source_entity.entity_id)
+        or discovered_entities.get(source_entity.entity_id)
+        or []
+    )
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id and unique_id in used_unique_ids:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
-    if (
-        unique_id is None
-        and source_entity.entity_id in existing_entities
-    ):
+    if unique_id is None and source_entity.entity_id in existing_entities:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 
@@ -742,6 +744,7 @@ def resolve_area_entities(
 class EntitiesBucket(NamedTuple):
     new: list[Entity, RealPowerSensor] = []
     existing: list[Entity, RealPowerSensor] = []
+
 
 class CreationContext(NamedTuple):
     group: bool = False
