@@ -317,7 +317,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
     if CONF_FIXED in sensor_config:
         fixed_config = copy.copy(sensor_config.get(CONF_FIXED))
         if CONF_POWER_TEMPLATE in fixed_config:
-            fixed_config[CONF_POWER] = fixed_config[CONF_POWER_TEMPLATE]
+            fixed_config[CONF_POWER] = Template(fixed_config[CONF_POWER_TEMPLATE])
             del fixed_config[CONF_POWER_TEMPLATE]
         sensor_config[CONF_FIXED] = fixed_config
 
