@@ -326,6 +326,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     energy_state = hass.states.get("sensor.testgroup_power")
     assert energy_state.state == STATE_UNAVAILABLE
 
+
 async def test_hide_members(hass: HomeAssistant):
     entity_reg = er.async_get(hass)
     await create_input_booleans(hass, ["one", "two"])
@@ -346,10 +347,16 @@ async def test_hide_members(hass: HomeAssistant):
                     CONF_ENTITY_ID: "input_boolean.two",
                     CONF_UNIQUE_ID: "two",
                     CONF_FIXED: {CONF_POWER: 20},
-                }
+                },
             ],
         },
     )
 
-    assert entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
-    assert entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert (
+        entity_reg.async_get("sensor.one_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
+    )
+    assert (
+        entity_reg.async_get("sensor.two_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
+    )
