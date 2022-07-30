@@ -250,7 +250,7 @@ async def test_reset_service(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0"
+    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
 
