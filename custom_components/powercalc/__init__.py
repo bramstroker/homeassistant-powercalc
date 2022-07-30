@@ -81,7 +81,9 @@ PLATFORMS = [Platform.SENSOR]
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
-            cv.deprecated(CONF_SCAN_INTERVAL, replacement_key=CONF_FORCE_UPDATE_FREQUENCY),
+            cv.deprecated(
+                CONF_SCAN_INTERVAL, replacement_key=CONF_FORCE_UPDATE_FREQUENCY
+            ),
             vol.Schema(
                 {
                     vol.Optional(
