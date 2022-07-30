@@ -114,6 +114,7 @@ They are as follows:
 | wled                      | object  | **Optional** | [WLED mode options](#wled-mode)                                            |
 | entities                  | list    | **Optional** | Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See [multiple entities and grouping](#multiple-entities-and-grouping)  |
 | create_group              | string  | **Optional** | This setting is only applicable when you also use `entities` setting or `include`. Define a group name here. See [multiple entities and grouping](#multiple-entities-and-grouping) |
+| hide_members              | boolean | **Optional** | Hide all group members in HA GUI, only applicable when `create_group` is also defined.
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 | energy_sensor_id           | string  | **Optional** | Entity id of an existing energy sensor. Mostly used in conjunction with `power_sensor_id`.

@@ -32,6 +32,7 @@ from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_HIDE_MEMBERS,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
@@ -325,6 +326,7 @@ async def test_create_group_entry(hass: HomeAssistant):
     assert result["data"] == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_CREATE_UTILITY_METERS: False,

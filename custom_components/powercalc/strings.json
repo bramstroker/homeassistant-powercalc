@@ -35,7 +35,7 @@
           "group_power_entities": "Member power entities",
           "group_energy_entities": "Member energy entities",
           "sub_groups": "Sub groups",
-          "hide_group_members": "Hide members",
+          "hide_members": "Hide members",
           "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]"
         },
         "data_description": {
@@ -156,7 +156,7 @@
           "group_power_entities": "[%key:component::powercalc::config::step::group::data::group_power_entities%]",
           "group_energy_entities": "[%key:component::powercalc::config::step::group::data::group_energy_entities%]",
           "sub_groups": "[%key:component::powercalc::config::step::group::data::sub_groups%]",
-          "hide_group_members": "[%key:component::powercalc::config::step::group::data::hide_members%]"
+          "hide_members": "[%key:component::powercalc::config::step::group::data::hide_members%]"
         },
         "data_description": {
           "calibrate": "[%key:component::powercalc::config::step::linear::data_description::calibrate%]",
