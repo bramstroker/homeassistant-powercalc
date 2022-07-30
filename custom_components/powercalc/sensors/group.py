@@ -256,12 +256,19 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         # Maybe we will convert these units in the future
         for state in available_states:
             unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+            if unit_of_measurement is None: # No unit of measurement, probably sensor has been reset
+                continue
             if unit_of_measurement != self._attr_native_unit_of_measurement:
                 _LOGGER.error(
                     f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
                 )
                 available_states.remove(state)
                 self._entities.remove(state.entity_id)
+        
+        if not available_states:
+            self._attr_available = False
+            self.async_schedule_update_ha_state(True)
+            return
 
         summed = sum(Decimal(state.state) for state in available_states)
 

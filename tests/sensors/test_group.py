@@ -19,6 +19,7 @@ from homeassistant.const import (
     POWER_WATT,
     STATE_OFF,
     STATE_ON,
+    STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -249,7 +250,7 @@ async def test_reset_service(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0"
+    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
 
@@ -297,3 +298,28 @@ async def test_mega_watt_hour(hass: HomeAssistant):
     state = hass.states.get("sensor.testgroup_energy")
 
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_MEGA_WATT_HOUR
+
+async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test2", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+        },
+    )
+
+    hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
+    hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state.state == STATE_UNAVAILABLE
+
+    energy_state = hass.states.get("sensor.testgroup_power")
+    assert energy_state.state == STATE_UNAVAILABLE
