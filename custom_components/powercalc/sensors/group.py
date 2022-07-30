@@ -27,6 +27,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers import entity_registry as er
 
 from ..const import (
     ATTR_ENTITIES,
@@ -35,6 +36,7 @@ from ..const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_HIDE_MEMBERS,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SUB_GROUPS,
     DOMAIN,
@@ -241,6 +243,24 @@ class GroupedSensor(RestoreEntity, SensorEntity):
             self._attr_native_value = state.state
 
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
+
+        self._async_hide_members()
+    
+    @callback
+    def _async_hide_members(self) -> None:
+        """Hide or unhide group members."""
+        registry = er.async_get(self.hass)
+        for member in self._entities:
+            if not (entity_id := er.async_resolve_entity_id(registry, member)):
+                continue
+            registry_entry = registry.async_get(member)
+            if not registry_entry:
+                continue
+
+            if self._sensor_config.get(CONF_HIDE_MEMBERS):
+                registry.async_update_entity(entity_id, hidden_by=er.RegistryEntryHider.INTEGRATION) 
+            elif (registry_entry.hidden_by == er.RegistryEntryHider.INTEGRATION):
+                registry.async_update_entity(entity_id, hidden_by=None)
 
     @callback
     def on_state_change(self, event):

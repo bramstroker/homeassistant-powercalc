@@ -78,6 +78,7 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_LINEAR,
@@ -193,6 +194,7 @@ SENSOR_CONFIG = {
         [cls.value for cls in UnitPrefix]
     ),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
+    vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
     vol.Optional(CONF_INCLUDE): vol.Schema(
         {
             vol.Optional(CONF_AREA): cv.string,
