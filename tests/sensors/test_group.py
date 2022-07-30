@@ -351,5 +351,5 @@ async def test_hide_members(hass: HomeAssistant):
         },
     )
 
-    entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
-    entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
