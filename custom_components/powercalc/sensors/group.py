@@ -250,10 +250,8 @@ class GroupedSensor(RestoreEntity, SensorEntity):
     def _async_hide_members(self) -> None:
         """Hide or unhide group members."""
         registry = er.async_get(self.hass)
-        for member in self._entities:
-            if not (entity_id := er.async_resolve_entity_id(registry, member)):
-                continue
-            registry_entry = registry.async_get(member)
+        for entity_id in self._entities:
+            registry_entry = registry.async_get(entity_id)
             if not registry_entry:
                 continue
 
