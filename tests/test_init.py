@@ -1,14 +1,22 @@
 from homeassistant.components import input_boolean, light
-from homeassistant.core import EVENT_HOMEASSISTANT_START, HomeAssistant
+from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE
 from homeassistant.setup import async_setup_component
+from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.config_entries import ConfigEntryState
 
 from custom_components.powercalc import create_domain_groups
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_ENABLE_AUTODISCOVERY,
+    CONF_FIXED,
+    CONF_POWER,
+    CONF_SENSOR_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
+    DUMMY_ENTITY_ID,
+    SensorType,
 )
 from custom_components.test.light import MockLight
 
@@ -19,6 +27,7 @@ from .common import (
     run_powercalc_setup_yaml_config,
 )
 
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 async def test_autodiscovery(hass: HomeAssistant):
     """Test that models are automatically discovered and power sensors created"""
@@ -90,3 +99,33 @@ async def test_domain_groups(hass: HomeAssistant):
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
 
     assert not hass.states.get("sensor.all_light_power")
+
+async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):
+    unique_id = "98493943242"
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testentry_power")
+    assert entity_reg.async_get("sensor.testentry_power")
+
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert entry.state is ConfigEntryState.NOT_LOADED
+
+    assert not hass.states.get("sensor.testentry_power")
+    assert not entity_reg.async_get("sensor.testentry_power")
