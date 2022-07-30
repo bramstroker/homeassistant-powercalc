@@ -299,6 +299,7 @@ async def test_mega_watt_hour(hass: HomeAssistant):
 
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_MEGA_WATT_HOUR
 
+
 async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
