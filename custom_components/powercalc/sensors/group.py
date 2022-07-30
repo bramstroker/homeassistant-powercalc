@@ -262,6 +262,11 @@ class GroupedSensor(RestoreEntity, SensorEntity):
                 )
                 available_states.remove(state)
                 self._entities.remove(state.entity_id)
+        
+        if not available_states:
+            self._attr_available = False
+            self.async_schedule_update_ha_state(True)
+            return
 
         summed = sum(Decimal(state.state) for state in available_states)
 
