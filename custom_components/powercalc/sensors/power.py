@@ -13,7 +13,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     CONF_NAME,
-    CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
     POWER_WATT,
     STATE_ON,
@@ -52,6 +51,7 @@ from ..const import (
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
     CONF_STANDBY_POWER,
+    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_LIGHT_MODEL,
@@ -200,7 +200,7 @@ async def create_virtual_power_sensor(
         unique_id=unique_id,
         standby_power=standby_power,
         standby_power_on=standby_power_on,
-        scan_interval=sensor_config.get(CONF_SCAN_INTERVAL),
+        update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
@@ -283,7 +283,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         unique_id: str,
         standby_power: Decimal,
         standby_power_on: Decimal,
-        scan_interval,
+        update_frequency,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
@@ -301,7 +301,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_power_on = standby_power_on
         self._attr_force_update = True
         self._attr_unique_id = unique_id
-        self._scan_interval = scan_interval
+        self._update_frequency = update_frequency
         self._multiply_factor = multiply_factor
         self._multiply_factor_standby = multiply_factor_standby
         self._ignore_unavailable_state = ignore_unavailable_state
@@ -370,7 +370,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             """Update the entity."""
             self.async_schedule_update_ha_state(True)
 
-        async_track_time_interval(self.hass, async_update, self._scan_interval)
+        async_track_time_interval(self.hass, async_update, self._update_frequency)
 
     async def _update_power_sensor(
         self, trigger_entity_id: str, state: State | None
