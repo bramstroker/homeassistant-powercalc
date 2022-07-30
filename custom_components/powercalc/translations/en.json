@@ -50,6 +50,7 @@
                     "group_power_entities": "Member power entities",
                     "name": "Name",
                     "sub_groups": "Sub groups",
+                    "hide_group_members": "Hide members",
                     "unique_id": "Unique id"
                 },
                 "data_description": {
@@ -158,6 +159,7 @@
                     "standby_power": "Standby power",
                     "states_power": "States power",
                     "sub_groups": "Sub groups",
+                    "hide_members": "Hide members",
                     "unit_of_measurement": "Unit of measurement",
                     "update_frequency": "Update frequency",
                     "value": "Value",

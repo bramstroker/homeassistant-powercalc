@@ -34,6 +34,7 @@ from .const import (
     CONF_GAMMA_CURVE,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_HIDE_MEMBERS,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
@@ -176,8 +177,8 @@ SCHEMA_GROUP_OPTIONS = vol.Schema(
         ),
         vol.Optional(
             CONF_CREATE_UTILITY_METERS, default=False
-        ): selector.BooleanSelector()
-        # vol.Required(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+        ): selector.BooleanSelector(),
+        vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
     }
 )
 

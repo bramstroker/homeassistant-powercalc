@@ -35,6 +35,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_HIDE_MEMBERS,
     CONF_MODE,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -324,3 +325,31 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
 
     energy_state = hass.states.get("sensor.testgroup_power")
     assert energy_state.state == STATE_UNAVAILABLE
+
+async def test_hide_members(hass: HomeAssistant):
+    entity_reg = er.async_get(hass)
+    await create_input_booleans(hass, ["one", "two"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_HIDE_MEMBERS: True,
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.one",
+                    CONF_UNIQUE_ID: "one",
+                    CONF_FIXED: {CONF_POWER: 10},
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.two",
+                    CONF_UNIQUE_ID: "two",
+                    CONF_FIXED: {CONF_POWER: 20},
+                }
+            ],
+        },
+    )
+
+    assert entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
