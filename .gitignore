@@ -4,3 +4,5 @@ __pycache__
 
 # Auto generated on macOS
 .DS_Store
+
+custom_components/test

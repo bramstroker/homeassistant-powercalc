@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TP-Link Tapo P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.23.2:docker"
+    },
+    "name": "Mirabella Genio Wi-Fi LED 3 metre Strip Light",
+    "standby_power": 0.7,
+    "supported_modes": [
+        "lut"
+    ]
+}

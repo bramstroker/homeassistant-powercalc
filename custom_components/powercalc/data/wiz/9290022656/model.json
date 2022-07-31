@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured 5 bulbs with utils/measure script with no dummy load",
+    "measure_device": "Kasa KP115",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 5,
+        "VERSION": "master"
+    },
+    "name": "Wiz Bulb A19 E26 Color (type SHRGB1C, model 9290022656, 8.8W 120V)",
+    "standby_power": 0.31,
+    "supported_modes": [
+        "lut"
+    ]
+}

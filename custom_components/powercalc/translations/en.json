@@ -1,0 +1,182 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Sensor is already configured, specify a unique_id"
+        },
+        "error": {
+            "daily_energy_mandatory": "You must supply at least one of Value or Value template",
+            "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
+            "group_mandatory": "You must define at least subgroups or power and energy-entities",
+            "linear_mandatory": "You must supply at least one of max_power or calibrate",
+            "linear_min_higher_as_max": "Max power cannot be lower than min power",
+            "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
+            "lut_wrong_domain": "Only light entities can use the LUT mode",
+            "unknown": "Unknown error occured, please see the logs for additional information"
+        },
+        "step": {
+            "daily_energy": {
+                "data": {
+                    "name": "Name",
+                    "on_time": "On time",
+                    "start_time": "Start time",
+                    "unique_id": "Unique id",
+                    "unit_of_measurement": "Unit of measurement",
+                    "update_frequency": "Update frequency",
+                    "value": "Value",
+                    "value_template": "Value template"
+                },
+                "data_description": {
+                    "on_time": "When left empty defaults to 1 day. always on",
+                    "update_frequency": "time in seconds between state updates of the sensor"
+                },
+                "title": "Create a daily fixed sensor"
+            },
+            "fixed": {
+                "data": {
+                    "power": "Power",
+                    "power_template": "Power template",
+                    "states_power": "States power"
+                },
+                "data_description": {
+                    "power": "A fixed power value in Watts when the entity is ON",
+                    "power_template": "Template will be evaluated to get the power value in W",
+                    "states_power": "One 'state: power' pair on each row, see example above"
+                },
+                "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
+                "title": "Fixed config"
+            },
+            "group": {
+                "data": {
+                    "create_utility_meters": "Create utility meters",
+                    "group_energy_entities": "Member energy entities",
+                    "group_power_entities": "Member power entities",
+                    "name": "Name",
+                    "sub_groups": "Sub groups",
+                    "hide_members": "Hide members",
+                    "unique_id": "Unique id"
+                },
+                "data_description": {
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+                },
+                "title": "Create a group sensor"
+            },
+            "linear": {
+                "data": {
+                    "attribute": "Attribute",
+                    "calibrate": "Calibration values",
+                    "gamma_curve": "Gamma curve",
+                    "max_power": "Max power",
+                    "min_power": "Min power"
+                },
+                "data_description": {
+                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+                    "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+                },
+                "title": "Linear config"
+            },
+            "lut": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirm model"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
+                },
+                "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
+                "title": "LUT config"
+            },
+            "lut_manufacturer": {
+                "data": {
+                    "manufacturer": "Manufacturer"
+                },
+                "description": "Select the device manufacturer",
+                "title": "LUT config"
+            },
+            "lut_model": {
+                "data": {
+                    "model": "Model ID"
+                },
+                "description": "Select the device model",
+                "title": "LUT config"
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Sensor type"
+                },
+                "title": "Choose your sensor type"
+            },
+            "virtual_power": {
+                "data": {
+                    "create_energy_sensor": "Create energy sensor",
+                    "create_utility_meters": "Create utility meters",
+                    "entity_id": "Source entity",
+                    "mode": "Calculation strategy",
+                    "name": "Name",
+                    "standby_power": "Standby power",
+                    "unique_id": "Unique id"
+                },
+                "data_description": {
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+                    "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+                    "name": "Leaving blank will take the name from the source entity",
+                    "standby_power": "Define the amount of power the device is consuming when in an OFF state",
+                    "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
+                },
+                "description": "See the readme for more information about the possible strategies and configuration options",
+                "title": "Create a virtual power sensor"
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Power factor",
+                    "voltage": "Voltage"
+                },
+                "title": "WLED config"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
+            "group_mandatory": "You must define at least subgroups or power and energy-entities",
+            "linear_mandatory": "You must supply at least one of max_power or calibrate",
+            "linear_min_higher_as_max": "Max power cannot be lower than min power",
+            "unknown": "Unknown error occured, please see the logs for additional information"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "attribute": "Attribute",
+                    "calibrate": "Calibration values",
+                    "create_energy_sensor": "Create energy sensor",
+                    "create_utility_meters": "Create utility meters",
+                    "gamma_curve": "Gamma curve",
+                    "group_energy_entities": "Member energy entities",
+                    "group_power_entities": "Member power entities",
+                    "max_power": "Max power",
+                    "min_power": "Min power",
+                    "name": "Name",
+                    "on_time": "On time",
+                    "power": "Power",
+                    "power_template": "Power template",
+                    "standby_power": "Standby power",
+                    "states_power": "States power",
+                    "sub_groups": "Sub groups",
+                    "hide_members": "Hide members",
+                    "unit_of_measurement": "Unit of measurement",
+                    "update_frequency": "Update frequency",
+                    "value": "Value",
+                    "value_template": "Value template"
+                },
+                "data_description": {
+                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+                    "calibrate": "Put a calibration value on each line. Example\n\n1: 20",
+                    "power_template": "Template will be evaluated to get the power value in W",
+                    "states_power": "One 'state: power' pair on each row, see example above",
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+                }
+            }
+        }
+    }
+}

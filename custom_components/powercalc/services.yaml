@@ -4,3 +4,4 @@ reset_energy:
   target:
     entity:
       domain: sensor
+      device_class: energy

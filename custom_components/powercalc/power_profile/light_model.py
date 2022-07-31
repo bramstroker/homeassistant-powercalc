@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -5,11 +7,11 @@ from enum import Enum
 from typing import Optional
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant
 
-from .aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
-from .const import MODE_FIXED, MODE_LINEAR
-from .errors import ModelNotSupported, UnsupportedMode
+from ..const import CalculationStrategy
+from ..errors import ModelNotSupported, UnsupportedMode
+from .library import ProfileLibrary
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,10 +26,10 @@ class DeviceType(Enum):
 class LightModel:
     def __init__(
         self,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         manufacturer: str,
         model: str,
-        custom_model_directory: str,
+        custom_model_directory: str | None,
     ):
         self._manufacturer = manufacturer
         self._model = model
@@ -42,7 +44,8 @@ class LightModel:
         self._model = self._model.replace("#slash#", "/")
         self._custom_model_directory = custom_model_directory
         self._hass = hass
-        self._directory: str = None
+        self._directory: str | None = None
+        self._profile_library: ProfileLibrary = ProfileLibrary(hass)
         self.load_model_manifest()
 
     def load_model_manifest(self) -> dict:
@@ -92,31 +95,12 @@ class LightModel:
         if self._custom_model_directory:
             return self._custom_model_directory
 
-        manufacturer_directory = (
-            MANUFACTURER_DIRECTORY_MAPPING.get(self._manufacturer) or self._manufacturer
-        ).lower()
-
-        model_directory = self._model
-        if isinstance(
-            MODEL_DIRECTORY_MAPPING.get(self._manufacturer), dict
-        ) and MODEL_DIRECTORY_MAPPING.get(self._manufacturer).get(self._model):
-            model_directory = MODEL_DIRECTORY_MAPPING.get(self._manufacturer).get(
-                self._model
-            )
-
-        data_directories = (
-            os.path.join(self._hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
-            os.path.join(os.path.dirname(__file__), "custom_data"),
-            os.path.join(os.path.dirname(__file__), "data"),
+        library_directory = self._profile_library.get_model_directory(
+            self._manufacturer, self._model
         )
-        for data_dir in data_directories:
-            model_data_dir = os.path.join(
-                data_dir,
-                f"{manufacturer_directory}/{model_directory}",
-            )
-            if os.path.exists(model_data_dir):
-                self._directory = model_data_dir
-                return self._directory
+        if library_directory:
+            self._directory = library_directory
+            return self._directory
 
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
@@ -124,7 +108,7 @@ class LightModel:
 
     def get_lut_directory(self) -> str:
         if self.linked_lut:
-            return os.path.join(os.path.dirname(__file__), "data", self.linked_lut)
+            return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
         model_directory = self.get_directory()
         if self._lut_subdirectory:
@@ -165,7 +149,7 @@ class LightModel:
 
     @property
     def linear_mode_config(self) -> Optional[dict]:
-        if not self.is_mode_supported(MODE_LINEAR):
+        if not self.is_mode_supported(CalculationStrategy.LINEAR):
             raise UnsupportedMode(
                 f"Mode linear is not supported by model: {self._model}"
             )
@@ -173,7 +157,7 @@ class LightModel:
 
     @property
     def fixed_mode_config(self) -> Optional[dict]:
-        if not self.is_mode_supported(MODE_FIXED):
+        if not self.is_mode_supported(CalculationStrategy.FIXED):
             raise UnsupportedMode(
                 f"Mode fixed is not supported by model: {self._model}"
             )

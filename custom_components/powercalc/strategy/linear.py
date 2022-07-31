@@ -10,18 +10,11 @@ from homeassistant.components import fan, light
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import CONF_ATTRIBUTE
-from homeassistant.core import State
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant, State
 
-from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import (
-    CONF_CALIBRATE,
-    CONF_GAMMA_CURVE,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER,
-)
-from custom_components.powercalc.errors import StrategyConfigurationError
-
+from ..common import SourceEntity
+from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
+from ..errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
 
 ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
@@ -44,7 +37,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
         config: dict,
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: Optional[float],
     ) -> None:
@@ -52,11 +45,17 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration = self.create_calibrate_list()
+        self._calibration: list[tuple] | None = None
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the current power consumption"""
+
+        if self._calibration is None:
+            self._calibration = self.create_calibrate_list()
+
         value = self.get_current_state_value(entity_state)
+        if value is None:
+            return None
 
         min_calibrate = self.get_min_calibrate(value)
         max_calibrate = self.get_max_calibrate(value)
@@ -66,16 +65,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug(
             f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})"
         )
-        if value is None:
-            return None
 
         min_power = min_calibrate[1]
         max_power = max_calibrate[1]
 
         value_range = max_value - min_value
-        if value_range == 0:
-            return Decimal(min_power)
-
         power_range = max_power - min_power
 
         gamma_curve = self._config.get(CONF_GAMMA_CURVE) or 1
@@ -96,25 +90,25 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def create_calibrate_list(self) -> list[tuple]:
         """Build a table of calibration values"""
-        list = []
+        calibration_list = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
-            if not self._source_entity.domain in ALLOWED_DOMAINS:
-                return list
             full_range = self.get_entity_value_range()
-            min = full_range[0]
-            max = full_range[1]
+            min_value = full_range[0]
+            max_value = full_range[1]
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
-            list.append((min, float(min_power)))
-            list.append((max, float(self._config.get(CONF_MAX_POWER))))
-            return list
+            calibration_list.append((min_value, float(min_power)))
+            calibration_list.append(
+                (max_value, float(self._config.get(CONF_MAX_POWER)))
+            )
+            return calibration_list
 
         for line in calibrate:
             parts = line.split(" -> ")
-            list.append((int(parts[0]), float(parts[1])))
+            calibration_list.append((int(parts[0]), float(parts[1])))
 
-        sorted_list = sorted(list, key=lambda tup: tup[0])
+        sorted_list = sorted(calibration_list, key=lambda tup: tup[0])
         return sorted_list
 
     def get_entity_value_range(self) -> tuple:
@@ -142,7 +136,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         try:
             return int(float(entity_state.state))
-        except ValueError as e:
+        except ValueError:
             _LOGGER.error(
                 f"Expecting state to be a number for entity: {entity_state.entity_id}"
             )
@@ -162,17 +156,26 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         return None
 
-    async def validate_config(self, source_entity: SourceEntity):
+    async def validate_config(self):
         """Validate correct setup of the strategy"""
 
-        if not CONF_CALIBRATE in self._config:
-            if source_entity.domain not in ALLOWED_DOMAINS:
+        if not self._config.get(CONF_CALIBRATE):
+            if self._source_entity.domain not in ALLOWED_DOMAINS:
                 raise StrategyConfigurationError(
                     "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
                         ",".join(ALLOWED_DOMAINS)
-                    )
+                    ),
+                    "linear_unsupported_domain",
                 )
-            if not CONF_MAX_POWER in self._config:
+            if not self._config.get(CONF_MAX_POWER):
                 raise StrategyConfigurationError(
-                    "Linear strategy must have at least 'max power' or 'calibrate' defined"
+                    "Linear strategy must have at least 'max power' or 'calibrate' defined",
+                    "linear_mandatory",
                 )
+
+        min_power = self._config.get(CONF_MIN_POWER)
+        max_power = self._config.get(CONF_MAX_POWER)
+        if min_power and max_power and min_power >= max_power:
+            raise StrategyConfigurationError(
+                "Max power cannot be lower than min power", "linear_min_higher_as_max"
+            )
