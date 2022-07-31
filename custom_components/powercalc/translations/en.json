@@ -53,7 +53,7 @@
                     "group_power_entities": "Member power entities",
                     "name": "Name",
                     "sub_groups": "Sub groups",
-                    "hide_group_members": "Hide members",
+                    "hide_members": "Hide members",
                     "unique_id": "Unique id"
                 },
                 "data_description": {
