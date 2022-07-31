@@ -9,7 +9,10 @@
             "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
             "group_mandatory": "You must define at least subgroups or power and energy-entities",
             "linear_mandatory": "You must supply at least one of max_power or calibrate",
-            "linear_min_higher_as_max": "Max power cannot be lower than min power"
+            "linear_min_higher_as_max": "Max power cannot be lower than min power",
+            "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
+            "lut_wrong_domain": "Only light entities can use the LUT mode",
+            "unknown": "Unknown error occured, please see the logs for additional information"
         },
         "step": {
             "daily_energy": {
@@ -138,7 +141,8 @@
             "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
             "group_mandatory": "You must define at least subgroups or power and energy-entities",
             "linear_mandatory": "You must supply at least one of max_power or calibrate",
-            "linear_min_higher_as_max": "Max power cannot be lower than min power"
+            "linear_min_higher_as_max": "Max power cannot be lower than min power",
+            "unknown": "Unknown error occured, please see the logs for additional information"
         },
         "step": {
             "init": {
