@@ -5,7 +5,6 @@ from __future__ import annotations
 import copy
 import logging
 from typing import Any
-from black import err
 
 import voluptuous as vol
 from homeassistant import config_entries
