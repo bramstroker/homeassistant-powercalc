@@ -1,0 +1,178 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Senzorul este deja configurat, specificați un ID unic"
+        },
+        "error": {
+            "daily_energy_mandatory": "Trebuie să furnizați cel puțin o Valoare sau șablonul Valoare",
+            "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
+            "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
+            "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
+            "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
+            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă"
+        },
+        "step": {
+            "daily_energy": {
+                "data": {
+                    "name": "Nume",
+                    "on_time": "Timp pornit",
+                    "start_time": "Timpul de începere",
+                    "unique_id": "ID unic",
+                    "unit_of_measurement": "Unitate de măsură",
+                    "update_frequency": "Frecvență de actualizare",
+                    "value": "Valoare",
+                    "value_template": "Șablon de valoare"
+                },
+                "data_description": {
+                    "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
+                    "update_frequency": "timpul în secunde între actualizările stării senzorului"
+                },
+                "title": "Creați un senzor fix zilnic"
+            },
+            "fixed": {
+                "data": {
+                    "power": "Putere",
+                    "power_template": "Sablon putere",
+                    "states_power": "Putere de stare"
+                },
+                "data_description": {
+                    "power": "O valoare fixă a puterii în wați când entitatea este PORNITĂ",
+                    "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
+                    "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus"
+                },
+                "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
+                "title": "Configurație fixă"
+            },
+            "group": {
+                "data": {
+                    "create_utility_meters": "Creați contoare de utilitate",
+                    "group_energy_entities": "Entități energetice membre",
+                    "group_power_entities": "Entități de putere membre",
+                    "name": "Nume",
+                    "sub_groups": "Sub grupuri",
+                    "hide_group_members": "Ascunde membrii",
+                    "unique_id": "ID unic"
+                },
+                "data_description": {
+                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
+                },
+                "title": "Creați un senzor de grup"
+            },
+            "linear": {
+                "data": {
+                    "attribute": "Atribut",
+                    "calibrate": "Valori de calibrare",
+                    "gamma_curve": "Curba gamma",
+                    "max_power": "Putere maxima",
+                    "min_power": "Putere minimă"
+                },
+                "data_description": {
+                    "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
+                    "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
+                },
+                "title": "Configurație liniară"
+            },
+            "lut": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirmați modelul"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
+                },
+                "description": "Producătorul '({manufacturer})' și modelul '({model})' au fost detectate automat pentru lumina dvs.",
+                "title": "Configurare LUT"
+            },
+            "lut_manufacturer": {
+                "data": {
+                    "manufacturer": "Producător"
+                },
+                "description": "Selectați producătorul dispozitivului",
+                "title": "Configurare LUT"
+            },
+            "lut_model": {
+                "data": {
+                    "model": "ID Model"
+                },
+                "description": "Selectați modelul dispozitivului",
+                "title": "Configurare LUT"
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Tip senzor"
+                },
+                "title": "Alegeți tipul dvs. de senzor"
+            },
+            "virtual_power": {
+                "data": {
+                    "create_energy_sensor": "Creați un senzor de energie",
+                    "create_utility_meters": "Creați contoare de utilitate",
+                    "entity_id": "Entitatea sursă",
+                    "mode": "Strategia de calcul",
+                    "name": "Nume",
+                    "standby_power": "Putere in Standby",
+                    "unique_id": "ID unic"
+                },
+                "data_description": {
+                    "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
+                    "create_utility_meters": "Lăsați powercalc să creeze contoare de utilitate, care circulă zilnic, pe oră etc.",
+                    "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
+                    "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
+                    "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
+                    "unique_id": "Specificați un ID unic. Acest lucru va permite configurarea mai multor senzori de putere pentru aceeași entitate. Când nu este specificat, va lua ID-ul unic al entității sursă"
+                },
+                "description": "Consultați cititorul pentru mai multe informații despre posibilele strategii și opțiuni de configurare",
+                "title": "Creați un senzor de putere virtual"
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Factor de putere",
+                    "voltage": "Voltaj"
+                },
+                "title": "Configurare WLED"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
+            "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
+            "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
+            "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
+            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "attribute": "Atribut",
+                    "calibrate": "Valori de calibrare",
+                    "create_energy_sensor": "Creați un senzor de energie",
+                    "create_utility_meters": "Creați contoare de utilitate",
+                    "gamma_curve": "Curba gamma",
+                    "group_energy_entities": "Entități energetice membre",
+                    "group_power_entities": "Entități de putere membre",
+                    "max_power": "Putere maxima",
+                    "min_power": "Putere minimă",
+                    "name": "Nume",
+                    "on_time": "Timp pornit",
+                    "power": "Putere",
+                    "power_template": "Șablon de putere",
+                    "standby_power": "Putere in Standby",
+                    "states_power": "Putere de stare",
+                    "sub_groups": "Subgrupuri",
+                    "hide_members": "Ascunde membrii",
+                    "unit_of_measurement": "Unitate de măsură",
+                    "update_frequency": "Frecvență de actualizare",
+                    "value": "Valoare",
+                    "value_template": "șablon valoare"
+                },
+                "data_description": {
+                    "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
+                    "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20",
+                    "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
+                    "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus",
+                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
+                }
+            }
+        }
+    }
+}
