@@ -344,9 +344,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_lut_manufacturer()
 
-        model_info = await autodiscover_model(
-            self.hass, self.source_entity.entity_entry
-        )
+        model_info = None
+        if self.source_entity.entity_entry:
+            model_info = await autodiscover_model(
+                self.hass, self.source_entity.entity_entry
+            )
         if model_info:
             return self.async_show_form(
                 step_id="lut",
@@ -380,16 +382,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_lut_model(
         self, user_input: dict[str, str] = None
     ) -> FlowResult:
+        errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
-            return self.create_config_entry()
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return self.create_config_entry()
 
         return self.async_show_form(
             step_id="lut_model",
             data_schema=_create_lut_schema_model(
                 self.hass, self.sensor_config.get(CONF_MANUFACTURER)
             ),
-            errors={},
+            errors=errors,
         )
 
     async def validate_strategy_config(self) -> dict:
@@ -400,7 +405,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             await strategy.validate_config()
         except StrategyConfigurationError as error:
-            return {"base": error.get_config_flow_translate_key()}
+            translation = error.get_config_flow_translate_key()
+            if translation is None:
+                translation = "unknown"
+            _LOGGER.error(str(error))
+            return {"base": translation}
         return {}
 
     @callback
