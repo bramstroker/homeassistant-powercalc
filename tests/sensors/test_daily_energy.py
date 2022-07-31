@@ -21,12 +21,14 @@ from pytest_homeassistant_custom_component.common import (
     async_fire_time_changed,
     mock_restore_cache,
 )
+from datetime import datetime
 
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_ON_TIME,
+    CONF_START_TIME,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
     DOMAIN,
@@ -161,6 +163,41 @@ async def test_power_sensor_not_created_when_not_on_whole_day(hass: HomeAssistan
 
     assert hass.states.get("sensor.ip_camera_upstairs_energy")
     assert not hass.states.get("sensor.ip_camera_upstairs_power")
+
+async def test_specific_start_time(hass: HomeAssistant):
+    start_time = datetime.now() + timedelta(minutes=30)
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 2,
+                CONF_ON_TIME: timedelta(minutes=40),
+                CONF_START_TIME: start_time.time()
+            },
+        },
+    )
+
+    sensor_entity_id = "sensor.ip_camera_upstairs_energy"
+
+    await _trigger_periodic_update(hass, 3)
+    assert_entity_state(hass, sensor_entity_id, "0.0000")
+
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "0.5000")
+
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "1.0000")
+
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "1.5000")
+
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "2.0000")
+
+    await _trigger_periodic_update(hass)
+    assert_entity_state(hass, sensor_entity_id, "2.0000")
 
 
 @pytest.mark.parametrize(
