@@ -128,6 +128,21 @@ async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
         await strategy.validate_config()
 
 
+async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
+    with pytest.raises(StrategyConfigurationError):
+        source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP])
+        strategy_factory = PowerCalculatorStrategyFactory(hass)
+        strategy = strategy_factory.create(
+            config={},
+            strategy=CalculationStrategy.LUT,
+            light_model=LightModel(
+                hass, "signify", "LWA017", None
+            ),  # This model only supports brightness
+            source_entity=source_entity,
+        )
+        await strategy.validate_config()
+
+
 def _create_lut_strategy(
     hass: HomeAssistant,
     manufacturer: str,

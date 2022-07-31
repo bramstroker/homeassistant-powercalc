@@ -129,7 +129,10 @@
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
       "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
       "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-      "group_mandatory": "You must define at least subgroups or power and energy-entities"
+      "group_mandatory": "You must define at least subgroups or power and energy-entities",
+      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
+      "lut_wrong_domain": "Only light entities can use the LUT mode",
+      "unknown": "Unknown error occured, please see the logs for additional information"
     }
   },
   "options": {
@@ -172,7 +175,8 @@
       "linear_min_higher_as_max": "[%key:component::powercalc::config::error::linear_min_higher_as_max%]",
       "fixed_mandatory": "[%key:component::powercalc::config::error::fixed_mandatory%]",
       "fixed_states_power_only": "[%key:component::powercalc::config::error::fixed_states_power_only%]",
-      "group_mandatory": "[%key:component::powercalc::config::error::group_mandatory%]"
+      "group_mandatory": "[%key:component::powercalc::config::error::group_mandatory%]",
+      "unknown": "[%key:component::powercalc::config::error::unknown%]"
     }
   }
 }

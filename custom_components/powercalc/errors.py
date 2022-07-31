@@ -35,7 +35,7 @@ class StrategyConfigurationError(PowercalcSetupError):
         super().__init__(message)
         self._config_flow_trans_key = config_flow_trans_key
 
-    def get_config_flow_translate_key(self) -> str:
+    def get_config_flow_translate_key(self) -> str | None:
         return self._config_flow_trans_key
 
 

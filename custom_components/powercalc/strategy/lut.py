@@ -230,19 +230,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     async def validate_config(self):
         if self._source_entity.domain != light.DOMAIN:
-            raise StrategyConfigurationError("Only light entities can use the LUT mode")
-
-        if self._model.manufacturer is None:
-            _LOGGER.error(
-                "Manufacturer not supplied for entity: %s",
-                self._source_entity.entity_id,
+            raise StrategyConfigurationError(
+                "Only light entities can use the LUT mode", "lut_unsupported_color_mode"
             )
-
-        if self._model.model is None:
-            _LOGGER.error(
-                "Model not supplied for entity: %s", self._source_entity.entity_id
-            )
-            return
 
         for color_mode in self._source_entity.supported_color_modes:
             if color_mode in LUT_COLOR_MODES:
@@ -251,7 +241,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
                         self._model, color_mode
                     )
                 except LutFileNotFound:
-                    raise ModelNotSupported("No lookup file found for mode", color_mode)
+                    raise ModelNotSupported(
+                        f"No lookup file found for mode: {color_mode}",
+                        "lut_unsupported_color_mode",
+                    )
 
 
 @dataclass
