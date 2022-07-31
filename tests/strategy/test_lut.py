@@ -45,6 +45,18 @@ async def test_colortemp_lut(hass: HomeAssistant):
         expected_power=3.01,
     )
 
+    # Out of bound values
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(brightness=-6, color_temp=170),
+        expected_power=2.03,
+    )
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(brightness=300, color_temp=400),
+        expected_power=7.34,
+    )
+
 
 async def test_brightness_lut(hass: HomeAssistant):
     """Test LUT lookup in brightness mode"""
