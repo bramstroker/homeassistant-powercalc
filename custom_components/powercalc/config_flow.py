@@ -344,9 +344,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_lut_manufacturer()
 
-        model_info = await autodiscover_model(
-            self.hass, self.source_entity.entity_entry
-        )
+        model_info = None
+        if self.source_entity.entity_entry:
+            model_info = await autodiscover_model(
+                self.hass, self.source_entity.entity_entry
+            )
         if model_info:
             return self.async_show_form(
                 step_id="lut",
