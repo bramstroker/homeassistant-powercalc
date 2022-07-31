@@ -248,6 +248,7 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 
+
 async def test_lut_not_autodiscovered(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON)
     light_entity._attr_unique_id = None
@@ -256,6 +257,7 @@ async def test_lut_not_autodiscovered(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_manufacturer"
+
 
 async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     """
