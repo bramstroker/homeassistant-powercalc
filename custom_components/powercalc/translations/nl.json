@@ -1,0 +1,182 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
+        },
+        "error": {
+            "daily_energy_mandatory": "Je moet mimimaal waarde or waarde template opgeven",
+            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; stroom, stroom template of stroom per status",
+            "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
+            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, stroom entiteiten of energie entiteiten",
+            "linear_mandatory": "Je moet mimimaal max stroom of kalibratie waardes instellen",
+            "linear_min_higher_as_max": "Maximale stroom kan niet lager zijn dan mimimale stroom",
+            "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
+            "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
+            "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+        },
+        "step": {
+            "daily_energy": {
+                "data": {
+                    "name": "Name",
+                    "on_time": "Tijd aan per dag",
+                    "start_time": "Start time",
+                    "unique_id": "Uniek id",
+                    "unit_of_measurement": "Eenheid",
+                    "update_frequency": "Update frequentie",
+                    "value": "Waarde",
+                    "value_template": "Waarde template"
+                },
+                "data_description": {
+                    "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
+                    "update_frequency": "tijd in seconden tussen status updates van de sensor"
+                },
+                "title": "Maak een dagelijkse energieverbruik sensor"
+            },
+            "fixed": {
+                "data": {
+                    "power": "Stroom",
+                    "power_template": "Stroom template",
+                    "states_power": "Stroom per status"
+                },
+                "data_description": {
+                    "power": "Een vastgestelde stroomsterkte in Watt wanneer de gekoppelde entiteit AAN is",
+                    "power_template": "Template die geevalueerd wordt om de stroomsterkte (W) te bepalen",
+                    "states_power": "Eén 'status: stroom' paar op elke rij, zie het voorbeeld boven"
+                },
+                "description": "Definieer een vaste stroomsterkte voor je entiteit. Eventueel kan je ook een stroomsterkte per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
+                "title": "Gefixeerde configuratie"
+            },
+            "group": {
+                "data": {
+                    "create_utility_meters": "Creëer utiliteit meters",
+                    "group_energy_entities": "Individuele energie entiteiten",
+                    "group_power_entities": "Individuele stroom entiteiten",
+                    "name": "Naam",
+                    "sub_groups": "Sub groepen",
+                    "hide_members": "Verberg onderliggende sensoren",
+                    "unique_id": "Uniek id"
+                },
+                "data_description": {
+                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+                },
+                "title": "Creëer een groep sensor"
+            },
+            "linear": {
+                "data": {
+                    "attribute": "Attribuut",
+                    "calibrate": "Kalibratie waardes",
+                    "gamma_curve": "Gamma curve",
+                    "max_power": "Max stroom",
+                    "min_power": "Min stroom"
+                },
+                "data_description": {
+                    "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+                    "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20"
+                },
+                "title": "Lineaire configuratie"
+            },
+            "lut": {
+                "data": {
+                    "confirm_autodisovered_model": "Bevestig model ID"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
+                },
+                "description": "Fabrikant '({manufacturer})' en model '({model})' zijn automatisch gedecteerd voor de lamp",
+                "title": "LUT configuratie"
+            },
+            "lut_manufacturer": {
+                "data": {
+                    "manufacturer": "Fabrikant"
+                },
+                "description": "Selecteer de fabrikant",
+                "title": "LUT configuratie"
+            },
+            "lut_model": {
+                "data": {
+                    "model": "Model ID"
+                },
+                "description": "Select het model",
+                "title": "LUT configuratie"
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Sensor type"
+                },
+                "title": "Kies het gewenste sensor type"
+            },
+            "virtual_power": {
+                "data": {
+                    "create_energy_sensor": "Creëer energie sensoren",
+                    "create_utility_meters": "Creëer utiliteit meters",
+                    "entity_id": "Bron entiteit",
+                    "mode": "Calculatie strategie",
+                    "name": "Naam",
+                    "standby_power": "Standby stroom",
+                    "unique_id": "Uniek id"
+                },
+                "data_description": {
+                    "create_energy_sensor": "Laat powercalc een kWh meter maken",
+                    "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc.",
+                    "entity_id": "entiteit waarop de virtuele stroom sensor is gebaseerd, de stroomsensor update zichzelf wanneer deze entiteit van status wijzigt",
+                    "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
+                    "standby_power": "Definieer het stroomverbruik wanneer het apparaat uit staat (OFF status in Home Assistant)",
+                    "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele stroommeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
+                },
+                "description": "Zie de readme voor meer information over de mogelijke strategieen en configuratie opties.",
+                "title": "Creëer een virtuele stroom meter"
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Power factor",
+                    "voltage": "Voltage"
+                },
+                "title": "WLED configuratie"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; stroom, stroom template of stroom per status",
+            "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
+            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, stroom entiteiten of energie entiteiten",
+            "linear_mandatory": "Je moet mimimaal max stroom of kalibratie waardes instellen",
+            "linear_min_higher_as_max": "Maximale stroom kan niet lager zijn dan mimimale stroom",
+            "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "attribute": "Attribuut",
+                    "calibrate": "Kalibratie waardes",
+                    "create_energy_sensor": "Creëer energie sensoren",
+                    "create_utility_meters": "Creëer utiliteit meters",
+                    "gamma_curve": "Gamma curve",
+                    "group_energy_entities": "Individuele energie entiteiten",
+                    "group_power_entities": "Individuele stroom entiteiten",
+                    "max_power": "Max stroom",
+                    "min_power": "Min stroom",
+                    "name": "Naam",
+                    "on_time": "Tijd aan per dag",
+                    "power": "Stroom",
+                    "power_template": "Stroom template",
+                    "standby_power": "Standby stroom",
+                    "states_power": "Stroom per status",
+                    "sub_groups": "Sub groepen",
+                    "hide_members": "Verberg onderliggende sensoren",
+                    "unit_of_measurement": "Eenheid",
+                    "update_frequency": "Update frequentie",
+                    "value": "Waarde",
+                    "value_template": "Waarde template"
+                },
+                "data_description": {
+                    "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+                    "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
+                    "power_template": "Template die geevalueerd wordt om de stroomsterkte (W) te bepalen",
+                    "states_power": "Eén 'status: stroom' paar op elke rij, zie het voorbeeld boven",
+                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+                }
+            }
+        }
+    }
+}
