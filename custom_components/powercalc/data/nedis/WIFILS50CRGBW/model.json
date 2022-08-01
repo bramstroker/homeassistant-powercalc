@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TP-Link Kasa HS110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.24.3:docker"
+    },
+    "name": "Nedis Smart LED-list",
+    "standby_power": 0.39,
+    "supported_modes": [
+        "lut"
+    ]
+}
