@@ -165,7 +165,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._update_frequency = update_frequency
         self._sensor_config = sensor_config
         self._on_time = on_time or timedelta(days=1)
-        self._start_time = start_time
+        self._start_time: datetime | None = start_time
         self._rounding_digits = rounding_digits
         self._attr_unique_id = sensor_config.get(CONF_UNIQUE_ID)
         self.entity_id = entity_id
@@ -229,19 +229,42 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             value.hass = self.hass
             value = value.async_render()
 
+        seconds_in_period = self._on_time.total_seconds() if self._on_time else 86400
+
         if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            wh_per_day = value * 1000
+            wh_per_period = value * 1000
         elif self._user_unit_of_measurement == POWER_WATT:
-            wh_per_day = value * (self._on_time.total_seconds() / 3600)
+            wh_per_period = value * (self._on_time.total_seconds() / 3600)
 
+        if self._start_time:
+            current_datetime = dt_util.utcnow()
+            (start, end) = self.get_on_time_period()
+            if current_datetime < start:
+                _LOGGER.debug("Period not started yet, don't increase")
+                return Decimal(0)
+            if current_datetime > end:
+                _LOGGER.debug("Period ended, add remainder if any")
+                return Decimal(0)
+
+        delta_wh = (wh_per_period / seconds_in_period) * elapsed_seconds
+        
         # Convert Wh to the native measurement unit
-        energy_per_day = wh_per_day
         if self._attr_native_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            energy_per_day = wh_per_day / 1000
+            delta_wh = delta_wh / 1000
         elif self._attr_native_unit_of_measurement == ENERGY_MEGA_WATT_HOUR:
-            energy_per_day = wh_per_day / 1000000
+            delta_wh = delta_wh / 1000000
 
-        return Decimal((energy_per_day / 86400) * elapsed_seconds)
+        return Decimal(delta_wh)
+    
+    def get_on_time_period(self) -> tuple:
+        current_datetime = dt_util.now()
+        start = current_datetime.replace(
+            hour=self._start_time.hour, minute=self._start_time.minute, second=0
+        )
+        time_zone = dt_util.get_time_zone(self._hass.config.time_zone)
+        start.astimezone(time_zone)
+        end = start + self._on_time
+        return (dt_util.as_utc(start), dt_util.as_utc(end))
 
     @property
     def native_value(self):
