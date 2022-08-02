@@ -295,6 +295,7 @@ class GroupedSensor(RestoreEntity, SensorEntity):
         summed = sum(Decimal(state.state) for state in available_states)
 
         self._attr_native_value = round(summed, self._rounding_digits)
+        self._attr_available = True
         self.async_schedule_update_ha_state(True)
 
 

@@ -310,7 +310,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
             CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
-                get_simple_fixed_config("input_boolean.test2", 50),
+                get_simple_fixed_config("input_boolean.test1", 50),
                 get_simple_fixed_config("input_boolean.test2", 50),
             ],
         },
@@ -325,6 +325,13 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
 
     energy_state = hass.states.get("sensor.testgroup_power")
     assert energy_state.state == STATE_UNAVAILABLE
+
+    hass.states.async_set("input_boolean.test1", STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state.state == "50.00"
+
 
 
 async def test_hide_members(hass: HomeAssistant):
