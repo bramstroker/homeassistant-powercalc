@@ -169,7 +169,6 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._rounding_digits = rounding_digits
         self._attr_unique_id = sensor_config.get(CONF_UNIQUE_ID)
         self.entity_id = entity_id
-        self._last_updated: float = dt_util.utcnow().timestamp()
         self._last_delta_calculate: float | None = None
         self.set_native_unit_of_measurement()
 
@@ -196,6 +195,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self.async_schedule_update_ha_state()
         else:
             self._state = Decimal(0)
+        
+        self._last_updated: float = dt_util.utcnow().timestamp()
 
         _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._state}")
 
@@ -209,7 +210,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                     f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}"
                 )
                 self.async_schedule_update_ha_state()
-                self._last_updated = dt_util.now().timestamp()
+            self._last_updated = dt_util.now().timestamp()
 
         self._timer = async_track_time_interval(
             self.hass, refresh, timedelta(seconds=self._update_frequency)
@@ -219,9 +220,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         if self._last_delta_calculate is None:
             self._last_delta_calculate = self._last_updated
 
-        elapsed_seconds = (
-            self._last_delta_calculate - self._last_updated
-        ) + elapsed_seconds
+        elapsed_seconds = dt_util.utcnow().timestamp() - self._last_delta_calculate
+        
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
         value = self._value
@@ -256,7 +256,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
         return Decimal(delta_wh)
     
-    def get_on_time_period(self) -> tuple:
+    def get_on_time_period(self) -> tuple[datetime, datetime]:
         current_datetime = dt_util.now()
         start = current_datetime.replace(
             hour=self._start_time.hour, minute=self._start_time.minute, second=0

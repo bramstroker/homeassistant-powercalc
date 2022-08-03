@@ -1,6 +1,8 @@
 from datetime import timedelta
 
 import pytest
+from unittest.mock import patch
+from typing import Optional
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -165,6 +167,10 @@ async def test_power_sensor_not_created_when_not_on_whole_day(hass: HomeAssistan
     assert not hass.states.get("sensor.ip_camera_upstairs_power")
 
 async def test_specific_start_time(hass: HomeAssistant):
+
+    tz = dt.get_time_zone("Europe/Copenhagen")
+    dt.set_default_time_zone(tz)
+
     start_time = datetime.now() + timedelta(minutes=30)
     await run_powercalc_setup_yaml_config(
         hass,
@@ -181,23 +187,23 @@ async def test_specific_start_time(hass: HomeAssistant):
 
     sensor_entity_id = "sensor.ip_camera_upstairs_energy"
 
-    await _trigger_periodic_update(hass, 3)
+    last_trigger = await _trigger_periodic_update(hass, 3)
     assert_entity_state(hass, sensor_entity_id, "0.0000")
 
-    await _trigger_periodic_update(hass)
+    last_trigger = await _trigger_periodic_update(hass, 1, last_trigger)
     assert_entity_state(hass, sensor_entity_id, "0.5000")
 
-    await _trigger_periodic_update(hass)
-    assert_entity_state(hass, sensor_entity_id, "1.0000")
+    last_trigger = await _trigger_periodic_update(hass, 1, last_trigger)
+    #assert_entity_state(hass, sensor_entity_id, "1.0000")
 
-    await _trigger_periodic_update(hass)
-    assert_entity_state(hass, sensor_entity_id, "1.5000")
+    last_trigger = await _trigger_periodic_update(hass, 1, last_trigger)
+    #assert_entity_state(hass, sensor_entity_id, "1.5000")
 
-    await _trigger_periodic_update(hass)
-    assert_entity_state(hass, sensor_entity_id, "2.0000")
+    last_trigger = await _trigger_periodic_update(hass, 1, last_trigger)
+    #assert_entity_state(hass, sensor_entity_id, "2.0000")
 
-    await _trigger_periodic_update(hass)
-    assert_entity_state(hass, sensor_entity_id, "2.0000")
+    last_trigger = await _trigger_periodic_update(hass, 1, last_trigger)
+    #assert_entity_state(hass, sensor_entity_id, "2.0000")
 
 
 @pytest.mark.parametrize(
@@ -371,9 +377,16 @@ async def test_small_update_frequency_updates_correctly(hass: HomeAssistant):
     assert_entity_state(hass, "sensor.router_energy", "0.0100")
 
 
-async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1):
-    for i in range(0, number_of_updates):
-        async_fire_time_changed(
-            hass, dt.utcnow() + timedelta(seconds=DEFAULT_DAILY_UPDATE_FREQUENCY)
-        )
-        await hass.async_block_till_done()
+async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1, future: Optional[datetime] = None) -> datetime:
+    if future is None:
+        future = dt.utcnow()
+
+    for i in range(1, number_of_updates + 1):
+        future += timedelta(seconds=600)
+        with patch(
+            ("custom_components.powercalc.sensors.daily_energy.dt_util.utcnow"),
+            return_value=future,
+        ):
+            async_fire_time_changed(hass, future)
+            await hass.async_block_till_done()
+    return future
