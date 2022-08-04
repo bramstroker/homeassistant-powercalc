@@ -92,15 +92,4 @@ class ProfileLibrary:
                 models.append(alias.model)
         
         return models
-
-def create_profile_library(hass: HomeAssistant) -> ProfileLibrary:
-    """
-    Creates and loads the profile library
-    Makes sure it is only loaded once and instance is save in hass data registry
-    """
-    if DATA_PROFILE_LIBRARY in hass.data:
-        return hass.data[DATA_PROFILE_LIBRARY]
-
-    library = ProfileLibrary(hass)
-    hass.data[DATA_PROFILE_LIBRARY] = library
-    return library
+        
