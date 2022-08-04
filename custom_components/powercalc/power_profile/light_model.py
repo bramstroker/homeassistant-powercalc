@@ -45,7 +45,7 @@ class LightModel:
         self._custom_model_directory = custom_model_directory
         self._hass = hass
         self._directory: str | None = None
-        self._profile_library: ProfileLibrary = ProfileLibrary(hass)
+        self._profile_library = ProfileLibrary.factory(hass)
         self.load_model_manifest()
 
     def load_model_manifest(self) -> dict:
