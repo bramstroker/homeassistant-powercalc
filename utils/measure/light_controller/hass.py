@@ -64,12 +64,13 @@ class HassLightController(LightController):
     def build_hs_json_body(self, bri: int, hue: int, sat: int) -> dict:
         return {
             "entity_id": self._entity_id,
+            "transition": 0,
             "brightness": bri,
             "hs_color": [hue / 65535 * 360, sat / 255 * 100],
         }
 
     def build_ct_json_body(self, bri: int, ct: int) -> dict:
-        return {"entity_id": self._entity_id, "brightness": bri, "color_temp": ct}
+        return {"entity_id": self._entity_id, "transition": 0, "brightness": bri, "color_temp": ct}
 
     def build_bri_json_body(self, bri: int) -> dict:
-        return {"entity_id": self._entity_id, "brightness": bri}
+        return {"entity_id": self._entity_id, "transition": 0, "brightness": bri}
