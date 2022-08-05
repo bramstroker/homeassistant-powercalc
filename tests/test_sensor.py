@@ -395,6 +395,10 @@ async def test_include_light_group(hass: HomeAssistant):
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
 async def test_user_can_rename_entity_id(hass: HomeAssistant, entity_reg: EntityRegistry):
+    """
+    When the power/energy sensors exist already with an unique ID, don't change the entity ID
+    This allows the users to change the entity ID's from the GUI
+    """
     entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef", suggested_object_id="my_renamed_power")
     entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef_energy", suggested_object_id="my_renamed_energy")
     await hass.async_block_till_done()
