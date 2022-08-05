@@ -15,10 +15,12 @@ from custom_components.powercalc import create_domain_groups
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_POWER,
     CONF_SENSOR_TYPE,
+    CONF_UTILITY_METER_TYPES,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
@@ -133,3 +135,36 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):
 
     assert not hass.states.get("sensor.testentry_power")
     assert not entity_reg.async_get("sensor.testentry_power")
+
+async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant):
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/939
+    """
+    light_entity = MockLight("testb")
+    light_entity.manufacturer = "signify"
+    light_entity.model = "LCA001"
+
+    await create_mock_light_entity(hass, light_entity)
+
+    domain_config = {
+        CONF_ENABLE_AUTODISCOVERY: True,
+        CONF_CREATE_DOMAIN_GROUPS: [
+            light.DOMAIN
+        ],
+        CONF_CREATE_UTILITY_METERS: True,
+        CONF_UTILITY_METER_TYPES: ["daily"]
+    }
+
+    await run_powercalc_setup_yaml_config(
+        hass, {}, domain_config
+    )
+
+    await create_domain_groups(
+        hass, hass.data[DOMAIN][DOMAIN_CONFIG], [light.DOMAIN]
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.all_light_power")
+    assert hass.states.get("sensor.all_light_energy")
+    assert not hass.states.get("sensor.all_light_energy_2")
+    assert hass.states.get("sensor.all_light_energy_daily")
