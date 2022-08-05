@@ -12,13 +12,12 @@ from homeassistant.components.light import (
 )
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.template import Template
 from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.power_profile.light_model import LightModel
+from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.lut import LutStrategy
 
@@ -135,7 +134,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
         strategy = strategy_factory.create(
             config={},
             strategy=CalculationStrategy.LUT,
-            light_model=LightModel(
+            power_profile=PowerProfile(
                 hass, "signify", "LWA017", None
             ),  # This model only supports brightness
             source_entity=source_entity,
@@ -155,7 +154,7 @@ def _create_lut_strategy(
     return strategy_factory.create(
         config={},
         strategy=CalculationStrategy.LUT,
-        light_model=LightModel(hass, manufacturer, model, None),
+        power_profile=PowerProfile(hass, manufacturer, model, None),
         source_entity=source_entity,
     )
 

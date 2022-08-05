@@ -14,16 +14,16 @@ from homeassistant.core import HomeAssistant
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from ..errors import ModelNotSupported
-from .light_model import LightModel
+from .power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def get_light_model(
+async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
     entity_entry: Optional[er.RegistryEntry] = None,
-) -> Optional[LightModel]:
+) -> Optional[PowerProfile]:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and entity_entry:
@@ -41,16 +41,16 @@ async def get_light_model(
             hass.config.config_dir, custom_model_directory
         )
 
-    return LightModel(hass, manufacturer, model, custom_model_directory)
+    return PowerProfile(hass, manufacturer, model, custom_model_directory)
 
 
 async def is_autoconfigurable(
     hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
-        light_model = await get_light_model(hass, sensor_config, entry)
+        power_profile = await get_power_profile(hass, sensor_config, entry)
         return bool(
-            light_model and not light_model.is_additional_configuration_required
+            power_profile and not power_profile.is_additional_configuration_required
         )
     except ModelNotSupported:
         return False

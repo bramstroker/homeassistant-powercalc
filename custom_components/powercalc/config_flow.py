@@ -59,7 +59,7 @@ from .const import (
 )
 from .errors import StrategyConfigurationError
 from .power_profile.library import ProfileLibrary
-from .power_profile.light_model import LightModel
+from .power_profile.power_profile import PowerProfile
 from .power_profile.model_discovery import autodiscover_model
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -532,12 +532,12 @@ def _create_strategy_object(
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
-    light_model = None
+    power_profile = None
     if strategy == CalculationStrategy.LUT:
-        light_model = LightModel(
+        power_profile = PowerProfile(
             hass, config.get(CONF_MANUFACTURER), config.get(CONF_MODEL), None
         )
-    return factory.create(config, strategy, light_model, source_entity)
+    return factory.create(config, strategy, power_profile, source_entity)
 
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:

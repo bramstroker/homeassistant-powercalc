@@ -54,14 +54,14 @@ from ..const import (
     CONF_STANDBY_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
-    DISCOVERY_LIGHT_MODEL,
+    DISCOVERY_POWER_PROFILE,
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
     CalculationStrategy,
 )
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
-from ..power_profile.model_discovery import get_light_model
+from ..power_profile.model_discovery import get_power_profile
 from ..strategy.factory import PowerCalculatorStrategyFactory
 from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 from .abstract import generate_power_sensor_entity_id, generate_power_sensor_name
@@ -103,7 +103,7 @@ async def create_virtual_power_sensor(
     )
     entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
 
-    light_model = None
+    power_profile = None
     try:
         mode = select_calculation_strategy(sensor_config)
 
@@ -112,19 +112,19 @@ async def create_virtual_power_sensor(
             if (
                 discovery_info
                 and sensor_config.get(CONF_MODEL) is None
-                and discovery_info.get(DISCOVERY_LIGHT_MODEL)
+                and discovery_info.get(DISCOVERY_POWER_PROFILE)
             ):
-                light_model = discovery_info.get(DISCOVERY_LIGHT_MODEL)
+                power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
             else:
-                light_model = await get_light_model(
+                power_profile = await get_power_profile(
                     hass, sensor_config, source_entity.entity_entry
                 )
-            if mode is None and light_model:
-                if not light_model.supported_modes:
+            if mode is None and power_profile:
+                if not power_profile.supported_modes:
                     raise UnsupportedMode(
-                        f"Power profile has no supported_modes in model.json. manufacturer: {light_model.manufacturer}, model: {light_model.model}"
+                        f"Power profile has no supported_modes in model.json. manufacturer: {power_profile.manufacturer}, model: {power_profile.model}"
                     )
-                mode = light_model.supported_modes[0]
+                mode = power_profile.supported_modes[0]
         except (ModelNotSupported) as err:
             if not is_fully_configured(sensor_config):
                 _LOGGER.error(
@@ -141,7 +141,7 @@ async def create_virtual_power_sensor(
             DOMAIN
         ][DATA_CALCULATOR_FACTORY]
         calculation_strategy = calculation_strategy_factory.create(
-            sensor_config, mode, light_model, source_entity
+            sensor_config, mode, power_profile, source_entity
         )
         await calculation_strategy.validate_config()
     except (UnsupportedMode) as err:
@@ -160,18 +160,18 @@ async def create_virtual_power_sensor(
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER):
             standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
-        elif light_model is not None:
-            standby_power = Decimal(light_model.standby_power)
-            standby_power_on = Decimal(light_model.standby_power_on)
+        elif power_profile is not None:
+            standby_power = Decimal(power_profile.standby_power)
+            standby_power_on = Decimal(power_profile.standby_power_on)
 
     if (
         CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
-        and light_model is not None
-        and light_model.calculation_enabled_condition
+        and power_profile is not None
+        and power_profile.calculation_enabled_condition
     ):
         sensor_config[
             CONF_CALCULATION_ENABLED_CONDITION
-        ] = light_model.calculation_enabled_condition
+        ] = power_profile.calculation_enabled_condition
 
     _LOGGER.debug(
         "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
@@ -179,8 +179,8 @@ async def create_virtual_power_sensor(
         entity_category,
         name,
         calculation_strategy.__class__.__name__,
-        light_model.manufacturer if light_model else "",
-        light_model.model if light_model else "",
+        power_profile.manufacturer if power_profile else "",
+        power_profile.model if power_profile else "",
         round(standby_power, 2),
         unique_id,
     )

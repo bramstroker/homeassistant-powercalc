@@ -23,7 +23,7 @@ class DeviceType(Enum):
     SMART_SWITCH = "smart_switch"
 
 
-class LightModel:
+class PowerProfile:
     def __init__(
         self,
         hass: HomeAssistant,

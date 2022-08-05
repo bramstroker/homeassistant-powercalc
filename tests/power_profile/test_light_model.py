@@ -10,65 +10,65 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode
-from custom_components.powercalc.power_profile.light_model import DeviceType, LightModel
+from custom_components.powercalc.power_profile.power_profile import DeviceType, PowerProfile
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
-    light_model = LightModel(
+    power_profile = PowerProfile(
         hass, "signify", "LCA001", get_test_profile_dir("signify-LCA001")
     )
-    assert light_model.supported_modes == [CalculationStrategy.LUT]
-    assert light_model.manufacturer == "signify"
-    assert light_model.model == "LCA001"
-    assert light_model.is_mode_supported(CalculationStrategy.LUT)
-    assert not light_model.is_mode_supported(CalculationStrategy.FIXED)
-    assert light_model.device_type == DeviceType.LIGHT
-    assert light_model.name == "Hue White and Color Ambiance A19 E26/E27 (Gen 5)"
+    assert power_profile.supported_modes == [CalculationStrategy.LUT]
+    assert power_profile.manufacturer == "signify"
+    assert power_profile.model == "LCA001"
+    assert power_profile.is_mode_supported(CalculationStrategy.LUT)
+    assert not power_profile.is_mode_supported(CalculationStrategy.FIXED)
+    assert power_profile.device_type == DeviceType.LIGHT
+    assert power_profile.name == "Hue White and Color Ambiance A19 E26/E27 (Gen 5)"
 
 
 async def test_load_fixed_profile(hass: HomeAssistant):
-    light_model = LightModel(hass, "dummy", "dummy", get_test_profile_dir("fixed"))
-    assert light_model.supported_modes == [CalculationStrategy.FIXED]
-    assert light_model.standby_power == 0.5
-    assert light_model.fixed_mode_config == {CONF_POWER: 50}
+    power_profile = PowerProfile(hass, "dummy", "dummy", get_test_profile_dir("fixed"))
+    assert power_profile.supported_modes == [CalculationStrategy.FIXED]
+    assert power_profile.standby_power == 0.5
+    assert power_profile.fixed_mode_config == {CONF_POWER: 50}
 
     with pytest.raises(UnsupportedMode):
-        light_model.linear_mode_config
+        power_profile.linear_mode_config
 
 
 async def test_load_linear_profile(hass: HomeAssistant):
-    light_model = LightModel(hass, "dummy", "dummy", get_test_profile_dir("linear"))
-    assert light_model.supported_modes == [CalculationStrategy.LINEAR]
-    assert light_model.standby_power == 0.5
-    assert light_model.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
+    power_profile = PowerProfile(hass, "dummy", "dummy", get_test_profile_dir("linear"))
+    assert power_profile.supported_modes == [CalculationStrategy.LINEAR]
+    assert power_profile.standby_power == 0.5
+    assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
     with pytest.raises(UnsupportedMode):
-        light_model.fixed_mode_config
+        power_profile.fixed_mode_config
 
 
 async def test_load_linked_profile(hass: HomeAssistant):
-    light_model = LightModel(
+    power_profile = PowerProfile(
         hass, "signify", "LCA007", get_test_profile_dir("linked_profile")
     )
-    assert light_model.supported_modes == [CalculationStrategy.LUT]
-    assert light_model.manufacturer == "signify"
-    assert light_model.model == "LCA007"
-    assert light_model.name == "Linked profile"
+    assert power_profile.supported_modes == [CalculationStrategy.LUT]
+    assert power_profile.manufacturer == "signify"
+    assert power_profile.model == "LCA007"
+    assert power_profile.name == "Linked profile"
 
 
 async def test_load_sub_lut(hass: HomeAssistant):
-    light_model = LightModel(hass, "yeelight", "YLDL01YL/ambilight", None)
-    assert light_model.supported_modes == [CalculationStrategy.LUT]
-    assert light_model.manufacturer == "yeelight"
-    assert light_model.model == "YLDL01YL"
-    assert light_model.name == "Yeelight YLDL01YL Downlight"
-    assert light_model._lut_subdirectory == "ambilight"
-    assert light_model.is_additional_configuration_required == True
+    power_profile = PowerProfile(hass, "yeelight", "YLDL01YL/ambilight", None)
+    assert power_profile.supported_modes == [CalculationStrategy.LUT]
+    assert power_profile.manufacturer == "yeelight"
+    assert power_profile.model == "YLDL01YL"
+    assert power_profile.name == "Yeelight YLDL01YL Downlight"
+    assert power_profile._lut_subdirectory == "ambilight"
+    assert power_profile.is_additional_configuration_required == True
 
 
 async def test_error_loading_model_manifest(hass: HomeAssistant):
     with pytest.raises(ModelNotSupported):
-        LightModel(
+        PowerProfile(
             hass,
             "dummy_manufacturer",
             "dummy_model",

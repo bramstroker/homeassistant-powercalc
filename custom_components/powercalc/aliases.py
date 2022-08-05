@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from types import MappingProxyType
-from typing import NamedTuple
-
 
 MANUFACTURER_SIGNIFY = "Signify Netherlands B.V."
 MANUFACTURER_IKEA = "IKEA of Sweden"
@@ -155,17 +152,3 @@ MODEL_DIRECTORY_MAPPING = {
         # "bslamp1": "MJCTD01YL",
     },
 }
-
-def load_model_aliases() -> MappingProxyType[str, list[ModelAlias]]:
-    #@todo load from json file
-    return MappingProxyType(
-        {
-            "ikea": [
-                ModelAlias("L1527", "FLOALT panel WS 30x30")
-            ]
-        }
-    )
-
-class ModelAlias(NamedTuple):
-    model: str
-    alias: str

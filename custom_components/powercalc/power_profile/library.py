@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import os
+import glob
+import json
+
+from typing import NamedTuple
 from types import MappingProxyType
 
 from homeassistant.core import HomeAssistant
 
 from ..const import DATA_PROFILE_LIBRARY, DOMAIN
-from ..aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING, ModelAlias, load_model_aliases
+from ..aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
@@ -75,7 +79,7 @@ class ProfileLibrary:
 
     def get_possible_matching_models(self, manufacturer: str, manufacturer_directory: str, model: str) -> list[str]:
         if self._model_aliases is None:
-            self._model_aliases = load_model_aliases()
+            self._model_aliases = self.load_model_aliases()
 
         models = [model]
 
@@ -92,4 +96,23 @@ class ProfileLibrary:
                 models.append(alias.model)
         
         return models
-        
+    
+    def load_model_aliases(self) -> MappingProxyType[str, list[ModelAlias]]:
+        aliases = dict()
+        for dir in self._data_directories:
+            for file_path in glob.glob(dir + "/**/model.json", recursive=True):
+                with open(file_path) as file:
+                    json_data = json.load(file)
+                    continue
+                
+        return MappingProxyType(
+            {
+                "ikea": [
+                    ModelAlias("L1527", "FLOALT panel WS 30x30")
+                ]
+            }
+        )
+
+class ModelAlias(NamedTuple):
+    model: str
+    alias: str
