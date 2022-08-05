@@ -333,7 +333,6 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     assert power_state.state == "50.00"
 
 
-
 async def test_hide_members(hass: HomeAssistant):
     entity_reg = er.async_get(hass)
     await create_input_booleans(hass, ["one", "two"])

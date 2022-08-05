@@ -76,19 +76,23 @@ async def create_daily_fixed_energy_sensor(
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
     name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
-    entity_id = generate_energy_sensor_entity_id(hass, sensor_config)
-    old_entity_id = async_generate_entity_id(
-        ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass
+    unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
+    entity_id = generate_energy_sensor_entity_id(
+        hass, sensor_config, unique_id=unique_id
     )
-    async_migrate_entity_id(
-        hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id
-    )
+    if not unique_id:
+        old_entity_id = async_generate_entity_id(
+            ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass
+        )
+        async_migrate_entity_id(
+            hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id
+        )
 
     _LOGGER.debug(
         "Creating daily_fixed_energy energy sensor (name=%s, entity_id=%s, unique_id=%s)",
         name,
         entity_id,
-        sensor_config.get(CONF_UNIQUE_ID),
+        unique_id,
     )
 
     if CONF_ON_TIME in mode_config:

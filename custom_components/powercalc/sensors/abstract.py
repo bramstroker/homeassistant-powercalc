@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
@@ -13,6 +14,7 @@ from ..const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    DOMAIN,
 )
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
@@ -73,8 +75,11 @@ def generate_power_sensor_entity_id(
     sensor_config: dict[str, Any],
     source_entity: SourceEntity | None = None,
     name: str | None = None,
+    unique_id: str | None = None,
 ) -> str:
     """Generates the entity_id to use for a power sensor"""
+    if entity_id := get_entity_id_by_unique_id(hass, unique_id):
+        return entity_id
     name_pattern: str = sensor_config.get(CONF_POWER_SENSOR_NAMING)
     object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
@@ -89,11 +94,23 @@ def generate_energy_sensor_entity_id(
     sensor_config: dict[str, Any],
     source_entity: SourceEntity | None = None,
     name: str | None = None,
+    unique_id: str | None = None,
 ) -> str:
     """Generates the entity_id to use for an energy sensor"""
+    if entity_id := get_entity_id_by_unique_id(hass, unique_id):
+        return entity_id
     name_pattern: str = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
     object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
     entity_id = async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
     return entity_id
+
+
+def get_entity_id_by_unique_id(
+    hass: HomeAssistant, unique_id: str | None
+) -> str | None:
+    if unique_id is None:
+        return None
+    entity_reg = er.async_get(hass)
+    return entity_reg.async_get_entity_id(SENSOR_DOMAIN, DOMAIN, unique_id)
