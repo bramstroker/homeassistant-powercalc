@@ -77,7 +77,9 @@ async def create_daily_fixed_energy_sensor(
 
     name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
-    entity_id = generate_energy_sensor_entity_id(hass, sensor_config, unique_id=unique_id)
+    entity_id = generate_energy_sensor_entity_id(
+        hass, sensor_config, unique_id=unique_id
+    )
     if not unique_id:
         old_entity_id = async_generate_entity_id(
             ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass

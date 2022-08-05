@@ -73,7 +73,9 @@ async def create_energy_sensor(
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
 
-    entity_id = generate_energy_sensor_entity_id(hass, sensor_config, source_entity, unique_id=unique_id)
+    entity_id = generate_energy_sensor_entity_id(
+        hass, sensor_config, source_entity, unique_id=unique_id
+    )
     entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
 
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)

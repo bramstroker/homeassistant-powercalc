@@ -106,7 +106,10 @@ def generate_energy_sensor_entity_id(
     )
     return entity_id
 
-def get_entity_id_by_unique_id(hass: HomeAssistant, unique_id: str | None) -> str | None:
+
+def get_entity_id_by_unique_id(
+    hass: HomeAssistant, unique_id: str | None
+) -> str | None:
     if unique_id is None:
         return None
     entity_reg = er.async_get(hass)

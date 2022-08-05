@@ -98,7 +98,9 @@ async def create_virtual_power_sensor(
         sensor_config, sensor_config.get(CONF_NAME), source_entity
     )
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
-    entity_id = generate_power_sensor_entity_id(hass, sensor_config, source_entity, unique_id=unique_id)
+    entity_id = generate_power_sensor_entity_id(
+        hass, sensor_config, source_entity, unique_id=unique_id
+    )
     entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
 
     light_model = None
