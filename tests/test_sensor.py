@@ -393,3 +393,33 @@ async def test_include_light_group(hass: HomeAssistant):
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+async def test_user_can_rename_entity_id(hass: HomeAssistant, entity_reg: EntityRegistry):
+    """
+    When the power/energy sensors exist already with an unique ID, don't change the entity ID
+    This allows the users to change the entity ID's from the GUI
+    """
+    entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef", suggested_object_id="my_renamed_power")
+    entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef_energy", suggested_object_id="my_renamed_energy")
+    await hass.async_block_till_done()
+
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_UNIQUE_ID: "abcdef",
+            CONF_FIXED: {CONF_POWER: 40},
+        }
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.my_renamed_power")
+    assert not hass.states.get("sensor.test_power")
+
+    energy_state = hass.states.get("sensor.my_renamed_energy")
+    assert energy_state
+    assert energy_state.attributes.get("source") == "sensor.my_renamed_power"
+    assert not hass.states.get("sensor.test_energy")
