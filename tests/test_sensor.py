@@ -396,6 +396,7 @@ async def test_include_light_group(hass: HomeAssistant):
 
 async def test_user_can_rename_entity_id(hass: HomeAssistant, entity_reg: EntityRegistry):
     entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef", suggested_object_id="my_renamed_power")
+    entity_reg.async_get_or_create("sensor", DOMAIN, "abcdef_energy", suggested_object_id="my_renamed_energy")
     await hass.async_block_till_done()
 
     await create_input_boolean(hass)
@@ -414,6 +415,7 @@ async def test_user_can_rename_entity_id(hass: HomeAssistant, entity_reg: Entity
     assert hass.states.get("sensor.my_renamed_power")
     assert not hass.states.get("sensor.test_power")
 
-    energy_state = hass.states.get("sensor.test_energy")
+    energy_state = hass.states.get("sensor.my_renamed_energy")
     assert energy_state
     assert energy_state.attributes.get("source") == "sensor.my_renamed_power"
+    assert not hass.states.get("sensor.test_energy")
