@@ -165,13 +165,84 @@ with open(os.path.join(sys.path[0], ".VERSION"), "r") as f:
     _VERSION = f.read().strip()
 
 class Measure:
-    def __init__(self, light_controller: LightController, power_meter: PowerMeter):
+    """Measure the power usage of a light.
+
+    This class is responsible for measuring the power usage of a light. It uses a LightController to control the light, and a PowerMeter
+    to measure the power usage. The measurements are exported as CSV files in export/<model_id>/<color_mode>.csv (or .csv.gz). The
+    model_id is retrieved from the LightController and color mode can be selected by user input or config file (.env). The CSV files
+    contain one row per variation, where each column represents one property of that variation (e.g., brightness, hue, saturation). The last
+    column contains the measured power value in watt.
+    If you want to generate model JSON files for the LUT model, you can do so by answering yes to the question "Do you want to generate
+    model.json?".
+
+    Example
+    -------
+    
+    >>> from light_controller import LightController
+    >>> from power_meter import PowerMeter
+
+    >>> light_controller = LightController()
+    >>> power_meter = PowerMeter()
+
+    >>> measure = Measure(light_controller, power_meter)
+    >>> measure.start()
+
+    # CSV file export/<model-id>/hs.csv will be created with measurements for HS
+    color mode (e.g., hue and saturation). The last column contains the measured
+    power value in watt.
+
+    # If you answered yes to generating a model JSON file, a model.json will be
+    created in export/<model-id>
+    
+    """
+
+    def __init__(self, light_controller: LightController, power_meter: PowerMeter) -> None:
+        """This class measures the power consumption of the light bulb.
+
+        Parameters
+        ----------
+        light_controller : LightController
+            The light controller to use.
+        power_meter : PowerMeter
+            The power meter to use.
+        """
         self.light_controller = light_controller
         self.power_meter = power_meter
         self.num_0_readings: int = 0
 
-    def start(self):
-        """Starts the measurement session"""
+    def start(self) -> None:
+        """Starts the measurement session.
+
+        This method asks the user for the required information, sets up the light controller and power meter and starts the measurement
+        session.
+
+        Parameters
+        ----------
+        self : Measure
+            The Measure object.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        PowerMeterError
+            If the power meter is not connected.
+
+        ZeroReadingError
+            If the power meter returns a 0 reading.
+
+        Notes
+        -----
+        This method is the main entry point for the measurement
+        session.
+
+        Examples
+        --------
+        >>> measure = Measure()
+        >>> measure.start()
+        """
         answers = self.ask_questions()
         self.light_controller.process_answers(answers)
         self.power_meter.process_answers(answers)
@@ -307,7 +378,32 @@ class Measure:
         raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries")
 
     def should_resume(self, csv_file_path: str) -> bool:
-        """Check whether we are able to resume a previous measurement session"""
+        """This method checks if a CSV file already exists for the current color mode.
+        
+        If so, it asks the user if he wants to resume measurements or start over.
+
+        Parameters
+        ----------
+        csv_file_path : str
+            The path of the CSV file that should be checked
+
+        Returns
+        -------
+        bool
+            True if we should resume measurements, False otherwise.
+
+        Raises
+        ------
+        Exception
+            When something goes wrong with reading/writing files.
+
+        UndefinedValueError
+            When no value is defined in .env for RESUME key.
+
+        ValueError
+            When an invalid value is defined in .env for RESUME key (not 'true' or 'false').
+
+        """
         if not os.path.exists(csv_file_path):
             return False
         
@@ -330,7 +426,38 @@ class Measure:
 
 
     def get_resume_variation(self, csv_file_path: str) -> Variation:
-        """Determine the variation where we have to resume the measurements"""
+        """This method returns the variation to resume at.
+
+        It reads the last row from the CSV file and converts it into a Variation object.
+
+        Parameters
+        ----------
+        csv_file_path : str
+            The path to the CSV file
+
+        Returns
+        -------
+        Variation:
+            The variation to resume at. None if no resuming is needed.
+
+        Raises
+        -------
+        FileNotFoundError, Exception, ZeroDivisionError, ValueError, TypeError, IndexError
+
+        Examples
+        --------
+        >>> get_resume_variation("/home/user/export/LCT001/hs.csv") -> HsVariation(bri=254, hue=0, sat=0)
+
+        See Also
+        -------
+        get_variations()
+        
+        Notes
+        -------
+        This method will raise an exception when something goes wrong while reading or parsing the CSV file or when an unsupported color
+        mode is used in the CSV file.
+        """
+
         with open(csv_file_path, "r") as csv_file:
             rows = csv.reader(csv_file)
             last_row = list(rows)[-1]
