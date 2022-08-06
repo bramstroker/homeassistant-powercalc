@@ -279,7 +279,7 @@ class Measure:
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
-    def nudge_and_remeasure(self, color_mode, variation):
+    def nudge_and_remeasure(self, color_mode: str, variation: Variation):
         for nudge_count in range(MAX_NUDGES):
             try:
                 # Likely not significant enough change for PM to detect. Try nudging it
@@ -294,7 +294,8 @@ class Measure:
                 # Wait a longer amount of time for the PM to settle
                 time.sleep(SLEEP_TIME_NUDGE)
                 power = self.take_power_measurement(variation_start_time)
-            except OutdatedMeasurementError as error:
+                return power
+            except OutdatedMeasurementError:
                 continue
             except ZeroReadingError as error:
                 self.num_0_readings += 1
@@ -303,14 +304,7 @@ class Measure:
                     _LOGGER.error("Aborting measurement session. Received too many 0 readings")
                     return
                 continue
-            except PowerMeterError as error:
-                _LOGGER.error(f"Aborting: {error}")
-                return
-            except error:
-                raise error
-            else:
-                return power
-        raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {nudge_count} nudged retries")
+        raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries")
 
     def should_resume(self, csv_file_path: str) -> bool:
         """Check whether we are able to resume a previous measurement session"""
