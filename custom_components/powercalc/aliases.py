@@ -42,7 +42,7 @@ MANUFACTURER_DIRECTORY_MAPPING = {
 }
 
 MODEL_DIRECTORY_MAPPING = {
-    MANUFACTURER_IKEA: {
+    "ikea": {
         "FLOALT panel WS 30x30": "L1527",
         "FLOALT panel WS 60x60": "L1529",
         "Slagsida": "L1616",
@@ -76,12 +76,12 @@ MODEL_DIRECTORY_MAPPING = {
         "TRADFRI bulb GU10 WW 345lm": "LED2005R5",
         "LEPTITER Recessed spot light": "T1820",
     },
-    MANUFACTURER_LEDVANCE: {"4058075168572": "Tibea TW Z3"},
-    MANUFACTURER_MULLER_LIGHT: {
+    "ledvance": {"4058075168572": "Tibea TW Z3"},
+    "mueller-licht": {
         "45327": "45318",
     },
-    MANUFACTURER_OSRAM: {"AC03642": "CLA60 TW"},
-    MANUFACTURER_SIGNIFY: {
+    "osram": {"AC03642": "CLA60 TW"},
+    "signify": {
         "9290022166": "LCA001",
         "929003053401": "LCA001",
         "9290024687": "LCA007",
@@ -119,10 +119,10 @@ MODEL_DIRECTORY_MAPPING = {
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
     },
-    MANUFACTURER_TUYA: {
+    "tuya": {
         "TS0505B": "NO66-ZB/length_5",
     },
-    MANUFACTURER_YEELIGHT: {
+    "yeelight": {
         "color2": "YLDP06YL",
         "ceiling10": "YLDL01YL",
         "mono1": "YLDP01YL",

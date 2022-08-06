@@ -8,7 +8,9 @@ from typing import Optional
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
+from sqlalchemy import ForeignKey
 
+from ..aliases import MODEL_DIRECTORY_MAPPING
 from ..const import CalculationStrategy
 from ..errors import ModelNotSupported, UnsupportedMode
 
@@ -48,7 +50,7 @@ class PowerProfile:
     def load_model_manifest(self) -> dict:
         """Load the model.json file data containing information about the light model"""
 
-        model_directory = self.get_directory()
+        model_directory = self._directory
         file_path = os.path.join(model_directory, "model.json")
         if not os.path.exists(file_path):
             raise ModelNotSupported(
@@ -79,7 +81,7 @@ class PowerProfile:
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
-        model_directory = self.get_directory()
+        model_directory = self._directory
         if self._lut_subdirectory:
             model_directory = os.path.join(model_directory, self._lut_subdirectory)
         return model_directory
@@ -88,8 +90,6 @@ class PowerProfile:
         if self._model == model:
             return True
 
-        
-        
         #@todo implement Regex/Json path
         for alias in self.aliases:
             if alias == model:
@@ -131,7 +131,17 @@ class PowerProfile:
 
     @property
     def aliases(self) -> list:
-        return self._json_data.get("aliases") or []
+        aliases = self._json_data.get("aliases") or []
+        if self.manufacturer in MODEL_DIRECTORY_MAPPING: 
+            aliases.extend(
+                [
+                    alias for (alias, model) 
+                    in MODEL_DIRECTORY_MAPPING[self.manufacturer].items() 
+                    if model == self.model
+                ]
+            )
+
+        return aliases
 
     @property
     def linear_mode_config(self) -> Optional[dict]:
