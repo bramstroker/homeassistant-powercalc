@@ -39,24 +39,17 @@ def async_migrate_unique_id(
 def async_migrate_entity_id(
     hass,
     platform: str,
+    old_entity_id: str,
     new_entity_id: str,
-    unique_id: str | None = None,
-    old_entity_id: str | None = None,
 ) -> None:
     """Check if entity with old unique ID exists, and if so migrate it to new ID."""
 
     entity_registry = async_get(hass)
-    if old_entity_id:
-        entry = entity_registry.async_get(old_entity_id)
-        if entry is None:
-            return
-    else:
-        old_entity_id = entity_registry.async_get_entity_id(platform, DOMAIN, unique_id)
-
-    if old_entity_id is None or old_entity_id == new_entity_id:
+    entry = entity_registry.async_get(old_entity_id)
+    if entry is None:
         return
 
-    if old_entity_id.startswith(new_entity_id):
+    if old_entity_id == new_entity_id:
         return
 
     _LOGGER.debug(
