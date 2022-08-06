@@ -31,14 +31,12 @@ class PowerProfile:
         json_data: dict | None = None,
     ):
         self._manufacturer = manufacturer
-        self._model = model
+        self._model = model.replace("#slash#", "/")
         self._hass = hass
         self._directory = directory
         self._json_data = json_data
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
-
-        self._model = self._model.replace("#slash#", "/")
 
     def load_sub_profile(self, sub_profile: str) -> None:
         """Load the model.json file data containing information about the light model"""
@@ -65,6 +63,7 @@ class PowerProfile:
         return self._sub_profile_dir or self._directory
 
     def supports(self, model: str) -> bool:
+        model = model.replace("#slash#", "/")
         if self._model == model:
             return True
 
