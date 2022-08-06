@@ -154,7 +154,7 @@ class PowerProfile:
 
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
-        if domain == LIGHT_DOMAIN and self.device_type != DeviceType.LIGHT:
+        if self.device_type == DeviceType.LIGHT and domain != LIGHT_DOMAIN:
             return False
 
         return True

@@ -10,7 +10,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.errors import UnsupportedMode
+from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 
@@ -75,7 +75,19 @@ async def test_load_sub_lut(hass: HomeAssistant):
     assert power_profile.name == "Yeelight YLDL01YL Downlight"
     assert power_profile.sub_profile == "ambilight"
     assert power_profile.is_additional_configuration_required == True
+
+async def test_error_when_sub_profile_not_exists(hass: HomeAssistant):
+    with pytest.raises(ModelNotSupported):
+        await ProfileLibrary.factory(hass).get_profile(
+            ModelInfo("yeelight", "YLDL01YL/ambilight_boo")
+        )
     
+async def test_unsupported_entity_domain(hass: HomeAssistant):
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("signify", "LCA007"),
+    )
+    assert power_profile.is_entity_domain_supported("light")
+    assert not power_profile.is_entity_domain_supported("switch")
 
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(
