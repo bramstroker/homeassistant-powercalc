@@ -28,63 +28,41 @@ class PowerProfile:
         manufacturer: str,
         model: str,
         directory: str | None,
-        json_data: dict | None = None
+        json_data: dict | None = None,
     ):
         self._manufacturer = manufacturer
         self._model = model
-        self._lut_subdirectory = None
-
-        # Support multiple LUT in subdirectories
-        if "/" in model:
-            model_parts = model.split("/", 1)
-            self._model = model_parts[0]
-            self._lut_subdirectory = model_parts[1]
-
-        self._model = self._model.replace("#slash#", "/")
         self._hass = hass
         self._directory = directory
         self._json_data = json_data
-        if self._json_data is None:
-            self.load_model_manifest()
+        self.sub_profile: str | None = None
+        self._sub_profile_dir: str | None = None
 
-    def load_model_manifest(self) -> dict:
+        self._model = self._model.replace("#slash#", "/")
+
+    def load_sub_profile(self, sub_profile: str) -> None:
         """Load the model.json file data containing information about the light model"""
 
-        model_directory = self._directory
-        file_path = os.path.join(model_directory, "model.json")
-        if not os.path.exists(file_path):
+        self._sub_profile_dir = os.path.join(self._directory, sub_profile)
+        _LOGGER.debug(f"Loading sub LUT directory {sub_profile}")
+        if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupported(
-                f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
+                f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
             )
 
-        _LOGGER.debug(f"Loading {file_path}")
-        json_file = open(file_path)
-        self._json_data = json.load(json_file)
-
-        if self._lut_subdirectory:
-            subdirectory = os.path.join(self._directory, self._lut_subdirectory)
-            _LOGGER.debug(f"Loading LUT directory {self._directory}")
-            if not os.path.exists(file_path):
-                raise ModelNotSupported(
-                    f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
-                )
-
-            # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
-            file_path = os.path.join(subdirectory, "model.json")
-            if os.path.exists(file_path):
-                json_file = open(file_path)
-                self._json_data = {**self._json_data, **json.load(json_file)}
-
-        return self._json_data
+        # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
+        file_path = os.path.join(self._sub_profile_dir, "model.json")
+        if os.path.exists(file_path):
+            json_file = open(file_path)
+            self._json_data = {**self._json_data, **json.load(json_file)}
+        
+        self.sub_profile = sub_profile
 
     def get_lut_directory(self) -> str:
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
-        model_directory = self._directory
-        if self._lut_subdirectory:
-            model_directory = os.path.join(model_directory, self._lut_subdirectory)
-        return model_directory
+        return self._sub_profile_dir or self._directory
 
     def supports(self, model: str) -> bool:
         if self._model == model:
@@ -132,6 +110,8 @@ class PowerProfile:
     @property
     def aliases(self) -> list:
         aliases = self._json_data.get("aliases") or []
+
+        # Logic below can be removed when all aliases have been moved to model.json
         if self.manufacturer in MODEL_DIRECTORY_MAPPING: 
             aliases.extend(
                 [
@@ -164,7 +144,7 @@ class PowerProfile:
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        if self._lut_subdirectory is not None:
+        if self.sub_profile is not None:
             return True
         return self._json_data.get("requires_additional_configuration") or False
 

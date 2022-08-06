@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import json
+from re import M
 
 from typing import NamedTuple
 
@@ -68,10 +69,19 @@ class ProfileLibrary:
         if custom_directory:
             return self._create_power_profile(model_info, custom_directory)
 
+        # Support multiple LUT in subdirectories
+        sub_profile = None
+        if "/" in model_info.model:
+            (model, sub_profile) = model_info.model.split("/", 1)
+            model_info = ModelInfo(model_info.manufacturer, model)
+
         profiles = self.get_profiles_by_manufacturer(model_info.manufacturer)
         for profile in profiles:
             if profile.supports(model_info.model):
+                if sub_profile:
+                    profile.load_sub_profile(sub_profile)
                 return profile
+
         return None
 
     def get_profiles_by_manufacturer(self, manufacturer: str) -> list[PowerProfile]:
