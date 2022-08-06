@@ -350,9 +350,15 @@ class Measure:
             if SAMPLE_COUNT > 1:
                 time.sleep(SLEEP_TIME_SAMPLE)
 
-        value = sum(measurements) / len(measurements) / self.num_lights
+        # Determine Average PM reading
+        value = sum(measurements) / len(measurements)
+
+        # Subtract Dummy Load (if present)
         if self.is_dummy_load_connected:
             value = value - self.dummy_load_value
+        
+        # Determine per load power consumption
+        value /= self.num_lights
 
         return round(value, 2)
 
