@@ -402,7 +402,7 @@ class Measure:
         time.sleep(SLEEP_STANDBY)
         try:
             return self.take_power_measurement(start_time)
-        except OutdatedMeasurementError as error:
+        except OutdatedMeasurementError:
             self.nudge_and_remeasure(MODE_BRIGHTNESS, Variation(0))
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load.")
