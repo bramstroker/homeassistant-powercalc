@@ -63,13 +63,14 @@ class PowerProfile:
         return self._sub_profile_dir or self._directory
 
     def supports(self, model: str) -> bool:
-        model = model.replace("#slash#", "/")
-        if self._model == model:
+        model = model.lower().replace("#slash#", "/")
+
+        if self._model.lower() == model:
             return True
 
         #@todo implement Regex/Json path
         for alias in self.aliases:
-            if alias == model:
+            if alias.lower() == model:
                 return True
         
         return False
@@ -107,7 +108,7 @@ class PowerProfile:
         return self._json_data.get("calculation_enabled_condition")
 
     @property
-    def aliases(self) -> list:
+    def aliases(self) -> list[str]:
         aliases = self._json_data.get("aliases") or []
 
         # Logic below can be removed when all aliases have been moved to model.json
