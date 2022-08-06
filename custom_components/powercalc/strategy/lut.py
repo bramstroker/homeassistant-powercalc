@@ -86,10 +86,6 @@ class LutRegistry:
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")
 
-        elif os.path.exists(path):
-            _LOGGER.debug("Loading LUT data file: %s", path)
-            return open(path, "r")
-
         raise LutFileNotFound("Data file not found: %s")
 
 
