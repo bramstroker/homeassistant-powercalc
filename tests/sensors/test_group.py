@@ -5,6 +5,7 @@ from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
     SensorStateClass,
 )
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
@@ -38,9 +39,11 @@ from custom_components.powercalc.const import (
     CONF_HIDE_MEMBERS,
     CONF_MODE,
     CONF_POWER,
+    CONF_POWER_SENSOR_ID,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DOMAIN,
+    DUMMY_ENTITY_ID,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
@@ -365,4 +368,29 @@ async def test_hide_members(hass: HomeAssistant):
     assert (
         entity_reg.async_get("sensor.two_power").hidden_by
         == er.RegistryEntryHider.INTEGRATION
+    )
+
+async def test_unhide_members(hass: HomeAssistant):
+    entity_reg = er.async_get(hass)
+    entity_reg.async_get_or_create(SENSOR_DOMAIN, DOMAIN, "abcdef", suggested_object_id="test_power", hidden_by=er.RegistryEntryHider.INTEGRATION)
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_HIDE_MEMBERS: False,
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+                    CONF_POWER_SENSOR_ID: "sensor.test_power"
+                },
+            ]
+        }
+    )
+
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        == None
     )
