@@ -17,7 +17,7 @@ from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
-from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedMode
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
@@ -141,7 +141,6 @@ async def test_unsupported_color_mode(hass: HomeAssistant, caplog: pytest.LogCap
     state = _create_light_color_temp_state(100, 150)
     assert not await strategy.calculate(state)
     assert "Lookup table not found" in caplog.text
-
 
 async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
     with pytest.raises(StrategyConfigurationError):

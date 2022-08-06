@@ -65,10 +65,8 @@ class LutRegistry:
                         )
                     elif color_mode == COLOR_MODE_COLOR_TEMP:
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
-                    elif color_mode == COLOR_MODE_BRIGHTNESS:
-                        lookup_dict[int(row[0])] = float(row[1])
                     else:
-                        raise UnsupportedMode(f"Unsupported color mode {color_mode}")
+                        lookup_dict[int(row[0])] = float(row[1])
                     line_count += 1
 
             _LOGGER.debug("LUT file loaded: %d lines", line_count)
