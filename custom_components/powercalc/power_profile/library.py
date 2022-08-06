@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import os
-import glob
 import json
 
 from typing import NamedTuple
-from types import MappingProxyType
 
 from homeassistant.core import HomeAssistant
+
+from .power_profile import PowerProfile
 
 from ..const import DATA_PROFILE_LIBRARY, DOMAIN
 from ..aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
@@ -27,7 +27,7 @@ class ProfileLibrary:
             )
             if os.path.exists(dir)
         ]
-        self._model_aliases: MappingProxyType[str, list[ModelAlias]] | None = None
+        self._profiles: dict[str, list[PowerProfile]] = dict()
 
     def factory(hass: HomeAssistant) -> ProfileLibrary:
         """
@@ -63,56 +63,65 @@ class ProfileLibrary:
             models.extend(os.listdir(manufacturer_dir))
         return sorted(models)
 
-    def get_model_directory(self, manufacturer: str, model: str) -> str | None:
-        """Get a directory for a model, walk through the available data directories"""
-    
-        manufacturer_directory = (
-            MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer) or manufacturer
-        ).lower()
+    def get_profile(self, model_info: ModelInfo, custom_directory: str | None = None) -> PowerProfile | None:
+        """Get a power profile for a given manufacturer and model"""
+        if custom_directory:
+            return self._create_power_profile(model_info, custom_directory)
 
-        for data_dir in self._data_directories:
-            for model_directory in self.get_possible_matching_models(manufacturer, manufacturer_directory, model):
-                directory = os.path.join(data_dir, manufacturer_directory, model_directory)
-                if os.path.exists(directory):
-                    return directory
+        profiles = self.get_profiles_by_manufacturer(model_info.manufacturer)
+        for profile in profiles:
+            if profile.supports(model_info.model):
+                return profile
         return None
 
-    def get_possible_matching_models(self, manufacturer: str, manufacturer_directory: str, model: str) -> list[str]:
-        if self._model_aliases is None:
-            self._model_aliases = self.load_model_aliases()
+    def get_profiles_by_manufacturer(self, manufacturer: str) -> list[PowerProfile]:
+        """
+        Lazy loads a list of power profiles per manufacturer
 
-        models = [model]
+        Using the following lookup fallback mechanism:
+         - check in user defined directory (config/powercalc-custom-models)
+         - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
+         - check in buildin directory (config/custom_components/powercalc/data)
+        """
 
-        if isinstance(
-            MODEL_DIRECTORY_MAPPING.get(manufacturer), dict
-        ) and MODEL_DIRECTORY_MAPPING.get(manufacturer).get(model):
-            models.append(MODEL_DIRECTORY_MAPPING.get(manufacturer).get(model))
+        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
+            manufacturer = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
+        manufacturer = manufacturer.lower()
         
+        if manufacturer in self._profiles:
+            return self._profiles[manufacturer]
 
-        model_aliases = self._model_aliases.get(manufacturer_directory) or []
-        for alias in model_aliases:
-            # matching logic
-            if alias.alias == model:
-                models.append(alias.model)
-        
-        return models
-    
-    def load_model_aliases(self) -> MappingProxyType[str, list[ModelAlias]]:
-        aliases = dict()
-        for dir in self._data_directories:
-            for file_path in glob.glob(dir + "/**/model.json", recursive=True):
-                with open(file_path) as file:
-                    json_data = json.load(file)
+        profiles = []
+        for data_dir in self._data_directories:
+            manufacturer_dir = os.path.join(data_dir, manufacturer)
+            if not os.path.exists(manufacturer_dir):
+                continue
+            for model in os.listdir(manufacturer_dir):
+                if model.startswith('.'):
                     continue
-                
-        return MappingProxyType(
-            {
-                "ikea": [
-                    ModelAlias("L1527", "FLOALT panel WS 30x30")
-                ]
-            }
-        )
+                profiles.append(
+                    self._create_power_profile(
+                        ModelInfo(manufacturer, model),
+                        os.path.join(manufacturer_dir, model)
+                    )
+                )
+        
+        self._profiles[manufacturer] = profiles
+        return profiles
 
-class ModelAlias(NamedTuple):
+    def _create_power_profile(self, model_info: ModelInfo, directory: str) -> PowerProfile:
+        model_json_path = os.path.join(directory, 'model.json')
+        with open(model_json_path) as file:
+            json_data = json.load(file)
+            profile = PowerProfile(
+                self._hass,
+                manufacturer=model_info.manufacturer,
+                model=model_info.model,
+                directory=directory,
+                json_data=json_data
+            )
+        return profile
+
+class ModelInfo(NamedTuple):
+    manufacturer: str
     model: str
-    alias: str

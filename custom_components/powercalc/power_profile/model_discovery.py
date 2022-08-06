@@ -5,11 +5,13 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import NamedTuple, Optional
+from typing import Optional
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.core import HomeAssistant
+
+from .library import ProfileLibrary, ModelInfo
 
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
@@ -23,7 +25,7 @@ async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
     entity_entry: Optional[er.RegistryEntry] = None,
-) -> Optional[PowerProfile]:
+) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and entity_entry:
@@ -41,7 +43,13 @@ async def get_power_profile(
             hass.config.config_dir, custom_model_directory
         )
 
-    return PowerProfile(hass, manufacturer, model, custom_model_directory)
+    libary = ProfileLibrary.factory(hass)
+    profile = libary.get_profile(ModelInfo(manufacturer, model), custom_model_directory)
+    if profile is None:
+        raise ModelNotSupported(
+            f"Model not found in library (manufacturer: {manufacturer}, model: {model})"
+        )
+    return profile
 
 
 async def is_autoconfigurable(
@@ -110,8 +118,3 @@ async def has_manufacturer_and_model_information(
         return False
 
     return True
-
-
-class ModelInfo(NamedTuple):
-    manufacturer: str
-    model: str

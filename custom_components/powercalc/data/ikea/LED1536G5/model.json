@@ -6,5 +6,8 @@
     ],
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
-    "measure_description": "Measured with script made by bramstroker and partially verified manual"
+    "measure_description": "Measured with script made by bramstroker and partially verified manual",
+    "aliases": [
+        "TRADFRI bulb E14 WS opal 400lm"
+    ]
 }

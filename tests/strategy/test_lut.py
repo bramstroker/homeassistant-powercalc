@@ -17,6 +17,7 @@ from homeassistant.setup import async_setup_component
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.lut import LutStrategy
@@ -131,12 +132,15 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
     with pytest.raises(StrategyConfigurationError):
         source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP])
         strategy_factory = PowerCalculatorStrategyFactory(hass)
+
+        power_profile = ProfileLibrary.factory(hass).get_profile(
+            # This model only supports brightness
+            ModelInfo("signify", "LWA017")
+        )
         strategy = strategy_factory.create(
             config={},
             strategy=CalculationStrategy.LUT,
-            power_profile=PowerProfile(
-                hass, "signify", "LWA017", None
-            ),  # This model only supports brightness
+            power_profile=power_profile, 
             source_entity=source_entity,
         )
         await strategy.validate_config()
@@ -151,10 +155,13 @@ def _create_lut_strategy(
     if not source_entity:
         source_entity = create_source_entity("light")
     strategy_factory = PowerCalculatorStrategyFactory(hass)
+    power_profile = ProfileLibrary.factory(hass).get_profile(
+        ModelInfo(manufacturer, model),
+    )
     return strategy_factory.create(
         config={},
         strategy=CalculationStrategy.LUT,
-        power_profile=PowerProfile(hass, manufacturer, model, None),
+        power_profile=power_profile,
         source_entity=source_entity,
     )
 

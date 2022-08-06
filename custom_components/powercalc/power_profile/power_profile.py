@@ -11,12 +11,8 @@ from homeassistant.core import HomeAssistant
 
 from ..const import CalculationStrategy
 from ..errors import ModelNotSupported, UnsupportedMode
-from .library import ProfileLibrary
 
 _LOGGER = logging.getLogger(__name__)
-
-CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
-
 
 class DeviceType(Enum):
     LIGHT = "light"
@@ -29,7 +25,8 @@ class PowerProfile:
         hass: HomeAssistant,
         manufacturer: str,
         model: str,
-        custom_model_directory: str | None,
+        directory: str | None,
+        json_data: dict | None = None
     ):
         self._manufacturer = manufacturer
         self._model = model
@@ -42,11 +39,11 @@ class PowerProfile:
             self._lut_subdirectory = model_parts[1]
 
         self._model = self._model.replace("#slash#", "/")
-        self._custom_model_directory = custom_model_directory
         self._hass = hass
-        self._directory: str | None = None
-        self._profile_library = ProfileLibrary.factory(hass)
-        self.load_model_manifest()
+        self._directory = directory
+        self._json_data = json_data
+        if self._json_data is None:
+            self.load_model_manifest()
 
     def load_model_manifest(self) -> dict:
         """Load the model.json file data containing information about the light model"""
@@ -78,34 +75,6 @@ class PowerProfile:
 
         return self._json_data
 
-    def get_directory(self) -> str:
-        """
-        Get the light model directory.
-        Using the following fallback mechanism:
-         - custom_model_directory defined on sensor configuration
-         - check in user defined directory (config/powercalc-custom-models)
-         - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
-         - check in buildin directory (config/custom_components/powercalc/data)
-        """
-
-        # Only fetch directory once
-        if self._directory:
-            return self._directory
-
-        if self._custom_model_directory:
-            return self._custom_model_directory
-
-        library_directory = self._profile_library.get_model_directory(
-            self._manufacturer, self._model
-        )
-        if library_directory:
-            self._directory = library_directory
-            return self._directory
-
-        raise ModelNotSupported(
-            f"Model not found in library (manufacturer: {self._manufacturer}, model: {self._model})"
-        )
-
     def get_lut_directory(self) -> str:
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
@@ -114,6 +83,19 @@ class PowerProfile:
         if self._lut_subdirectory:
             model_directory = os.path.join(model_directory, self._lut_subdirectory)
         return model_directory
+
+    def supports(self, model: str) -> bool:
+        if self._model == model:
+            return True
+
+        
+        
+        #@todo implement Regex/Json path
+        for alias in self.aliases:
+            if alias == model:
+                return True
+        
+        return False
 
     @property
     def manufacturer(self) -> str:
@@ -146,6 +128,10 @@ class PowerProfile:
     @property
     def calculation_enabled_condition(self) -> Optional[str]:
         return self._json_data.get("calculation_enabled_condition")
+
+    @property
+    def aliases(self) -> list:
+        return self._json_data.get("aliases") or []
 
     @property
     def linear_mode_config(self) -> Optional[dict]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from dbm.ndbm import library
 import logging
 from typing import Any
 
@@ -58,7 +59,7 @@ from .const import (
     SensorType,
 )
 from .errors import StrategyConfigurationError
-from .power_profile.library import ProfileLibrary
+from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import PowerProfile
 from .power_profile.model_discovery import autodiscover_model
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
@@ -534,8 +535,8 @@ def _create_strategy_object(
     factory = PowerCalculatorStrategyFactory(hass)
     power_profile = None
     if strategy == CalculationStrategy.LUT:
-        power_profile = PowerProfile(
-            hass, config.get(CONF_MANUFACTURER), config.get(CONF_MODEL), None
+        power_profile = ProfileLibrary.factory(hass).get_profile(
+            ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
         )
     return factory.create(config, strategy, power_profile, source_entity)
 
