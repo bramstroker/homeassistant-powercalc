@@ -30,7 +30,7 @@ async def test_colortemp_lut(hass: HomeAssistant):
 
     source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP])
 
-    strategy = _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
@@ -63,7 +63,7 @@ async def test_brightness_lut(hass: HomeAssistant):
 
     source_entity = create_source_entity("light", [ColorMode.BRIGHTNESS])
 
-    strategy = _create_lut_strategy(hass, "signify", "LWB010", source_entity)
+    strategy = await _create_lut_strategy(hass, "signify", "LWB010", source_entity)
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
@@ -79,7 +79,7 @@ async def test_brightness_lut(hass: HomeAssistant):
 async def test_sub_lut_loaded(hass: HomeAssistant):
     source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP, ColorMode.HS])
 
-    strategy = _create_lut_strategy(
+    strategy = await _create_lut_strategy(
         hass, "yeelight", "YLDL01YL/ambilight", source_entity
     )
     await strategy.validate_config()
@@ -91,7 +91,7 @@ async def test_sub_lut_loaded(hass: HomeAssistant):
 
 async def test_linked_profile_loaded(hass: HomeAssistant):
     source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP, ColorMode.HS])
-    strategy = _create_lut_strategy(hass, "signify", "LCA007", source_entity)
+    strategy = await _create_lut_strategy(hass, "signify", "LCA007", source_entity)
     await _calculate_and_assert_power(
         strategy, state=_create_light_color_temp_state(255, 588), expected_power=5.21
     )
@@ -99,7 +99,7 @@ async def test_linked_profile_loaded(hass: HomeAssistant):
 
 async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
     """When brightness attribute is not available on state return no power"""
-    strategy = _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
 
     state = State("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
     assert not await strategy.calculate(state)
@@ -109,7 +109,7 @@ async def test_color_mode_unknown_is_handled_gracefully(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.at_level(logging.ERROR)
-    strategy = _create_lut_strategy(hass, "signify", "LCT010")
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
 
     state = State(
         "light.test",
@@ -122,7 +122,7 @@ async def test_color_mode_unknown_is_handled_gracefully(
 
 async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
     with pytest.raises(StrategyConfigurationError):
-        strategy = _create_lut_strategy(
+        strategy = await _create_lut_strategy(
             hass, "signify", "LCT010", source_entity=create_source_entity("sensor")
         )
         await strategy.validate_config()
@@ -133,7 +133,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
         source_entity = create_source_entity("light", [ColorMode.COLOR_TEMP])
         strategy_factory = PowerCalculatorStrategyFactory(hass)
 
-        power_profile = ProfileLibrary.factory(hass).get_profile(
+        power_profile = await ProfileLibrary.factory(hass).get_profile(
             # This model only supports brightness
             ModelInfo("signify", "LWA017")
         )
@@ -146,7 +146,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
         await strategy.validate_config()
 
 
-def _create_lut_strategy(
+async def _create_lut_strategy(
     hass: HomeAssistant,
     manufacturer: str,
     model: str,
@@ -155,7 +155,7 @@ def _create_lut_strategy(
     if not source_entity:
         source_entity = create_source_entity("light")
     strategy_factory = PowerCalculatorStrategyFactory(hass)
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo(manufacturer, model),
     )
     return strategy_factory.create(

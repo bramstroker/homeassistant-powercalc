@@ -399,7 +399,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def validate_strategy_config(self) -> dict:
         strategy_name = self.sensor_config.get(CONF_MODE)
-        strategy = _create_strategy_object(
+        strategy = await _create_strategy_object(
             self.hass, strategy_name, self.sensor_config, self.source_entity
         )
         try:
@@ -487,7 +487,7 @@ class OptionsFlowHandler(OptionsFlow):
             if strategy != CalculationStrategy.LUT:
                 self.current_config.update({strategy: strategy_options})
 
-            strategy_object = _create_strategy_object(
+            strategy_object = await _create_strategy_object(
                 self.hass, strategy, self.current_config, self.source_entity
             )
             try:
@@ -527,14 +527,14 @@ class OptionsFlowHandler(OptionsFlow):
         return data_schema
 
 
-def _create_strategy_object(
+async def _create_strategy_object(
     hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
     power_profile = None
     if strategy == CalculationStrategy.LUT:
-        power_profile = ProfileLibrary.factory(hass).get_profile(
+        power_profile = await ProfileLibrary.factory(hass).get_profile(
             ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
         )
     return factory.create(config, strategy, power_profile, source_entity)

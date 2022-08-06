@@ -26,7 +26,7 @@ async def test_non_existing_manufacturer_returns_empty_model_list(hass: HomeAssi
 
 async def test_get_profile(hass: HomeAssistant):
     library = ProfileLibrary(hass)
-    profile = library.get_profile(ModelInfo("signify", "LCT010"))
+    profile = await library.get_profile(ModelInfo("signify", "LCT010"))
     assert profile
     assert profile.manufacturer == "signify"
     assert profile.model == "LCT010" 
@@ -35,7 +35,7 @@ async def test_get_profile(hass: HomeAssistant):
 
 async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant):
     library = ProfileLibrary(hass)
-    profile = library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCT010"))
+    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCT010"))
     assert profile
     assert profile.manufacturer == "signify"
     assert profile._directory.endswith("signify/LCT010")
@@ -43,7 +43,7 @@ async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant):
 
 async def test_get_profile_with_model_alias(hass: HomeAssistant):
     library = ProfileLibrary(hass)
-    profile = library.get_profile(
+    profile = await library.get_profile(
         ModelInfo(
             MANUFACTURER_IKEA,
             "TRADFRI bulb E14 WS opal 400lm"
@@ -53,5 +53,5 @@ async def test_get_profile_with_model_alias(hass: HomeAssistant):
 
 async def test_get_non_existing_profile(hass: HomeAssistant):
     library = ProfileLibrary(hass)
-    profile = library.get_profile(ModelInfo("foo", "bar"))
+    profile = await library.get_profile(ModelInfo("foo", "bar"))
     assert not profile

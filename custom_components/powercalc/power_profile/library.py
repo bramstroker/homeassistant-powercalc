@@ -64,10 +64,10 @@ class ProfileLibrary:
             models.extend(os.listdir(manufacturer_dir))
         return sorted(models)
 
-    def get_profile(self, model_info: ModelInfo, custom_directory: str | None = None) -> PowerProfile | None:
+    async def get_profile(self, model_info: ModelInfo, custom_directory: str | None = None) -> PowerProfile | None:
         """Get a power profile for a given manufacturer and model"""
         if custom_directory:
-            return self._create_power_profile(model_info, custom_directory)
+            return await self._create_power_profile(model_info, custom_directory)
 
         # Support multiple LUT in subdirectories
         sub_profile = None
@@ -75,7 +75,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model)
 
-        profiles = self.get_profiles_by_manufacturer(model_info.manufacturer)
+        profiles = await self.get_profiles_by_manufacturer(model_info.manufacturer)
         for profile in profiles:
             if profile.supports(model_info.model):
                 if sub_profile:
@@ -84,7 +84,7 @@ class ProfileLibrary:
 
         return None
 
-    def get_profiles_by_manufacturer(self, manufacturer: str) -> list[PowerProfile]:
+    async def get_profiles_by_manufacturer(self, manufacturer: str) -> list[PowerProfile]:
         """
         Lazy loads a list of power profiles per manufacturer
 
@@ -110,7 +110,7 @@ class ProfileLibrary:
                 if model.startswith('.'):
                     continue
                 profiles.append(
-                    self._create_power_profile(
+                    await self._create_power_profile(
                         ModelInfo(manufacturer, model),
                         os.path.join(manufacturer_dir, model)
                     )
@@ -119,7 +119,7 @@ class ProfileLibrary:
         self._profiles[manufacturer] = profiles
         return profiles
 
-    def _create_power_profile(self, model_info: ModelInfo, directory: str) -> PowerProfile:
+    async def _create_power_profile(self, model_info: ModelInfo, directory: str) -> PowerProfile:
         model_json_path = os.path.join(directory, 'model.json')
         with open(model_json_path) as file:
             json_data = json.load(file)

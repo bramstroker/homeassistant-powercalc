@@ -44,7 +44,7 @@ async def get_power_profile(
         )
 
     libary = ProfileLibrary.factory(hass)
-    profile = libary.get_profile(ModelInfo(manufacturer, model), custom_model_directory)
+    profile = await libary.get_profile(ModelInfo(manufacturer, model), custom_model_directory)
     if profile is None:
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {manufacturer}, model: {model})"

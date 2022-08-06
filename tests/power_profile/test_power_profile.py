@@ -15,7 +15,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA001"),
         get_test_profile_dir("signify-LCA001")
     )
@@ -29,7 +29,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
 
 
 async def test_load_fixed_profile(hass: HomeAssistant):
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("fixed")
     )
@@ -42,7 +42,7 @@ async def test_load_fixed_profile(hass: HomeAssistant):
 
 
 async def test_load_linear_profile(hass: HomeAssistant):
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("linear")
     )
@@ -55,7 +55,7 @@ async def test_load_linear_profile(hass: HomeAssistant):
 
 
 async def test_load_linked_profile(hass: HomeAssistant):
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA007"),
         get_test_profile_dir("linked_profile")
     )
@@ -66,7 +66,7 @@ async def test_load_linked_profile(hass: HomeAssistant):
 
 
 async def test_load_sub_lut(hass: HomeAssistant):
-    power_profile = ProfileLibrary.factory(hass).get_profile(
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("yeelight", "YLDL01YL/ambilight")
     )
     assert power_profile.supported_modes == [CalculationStrategy.LUT]
