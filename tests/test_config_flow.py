@@ -1,6 +1,7 @@
 from selectors import SelectSelector
 from typing import Any
 
+from unittest.mock import patch
 import pytest
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
@@ -23,10 +24,8 @@ import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
-    ConfigFlow,
 )
 from custom_components.powercalc.const import (
-    ATTR_ENTITIES,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
@@ -51,6 +50,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.test.light import MockLight
 
 from .common import MockConfigEntry, create_mock_light_entity
@@ -526,6 +526,21 @@ async def test_linear_options_flow_error(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
     assert result["errors"]["base"] == "linear_min_higher_as_max"
+
+async def test_strategy_raises_unknown_error(hass: HomeAssistant):
+    with patch(
+        "custom_components.powercalc.strategy.fixed.FixedStrategy.validate_config",
+        side_effect=StrategyConfigurationError("test")
+    ):
+        result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
+
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_POWER: 20}
+        )
+
+        assert result["errors"]
+        assert result["errors"]["base"] == "unknown"
+        assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
 def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
