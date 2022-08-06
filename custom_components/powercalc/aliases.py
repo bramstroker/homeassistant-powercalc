@@ -119,9 +119,6 @@ MODEL_DIRECTORY_MAPPING = {
         "LCA005": "LCA001",
         "9290022266A": "LCA001",
     },
-    "tuya": {
-        "TS0505B": "NO66-ZB/length_5",
-    },
     "yeelight": {
         "color2": "YLDP06YL",
         "ceiling10": "YLDL01YL",
