@@ -46,7 +46,6 @@ MODEL_DIRECTORY_MAPPING = {
     },
     "ledvance": {"4058075168572": "Tibea TW Z3"},
     "mueller-licht": {
-        "45327": "45318",
     },
     "osram": {
     },
