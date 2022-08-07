@@ -48,7 +48,7 @@ MODEL_DIRECTORY_MAPPING = {
     "mueller-licht": {
         "45327": "45318",
     },
-    "osram": {"AC03642": "CLA60 TW"},
+    "osram": {},
     "signify": {
     },
     "yeelight": {
