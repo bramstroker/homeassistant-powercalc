@@ -55,28 +55,5 @@ MODEL_DIRECTORY_MAPPING = {
     "signify": {
     },
     "yeelight": {
-        ### No profiles yet ###
-        # "mono": "YLTD03YL",
-        # "color6": "YLDP13AYL",
-        # "colorb": "YLDP005",
-        # "colorc": "YLDP004-A",
-        # "RGBW": "MJDP02YL",
-        # "lamp": "MJTD02YL",
-        # "lamp1": "MJTD01YL",
-        # "lamp15": "YLTD003",
-        # "ceiling1": "YLXD01YL",
-        # "ceiling2": "YLXD03YL",
-        # "ceiling3": "YLXD05YL",
-        # "ceiling4": "YLXD02YL",
-        # "ceiling13": "YLXD01YL",
-        # "ceil26": "YLXD76YL",
-        # not a unique match, as it also may refer to "YLDP04YL"
-        # "color4": "YLDP13YL",
-        # not a unique match, as it also may refer to "YLDP03YL"
-        # "color1": "YLDP02YL",
-        # not a unique match, as it also may refer to "YLDD02YL"
-        # "strip1": "YLDD01YL",
-        # not a unique match, as it also may refer to "MJCTD02YL"
-        # "bslamp1": "MJCTD01YL",
     },
 }

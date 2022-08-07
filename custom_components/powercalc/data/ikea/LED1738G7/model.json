@@ -12,5 +12,7 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb E14 WS opal 600lm"
+    ]
 }
