@@ -7,5 +7,8 @@
     "supported_modes": [
         "lut"
     ],
-    "linked_lut": "signify/LCA006"
+    "linked_lut": "signify/LCA006",
+    "aliases": [
+        "9290024687"
+    ]
 }
