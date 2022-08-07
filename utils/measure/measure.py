@@ -119,7 +119,10 @@ SLEEP_TIME_SAMPLE = config("SLEEP_TIME_SAMPLE", default=1, cast=int)
 SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
 SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
 SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
+SLEEP_TIME_NUDGE = config("SLEEP_TIME_NUDGE", default=10, cast=float)
+PULSE_TIME_NUDGE = config("PULSE_TIME_NUDGE", default=2, cast=float)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
+MAX_NUDGES = config("MAX_NUDGES", default=0, cast=int)
 SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
 
 SHELLY_IP = config("SHELLY_IP")
@@ -256,6 +259,8 @@ class Measure:
                 time.sleep(SLEEP_TIME)
                 try:
                     power = self.take_power_measurement(variation_start_time)
+                except OutdatedMeasurementError as error:
+                    self.nudge_and_remeasure(self.color_mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
                     _LOGGER.warning(f"Discarding measurement: {error}")
@@ -274,6 +279,32 @@ class Measure:
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
+    def nudge_and_remeasure(self, color_mode: str, variation: Variation):
+        for nudge_count in range(MAX_NUDGES):
+            try:
+                # Likely not significant enough change for PM to detect. Try nudging it
+                _LOGGER.warning("Measurement is stuck, Nudging")
+                # If brightness is low, set brightness high. Else, turn light off
+                self.light_controller.change_light_state(MODE_BRIGHTNESS, on=(variation.bri < 128), bri=255)
+                time.sleep(PULSE_TIME_NUDGE)
+                variation_start_time = time.time()
+                self.light_controller.change_light_state(
+                    color_mode, on=True, **asdict(variation)
+                )
+                # Wait a longer amount of time for the PM to settle
+                time.sleep(SLEEP_TIME_NUDGE)
+                power = self.take_power_measurement(variation_start_time)
+                return power
+            except OutdatedMeasurementError:
+                continue
+            except ZeroReadingError as error:
+                self.num_0_readings += 1
+                _LOGGER.warning(f"Discarding measurement: {error}")
+                if self.num_0_readings > MAX_ALLOWED_0_READINGS:
+                    _LOGGER.error("Aborting measurement session. Received too many 0 readings")
+                    return
+                continue
+        raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries")
 
     def should_resume(self, csv_file_path: str) -> bool:
         """Check whether we are able to resume a previous measurement session"""
@@ -332,7 +363,7 @@ class Measure:
 
             # Check if measurement is not outdated
             if measurement.updated < start_timestamp:
-                error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} retries")
+                error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} successive retries")
 
             # Check if we not have a 0 measurument
             if measurement.power == 0:
@@ -371,6 +402,8 @@ class Measure:
         time.sleep(SLEEP_STANDBY)
         try:
             return self.take_power_measurement(start_time)
+        except OutdatedMeasurementError:
+            self.nudge_and_remeasure(MODE_BRIGHTNESS, Variation(0))
         except ZeroReadingError:
             _LOGGER.error("Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load.")
             return 0
