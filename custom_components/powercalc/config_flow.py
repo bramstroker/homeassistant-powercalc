@@ -389,7 +389,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             profile = await library.get_profile(
                 ModelInfo(
                     self.sensor_config.get(CONF_MANUFACTURER),
-                    self.sensor_config.get(CONF_MODEL)
+                    self.sensor_config.get(CONF_MODEL),
                 )
             )
             sub_profiles = await library.get_subprofile_listing(profile)
@@ -421,14 +421,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         model_info = ModelInfo(
             self.sensor_config.get(CONF_MANUFACTURER),
-            self.sensor_config.get(CONF_MODEL)
+            self.sensor_config.get(CONF_MODEL),
         )
         return self.async_show_form(
             step_id="lut_subprofile",
-            data_schema=await _create_lut_schema_subprofile(
-                self.hass, 
-                model_info
-            ),
+            data_schema=await _create_lut_schema_subprofile(self.hass, model_info),
             errors=errors,
         )
 
@@ -667,7 +664,10 @@ def _create_lut_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Sche
         }
     )
 
-async def _create_lut_schema_subprofile(hass: HomeAssistant, model_info: ModelInfo) -> vol.Schema:
+
+async def _create_lut_schema_subprofile(
+    hass: HomeAssistant, model_info: ModelInfo
+) -> vol.Schema:
     """Create LUT schema"""
     library = ProfileLibrary(hass)
     profile = await library.get_profile(model_info)

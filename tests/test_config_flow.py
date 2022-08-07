@@ -281,6 +281,7 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_manufacturer"
 
+
 async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
@@ -293,7 +294,7 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_MODEL: "YLDL01YL"}
     )
-    
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_subprofile"
     data_schema: vol.Schema = result["data_schema"]
@@ -301,7 +302,7 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     select_options = model_select.config["options"]
     assert {"value": "ambilight", "label": "ambilight"} in select_options
     assert {"value": "downlight", "label": "downlight"} in select_options
-    
+
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_SUB_PROFILE: "ambilight"}
     )
