@@ -6,5 +6,9 @@
     "measure_description": "",
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "9290012573A"
     ]
 }
+
