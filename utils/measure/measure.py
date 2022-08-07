@@ -216,15 +216,6 @@ class Measure:
         This method asks the user for the required information, sets up the light controller and power meter and starts the measurement
         session.
 
-        Parameters
-        ----------
-        self : Measure
-            The Measure object.
-
-        Returns
-        -------
-        None
-
         Raises
         ------
         PowerMeterError
