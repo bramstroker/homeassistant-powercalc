@@ -53,10 +53,6 @@ MODEL_DIRECTORY_MAPPING = {
     "signify": {
     },
     "yeelight": {
-        "color2": "YLDP06YL",
-        "ceiling10": "YLDL01YL",
-        "mono1": "YLDP01YL",
-        "strip6": "YLDD05YL",
         ### No profiles yet ###
         # "mono": "YLTD03YL",
         # "color6": "YLDP13AYL",
