@@ -66,6 +66,13 @@
       "type": "string",
       "description": "Template which can be evaluated."
     },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Aliases for this model"
+    },
     "linear_config": {
       "type": "object",
       "description": "Configuration for linear calculation mode",
