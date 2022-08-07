@@ -11,5 +11,8 @@
     "standby_power": 0.69,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "strip6"
     ]
 }
