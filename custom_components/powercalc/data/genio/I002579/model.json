@@ -11,5 +11,9 @@
     "standby_power": 0.7,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+      "GENIO Smart Lighting",
+      "7n9kwxx6zrwdqkcx"
     ]
 }
