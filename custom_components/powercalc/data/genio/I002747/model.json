@@ -11,5 +11,9 @@
     "standby_power": 0.7,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "Genio Smart WIFI bulb G95",
+        "v5ixexiafmjifkfr"
     ]
 }
