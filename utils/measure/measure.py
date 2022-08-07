@@ -344,7 +344,7 @@ class Measure:
                     raise error
                 retry_count += 1
                 time.sleep(SLEEP_TIME)
-                self.take_power_measurement(start_timestamp, retry_count)
+                return self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
             if SAMPLE_COUNT > 1:
