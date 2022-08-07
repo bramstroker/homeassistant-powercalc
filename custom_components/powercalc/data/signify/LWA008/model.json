@@ -7,5 +7,8 @@
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured twice with script made by bramstroker using 9 sec pauses and partially verified manual",
-    "linked_lut": "signify/LWA009"
+    "linked_lut": "signify/LWA009",
+    "aliases": [
+        "9290023351"
+    ]
 }
