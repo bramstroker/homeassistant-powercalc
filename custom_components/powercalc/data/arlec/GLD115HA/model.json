@@ -11,5 +11,9 @@
     "standby_power": 0.58,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "GLD115HA",
+        "11dy5dnkq0ejovau"
     ]
 }
