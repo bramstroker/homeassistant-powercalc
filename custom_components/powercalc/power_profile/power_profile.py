@@ -55,7 +55,7 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
-    def get_lut_directory(self) -> str:
+    def get_model_directory(self) -> str:
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 

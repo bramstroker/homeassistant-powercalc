@@ -121,6 +121,13 @@
         "data": {
           "model": "Model ID"
         }
+      },
+      "lut_subprofile": {
+        "title": "LUT config",
+        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "data": {
+          "sub_profile": "Sub profile"
+        }
       }
     },
     "error": {

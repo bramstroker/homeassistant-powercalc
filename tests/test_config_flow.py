@@ -43,6 +43,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STATES_POWER,
+    CONF_SUB_PROFILE,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
     CONF_VOLTAGE,
@@ -279,6 +280,38 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut_manufacturer"
+
+async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    await create_mock_light_entity(hass, light_entity)
+
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MANUFACTURER: "yeelight"}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MODEL: "YLDL01YL"}
+    )
+    
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "lut_subprofile"
+    data_schema: vol.Schema = result["data_schema"]
+    model_select: SelectSelector = data_schema.schema["sub_profile"]
+    select_options = model_select.config["options"]
+    assert {"value": "ambilight", "label": "ambilight"} in select_options
+    assert {"value": "downlight", "label": "downlight"} in select_options
+    
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_SUB_PROFILE: "ambilight"}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    _assert_default_virtual_power_entry_data(
+        CalculationStrategy.LUT,
+        result["data"],
+        {CONF_MANUFACTURER: "yeelight", CONF_MODEL: "YLDL01YL/ambilight"},
+    )
 
 
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):

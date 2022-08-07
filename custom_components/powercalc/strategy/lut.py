@@ -77,7 +77,7 @@ class LutRegistry:
         return lookup_dict
 
     def get_lut_file(self, power_profile: PowerProfile, color_mode: str):
-        path = os.path.join(power_profile.get_lut_directory(), f"{color_mode}.csv")
+        path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):

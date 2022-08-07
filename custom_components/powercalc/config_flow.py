@@ -49,6 +49,7 @@ from .const import (
     CONF_START_TIME,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
+    CONF_SUB_PROFILE,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
@@ -60,7 +61,6 @@ from .const import (
 from .errors import StrategyConfigurationError
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.model_discovery import autodiscover_model
-from .power_profile.power_profile import PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -385,6 +385,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
+            library = ProfileLibrary(self.hass)
+            profile = await library.get_profile(
+                ModelInfo(
+                    self.sensor_config.get(CONF_MANUFACTURER),
+                    self.sensor_config.get(CONF_MODEL)
+                )
+            )
+            sub_profiles = await library.get_subprofile_listing(profile)
+            if sub_profiles:
+                return await self.async_step_lut_subprofile()
             errors = await self.validate_strategy_config()
             if not errors:
                 return self.create_config_entry()
@@ -393,6 +403,31 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="lut_model",
             data_schema=_create_lut_schema_model(
                 self.hass, self.sensor_config.get(CONF_MANUFACTURER)
+            ),
+            errors=errors,
+        )
+
+    async def async_step_lut_subprofile(
+        self, user_input: dict[str, str] = None
+    ) -> FlowResult:
+        errors = {}
+        if user_input is not None:
+            # Append the sub profile to the model
+            model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
+            self.sensor_config[CONF_MODEL] = model
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return self.create_config_entry()
+
+        model_info = ModelInfo(
+            self.sensor_config.get(CONF_MANUFACTURER),
+            self.sensor_config.get(CONF_MODEL)
+        )
+        return self.async_show_form(
+            step_id="lut_subprofile",
+            data_schema=await _create_lut_schema_subprofile(
+                self.hass, 
+                model_info
             ),
             errors=errors,
         )
@@ -627,6 +662,24 @@ def _create_lut_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Sche
             vol.Required(CONF_MODEL): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=models, mode=selector.SelectSelectorMode.DROPDOWN
+                )
+            )
+        }
+    )
+
+async def _create_lut_schema_subprofile(hass: HomeAssistant, model_info: ModelInfo) -> vol.Schema:
+    """Create LUT schema"""
+    library = ProfileLibrary(hass)
+    profile = await library.get_profile(model_info)
+    sub_profiles = [
+        selector.SelectOptionDict(value=sub_profile, label=sub_profile)
+        for sub_profile in await library.get_subprofile_listing(profile)
+    ]
+    return vol.Schema(
+        {
+            vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=sub_profiles, mode=selector.SelectSelectorMode.DROPDOWN
                 )
             )
         }
