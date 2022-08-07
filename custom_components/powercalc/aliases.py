@@ -49,7 +49,6 @@ MODEL_DIRECTORY_MAPPING = {
         "45327": "45318",
     },
     "osram": {
-    
     },
     "signify": {
     },
