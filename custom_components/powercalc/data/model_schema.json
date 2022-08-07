@@ -69,7 +69,7 @@
     "aliases": {
       "type": "array",
       "items": {
-        "type": "number"
+        "type": "string"
       },
       "description": "Aliases for this model"
     },
