@@ -40,18 +40,3 @@ MANUFACTURER_DIRECTORY_MAPPING = {
     MANUFACTURER_MELITECH: "melitec",
     MANUFACTURER_WIZ: "wiz",
 }
-
-MODEL_DIRECTORY_MAPPING = {
-    "ikea": {
-    },
-    "ledvance": {
-    },
-    "mueller-licht": {
-    },
-    "osram": {
-    },
-    "signify": {
-    },
-    "yeelight": {
-    },
-}

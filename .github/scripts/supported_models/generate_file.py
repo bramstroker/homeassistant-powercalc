@@ -49,7 +49,6 @@ def generate_supported_model_list():
                 name = model_data["name"]
                 color_modes = get_color_modes(model_directory, data_dir, model_data)
                 aliases = model_data.get("aliases") or []
-                aliases.extend(get_legacy_aliases(manufacturer, model))
                 rows.append(
                     [
                         manufacturer,
@@ -79,23 +78,6 @@ def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> li
         color_mode = filename[:index]
         color_modes.add(color_mode)
     return color_modes
-
-
-def get_legacy_aliases(manufacturer_dir: str, model: str) -> list:
-    manufacturer = get_manufacturer_by_directory_name(manufacturer_dir)
-    if manufacturer is None:
-        return []
-
-    model_aliases = MODEL_DIRECTORY_MAPPING.get(manufacturer)
-    if model_aliases is None:
-        return []
-
-    aliases = list()
-    for alias, model_id in model_aliases.items():
-        if model == model_id:
-            aliases.append(alias)
-
-    return aliases
 
 
 def get_manufacturer_by_directory_name(search_directory: str) -> Optional[str]:
