@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 MANUFACTURER_SIGNIFY = "Signify Netherlands B.V."
 MANUFACTURER_IKEA = "IKEA of Sweden"
 MANUFACTURER_MULLER_LIGHT = "Müller Licht"

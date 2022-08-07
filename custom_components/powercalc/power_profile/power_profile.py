@@ -14,6 +14,7 @@ from ..errors import ModelNotSupported, UnsupportedMode
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class DeviceType(Enum):
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
@@ -51,7 +52,7 @@ class PowerProfile:
         if os.path.exists(file_path):
             json_file = open(file_path)
             self._json_data = {**self._json_data, **json.load(json_file)}
-        
+
         self.sub_profile = sub_profile
 
     def get_lut_directory(self) -> str:
@@ -66,11 +67,11 @@ class PowerProfile:
         if self._model.lower() == model:
             return True
 
-        #@todo implement Regex/Json path
+        # @todo implement Regex/Json path
         for alias in self.aliases:
             if alias.lower() == model:
                 return True
-        
+
         return False
 
     @property

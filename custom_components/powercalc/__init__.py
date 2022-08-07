@@ -259,7 +259,9 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
 
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
-            power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+            power_profile = await get_power_profile(
+                hass, {}, source_entity.entity_entry
+            )
             if power_profile.is_additional_configuration_required:
                 if not manual_configuration:
                     _LOGGER.warning(

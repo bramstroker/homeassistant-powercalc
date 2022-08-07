@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import os
 import json
+import os
 from re import M
-
 from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
 
-from .power_profile import PowerProfile
-
-from ..const import DATA_PROFILE_LIBRARY, DOMAIN
 from ..aliases import MANUFACTURER_DIRECTORY_MAPPING
+from ..const import DATA_PROFILE_LIBRARY, DOMAIN
+from .power_profile import PowerProfile
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
@@ -37,14 +35,14 @@ class ProfileLibrary:
         """
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {}
-        
+
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
             return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]
-        
+
         library = ProfileLibrary(hass)
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
         return library
-    
+
     factory = staticmethod(factory)
 
     def get_manufacturer_listing(self) -> list[str]:
@@ -64,7 +62,9 @@ class ProfileLibrary:
             models.extend(os.listdir(manufacturer_dir))
         return sorted(models)
 
-    async def get_profile(self, model_info: ModelInfo, custom_directory: str | None = None) -> PowerProfile | None:
+    async def get_profile(
+        self, model_info: ModelInfo, custom_directory: str | None = None
+    ) -> PowerProfile | None:
         """Get a power profile for a given manufacturer and model"""
         if custom_directory:
             return await self._create_power_profile(model_info, custom_directory)
@@ -84,7 +84,9 @@ class ProfileLibrary:
 
         return None
 
-    async def get_profiles_by_manufacturer(self, manufacturer: str) -> list[PowerProfile]:
+    async def get_profiles_by_manufacturer(
+        self, manufacturer: str
+    ) -> list[PowerProfile]:
         """
         Lazy loads a list of power profiles per manufacturer
 
@@ -97,7 +99,7 @@ class ProfileLibrary:
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
             manufacturer = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
         manufacturer = manufacturer.lower()
-        
+
         if manufacturer in self._profiles:
             return self._profiles[manufacturer]
 
@@ -107,20 +109,22 @@ class ProfileLibrary:
             if not os.path.exists(manufacturer_dir):
                 continue
             for model in os.listdir(manufacturer_dir):
-                if model.startswith('.'):
+                if model.startswith("."):
                     continue
                 profiles.append(
                     await self._create_power_profile(
                         ModelInfo(manufacturer, model),
-                        os.path.join(manufacturer_dir, model)
+                        os.path.join(manufacturer_dir, model),
                     )
                 )
-        
+
         self._profiles[manufacturer] = profiles
         return profiles
 
-    async def _create_power_profile(self, model_info: ModelInfo, directory: str) -> PowerProfile:
-        model_json_path = os.path.join(directory, 'model.json')
+    async def _create_power_profile(
+        self, model_info: ModelInfo, directory: str
+    ) -> PowerProfile:
+        model_json_path = os.path.join(directory, "model.json")
         with open(model_json_path) as file:
             json_data = json.load(file)
             profile = PowerProfile(
@@ -128,9 +132,10 @@ class ProfileLibrary:
                 manufacturer=model_info.manufacturer,
                 model=model_info.model,
                 directory=directory,
-                json_data=json_data
+                json_data=json_data,
             )
         return profile
+
 
 class ModelInfo(NamedTuple):
     manufacturer: str

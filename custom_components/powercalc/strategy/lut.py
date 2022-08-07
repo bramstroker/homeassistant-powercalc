@@ -89,7 +89,10 @@ class LutRegistry:
 
 class LutStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self, source_entity: SourceEntity, lut_registry: LutRegistry, profile: PowerProfile
+        self,
+        source_entity: SourceEntity,
+        lut_registry: LutRegistry,
+        profile: PowerProfile,
     ) -> None:
         self._source_entity = source_entity
         self._lut_registry = lut_registry

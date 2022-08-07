@@ -59,8 +59,8 @@ from .const import (
 )
 from .errors import StrategyConfigurationError
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import PowerProfile
 from .power_profile.model_discovery import autodiscover_model
+from .power_profile.power_profile import PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface

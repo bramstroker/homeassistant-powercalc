@@ -8,16 +8,19 @@ from homeassistant.components.light import (
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
-    ColorMode,
-    DOMAIN as LIGHT_DOMAIN
 )
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.light import ColorMode
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
-from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedMode
+from custom_components.powercalc.errors import (
+    StrategyConfigurationError,
+    UnsupportedMode,
+)
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
@@ -76,6 +79,7 @@ async def test_brightness_lut(hass: HomeAssistant):
         strategy, state=_create_light_brightness_state(450), expected_power=9.65
     )
 
+
 async def test_hs_lut(hass: HomeAssistant):
     """Test LUT lookup in HS mode"""
 
@@ -90,7 +94,9 @@ async def test_hs_lut(hass: HomeAssistant):
 
 
 async def test_sub_lut_loaded(hass: HomeAssistant):
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS])
+    source_entity = create_source_entity(
+        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS]
+    )
 
     strategy = await _create_lut_strategy(
         hass, "yeelight", "YLDL01YL/ambilight", source_entity
@@ -103,7 +109,9 @@ async def test_sub_lut_loaded(hass: HomeAssistant):
 
 
 async def test_linked_profile_loaded(hass: HomeAssistant):
-    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS])
+    source_entity = create_source_entity(
+        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS]
+    )
     strategy = await _create_lut_strategy(hass, "signify", "LCA007", source_entity)
     await _calculate_and_assert_power(
         strategy, state=_create_light_color_temp_state(255, 588), expected_power=5.21
@@ -132,15 +140,19 @@ async def test_color_mode_unknown_is_handled_gracefully(
     assert not await strategy.calculate(state)
     assert "color mode unknown" in caplog.text
 
-async def test_unsupported_color_mode(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+
+async def test_unsupported_color_mode(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     caplog.at_level(logging.ERROR)
 
-    #This model only supports brightness
+    # This model only supports brightness
     strategy = await _create_lut_strategy(hass, "signify", "LWA017")
 
     state = _create_light_color_temp_state(100, 150)
     assert not await strategy.calculate(state)
     assert "Lookup table not found" in caplog.text
+
 
 async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
     with pytest.raises(StrategyConfigurationError):
@@ -162,7 +174,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
         strategy = strategy_factory.create(
             config={},
             strategy=CalculationStrategy.LUT,
-            power_profile=power_profile, 
+            power_profile=power_profile,
             source_entity=source_entity,
         )
         await strategy.validate_config()
@@ -209,6 +221,7 @@ def _create_light_color_temp_state(brightness: int, color_temp: int) -> State:
             ATTR_COLOR_TEMP: color_temp,
         },
     )
+
 
 def _create_light_hs_state(brightness: int, hue: int, sat: int) -> State:
     return State(

@@ -11,11 +11,10 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.core import HomeAssistant
 
-from .library import ProfileLibrary, ModelInfo
-
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from ..errors import ModelNotSupported
+from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +43,9 @@ async def get_power_profile(
         )
 
     libary = ProfileLibrary.factory(hass)
-    profile = await libary.get_profile(ModelInfo(manufacturer, model), custom_model_directory)
+    profile = await libary.get_profile(
+        ModelInfo(manufacturer, model), custom_model_directory
+    )
     if profile is None:
         raise ModelNotSupported(
             f"Model not found in library (manufacturer: {manufacturer}, model: {model})"

@@ -1,7 +1,7 @@
 from selectors import SelectSelector
 from typing import Any
-
 from unittest.mock import patch
+
 import pytest
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
@@ -527,12 +527,15 @@ async def test_linear_options_flow_error(hass: HomeAssistant):
     assert result["errors"]
     assert result["errors"]["base"] == "linear_min_higher_as_max"
 
+
 async def test_strategy_raises_unknown_error(hass: HomeAssistant):
     with patch(
         "custom_components.powercalc.strategy.fixed.FixedStrategy.validate_config",
-        side_effect=StrategyConfigurationError("test")
+        side_effect=StrategyConfigurationError("test"),
     ):
-        result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
+        result = await _goto_virtual_power_strategy_step(
+            hass, CalculationStrategy.FIXED
+        )
 
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_POWER: 20}
