@@ -6,5 +6,8 @@
     ],
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
-    "measure_description": "Measured twice with script made by bramstroker and partially verified manual"
+    "measure_description": "Measured twice with script made by bramstroker and partially verified manual",
+    "aliases": [
+        "4058075168572"
+    ]
 }

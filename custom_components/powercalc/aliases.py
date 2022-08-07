@@ -44,11 +44,12 @@ MANUFACTURER_DIRECTORY_MAPPING = {
 MODEL_DIRECTORY_MAPPING = {
     "ikea": {
     },
-    "ledvance": {"4058075168572": "Tibea TW Z3"},
-    "mueller-licht": {
-        "45327": "45318",
+    "ledvance": {
     },
-    "osram": {"AC03642": "CLA60 TW"},
+    "mueller-licht": {
+    },
+    "osram": {
+    },
     "signify": {
     },
     "yeelight": {
