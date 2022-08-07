@@ -11,5 +11,8 @@
     "standby_power": 0.25,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E14 WS 470lm"
     ]
 }

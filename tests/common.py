@@ -55,6 +55,7 @@ async def create_mock_light_entity(
         entity_entry = entity_registry.async_get_or_create(
             "light", "test", entity.unique_id, device_id=device_entry.id
         )
+        await hass.async_block_till_done()
 
     return (entity_entry.entity_id, device_entry.id)
 

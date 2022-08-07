@@ -7,9 +7,12 @@
         "SLEEP_TIME": 3,
         "VERSION": "v0.22.1:docker"
     },
-    "name": "TRADFRIbulbE27WWclear250lm",
+    "name": "TRADFRI bulb E27 WW clear 250lm",
     "standby_power": 0.27,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRIbulbE27WWclear250lm"
     ]
 }

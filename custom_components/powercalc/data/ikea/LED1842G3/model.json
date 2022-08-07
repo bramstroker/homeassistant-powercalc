@@ -11,5 +11,9 @@
     "standby_power": 0.551,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E27 WW clear 250lm"
     ]
 }
+

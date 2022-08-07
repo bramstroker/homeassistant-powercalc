@@ -32,7 +32,7 @@ from ..errors import (
     StrategyConfigurationError,
     UnsupportedMode,
 )
-from ..power_profile.light_model import LightModel
+from ..power_profile.power_profile import PowerProfile
 from .strategy_interface import PowerCalculationStrategyInterface
 
 LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
@@ -45,15 +45,15 @@ class LutRegistry:
         self._lookup_dictionaries = {}
 
     async def get_lookup_dictionary(
-        self, light_model: LightModel, color_mode: str
+        self, power_profile: PowerProfile, color_mode: str
     ) -> dict | None:
-        cache_key = f"{light_model.manufacturer}_{light_model.model}_{color_mode}"
+        cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if lookup_dict is None:
             defaultdict_of_dict = partial(defaultdict, dict)
             lookup_dict = defaultdict(defaultdict_of_dict)
 
-            with self.get_lut_file(light_model, color_mode) as csv_file:
+            with self.get_lut_file(power_profile, color_mode) as csv_file:
                 csv_reader = reader(csv_file)
                 next(csv_reader)  # skip header row
 
@@ -65,10 +65,8 @@ class LutRegistry:
                         )
                     elif color_mode == COLOR_MODE_COLOR_TEMP:
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
-                    elif color_mode == COLOR_MODE_BRIGHTNESS:
-                        lookup_dict[int(row[0])] = float(row[1])
                     else:
-                        raise UnsupportedMode(f"Unsupported color mode {color_mode}")
+                        lookup_dict[int(row[0])] = float(row[1])
                     line_count += 1
 
             _LOGGER.debug("LUT file loaded: %d lines", line_count)
@@ -78,28 +76,24 @@ class LutRegistry:
 
         return lookup_dict
 
-    def get_lut_file(self, light_model: LightModel, color_mode: str):
-        path = os.path.join(light_model.get_lut_directory(), f"{color_mode}.csv")
+    def get_lut_file(self, power_profile: PowerProfile, color_mode: str):
+        path = os.path.join(power_profile.get_lut_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")
 
-        elif os.path.exists(path):
-            _LOGGER.debug("Loading LUT data file: %s", path)
-            return open(path, "r")
-
         raise LutFileNotFound("Data file not found: %s")
 
 
 class LutStrategy(PowerCalculationStrategyInterface):
     def __init__(
-        self, source_entity: SourceEntity, lut_registry: LutRegistry, model: LightModel
+        self, source_entity: SourceEntity, lut_registry: LutRegistry, profile: PowerProfile
     ) -> None:
         self._source_entity = source_entity
         self._lut_registry = lut_registry
-        self._model = model
+        self._profile = profile
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         """Calculate the power consumption based on brightness, mired, hsl values."""
@@ -127,13 +121,13 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
-                self._model, color_mode
+                self._profile, color_mode
             )
         except LutFileNotFound:
             _LOGGER.error(
                 "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
-                self._model.model,
+                self._profile.model,
                 color_mode,
             )
             return None
@@ -238,7 +232,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(
-                        self._model, color_mode
+                        self._profile, color_mode
                     )
                 except LutFileNotFound:
                     raise ModelNotSupported(

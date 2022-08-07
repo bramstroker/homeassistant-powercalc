@@ -11,5 +11,9 @@
     "standby_power": 0.17,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRIbulbE27WSglobeopal1055lm"
     ]
 }
+

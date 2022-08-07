@@ -58,8 +58,8 @@ from .const import (
     SensorType,
 )
 from .errors import StrategyConfigurationError
-from .power_profile.library import ProfileLibrary
-from .power_profile.light_model import LightModel
+from .power_profile.library import ModelInfo, ProfileLibrary
+from .power_profile.power_profile import PowerProfile
 from .power_profile.model_discovery import autodiscover_model
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -399,7 +399,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def validate_strategy_config(self) -> dict:
         strategy_name = self.sensor_config.get(CONF_MODE)
-        strategy = _create_strategy_object(
+        strategy = await _create_strategy_object(
             self.hass, strategy_name, self.sensor_config, self.source_entity
         )
         try:
@@ -487,7 +487,7 @@ class OptionsFlowHandler(OptionsFlow):
             if strategy != CalculationStrategy.LUT:
                 self.current_config.update({strategy: strategy_options})
 
-            strategy_object = _create_strategy_object(
+            strategy_object = await _create_strategy_object(
                 self.hass, strategy, self.current_config, self.source_entity
             )
             try:
@@ -527,17 +527,17 @@ class OptionsFlowHandler(OptionsFlow):
         return data_schema
 
 
-def _create_strategy_object(
+async def _create_strategy_object(
     hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
-    light_model = None
+    power_profile = None
     if strategy == CalculationStrategy.LUT:
-        light_model = LightModel(
-            hass, config.get(CONF_MANUFACTURER), config.get(CONF_MODEL), None
+        power_profile = await ProfileLibrary.factory(hass).get_profile(
+            ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
         )
-    return factory.create(config, strategy, light_model, source_entity)
+    return factory.create(config, strategy, power_profile, source_entity)
 
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:

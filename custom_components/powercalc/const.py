@@ -21,6 +21,7 @@ DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
+DATA_PROFILE_LIBRARY = "profile_library"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 
@@ -125,7 +126,7 @@ DEFAULT_ENTITY_CATEGORY = ENTITY_CATEGORY_NONE
 DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
-DISCOVERY_LIGHT_MODEL = "light_model"
+DISCOVERY_POWER_PROFILE = "power_profile"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"

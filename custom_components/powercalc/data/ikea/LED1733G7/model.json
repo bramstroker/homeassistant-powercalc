@@ -11,5 +11,8 @@
     "standby_power": 0.33,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E14 WS opal 600lm"
     ]
 }

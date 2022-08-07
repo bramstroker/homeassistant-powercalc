@@ -5,25 +5,27 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import NamedTuple, Optional
+from typing import Optional
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.core import HomeAssistant
 
+from .library import ProfileLibrary, ModelInfo
+
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
 from ..errors import ModelNotSupported
-from .light_model import LightModel
+from .power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def get_light_model(
+async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
     entity_entry: Optional[er.RegistryEntry] = None,
-) -> Optional[LightModel]:
+) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
     if (manufacturer is None or model is None) and entity_entry:
@@ -41,16 +43,22 @@ async def get_light_model(
             hass.config.config_dir, custom_model_directory
         )
 
-    return LightModel(hass, manufacturer, model, custom_model_directory)
+    libary = ProfileLibrary.factory(hass)
+    profile = await libary.get_profile(ModelInfo(manufacturer, model), custom_model_directory)
+    if profile is None:
+        raise ModelNotSupported(
+            f"Model not found in library (manufacturer: {manufacturer}, model: {model})"
+        )
+    return profile
 
 
 async def is_autoconfigurable(
     hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: dict = {}
 ) -> bool:
     try:
-        light_model = await get_light_model(hass, sensor_config, entry)
+        power_profile = await get_power_profile(hass, sensor_config, entry)
         return bool(
-            light_model and not light_model.is_additional_configuration_required
+            power_profile and not power_profile.is_additional_configuration_required
         )
     except ModelNotSupported:
         return False
@@ -94,12 +102,9 @@ async def autodiscover_model(
 
 
 async def has_manufacturer_and_model_information(
-    hass: HomeAssistant, entity_entry: er.RegistryEntry | None
+    hass: HomeAssistant, entity_entry: er.RegistryEntry
 ) -> bool:
     """See if we have enough information in device registry to automatically setup the power sensor"""
-
-    if entity_entry is None:
-        return False
 
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
@@ -110,8 +115,3 @@ async def has_manufacturer_and_model_information(
         return False
 
     return True
-
-
-class ModelInfo(NamedTuple):
-    manufacturer: str
-    model: str

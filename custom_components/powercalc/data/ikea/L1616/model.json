@@ -7,9 +7,13 @@
         "SLEEP_TIME": 3,
         "VERSION": "master"
     },
-    "name": "Ikea Slagsida",
+    "name": "Ikea Slagsida (60cm)",
     "standby_power": 0.62,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "Slagsida"
     ]
 }
+

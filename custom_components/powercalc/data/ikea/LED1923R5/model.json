@@ -11,5 +11,9 @@
     "standby_power": 0.18,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb GU10 CWS 345lm"
     ]
 }
+

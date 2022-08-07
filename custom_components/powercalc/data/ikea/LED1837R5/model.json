@@ -11,5 +11,9 @@
     "standby_power": 0.21,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb GU10 WW 400lm"
     ]
 }
+
