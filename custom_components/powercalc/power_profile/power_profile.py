@@ -8,9 +8,7 @@ from typing import Optional
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
-from sqlalchemy import ForeignKey
 
-from ..aliases import MODEL_DIRECTORY_MAPPING
 from ..const import CalculationStrategy
 from ..errors import ModelNotSupported, UnsupportedMode
 
@@ -109,19 +107,7 @@ class PowerProfile:
 
     @property
     def aliases(self) -> list[str]:
-        aliases = self._json_data.get("aliases") or []
-
-        # Logic below can be removed when all aliases have been moved to model.json
-        if self.manufacturer in MODEL_DIRECTORY_MAPPING: 
-            aliases.extend(
-                [
-                    alias for (alias, model) 
-                    in MODEL_DIRECTORY_MAPPING[self.manufacturer].items() 
-                    if model == self.model
-                ]
-            )
-
-        return aliases
+        return self._json_data.get("aliases") or []
 
     @property
     def linear_mode_config(self) -> Optional[dict]:

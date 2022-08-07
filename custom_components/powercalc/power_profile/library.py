@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from .power_profile import PowerProfile
 
 from ..const import DATA_PROFILE_LIBRARY, DOMAIN
-from ..aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
+from ..aliases import MANUFACTURER_DIRECTORY_MAPPING
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
