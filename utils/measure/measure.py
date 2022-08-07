@@ -416,7 +416,7 @@ class Measure:
             )
 
 
-    def get_resume_variation(self, csv_file_path: str) -> Variation:
+    def get_resume_variation(self, csv_file_path: str) -> Variation | None:
         """This method returns the variation to resume at.
 
         It reads the last row from the CSV file and converts it into a Variation object.
