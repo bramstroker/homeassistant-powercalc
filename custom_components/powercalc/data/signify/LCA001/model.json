@@ -5,5 +5,11 @@
     "standby_power": 0.33,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "9290022166",
+        "929003053401",
+        "LCA005",
+        "9290022266A"
     ]
 }

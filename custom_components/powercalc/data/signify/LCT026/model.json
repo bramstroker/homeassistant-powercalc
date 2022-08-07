@@ -6,5 +6,9 @@
     "measure_description": "Measured with measure script made by smonesi (SAMPLE_COUNT=6, steps: bri 40/sat 40/mired 30/hue 2000) and linearly interpolated to provide more data",
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "7602031P7"
     ]
 }
+

@@ -11,5 +11,8 @@
     "standby_power": 0.4,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "8718699703424"
     ]
 }
