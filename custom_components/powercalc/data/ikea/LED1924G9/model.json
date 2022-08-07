@@ -11,5 +11,8 @@
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E27 CWS 806lm"
     ]
 }

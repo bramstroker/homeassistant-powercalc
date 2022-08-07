@@ -5,5 +5,9 @@
     "standby_power": 0.4,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E27 WS opal 980lm"
     ]
 }
+

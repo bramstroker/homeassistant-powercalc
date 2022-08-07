@@ -11,5 +11,8 @@
     "standby_power": 0.34,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRI bulb E27 WS clear 806lm"
     ]
 }

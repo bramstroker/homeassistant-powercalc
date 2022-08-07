@@ -7,9 +7,12 @@
         "SLEEP_TIME": 2,
         "VERSION": "v0.13.4"
     },
-    "name": "TRADFRIbulbE14WSglobeopal470lm",
+    "name": "TRADFRI bulb E14 WS globe opal 470lm",
     "standby_power": 0.23,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRIbulbE14WSglobeopal470lm"
     ]
 }

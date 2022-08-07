@@ -6,5 +6,9 @@
     ],
     "measure_method": "manual",
     "measure_device": "Power Recorder; PR10-D (Model); Shenzen Zhurui Technology (Manufacturer)",
-    "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences"
+    "measure_description": "Bulbs was measured twice at each dim setting (100 points) and mean value was used when there were differences",
+    "aliases": [
+        "TRADFRI bulb E27 opal 1000lm",
+        "TRADFRI bulb E27 W opal 1000lm"
+    ]
 }

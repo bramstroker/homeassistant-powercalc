@@ -11,5 +11,8 @@
     "standby_power": 0.08,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "FLOALT panel WS 30x30"
     ]
 }
