@@ -99,6 +99,13 @@
                 "description": "Select het model",
                 "title": "LUT configuratie"
             },
+            "lut_subprofile": {
+                "data": {
+                    "sub_profile": "Sub profiel"
+                },
+                "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
+                "title": "LUT config"
+            },
             "user": {
                 "data": {
                     "sensor_type": "Sensor type"

@@ -18,6 +18,17 @@ async def test_model_listing(hass: HomeAssistant):
     assert "LCT010" in models
     assert "LCA007" in models
 
+async def test_get_subprofile_listing(hass: HomeAssistant):
+    library = ProfileLibrary(hass)
+    profile = await library.get_profile(ModelInfo("yeelight", "YLDL01YL"))
+    sub_profiles = await library.get_subprofile_listing(profile)
+    assert sub_profiles == ["ambilight", "downlight"]
+
+async def test_get_subprofile_listing_empty_list(hass: HomeAssistant):
+    library = ProfileLibrary(hass)
+    profile = await library.get_profile(ModelInfo("signify", "LCT010"))
+    sub_profiles = await library.get_subprofile_listing(profile)
+    assert sub_profiles == []
 
 async def test_non_existing_manufacturer_returns_empty_model_list(hass: HomeAssistant):
     library = ProfileLibrary(hass)

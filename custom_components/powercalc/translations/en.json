@@ -99,6 +99,13 @@
                 "description": "Select the device model",
                 "title": "LUT config"
             },
+            "lut_subprofile": {
+                "data": {
+                    "sub_profile": "Sub profile"
+                },
+                "description": "This model has multiple sub profiles. Select one that suites your device",
+                "title": "LUT config"
+            },
             "user": {
                 "data": {
                     "sensor_type": "Sensor type"

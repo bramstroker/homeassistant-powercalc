@@ -61,6 +61,14 @@ class ProfileLibrary:
                 continue
             models.extend(os.listdir(manufacturer_dir))
         return sorted(models)
+    
+    async def get_subprofile_listing(self, profile: PowerProfile) -> list[str]:
+        """Get listing op possible sub profiles"""
+        return sorted(list(
+            next(
+                os.walk(profile.get_model_directory())
+            )[1]
+        ))
 
     async def get_profile(
         self, model_info: ModelInfo, custom_directory: str | None = None
