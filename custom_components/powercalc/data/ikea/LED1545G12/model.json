@@ -6,6 +6,8 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb E27 WS opal 980lm"
+    ]
 }
 

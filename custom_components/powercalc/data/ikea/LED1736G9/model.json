@@ -12,5 +12,7 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb E27 WS clear 806lm"
+    ]
 }

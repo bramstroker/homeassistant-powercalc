@@ -6,5 +6,7 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb E27 WW 806lm"
+    ]
 }

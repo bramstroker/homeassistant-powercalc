@@ -12,6 +12,8 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb E14 CWS 470lm"
+    ]
 }
 

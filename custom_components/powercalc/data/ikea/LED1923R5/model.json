@@ -12,6 +12,8 @@
     "supported_modes": [
         "lut"
     ],
-    "aliases": []
+    "aliases": [
+        "TRADFRI bulb GU10 CWS 345lm"
+    ]
 }
 
