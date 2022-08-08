@@ -1,0 +1,14 @@
+{
+  "measure_description": "Transcribed from http://www.pidramble.com/wiki/benchmarks/power-consumption",
+  "measure_device": "SATECHI USB-C Power Meter",
+  "measure_method": "manual",
+  "name": "Raspberry Pi 4B",
+  "standby_power": "2.7",
+  "supported_modes": [
+    "linear"
+  ],
+  "linear_config": {
+  	"min_watt": 2.7,
+  	"max_watt": 6.4
+  }
+}

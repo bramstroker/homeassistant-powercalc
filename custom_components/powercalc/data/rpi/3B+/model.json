@@ -1,0 +1,14 @@
+{
+  "measure_description": "Transcribed from http://www.pidramble.com/wiki/benchmarks/power-consumption",
+  "measure_device": "PowerJive USB Power Meter",
+  "measure_method": "manual",
+  "name": "Raspberry Pi 3B+",
+  "standby_power": 0.1,
+  "supported_modes": [
+    "linear"
+  ],
+  "linear_config": {
+  	"min_watt": 1.9,
+  	"max_watt": 5.1
+  }
+}
