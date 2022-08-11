@@ -32,6 +32,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_GROUP,
+    CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -68,6 +69,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
             CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "group_unique_id",
+            CONF_CREATE_UTILITY_METERS: True,
             CONF_ENTITIES: [
                 {
                     CONF_ENTITY_ID: "input_boolean.test1",
@@ -398,3 +400,24 @@ async def test_unhide_members(hass: HomeAssistant):
     )
 
     assert entity_reg.async_get("sensor.test_power").hidden_by == None
+
+async def test_group_utility_meter(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_UNIQUE_ID: "group_unique_id",
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 20),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+        },
+    )
+
+    utility_meter_state = hass.states.get("sensor.testgroup_energy_daily")
+    assert utility_meter_state
+    assert utility_meter_state.attributes.get("source") == "sensor.testgroup_energy"
