@@ -24,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_restore_cache,
@@ -401,7 +402,14 @@ async def test_unhide_members(hass: HomeAssistant):
 
     assert entity_reg.async_get("sensor.test_power").hidden_by == None
 
-async def test_group_utility_meter(hass: HomeAssistant):
+async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="testgroup_power"
+    )
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef_energy", suggested_object_id="testgroup_energy"
+    )
+
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
@@ -409,7 +417,7 @@ async def test_group_utility_meter(hass: HomeAssistant):
         {
             CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
-            CONF_UNIQUE_ID: "group_unique_id",
+            CONF_UNIQUE_ID: "abcdef",
             CONF_CREATE_UTILITY_METERS: True,
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 20),
