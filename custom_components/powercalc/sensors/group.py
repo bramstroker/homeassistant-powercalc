@@ -198,7 +198,7 @@ def create_grouped_energy_sensor(
     if unique_id:
         energy_unique_id = f"{unique_id}_energy"
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, name=group_name, unique_id=unique_id
+        hass, sensor_config, name=group_name, unique_id=energy_unique_id
     )
 
     _LOGGER.debug("Creating grouped energy sensor: %s", name)
