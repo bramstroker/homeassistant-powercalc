@@ -632,7 +632,8 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     if (
         CONF_SUB_GROUPS not in user_input
         and CONF_GROUP_POWER_ENTITIES not in user_input
-        and CONF_GROUP_ENERGY_ENTITIES not in user_input
+        and CONF_GROUP_ENERGY_ENTITIES not in user_input 
+        and CONF_GROUP_MEMBER_SENSORS not in user_input
     ):
         errors["base"] = "group_mandatory"
 

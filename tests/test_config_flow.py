@@ -397,6 +397,25 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
     assert {"value": config_entry_1.entry_id, "label": "VirtualPower1"} in options
     assert {"value": config_entry_2.entry_id, "label": "VirtualPower2"} not in options
 
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_GROUP_MEMBER_SENSORS: [ config_entry_1.entry_id ],
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
+        CONF_GROUP_MEMBER_SENSORS: [ config_entry_1.entry_id ],
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_CREATE_UTILITY_METERS: False,
+    }
+
 async def test_group_error_mandatory(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
