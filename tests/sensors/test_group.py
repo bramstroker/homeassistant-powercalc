@@ -402,6 +402,7 @@ async def test_unhide_members(hass: HomeAssistant):
 
     assert entity_reg.async_get("sensor.test_power").hidden_by == None
 
+
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
     entity_reg.async_get_or_create(
         "sensor", DOMAIN, "abcdef", suggested_object_id="testgroup_power"

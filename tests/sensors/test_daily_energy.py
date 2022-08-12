@@ -18,9 +18,9 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     async_fire_time_changed,
     mock_restore_cache,
-    MockConfigEntry
 )
 
 from custom_components.powercalc.const import (
@@ -258,6 +258,7 @@ async def test_template_value(hass: HomeAssistant):
     state = hass.states.get("sensor.router_energy")
     assert state.state == "0.0250"
 
+
 async def test_config_flow_template_value(hass: HomeAssistant):
     """
     Test that power sensor is correctly created when a template is used as the value
@@ -270,9 +271,9 @@ async def test_config_flow_template_value(hass: HomeAssistant):
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
-                CONF_VALUE_TEMPLATE: "{{ 5*0.5 }}"
-            }
-        }
+                CONF_VALUE_TEMPLATE: "{{ 5*0.5 }}",
+            },
+        },
     )
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
