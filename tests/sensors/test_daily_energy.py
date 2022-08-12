@@ -283,6 +283,25 @@ async def test_config_flow_template_value(hass: HomeAssistant):
     assert power_state
     assert power_state.state == "2.50"
 
+async def test_config_flow_decimal_value(hass: HomeAssistant):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_NAME: "My daily",
+            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_VALUE: 0.3,
+            },
+        },
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.my_daily_power")
+    assert power_state
+    assert power_state.state == "0.30"
 
 async def test_reset_service(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(

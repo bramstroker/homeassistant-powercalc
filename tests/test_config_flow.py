@@ -338,7 +338,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
     user_input = {
         CONF_NAME: "My daily energy sensor",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-        CONF_VALUE: 20,
+        CONF_VALUE: 0.5,
         CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
     }
     result = await hass.config_entries.flow.async_configure(
@@ -351,7 +351,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
         CONF_NAME: "My daily energy sensor",
         CONF_DAILY_FIXED_ENERGY: {
             CONF_UPDATE_FREQUENCY: 1800,
-            CONF_VALUE: 20,
+            CONF_VALUE: 0.5,
             CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
         },
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
