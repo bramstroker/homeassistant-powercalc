@@ -303,7 +303,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         daily_fixed_config = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))
         if CONF_VALUE_TEMPLATE in daily_fixed_config:
-            daily_fixed_config[CONF_VALUE] = daily_fixed_config[CONF_VALUE_TEMPLATE]
+            daily_fixed_config[CONF_VALUE] = Template(
+                daily_fixed_config[CONF_VALUE_TEMPLATE]
+            )
             del daily_fixed_config[CONF_VALUE_TEMPLATE]
         if CONF_ON_TIME in daily_fixed_config:
             on_time = daily_fixed_config[CONF_ON_TIME]

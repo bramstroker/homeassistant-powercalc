@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_MODE,
@@ -151,6 +152,21 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
     assert await hass.config_entries.async_setup(config_entry_groupb.entry_id)
     await hass.async_block_till_done()
 
+    config_entry_groupc = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupC",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test3_power"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.test3_energy"],
+            CONF_SUB_GROUPS: [config_entry_groupb.entry_id],
+        },
+    )
+
+    config_entry_groupc.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_groupc.entry_id)
+    await hass.async_block_till_done()
+
     groupa_power_state = hass.states.get("sensor.groupa_power")
     assert groupa_power_state
     assert groupa_power_state.attributes.get(ATTR_ENTITIES) == {
@@ -173,6 +189,14 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
     assert groupb_energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
         "sensor.test2_energy",
+    }
+
+    groupc_power_state = hass.states.get("sensor.groupc_power")
+    assert groupc_power_state
+    assert groupc_power_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_power",
+        "sensor.test2_power",
+        "sensor.test3_power",
     }
 
 
@@ -402,6 +426,7 @@ async def test_unhide_members(hass: HomeAssistant):
 
     assert entity_reg.async_get("sensor.test_power").hidden_by == None
 
+
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
     entity_reg.async_get_or_create(
         "sensor", DOMAIN, "abcdef", suggested_object_id="testgroup_power"
@@ -429,3 +454,49 @@ async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegist
     utility_meter_state = hass.states.get("sensor.testgroup_energy_daily")
     assert utility_meter_state
     assert utility_meter_state.attributes.get("source") == "sensor.testgroup_energy"
+
+
+async def test_include_config_entries_in_group(hass: HomeAssistant):
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UNIQUE_ID: "abcdef",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "VirtualSensor",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    group_config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+            CONF_GROUP_MEMBER_SENSORS: [config_entry.entry_id],
+            CONF_GROUP_POWER_ENTITIES: ["sensor.other_power"],
+        },
+    )
+
+    group_config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(group_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    group_power_state = hass.states.get("sensor.groupa_power")
+    assert group_power_state
+    assert group_power_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.virtualsensor_power",
+        "sensor.other_power",
+    }
+
+    group_energy_state = hass.states.get("sensor.groupa_energy")
+    assert group_energy_state
+    assert group_energy_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.virtualsensor_energy"
+    }
