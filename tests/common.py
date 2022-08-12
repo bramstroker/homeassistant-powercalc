@@ -132,7 +132,10 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
         CONF_FIXED: {CONF_POWER: power},
     }
 
-async def create_mocked_virtual_power_sensor_entry(hass: HomeAssistant, name: str, unique_id: str | None) -> config_entries.ConfigEntry:
+
+async def create_mocked_virtual_power_sensor_entry(
+    hass: HomeAssistant, name: str, unique_id: str | None
+) -> config_entries.ConfigEntry:
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id=unique_id,
@@ -142,9 +145,7 @@ async def create_mocked_virtual_power_sensor_entry(hass: HomeAssistant, name: st
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: name,
             CONF_MODE: CalculationStrategy.FIXED,
-            CONF_FIXED: {
-                CONF_POWER: 50
-            }
+            CONF_FIXED: {CONF_POWER: 50},
         },
     )
 

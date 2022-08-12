@@ -264,7 +264,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not errors:
                 return self.create_config_entry()
 
-        group_schema = SCHEMA_GROUP.extend(_create_group_options_schema(self.hass).schema)
+        group_schema = SCHEMA_GROUP.extend(
+            _create_group_options_schema(self.hass).schema
+        )
         return self.async_show_form(
             step_id="group",
             data_schema=group_schema,
@@ -583,38 +585,42 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
         selector.SelectOptionDict(
             value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
         )
-        for config_entry in hass.config_entries.async_entries(DOMAIN) 
+        for config_entry in hass.config_entries.async_entries(DOMAIN)
         if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
         and config_entry.unique_id is not None
     ]
     member_sensor_selector = selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=member_sensors, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
+            options=member_sensors,
+            multiple=True,
+            mode=selector.SelectSelectorMode.DROPDOWN,
         )
     )
 
-    return vol.Schema({
-        vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
-        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(
-                domain=Platform.SENSOR,
-                device_class=SensorDeviceClass.POWER,
-                multiple=True,
-            )
-        ),
-        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(
-                domain=Platform.SENSOR,
-                device_class=SensorDeviceClass.ENERGY,
-                multiple=True,
-            )
-        ),
-        vol.Optional(CONF_SUB_GROUPS): sub_group_selector,
-        vol.Optional(
-            CONF_CREATE_UTILITY_METERS, default=False
-        ): selector.BooleanSelector(),
-        vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
-    })
+    return vol.Schema(
+        {
+            vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+            vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=Platform.SENSOR,
+                    device_class=SensorDeviceClass.POWER,
+                    multiple=True,
+                )
+            ),
+            vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=Platform.SENSOR,
+                    device_class=SensorDeviceClass.ENERGY,
+                    multiple=True,
+                )
+            ),
+            vol.Optional(CONF_SUB_GROUPS): sub_group_selector,
+            vol.Optional(
+                CONF_CREATE_UTILITY_METERS, default=False
+            ): selector.BooleanSelector(),
+            vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+        }
+    )
 
 
 def _validate_group_input(user_input: dict[str, str] = None) -> dict:
@@ -626,7 +632,7 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     if (
         CONF_SUB_GROUPS not in user_input
         and CONF_GROUP_POWER_ENTITIES not in user_input
-        and CONF_GROUP_ENERGY_ENTITIES not in user_input 
+        and CONF_GROUP_ENERGY_ENTITIES not in user_input
         and CONF_GROUP_MEMBER_SENSORS not in user_input
     ):
         errors["base"] = "group_mandatory"

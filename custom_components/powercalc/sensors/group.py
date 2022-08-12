@@ -5,9 +5,9 @@ from decimal import Decimal
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
+from homeassistant.components.sensor import ATTR_STATE_CLASS
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
-    ATTR_STATE_CLASS,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
@@ -36,8 +36,8 @@ from ..const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_GROUP_ENERGY_ENTITIES,
-    CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
+    CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SUB_GROUPS,
@@ -118,14 +118,18 @@ async def create_group_sensors_from_config_entry(
 
     group_name = entry.data.get(CONF_NAME)
 
-    power_sensor_ids: set[str] = set(resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER))
+    power_sensor_ids: set[str] = set(
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
+    )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
             hass, group_name, sensor_config, power_sensor_ids
         )
         group_sensors.append(power_sensor)
 
-    energy_sensor_ids: set[str] = set(resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY))
+    energy_sensor_ids: set[str] = set(
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
+    )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
             hass, group_name, sensor_config, energy_sensor_ids
@@ -138,9 +142,13 @@ async def create_group_sensors_from_config_entry(
 
     return group_sensors
 
+
 @callback
 def resolve_entity_ids_recursively(
-    hass: HomeAssistant, entry: ConfigEntry, device_class: SensorDeviceClass, resolved_ids: list[str] | None = None
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    device_class: SensorDeviceClass,
+    resolved_ids: list[str] | None = None,
 ) -> list[str]:
     """
     Get all the entity id's for the current group and all the subgroups
@@ -154,17 +162,25 @@ def resolve_entity_ids_recursively(
     member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS)
     # Unfortunately device_class is not correctly set at this time in the entity_registry
     # So we need to match on state_class.
-    state_class = SensorStateClass.MEASUREMENT if device_class == SensorDeviceClass.POWER else SensorStateClass.TOTAL
+    state_class = (
+        SensorStateClass.MEASUREMENT
+        if device_class == SensorDeviceClass.POWER
+        else SensorStateClass.TOTAL
+    )
     entities = [
-        entity_entry.entity_id for entity_entry 
-        in entity_reg.entities.values()
-        if entity_entry.config_entry_id in member_entry_ids 
+        entity_entry.entity_id
+        for entity_entry in entity_reg.entities.values()
+        if entity_entry.config_entry_id in member_entry_ids
         and entity_entry.capabilities.get(ATTR_STATE_CLASS) == state_class
     ]
     resolved_ids.extend(entities)
 
     # Include the additional power/energy sensors the user specified
-    conf_key = CONF_GROUP_POWER_ENTITIES if device_class == SensorDeviceClass.POWER else CONF_GROUP_ENERGY_ENTITIES
+    conf_key = (
+        CONF_GROUP_POWER_ENTITIES
+        if device_class == SensorDeviceClass.POWER
+        else CONF_GROUP_ENERGY_ENTITIES
+    )
     resolved_ids.extend(entry.data.get(conf_key) or [])
 
     # Include the entities from sub groups
