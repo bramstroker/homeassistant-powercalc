@@ -180,22 +180,6 @@ def resolve_entity_ids_recursively(
         resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
     return resolved_ids
 
-@callback
-def resolve_sub_group_entity_ids(
-    hass: HomeAssistant, entry: ConfigEntry, conf_key: str = CONF_GROUP_POWER_ENTITIES
-) -> list[str]:
-    subgroups = entry.data.get(CONF_SUB_GROUPS)
-    if not subgroups:
-        return []
-    all_sensor_ids = []
-    for subgroup_entry_id in subgroups:
-        subgroup_entry = hass.config_entries.async_get_entry(subgroup_entry_id)
-        if subgroup_entry is None:
-            _LOGGER.error(f"Subgroup config entry not found: {subgroup_entry_id}")
-            continue
-        all_sensor_ids.extend(subgroup_entry.data.get(conf_key) or [])
-    return all_sensor_ids
-
 
 @callback
 def create_grouped_power_sensor(
