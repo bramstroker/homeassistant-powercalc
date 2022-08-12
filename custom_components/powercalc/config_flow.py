@@ -59,9 +59,9 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .errors import StrategyConfigurationError
+from .errors import StrategyConfigurationError, ModelNotSupported
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.model_discovery import autodiscover_model
+from .power_profile.model_discovery import get_power_profile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -323,17 +323,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_lut_manufacturer()
 
-        model_info = None
+        power_profile = None
         if self.source_entity.entity_entry:
-            model_info = await autodiscover_model(
-                self.hass, self.source_entity.entity_entry
-            )
-        if model_info:
+            try:
+                power_profile = await get_power_profile(
+                    self.hass, {}, self.source_entity.entity_entry
+                )
+            except ModelNotSupported:
+                power_profile = None
+        if power_profile:
             return self.async_show_form(
                 step_id="lut",
                 description_placeholders={
-                    "manufacturer": model_info.manufacturer,
-                    "model": model_info.model,
+                    "manufacturer": power_profile.manufacturer,
+                    "model": power_profile.model,
                 },
                 data_schema=SCHEMA_POWER_LUT_AUTODISCOVERED,
                 errors={},
