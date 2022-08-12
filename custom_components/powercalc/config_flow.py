@@ -59,7 +59,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .errors import StrategyConfigurationError, ModelNotSupported
+from .errors import ModelNotSupported, StrategyConfigurationError
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.model_discovery import get_power_profile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY

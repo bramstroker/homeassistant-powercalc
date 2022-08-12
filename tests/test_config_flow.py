@@ -254,6 +254,7 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
 
+
 async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant):
     light_entity = MockLight("test", STATE_ON)
     light_entity.manufacturer = "ikea"
