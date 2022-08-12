@@ -33,6 +33,7 @@ from .const import (
     CONF_FIXED,
     CONF_GAMMA_CURVE,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_LINEAR,
@@ -599,7 +600,27 @@ def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Sc
             options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
         )
     )
-    return base_schema.extend({vol.Optional(CONF_SUB_GROUPS): sub_group_selector})
+
+    member_sensors = [
+        selector.SelectOptionDict(
+            value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
+        )
+        for config_entry in hass.config_entries.async_entries(DOMAIN) 
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
+        and config_entry.unique_id is not None
+    ]
+    member_sensor_selector = selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=member_sensors, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
+        )
+    )
+
+    return base_schema.extend(
+        {
+            vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+            vol.Optional(CONF_SUB_GROUPS): sub_group_selector
+        }
+    )
 
 
 def _validate_group_input(user_input: dict[str, str] = None) -> dict:
