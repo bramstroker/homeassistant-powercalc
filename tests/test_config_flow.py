@@ -30,6 +30,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_LINEAR,
@@ -54,7 +55,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.test.light import MockLight
 
-from .common import MockConfigEntry, create_mock_light_entity
+from .common import MockConfigEntry, create_mock_light_entity, create_mocked_virtual_power_sensor_entry
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -379,6 +380,41 @@ async def test_create_group_entry(hass: HomeAssistant):
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
 
+async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAssistant):
+    """
+    Test if we can select previously created virtual power config entries as the group member.
+    Only entries with a unique ID must be selectable
+    """
+
+    config_entry_1 = await create_mocked_virtual_power_sensor_entry(hass, "VirtualPower1", "abcdef")
+    config_entry_2 = await create_mocked_virtual_power_sensor_entry(hass, "VirtualPower2", None)
+
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    data_schema: vol.Schema = result["data_schema"]
+    select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
+    options = select.config["options"]
+    assert {"value": config_entry_1.entry_id, "label": "VirtualPower1"} in options
+    assert {"value": config_entry_2.entry_id, "label": "VirtualPower2"} not in options
+
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_GROUP_MEMBER_SENSORS: [ config_entry_1.entry_id ],
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
+        CONF_GROUP_MEMBER_SENSORS: [ config_entry_1.entry_id ],
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_CREATE_UTILITY_METERS: False,
+    }
 
 async def test_group_error_mandatory(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.GROUP)

@@ -33,6 +33,7 @@ from .const import (
     CONF_FIXED,
     CONF_GAMMA_CURVE,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_LINEAR,
@@ -159,35 +160,12 @@ SCHEMA_POWER_LUT_AUTODISCOVERED = vol.Schema(
     {vol.Optional(CONF_CONFIRM_AUTODISCOVERED_MODEL, default=True): bool}
 )
 
-SCHEMA_GROUP_OPTIONS = vol.Schema(
-    {
-        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(
-                domain=Platform.SENSOR,
-                device_class=SensorDeviceClass.POWER,
-                multiple=True,
-            )
-        ),
-        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
-            selector.EntitySelectorConfig(
-                domain=Platform.SENSOR,
-                device_class=SensorDeviceClass.ENERGY,
-                multiple=True,
-            )
-        ),
-        vol.Optional(
-            CONF_CREATE_UTILITY_METERS, default=False
-        ): selector.BooleanSelector(),
-        vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
-    }
-)
-
 SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     }
-).extend(SCHEMA_GROUP_OPTIONS.schema)
+)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -286,9 +264,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not errors:
                 return self.create_config_entry()
 
+        group_schema = SCHEMA_GROUP.extend(_create_group_options_schema(self.hass).schema)
         return self.async_show_form(
             step_id="group",
-            data_schema=_create_group_schema(self.hass, SCHEMA_GROUP),
+            data_schema=group_schema,
             errors=errors,
         )
 
@@ -551,7 +530,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
 
         if self.sensor_type == SensorType.GROUP:
-            data_schema = _create_group_schema(self.hass, SCHEMA_GROUP_OPTIONS)
+            data_schema = _create_group_options_schema(self.hass)
 
         data_schema = _fill_schema_defaults(
             data_schema, self.current_config | strategy_options
@@ -584,7 +563,7 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return vol.Schema({})
 
 
-def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Schema:
+def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
     """Create config schema for groups"""
     sub_groups = [
         selector.SelectOptionDict(
@@ -599,7 +578,43 @@ def _create_group_schema(hass: HomeAssistant, base_schema: vol.Schema) -> vol.Sc
             options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
         )
     )
-    return base_schema.extend({vol.Optional(CONF_SUB_GROUPS): sub_group_selector})
+
+    member_sensors = [
+        selector.SelectOptionDict(
+            value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
+        )
+        for config_entry in hass.config_entries.async_entries(DOMAIN) 
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
+        and config_entry.unique_id is not None
+    ]
+    member_sensor_selector = selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=member_sensors, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
+        )
+    )
+
+    return vol.Schema({
+        vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+        vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
+                multiple=True,
+            )
+        ),
+        vol.Optional(CONF_GROUP_ENERGY_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.ENERGY,
+                multiple=True,
+            )
+        ),
+        vol.Optional(CONF_SUB_GROUPS): sub_group_selector,
+        vol.Optional(
+            CONF_CREATE_UTILITY_METERS, default=False
+        ): selector.BooleanSelector(),
+        vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+    })
 
 
 def _validate_group_input(user_input: dict[str, str] = None) -> dict:
@@ -611,7 +626,8 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     if (
         CONF_SUB_GROUPS not in user_input
         and CONF_GROUP_POWER_ENTITIES not in user_input
-        and CONF_GROUP_ENERGY_ENTITIES not in user_input
+        and CONF_GROUP_ENERGY_ENTITIES not in user_input 
+        and CONF_GROUP_MEMBER_SENSORS not in user_input
     ):
         errors["base"] = "group_mandatory"
 

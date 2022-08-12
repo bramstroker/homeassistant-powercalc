@@ -49,14 +49,18 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Create utility meters",
-                    "group_energy_entities": "Member energy entities",
-                    "group_power_entities": "Member power entities",
+                    "group_member_sensors": "Member powercalc sensors",
+                    "group_power_entities": "Additional power entities",
+                    "group_energy_entities": "Additional energy entities",
                     "name": "Name",
                     "sub_groups": "Sub groups",
                     "hide_members": "Hide members",
                     "unique_id": "Unique id"
                 },
                 "data_description": {
+                    "group_member_sensors": "Powercalc sensors to include in the group",
+                    "group_power_entities": "Additional power sensors (W) from your HA installation to include",
+                    "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
                     "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
                 },
                 "title": "Create a group sensor"
@@ -159,8 +163,9 @@
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
                     "gamma_curve": "Gamma curve",
-                    "group_energy_entities": "Member energy entities",
-                    "group_power_entities": "Member power entities",
+                    "group_member_sensors": "Member powercalc sensors",
+                    "group_power_entities": "Additional power entities",
+                    "group_energy_entities": "Additional energy entities",
                     "max_power": "Max power",
                     "min_power": "Min power",
                     "name": "Name",
@@ -181,6 +186,9 @@
                     "calibrate": "Put a calibration value on each line. Example\n\n1: 20",
                     "power_template": "Template will be evaluated to get the power value in W",
                     "states_power": "One 'state: power' pair on each row, see example above",
+                    "group_member_sensors": "Powercalc sensors to include in the group",
+                    "group_power_entities": "Additional power sensors (W) from your HA installation to include",
+                    "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
                     "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
                 }
             }
