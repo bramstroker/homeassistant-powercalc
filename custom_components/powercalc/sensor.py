@@ -9,6 +9,7 @@ from datetime import timedelta
 from typing import Any, Final, NamedTuple, Optional, cast
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components import (
@@ -497,8 +498,8 @@ async def create_individual_sensors(
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
     try:
-        check_entity_not_already_configured(
-            sensor_config, source_entity, hass, used_unique_ids
+        await check_entity_not_already_configured(
+            sensor_config, source_entity, hass, used_unique_ids, discovery_info is not None
         )
     except SensorAlreadyConfiguredError as error:
         # Include previously discovered/configured entities in group when no specific configuration
@@ -583,11 +584,12 @@ async def create_individual_sensors(
     return EntitiesBucket(new=entities_to_add, existing=[])
 
 
-def check_entity_not_already_configured(
+async def check_entity_not_already_configured(
     sensor_config: dict,
     source_entity: SourceEntity,
     hass: HomeAssistant,
     used_unique_ids: list[str],
+    is_discovered: True
 ):
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -598,6 +600,16 @@ def check_entity_not_already_configured(
     discovered_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
         DATA_DISCOVERED_ENTITIES
     ]
+
+    # Prefer configured entity over discovered entity
+    if not is_discovered and source_entity.entity_id in discovered_entities:
+        entity_reg = er.async_get(hass)
+        for entity in discovered_entities.get(source_entity.entity_id):
+            entity_reg.async_remove(entity.entity_id)
+            hass.states.async_remove(entity.entity_id)
+        discovered_entities[source_entity.entity_id] = []
+        return
+    
     existing_entities = (
         configured_entities.get(source_entity.entity_id)
         or discovered_entities.get(source_entity.entity_id)
