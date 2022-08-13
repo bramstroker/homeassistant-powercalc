@@ -159,7 +159,7 @@ def resolve_entity_ids_recursively(
 
     # Include the power/energy sensors for an existing Virtual Power config entry
     entity_reg = er.async_get(hass)
-    member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS)
+    member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
     # Unfortunately device_class is not correctly set at this time in the entity_registry
     # So we need to match on state_class.
     state_class = (
