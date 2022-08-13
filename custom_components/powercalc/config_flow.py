@@ -386,6 +386,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=_create_lut_schema_model(
                 self.hass, self.sensor_config.get(CONF_MANUFACTURER)
             ),
+            description_placeholders={
+                "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
+            },
             errors=errors,
         )
 
