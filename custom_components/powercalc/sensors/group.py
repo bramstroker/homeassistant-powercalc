@@ -1,5 +1,4 @@
 from __future__ import annotations
-from distutils.command.config import config
 
 import logging
 from decimal import Decimal
