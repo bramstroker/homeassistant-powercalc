@@ -54,6 +54,7 @@
           "mode": "Calculation strategy",
           "entity_id": "Source entity",
           "unique_id": "Unique id",
+          "group": "Add to group",
           "standby_power": "Standby power",
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters"

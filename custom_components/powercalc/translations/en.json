@@ -121,6 +121,7 @@
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
                     "entity_id": "Source entity",
+                    "group": "Add to group",
                     "mode": "Calculation strategy",
                     "name": "Name",
                     "standby_power": "Standby power",

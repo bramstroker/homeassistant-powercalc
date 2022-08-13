@@ -121,6 +121,7 @@
                     "create_energy_sensor": "Creëer energie sensoren",
                     "create_utility_meters": "Creëer utiliteit meters",
                     "entity_id": "Bron entiteit",
+                    "group": "Aan groep toevoegen",
                     "mode": "Calculatie strategie",
                     "name": "Naam",
                     "standby_power": "Standby stroom",
