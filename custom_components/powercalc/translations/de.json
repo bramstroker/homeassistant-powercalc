@@ -9,7 +9,10 @@
             "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
             "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
             "linear_mandatory": "Sie müssen mindestens Minimale Leistung oder Kalibrierungswert angeben",
-            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung"
+            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
+            "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
+            "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
+            "unknown": "Unbekannter Fehler aufgetreten, bitte sehen in die Logs für weitere Informationen"
         },
         "step": {
             "daily_energy": {
@@ -46,13 +49,18 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Utilitymeter erstellen",
-                    "group_energy_entities": "Energie-Entitäten der Gruppe",
+                    "group_member_sensors": "Mitglied powercalc sensors",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
+                    "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
+                    "hide_members": "Mitglieder ausblenden",
                     "unique_id": "Unique-Id"
                 },
                 "data_description": {
+                    "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
+                    "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
+                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 },
                 "title": "Einen Gruppensensor erstellen"
@@ -93,6 +101,13 @@
                     "model": "Modelnummer"
                 },
                 "description": "Wählen Sie das Gerätemodell",
+                "title": "LUT Konfiguration"
+            },
+            "lut_subprofile": {
+                "data": {
+                    "sub_profile": "Unterprofil"
+                },
+                "description": "Dieses Modell hat mehrere Unterprofile. Wählen Sie eines, das zu Ihrem Gerät passt",
                 "title": "LUT Konfiguration"
             },
             "user": {
@@ -137,7 +152,8 @@
             "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
             "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
             "linear_mandatory": "Sie müssen mindestens Maximale Leistung oder Kalibrierung angeben",
-            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung"
+            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
+            "unknown": "Unbekannter Fehler aufgetreten, bitte sehe in die Logs für weitere Informationen"
         },
         "step": {
             "init": {
@@ -147,6 +163,7 @@
                     "create_energy_sensor": "Energiessensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "gamma_curve": "Gammakurve",
+                    "group_member_sensors": "Mitglied powercalc sensors",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "max_power": "Maximale Leistung",
@@ -158,6 +175,7 @@
                     "standby_power": "Standby-Leistung",
                     "states_power": "Leistung je Zustand",
                     "sub_groups": "Untergruppen",
+                    "hide_members": "Mitglieder ausblenden",
                     "unit_of_measurement": "Maßeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
                     "value": "Wert",
@@ -168,6 +186,9 @@
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20",
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
+                    "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
+                    "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
+                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 }
             }
