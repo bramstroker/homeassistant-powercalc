@@ -499,7 +499,11 @@ async def create_individual_sensors(
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
     try:
         await check_entity_not_already_configured(
-            sensor_config, source_entity, hass, used_unique_ids, discovery_info is not None
+            sensor_config,
+            source_entity,
+            hass,
+            used_unique_ids,
+            discovery_info is not None,
         )
     except SensorAlreadyConfiguredError as error:
         # Include previously discovered/configured entities in group when no specific configuration
@@ -589,7 +593,7 @@ async def check_entity_not_already_configured(
     source_entity: SourceEntity,
     hass: HomeAssistant,
     used_unique_ids: list[str],
-    is_discovered: True
+    is_discovered: True,
 ):
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -609,7 +613,7 @@ async def check_entity_not_already_configured(
             hass.states.async_remove(entity.entity_id)
         discovered_entities[source_entity.entity_id] = []
         return
-    
+
     existing_entities = (
         configured_entities.get(source_entity.entity_id)
         or discovered_entities.get(source_entity.entity_id)

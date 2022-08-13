@@ -274,7 +274,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
                 entity_entry.entity_id,
             )
             continue
-    
+
         if has_user_config:
             _LOGGER.debug(
                 "%s: Entity is manually configured, skipping auto configuration",
@@ -307,7 +307,11 @@ def is_user_configured(config: dict, entity_id: str) -> dict | None:
         return None
     sensor_config = config.get(SENSOR_DOMAIN)
     for item in sensor_config:
-        if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN and item.get(CONF_ENTITY_ID) == entity_id:
+        if (
+            isinstance(item, dict)
+            and item.get(CONF_PLATFORM) == DOMAIN
+            and item.get(CONF_ENTITY_ID) == entity_id
+        ):
             return item
     return None
 

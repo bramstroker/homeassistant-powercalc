@@ -71,6 +71,7 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
 
     assert not hass.states.get("sensor.testa_power")
 
+
 async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssistant):
     light_entity = MockLight("testing")
     light_entity.manufacturer = "signify"
@@ -78,19 +79,13 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     await create_mock_light_entity(hass, light_entity)
 
     await run_powercalc_setup_yaml_config(
-        hass,
-        {
-            CONF_ENTITY_ID: "light.testing",
-            CONF_FIXED: {
-                CONF_POWER: 25
-            }
-        },
-        {}
+        hass, {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}}, {}
     )
 
     state = hass.states.get("sensor.testing_power")
     assert state
     assert state.state == "25.00"
+
 
 async def test_domain_groups(hass: HomeAssistant):
     await create_input_boolean(hass)
