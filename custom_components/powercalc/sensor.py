@@ -79,6 +79,7 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
@@ -263,8 +264,24 @@ async def async_setup_entry(
         )
         async_add_entities(entities)
         return
+    
+    # Add entry to an existing group
+    reload_group_entry = None
+    if sensor_type == SensorType.VIRTUAL_POWER and CONF_GROUP in sensor_config:
+        group_entry_id = sensor_config.get(CONF_GROUP)
+        group_entry = hass.config_entries.async_get_entry(group_entry_id)
+        member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+        if not entry.entry_id in member_sensors:
+            member_sensors.append(entry.entry_id)
+            hass.config_entries.async_update_entry(
+                group_entry,
+                data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors}
+            )
+            reload_group_entry = group_entry
 
     await _async_setup_entities(hass, sensor_config, async_add_entities)
+    if reload_group_entry:
+        await hass.config_entries.async_reload(group_entry.entry_id)
 
 
 async def _async_setup_entities(

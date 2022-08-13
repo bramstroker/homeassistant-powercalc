@@ -21,7 +21,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.data_entry_flow import FlowResult, FlowHandler
 from homeassistant.helpers import selector
 
 from .common import SourceEntity, create_source_entity
@@ -32,6 +32,7 @@ from .const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_GAMMA_CURVE,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -134,6 +135,7 @@ SCHEMA_POWER = vol.Schema(
                 mode=selector.SelectSelectorMode.DROPDOWN,
             )
         ),
+        vol.Optional(CONF_GROUP): selector.TextSelector(),
     }
 ).extend(SCHEMA_POWER_OPTIONS.schema)
 
@@ -439,7 +441,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self.unique_id:
             self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
         return self.async_create_entry(title=self.name, data=self.sensor_config)
-
 
 class OptionsFlowHandler(OptionsFlow):
     """Handle an option flow for PowerCalc."""
