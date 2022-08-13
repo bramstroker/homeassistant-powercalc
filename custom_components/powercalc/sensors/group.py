@@ -161,13 +161,9 @@ async def update_associated_group_entry(hass: HomeAssistant, config_entry: Confi
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
     member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
     
-    if remove:
-        if not config_entry.entry_id in member_sensors:
-            return None
+    if remove and config_entry.entry_id in member_sensors:
         member_sensors.remove(config_entry.entry_id)
-    else:
-        if config_entry.entry_id in member_sensors:
-            return None
+    elif config_entry.entry_id not in member_sensors:
         member_sensors.append(config_entry.entry_id)
 
     hass.config_entries.async_update_entry(
