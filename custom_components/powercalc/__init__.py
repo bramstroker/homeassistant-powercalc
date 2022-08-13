@@ -220,7 +220,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     )
 
     if unload_ok:
-        updated_group_entry = await update_associated_group_entry(hass, config_entry, remove=True)
+        updated_group_entry = await update_associated_group_entry(
+            hass, config_entry, remove=True
+        )
         if updated_group_entry:
             await hass.config_entries.async_reload(updated_group_entry.entry_id)
 

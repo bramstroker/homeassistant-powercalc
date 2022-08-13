@@ -145,7 +145,10 @@ async def create_group_sensors_from_config_entry(
 
     return group_sensors
 
-async def update_associated_group_entry(hass: HomeAssistant, config_entry: ConfigEntry, remove: bool) -> ConfigEntry | None:
+
+async def update_associated_group_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, remove: bool
+) -> ConfigEntry | None:
     """
     Update the group config entry when the virtual power config entry is associated to a group
     Adds the sensor to the group on creation of the config entry
@@ -160,7 +163,7 @@ async def update_associated_group_entry(hass: HomeAssistant, config_entry: Confi
     group_entry_id = config_entry.data.get(CONF_GROUP)
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
     member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-    
+
     if remove and config_entry.entry_id in member_sensors:
         member_sensors.remove(config_entry.entry_id)
     elif config_entry.entry_id not in member_sensors:
@@ -168,7 +171,7 @@ async def update_associated_group_entry(hass: HomeAssistant, config_entry: Confi
 
     hass.config_entries.async_update_entry(
         group_entry,
-        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors}
+        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
     )
     return group_entry
 

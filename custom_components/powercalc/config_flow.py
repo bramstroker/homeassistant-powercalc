@@ -1,10 +1,10 @@
 """Config flow for Adaptive Lighting integration."""
 
 from __future__ import annotations
-from audioop import mul
 
 import copy
 import logging
+from audioop import mul
 from typing import Any
 
 import voluptuous as vol
@@ -22,7 +22,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResult, FlowHandler
+from homeassistant.data_entry_flow import FlowHandler, FlowResult
 from homeassistant.helpers import selector
 
 from .common import SourceEntity, create_source_entity
@@ -442,6 +442,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
         return self.async_create_entry(title=self.name, data=self.sensor_config)
 
+
 class OptionsFlowHandler(OptionsFlow):
     """Handle an option flow for PowerCalc."""
 
@@ -568,13 +569,13 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     if strategy == CalculationStrategy.LUT:
         return vol.Schema({})
 
+
 def _create_virtual_power_schema(hass: HomeAssistant) -> vol.Schema:
     base_schema: vol.Schema = SCHEMA_POWER_BASE.extend(
-        {
-            vol.Optional(CONF_GROUP): _create_group_selector(hass)
-        }
+        {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
     )
     return base_schema.extend(SCHEMA_POWER_OPTIONS.schema)
+
 
 def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
     """Create config schema for groups"""
@@ -619,7 +620,10 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
         }
     )
 
-def _create_group_selector(hass: HomeAssistant, multiple: bool = False) -> selector.SelectSelector:
+
+def _create_group_selector(
+    hass: HomeAssistant, multiple: bool = False
+) -> selector.SelectSelector:
     options = [
         selector.SelectOptionDict(
             value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
@@ -630,7 +634,9 @@ def _create_group_selector(hass: HomeAssistant, multiple: bool = False) -> selec
 
     return selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=options, multiple=multiple, mode=selector.SelectSelectorMode.DROPDOWN
+            options=options,
+            multiple=multiple,
+            mode=selector.SelectSelectorMode.DROPDOWN,
         )
     )
 

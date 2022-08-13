@@ -131,7 +131,11 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import create_energy_sensor
-from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry, update_associated_group_entry
+from .sensors.group import (
+    create_group_sensors,
+    create_group_sensors_from_config_entry,
+    update_associated_group_entry,
+)
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -264,7 +268,7 @@ async def async_setup_entry(
         )
         async_add_entities(entities)
         return
-    
+
     # Add entry to an existing group
     updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
 
