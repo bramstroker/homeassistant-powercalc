@@ -121,7 +121,7 @@
       },
       "lut_model": {
         "title": "LUT config",
-        "description": "Select the device model",
+        "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
         "data": {
           "model": "Model ID"
         }
