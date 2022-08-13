@@ -100,7 +100,7 @@
                 "data": {
                     "model": "Model ID"
                 },
-                "description": "Select het model",
+                "description": "Select het model. Zie de [lijst]({supported_models_link}) van ondersteunde verlichting voor meer informatie",
                 "title": "LUT configuratie"
             },
             "lut_subprofile": {
