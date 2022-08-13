@@ -131,7 +131,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import create_energy_sensor
-from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry
+from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry, update_associated_group_entry
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -266,22 +266,11 @@ async def async_setup_entry(
         return
     
     # Add entry to an existing group
-    reload_group_entry = None
-    if sensor_type == SensorType.VIRTUAL_POWER and CONF_GROUP in sensor_config:
-        group_entry_id = sensor_config.get(CONF_GROUP)
-        group_entry = hass.config_entries.async_get_entry(group_entry_id)
-        member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-        if not entry.entry_id in member_sensors:
-            member_sensors.append(entry.entry_id)
-            hass.config_entries.async_update_entry(
-                group_entry,
-                data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors}
-            )
-            reload_group_entry = group_entry
+    updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
 
     await _async_setup_entities(hass, sensor_config, async_add_entities)
-    if reload_group_entry:
-        await hass.config_entries.async_reload(group_entry.entry_id)
+    if updated_group_entry:
+        await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
 
 async def _async_setup_entities(

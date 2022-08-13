@@ -1,4 +1,5 @@
 from __future__ import annotations
+from distutils.command.config import config
 
 import logging
 from decimal import Decimal
@@ -35,14 +36,17 @@ from ..const import (
     ATTR_IS_GROUP,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DOMAIN,
     SERVICE_RESET_ENERGY,
+    SensorType,
     UnitPrefix,
 )
 from .abstract import (
@@ -141,6 +145,37 @@ async def create_group_sensors_from_config_entry(
         )
 
     return group_sensors
+
+async def update_associated_group_entry(hass: HomeAssistant, config_entry: ConfigEntry, remove: bool) -> ConfigEntry | None:
+    """
+    Update the group config entry when the virtual power config entry is associated to a group
+    Adds the sensor to the group on creation of the config entry
+    Removes the sensor from the group on removal of the config entry
+    """
+    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type != SensorType.VIRTUAL_POWER:
+        return None
+    if CONF_GROUP not in config_entry.data:
+        return None
+
+    group_entry_id = config_entry.data.get(CONF_GROUP)
+    group_entry = hass.config_entries.async_get_entry(group_entry_id)
+    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+    
+    if remove:
+        if not config_entry.entry_id in member_sensors:
+            return None
+        member_sensors.remove(config_entry.entry_id)
+    else:
+        if config_entry.entry_id in member_sensors:
+            return None
+        member_sensors.append(config_entry.entry_id)
+
+    hass.config_entries.async_update_entry(
+        group_entry,
+        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors}
+    )
+    return group_entry
 
 
 @callback
