@@ -36,6 +36,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -56,6 +57,7 @@ from custom_components.powercalc.const import (
 from ..common import (
     create_input_boolean,
     create_input_booleans,
+    create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup_yaml_config,
 )
@@ -500,3 +502,69 @@ async def test_include_config_entries_in_group(hass: HomeAssistant):
     assert group_energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.virtualsensor_energy"
     }
+    
+async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant):
+    """
+    When creating a virtual power sensor using the config flow you can define a group you want to add it to
+    Test that the new sensors are added to the existing group correctly
+    """
+
+    config_entry_sensor1 = await create_mocked_virtual_power_sensor_entry(hass, "VirtualSensor1", "xyz")
+
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+            CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor1.entry_id]
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_sensor2 = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "VirtualSensor2",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_UNIQUE_ID: "abc",
+            CONF_GROUP: config_entry_group.entry_id,
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
+        },
+    )
+    config_entry_sensor2.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_sensor2.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_group = hass.config_entries.async_get_entry(config_entry_group.entry_id)
+    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
+        config_entry_sensor1.entry_id,
+        config_entry_sensor2.entry_id
+    ]
+
+    group_state = hass.states.get("sensor.groupa_power")
+    assert group_state
+    assert group_state.attributes.get("entities") == {
+        "sensor.virtualsensor1_power",
+        "sensor.virtualsensor2_power"
+    }
+
+    # Remove config entry from Home Assistant, and see if group is updated accordingly
+    await hass.config_entries.async_remove(config_entry_sensor2.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_group = hass.config_entries.async_get_entry(config_entry_group.entry_id)
+    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
+        config_entry_sensor1.entry_id,
+    ]
+
+    group_state = hass.states.get("sensor.groupa_power")
+    assert group_state
+    assert group_state.attributes.get("entities") == {
+        "sensor.virtualsensor1_power",
+    }
+

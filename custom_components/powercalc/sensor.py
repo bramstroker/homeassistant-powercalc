@@ -79,6 +79,7 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
@@ -130,7 +131,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import create_energy_sensor
-from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry
+from .sensors.group import create_group_sensors, create_group_sensors_from_config_entry, update_associated_group_entry
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -263,8 +264,13 @@ async def async_setup_entry(
         )
         async_add_entities(entities)
         return
+    
+    # Add entry to an existing group
+    updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
 
     await _async_setup_entities(hass, sensor_config, async_add_entities)
+    if updated_group_entry:
+        await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
 
 async def _async_setup_entities(
