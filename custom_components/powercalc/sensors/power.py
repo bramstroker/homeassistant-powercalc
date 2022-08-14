@@ -64,7 +64,11 @@ from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedM
 from ..power_profile.model_discovery import get_power_profile
 from ..strategy.factory import PowerCalculatorStrategyFactory
 from ..strategy.strategy_interface import PowerCalculationStrategyInterface
-from .abstract import BaseEntity, generate_power_sensor_entity_id, generate_power_sensor_name
+from .abstract import (
+    BaseEntity,
+    generate_power_sensor_entity_id,
+    generate_power_sensor_name,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

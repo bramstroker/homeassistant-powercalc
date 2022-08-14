@@ -58,8 +58,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_ent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .sensors.abstract import BaseEntity
-
 from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
     CONF_AREA,
@@ -124,6 +122,7 @@ from .errors import (
     SensorConfigurationError,
 )
 from .power_profile.model_discovery import is_autoconfigurable
+from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
@@ -566,7 +565,7 @@ async def create_individual_sensors(
             if not isinstance(entity, BaseEntity):
                 continue
             try:
-                setattr(entity, 'device_id', source_entity.device_entry.id)
+                setattr(entity, "device_id", source_entity.device_entry.id)
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
 

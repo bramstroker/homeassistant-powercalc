@@ -24,7 +24,6 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
-
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 import custom_components.test.light as test_light_platform
@@ -437,11 +436,14 @@ async def test_user_can_rename_entity_id(
     assert energy_state.attributes.get("source") == "sensor.my_renamed_power"
     assert not hass.states.get("sensor.test_energy")
 
-async def test_entities_are_bound_to_source_device(hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry):
+
+async def test_entities_are_bound_to_source_device(
+    hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry
+):
     """
     Test that all powercalc created sensors are attached to same device as the source entity
     """
-    
+
     # Create a device
     config_entry = MockConfigEntry(domain="test")
     config_entry.add_to_hass(hass)
@@ -455,7 +457,11 @@ async def test_entities_are_bound_to_source_device(hass: HomeAssistant, entity_r
     # Create a source entity which is bound to the device
     unique_id = "34445329342797234"
     entity_reg.async_get_or_create(
-        "switch", "switch", unique_id, suggested_object_id="google_home", device_id=device_entry.id
+        "switch",
+        "switch",
+        unique_id,
+        suggested_object_id="google_home",
+        device_id=device_entry.id,
     )
     await hass.async_block_till_done()
 

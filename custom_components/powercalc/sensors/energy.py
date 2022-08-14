@@ -27,7 +27,11 @@ from ..const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
 )
-from .abstract import BaseEntity, generate_energy_sensor_entity_id, generate_energy_sensor_name
+from .abstract import (
+    BaseEntity,
+    generate_energy_sensor_entity_id,
+    generate_energy_sensor_name,
+)
 from .power import PowerSensor, RealPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
