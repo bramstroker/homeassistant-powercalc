@@ -471,10 +471,10 @@ async def create_sensors(
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
         context = CreationContext(group=context.group, entity_config=sensor_config)
-        merged_sensor_config = get_merged_sensor_configuration(
-            global_config, config, sensor_config
-        )
         try:
+            merged_sensor_config = get_merged_sensor_configuration(
+                global_config, config, sensor_config
+            )
             new_entities = await create_individual_sensors(
                 hass, merged_sensor_config, context=context
             )

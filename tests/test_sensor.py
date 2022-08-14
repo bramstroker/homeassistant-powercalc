@@ -493,3 +493,31 @@ async def test_entities_are_bound_to_source_device(
     utility_entity_entry = entity_reg.async_get("sensor.google_home_energy_daily")
     assert utility_entity_entry
     assert utility_entity_entry.device_id == device_entry.id
+
+
+async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2", "test3"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1"),
+                get_simple_fixed_config("input_boolean.test2"),
+                # Omitting the entity_id should log an error, but still successfully create the other entities
+                {
+                    CONF_NAME: "test3",
+                    CONF_FIXED: {
+                        CONF_POWER: 20
+                    }
+                }
+            ]
+        },
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test1_power")
+    assert hass.states.get("sensor.test2_power")
+    assert not hass.states.get("sensor.test3_power")
