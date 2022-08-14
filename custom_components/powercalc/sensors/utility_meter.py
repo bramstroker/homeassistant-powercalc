@@ -34,6 +34,7 @@ from ..const import (
 )
 from ..errors import SensorConfigurationError
 from ..migrate import async_set_unique_id
+from .abstract import BaseEntity
 from .energy import EnergySensor
 
 _LOGGER = logging.getLogger(__name__)
@@ -205,7 +206,7 @@ async def create_utility_meter(
     return utility_meter
 
 
-class VirtualUtilityMeter(UtilityMeterSensor):
+class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
 
     @property

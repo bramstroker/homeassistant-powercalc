@@ -43,7 +43,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_STARTED,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
@@ -58,7 +57,8 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from numpy import source
+
+from .sensors.abstract import BaseEntity
 
 from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
@@ -79,7 +79,6 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
-    CONF_GROUP_MEMBER_SENSORS,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
@@ -523,7 +522,7 @@ async def create_individual_sensors(
             return EntitiesBucket()
         raise error
 
-    entities_to_add = []
+    entities_to_add: list[BaseEntity] = []
 
     energy_sensor = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
@@ -561,17 +560,15 @@ async def create_individual_sensors(
             await create_utility_meters(hass, energy_sensor, sensor_config)
         )
 
+    # Set the entity to same device as the source entity, if any available
     if source_entity.entity_entry and source_entity.device_entry:
-        hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STARTED,
-            callback(
-                lambda _: bind_entities_to_devices(
-                    hass,
-                    entities_to_add,
-                    source_entity.device_entry.id,
-                )
-            ),
-        )
+        for entity in entities_to_add:
+            if not isinstance(entity, BaseEntity):
+                continue
+            try:
+                setattr(entity, 'device_id', source_entity.device_entry.id)
+            except AttributeError:
+                _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
 
     # Update several registries
     if discovery_info:
@@ -636,25 +633,6 @@ async def check_entity_not_already_configured(
 
     if unique_id is None and source_entity.entity_id in existing_entities:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
-
-
-def bind_entities_to_devices(
-    hass: HomeAssistant, entities: list[Entity], device_id: str
-):
-    """Attach all the power/energy sensors to the same device as the source entity"""
-
-    for entity in entities:
-        ent_reg = entity_registry.async_get(hass)
-        entity_entry = ent_reg.async_get(entity.entity_id)
-        if (
-            not entity_entry
-            or entity_entry.platform != DOMAIN
-            or entity_entry.device_id == device_id
-        ):
-            continue
-
-        _LOGGER.debug(f"Binding {entity.entity_id} to device {device_id}")
-        ent_reg.async_update_entity(entity.entity_id, device_id=device_id)
 
 
 @callback
