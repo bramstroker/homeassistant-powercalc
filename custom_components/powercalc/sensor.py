@@ -58,9 +58,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_ent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .sensors.abstract import BaseEntity
-
-from .common import SourceEntity, create_source_entity, validate_name_pattern, validate_is_number
+from .common import (
+    SourceEntity,
+    create_source_entity,
+    validate_is_number,
+    validate_name_pattern,
+)
 from .const import (
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
@@ -298,6 +301,7 @@ async def _async_setup_entities(
         async_add_entities(
             [entity for entity in entities.new if isinstance(entity, SensorEntity)]
         )
+
 
 @callback
 def register_entity_services():

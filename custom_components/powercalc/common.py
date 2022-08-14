@@ -5,10 +5,10 @@ from typing import NamedTuple
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
-from homeassistant.helpers.template import is_number
 import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
 from homeassistant.core import HomeAssistant, split_entity_id
+from homeassistant.helpers.template import is_number
 
 from .const import DUMMY_ENTITY_ID
 
@@ -79,6 +79,7 @@ def validate_name_pattern(value: str) -> str:
     if not regex.search(value):
         raise vol.Invalid("Naming pattern must contain {}")
     return value
+
 
 def validate_is_number(value: str) -> str:
     """Validate value is a number."""
