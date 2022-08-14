@@ -5,3 +5,17 @@ reset_energy:
     entity:
       domain: sensor
       device_class: energy
+calibrate_utility_meter:
+  name: Calibrate utility meter
+  description: Calibrates a utility meter sensor.
+  target:
+    entity:
+      domain: sensor
+  fields:
+    value:
+      name: Value
+      description: Value to which set the meter
+      example: "100"
+      required: true
+      selector:
+        text:
