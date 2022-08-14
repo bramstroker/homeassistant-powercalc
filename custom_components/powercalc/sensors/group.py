@@ -49,6 +49,7 @@ from ..const import (
     UnitPrefix,
 )
 from .abstract import (
+    BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
     generate_power_sensor_entity_id,
@@ -283,7 +284,7 @@ def create_grouped_energy_sensor(
     )
 
 
-class GroupedSensor(RestoreEntity, SensorEntity):
+class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     """Base class for grouped sensors"""
 
     _attr_should_poll = False
