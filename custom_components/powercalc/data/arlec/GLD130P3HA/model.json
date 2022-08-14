@@ -8,7 +8,7 @@
         "VERSION": "v0.23.2:docker"
     },
     "name": "Arlec 12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe",
-    "standby_power": 0,
+    "standby_power": 0.7,
     "supported_modes": [
         "lut"
     ]
