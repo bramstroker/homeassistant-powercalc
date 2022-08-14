@@ -124,10 +124,6 @@ async def create_virtual_power_sensor(
                     hass, sensor_config, source_entity.entity_entry
                 )
             if mode is None and power_profile:
-                if not power_profile.supported_modes:
-                    raise UnsupportedMode(
-                        f"Power profile has no supported_modes in model.json. manufacturer: {power_profile.manufacturer}, model: {power_profile.model}"
-                    )
                 mode = power_profile.supported_modes[0]
         except (ModelNotSupported) as err:
             if not is_fully_configured(sensor_config):
