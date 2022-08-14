@@ -6,16 +6,15 @@ from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
-
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
+    CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_SENSOR_TYPE,
-    CONF_LINEAR,
     DOMAIN,
     SensorType,
 )
@@ -23,8 +22,8 @@ from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
 from custom_components.test.light import MockLight
 
-from .common import create_source_entity
 from ..common import create_mock_light_entity
+from .common import create_source_entity
 
 
 async def test_light_max_power_only(hass: HomeAssistant):
@@ -175,14 +174,7 @@ async def test_config_entry_with_calibrate_list(hass: HomeAssistant):
         data={
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_ENTITY_ID: "light.test",
-            CONF_LINEAR: {
-                CONF_CALIBRATE: {
-                    "1": 0.4,
-                    "25": 1.2,
-                    "100": 3,
-                    "255": 5.3
-                }
-            },
+            CONF_LINEAR: {CONF_CALIBRATE: {"1": 0.4, "25": 1.2, "100": 3, "255": 5.3}},
         },
     )
     config_entry.add_to_hass(hass)

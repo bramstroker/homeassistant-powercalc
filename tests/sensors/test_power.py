@@ -123,6 +123,7 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
 
     assert hass.states.get("sensor.henkie_power").state == "30.00"
 
+
 async def test_standby_power(hass: HomeAssistant):
     await create_input_boolean(hass)
 
@@ -133,7 +134,7 @@ async def test_standby_power(hass: HomeAssistant):
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_STANDBY_POWER: 0.5,
             CONF_FIXED: {CONF_POWER: 15},
-        }
+        },
     )
 
     hass.states.async_set("input_boolean.test", STATE_OFF)
