@@ -58,7 +58,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_ent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
-from .common import SourceEntity, create_source_entity, validate_name_pattern
+from .sensors.abstract import BaseEntity
+
+from .common import SourceEntity, create_source_entity, validate_name_pattern, validate_is_number
 from .const import (
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
@@ -111,6 +113,7 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
+    SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
@@ -283,12 +286,7 @@ async def _async_setup_entities(
 ):
     """Main routine to setup power/energy sensors from provided configuration"""
 
-    platform = entity_platform.async_get_current_platform()
-    platform.async_register_entity_service(
-        SERVICE_RESET_ENERGY,
-        {},
-        "async_reset_energy",
-    )
+    register_entity_services()
 
     try:
         entities = await create_sensors(hass, config, discovery_info)
@@ -300,6 +298,22 @@ async def _async_setup_entities(
         async_add_entities(
             [entity for entity in entities.new if isinstance(entity, SensorEntity)]
         )
+
+@callback
+def register_entity_services():
+    """Register the different entity services"""
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        SERVICE_RESET_ENERGY,
+        {},
+        "async_reset_energy",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE_UTILITY_METER,
+        {vol.Required(CONF_VALUE): validate_is_number},
+        "async_calibrate",
+    )
 
 
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
