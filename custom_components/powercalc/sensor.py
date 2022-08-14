@@ -43,7 +43,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    EVENT_HOMEASSISTANT_STARTED,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
@@ -80,7 +79,6 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
-    CONF_GROUP_MEMBER_SENSORS,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
