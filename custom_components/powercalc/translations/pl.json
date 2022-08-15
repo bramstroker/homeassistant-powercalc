@@ -9,7 +9,10 @@
             "fixed_states_power_only": "Ta encja może działać tylko ze 'states_power', a nie z 'power'",
             "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
             "linear_mandatory": "Musisz dostarczyć co najmniej jedno z: Maksymalna moc lub Kalibracja",
-            "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc"
+            "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc",
+            "lut_unsupported_color_mode": "Profil LUT nie obsługuje jednego z trybów kolorów Twojego światła. Zobacz logi, aby uzyskać więcej informacji",
+            "lut_wrong_domain": "Tylko encje świateł mogą korzystać z trybu LUT",
+            "unknown": "Wystąpił nieznany błąd, sprawdź logi, aby uzyskać dodatkowe informacje"
         },
         "step": {
             "daily_energy": {
@@ -50,6 +53,7 @@
                     "group_power_entities": "Członek encji mocy",
                     "name": "Nazwa",
                     "sub_groups": "Podgrupy",
+                    "hide_members": "Ukryj członków",
                     "unique_id": "Unikatowy identyfikator"
                 },
                 "data_description": {
@@ -95,6 +99,13 @@
                 "description": "Wybierz model urządzenia",
                 "title": "Konfiguracja LUT"
             },
+            "lut_subprofile": {
+                "data": {
+                    "sub_profile": "Sub profile"
+                },
+                "description": "This model has multiple sub profiles. Select one that suites your device",
+                "title": "LUT config"
+            },
             "user": {
                 "data": {
                     "sensor_type": "Typ sensora"
@@ -137,7 +148,8 @@
             "fixed_states_power_only": "Ta encja może działać tylko ze 'states_power', a nie z 'power'",
             "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
             "linear_mandatory": "Musisz dostarczyć co najmniej jedno z: Maksymalna moc lub Kalibracja",
-            "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc"
+            "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc",
+            "unknown": "Wystąpił nieznany błąd, sprawdź logi, aby uzyskać dodatkowe informacje"
         },
         "step": {
             "init": {
@@ -158,6 +170,7 @@
                     "standby_power": "Moc w trybie czuwania",
                     "states_power": "Moce stanów",
                     "sub_groups": "Podgrupy",
+                    "hide_members": "Ukryj członków",
                     "unit_of_measurement": "Jednostka pomiaru",
                     "update_frequency": "Częstotliwość aktualizacji",
                     "value": "Wartość",
