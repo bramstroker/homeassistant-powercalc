@@ -53,7 +53,7 @@
                     "group_power_entities": "Członek encji mocy",
                     "name": "Nazwa",
                     "sub_groups": "Podgrupy",
-            "hide_members": "Ukryj członków",
+                    "hide_members": "Ukryj członków",
                     "unique_id": "Unikatowy identyfikator"
                 },
                 "data_description": {
