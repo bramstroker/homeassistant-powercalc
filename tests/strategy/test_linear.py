@@ -1,23 +1,28 @@
 import logging
-from turtle import st
 
 import pytest
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.const import CONF_ATTRIBUTE, STATE_ON
+from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_CALIBRATE,
+    CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_SENSOR_TYPE,
+    DOMAIN,
+    SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
+from custom_components.test.light import MockLight
 
+from ..common import create_mock_light_entity
 from .common import create_source_entity
 
 
@@ -158,3 +163,27 @@ async def _create_strategy_instance(
     await strategy.validate_config()
 
     return strategy
+
+
+async def test_config_entry_with_calibrate_list(hass: HomeAssistant):
+    light_entity = MockLight("test")
+    await create_mock_light_entity(hass, light_entity)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_LINEAR: {CONF_CALIBRATE: {"1": 0.4, "25": 1.2, "100": 3, "255": 5.3}},
+        },
+    )
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 25})
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "1.20"

@@ -35,17 +35,21 @@ from ..const import (
     ATTR_IS_GROUP,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DOMAIN,
     SERVICE_RESET_ENERGY,
+    SensorType,
     UnitPrefix,
 )
 from .abstract import (
+    BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
     generate_power_sensor_entity_id,
@@ -143,6 +147,36 @@ async def create_group_sensors_from_config_entry(
     return group_sensors
 
 
+async def update_associated_group_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry, remove: bool
+) -> ConfigEntry | None:
+    """
+    Update the group config entry when the virtual power config entry is associated to a group
+    Adds the sensor to the group on creation of the config entry
+    Removes the sensor from the group on removal of the config entry
+    """
+    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type != SensorType.VIRTUAL_POWER:
+        return None
+    if CONF_GROUP not in config_entry.data:
+        return None
+
+    group_entry_id = config_entry.data.get(CONF_GROUP)
+    group_entry = hass.config_entries.async_get_entry(group_entry_id)
+    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+
+    if remove and config_entry.entry_id in member_sensors:
+        member_sensors.remove(config_entry.entry_id)
+    elif config_entry.entry_id not in member_sensors:
+        member_sensors.append(config_entry.entry_id)
+
+    hass.config_entries.async_update_entry(
+        group_entry,
+        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
+    )
+    return group_entry
+
+
 @callback
 def resolve_entity_ids_recursively(
     hass: HomeAssistant,
@@ -159,7 +193,7 @@ def resolve_entity_ids_recursively(
 
     # Include the power/energy sensors for an existing Virtual Power config entry
     entity_reg = er.async_get(hass)
-    member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS)
+    member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
     # Unfortunately device_class is not correctly set at this time in the entity_registry
     # So we need to match on state_class.
     state_class = (
@@ -250,7 +284,7 @@ def create_grouped_energy_sensor(
     )
 
 
-class GroupedSensor(RestoreEntity, SensorEntity):
+class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     """Base class for grouped sensors"""
 
     _attr_should_poll = False

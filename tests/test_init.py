@@ -13,6 +13,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
+    CONF_MANUFACTURER,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
@@ -69,6 +70,21 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.testa_power")
+
+
+async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssistant):
+    light_entity = MockLight("testing")
+    light_entity.manufacturer = "signify"
+    light_entity.model = "LCA001"
+    await create_mock_light_entity(hass, light_entity)
+
+    await run_powercalc_setup_yaml_config(
+        hass, {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}}, {}
+    )
+
+    state = hass.states.get("sensor.testing_power")
+    assert state
+    assert state.state == "25.00"
 
 
 async def test_domain_groups(hass: HomeAssistant):

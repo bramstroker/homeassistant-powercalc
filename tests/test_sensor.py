@@ -12,6 +12,7 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
@@ -23,6 +24,7 @@ from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -30,6 +32,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_SOURCE_ENTITY,
     CONF_AREA,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
@@ -44,9 +47,11 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     CalculationStrategy,
+    SensorType,
 )
 from custom_components.test.light import MockLight
 
@@ -430,3 +435,89 @@ async def test_user_can_rename_entity_id(
     assert energy_state
     assert energy_state.attributes.get("source") == "sensor.my_renamed_power"
     assert not hass.states.get("sensor.test_energy")
+
+
+async def test_entities_are_bound_to_source_device(
+    hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry
+):
+    """
+    Test that all powercalc created sensors are attached to same device as the source entity
+    """
+
+    # Create a device
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    device_entry = device_reg.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        connections={("dummy", "abcdef")},
+        manufacturer="Google Inc.",
+        model="Google Home Mini",
+    )
+
+    # Create a source entity which is bound to the device
+    unique_id = "34445329342797234"
+    entity_reg.async_get_or_create(
+        "switch",
+        "switch",
+        unique_id,
+        suggested_object_id="google_home",
+        device_id=device_entry.id,
+    )
+    await hass.async_block_till_done()
+
+    # Create powercalc sensors
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "switch.google_home",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    # Assert that all the entities are bound to correct device
+    power_entity_entry = entity_reg.async_get("sensor.google_home_power")
+    assert power_entity_entry
+    assert power_entity_entry.device_id == device_entry.id
+
+    energy_entity_entry = entity_reg.async_get("sensor.google_home_energy")
+    assert energy_entity_entry
+    assert energy_entity_entry.device_id == device_entry.id
+
+    utility_entity_entry = entity_reg.async_get("sensor.google_home_energy_daily")
+    assert utility_entity_entry
+    assert utility_entity_entry.device_id == device_entry.id
+
+
+async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2", "test3"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1"),
+                get_simple_fixed_config("input_boolean.test2"),
+                # Omitting the entity_id should log an error, but still successfully create the other entities
+                {
+                    CONF_NAME: "test3",
+                    CONF_FIXED: {
+                        CONF_POWER: 20
+                    }
+                }
+            ]
+        },
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test1_power")
+    assert hass.states.get("sensor.test2_power")
+    assert not hass.states.get("sensor.test3_power")

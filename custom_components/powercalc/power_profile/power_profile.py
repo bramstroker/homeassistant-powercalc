@@ -96,7 +96,7 @@ class PowerProfile:
 
     @property
     def supported_modes(self) -> list:
-        return self._json_data.get("supported_modes") or []
+        return self._json_data.get("supported_modes") or [CalculationStrategy.LUT]
 
     @property
     def linked_lut(self) -> Optional[str]:

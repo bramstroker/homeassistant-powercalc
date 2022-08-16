@@ -64,7 +64,11 @@ from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedM
 from ..power_profile.model_discovery import get_power_profile
 from ..strategy.factory import PowerCalculatorStrategyFactory
 from ..strategy.strategy_interface import PowerCalculationStrategyInterface
-from .abstract import generate_power_sensor_entity_id, generate_power_sensor_name
+from .abstract import (
+    BaseEntity,
+    generate_power_sensor_entity_id,
+    generate_power_sensor_name,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -120,10 +124,6 @@ async def create_virtual_power_sensor(
                     hass, sensor_config, source_entity.entity_entry
                 )
             if mode is None and power_profile:
-                if not power_profile.supported_modes:
-                    raise UnsupportedMode(
-                        f"Power profile has no supported_modes in model.json. manufacturer: {power_profile.manufacturer}, model: {power_profile.model}"
-                    )
                 mode = power_profile.supported_modes[0]
         except (ModelNotSupported) as err:
             if not is_fully_configured(sensor_config):
@@ -259,7 +259,7 @@ class PowerSensor:
     pass
 
 
-class VirtualPowerSensor(SensorEntity, PowerSensor):
+class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
     """Virtual power sensor"""
 
     _attr_device_class = SensorDeviceClass.POWER
@@ -316,6 +316,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_added_to_hass(self):
         """Register callbacks."""
+        await super().async_added_to_hass()
 
         async def appliance_state_listener(event):
             """Handle for state changes for dependent sensors."""

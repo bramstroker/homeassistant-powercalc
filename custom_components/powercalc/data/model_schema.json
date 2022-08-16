@@ -6,7 +6,8 @@
     "name",
     "standby_power",
     "measure_method",
-    "measure_device"
+    "measure_device",
+    "supported_modes"
   ],
   "properties": {
     "name": {

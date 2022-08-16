@@ -5,6 +5,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
+    STATE_OFF,
     STATE_ON,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
@@ -19,6 +20,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_STANDBY_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -120,3 +122,29 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.henkie_power").state == "30.00"
+
+
+async def test_standby_power(hass: HomeAssistant):
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_STANDBY_POWER: 0.5,
+            CONF_FIXED: {CONF_POWER: 15},
+        },
+    )
+
+    hass.states.async_set("input_boolean.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "0.50"
+
+    hass.states.async_set("input_boolean.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "15.00"

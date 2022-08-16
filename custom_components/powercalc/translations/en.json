@@ -86,7 +86,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
                 },
-                "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
+                "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light.",
                 "title": "LUT config"
             },
             "lut_manufacturer": {
@@ -100,7 +100,7 @@
                 "data": {
                     "model": "Model ID"
                 },
-                "description": "Select the device model",
+                "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
                 "title": "LUT config"
             },
             "lut_subprofile": {
@@ -121,6 +121,7 @@
                     "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
                     "entity_id": "Source entity",
+                    "group": "Add to group",
                     "mode": "Calculation strategy",
                     "name": "Name",
                     "standby_power": "Standby power",

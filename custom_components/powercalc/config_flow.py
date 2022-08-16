@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import logging
+from audioop import mul
 from typing import Any
 
 import voluptuous as vol
@@ -21,7 +22,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.data_entry_flow import FlowHandler, FlowResult
 from homeassistant.helpers import selector
 
 from .common import SourceEntity, create_source_entity
@@ -32,6 +33,7 @@ from .const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_FIXED,
     CONF_GAMMA_CURVE,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -116,7 +118,7 @@ SCHEMA_POWER_OPTIONS = vol.Schema(
     }
 )
 
-SCHEMA_POWER = vol.Schema(
+SCHEMA_POWER_BASE = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
         vol.Optional(CONF_NAME): selector.TextSelector(),
@@ -135,7 +137,7 @@ SCHEMA_POWER = vol.Schema(
             )
         ),
     }
-).extend(SCHEMA_POWER_OPTIONS.schema)
+)
 
 SCHEMA_POWER_FIXED = vol.Schema(
     {
@@ -225,7 +227,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="virtual_power",
-            data_schema=SCHEMA_POWER,
+            data_schema=_create_virtual_power_schema(self.hass),
             errors={},
         )
 
@@ -386,6 +388,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=_create_lut_schema_model(
                 self.hass, self.sensor_config.get(CONF_MANUFACTURER)
             ),
+            description_placeholders={
+                "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
+            },
             errors=errors,
         )
 
@@ -522,10 +527,9 @@ class OptionsFlowHandler(OptionsFlow):
 
         strategy_options = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            base_power_schema = SCHEMA_POWER_OPTIONS
             strategy: str = self.current_config.get(CONF_MODE)
             strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
-            data_schema = base_power_schema.extend(strategy_schema.schema)
+            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema)
             strategy_options = self.current_config.get(strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
@@ -566,22 +570,15 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return vol.Schema({})
 
 
+def _create_virtual_power_schema(hass: HomeAssistant) -> vol.Schema:
+    base_schema: vol.Schema = SCHEMA_POWER_BASE.extend(
+        {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
+    )
+    return base_schema.extend(SCHEMA_POWER_OPTIONS.schema)
+
+
 def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
     """Create config schema for groups"""
-    sub_groups = [
-        selector.SelectOptionDict(
-            value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
-        )
-        for config_entry in hass.config_entries.async_entries(DOMAIN)
-        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-    ]
-
-    sub_group_selector = selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=sub_groups, multiple=True, mode=selector.SelectSelectorMode.DROPDOWN
-        )
-    )
-
     member_sensors = [
         selector.SelectOptionDict(
             value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
@@ -615,12 +612,32 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
                     multiple=True,
                 )
             ),
-            vol.Optional(CONF_SUB_GROUPS): sub_group_selector,
+            vol.Optional(CONF_SUB_GROUPS): _create_group_selector(hass, multiple=True),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS, default=False
             ): selector.BooleanSelector(),
             vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
         }
+    )
+
+
+def _create_group_selector(
+    hass: HomeAssistant, multiple: bool = False
+) -> selector.SelectSelector:
+    options = [
+        selector.SelectOptionDict(
+            value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
+        )
+        for config_entry in hass.config_entries.async_entries(DOMAIN)
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+    ]
+
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=options,
+            multiple=multiple,
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
     )
 
 
