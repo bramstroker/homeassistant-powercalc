@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Kasa, KP115(US)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.24.8:docker"
+    },
+    "name": "Gledopto 4W MR16 Dual White and Color 120°",
+    "standby_power": 1.09,
+    "supported_modes": [
+        "lut"
+    ]
+}
