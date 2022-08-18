@@ -4,6 +4,7 @@
   "measure_method": "manual",
   "name": "Raspberry Pi 4B",
   "standby_power": "2.7",
+  "device_type": "computer",                                                                                                                                                                                                                   "requires_additional_configuration": true, 
   "supported_modes": [
     "linear"
   ],
