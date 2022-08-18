@@ -1,0 +1,13 @@
+{
+	"measure_description": "Manually measured. Set to 0.3 as a minimum as 0 is impossible. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+	"measure_method": "manual",
+	"measure_device": "Fibaro FGW102",
+	"name": "Everspring AN158",
+	"standby_power": 0.3,
+	"standby_power_on": 0.5,
+	"requires_additional_configuration": true,
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	]
+}
