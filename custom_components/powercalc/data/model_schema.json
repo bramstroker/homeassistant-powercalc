@@ -59,7 +59,7 @@
     },
     "device_type": {
       "type": "string",
-      "enum": ["light", "smart_switch"],
+      "enum": ["light", "smart_switch", "computer"],
       "description": "Type of device"
     },
     "calculation_enabled_condition": {
