@@ -1,0 +1,13 @@
+{
+	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+	"measure_method": "manual",
+	"measure_device": "manual power meter, unspecified model",
+	"name": "Osram Lightify Plug 01",
+	"standby_power": 0.44,
+	"standby_power_on": 1.04,
+	"requires_additional_configuration": true,
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	]
+}
