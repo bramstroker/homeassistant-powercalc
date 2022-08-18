@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "model.json described a light model ",
+  "description": "model.json describes a number of devices, typically lights, for use within the HomeAssistant Powercalc extension.",
   "type": "object",
   "required": [
     "name",
@@ -17,12 +17,12 @@
     "standby_power": {
       "type": "number",
       "minimum": 0.05,
-      "description": "Power draw when the light is turned off. When you are not able to measure set to 0.4"
+      "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
     },
     "standby_power_on": {
       "type": "number",
       "minimum": 0.05,
-      "description": "Power draw when the light is turned on."
+      "description": "Power draw when the device is turned on."
     },
     "supported_modes": {
       "type": "array",
@@ -36,7 +36,7 @@
     "measure_method": {
       "type": "string",
       "enum": ["manual", "script"],
-      "description": "How the light was measured"
+      "description": "How the device was measured"
     },
     "measure_device": {
       "type": "string",
@@ -44,7 +44,7 @@
     },
     "measure_description": {
       "type": "string",
-      "description": "Add more information about how you measured the light or any remarks"
+      "description": "Add more information about how you measured the device or any remarks"
     },
     "measure_settings": {
       "type": "object",
