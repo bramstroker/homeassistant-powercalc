@@ -1,0 +1,13 @@
+{
+	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+	"measure_method": "manual",
+	"measure_device": "manual power meter, unspecificd model",
+	"name": "Hue smart plug LOM002",
+	"standby_power": 0.23,
+	"standby_power_on": 0.91,
+	"requires_additional_configuration": true,
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	]
+}
