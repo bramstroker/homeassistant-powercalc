@@ -157,7 +157,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
             integration_method=integration_method,
             unique_id=unique_id,
         )
-        
+
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id

@@ -505,12 +505,7 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
                 get_simple_fixed_config("input_boolean.test1"),
                 get_simple_fixed_config("input_boolean.test2"),
                 # Omitting the entity_id should log an error, but still successfully create the other entities
-                {
-                    CONF_NAME: "test3",
-                    CONF_FIXED: {
-                        CONF_POWER: 20
-                    }
-                }
+                {CONF_NAME: "test3", CONF_FIXED: {CONF_POWER: 20}},
             ]
         },
     )
