@@ -11,7 +11,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 
-MIN_HA_VERSION = "2022.2"
+MIN_HA_VERSION = "2022.5"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"

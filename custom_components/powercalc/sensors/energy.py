@@ -5,12 +5,10 @@ from typing import Any, Optional
 
 import homeassistant.helpers.entity_registry as er
 import homeassistant.util.dt as dt_util
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 
@@ -95,7 +93,6 @@ async def create_energy_sensor(
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
         unit_prefix=unit_prefix,
-        unit_of_measurement=None,
         unit_time=TIME_HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
         or DEFAULT_ENERGY_INTEGRATION_METHOD,
@@ -129,7 +126,7 @@ def find_related_real_energy_sensor(
 
 
 class EnergySensor:
-    """Class which all power sensors should extend from"""
+    """Class which all energy sensors should extend from"""
 
     pass
 
@@ -147,45 +144,20 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
         round_digits,
         unit_prefix,
         unit_time,
-        unit_of_measurement,
         integration_method,
         powercalc_source_entity: str,
         powercalc_source_domain: str,
     ):
-        if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.5.0.dev0"):
-            super().__init__(
-                source_entity=source_entity,
-                name=name,
-                round_digits=round_digits,
-                unit_prefix=unit_prefix,
-                unit_time=unit_time,
-                integration_method=integration_method,
-                unique_id=unique_id,
-            )
-        elif AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.4.0.dev0"):
-            super().__init__(
-                source_entity=source_entity,
-                name=name,
-                round_digits=round_digits,
-                unit_prefix=unit_prefix,
-                unit_time=unit_time,
-                unit_of_measurement=unit_of_measurement,
-                integration_method=integration_method,
-                unique_id=unique_id,
-            )
-        else:
-            super().__init__(
-                source_entity=source_entity,
-                name=name,
-                round_digits=round_digits,
-                unit_prefix=unit_prefix,
-                unit_time=unit_time,
-                unit_of_measurement=unit_of_measurement,
-                integration_method=integration_method,
-            )
-            if unique_id:
-                self._attr_unique_id = unique_id
-
+        super().__init__(
+            source_entity=source_entity,
+            name=name,
+            round_digits=round_digits,
+            unit_prefix=unit_prefix,
+            unit_time=unit_time,
+            integration_method=integration_method,
+            unique_id=unique_id,
+        )
+        
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
         self.entity_id = entity_id
