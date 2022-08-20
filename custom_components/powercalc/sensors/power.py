@@ -5,7 +5,6 @@ from decimal import Decimal, DecimalException
 from typing import Optional, cast
 
 import homeassistant.helpers.entity_registry as er
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -144,7 +143,7 @@ async def create_virtual_power_sensor(
             sensor_config, mode, power_profile, source_entity
         )
         await calculation_strategy.validate_config()
-    except (UnsupportedMode) as err:
+    except UnsupportedMode as err:
         _LOGGER.error("Skipping sensor setup %s: %s", source_entity.entity_id, err)
         raise err
     except StrategyConfigurationError as err:

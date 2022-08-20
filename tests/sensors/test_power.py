@@ -1,3 +1,6 @@
+import pytest
+import logging
+
 from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -25,6 +28,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
+from custom_components.powercalc.errors import UnsupportedMode
 
 from ..common import (
     create_input_boolean,
@@ -131,7 +135,6 @@ async def test_standby_power(hass: HomeAssistant):
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
-            CONF_MODE: CalculationStrategy.FIXED,
             CONF_STANDBY_POWER: 0.5,
             CONF_FIXED: {CONF_POWER: 15},
         },
@@ -148,3 +151,17 @@ async def test_standby_power(hass: HomeAssistant):
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "15.00"
+
+
+async def test_error_when_no_strategy_has_been_configured(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test"
+        },
+    )
+
+    assert "Skipping sensor setup" in caplog.text
