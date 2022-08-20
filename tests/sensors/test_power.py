@@ -20,6 +20,8 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_FIXED,
     CONF_MODE,
+    CONF_MULTIPLY_FACTOR,
+    CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
@@ -145,6 +147,32 @@ async def test_standby_power(hass: HomeAssistant):
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "0.50"
+
+    hass.states.async_set("input_boolean.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "15.00"
+
+
+async def test_multiply_factor(hass: HomeAssistant):
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_STANDBY_POWER: 0.2,
+            CONF_MULTIPLY_FACTOR_STANDBY: True,
+            CONF_MULTIPLY_FACTOR: 3,
+            CONF_FIXED: {
+                CONF_POWER: 5
+            }
+        },
+    )
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state.state == "0.60"
 
     hass.states.async_set("input_boolean.test", STATE_ON)
     await hass.async_block_till_done()
