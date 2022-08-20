@@ -9,5 +9,8 @@
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
-	]
+	],
+	"fixed_config": {
+		"watt": 0.85
+	}
 }
