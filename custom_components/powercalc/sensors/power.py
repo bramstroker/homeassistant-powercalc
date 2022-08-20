@@ -131,7 +131,9 @@ async def create_virtual_power_sensor(
         strategy = select_calculation_strategy(sensor_config, power_profile)
         if strategy is None:
             error_message = "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme"
-            _LOGGER.error("%s: Skipping sensor setup: %s", source_entity.entity_id, error_message)
+            _LOGGER.error(
+                "%s: Skipping sensor setup: %s", source_entity.entity_id, error_message
+            )
             raise UnsupportedMode(error_message)
 
         calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[
@@ -219,7 +221,9 @@ async def create_real_power_sensor(
     )
 
 
-def select_calculation_strategy(config: dict, power_profile: PowerProfile | None) -> CalculationStrategy:
+def select_calculation_strategy(
+    config: dict, power_profile: PowerProfile | None
+) -> CalculationStrategy:
     """Select the calculation strategy"""
     config_mode = config.get(CONF_MODE)
     if config_mode:

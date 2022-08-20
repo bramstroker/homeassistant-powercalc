@@ -165,9 +165,7 @@ async def test_multiply_factor(hass: HomeAssistant):
             CONF_STANDBY_POWER: 0.2,
             CONF_MULTIPLY_FACTOR_STANDBY: True,
             CONF_MULTIPLY_FACTOR: 3,
-            CONF_FIXED: {
-                CONF_POWER: 5
-            }
+            CONF_FIXED: {CONF_POWER: 5},
         },
     )
 
