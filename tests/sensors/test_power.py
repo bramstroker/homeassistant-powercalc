@@ -1,6 +1,6 @@
-import pytest
 import logging
 
+import pytest
 from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -153,15 +153,15 @@ async def test_standby_power(hass: HomeAssistant):
     assert power_state.state == "15.00"
 
 
-async def test_error_when_no_strategy_has_been_configured(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_error_when_no_strategy_has_been_configured(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
     await run_powercalc_setup_yaml_config(
         hass,
-        {
-            CONF_ENTITY_ID: "input_boolean.test"
-        },
+        {CONF_ENTITY_ID: "input_boolean.test"},
     )
 
     assert "Skipping sensor setup" in caplog.text
