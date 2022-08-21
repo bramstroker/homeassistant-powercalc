@@ -10,12 +10,13 @@ from homeassistant.components.vacuum import (
     STATE_RETURNING,
 )
 from homeassistant.const import (
+    CONF_ATTRIBUTE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
     STATE_OFF,
-    STATE_ON, CONF_ATTRIBUTE,
+    STATE_ON,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
@@ -23,8 +24,11 @@ from pytest_homeassistant_custom_component.common import MockEntity, MockEntityP
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CALIBRATE,
     CONF_CREATE_GROUP,
     CONF_FIXED,
+    CONF_LINEAR,
     CONF_MODE,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
@@ -35,9 +39,6 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
-    CONF_LINEAR,
-    CONF_CALIBRATE,
-    CONF_CALCULATION_ENABLED_CONDITION,
 )
 
 from ..common import (
@@ -226,10 +227,10 @@ async def test_strategy_enabled_condition(hass: HomeAssistant):
                     "79 -> 20",
                     "80 -> 15",
                     "99 -> 8",
-                    "100 -> 1.5"
-                ]
-            }
-        }
+                    "100 -> 1.5",
+                ],
+            },
+        },
     )
 
     assert hass.states.get(power_entity_id)
@@ -263,4 +264,3 @@ async def test_strategy_enabled_condition(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "1.50"
-
