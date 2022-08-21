@@ -424,7 +424,11 @@ async def create_sensors(
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
-    if CONF_ENTITY_ID in config or discovery_info is not None or CONF_DAILY_FIXED_ENERGY in config:
+    if (
+        CONF_ENTITY_ID in config
+        or discovery_info is not None
+        or CONF_DAILY_FIXED_ENERGY in config
+    ):
         if discovery_info:
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
@@ -540,7 +544,9 @@ async def create_individual_sensors(
 
     energy_sensor = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
+        energy_sensor = await create_daily_fixed_energy_sensor(
+            hass, sensor_config, source_entity
+        )
         entities_to_add.append(energy_sensor)
         power_sensor = await create_daily_fixed_energy_power_sensor(
             hass, sensor_config, source_entity
