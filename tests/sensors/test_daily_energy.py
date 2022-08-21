@@ -6,6 +6,7 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIT_OF_MEASUREMENT,
@@ -45,6 +46,7 @@ from custom_components.powercalc.sensors.daily_energy import (
 from ..common import (
     assert_entity_state,
     create_input_number,
+    create_input_boolean,
     run_powercalc_setup_yaml_config,
 )
 
@@ -382,6 +384,21 @@ async def test_small_update_frequency_updates_correctly(hass: HomeAssistant):
 
     await _trigger_periodic_update(hass, 50)
     assert_entity_state(hass, "sensor.router_energy", "0.0100")
+
+
+async def test_name_and_entity_id_can_be_inherited_from_source_entity(hass: HomeAssistant):
+    await create_input_boolean(hass, "test")
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 0.24,
+            },
+        },
+    )
+    state = hass.states.get("sensor.test_energy")
+    assert state
 
 
 async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1):

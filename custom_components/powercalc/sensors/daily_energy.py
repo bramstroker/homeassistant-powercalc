@@ -71,14 +71,14 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_daily_fixed_energy_sensor(
-    hass: HomeAssistant, sensor_config: ConfigType
+    hass: HomeAssistant, sensor_config: ConfigType, source_entity: SourceEntity | None = None
 ) -> DailyEnergySensor:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
-    name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
+    name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME), source_entity)
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, unique_id=unique_id
+        hass, sensor_config, unique_id=unique_id, source_entity=source_entity
     )
     if not unique_id:
         old_entity_id = async_generate_entity_id(
