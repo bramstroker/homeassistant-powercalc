@@ -52,7 +52,7 @@ async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRe
             "ikea",
             "TRADFRI bulb E14 W op#slash#ch 400lm",
         ),
-        ("MLI", "45317", "Müller Licht", "45317"),
+        ("MLI", 45317, "Müller Licht", "45317"),
     ],
 )
 async def test_autodiscover_model_from_entity_entry(
