@@ -89,7 +89,7 @@ async def autodiscover_model(
 
     # Make sure we don't have a literal / in model_id, so we don't get issues with sublut directory matching down the road
     # See github #658
-    model_id = model_id.replace("/", "#slash#")
+    model_id = str(model_id).replace("/", "#slash#")
 
     model_info = ModelInfo(manufacturer, model_id)
 
