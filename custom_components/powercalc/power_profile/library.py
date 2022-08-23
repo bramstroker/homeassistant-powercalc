@@ -114,7 +114,7 @@ class ProfileLibrary:
             if not os.path.exists(manufacturer_dir):
                 continue
             for model in os.listdir(manufacturer_dir):
-                if model.startswith("."):
+                if model.startswith(".") or not model:
                     continue
 
                 power_profile = await self._create_power_profile(
