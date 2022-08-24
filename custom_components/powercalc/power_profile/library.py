@@ -113,10 +113,7 @@ class ProfileLibrary:
             manufacturer_dir = os.path.join(data_dir, manufacturer)
             if not os.path.exists(manufacturer_dir):
                 continue
-            for model in os.listdir(manufacturer_dir):
-                if model.startswith(".") or not model:
-                    continue
-
+            for model in next(os.walk(manufacturer_dir))[1]:
                 power_profile = await self._create_power_profile(
                     ModelInfo(manufacturer, model),
                     os.path.join(manufacturer_dir, model),
