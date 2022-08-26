@@ -203,6 +203,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
+
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
@@ -231,14 +232,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
             return True
-
-        entity_registry = er.async_get(hass)
-        entries = er.async_entries_for_config_entry(
-            entity_registry, config_entry.entry_id
-        )
-        for entry in entries:
-            entity_registry.async_remove(entry.entity_id)
-            _LOGGER.debug(f"Removing {entry.entity_id}")
 
     return unload_ok
 
