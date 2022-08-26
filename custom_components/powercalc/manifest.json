@@ -9,7 +9,8 @@
     "group",
     "template",
     "select",
-    "hue"
+    "hue",
+    "utility_meter"
   ],
   "after_dependencies": [
     "integration",
