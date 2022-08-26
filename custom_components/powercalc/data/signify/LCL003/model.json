@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, Plug @\u007fS",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.25.2:docker"
+    },
+    "name": "LCL003",
+    "standby_power": 0,
+    "supported_modes": [
+        "lut"
+    ]
+}
