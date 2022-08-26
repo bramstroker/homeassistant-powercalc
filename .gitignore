@@ -2,6 +2,9 @@
 .vscode
 __pycache__
 
+.coverage
+cov.xml
+
 # Auto generated on macOS
 .DS_Store
 
