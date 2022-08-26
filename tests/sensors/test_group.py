@@ -34,6 +34,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
@@ -572,3 +573,24 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     assert group_state.attributes.get("entities") == {
         "sensor.virtualsensor1_power",
     }
+
+
+async def test_custom_naming_pattern(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+            CONF_ENERGY_SENSOR_NAMING: "{} - Energie"
+        },
+    )
+    energy_state = hass.states.get("sensor.testgroup_energie")
+    assert energy_state
+    assert energy_state.name == "TestGroup - Energie"
+    assert energy_state.attributes["friendly_name"] == "TestGroup - Energie"
