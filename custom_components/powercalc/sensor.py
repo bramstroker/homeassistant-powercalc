@@ -276,6 +276,9 @@ async def async_setup_entry(
     # Add entry to an existing group
     updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
 
+    if CONF_UNIQUE_ID not in sensor_config:
+        sensor_config[CONF_UNIQUE_ID] = entry.unique_id
+
     await _async_setup_entities(hass, sensor_config, async_add_entities)
     if updated_group_entry:
         await hass.config_entries.async_reload(updated_group_entry.entry_id)
