@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-import os
 import logging
+import os
 from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
@@ -14,6 +14,7 @@ from .power_profile import PowerProfile
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class ProfileLibrary:
     def __init__(self, hass: HomeAssistant):

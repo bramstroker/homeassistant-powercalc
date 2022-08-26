@@ -587,7 +587,7 @@ async def test_custom_naming_pattern(hass: HomeAssistant):
                 get_simple_fixed_config("input_boolean.test1", 50),
                 get_simple_fixed_config("input_boolean.test2", 50),
             ],
-            CONF_ENERGY_SENSOR_NAMING: "{} - Energie"
+            CONF_ENERGY_SENSOR_NAMING: "{} - Energie",
         },
     )
     energy_state = hass.states.get("sensor.testgroup_energie")
