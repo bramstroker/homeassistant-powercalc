@@ -7,7 +7,7 @@
         "SLEEP_TIME": 3,
         "VERSION": "v0.25.2:docker"
     },
-    "name": "LCL003",
+    "name": "Hue Lily Outdoor Lightstrip",
     "standby_power": 0,
     "supported_modes": [
         "lut"
