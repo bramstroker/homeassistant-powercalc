@@ -292,7 +292,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         self._calculation_mode = calculation_strategy
         self._source_entity = source_entity
         self._source_domain = source_domain
-        self._name = name
+        self._attr_name = name
         self._power = None
         self._standby_power = standby_power
         self._standby_power_on = standby_power_on
@@ -471,11 +471,6 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
     def source_entity(self) -> str:
         """The source entity this power sensor calculates power for."""
         return self._source_entity
-
-    @property
-    def name(self) -> str:
-        """Return the name of the sensor."""
-        return self._name
 
     @property
     def native_value(self) -> StateType:

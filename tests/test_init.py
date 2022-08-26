@@ -144,9 +144,6 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):
     await hass.async_block_till_done()
     assert entry.state is ConfigEntryState.NOT_LOADED
 
-    assert not hass.states.get("sensor.testentry_power")
-    assert not entity_reg.async_get("sensor.testentry_power")
-
 
 async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant):
     """
