@@ -294,7 +294,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
             CONF_ENTITY_ID: entity_entry.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
             DISCOVERY_POWER_PROFILE: power_profile,
-            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY
+            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
         }
         hass.async_create_task(
             discovery.async_load_platform(
@@ -339,8 +339,8 @@ async def create_domain_groups(
                 {
                     DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
                     CONF_ENTITIES: domain_entities,
-                    CONF_DOMAIN: domain
+                    CONF_DOMAIN: domain,
                 },
-                global_config
+                global_config,
             )
         )

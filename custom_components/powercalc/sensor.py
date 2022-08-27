@@ -118,9 +118,9 @@ from .const import (
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
+    PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
-    PowercalcDiscoveryType,
 )
 from .errors import (
     PowercalcSetupError,
@@ -427,12 +427,19 @@ async def create_sensors(
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
     # Handle setup of domain groups
-    if discovery_info and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
+    if (
+        discovery_info
+        and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP
+    ):
         domain = discovery_info[CONF_DOMAIN]
         sensor_config = global_config.copy()
-        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+        sensor_config[
+            CONF_UNIQUE_ID
+        ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
         return EntitiesBucket(
-            new=await create_group_sensors(f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass)
+            new=await create_group_sensors(
+                f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass
+            )
         )
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
