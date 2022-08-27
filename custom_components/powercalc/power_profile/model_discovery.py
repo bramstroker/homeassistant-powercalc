@@ -33,7 +33,7 @@ async def get_power_profile(
             manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
             model = config.get(CONF_MODEL) or model_info.model
 
-    if manufacturer is None or model is None:
+    if not manufacturer or not model:
         return None
 
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)

@@ -1,8 +1,9 @@
+import logging
+
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 
-from custom_components.powercalc.const import DOMAIN
 from custom_components.powercalc.power_profile.model_discovery import (
     autodiscover_model,
     get_power_profile,
@@ -75,3 +76,18 @@ async def test_autodiscover_model_from_entity_entry(
 
     assert model_info.manufacturer == expected_manufacturer
     assert model_info.model == expected_model
+
+
+async def test_get_power_profile_empty_manufacturer(hass: HomeAssistant, entity_reg: EntityRegistry, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    light_mock = MockLight("test")
+    light_mock.manufacturer = ""
+    light_mock.model = "some model"
+
+    await create_mock_light_entity(hass, light_mock)
+
+    entity_entry = entity_reg.async_get("light.test")
+
+    profile = await get_power_profile(hass, {}, entity_entry)
+    assert not profile
+    assert not caplog.records
