@@ -244,7 +244,7 @@ def create_grouped_power_sensor(
         hass, sensor_config, name=group_name, unique_id=unique_id
     )
 
-    _LOGGER.debug(f"Creating grouped power sensor: %s", name)
+    _LOGGER.debug(f"Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedPowerSensor(
         name=name,
@@ -272,7 +272,7 @@ def create_grouped_energy_sensor(
         hass, sensor_config, name=group_name, unique_id=energy_unique_id
     )
 
-    _LOGGER.debug("Creating grouped energy sensor: %s", name)
+    _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedEnergySensor(
         name=name,
@@ -295,7 +295,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
-        unique_id: str = None,
+        unique_id: str | None = None,
         rounding_digits: int = 2,
     ):
         self._attr_name = name
@@ -394,7 +394,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         entities: list[str],
         entity_id: str,
         sensor_config: dict[str, Any],
-        unique_id: str = None,
+        unique_id: str | None = None,
         rounding_digits: int = 2,
     ):
         super().__init__(

@@ -129,6 +129,7 @@ DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_POWER_PROFILE = "power_profile"
+DISCOVERY_TYPE = "discovery_type"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"
@@ -164,3 +165,8 @@ class SensorType(StrEnum):
     DAILY_ENERGY = "daily_energy"
     VIRTUAL_POWER = "virtual_power"
     GROUP = "group"
+
+
+class PowercalcDiscoveryType(StrEnum):
+    DOMAIN_GROUP = "domain_group"
+    LIBRARY = "library"
