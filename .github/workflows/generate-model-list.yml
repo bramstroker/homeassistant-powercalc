@@ -3,7 +3,7 @@ name: Generate support model list
 on:
   push:
     paths:
-      - 'model.json'
+      - '**/model.json'
     branches:
       - master
 
