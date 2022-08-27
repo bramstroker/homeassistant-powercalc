@@ -87,7 +87,7 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     assert state.state == "25.00"
 
 
-async def test_domain_groups(hass: HomeAssistant):
+async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
     await create_input_boolean(hass)
 
     domain_config = {
@@ -117,6 +117,10 @@ async def test_domain_groups(hass: HomeAssistant):
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
 
     assert not hass.states.get("sensor.all_light_power")
+
+    entity_entry = entity_reg.async_get("sensor.all_input_boolean_power")
+    assert entity_entry
+    assert entity_entry.platform == "powercalc"
 
 
 async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):

@@ -11,7 +11,6 @@ from typing import Any, Final, NamedTuple, Optional, cast
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -44,7 +43,6 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     area_registry,
@@ -111,6 +109,7 @@ from .const import (
     DATA_DOMAIN_ENTITIES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
@@ -121,6 +120,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
     UnitPrefix,
+    PowercalcDiscoveryType,
 )
 from .errors import (
     PowercalcSetupError,
@@ -425,6 +425,15 @@ async def create_sensors(
         )
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+
+    # Handle setup of domain groups
+    if discovery_info and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
+        domain = discovery_info[CONF_DOMAIN]
+        sensor_config = global_config.copy()
+        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+        return EntitiesBucket(
+            new=await create_group_sensors(f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass)
+        )
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
     if (

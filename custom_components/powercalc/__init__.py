@@ -15,10 +15,11 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_DOMAIN,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
-    CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
@@ -61,11 +62,13 @@ from .const import (
     DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
+    PowercalcDiscoveryType,
     UnitPrefix,
 )
 from .errors import ModelNotSupported
@@ -291,6 +294,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
             CONF_ENTITY_ID: entity_entry.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
             DISCOVERY_POWER_PROFILE: power_profile,
+            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY
         }
         hass.async_create_task(
             discovery.async_load_platform(
@@ -319,8 +323,6 @@ async def create_domain_groups(
     hass: HomeAssistant, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
-    sensor_component = hass.data[SENSOR_DOMAIN]
-    sensor_config = global_config.copy()
     _LOGGER.debug(f"Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
@@ -328,11 +330,17 @@ async def create_domain_groups(
             continue
 
         domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
-        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
-        group_name = f"All {domain}"
 
-        entities = await create_group_sensors(
-            group_name, sensor_config, domain_entities, hass
+        hass.async_create_task(
+            discovery.async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {
+                    DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
+                    CONF_ENTITIES: domain_entities,
+                    CONF_DOMAIN: domain
+                },
+                global_config
+            )
         )
-        await sensor_component.async_add_entities(entities)
-    return []
