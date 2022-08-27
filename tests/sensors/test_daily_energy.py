@@ -367,6 +367,30 @@ async def test_restore_state(hass: HomeAssistant):
     assert hass.states.get("sensor.my_daily_energy").state == "0.5000"
 
 
+async def test_restore_state_catches_decimal_conversion_exception(hass: HomeAssistant):
+    mock_restore_cache(
+        hass,
+        [
+            State(
+                "sensor.my_daily_energy",
+                "unknown",
+            ),
+        ],
+    )
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_NAME: "My daily",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 1.5,
+            },
+        },
+    )
+
+    assert hass.states.get("sensor.my_daily_energy").state == "0.0000"
+
+
 async def test_small_update_frequency_updates_correctly(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
