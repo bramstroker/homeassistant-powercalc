@@ -1,0 +1,15 @@
+{
+	"measure_description": "Manually sampled at 10% volume increases, radio, listening to EDM. Max power is from manufacturer specs",
+	"measure_method": "manual",
+	"measure_device": "TP-Link Tapo P110",
+	"name": "Google Home",
+	"standby_power": 2.4,
+	"requires_additional_configuration": true,
+	"device_type": "media_player",
+	"supported_modes": ["linear"],
+	"linear_config": {
+		"calibrate": [
+			"100 -> 3.87"
+		]
+	}
+}
