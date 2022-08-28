@@ -89,7 +89,10 @@
           "type": "number"
         },
 	"calibrate": {
-	  "type": "array"
+	  "type": "array",
+	  "items": {
+	    "type": "string"
+	  }
 	}
       }
     },
@@ -99,7 +102,11 @@
       "properties": {
         "watt": {
           "type": "number"
-        }
+        },
+	"states_power": {
+	  "type": "object",
+	  "description": "A dict of state attributes and the power. See https://github.com/bramstroker/homeassistant-powercalc#power-per-state"
+	}
       }
     }
   }
