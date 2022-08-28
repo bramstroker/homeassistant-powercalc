@@ -2,7 +2,7 @@ import os
 
 import pytest
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_OFF
 
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
@@ -45,7 +45,19 @@ async def test_smart_switch(hass: HomeAssistant, entity_reg: EntityRegistry, dev
         },
     )
 
-    assert hass.states.get("sensor.oven_device_power")
+    power_state = hass.states.get("sensor.oven_device_power")
+    assert power_state
+    assert power_state.state == "unavailable"
+
+    hass.states.async_set("switch.oven", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.oven_device_power").state == "0.82"
+
+    hass.states.async_set("switch.oven", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.oven_device_power").state == "0.52"
 
 
 def get_test_profile_dir(sub_dir: str) -> str:
