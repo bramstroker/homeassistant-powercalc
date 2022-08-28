@@ -2,9 +2,10 @@ from homeassistant.components import input_boolean, light
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry, RegistryEntryDisabler
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry, mock_device_registry
 
 from custom_components.powercalc import create_domain_groups
 from custom_components.powercalc.const import (
@@ -85,6 +86,63 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     state = hass.states.get("sensor.testing_power")
     assert state
     assert state.state == "25.00"
+
+
+async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant):
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="some-device-id",
+                disabled_by=RegistryEntryDisabler.HASS
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "light.test": DeviceEntry(
+                id="some-device-id",
+                manufacturer="signify",
+                model="LCT010"
+            )
+        }
+    )
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.test_power")
+
+
+async def test_autodiscover_skips_entities_with_empty_manufacturer(hass: HomeAssistant):
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="some-device-id"
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "light.test": DeviceEntry(
+                id="some-device-id",
+                manufacturer="",
+                model="LCT010"
+            )
+        }
+    )
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.test_power")
 
 
 async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):

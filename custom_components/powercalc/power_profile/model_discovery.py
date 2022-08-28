@@ -10,6 +10,7 @@ from typing import Optional
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.typing import ConfigType
 
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
@@ -54,10 +55,14 @@ async def get_power_profile(
 
 
 async def is_autoconfigurable(
-    hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: dict = {}
+    hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: ConfigType = None
 ) -> bool:
+    if sensor_config is None:
+        sensor_config = {}
     try:
         power_profile = await get_power_profile(hass, sensor_config, entry)
+        if not power_profile:
+            return False
         return bool(
             power_profile and not power_profile.is_additional_configuration_required
         )
