@@ -61,7 +61,6 @@ async def create_utility_meters(
 
             for tariff in tariffs:
                 utility_meter = await create_utility_meter(
-                    hass,
                     energy_sensor.entity_id,
                     entity_id,
                     name,
@@ -76,7 +75,6 @@ async def create_utility_meters(
 
         else:
             utility_meter = await create_utility_meter(
-                hass,
                 energy_sensor.entity_id,
                 entity_id,
                 name,
@@ -126,7 +124,6 @@ async def create_tariff_select(
 
 
 async def create_utility_meter(
-    hass: HomeAssistant,
     source_entity: str,
     entity_id: str,
     name: str,
