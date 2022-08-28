@@ -5,6 +5,7 @@ import logging
 import os
 from enum import Enum
 from typing import Optional
+from homeassistant.helpers.typing import ConfigType
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
@@ -125,6 +126,10 @@ class PowerProfile:
                 f"Mode fixed is not supported by model: {self._model}"
             )
         return self._json_data.get("fixed_config")
+
+    @property
+    def sensor_config(self) -> ConfigType:
+        return self._json_data.get("sensor_config") or {}
 
     def is_mode_supported(self, mode: str) -> bool:
         return mode in self.supported_modes
