@@ -10,7 +10,7 @@
 	"supported_modes": [
 		"fixed"
 	],
-	"fixed_cnfig": {
+	"fixed_config": {
 		"watt": 0.82
 	}
 }
