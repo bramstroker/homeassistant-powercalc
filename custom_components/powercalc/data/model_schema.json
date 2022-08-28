@@ -60,7 +60,11 @@
     },
     "device_type": {
       "type": "string",
-      "enum": ["light", "smart_switch"],
+      "enum": [
+	      "light", 
+	      "smart_switch",
+	      "media_player"
+      ],
       "description": "Type of device"
     },
     "calculation_enabled_condition": {
@@ -83,7 +87,10 @@
         },
         "max_watt": {
           "type": "number"
-        }
+        },
+	"calibrate": {
+	  "type": "array"
+	}
       }
     },
     "fixed_config": {
