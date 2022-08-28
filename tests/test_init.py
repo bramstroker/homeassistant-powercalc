@@ -2,10 +2,18 @@ from homeassistant.components import input_boolean, light
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry, RegistryEntryDisabler
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import (
+    EntityRegistry,
+    RegistryEntry,
+    RegistryEntryDisabler,
+)
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry, mock_device_registry
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc import create_domain_groups
 from custom_components.powercalc.const import (
@@ -97,7 +105,7 @@ async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant):
                 unique_id="1234",
                 platform="light",
                 device_id="some-device-id",
-                disabled_by=RegistryEntryDisabler.HASS
+                disabled_by=RegistryEntryDisabler.HASS,
             ),
         },
     )
@@ -105,11 +113,9 @@ async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant):
         hass,
         {
             "light.test": DeviceEntry(
-                id="some-device-id",
-                manufacturer="signify",
-                model="LCT010"
+                id="some-device-id", manufacturer="signify", model="LCT010"
             )
-        }
+        },
     )
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
@@ -125,7 +131,7 @@ async def test_autodiscover_skips_entities_with_empty_manufacturer(hass: HomeAss
                 entity_id="light.test",
                 unique_id="1234",
                 platform="light",
-                device_id="some-device-id"
+                device_id="some-device-id",
             ),
         },
     )
@@ -133,11 +139,9 @@ async def test_autodiscover_skips_entities_with_empty_manufacturer(hass: HomeAss
         hass,
         {
             "light.test": DeviceEntry(
-                id="some-device-id",
-                manufacturer="",
-                model="LCT010"
+                id="some-device-id", manufacturer="", model="LCT010"
             )
-        }
+        },
     )
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
