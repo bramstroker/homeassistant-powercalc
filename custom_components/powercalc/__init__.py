@@ -257,23 +257,25 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
         if not await has_manufacturer_and_model_information(hass, entity_entry):
             continue
 
-        has_user_config = is_user_configured(config, entity_entry.entity_id)
-
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
             power_profile = await get_power_profile(
                 hass, {}, source_entity.entity_entry
             )
-            if power_profile.is_additional_configuration_required:
-                if not has_user_config:
-                    _LOGGER.warning(
-                        f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-                    )
-                    continue
+            if not power_profile:
+                continue
         except ModelNotSupported:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping auto configuration",
                 entity_entry.entity_id,
+            )
+            continue
+
+        has_user_config = is_user_configured(config, entity_entry.entity_id)
+
+        if power_profile.is_additional_configuration_required and not has_user_config:
+            _LOGGER.warning(
+                f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
             )
             continue
 
@@ -282,9 +284,6 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
                 "%s: Entity is manually configured, skipping auto configuration",
                 entity_entry.entity_id,
             )
-            continue
-
-        if not power_profile:
             continue
 
         if not power_profile.is_entity_domain_supported(source_entity.domain):
