@@ -26,11 +26,7 @@ from homeassistant.components.light import (
 from homeassistant.core import State
 
 from ..common import SourceEntity
-from ..errors import (
-    LutFileNotFound,
-    ModelNotSupported,
-    StrategyConfigurationError,
-)
+from ..errors import LutFileNotFound, ModelNotSupported, StrategyConfigurationError
 from ..power_profile.power_profile import PowerProfile
 from .strategy_interface import PowerCalculationStrategyInterface
 

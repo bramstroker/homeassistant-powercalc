@@ -78,7 +78,9 @@ async def test_autodiscover_model_from_entity_entry(
     assert model_info.model == expected_model
 
 
-async def test_get_power_profile_empty_manufacturer(hass: HomeAssistant, entity_reg: EntityRegistry, caplog: pytest.LogCaptureFixture):
+async def test_get_power_profile_empty_manufacturer(
+    hass: HomeAssistant, entity_reg: EntityRegistry, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.ERROR)
     light_mock = MockLight("test")
     light_mock.manufacturer = ""
