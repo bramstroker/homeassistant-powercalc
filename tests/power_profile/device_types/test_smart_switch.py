@@ -1,12 +1,11 @@
 import os
 
-import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_OFF
 
-from homeassistant.helpers.device_registry import DeviceRegistry, DeviceEntry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry, mock_device_registry
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import mock_registry, mock_device_registry
 
 from tests.common import run_powercalc_setup_yaml_config
 
@@ -14,6 +13,9 @@ from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CON
 
 
 async def test_smart_switch(hass: HomeAssistant):
+    """
+    Test that smart plug can be setup from profile library
+    """
     switch_id = "switch.oven"
     manufacturer = "Shelly"
     model = "Shelly Plug S"
