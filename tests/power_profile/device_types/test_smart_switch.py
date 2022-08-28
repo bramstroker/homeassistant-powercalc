@@ -35,29 +35,32 @@ async def test_smart_switch(hass: HomeAssistant, entity_reg: EntityRegistry, dev
     )
     await hass.async_block_till_done()
 
+    switch_id = "switch.oven"
+    power_id = "sensor.oven_device_power"
+
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_ENTITY_ID: "switch.oven",
+            CONF_ENTITY_ID: switch_id,
             CONF_MANUFACTURER: "Shelly",
             CONF_MODEL: "Shelly Plug S",
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch")
         },
     )
 
-    power_state = hass.states.get("sensor.oven_device_power")
+    power_state = hass.states.get(power_id)
     assert power_state
     assert power_state.state == "unavailable"
 
-    hass.states.async_set("switch.oven", STATE_ON)
+    hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.oven_device_power").state == "0.82"
+    assert hass.states.get(power_id).state == "0.82"
 
-    hass.states.async_set("switch.oven", STATE_OFF)
+    hass.states.async_set(switch_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.oven_device_power").state == "0.52"
+    assert hass.states.get(power_id).state == "0.52"
 
 
 def get_test_profile_dir(sub_dir: str) -> str:
