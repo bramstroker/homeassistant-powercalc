@@ -6,10 +6,12 @@
 	"standby_power": 2.4,
 	"requires_additional_configuration": true,
 	"device_type": "media_player",
-	"supported_modes": ["linear"],
-	"linear_config": {
-		"calibrate": [
-			"100 -> 3.87"
-		]
+	"supported_modes": ["fixed"],
+	"fixed_config": {
+	        "power": 2.4,
+	        "states_power": {
+			"idle": 2.4,
+			"playing": "{{((3.87-2.4) * states_attr(need_some_way_to_reference_entity, 'volume_level')}}" 
+		}
 	}
 }
