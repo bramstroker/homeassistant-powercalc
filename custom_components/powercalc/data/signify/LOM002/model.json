@@ -4,13 +4,12 @@
 	"measure_device": "Zhirui PR10-D",
 	"name": "Hue smart plug LOM002",
 	"standby_power": 0.23,
-	"standby_power_on": 0.91,
 	"requires_additional_configuration": true,
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
 	],
 	"fixed_config": {
-		"watt": 0.91
+		"power": 0.91
 	}
 }
