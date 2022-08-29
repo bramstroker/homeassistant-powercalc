@@ -11,6 +11,6 @@
 		"fixed"
 	],
 	"fixed_config": {
-		"watt": 1.1
+		"power": 1.1
 	}
 }
