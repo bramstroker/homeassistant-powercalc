@@ -4,13 +4,12 @@
 	"measure_device": "Fibaro FGW102",
 	"name": "Quibino Smart Plug 16A",
 	"standby_power": 0.3,
-	"standby_power_on": 0.5,
 	"requires_additional_configuration": true,
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
 	],
 	"fixed_config": {
-		"watt": 0.5
+		"power": 0.5
 	}
 }
