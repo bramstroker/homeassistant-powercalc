@@ -1,15 +1,20 @@
 import os
 
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_OFF
-
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import mock_registry, mock_device_registry
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
+from custom_components.powercalc.const import (
+    CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
+)
 from tests.common import run_powercalc_setup_yaml_config
-
-from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CONF_CUSTOM_MODEL_DIRECTORY
 
 
 async def test_smart_switch(hass: HomeAssistant):
@@ -35,11 +40,9 @@ async def test_smart_switch(hass: HomeAssistant):
         hass,
         {
             "shelly-device": DeviceEntry(
-                id="shelly-device-id",
-                manufacturer=manufacturer,
-                model=model
+                id="shelly-device-id", manufacturer=manufacturer, model=model
             )
-        }
+        },
     )
 
     power_sensor_id = "sensor.oven_device_power"
@@ -50,7 +53,7 @@ async def test_smart_switch(hass: HomeAssistant):
             CONF_ENTITY_ID: switch_id,
             CONF_MANUFACTURER: manufacturer,
             CONF_MODEL: model,
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch")
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch"),
         },
     )
 

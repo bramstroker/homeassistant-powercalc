@@ -59,9 +59,9 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .common import (
     SourceEntity,
     create_source_entity,
+    get_merged_sensor_configuration,
     validate_is_number,
     validate_name_pattern,
-    get_merged_sensor_configuration
 )
 from .const import (
     CONF_AREA,

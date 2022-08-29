@@ -7,12 +7,8 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
-from homeassistant.const import (
-    CONF_ENTITY_ID,
-    CONF_NAME,
-    CONF_UNIQUE_ID,
-)
 from homeassistant.helpers.template import is_number
 
 from .const import (
@@ -21,7 +17,7 @@ from .const import (
     CONF_CREATE_GROUP,
     CONF_DAILY_FIXED_ENERGY,
     CONF_POWER_SENSOR_ID,
-    DUMMY_ENTITY_ID
+    DUMMY_ENTITY_ID,
 )
 from .errors import SensorConfigurationError
 
@@ -126,6 +122,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
         )
 
     return merged_config
+
 
 def validate_name_pattern(value: str) -> str:
     """Validate that the naming pattern contains {}."""

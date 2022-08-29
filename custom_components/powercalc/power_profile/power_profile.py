@@ -5,10 +5,10 @@ import logging
 import os
 from enum import Enum
 from typing import Optional
-from homeassistant.helpers.typing import ConfigType
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.typing import ConfigType
 
 from ..const import CalculationStrategy
 from ..errors import ModelNotSupported, UnsupportedMode
