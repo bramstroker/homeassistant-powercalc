@@ -4,13 +4,12 @@
 	"measure_device": "Tapo P110 Smart Plug",
 	"name": "HS100",
 	"standby_power": 1.044,
-	"standby_power_on": 1.5434,
 	"requires_additional_configuration": true,
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
 	],
 	"fixed_config": {
-		"watt": 1.5435
+		"power": 1.5434
 	}
 }
