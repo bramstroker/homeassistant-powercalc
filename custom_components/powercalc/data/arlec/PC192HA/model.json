@@ -4,7 +4,6 @@
 	"measure_device": "Tapo P110 Smart Plug",
 	"name": "Arlec Grid Connect Smart Plug In Multi-Function Socket With USB",
 	"standby_power": 0.66,
-	"standby_power_on": 1.596,
 	"requires_additional_configuration": true,
 	"device_type": "smart_switch",
 	"supported_modes": [
