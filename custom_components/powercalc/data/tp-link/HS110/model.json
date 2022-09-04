@@ -4,7 +4,10 @@
 	"measure_device": "Zhirui PR10-D",
 	"name": "HS110",
 	"standby_power": 1.77,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
