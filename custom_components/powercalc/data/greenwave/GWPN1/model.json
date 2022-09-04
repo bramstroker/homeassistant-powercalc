@@ -4,7 +4,10 @@
 	"measure_device": "Fibaro FGW102",
 	"name": "Greenwave GWPN1",
 	"standby_power": 0.3,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
