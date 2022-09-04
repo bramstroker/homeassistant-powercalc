@@ -4,7 +4,10 @@
 	"measure_device": "Tapo P110 Smart Plug",
 	"name": "Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA",
 	"standby_power": 0.29,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
