@@ -6,5 +6,8 @@
     "measure_method": "script",
     "measure_device": "Shelly plug S",
     "measure_description": "Used script utils/measure_shelly.py from repository. Standby power is guessed",
-    "standby_power": 0.4
+    "standby_power": 0.4,
+    "aliases": [
+        "8718696548738"
+    ]
 }

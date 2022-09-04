@@ -15,10 +15,11 @@ from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_DOMAIN,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
-    CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
@@ -61,11 +62,13 @@ from .const import (
     DEFAULT_UTILITY_METER_TYPES,
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
+    PowercalcDiscoveryType,
     UnitPrefix,
 )
 from .errors import ModelNotSupported
@@ -203,6 +206,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
+
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
@@ -232,14 +236,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         except ValueError:
             return True
 
-        entity_registry = er.async_get(hass)
-        entries = er.async_entries_for_config_entry(
-            entity_registry, config_entry.entry_id
-        )
-        for entry in entries:
-            entity_registry.async_remove(entry.entity_id)
-            _LOGGER.debug(f"Removing {entry.entity_id}")
-
     return unload_ok
 
 
@@ -261,23 +257,25 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
         if not await has_manufacturer_and_model_information(hass, entity_entry):
             continue
 
-        has_user_config = is_user_configured(config, entity_entry.entity_id)
-
         source_entity = await create_source_entity(entity_entry.entity_id, hass)
         try:
             power_profile = await get_power_profile(
                 hass, {}, source_entity.entity_entry
             )
-            if power_profile.is_additional_configuration_required:
-                if not has_user_config:
-                    _LOGGER.warning(
-                        f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-                    )
-                    continue
+            if not power_profile:
+                continue
         except ModelNotSupported:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping auto configuration",
                 entity_entry.entity_id,
+            )
+            continue
+
+        has_user_config = is_user_configured(config, entity_entry.entity_id)
+
+        if power_profile.is_additional_configuration_required and not has_user_config:
+            _LOGGER.warning(
+                f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
             )
             continue
 
@@ -288,9 +286,6 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
             )
             continue
 
-        if not power_profile:
-            continue
-
         if not power_profile.is_entity_domain_supported(source_entity.domain):
             continue
 
@@ -298,6 +293,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
             CONF_ENTITY_ID: entity_entry.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
             DISCOVERY_POWER_PROFILE: power_profile,
+            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
         }
         hass.async_create_task(
             discovery.async_load_platform(
@@ -326,8 +322,6 @@ async def create_domain_groups(
     hass: HomeAssistant, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
-    sensor_component = hass.data[SENSOR_DOMAIN]
-    sensor_config = global_config.copy()
     _LOGGER.debug(f"Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
@@ -335,11 +329,17 @@ async def create_domain_groups(
             continue
 
         domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
-        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
-        group_name = f"All {domain}"
 
-        entities = await create_group_sensors(
-            group_name, sensor_config, domain_entities, hass
+        hass.async_create_task(
+            discovery.async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {
+                    DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
+                    CONF_ENTITIES: domain_entities,
+                    CONF_DOMAIN: domain,
+                },
+                global_config,
+            )
         )
-        await sensor_component.async_add_entities(entities)
-    return []

@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 3, Dummy Load: None",
+    "measure_device": "Kasa, KP115(US)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.24.8:docker"
+    },
+    "name": "Hue White and Color Ambiance A19 E26",
+    "standby_power": 0.17,
+    "supported_modes": [
+        "lut"
+    ]
+}

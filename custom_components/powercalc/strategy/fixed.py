@@ -78,7 +78,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 "fixed_states_power_only",
             )
 
-    def get_entities_to_track(self) -> list[str, TrackTemplate]:
+    def get_entities_to_track(self) -> list[Union[str, TrackTemplate]]:
         track_templates = []
 
         if isinstance(self._power, Template):

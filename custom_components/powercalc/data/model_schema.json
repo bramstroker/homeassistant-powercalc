@@ -94,6 +94,10 @@
           "type": "number"
         }
       }
+    },
+    "sensor_config": {
+      "type": "object",
+      "description": "Sensor configuration options. See the README"
     }
   }
 }

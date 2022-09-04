@@ -10,6 +10,7 @@ from typing import Optional
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.typing import ConfigType
 
 from ..aliases import MANUFACTURER_ALIASES
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
@@ -33,7 +34,7 @@ async def get_power_profile(
             manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
             model = config.get(CONF_MODEL) or model_info.model
 
-    if manufacturer is None or model is None:
+    if not manufacturer or not model:
         return None
 
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
@@ -54,10 +55,14 @@ async def get_power_profile(
 
 
 async def is_autoconfigurable(
-    hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: dict = {}
+    hass: HomeAssistant, entry: er.RegistryEntry, sensor_config: ConfigType = None
 ) -> bool:
+    if sensor_config is None:
+        sensor_config = {}
     try:
         power_profile = await get_power_profile(hass, sensor_config, entry)
+        if not power_profile:
+            return False
         return bool(
             power_profile and not power_profile.is_additional_configuration_required
         )
@@ -89,7 +94,7 @@ async def autodiscover_model(
 
     # Make sure we don't have a literal / in model_id, so we don't get issues with sublut directory matching down the road
     # See github #658
-    model_id = model_id.replace("/", "#slash#")
+    model_id = str(model_id).replace("/", "#slash#")
 
     model_info = ModelInfo(manufacturer, model_id)
 

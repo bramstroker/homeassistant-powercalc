@@ -13,7 +13,7 @@ sys.path.insert(
     ),
 )
 
-from aliases import MANUFACTURER_DIRECTORY_MAPPING, MODEL_DIRECTORY_MAPPING
+from aliases import MANUFACTURER_DIRECTORY_MAPPING
 from pytablewriter import MarkdownTableWriter
 
 

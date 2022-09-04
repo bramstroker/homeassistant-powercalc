@@ -70,7 +70,7 @@ async def test_load_sub_lut(hass: HomeAssistant):
     assert power_profile.model == "YLDL01YL"
     assert power_profile.name == "Yeelight YLDL01YL Downlight"
     assert power_profile.sub_profile == "ambilight"
-    assert power_profile.is_additional_configuration_required == True
+    assert power_profile.is_additional_configuration_required is True
 
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant):

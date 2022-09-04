@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
-from re import M
 from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
@@ -12,6 +12,8 @@ from ..const import DATA_PROFILE_LIBRARY, DOMAIN
 from .power_profile import PowerProfile
 
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
@@ -112,32 +114,37 @@ class ProfileLibrary:
             manufacturer_dir = os.path.join(data_dir, manufacturer)
             if not os.path.exists(manufacturer_dir):
                 continue
-            for model in os.listdir(manufacturer_dir):
-                if model.startswith("."):
-                    continue
-                profiles.append(
-                    await self._create_power_profile(
-                        ModelInfo(manufacturer, model),
-                        os.path.join(manufacturer_dir, model),
-                    )
+            for model in next(os.walk(manufacturer_dir))[1]:
+                power_profile = await self._create_power_profile(
+                    ModelInfo(manufacturer, model),
+                    os.path.join(manufacturer_dir, model),
                 )
+                if power_profile is None:
+                    continue
+
+                profiles.append(power_profile)
 
         self._profiles[manufacturer] = profiles
         return profiles
 
     async def _create_power_profile(
         self, model_info: ModelInfo, directory: str
-    ) -> PowerProfile:
+    ) -> PowerProfile | None:
         model_json_path = os.path.join(directory, "model.json")
-        with open(model_json_path) as file:
-            json_data = json.load(file)
-            profile = PowerProfile(
-                self._hass,
-                manufacturer=model_info.manufacturer,
-                model=model_info.model,
-                directory=directory,
-                json_data=json_data,
-            )
+        try:
+            with open(model_json_path) as file:
+                json_data = json.load(file)
+                profile = PowerProfile(
+                    self._hass,
+                    manufacturer=model_info.manufacturer,
+                    model=model_info.model,
+                    directory=directory,
+                    json_data=json_data,
+                )
+        except FileNotFoundError:
+            _LOGGER.error("model.json file not found in directory %s", directory)
+            return None
+
         return profile
 
 

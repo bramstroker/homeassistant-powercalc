@@ -38,6 +38,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._power_factor = config.get(CONF_POWER_FACTOR) or 0.9
         self._light_entity = light_entity
         self._standby_power = standby_power
+        self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Optional[Decimal]:
         if entity_state.entity_id == self._light_entity.entity_id:

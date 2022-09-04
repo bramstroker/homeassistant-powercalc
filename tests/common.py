@@ -84,8 +84,11 @@ def create_discoverable_light(
 async def run_powercalc_setup_yaml_config(
     hass: HomeAssistant,
     sensor_config: list[ConfigType] | ConfigType,
-    domain_config: ConfigType = {},
+    domain_config: ConfigType | None = None,
 ):
+    if domain_config is None:
+        domain_config = {}
+
     assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
     await hass.async_block_till_done()
 

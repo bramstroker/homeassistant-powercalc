@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import decimal
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Any
+from typing import Any, Callable
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util
@@ -71,14 +72,18 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_daily_fixed_energy_sensor(
-    hass: HomeAssistant, sensor_config: ConfigType
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity | None = None,
 ) -> DailyEnergySensor:
-    mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
-    name = generate_energy_sensor_name(sensor_config, sensor_config.get(CONF_NAME))
+    name = generate_energy_sensor_name(
+        sensor_config, sensor_config.get(CONF_NAME), source_entity
+    )
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, unique_id=unique_id
+        hass, sensor_config, unique_id=unique_id, source_entity=source_entity
     )
     if not unique_id:
         old_entity_id = async_generate_entity_id(
@@ -163,6 +168,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
     ):
         self._hass = hass
         self._attr_name = name
+        self._state: Decimal = Decimal(0)
         self._attr_entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
         self._value = value
         self._user_unit_of_measurement = user_unit_of_measurement
@@ -176,6 +182,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._last_updated: float = dt_util.utcnow().timestamp()
         self._last_delta_calculate: float | None = None
         self.set_native_unit_of_measurement()
+        self._update_timer_removal: Callable[[], None] | None = None
 
     def set_native_unit_of_measurement(self):
         """Set the native unit of measurement"""
@@ -193,10 +200,15 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         """Handle entity which will be added."""
 
         if state := await self.async_get_last_state():
-            self._state = Decimal(state.state)
+            try:
+                self._state = Decimal(state.state)
+            except decimal.DecimalException:
+                _LOGGER.warning(
+                    f"{self.entity_id}: Cannot restore state: {state.state}"
+                )
+                self._state = Decimal(0)
             self._last_updated = state.last_changed.timestamp()
-            delta = self.calculate_delta()
-            self._state = self._state + delta
+            self._state += self.calculate_delta()
             self.async_schedule_update_ha_state()
         else:
             self._state = Decimal(0)
@@ -215,7 +227,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                 self.async_schedule_update_ha_state()
                 self._last_updated = dt_util.now().timestamp()
 
-        self._timer = async_track_time_interval(
+        self._update_timer_removal = async_track_time_interval(
             self.hass, refresh, timedelta(seconds=self._update_frequency)
         )
 
@@ -233,10 +245,10 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             value.hass = self.hass
             value = value.async_render()
 
-        if self._user_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
-            wh_per_day = value * 1000
-        elif self._user_unit_of_measurement == POWER_WATT:
+        if self._user_unit_of_measurement == POWER_WATT:
             wh_per_day = value * (self._on_time.total_seconds() / 3600)
+        else:
+            wh_per_day = value * 1000
 
         # Convert Wh to the native measurement unit
         energy_per_day = wh_per_day

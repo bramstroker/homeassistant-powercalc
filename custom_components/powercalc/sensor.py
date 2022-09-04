@@ -11,7 +11,6 @@ from typing import Any, Final, NamedTuple, Optional, cast
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components import (
     binary_sensor,
     climate,
@@ -44,7 +43,6 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import (
     area_registry,
@@ -61,6 +59,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .common import (
     SourceEntity,
     create_source_entity,
+    get_merged_sensor_configuration,
     validate_is_number,
     validate_name_pattern,
 )
@@ -111,6 +110,7 @@ from .const import (
     DATA_DOMAIN_ENTITIES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
@@ -119,6 +119,7 @@ from .const import (
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
+    PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
 )
@@ -276,6 +277,9 @@ async def async_setup_entry(
     # Add entry to an existing group
     updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
 
+    if CONF_UNIQUE_ID not in sensor_config:
+        sensor_config[CONF_UNIQUE_ID] = entry.unique_id
+
     await _async_setup_entities(hass, sensor_config, async_add_entities)
     if updated_group_entry:
         await hass.config_entries.async_reload(updated_group_entry.entry_id)
@@ -366,48 +370,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
     return sensor_config
 
 
-def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
-    """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
-
-    exclude_from_merging = [
-        CONF_NAME,
-        CONF_ENTITY_ID,
-        CONF_UNIQUE_ID,
-        CONF_POWER_SENSOR_ID,
-    ]
-    num_configs = len(configs)
-
-    merged_config = {}
-    for i, config in enumerate(configs, 1):
-        config_copy = config.copy()
-        # Remove config properties which are only allowed on the deepest level
-        if i < num_configs:
-            for key in exclude_from_merging:
-                if key in config:
-                    config_copy.pop(key)
-
-        merged_config.update(config_copy)
-
-    if CONF_CREATE_ENERGY_SENSOR not in merged_config:
-        merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
-            CONF_CREATE_ENERGY_SENSORS
-        )
-
-    if CONF_DAILY_FIXED_ENERGY in merged_config:
-        merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-
-    if (
-        validate
-        and CONF_CREATE_GROUP not in merged_config
-        and CONF_ENTITY_ID not in merged_config
-    ):
-        raise SensorConfigurationError(
-            "You must supply an entity_id in the configuration, see the README"
-        )
-
-    return merged_config
-
-
 async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
@@ -423,11 +385,28 @@ async def create_sensors(
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
-    if CONF_DAILY_FIXED_ENERGY in config:
-        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+    # Handle setup of domain groups
+    if (
+        discovery_info
+        and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP
+    ):
+        domain = discovery_info[CONF_DOMAIN]
+        sensor_config = global_config.copy()
+        sensor_config[
+            CONF_UNIQUE_ID
+        ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+        return EntitiesBucket(
+            new=await create_group_sensors(
+                f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass
+            )
+        )
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
-    if CONF_ENTITY_ID in config or discovery_info is not None:
+    if (
+        CONF_ENTITY_ID in config
+        or discovery_info is not None
+        or CONF_DAILY_FIXED_ENERGY in config
+    ):
         if discovery_info:
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
@@ -543,7 +522,9 @@ async def create_individual_sensors(
 
     energy_sensor = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config)
+        energy_sensor = await create_daily_fixed_energy_sensor(
+            hass, sensor_config, source_entity
+        )
         entities_to_add.append(energy_sensor)
         power_sensor = await create_daily_fixed_energy_power_sensor(
             hass, sensor_config, source_entity

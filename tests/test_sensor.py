@@ -41,9 +41,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
-    CONF_MANUFACTURER,
     CONF_MODE,
-    CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -505,12 +503,7 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
                 get_simple_fixed_config("input_boolean.test1"),
                 get_simple_fixed_config("input_boolean.test2"),
                 # Omitting the entity_id should log an error, but still successfully create the other entities
-                {
-                    CONF_NAME: "test3",
-                    CONF_FIXED: {
-                        CONF_POWER: 20
-                    }
-                }
+                {CONF_NAME: "test3", CONF_FIXED: {CONF_POWER: 20}},
             ]
         },
     )
@@ -521,3 +514,79 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
     assert hass.states.get("sensor.test1_power")
     assert hass.states.get("sensor.test2_power")
     assert not hass.states.get("sensor.test3_power")
+
+
+async def test_change_options_of_renamed_sensor(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy_daily").name == "test energy daily"
+
+    entity_reg.async_update_entity(
+        entity_id="sensor.test_energy_daily", name="Renamed daily utility meter"
+    )
+    await hass.async_block_till_done()
+
+    assert (
+        hass.states.get("sensor.test_energy_daily").name
+        == "Renamed daily utility meter"
+    )
+
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_CREATE_UTILITY_METERS: True, CONF_POWER: 100},
+    )
+    await hass.async_block_till_done()
+
+    assert (
+        hass.states.get("sensor.test_energy_daily").name
+        == "Renamed daily utility meter"
+    )
+
+
+async def test_renaming_sensor_is_retained_after_startup(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+    )
+    await hass.async_block_till_done()
+    entity_reg.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
+    await hass.async_block_till_done()
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").name == "Renamed power"

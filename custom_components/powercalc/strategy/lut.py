@@ -26,12 +26,7 @@ from homeassistant.components.light import (
 from homeassistant.core import State
 
 from ..common import SourceEntity
-from ..errors import (
-    LutFileNotFound,
-    ModelNotSupported,
-    StrategyConfigurationError,
-    UnsupportedMode,
-)
+from ..errors import LutFileNotFound, ModelNotSupported, StrategyConfigurationError
 from ..power_profile.power_profile import PowerProfile
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -191,7 +186,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return np.interp(brightness, brightness_range, power_range)
 
     def lookup_power_for_brightness(
-        self, lut_value: Union(dict, int), light_setting: LightSetting
+        self, lut_value: Union[dict, int], light_setting: LightSetting
     ):
         if light_setting.color_mode == COLOR_MODE_BRIGHTNESS:
             return lut_value
@@ -201,13 +196,15 @@ class LutStrategy(PowerCalculationStrategyInterface):
             sat_values = self.get_nearest(lut_value, light_setting.hue)
             return self.get_nearest(sat_values, light_setting.saturation)
 
-    def get_nearest(self, dict: dict, search_key: int):
+    @staticmethod
+    def get_nearest(dict: dict, search_key: int):
         return (
             dict.get(search_key)
             or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
-    def get_nearest_lower_brightness(self, dict: dict, search_key: int) -> int:
+    @staticmethod
+    def get_nearest_lower_brightness(dict: dict, search_key: int) -> int:
         keys = dict.keys()
         last_key = [*keys][-1]
         if last_key < search_key:
@@ -217,7 +214,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             (k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
         )
 
-    def get_nearest_higher_brightness(self, dict: dict, search_key: int) -> int:
+    @staticmethod
+    def get_nearest_higher_brightness(dict: dict, search_key: int) -> int:
         keys = dict.keys()
         first_key = [*keys][0]
         if first_key > search_key:
