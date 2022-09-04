@@ -4,7 +4,10 @@
 	"measure_device": "TP-Link Tapo P110",
 	"name": "TP Link Tapo P100 Mini Smart Wi-Fi Socket",
 	"standby_power": 0.633,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
