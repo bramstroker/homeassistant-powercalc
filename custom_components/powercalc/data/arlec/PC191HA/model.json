@@ -4,7 +4,10 @@
 	"measure_device": "Tapo P110 Smart Plug",
 	"name": "Arlec White Grid Connect Smart Plug In Socket With Energy Meter",
 	"standby_power": 0.267,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
