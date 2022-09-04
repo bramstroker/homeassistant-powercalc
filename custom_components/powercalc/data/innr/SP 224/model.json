@@ -4,7 +4,10 @@
 	"measure_device": "Kasa KP115(US)",
 	"name": "Innr Zigbee Smart Plug",
 	"standby_power": 0.18,
-	"requires_additional_configuration": true,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy",
+  	},
 	"device_type": "smart_switch",
 	"supported_modes": [
 		"fixed"
