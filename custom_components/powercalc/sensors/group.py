@@ -77,11 +77,11 @@ async def create_group_sensors(
         filters = []
 
     def _get_filtered_entity_ids_by_class(
-        all_entities: list, default_filters: list[Callable], className
+        all_entities: list, default_filters: list[Callable], class_name
     ) -> list[str]:
         filters = default_filters.copy()
         filters.append(lambda elm: not isinstance(elm, GroupedSensor))
-        filters.append(lambda elm: isinstance(elm, className))
+        filters.append(lambda elm: isinstance(elm, class_name))
         return list(
             map(
                 lambda x: x.entity_id,
