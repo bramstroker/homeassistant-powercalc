@@ -1,0 +1,18 @@
+{
+	"measure_description": "Manually measured.",
+	"measure_method": "manual",
+	"measure_device": "Tapo P110 Smart Plug",
+	"name": "HS100",
+	"standby_power": 1.044,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	],
+	"fixed_config": {
+		"power": 1.5434
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+	"measure_method": "manual",
+	"measure_device": "Zhirui PR10-D",
+	"name": "HS110",
+	"standby_power": 1.77,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	],
+	"fixed_config": {
+		"power": 2.56
+	}
+}
