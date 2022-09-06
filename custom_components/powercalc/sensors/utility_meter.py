@@ -82,7 +82,7 @@ async def create_utility_meters(
                 sensor_config,
                 meter_type,
                 unique_id,
-                net_consumption=net_consumption
+                net_consumption=net_consumption,
             )
             tariff_sensors.append(utility_meter)
             utility_meters.append(utility_meter)

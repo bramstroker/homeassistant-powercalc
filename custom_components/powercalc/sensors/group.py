@@ -111,7 +111,9 @@ async def create_group_sensors(
     group_sensors.append(energy_sensor)
 
     group_sensors.extend(
-        await create_utility_meters(hass, energy_sensor, sensor_config, net_consumption=True)
+        await create_utility_meters(
+            hass, energy_sensor, sensor_config, net_consumption=True
+        )
     )
 
     return group_sensors
@@ -144,7 +146,9 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(energy_sensor)
 
         group_sensors.extend(
-            await create_utility_meters(hass, energy_sensor, sensor_config, net_consumption=True)
+            await create_utility_meters(
+                hass, energy_sensor, sensor_config, net_consumption=True
+            )
         )
 
     return group_sensors
