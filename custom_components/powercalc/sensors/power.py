@@ -59,7 +59,12 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode, SensorConfigurationError
+from ..errors import (
+    ModelNotSupported,
+    SensorConfigurationError,
+    StrategyConfigurationError,
+    UnsupportedMode,
+)
 from ..power_profile.model_discovery import get_power_profile
 from ..power_profile.power_profile import PowerProfile
 from ..strategy.factory import PowerCalculatorStrategyFactory
@@ -239,7 +244,9 @@ def select_calculation_strategy(
     if power_profile:
         return power_profile.supported_modes[0]
 
-    raise UnsupportedMode("Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme")
+    raise UnsupportedMode(
+        "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme"
+    )
 
 
 def is_fully_configured(config) -> bool:

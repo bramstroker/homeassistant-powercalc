@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional, MutableMapping
+from typing import Any, MutableMapping, Optional
 
 import homeassistant.helpers.entity_registry as er
 import homeassistant.util.dt as dt_util
