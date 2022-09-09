@@ -59,7 +59,7 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
+from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode, SensorConfigurationError
 from ..power_profile.model_discovery import get_power_profile
 from ..power_profile.power_profile import PowerProfile
 from ..strategy.factory import PowerCalculatorStrategyFactory
@@ -101,23 +101,24 @@ async def create_virtual_power_sensor(
     power_profile = None
     try:
         # When the user did not manually configured a model and a model was auto discovered we can load it.
-        try:
-            if (
-                discovery_info
-                and sensor_config.get(CONF_MODEL) is None
-                and discovery_info.get(DISCOVERY_POWER_PROFILE)
-            ):
-                power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
-            else:
+
+        if (
+            discovery_info
+            and sensor_config.get(CONF_MODEL) is None
+            and discovery_info.get(DISCOVERY_POWER_PROFILE)
+        ):
+            power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
+        else:
+            try:
                 power_profile = await get_power_profile(
                     hass, sensor_config, source_entity.entity_entry
                 )
-        except ModelNotSupported as err:
-            if not is_fully_configured(sensor_config):
-                _LOGGER.error(
-                    "%s: Skipping sensor setup %s", source_entity.entity_id, err
-                )
-                raise err
+            except ModelNotSupported as err:
+                if not is_fully_configured(sensor_config):
+                    _LOGGER.error(
+                        "%s: Skipping sensor setup %s", source_entity.entity_id, err
+                    )
+                    raise err
 
         if power_profile and power_profile.sensor_config != {}:
             sensor_config.update(power_profile.sensor_config)
@@ -132,12 +133,6 @@ async def create_virtual_power_sensor(
         entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
 
         strategy = select_calculation_strategy(sensor_config, power_profile)
-        if strategy is None:
-            error_message = "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme"
-            _LOGGER.error(
-                "%s: Skipping sensor setup: %s", source_entity.entity_id, error_message
-            )
-            raise UnsupportedMode(error_message)
 
         calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[
             DOMAIN
@@ -146,9 +141,9 @@ async def create_virtual_power_sensor(
             sensor_config, strategy, power_profile, source_entity
         )
         await calculation_strategy.validate_config()
-    except StrategyConfigurationError as err:
+    except (StrategyConfigurationError, UnsupportedMode) as err:
         _LOGGER.error(
-            "%s: Error setting up calculation strategy: %s",
+            "%s: Skipping sensor setup: %s",
             source_entity.entity_id,
             err,
         )
@@ -244,7 +239,7 @@ def select_calculation_strategy(
     if power_profile:
         return power_profile.supported_modes[0]
 
-    return None
+    raise UnsupportedMode("Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme")
 
 
 def is_fully_configured(config) -> bool:

@@ -677,7 +677,7 @@ def resolve_include_entities(
             entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
         }
 
-    return entities.values()
+    return list(entities.values())
 
 
 @callback

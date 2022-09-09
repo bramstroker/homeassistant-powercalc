@@ -126,7 +126,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
 
 def validate_name_pattern(value: str) -> str:
     """Validate that the naming pattern contains {}."""
-    regex = re.compile(r"\{\}")
+    regex = re.compile(r"{}")
     if not regex.search(value):
         raise vol.Invalid("Naming pattern must contain {}")
     return value
