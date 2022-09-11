@@ -117,7 +117,7 @@ async def has_manufacturer_and_model_information(
     if device_entry is None:
         return False
 
-    if device_entry.manufacturer is None or device_entry.model is None:
+    if device_entry.manufacturer is None or len(str(device_entry.model)) == 0:
         return False
 
     return True
