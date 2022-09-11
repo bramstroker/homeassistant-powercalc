@@ -1,4 +1,4 @@
-# Supported models (187 total)
+# Supported models (188 total)
 | manufacturer |        model id         |                                       name                                        |calculation modes|      color modes       |                                            aliases                                            |
 |--------------|-------------------------|-----------------------------------------------------------------------------------|-----------------|------------------------|-----------------------------------------------------------------------------------------------|
 |anko          |                 42997610|Anko Smart String Lights 42997610                                                  |lut              |color_temp,hs           |                                                                                               |
@@ -21,6 +21,7 @@
 |genio         |I002747                  |Genio Wi-Fi Dimmable 5W G95 ES CCT Filament LED Bulb                               |lut              |color_temp              |                                                                                               |
 |genio         |I002926                  |Mirabella Genio Wi-Fi Dimmable 5.5W ES RGBW Spiral Filament LED Bulb               |lut              |brightness,hs           |                                                                                               |
 |genio         |I003028                  |Mirabella Genio Wi-Fi 7W LED Tube Lamp                                             |lut              |brightness,hs           |                                                                                               |
+|gledopto      |GL-B-001P                |GL-B-001P                                                                          |lut              |color_temp,hs           |                                                                                               |
 |gledopto      |GL-S-005Z                |Gledopto 4W MR16 Dual White and Color 120°                                         |lut              |color_temp,hs           |                                                                                               |
 |gledopto      |GL-S-007Z                |Gledopto 5W GU10 Dual White And Color Spotlight                                    |lut              |color_temp,hs           |                                                                                               |
 |greenwave     |GWPN1                    |Greenwave GWPN1                                                                    |fixed            |                        |                                                                                               |
