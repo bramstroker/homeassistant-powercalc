@@ -59,6 +59,7 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .common import (
     SourceEntity,
     create_source_entity,
+    get_merged_sensor_configuration,
     validate_is_number,
     validate_name_pattern,
 )
@@ -369,48 +370,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
     return sensor_config
 
 
-def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
-    """Merges configuration from multiple levels (sensor, group, global) into a single dict"""
-
-    exclude_from_merging = [
-        CONF_NAME,
-        CONF_ENTITY_ID,
-        CONF_UNIQUE_ID,
-        CONF_POWER_SENSOR_ID,
-    ]
-    num_configs = len(configs)
-
-    merged_config = {}
-    for i, config in enumerate(configs, 1):
-        config_copy = config.copy()
-        # Remove config properties which are only allowed on the deepest level
-        if i < num_configs:
-            for key in exclude_from_merging:
-                if key in config:
-                    config_copy.pop(key)
-
-        merged_config.update(config_copy)
-
-    if CONF_CREATE_ENERGY_SENSOR not in merged_config:
-        merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
-            CONF_CREATE_ENERGY_SENSORS
-        )
-
-    if CONF_DAILY_FIXED_ENERGY in merged_config and CONF_ENTITY_ID not in merged_config:
-        merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-
-    if (
-        validate
-        and CONF_CREATE_GROUP not in merged_config
-        and CONF_ENTITY_ID not in merged_config
-    ):
-        raise SensorConfigurationError(
-            "You must supply an entity_id in the configuration, see the README"
-        )
-
-    return merged_config
-
-
 async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
@@ -718,7 +677,7 @@ def resolve_include_entities(
             entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
         }
 
-    return entities.values()
+    return list(entities.values())
 
 
 @callback

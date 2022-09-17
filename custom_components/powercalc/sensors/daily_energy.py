@@ -203,7 +203,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             try:
                 self._state = Decimal(state.state)
             except decimal.DecimalException:
-                _LOGGER.warning(f"{self.entity_id}: Cannot restore state: {state.state}")
+                _LOGGER.warning(
+                    f"{self.entity_id}: Cannot restore state: {state.state}"
+                )
                 self._state = Decimal(0)
             self._last_updated = state.last_changed.timestamp()
             self._state += self.calculate_delta()

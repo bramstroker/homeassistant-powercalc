@@ -69,16 +69,19 @@ async def create_group_sensors(
     sensor_config: dict[str, Any],
     entities: list[SensorEntity, RealPowerSensor, RealEnergySensor],
     hass: HomeAssistant,
-    filters: list[Callable, None] = [],
+    filters: list[Callable, None] = None,
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 
+    if filters is None:
+        filters = []
+
     def _get_filtered_entity_ids_by_class(
-        all_entities: list, default_filters: list[Callable], className
+        all_entities: list, default_filters: list[Callable], class_name
     ) -> list[str]:
         filters = default_filters.copy()
         filters.append(lambda elm: not isinstance(elm, GroupedSensor))
-        filters.append(lambda elm: isinstance(elm, className))
+        filters.append(lambda elm: isinstance(elm, class_name))
         return list(
             map(
                 lambda x: x.entity_id,
@@ -108,7 +111,9 @@ async def create_group_sensors(
     group_sensors.append(energy_sensor)
 
     group_sensors.extend(
-        await create_utility_meters(hass, energy_sensor, sensor_config)
+        await create_utility_meters(
+            hass, energy_sensor, sensor_config, net_consumption=True
+        )
     )
 
     return group_sensors
@@ -117,7 +122,7 @@ async def create_group_sensors(
 async def create_group_sensors_from_config_entry(
     hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict
 ) -> list[GroupedSensor]:
-    """Create group sensors based on an config_entry"""
+    """Create group sensors based on a config_entry"""
     group_sensors = []
 
     group_name = entry.data.get(CONF_NAME)
@@ -141,7 +146,9 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(energy_sensor)
 
         group_sensors.extend(
-            await create_utility_meters(hass, energy_sensor, sensor_config)
+            await create_utility_meters(
+                hass, energy_sensor, sensor_config, net_consumption=True
+            )
         )
 
     return group_sensors

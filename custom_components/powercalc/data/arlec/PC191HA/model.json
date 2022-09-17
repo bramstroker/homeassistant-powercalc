@@ -1,0 +1,18 @@
+{
+	"measure_description": "Manually measured. Set to 0.29 as fell below detection range in standby mode",
+	"measure_method": "manual",
+	"measure_device": "Tapo P110 Smart Plug",
+	"name": "Arlec White Grid Connect Smart Plug In Socket With Energy Meter",
+	"standby_power": 0.267,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	],
+	"fixed_config": {
+		"power": 1.144
+	}
+}

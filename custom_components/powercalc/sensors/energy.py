@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any, MutableMapping, Optional
 
 import homeassistant.helpers.entity_registry as er
 import homeassistant.util.dt as dt_util
@@ -165,12 +165,14 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
             self._attr_entity_category = EntityCategory(entity_category)
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return the state attributes of the acceleration sensor."""
-        state_attr = super().extra_state_attributes
-        state_attr[ATTR_SOURCE_ENTITY] = self._powercalc_source_entity
-        state_attr[ATTR_SOURCE_DOMAIN] = self._powercalc_source_domain
-        return state_attr
+    def extra_state_attributes(self) -> MutableMapping[str, Any]:
+        """Return the state attributes of the energy sensor."""
+        attrs = {
+            ATTR_SOURCE_ENTITY: self._powercalc_source_entity,
+            ATTR_SOURCE_DOMAIN: self._powercalc_source_domain,
+        }
+        attrs.update(super().extra_state_attributes)
+        return attrs
 
     @property
     def icon(self):
@@ -185,7 +187,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
 
 
 class RealEnergySensor(EnergySensor):
-    """Contains a reference to a existing energy sensor entity"""
+    """Contains a reference to an existing energy sensor entity"""
 
     def __init__(self, entity_entry: er.RegistryEntry):
         self._entity_entry = entity_entry

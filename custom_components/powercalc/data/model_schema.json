@@ -116,6 +116,10 @@
           "additionalProperties": {"type": ["number", "string"] }
 	}
       }
+    },
+    "sensor_config": {
+      "type": "object",
+      "description": "Sensor configuration options. See the README"
     }
   }
 }

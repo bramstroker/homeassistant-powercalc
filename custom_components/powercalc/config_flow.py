@@ -526,6 +526,7 @@ class OptionsFlowHandler(OptionsFlow):
         """Build the options schema. depending on the selected sensor type"""
 
         strategy_options = {}
+        data_schema = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             strategy: str = self.current_config.get(CONF_MODE)
             strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
