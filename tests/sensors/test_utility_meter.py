@@ -1,5 +1,4 @@
 from homeassistant.components import input_boolean, sensor, utility_meter
-from homeassistant.components.utility_meter.select import ATTR_OPTIONS
 from homeassistant.components.utility_meter.sensor import (
     ATTR_SOURCE_ID,
     ATTR_STATUS,
@@ -54,7 +53,6 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     tariff_select = hass.states.get("select.test_energy_daily")
     assert tariff_select
     assert tariff_select.state == "peak"
-    assert tariff_select.attributes[ATTR_OPTIONS] == ["peak", "offpeak"]
 
     peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
     assert peak_sensor
