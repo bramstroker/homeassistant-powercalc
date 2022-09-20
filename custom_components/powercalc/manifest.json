@@ -9,7 +9,6 @@
     "group",
     "template",
     "select",
-    "hue",
     "utility_meter"
   ],
   "after_dependencies": [
