@@ -75,7 +75,7 @@ def create_discoverable_light(
 ) -> test_light_platform.MockLight:
     light = test_light_platform.MockLight(name, STATE_ON, unique_id)
     light.manufacturer = "lidl"
-    light.model = "HG06106C"
+    light.model = "HG06462A"
     light.supported_color_modes = [ColorMode.BRIGHTNESS]
     light.brightness = 125
     return light
