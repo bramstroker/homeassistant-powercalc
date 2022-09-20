@@ -85,7 +85,9 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     assert not hass.states.get("sensor.testa_power")
 
 
-async def test_autodiscovery_skipped_for_lut_with_subprofiles(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_autodiscovery_skipped_for_lut_with_subprofiles(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     """
     Lights which can be autodiscovered and have sub profiles need to de skipped
     User needs to configure this because we cannot know which sub profile to select
@@ -106,7 +108,6 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(hass: HomeAssistan
 
     assert not hass.states.get("sensor.testa_power")
     assert not caplog.records
-
 
 
 async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssistant):

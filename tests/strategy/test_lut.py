@@ -16,12 +16,12 @@ from homeassistant.core import HomeAssistant, State
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
-from custom_components.powercalc.errors import (
-    StrategyConfigurationError,
-)
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.strategy.strategy_interface import (
+    PowerCalculationStrategyInterface,
+)
 
 from .common import create_source_entity
 

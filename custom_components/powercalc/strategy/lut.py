@@ -17,8 +17,8 @@ from homeassistant.components.light import (
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
-    ColorMode,
     COLOR_MODES_COLOR,
+    ColorMode,
 )
 from homeassistant.core import State
 
