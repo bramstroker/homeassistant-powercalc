@@ -13,18 +13,15 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.light import ColorMode
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
-from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CalculationStrategy
 from custom_components.powercalc.errors import (
     StrategyConfigurationError,
-    UnsupportedMode,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.lut import LutStrategy
+from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
 
 from .common import create_source_entity
 
@@ -185,7 +182,7 @@ async def _create_lut_strategy(
     manufacturer: str,
     model: str,
     source_entity: Optional[SourceEntity] = None,
-) -> LutStrategy:
+) -> PowerCalculationStrategyInterface:
     if not source_entity:
         source_entity = create_source_entity(LIGHT_DOMAIN)
     strategy_factory = PowerCalculatorStrategyFactory(hass)
@@ -236,7 +233,7 @@ def _create_light_hs_state(brightness: int, hue: int, sat: int) -> State:
 
 
 async def _calculate_and_assert_power(
-    strategy: LutStrategy, state: State, expected_power: float
+    strategy: PowerCalculationStrategyInterface, state: State, expected_power: float
 ):
     power = await strategy.calculate(state)
     assert round(Decimal(expected_power), 2) == round(power, 2)
