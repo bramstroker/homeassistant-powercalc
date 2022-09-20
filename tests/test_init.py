@@ -1,4 +1,8 @@
+import logging
+
+import pytest
 from homeassistant.components import input_boolean, light
+from homeassistant.components.light import ColorMode
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
@@ -79,6 +83,30 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.testa_power")
+
+
+async def test_autodiscovery_skipped_for_lut_with_subprofiles(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    """
+    Lights which can be autodiscovered and have sub profiles need to de skipped
+    User needs to configure this because we cannot know which sub profile to select
+    No power sensor should be created and no error should appear in the logs
+    """
+    caplog.set_level(logging.ERROR)
+
+    light_entity = MockLight("testa")
+    light_entity.manufacturer = "Yeelight"
+    light_entity.model = "strip6"
+    light_entity.supported_color_modes = [ColorMode.COLOR_TEMP, ColorMode.HS]
+    await create_mock_light_entity(hass, light_entity)
+
+    await async_setup_component(
+        hass, DOMAIN, {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: True}}
+    )
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.testa_power")
+    assert not caplog.records
+
 
 
 async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssistant):

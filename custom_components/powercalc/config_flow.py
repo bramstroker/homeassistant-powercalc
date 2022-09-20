@@ -376,7 +376,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.sensor_config.get(CONF_MODEL),
                 )
             )
-            sub_profiles = await library.get_subprofile_listing(profile)
+            sub_profiles = profile.get_sub_profiles()
             if sub_profiles:
                 return await self.async_step_lut_subprofile()
             errors = await self.validate_strategy_config()
@@ -714,7 +714,7 @@ async def _create_lut_schema_subprofile(
     profile = await library.get_profile(model_info)
     sub_profiles = [
         selector.SelectOptionDict(value=sub_profile, label=sub_profile)
-        for sub_profile in await library.get_subprofile_listing(profile)
+        for sub_profile in profile.get_sub_profiles()
     ]
     return vol.Schema(
         {
