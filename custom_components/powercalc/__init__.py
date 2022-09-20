@@ -271,7 +271,7 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
             )
             continue
 
-        has_user_config = is_user_configured(config, entity_entry.entity_id)
+        has_user_config = is_user_configured(hass, config, entity_entry.entity_id)
 
         if power_profile.is_additional_configuration_required and not has_user_config:
             _LOGGER.warning(
@@ -304,18 +304,26 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
     _LOGGER.debug("Done auto discovering entities")
 
 
-def is_user_configured(config: dict, entity_id: str) -> dict | None:
-    if SENSOR_DOMAIN not in config:
-        return None
-    sensor_config = config.get(SENSOR_DOMAIN)
-    for item in sensor_config:
-        if (
-            isinstance(item, dict)
-            and item.get(CONF_PLATFORM) == DOMAIN
-            and item.get(CONF_ENTITY_ID) == entity_id
-        ):
-            return item
-    return None
+def is_user_configured(hass: HomeAssistant, config: dict, entity_id: str) -> bool:
+    """
+    Check if user have setup powercalc sensors for a given entity_id.
+    Either with the YAML or GUI method.
+    """
+    if SENSOR_DOMAIN in config:
+        sensor_config = config.get(SENSOR_DOMAIN)
+        for item in sensor_config:
+            if (
+                isinstance(item, dict)
+                and item.get(CONF_PLATFORM) == DOMAIN
+                and item.get(CONF_ENTITY_ID) == entity_id
+            ):
+                return True
+
+    for config_entry in hass.config_entries.async_entries(DOMAIN):
+        if config_entry.data.get(CONF_ENTITY_ID) == entity_id:
+            return True
+
+    return False
 
 
 async def create_domain_groups(
