@@ -4,10 +4,9 @@ import inspect
 import logging
 from typing import cast
 
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import __version__ as HA_VERSION
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
@@ -15,6 +14,7 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 
@@ -112,7 +112,7 @@ async def create_tariff_select(
         )
         if utility_meter_component is None:
             utility_meter_component = (
-                    hass.data.get("utility_meter_legacy_component") or None
+                hass.data.get("utility_meter_legacy_component") or None
             )
 
         if utility_meter_component is None:
