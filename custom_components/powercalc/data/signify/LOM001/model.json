@@ -1,7 +1,7 @@
 {
 	"measure_description": "Manually measured. Copied from LOM002 as suggested in https://github.com/bramstroker/homeassistant-powercalc/discussions/1093",
 	"measure_method": "manual",
-	"measure_device": "Zhirui PR10-D",
+	"measure_device": "Shelly Plug S",
 	"name": "Hue smart plug LOM001",
 	"standby_power": 0.23,
 	"sensor_config": {
