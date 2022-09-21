@@ -28,7 +28,7 @@ class ProfileLibrary:
             )
             if os.path.exists(dir)
         ]
-        self._profiles: dict[str, list[PowerProfile]] = dict()
+        self._profiles: dict[str, list[PowerProfile]] = {}
 
     def factory(hass: HomeAssistant) -> ProfileLibrary:
         """
