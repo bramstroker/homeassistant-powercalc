@@ -1,0 +1,18 @@
+{
+	"measure_description": "Manually measured. Copied from LOM002 as suggested in https://github.com/bramstroker/homeassistant-powercalc/discussions/1093",
+	"measure_method": "manual",
+	"measure_device": "Shelly Plug S",
+	"name": "Hue smart plug LOM001",
+	"standby_power": 0.23,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	],
+	"fixed_config": {
+		"power": 0.91
+	}
+}
