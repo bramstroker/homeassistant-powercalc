@@ -25,7 +25,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State, CoreState, callback
+from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -82,17 +82,13 @@ async def create_group_sensors(
         filters = default_filters.copy()
         filters.append(lambda elm: not isinstance(elm, GroupedSensor))
         filters.append(lambda elm: isinstance(elm, class_name))
-        return list(
-            map(
-                lambda x: x.entity_id,
-                list(
-                    filter(
-                        lambda x: all(f(x) for f in filters),
-                        all_entities,
-                    )
-                ),
+        return [
+            x.entity_id
+            for x in filter(
+                lambda x: all(f(x) for f in filters),
+                all_entities,
             )
-        )
+        ]
 
     group_sensors = []
 
@@ -251,7 +247,7 @@ def create_grouped_power_sensor(
         hass, sensor_config, name=group_name, unique_id=unique_id
     )
 
-    _LOGGER.debug(f"Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
+    _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedPowerSensor(
         name=name,

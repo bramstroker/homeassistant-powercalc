@@ -30,7 +30,7 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, StateType
 
-from ..common import SourceEntity, get_merged_sensor_configuration
+from ..common import SourceEntity
 from ..const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENERGY_SENSOR_ENTITY_ID,
@@ -59,12 +59,7 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from ..errors import (
-    ModelNotSupported,
-    SensorConfigurationError,
-    StrategyConfigurationError,
-    UnsupportedMode,
-)
+from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from ..power_profile.model_discovery import get_power_profile
 from ..power_profile.power_profile import PowerProfile
 from ..strategy.factory import PowerCalculatorStrategyFactory

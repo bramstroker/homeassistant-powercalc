@@ -76,7 +76,7 @@ from .power_profile.model_discovery import (
     get_power_profile,
     has_manufacturer_and_model_information,
 )
-from .sensors.group import create_group_sensors, update_associated_group_entry
+from .sensors.group import update_associated_group_entry
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -330,7 +330,7 @@ async def create_domain_groups(
     hass: HomeAssistant, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
-    _LOGGER.debug(f"Setting up domain based group sensors..")
+    _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
             _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import logging
-from audioop import mul
 from typing import Any
 
 import voluptuous as vol
@@ -22,7 +21,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.data_entry_flow import FlowHandler, FlowResult
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 
 from .common import SourceEntity, create_source_entity
@@ -49,7 +48,6 @@ from .const import (
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
-    CONF_START_TIME,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
@@ -175,7 +173,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def __init__(self):
         """Initialize options flow."""
-        self.sensor_config: dict[str, Any] = dict()
+        self.sensor_config: dict[str, Any] = {}
         self.selected_sensor_type: str | None = None
         self.name: str | None = None
         self.source_entity: SourceEntity | None = None
