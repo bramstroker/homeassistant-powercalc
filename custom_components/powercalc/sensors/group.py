@@ -346,9 +346,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 continue
 
             hidden_by = er.RegistryEntryHider.INTEGRATION if hide else None
-            registry.async_update_entity(
-                entity_id, hidden_by=hidden_by
-            )
+            registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
     def on_state_change(self, event):

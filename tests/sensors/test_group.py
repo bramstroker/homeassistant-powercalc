@@ -430,7 +430,9 @@ async def test_unhide_members(hass: HomeAssistant):
     assert entity_reg.async_get("sensor.test_power").hidden_by is None
 
 
-async def test_members_are_unhiden_after_group_removed(hass: HomeAssistant, entity_reg: EntityRegistry):
+async def test_members_are_unhiden_after_group_removed(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
     entity_reg.async_get_or_create(
         "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
     )
@@ -443,7 +445,7 @@ async def test_members_are_unhiden_after_group_removed(hass: HomeAssistant, enti
             CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
             CONF_HIDE_MEMBERS: True,
         },
-        unique_id="group_unique_id"
+        unique_id="group_unique_id",
     )
 
     config_entry.add_to_hass(hass)
@@ -451,7 +453,10 @@ async def test_members_are_unhiden_after_group_removed(hass: HomeAssistant, enti
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.mygroup_power")
-    assert entity_reg.async_get("sensor.test_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
+    )
 
     # Remove the config entry
     assert await hass.config_entries.async_remove(config_entry.entry_id)
