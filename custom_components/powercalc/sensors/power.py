@@ -30,7 +30,7 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, StateType
 
-from ..common import SourceEntity, get_merged_sensor_configuration
+from ..common import SourceEntity
 from ..const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENERGY_SENSOR_ENTITY_ID,
@@ -61,7 +61,6 @@ from ..const import (
 )
 from ..errors import (
     ModelNotSupported,
-    SensorConfigurationError,
     StrategyConfigurationError,
     UnsupportedMode,
 )

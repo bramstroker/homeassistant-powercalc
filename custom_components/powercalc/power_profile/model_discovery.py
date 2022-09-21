@@ -85,7 +85,7 @@ async def autodiscover_model(
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
     model_id = device_entry.model
-    if match := re.search("\(([^\(\)]+)\)$", str(device_entry.model)):
+    if match := re.search(r"\(([^\(\)]+)\)$", str(device_entry.model)):
         model_id = match.group(1)
 
     manufacturer = device_entry.manufacturer
