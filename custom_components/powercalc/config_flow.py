@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import logging
-from audioop import mul
 from typing import Any
 
 import voluptuous as vol
@@ -27,6 +26,7 @@ from homeassistant.helpers import selector
 
 from .common import SourceEntity, create_source_entity
 from .const import (
+    CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -49,7 +49,6 @@ from .const import (
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
-    CONF_START_TIME,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
@@ -158,6 +157,10 @@ SCHEMA_POWER_LINEAR = vol.Schema(
 
 SCHEMA_POWER_LUT_AUTODISCOVERED = vol.Schema(
     {vol.Optional(CONF_CONFIRM_AUTODISCOVERED_MODEL, default=True): bool}
+)
+
+SCHEMA_POWER_ADVANCED = vol.Schema(
+    {vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): selector.TemplateSelector()}
 )
 
 SCHEMA_GROUP = vol.Schema(
@@ -281,7 +284,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_FIXED: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
         return self.async_show_form(
             step_id="fixed",
@@ -295,7 +298,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_LINEAR: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
         return self.async_show_form(
             step_id="linear",
@@ -309,7 +312,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_WLED: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
         return self.async_show_form(
             step_id="wled",
@@ -321,7 +324,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Try to autodiscover manufacturer/model first. Ask the user to confirm this or forward to manual configuration"""
         if user_input is not None:
             if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL):
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
             return await self.async_step_lut_manufacturer()
 
@@ -381,7 +384,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_lut_subprofile()
             errors = await self.validate_strategy_config()
             if not errors:
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
         return self.async_show_form(
             step_id="lut_model",
@@ -404,7 +407,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config[CONF_MODEL] = model
             errors = await self.validate_strategy_config()
             if not errors:
-                return self.create_config_entry()
+                return await self.async_step_power_advanced()
 
         model_info = ModelInfo(
             self.sensor_config.get(CONF_MANUFACTURER),
@@ -413,6 +416,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="lut_subprofile",
             data_schema=await _create_lut_schema_subprofile(self.hass, model_info),
+            errors=errors,
+        )
+
+    async def async_step_power_advanced(self, user_input: dict[str, str] = None) -> FlowResult:
+        errors = {}
+        if user_input is not None:
+            return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="power_advanced",
+            data_schema=SCHEMA_POWER_ADVANCED,
             errors=errors,
         )
 
