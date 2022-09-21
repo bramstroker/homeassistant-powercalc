@@ -1,4 +1,4 @@
-# Supported models (191 total)
+# Supported models (192 total)
 | manufacturer |        model id         |                                       name                                        |calculation modes| color modes |                                            aliases                                            |
 |--------------|-------------------------|-----------------------------------------------------------------------------------|-----------------|-------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                                |lut              |color_temp   |                                                                                               |
@@ -131,6 +131,7 @@
 |signify       |LLC011                   |Living Colours Bloom 7099760PH                                                     |lut              |hs           |                                                                                               |
 |signify       |LLC012                   |Hue Bloom Table Lamp                                                               |lut              |hs           |                                                                                               |
 |signify       |LLC020                   |Hue Go                                                                             |lut              |hs,color_temp|7146060PH                                                                                      |
+|signify       |LOM001                   |Hue smart plug LOM001                                                              |fixed            |             |                                                                                               |
 |signify       |LOM002                   |Hue smart plug LOM002                                                              |fixed            |             |                                                                                               |
 |signify       |LST001                   |Hue LightStrip                                                                     |lut              |hs           |7299355PH                                                                                      |
 |signify       |LST002                   |Hue LightStrip Plus (2m)                                                           |lut              |hs,color_temp|                                                                                   915005106701|
