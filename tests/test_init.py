@@ -2,7 +2,7 @@ import logging
 
 import pytest
 from homeassistant.components import input_boolean, light
-from homeassistant.components.light import ColorMode, ATTR_BRIGHTNESS, ATTR_COLOR_MODE
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
@@ -126,7 +126,9 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     assert state.state == "25.00"
 
 
-async def test_config_entry_overrides_autodiscovered(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_config_entry_overrides_autodiscovered(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.ERROR)
 
     light_entity = MockLight("testing", unique_id="abcdef")
@@ -135,11 +137,13 @@ async def test_config_entry_overrides_autodiscovered(hass: HomeAssistant, caplog
     light_entity.color_mode = ColorMode.BRIGHTNESS
     await create_mock_light_entity(hass, light_entity)
 
-    hass.states.async_set("light.testing", STATE_ON, {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
-
-    await run_powercalc_setup_yaml_config(
-        hass, {}, {}
+    hass.states.async_set(
+        "light.testing",
+        STATE_ON,
+        {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
     )
+
+    await run_powercalc_setup_yaml_config(hass, {}, {})
 
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -148,7 +152,7 @@ async def test_config_entry_overrides_autodiscovered(hass: HomeAssistant, caplog
             CONF_NAME: "testing",
             CONF_ENTITY_ID: "light.testing",
             CONF_MANUFACTURER: "signify",
-            CONF_MODEL: "LWA017"
+            CONF_MODEL: "LWA017",
         },
         unique_id="abcdef",
     )
