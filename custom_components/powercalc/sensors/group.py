@@ -326,23 +326,29 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
 
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
 
-        self._async_hide_members()
+        self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS))
+
+    async def async_will_remove_from_hass(self) -> None:
+        """
+        This will trigger when entity is about to be removed from HA
+        Unhide the entities, when they where hidden before
+        """
+        if self._sensor_config.get(CONF_HIDE_MEMBERS) is True:
+            self._async_hide_members(False)
 
     @callback
-    def _async_hide_members(self) -> None:
-        """Hide or unhide group members."""
+    def _async_hide_members(self, hide: True):
+        """Hide/unhide group members"""
         registry = er.async_get(self.hass)
         for entity_id in self._entities:
             registry_entry = registry.async_get(entity_id)
             if not registry_entry:
                 continue
 
-            if self._sensor_config.get(CONF_HIDE_MEMBERS):
-                registry.async_update_entity(
-                    entity_id, hidden_by=er.RegistryEntryHider.INTEGRATION
-                )
-            elif registry_entry.hidden_by == er.RegistryEntryHider.INTEGRATION:
-                registry.async_update_entity(entity_id, hidden_by=None)
+            hidden_by = er.RegistryEntryHider.INTEGRATION if hide else None
+            registry.async_update_entity(
+                entity_id, hidden_by=hidden_by
+            )
 
     @callback
     def on_state_change(self, event):

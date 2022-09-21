@@ -427,7 +427,40 @@ async def test_unhide_members(hass: HomeAssistant):
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by == None
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+
+async def test_members_are_unhiden_after_group_removed(hass: HomeAssistant, entity_reg: EntityRegistry):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+    )
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
+            CONF_HIDE_MEMBERS: True,
+        },
+        unique_id="group_unique_id"
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.mygroup_power")
+    assert entity_reg.async_get("sensor.test_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+
+    # Remove the config entry
+    assert await hass.config_entries.async_remove(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+    assert not hass.states.get("sensor.mygroup_power")
+    assert not entity_reg.async_get("sensor.mygroup_power")
 
 
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
