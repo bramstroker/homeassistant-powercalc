@@ -2,9 +2,9 @@ import logging
 
 import pytest
 from homeassistant.components import input_boolean, light
-from homeassistant.components.light import ColorMode
+from homeassistant.components.light import ColorMode, ATTR_BRIGHTNESS, ATTR_COLOR_MODE
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import (
@@ -27,6 +27,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
@@ -123,6 +124,41 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     state = hass.states.get("sensor.testing_power")
     assert state
     assert state.state == "25.00"
+
+
+async def test_config_entry_overrides_autodiscovered(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+
+    light_entity = MockLight("testing", unique_id="abcdef")
+    light_entity.manufacturer = "signify"
+    light_entity.model = "LWA017"
+    light_entity.color_mode = ColorMode.BRIGHTNESS
+    await create_mock_light_entity(hass, light_entity)
+
+    hass.states.async_set("light.testing", STATE_ON, {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS})
+
+    await run_powercalc_setup_yaml_config(
+        hass, {}, {}
+    )
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "testing",
+            CONF_ENTITY_ID: "light.testing",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LWA017"
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testing_power")
+    assert not caplog.records
 
 
 async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant):
