@@ -25,7 +25,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State, CoreState, callback
+from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -83,8 +83,8 @@ async def create_group_sensors(
         filters.append(lambda elm: not isinstance(elm, GroupedSensor))
         filters.append(lambda elm: isinstance(elm, class_name))
         return [
-            x.entity_id for x in
-            filter(
+            x.entity_id
+            for x in filter(
                 lambda x: all(f(x) for f in filters),
                 all_entities,
             )

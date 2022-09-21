@@ -59,11 +59,7 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
-from ..errors import (
-    ModelNotSupported,
-    StrategyConfigurationError,
-    UnsupportedMode,
-)
+from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from ..power_profile.model_discovery import get_power_profile
 from ..power_profile.power_profile import PowerProfile
 from ..strategy.factory import PowerCalculatorStrategyFactory
