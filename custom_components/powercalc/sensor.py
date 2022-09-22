@@ -366,6 +366,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
 
         sensor_config[CONF_LINEAR] = linear_config
 
+    if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
+        sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(sensor_config[CONF_CALCULATION_ENABLED_CONDITION])
+
     return sensor_config
 
 
