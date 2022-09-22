@@ -110,6 +110,16 @@
                 "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
                 "title": "LUT config"
             },
+            "power_advanced": {
+                "title": "Geavanceerde opties",
+                "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
+                "data": {
+                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie"
+                },
+                "data_description": {
+                    "calculation_enabled_condition": "De geconfigureerde stroom calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen"
+                }
+            },
             "user": {
                 "data": {
                     "sensor_type": "Sensor type"
@@ -160,6 +170,7 @@
             "init": {
                 "data": {
                     "attribute": "Attribuut",
+                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
                     "calibrate": "Kalibratie waardes",
                     "create_energy_sensor": "Creëer energie sensoren",
                     "create_utility_meters": "Creëer utiliteit meters",
@@ -184,6 +195,7 @@
                 },
                 "data_description": {
                     "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+                    "calculation_enabled_condition": "De geconfigureerde stroom calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen",
                     "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
                     "power_template": "Template die geevalueerd wordt om de stroomsterkte (W) te bepalen",
                     "states_power": "Eén 'status: stroom' paar op elke rij, zie het voorbeeld boven",
