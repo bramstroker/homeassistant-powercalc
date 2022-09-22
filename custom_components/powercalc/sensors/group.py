@@ -377,7 +377,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 _LOGGER.error(
                     f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
                 )
-                states.remove(state)
+                available_states.remove(state)
                 self._entities.remove(state.entity_id)
 
         if not available_states:
