@@ -363,7 +363,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state == "50.00"
+    assert power_state.state == STATE_UNAVAILABLE
 
 
 async def test_hide_members(hass: HomeAssistant):
