@@ -32,7 +32,7 @@ from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
-from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
+from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -68,7 +68,6 @@ from .const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
-    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -236,7 +235,7 @@ def build_nested_configuration_schema(schema: dict, iteration: int = 0) -> dict:
 
 SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
 
-PLATFORM_SCHEMA: Final = vol.All(
+PLATFORM_SCHEMA: Final = vol.All(  # noqa: F811
     cv.has_at_least_one_key(
         CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY
     ),
@@ -367,6 +366,11 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str
 
         sensor_config[CONF_LINEAR] = linear_config
 
+    if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
+        sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
+            sensor_config[CONF_CALCULATION_ENABLED_CONDITION]
+        )
+
     return sensor_config
 
 
@@ -469,7 +473,7 @@ async def create_sensors(
             )
         elif not sensor_configs:
             raise SensorConfigurationError(
-                f"Could not resolve any entities for non-group sensor"
+                "Could not resolve any entities for non-group sensor"
             )
 
     # Create group sensors (power, energy, utility)
@@ -487,7 +491,7 @@ async def create_sensors(
     return EntitiesBucket(new=new_sensors, existing=existing_sensors)
 
 
-async def create_individual_sensors(
+async def create_individual_sensors(  # noqa: C901
     hass: HomeAssistant,
     sensor_config: dict,
     context: CreationContext,

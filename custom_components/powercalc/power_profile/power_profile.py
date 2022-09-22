@@ -67,7 +67,7 @@ class PowerProfile:
 
     def get_sub_profiles(self) -> list[str]:
         """Get listing op possible sub profiles"""
-        return sorted(list(next(os.walk(self.get_model_directory(True)))[1]))
+        return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     def supports(self, model: str) -> bool:
         model = model.lower().replace("#slash#", "/")
