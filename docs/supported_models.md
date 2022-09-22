@@ -1,4 +1,4 @@
-# Supported models (192 total)
+# Supported models (191 total)
 | manufacturer |        model id         |                                       name                                        |calculation modes| color modes |                                            aliases                                            |
 |--------------|-------------------------|-----------------------------------------------------------------------------------|-----------------|-------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                                |lut              |color_temp   |                                                                                               |
@@ -86,7 +86,6 @@
 |lifx          |LIFX Original 1000       |LIFX Original 1000                                                                 |lut              |hs,color_temp|                                                                                               |
 |lifx          |LIFX Z                   |LIFX Z                                                                             |lut              |hs,color_temp|                                                                                               |
 |malmbergs     |9970020                  |Malmbergs Sirius III                                                               |lut              |color_temp   |                                                                                               |
-|melitec       |DP15                     |LightZone DP15 LED-Pendelleuchte                                                   |lut              |color_temp   |                                                                                               |
 |mueller-licht |43961                    |Müller Licht GU10 Spot tint white                                                  |lut              |color_temp   |                                                                                               |
 |mueller-licht |45311                    |Müller Licht E27 Globe Gold                                                        |lut              |color_temp   |                                                                                               |
 |mueller-licht |45317                    |Müller Licht E27 Bulb white+color                                                  |lut              |hs,color_temp|                                                                                               |
