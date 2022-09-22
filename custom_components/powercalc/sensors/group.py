@@ -350,11 +350,19 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         if self.hass.state != CoreState.running:
             return
 
-        ignored_states = (STATE_UNAVAILABLE, STATE_UNKNOWN)
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
+        unavailable_states = [
+            state for state in states if state and state.state == STATE_UNAVAILABLE
+        ]
+        if unavailable_states:
+            _LOGGER.error(f"{self.entity_id}: One or more members of the group are unavailable, setting group to unavailable")
+            self._attr_available = False
+            self.async_schedule_update_ha_state(True)
+            return
+
         available_states = [
-            state for state in states if state and state.state not in ignored_states
+            state for state in states if state and state.state != STATE_UNKNOWN
         ]
 
         # Remove members with an incompatible unit of measurement for now
@@ -369,7 +377,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 _LOGGER.error(
                     f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
                 )
-                available_states.remove(state)
+                states.remove(state)
                 self._entities.remove(state.entity_id)
 
         if not available_states:
