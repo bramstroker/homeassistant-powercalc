@@ -133,6 +133,16 @@
         "data": {
           "sub_profile": "Sub profile"
         }
+      },
+      "power_advanced": {
+        "title": "Advanced options",
+        "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
+        "data": {
+          "calculation_enabled_condition": "Calculation enabled condition"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0"
+        }
       }
     },
     "error": {
@@ -158,6 +168,7 @@
           "on_time": "[%key:component::powercalc::config::step::daily_energy::data::on_time%]",
           "value_template": "[%key:component::powercalc::config::step::daily_energy::data::value_template%]",
           "standby_power": "[%key:component::powercalc::config::step::virtual_power::data::standby_power%]",
+          "calculation_enabled_condition": "[%key:component::powercalc::config::step::power_advanced::data::calculation_enabled_condition%]",
           "create_energy_sensor": "[%key:component::powercalc::config::step::virtual_power::data::create_energy_sensor%]",
           "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]",
           "power": "[%key:component::powercalc::config::step::fixed::data::power%]",
@@ -175,6 +186,7 @@
           "hide_members": "[%key:component::powercalc::config::step::group::data::hide_members%]"
         },
         "data_description": {
+          "calculation_enabled_condition": "[%key:component::powercalc::config::step::power_advanced::data_description::calculation_enabled_condition%]",
           "calibrate": "[%key:component::powercalc::config::step::linear::data_description::calibrate%]",
           "attribute": "[%key:component::powercalc::config::step::linear::data_description::attribute%]",
           "power_template": "[%key:component::powercalc::config::step::fixed::data_description::power_template%]",

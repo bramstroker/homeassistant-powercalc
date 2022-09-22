@@ -422,6 +422,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_power_advanced(self, user_input: dict[str, str] = None) -> FlowResult:
         errors = {}
         if user_input is not None:
+            self.sensor_config.update(user_input)
             return self.create_config_entry()
 
         return self.async_show_form(
@@ -500,17 +501,16 @@ class OptionsFlowHandler(OptionsFlow):
             self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
 
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            self.current_config.update(
-                {
-                    CONF_CREATE_ENERGY_SENSOR: user_input.get(
-                        CONF_CREATE_ENERGY_SENSOR
-                    ),
-                    CONF_CREATE_UTILITY_METERS: user_input.get(
-                        CONF_CREATE_UTILITY_METERS
-                    ),
-                    CONF_STANDBY_POWER: user_input.get(CONF_STANDBY_POWER),
-                }
-            )
+            generic_option_schema = SCHEMA_POWER_OPTIONS.extend(SCHEMA_POWER_ADVANCED.schema)
+            generic_options = {}
+            for key, val in generic_option_schema.schema.items():
+                if isinstance(key, vol.Marker):
+                    key = key.schema
+                if key in user_input:
+                    generic_options[key] = user_input.get(key)
+
+            self.current_config.update(generic_options)
+
             strategy = self.current_config.get(CONF_MODE)
 
             strategy_options = _build_strategy_config(
@@ -544,7 +544,7 @@ class OptionsFlowHandler(OptionsFlow):
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             strategy: str = self.current_config.get(CONF_MODE)
             strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
-            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema)
+            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(SCHEMA_POWER_ADVANCED.schema)
             strategy_options = self.current_config.get(strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
