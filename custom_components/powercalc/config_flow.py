@@ -419,7 +419,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_power_advanced(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_power_advanced(
+        self, user_input: dict[str, str] = None
+    ) -> FlowResult:
         errors = {}
         if user_input is not None:
             self.sensor_config.update(user_input)
@@ -501,7 +503,9 @@ class OptionsFlowHandler(OptionsFlow):
             self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
 
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            generic_option_schema = SCHEMA_POWER_OPTIONS.extend(SCHEMA_POWER_ADVANCED.schema)
+            generic_option_schema = SCHEMA_POWER_OPTIONS.extend(
+                SCHEMA_POWER_ADVANCED.schema
+            )
             generic_options = {}
             for key, val in generic_option_schema.schema.items():
                 if isinstance(key, vol.Marker):
@@ -544,7 +548,9 @@ class OptionsFlowHandler(OptionsFlow):
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             strategy: str = self.current_config.get(CONF_MODE)
             strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
-            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(SCHEMA_POWER_ADVANCED.schema)
+            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
+                SCHEMA_POWER_ADVANCED.schema
+            )
             strategy_options = self.current_config.get(strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:

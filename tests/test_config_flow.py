@@ -103,7 +103,9 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
 
     template = "{states(input_number.my_number} | float"
-    result = await _set_virtual_power_configuration(hass, result, {CONF_POWER_TEMPLATE: template})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_POWER_TEMPLATE: template}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -119,7 +121,9 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
 
 async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
-    result = await _set_virtual_power_configuration(hass, result, {CONF_STATES_POWER: ""})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_STATES_POWER: ""}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -133,7 +137,9 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
 
 async def test_create_linear_sensor_entry(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
-    result = await _set_virtual_power_configuration(hass, result, {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -160,7 +166,9 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant):
     await _create_wled_entities(hass)
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
-    result = await _set_virtual_power_configuration(hass, result, {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -206,9 +214,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     # Advanced options step
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {}
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
@@ -233,7 +239,9 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "lut"
 
-    result = await _set_virtual_power_configuration(hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -310,7 +318,9 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     assert {"value": "ambilight", "label": "ambilight"} in select_options
     assert {"value": "downlight", "label": "downlight"} in select_options
 
-    result = await _set_virtual_power_configuration(hass, result, {CONF_SUB_PROFILE: "ambilight"})
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_SUB_PROFILE: "ambilight"}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
@@ -326,7 +336,9 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
         CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}"
     }
 
-    result = await _set_virtual_power_configuration(hass, result, {CONF_POWER: 20}, advanced_options)
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_POWER: 20}, advanced_options
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
@@ -334,11 +346,9 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
         CalculationStrategy.FIXED,
         result["data"],
         {
-            CONF_FIXED: {
-                CONF_POWER: 20
-            },
-            CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}"
-        }
+            CONF_FIXED: {CONF_POWER: 20},
+            CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}",
+        },
     )
 
 
@@ -708,7 +718,7 @@ async def _goto_virtual_power_strategy_step(
             CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         }
 
-    result = await _select_sensor_type(hass,SensorType.VIRTUAL_POWER)
+    result = await _select_sensor_type(hass, SensorType.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], user_input
     )
