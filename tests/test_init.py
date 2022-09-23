@@ -110,6 +110,32 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
     assert not hass.states.get("sensor.testc_power")
 
 
+async def test_discovery_skipped_when_confirmed_by_user(hass: HomeAssistant, mock_flow_init):
+    light_entity = MockLight("test")
+    light_entity.manufacturer = "lidl"
+    light_entity.model = "HG06106C"
+    await create_mock_light_entity(hass, light_entity)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_UNIQUE_ID: light_entity.unique_id,
+            CONF_NAME: light_entity.name,
+            CONF_ENTITY_ID: light_entity.entity_id,
+            CONF_MANUFACTURER: light_entity.manufacturer,
+            CONF_MODEL: light_entity.model,
+        },
+        source=SOURCE_INTEGRATION_DISCOVERY,
+        unique_id=light_entity.unique_id
+    )
+    config_entry.add_to_hass(hass)
+
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not mock_flow_init.mock_calls
+
+
 async def test_autodiscovery_disabled(hass: HomeAssistant):
     """Test that power sensors are not automatically added when auto discovery is disabled"""
 

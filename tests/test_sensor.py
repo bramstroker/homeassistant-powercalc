@@ -4,7 +4,7 @@ import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import ColorMode
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
@@ -219,18 +219,20 @@ async def test_error_when_configuring_same_entity_twice(
 async def test_alternate_naming_strategy(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {
+        CONF_POWER_SENSOR_NAMING: "{} Power consumption",
+        CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
+        CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
+        CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+    }})
+    await hass.async_block_till_done()
+
+    assert await async_setup_component(
         hass,
-        [
-            get_simple_fixed_config("input_boolean.test", 50),
-        ],
-        {
-            CONF_POWER_SENSOR_NAMING: "{} Power consumption",
-            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
-            CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
-            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
-        },
+        SENSOR_DOMAIN,
+        {SENSOR_DOMAIN: {"platform": DOMAIN, CONF_ENTITY_ID: "input_boolean.test", CONF_FIXED: {CONF_POWER: 25}}}
     )
+    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.test_power_consumption")
     assert power_state
