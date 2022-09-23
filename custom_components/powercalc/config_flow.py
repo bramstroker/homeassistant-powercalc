@@ -62,9 +62,9 @@ from .const import (
     SensorType,
 )
 from .errors import ModelNotSupported, StrategyConfigurationError
-from .power_profile.power_profile import PowerProfile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.model_discovery import get_power_profile
+from .power_profile.power_profile import PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -199,7 +199,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle integration discovery."""
 
-        self.skip_advanced_step = True  # We don't want to ask advanced option when discovered
+        self.skip_advanced_step = (
+            True  # We don't want to ask advanced option when discovered
+        )
         self.sensor_config.update(discovery_info)
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.name = discovery_info[CONF_NAME]
@@ -356,7 +358,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self.sensor_config.update(
                     {
                         CONF_MANUFACTURER: self.power_profile.manufacturer,
-                        CONF_MODEL: self.power_profile.model
+                        CONF_MODEL: self.power_profile.model,
                     }
                 )
                 return await self.async_step_power_advanced()
