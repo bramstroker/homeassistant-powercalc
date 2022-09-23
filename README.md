@@ -61,12 +61,14 @@ powercalc:
 
 ### Setup power sensors
 
-Powercalc has a build-in library of more than 190 light models ([LUT](#lut-mode)), which have been measured and provided by users. See [supported models](docs/supported_models.md).
+Powercalc has a build-in library of more than 190 power profiles. Currently, this exists mostly of lights. 
+These profiles have been measured and provided by users. See [supported models](docs/supported_models.md) for the listing of supported devices.
 
-Starting from 0.12.0 Powercalc can automatically discover entities in your HA instance which are supported for automatic configuration.
-After intallation and restarting HA power and energy sensors should appear. When this is not the case please check the logs for any errors.
+Powercalc scans your HA instance for entities which are supported for automatic configuration. It does that based on the manufacturer and model information known in HA.
+After following the installation steps above and restarting HA power and energy sensors should appear.
+When this is not the case please check the logs for any errors, you can also enable debug logging to get more details about the discovery routine.
 
-When your appliance is not supported you have extensive options for manual configuration. These are explained below.
+When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. These are explained below.
 
 > Note: Manually configuring an entity will override an auto discovered entity
 
@@ -74,7 +76,7 @@ When your appliance is not supported you have extensive options for manual confi
 
 To manually add virtual sensors for your devices you have to add some configuration to `configuration.yaml`, or you can use the GUI configuration ("Settings" -> "Devices & Services" -> "Add integration" -> "Powercalc") and follow the instructions.
 
-Additionally some settings can be applied on global level and will apply to all your virtual power sensors. This global configuration cannot be configured using the GUI yet.
+Additionally, some settings can be applied on global level and will apply to all your virtual power sensors. This global configuration cannot be configured using the GUI yet.
 
 After changing the configuration you need to restart HA to get your power sensors to appear. This is only necessary for changes in the YAML files. 
 
