@@ -66,6 +66,35 @@ DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 
+async def test_discovery_flow(hass: HomeAssistant):
+    result: FlowResult = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
+        data={
+            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            CONF_NAME: "test",
+            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        }
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {}
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "signify",
+        CONF_MODEL: "LCT010",
+        CONF_MODE: CalculationStrategy.LUT,
+        CONF_NAME: "test",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+    }
+
+
 async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     """Test a menu is diplayed with sensor type selection"""
 
