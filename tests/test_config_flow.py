@@ -86,7 +86,9 @@ async def test_discovery_flow(hass: HomeAssistant):
 
     # Confirm selected manufacturer/model
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
@@ -280,10 +282,7 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.LUT,
         result["data"],
-        {
-            CONF_MANUFACTURER: light_entity.manufacturer,
-            CONF_MODEL: light_entity.model
-        }
+        {CONF_MANUFACTURER: light_entity.manufacturer, CONF_MODEL: light_entity.model},
     )
 
     await hass.async_block_till_done()
