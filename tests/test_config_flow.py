@@ -76,13 +76,11 @@ async def test_discovery_flow(hass: HomeAssistant):
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
-        }
+        },
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {}
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_ENTITY_ID: DEFAULT_ENTITY_ID,

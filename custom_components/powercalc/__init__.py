@@ -8,29 +8,33 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry, SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
+from homeassistant.config_entries import (
+    SOURCE_INTEGRATION_DISCOVERY,
+    SOURCE_USER,
+    ConfigEntry,
+)
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_UNIQUE_ID,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
+    CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
+from homeassistant.helpers.typing import ConfigType
 
-from .common import create_source_entity, validate_name_pattern, SourceEntity
+from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -78,9 +82,9 @@ from .const import (
 )
 from .errors import ModelNotSupported
 from .power_profile.model_discovery import (
+    PowerProfile,
     get_power_profile,
     has_manufacturer_and_model_information,
-    PowerProfile,
 )
 from .sensors.group import update_associated_group_entry
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -292,10 +296,14 @@ class DiscoveryManager:
             if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
                 continue
 
-            if not await has_manufacturer_and_model_information(self.hass, entity_entry):
+            if not await has_manufacturer_and_model_information(
+                self.hass, entity_entry
+            ):
                 continue
 
-            source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
+            source_entity = await create_source_entity(
+                entity_entry.entity_id, self.hass
+            )
             try:
                 power_profile = await get_power_profile(
                     self.hass, {}, source_entity.entity_entry
@@ -311,7 +319,10 @@ class DiscoveryManager:
 
             has_user_config = self._is_user_configured(entity_entry.entity_id)
 
-            if power_profile.is_additional_configuration_required and not has_user_config:
+            if (
+                power_profile.is_additional_configuration_required
+                and not has_user_config
+            ):
                 _LOGGER.warning(
                     f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
                 )
@@ -332,15 +343,18 @@ class DiscoveryManager:
         _LOGGER.debug("Done auto discovering entities")
 
     @callback
-    def _init_entity_discovery(self, source_entity: SourceEntity, power_profile: PowerProfile):
+    def _init_entity_discovery(
+        self, source_entity: SourceEntity, power_profile: PowerProfile
+    ):
         existing_entries = [
             entry
-            for entry in
-            self.hass.config_entries.async_entries(DOMAIN)
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
             if entry.unique_id == source_entity.unique_id
         ]
         if existing_entries:
-            _LOGGER.debug(f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery")
+            _LOGGER.debug(
+                f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery"
+            )
             return
 
         discovery_flow.async_create_flow(
@@ -353,7 +367,7 @@ class DiscoveryManager:
                 CONF_ENTITY_ID: source_entity.entity_id,
                 CONF_MANUFACTURER: power_profile.manufacturer,
                 CONF_MODEL: power_profile.model,
-            }
+            },
         )
 
         # Code below if for legacy discovery routine, will be removed somewhere in the future
@@ -375,7 +389,9 @@ class DiscoveryManager:
         Either with the YAML or GUI method.
         """
         if not self.manually_configured_entities:
-            self.manually_configured_entities = self._load_manually_configured_entities()
+            self.manually_configured_entities = (
+                self._load_manually_configured_entities()
+            )
 
         return entity_id in self.manually_configured_entities
 
@@ -386,7 +402,8 @@ class DiscoveryManager:
         if SENSOR_DOMAIN in self.ha_config:
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
             platform_entries = [
-                item for item in sensor_config
+                item
+                for item in sensor_config
                 if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
             ]
             for entry in platform_entries:

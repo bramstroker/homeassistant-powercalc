@@ -1,10 +1,10 @@
 import logging
-
 from unittest.mock import AsyncMock, call, patch
+
 import pytest
 from homeassistant.components import input_boolean, light
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
-from homeassistant.config_entries import ConfigEntryState, SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntryState
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -87,7 +87,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
                 CONF_ENTITY_ID: lighta.entity_id,
                 CONF_MANUFACTURER: lighta.manufacturer,
                 CONF_MODEL: lighta.model,
-            }
+            },
         ),
         call(
             DOMAIN,
@@ -98,8 +98,8 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
                 CONF_ENTITY_ID: lightb.entity_id,
                 CONF_MANUFACTURER: lightb.manufacturer,
                 CONF_MODEL: lightb.model,
-            }
-        )
+            },
+        ),
     ]
 
     # Also check if power sensors are created.
@@ -110,7 +110,9 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
     assert not hass.states.get("sensor.testc_power")
 
 
-async def test_discovery_skipped_when_confirmed_by_user(hass: HomeAssistant, mock_flow_init):
+async def test_discovery_skipped_when_confirmed_by_user(
+    hass: HomeAssistant, mock_flow_init
+):
     light_entity = MockLight("test")
     light_entity.manufacturer = "lidl"
     light_entity.model = "HG06106C"
@@ -126,7 +128,7 @@ async def test_discovery_skipped_when_confirmed_by_user(hass: HomeAssistant, moc
             CONF_MODEL: light_entity.model,
         },
         source=SOURCE_INTEGRATION_DISCOVERY,
-        unique_id=light_entity.unique_id
+        unique_id=light_entity.unique_id,
     )
     config_entry.add_to_hass(hass)
 
