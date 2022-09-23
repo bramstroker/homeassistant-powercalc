@@ -23,6 +23,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
+from homeassistant.helpers.typing import DiscoveryInfoType
 
 from .common import SourceEntity, create_source_entity
 from .const import (
@@ -189,6 +190,38 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow for this handler."""
         return OptionsFlowHandler(config_entry)
+
+    async def async_step_integration_discovery(
+        self, discovery_info: DiscoveryInfoType
+    ) -> FlowResult:
+        """Handle integration discovery."""
+
+        self.sensor_config.update(discovery_info)
+        self.sensor_config.update({CONF_MODE: CalculationStrategy.LUT})
+        self.selected_sensor_type = SensorType.VIRTUAL_POWER
+        self.name = discovery_info[CONF_NAME]
+        unique_id = discovery_info[CONF_UNIQUE_ID]
+        await self.async_set_unique_id(unique_id)
+
+        return await self.async_step_discovery_confirm()
+
+    async def async_step_discovery_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Confirm discovery."""
+
+        if user_input is not None:
+            return self.create_config_entry()
+        self._set_confirm_only()
+        placeholders = {
+            "name": self.sensor_config.get(CONF_NAME),
+            "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
+            "model": self.sensor_config.get(CONF_MODEL),
+        }
+        self.context["title_placeholders"] = placeholders
+        return self.async_show_form(
+            step_id="discovery_confirm", description_placeholders=placeholders
+        )
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""

@@ -13,11 +13,13 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_UNIQUE_ID,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_STARTED,
@@ -25,7 +27,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
+from homeassistant.helpers import discovery, discovery_flow
 
 from .common import create_source_entity, validate_name_pattern
 from .const import (
@@ -40,6 +42,8 @@ from .const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -288,6 +292,19 @@ async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAss
 
         if not power_profile.is_entity_domain_supported(source_entity.domain):
             continue
+
+        discovery_flow.async_create_flow(
+            hass,
+            DOMAIN,
+            context={"source": SOURCE_INTEGRATION_DISCOVERY},
+            data={
+                CONF_UNIQUE_ID: f"d{source_entity.unique_id}",
+                CONF_NAME: source_entity.name,
+                CONF_ENTITY_ID: source_entity.entity_id,
+                CONF_MANUFACTURER: power_profile.manufacturer,
+                CONF_MODEL: power_profile.model,
+            }
+        )
 
         discovery_info = {
             CONF_ENTITY_ID: entity_entry.entity_id,
