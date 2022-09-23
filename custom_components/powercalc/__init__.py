@@ -278,6 +278,7 @@ class DiscoveryManager:
     def __init__(self, hass: HomeAssistant, ha_config: ConfigType):
         self.hass = hass
         self.ha_config = ha_config
+        self.manually_configured_entities: list[str] | None = None
 
     async def start_discovery(self):
         """Discover entities supported for powercalc autoconfiguration in HA instance"""
@@ -308,7 +309,7 @@ class DiscoveryManager:
                 )
                 continue
 
-            has_user_config = self.is_user_configured(entity_entry.entity_id)
+            has_user_config = self._is_user_configured(entity_entry.entity_id)
 
             if power_profile.is_additional_configuration_required and not has_user_config:
                 _LOGGER.warning(
@@ -368,29 +369,63 @@ class DiscoveryManager:
             )
         )
 
-    def is_user_configured(self, entity_id: str) -> bool:
+    def _is_user_configured(self, entity_id: str) -> bool:
         """
         Check if user have setup powercalc sensors for a given entity_id.
         Either with the YAML or GUI method.
         """
+        if not self.manually_configured_entities:
+            self.manually_configured_entities = self._load_manually_configured_entities()
+
+        return entity_id in self.manually_configured_entities
+
+    def _load_manually_configured_entities(self) -> list[str]:
+        entities = []
+
+        # Find entity ids in yaml config
         if SENSOR_DOMAIN in self.ha_config:
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
-            for item in sensor_config:
-                if (
-                        isinstance(item, dict)
-                        and item.get(CONF_PLATFORM) == DOMAIN
-                        and item.get(CONF_ENTITY_ID) == entity_id
-                ):
-                    return True
+            platform_entries = [
+                item for item in sensor_config
+                if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
+            ]
+            for entry in platform_entries:
+                entities.extend(self._find_entity_ids_in_yaml_config(entry))
 
-        # Check if the user has setup a config entry for this entity_id
-        config_entries = [
-            entry
-            for entry in self.hass.config_entries.async_entries(DOMAIN)
-            if entry.source == SOURCE_USER
-            and entry.data.get(CONF_ENTITY_ID) == entity_id
-        ]
-        if config_entries:
-            return True
+        # Add entities from existing config entries
+        entities.extend(
+            [
+                entry.data.get(CONF_ENTITY_ID)
+                for entry in self.hass.config_entries.async_entries(DOMAIN)
+                if entry.source == SOURCE_USER
+            ]
+        )
 
-        return False
+        return entities
+
+    def _find_entity_ids_in_yaml_config(self, search_dict: dict):
+        """
+        Takes a dict with nested lists and dicts,
+        and searches all dicts for a key of the field
+        provided.
+        """
+        found_entity_ids = []
+
+        for key, value in search_dict.items():
+
+            if key == "entity_id":
+                found_entity_ids.append(value)
+
+            elif isinstance(value, dict):
+                results = self._find_entity_ids_in_yaml_config(value)
+                for result in results:
+                    found_entity_ids.append(result)
+
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        results = self._find_entity_ids_in_yaml_config(item)
+                        for result in results:
+                            found_entity_ids.append(result)
+
+        return found_entity_ids
