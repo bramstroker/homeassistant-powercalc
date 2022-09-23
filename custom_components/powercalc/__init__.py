@@ -279,13 +279,19 @@ async def create_domain_groups(
 
 
 class DiscoveryManager:
+    """
+    This class is responsible for scanning the HA instance for entities and their manufacturer / model info
+    It checks if any of these devices is supported in the powercalc library
+    When entities are found it will dispatch a discovery flow, so the user can add them to their HA instance
+    """
+
     def __init__(self, hass: HomeAssistant, ha_config: ConfigType):
         self.hass = hass
         self.ha_config = ha_config
         self.manually_configured_entities: list[str] | None = None
 
     async def start_discovery(self):
-        """Discover entities supported for powercalc autoconfiguration in HA instance"""
+        """Start the discovery procedure"""
 
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
@@ -346,6 +352,7 @@ class DiscoveryManager:
     def _init_entity_discovery(
         self, source_entity: SourceEntity, power_profile: PowerProfile
     ):
+        """Dispatch the discovery flow for a given entity"""
         existing_entries = [
             entry
             for entry in self.hass.config_entries.async_entries(DOMAIN)
@@ -396,6 +403,7 @@ class DiscoveryManager:
         return entity_id in self.manually_configured_entities
 
     def _load_manually_configured_entities(self) -> list[str]:
+        """Looks at the YAML and GUI config entries for all the configured entity_id's"""
         entities = []
 
         # Find entity ids in yaml config
