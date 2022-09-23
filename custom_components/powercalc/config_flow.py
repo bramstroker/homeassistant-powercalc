@@ -62,6 +62,7 @@ from .const import (
     SensorType,
 )
 from .errors import ModelNotSupported, StrategyConfigurationError
+from .power_profile.power_profile import PowerProfile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.model_discovery import get_power_profile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
@@ -184,6 +185,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.name: str | None = None
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str | None = None
+        self.power_profile: PowerProfile | None = None
+        self.skip_advanced_step: bool = False
 
     @staticmethod
     @callback
@@ -196,32 +199,25 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle integration discovery."""
 
+        self.skip_advanced_step = True  # We don't want to ask advanced option when discovered
         self.sensor_config.update(discovery_info)
-        self.sensor_config.update({CONF_MODE: CalculationStrategy.LUT})
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.name = discovery_info[CONF_NAME]
         unique_id = discovery_info[CONF_UNIQUE_ID]
         await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
 
-        return await self.async_step_discovery_confirm()
+        self.source_entity_id = discovery_info[CONF_ENTITY_ID]
+        self.source_entity = await create_source_entity(
+            self.source_entity_id, self.hass
+        )
 
-    async def async_step_discovery_confirm(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Confirm discovery."""
-
-        if user_input is not None:
-            return self.create_config_entry()
-        self._set_confirm_only()
-        placeholders = {
+        self.context["title_placeholders"] = {
             "name": self.sensor_config.get(CONF_NAME),
             "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
             "model": self.sensor_config.get(CONF_MODEL),
         }
-        self.context["title_placeholders"] = placeholders
-        return self.async_show_form(
-            step_id="discovery_confirm", description_placeholders=placeholders
-        )
+        return await self.async_step_lut()
 
     async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step."""
@@ -356,25 +352,30 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_lut(self, user_input: dict[str, str] = None) -> FlowResult:
         """Try to autodiscover manufacturer/model first. Ask the user to confirm this or forward to manual configuration"""
         if user_input is not None:
-            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL):
+            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.power_profile:
+                self.sensor_config.update(
+                    {
+                        CONF_MANUFACTURER: self.power_profile.manufacturer,
+                        CONF_MODEL: self.power_profile.model
+                    }
+                )
                 return await self.async_step_power_advanced()
 
             return await self.async_step_lut_manufacturer()
 
-        power_profile = None
         if self.source_entity.entity_entry:
             try:
-                power_profile = await get_power_profile(
+                self.power_profile = await get_power_profile(
                     self.hass, {}, self.source_entity.entity_entry
                 )
             except ModelNotSupported:
-                power_profile = None
-        if power_profile:
+                self.power_profile = None
+        if self.power_profile:
             return self.async_show_form(
                 step_id="lut",
                 description_placeholders={
-                    "manufacturer": power_profile.manufacturer,
-                    "model": power_profile.model,
+                    "manufacturer": self.power_profile.manufacturer,
+                    "model": self.power_profile.model,
                 },
                 data_schema=SCHEMA_POWER_LUT_AUTODISCOVERED,
                 errors={},
@@ -456,8 +457,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, str] = None
     ) -> FlowResult:
         errors = {}
-        if user_input is not None:
-            self.sensor_config.update(user_input)
+        if user_input is not None or self.skip_advanced_step:
+            self.sensor_config.update(user_input or {})
             return self.create_config_entry()
 
         return self.async_show_form(

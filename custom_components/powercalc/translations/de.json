@@ -1,5 +1,6 @@
 {
     "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine Unique-Id an"
         },

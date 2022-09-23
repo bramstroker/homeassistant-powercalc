@@ -67,6 +67,11 @@ DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 
 async def test_discovery_flow(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    light_entity.manufacturer = "signify"
+    light_entity.model = "LCT010"
+    await create_mock_light_entity(hass, light_entity)
+
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
@@ -78,16 +83,17 @@ async def test_discovery_flow(hass: HomeAssistant):
             CONF_MODEL: "LCT010",
         },
     )
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
 
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    # Confirm selected manufacturer/model
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True})
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "signify",
         CONF_MODEL: "LCT010",
-        CONF_MODE: CalculationStrategy.LUT,
         CONF_NAME: "test",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
     }
@@ -272,7 +278,12 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.LUT, result["data"], {}
+        CalculationStrategy.LUT,
+        result["data"],
+        {
+            CONF_MANUFACTURER: light_entity.manufacturer,
+            CONF_MODEL: light_entity.model
+        }
     )
 
     await hass.async_block_till_done()
