@@ -352,11 +352,15 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
 
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        unavailable_states = [
-            state for state in states if state and state.state == STATE_UNAVAILABLE
+        unavailable_entities = [
+            state.entity_id for state in states if state and state.state == STATE_UNAVAILABLE
         ]
-        if unavailable_states:
-            _LOGGER.error(f"{self.entity_id}: One or more members of the group are unavailable, setting group to unavailable")
+        if unavailable_entities:
+            _LOGGER.error(
+                "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
+                self.entity_id,
+                ",".join(unavailable_entities)
+            )
             self._attr_available = False
             self.async_schedule_update_ha_state(True)
             return

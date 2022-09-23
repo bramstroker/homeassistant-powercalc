@@ -1,5 +1,6 @@
 {
   "config": {
+    "flow_title": "{name} ({manufacturer} {model})",
     "abort": {
       "already_configured": "Sensor is already configured, specify a unique_id"
     },
@@ -26,6 +27,9 @@
           "on_time": "When left empty defaults to 1 day. always on",
           "update_frequency": "time in seconds between state updates of the sensor"
         }
+      },
+      "discovery_confirm": {
+        "description": "Do you want to setup power sensors for {name} ({manufacturer} {model})?"
       },
       "group": {
         "title": "Create a group sensor",
