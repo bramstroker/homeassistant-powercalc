@@ -14,7 +14,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry, SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.config_entries import ConfigEntry, SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
@@ -27,7 +27,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
 
 from .common import create_source_entity, validate_name_pattern, SourceEntity
@@ -303,7 +303,7 @@ class DiscoveryManager:
                     continue
             except ModelNotSupported:
                 _LOGGER.debug(
-                    "%s: Model not found in library, skipping auto configuration",
+                    "%s: Model not found in library, skipping discovery",
                     entity_entry.entity_id,
                 )
                 continue
@@ -326,17 +326,28 @@ class DiscoveryManager:
             if not power_profile.is_entity_domain_supported(source_entity.domain):
                 continue
 
-            self.init_entity_discovery(source_entity, power_profile)
+            self._init_entity_discovery(source_entity, power_profile)
 
         _LOGGER.debug("Done auto discovering entities")
 
-    def init_entity_discovery(self, source_entity: SourceEntity, power_profile: PowerProfile):
+    @callback
+    def _init_entity_discovery(self, source_entity: SourceEntity, power_profile: PowerProfile):
+        existing_entries = [
+            entry
+            for entry in
+            self.hass.config_entries.async_entries(DOMAIN)
+            if entry.unique_id == source_entity.unique_id
+        ]
+        if existing_entries:
+            _LOGGER.debug(f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery")
+            return
+
         discovery_flow.async_create_flow(
             self.hass,
             DOMAIN,
             context={"source": SOURCE_INTEGRATION_DISCOVERY},
             data={
-                CONF_UNIQUE_ID: f"d{source_entity.unique_id}",
+                CONF_UNIQUE_ID: source_entity.unique_id,
                 CONF_NAME: source_entity.name,
                 CONF_ENTITY_ID: source_entity.entity_id,
                 CONF_MANUFACTURER: power_profile.manufacturer,
@@ -344,6 +355,7 @@ class DiscoveryManager:
             }
         )
 
+        # Code below if for legacy discovery routine, will be removed somewhere in the future
         discovery_info = {
             CONF_ENTITY_ID: source_entity.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
@@ -371,8 +383,14 @@ class DiscoveryManager:
                 ):
                     return True
 
-        for config_entry in self.hass.config_entries.async_entries(DOMAIN):
-            if config_entry.data.get(CONF_ENTITY_ID) == entity_id:
-                return True
+        # Check if the user has setup a config entry for this entity_id
+        config_entries = [
+            entry
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
+            if entry.source == SOURCE_USER
+            and entry.data.get(CONF_ENTITY_ID) == entity_id
+        ]
+        if config_entries:
+            return True
 
         return False
