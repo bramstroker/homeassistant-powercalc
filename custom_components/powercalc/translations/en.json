@@ -33,6 +33,9 @@
                 },
                 "title": "Create a daily fixed sensor"
             },
+            "discovery_confirm": {
+                "description": "Do you want to setup power sensors for {name} ({manufacturer} {model})?"
+            },
             "fixed": {
                 "data": {
                     "power": "Power",
