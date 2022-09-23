@@ -279,7 +279,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     # Run powercalc setup with autodiscovery
     await run_powercalc_setup_yaml_config(hass, {}, {})
 
-    assert "Model not found in library, skipping auto configuration" in caplog.text
+    assert "Model not found in library, skipping discovery" in caplog.text
 
 
 async def test_can_include_autodiscovered_entity_in_group(
