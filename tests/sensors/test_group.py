@@ -205,7 +205,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
 async def test_entities_with_incompatible_unit_of_measurement_are_removed(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
-    caplog.set_level(logging.ERROR)
+    caplog.set_level(logging.WARNING)
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
