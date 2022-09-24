@@ -415,7 +415,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
     def __init__(
         self,
         name: str,
-        entities: list[str],
+        entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
         unique_id: str | None = None,

@@ -148,7 +148,7 @@ from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_ENTITY_DOMAINS = (
+SUPPORTED_ENTITY_DOMAINS = [
     light.DOMAIN,
     switch.DOMAIN,
     fan.DOMAIN,
@@ -164,7 +164,7 @@ SUPPORTED_ENTITY_DOMAINS = (
     sensor.DOMAIN,
     vacuum.DOMAIN,
     water_heater.DOMAIN,
-)
+]
 
 MAX_GROUP_NESTING_LEVEL = 5
 
