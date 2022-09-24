@@ -21,6 +21,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -335,6 +336,10 @@ async def test_mega_watt_hour(hass: HomeAssistant):
 
 
 async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
+    """
+    When any of the group members becomes unavailable the energy group should also be unavailable
+    Group power sensor must only be unavailable when ALL group members are unavailable
+    """
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
@@ -356,14 +361,17 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state.state == STATE_UNAVAILABLE
 
-    energy_state = hass.states.get("sensor.testgroup_power")
-    assert energy_state.state == STATE_UNAVAILABLE
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNKNOWN
 
     hass.states.async_set("input_boolean.test1", STATE_ON)
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state == STATE_UNAVAILABLE
+    assert power_state.state != STATE_UNAVAILABLE
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNAVAILABLE
 
 
 async def test_hide_members(hass: HomeAssistant):

@@ -357,7 +357,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             for state in states
             if state and state.state == STATE_UNAVAILABLE
         ]
-        if unavailable_entities:
+        if unavailable_entities and isinstance(self, GroupedEnergySensor):
             _LOGGER.error(
                 "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
                 self.entity_id,
@@ -368,7 +368,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             return
 
         available_states = [
-            state for state in states if state and state.state != STATE_UNKNOWN
+            state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
 
         # Remove members with an incompatible unit of measurement for now
