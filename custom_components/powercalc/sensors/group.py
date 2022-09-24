@@ -368,7 +368,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             return
 
         available_states = [
-            state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
+            state
+            for state in states
+            if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
 
         # Remove members with an incompatible unit of measurement for now
