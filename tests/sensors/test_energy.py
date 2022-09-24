@@ -1,18 +1,16 @@
 from homeassistant.components import input_boolean
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
-from homeassistant.const import (
-    CONF_ENTITIES,
-    CONF_ENTITY_ID,
-)
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.setup import async_setup_component
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
+    MockEntity,
+    MockEntityPlatform,
     mock_device_registry,
     mock_registry,
 )
-from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -23,7 +21,9 @@ from custom_components.powercalc.const import (
 from ..common import run_powercalc_setup_yaml_config
 
 
-async def test_related_energy_sensor_is_used_for_existing_power_sensor(hass: HomeAssistant):
+async def test_related_energy_sensor_is_used_for_existing_power_sensor(
+    hass: HomeAssistant,
+):
     assert await async_setup_component(
         hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
     )
@@ -45,14 +45,14 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(hass: Hom
                 unique_id="1234",
                 platform="sensor",
                 device_id="shelly-device-id",
-                device_class=SensorDeviceClass.POWER
+                device_class=SensorDeviceClass.POWER,
             ),
             "sensor.existing_energy": RegistryEntry(
                 entity_id="sensor.existing_energy",
                 unique_id="12345",
                 platform="sensor",
                 device_id="shelly-device-id",
-                device_class=SensorDeviceClass.ENERGY
+                device_class=SensorDeviceClass.ENERGY,
             ),
         },
     )
@@ -68,7 +68,7 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(hass: Hom
                     CONF_ENTITY_ID: "sensor.dummy",
                     CONF_POWER_SENSOR_ID: "sensor.existing_power",
                 },
-            ]
+            ],
         },
     )
 
