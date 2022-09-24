@@ -358,7 +358,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             if state and state.state == STATE_UNAVAILABLE
         ]
         if unavailable_entities and isinstance(self, GroupedEnergySensor):
-            _LOGGER.error(
+            _LOGGER.warning(
                 "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
                 self.entity_id,
                 ",".join(unavailable_entities),
@@ -382,7 +382,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             ):  # No unit of measurement, probably sensor has been reset
                 continue
             if unit_of_measurement != self._attr_native_unit_of_measurement:
-                _LOGGER.error(
+                _LOGGER.warning(
                     f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
                 )
                 available_states.remove(state)
