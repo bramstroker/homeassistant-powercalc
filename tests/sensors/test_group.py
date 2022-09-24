@@ -13,7 +13,6 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
@@ -72,7 +71,6 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "group_unique_id",
             CONF_CREATE_UTILITY_METERS: True,
@@ -345,7 +343,6 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
@@ -381,7 +378,6 @@ async def test_hide_members(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: True,
             CONF_ENTITIES: [
@@ -423,7 +419,6 @@ async def test_unhide_members(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: False,
             CONF_ENTITIES: [
@@ -489,7 +484,6 @@ async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegist
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "abcdef",
             CONF_CREATE_UTILITY_METERS: True,
@@ -627,7 +621,6 @@ async def test_custom_naming_pattern(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
