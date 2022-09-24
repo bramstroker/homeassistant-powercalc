@@ -338,7 +338,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_wled(self, user_input: dict[str, str] = None) -> FlowResult:
-        errors = {}
+        errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_WLED: user_input})
             errors = await self.validate_strategy_config()
@@ -405,7 +405,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_lut_model(
         self, user_input: dict[str, str] = None
     ) -> FlowResult:
-        errors = {}
+        errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
             library = ProfileLibrary(self.hass)
@@ -436,7 +436,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_lut_subprofile(
         self, user_input: dict[str, str] = None
     ) -> FlowResult:
-        errors = {}
+        errors: dict[str, str] = {}
         if user_input is not None:
             # Append the sub profile to the model
             model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
@@ -458,7 +458,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_power_advanced(
         self, user_input: dict[str, str] = None
     ) -> FlowResult:
-        errors = {}
+        errors: dict[str, str] = {}
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
             return self.create_config_entry()
@@ -607,7 +607,7 @@ async def _create_strategy_object(
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
-    power_profile = None
+    power_profile: PowerProfile | None = None
     if strategy == CalculationStrategy.LUT:
         power_profile = await ProfileLibrary.factory(hass).get_profile(
             ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
@@ -702,7 +702,7 @@ def _validate_group_input(user_input: dict[str, str] = None) -> dict:
     """Validate the group form"""
     if not user_input:
         return {}
-    errors = {}
+    errors: dict[str, str] = {}
 
     if (
         CONF_SUB_GROUPS not in user_input
@@ -788,7 +788,7 @@ def _build_strategy_config(
 ) -> dict[str, Any]:
     """Build the config dict needed for the configured strategy"""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
-    strategy_options = {}
+    strategy_options: dict[str, Any] = {}
     for key in strategy_schema.schema.keys():
         if user_input.get(key) is None:
             continue
@@ -799,7 +799,7 @@ def _build_strategy_config(
 def _build_daily_energy_config(user_input: dict[str, str] = None) -> dict[str, Any]:
     """Build the config under daily_energy: key"""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
-    config = {}
+    config: dict[str, Any] = {}
     for key in schema.schema.keys():
         if user_input.get(key) is None:
             continue
@@ -811,7 +811,7 @@ def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
     """Validates the daily energy form"""
     if not user_input:
         return {}
-    errors = {}
+    errors: dict[str, str] = {}
 
     if CONF_VALUE not in user_input and CONF_VALUE_TEMPLATE not in user_input:
         errors["base"] = "daily_energy_mandatory"
