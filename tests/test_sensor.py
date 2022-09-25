@@ -605,3 +605,43 @@ async def test_renaming_sensor_is_retained_after_startup(
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").name == "Renamed power"
+
+
+async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    """
+    When creating a group or setting up multiple entities in one platform entry,
+    a sensor with an error should be skipped and not prevent the whole group from being setup.
+    This should be logged as an error.
+    """
+    caplog.set_level(logging.ERROR)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 40},
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test2",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {},
+                },
+                {
+                    CONF_ENTITIES: [
+                        {
+                            CONF_ENTITY_ID: "input_boolean.test3",
+                            CONF_MODE: CalculationStrategy.FIXED,
+                            CONF_FIXED: {},
+                        },
+                    ]
+                }
+            ]
+        }
+    )
+    await hass.async_block_till_done()
+
+    assert len(caplog.records) == 2
+    assert "Skipping sensor setup" in caplog.text
