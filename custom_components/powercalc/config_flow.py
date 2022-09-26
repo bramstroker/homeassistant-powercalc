@@ -273,7 +273,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None and not errors:
             self.selected_sensor_type = SensorType.DAILY_ENERGY
             self.name = user_input.get(CONF_NAME)
-            unique_id = self.sensor_config.get(CONF_UNIQUE_ID) or self.sensor_config.get(CONF_NAME)
+            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
@@ -295,7 +295,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
 
-            unique_id = self.sensor_config.get(CONF_UNIQUE_ID) or self.sensor_config.get(CONF_NAME)
+            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
