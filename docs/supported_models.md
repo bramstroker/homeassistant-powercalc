@@ -1,4 +1,4 @@
-# Supported models (192 total)
+# Supported models (193 total)
 | manufacturer |        model id         |                                       name                                        |calculation modes| color modes |                                            aliases                                            |
 |--------------|-------------------------|-----------------------------------------------------------------------------------|-----------------|-------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                                |lut              |color_temp   |                                                                                               |
@@ -189,7 +189,8 @@
 |wiz           |9290022662               |Wiz Filament ST19 E26 Transparent (type SHDW9, model 9290022662, 3.8W 120V)        |lut              |brightness   |                                                                                               |
 |wiz           |9290023839               |WiZ Globe G95 E27 Color (type SHRGB1C, model 9290023839)                           |lut              |hs,color_temp|                                                                                               |
 |yeelight      |YLDD05YL                 |Yeelight LED Light Strip 1S                                                        |lut              |hs,color_temp|strip6                                                                                         |
-|yeelight      |YLDL01YL                 |Yeelight YLDL01YL Downlight                                                        |lut              |hs,color_temp|ceiling10                                                                                      |
+|yeelight      |YLDL01YL                 |Yeelight YLDL01YL Downlight                                                        |lut              |color_temp,hs|ceiling10                                                                                      |
 |yeelight      |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                                   |lut              |brightness   |mono1                                                                                          |
 |yeelight      |YLDP06YL                 |Yeelight Smart LED Bulb II Color                                                   |lut              |hs,color_temp|color2                                                                                         |
 |yeelight      |YLDP13YL                 |Yeelight LED Bulb 1S                                                               |lut              |hs,color_temp|                                                                                               |
+|zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                                |lut              |hs,color_temp|                                                                                               |
