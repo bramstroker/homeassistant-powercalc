@@ -6,9 +6,10 @@ from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import fan, light
+from homeassistant.components import fan, light, media_player
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL, ATTR_MEDIA_VOLUME_MUTED, STATE_PLAYING
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
 
@@ -17,7 +18,7 @@ from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_P
 from ..errors import StrategyConfigurationError
 from .strategy_interface import PowerCalculationStrategyInterface
 
-ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN]
+ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
@@ -119,6 +120,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if self._source_entity.domain == light.DOMAIN:
             return (0, 255)
 
+        if self._source_entity.domain == media_player.DOMAIN:
+            return (0, 100)
+
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
 
@@ -132,6 +136,11 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 return None
             if attribute == ATTR_BRIGHTNESS and value > 255:
                 value = 255
+            # Convert volume level to 0-100 range
+            if attribute == ATTR_MEDIA_VOLUME_LEVEL:
+                if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True or entity_state.state != STATE_PLAYING:
+                    return None
+                value *= 100
             return value
 
         try:
@@ -153,6 +162,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         if entity_state.domain == fan.DOMAIN:
             return ATTR_PERCENTAGE
+
+        if entity_state.domain == media_player.DOMAIN:
+            return ATTR_MEDIA_VOLUME_LEVEL
 
         return None
 

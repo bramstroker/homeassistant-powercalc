@@ -100,7 +100,7 @@ async def create_virtual_power_sensor(
 
     power_profile = None
     try:
-        # When the user did not manually configured a model and a model was auto discovered we can load it.
+        # When the user did not manually configure a model and a model was auto discovered we can load it.
 
         if (
             discovery_info
