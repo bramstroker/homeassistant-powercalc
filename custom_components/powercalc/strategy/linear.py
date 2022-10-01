@@ -138,8 +138,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                 value = 255
             # Convert volume level to 0-100 range
             if attribute == ATTR_MEDIA_VOLUME_LEVEL:
-                if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True or entity_state.state != STATE_PLAYING:
+                if entity_state.state != STATE_PLAYING:
                     return None
+                if entity_state.attributes.get(ATTR_MEDIA_VOLUME_MUTED) is True:
+                    value = 0
                 value *= 100
             return value
 

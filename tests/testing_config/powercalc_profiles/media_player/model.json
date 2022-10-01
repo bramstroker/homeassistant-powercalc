@@ -6,9 +6,10 @@
 	"standby_power": 1.65,
 	"device_type": "media_player",
 	"supported_modes": ["linear"],
-	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') and not bool(state_attr('[[entity]]', 'is_volume_muted'))}}",
+	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
 	"linear_config": {
 		"calibrate": [
+			"0 -> 2.01",
 			"10 -> 2.01",
 			"20 -> 2.04",
 			"30 -> 2.10",

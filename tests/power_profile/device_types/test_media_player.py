@@ -20,7 +20,7 @@ from tests.common import run_powercalc_setup_yaml_config
 
 async def test_media_player(hass: HomeAssistant):
     """
-    Test that media plauer can be setup from profile library
+    Test that media player can be setup from profile library
     """
     entity_id = "media_player.nest_mini"
     manufacturer = "Google Inc."
@@ -70,17 +70,17 @@ async def test_media_player(hass: HomeAssistant):
     hass.states.async_set(entity_id, STATE_PAUSED, {"volume_level": 0.20, "is_volume_muted": False})
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.42"
+    assert hass.states.get(power_sensor_id).state == "1.65"
 
     hass.states.async_set(entity_id, STATE_PLAYING, {"volume_level": 0.20, "is_volume_muted": True})
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.42"
+    assert hass.states.get(power_sensor_id).state == "2.01"
 
     hass.states.async_set(entity_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.42"
+    assert hass.states.get(power_sensor_id).state == "1.65"
 
 
 def get_test_profile_dir(sub_dir: str) -> str:
