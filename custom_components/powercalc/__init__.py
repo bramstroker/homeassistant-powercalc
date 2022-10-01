@@ -13,21 +13,28 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import (
+    SOURCE_INTEGRATION_DISCOVERY,
+    SOURCE_USER,
+    ConfigEntry,
+)
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
     CONF_PLATFORM,
     CONF_SCAN_INTERVAL,
+    CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import discovery, discovery_flow
+from homeassistant.helpers.typing import ConfigType
 
-from .common import create_source_entity, validate_name_pattern
+from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -40,6 +47,8 @@ from .const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -73,10 +82,11 @@ from .const import (
 )
 from .errors import ModelNotSupported
 from .power_profile.model_discovery import (
+    PowerProfile,
     get_power_profile,
     has_manufacturer_and_model_information,
 )
-from .sensors.group import create_group_sensors, update_associated_group_entry
+from .sensors.group import update_associated_group_entry
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -185,7 +195,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         DATA_USED_UNIQUE_IDS: [],
     }
 
-    await autodiscover_entities(config, domain_config, hass)
+    if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
+        discovery_manager = DiscoveryManager(hass, config)
+        await discovery_manager.start_discovery()
 
     if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
 
@@ -207,7 +219,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
 
@@ -239,90 +251,11 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     return unload_ok
 
 
-async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAssistant):
-    """Discover entities supported for powercalc autoconfiguration in HA instance"""
-
-    if not domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        return
-
-    _LOGGER.debug("Start auto discovering entities")
-    entity_registry = er.async_get(hass)
-    for entity_entry in list(entity_registry.entities.values()):
-        if entity_entry.disabled:
-            continue
-
-        if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
-            continue
-
-        if not await has_manufacturer_and_model_information(hass, entity_entry):
-            continue
-
-        source_entity = await create_source_entity(entity_entry.entity_id, hass)
-        try:
-            power_profile = await get_power_profile(
-                hass, {}, source_entity.entity_entry
-            )
-            if not power_profile:
-                continue
-        except ModelNotSupported:
-            _LOGGER.debug(
-                "%s: Model not found in library, skipping auto configuration",
-                entity_entry.entity_id,
-            )
-            continue
-
-        has_user_config = is_user_configured(config, entity_entry.entity_id)
-
-        if power_profile.is_additional_configuration_required and not has_user_config:
-            _LOGGER.warning(
-                f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-            )
-            continue
-
-        if has_user_config:
-            _LOGGER.debug(
-                "%s: Entity is manually configured, skipping auto configuration",
-                entity_entry.entity_id,
-            )
-            continue
-
-        if not power_profile.is_entity_domain_supported(source_entity.domain):
-            continue
-
-        discovery_info = {
-            CONF_ENTITY_ID: entity_entry.entity_id,
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
-        }
-        hass.async_create_task(
-            discovery.async_load_platform(
-                hass, SENSOR_DOMAIN, DOMAIN, discovery_info, config
-            )
-        )
-
-    _LOGGER.debug("Done auto discovering entities")
-
-
-def is_user_configured(config: dict, entity_id: str) -> dict | None:
-    if SENSOR_DOMAIN not in config:
-        return None
-    sensor_config = config.get(SENSOR_DOMAIN)
-    for item in sensor_config:
-        if (
-            isinstance(item, dict)
-            and item.get(CONF_PLATFORM) == DOMAIN
-            and item.get(CONF_ENTITY_ID) == entity_id
-        ):
-            return item
-    return None
-
-
 async def create_domain_groups(
     hass: HomeAssistant, global_config: dict, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
-    _LOGGER.debug(f"Setting up domain based group sensors..")
+    _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
             _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")
@@ -343,3 +276,181 @@ async def create_domain_groups(
                 global_config,
             )
         )
+
+
+class DiscoveryManager:
+    """
+    This class is responsible for scanning the HA instance for entities and their manufacturer / model info
+    It checks if any of these devices is supported in the powercalc library
+    When entities are found it will dispatch a discovery flow, so the user can add them to their HA instance
+    """
+
+    def __init__(self, hass: HomeAssistant, ha_config: ConfigType):
+        self.hass = hass
+        self.ha_config = ha_config
+        self.manually_configured_entities: list[str] | None = None
+
+    async def start_discovery(self):
+        """Start the discovery procedure"""
+
+        _LOGGER.debug("Start auto discovering entities")
+        entity_registry = er.async_get(self.hass)
+        for entity_entry in list(entity_registry.entities.values()):
+            if entity_entry.disabled:
+                continue
+
+            if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
+                continue
+
+            if not await has_manufacturer_and_model_information(
+                self.hass, entity_entry
+            ):
+                continue
+
+            source_entity = await create_source_entity(
+                entity_entry.entity_id, self.hass
+            )
+            try:
+                power_profile = await get_power_profile(
+                    self.hass, {}, source_entity.entity_entry
+                )
+                if not power_profile:
+                    continue
+            except ModelNotSupported:
+                _LOGGER.debug(
+                    "%s: Model not found in library, skipping discovery",
+                    entity_entry.entity_id,
+                )
+                continue
+
+            has_user_config = self._is_user_configured(entity_entry.entity_id)
+
+            if (
+                power_profile.is_additional_configuration_required
+                and not has_user_config
+            ):
+                _LOGGER.warning(
+                    f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
+                )
+                continue
+
+            if has_user_config:
+                _LOGGER.debug(
+                    "%s: Entity is manually configured, skipping auto configuration",
+                    entity_entry.entity_id,
+                )
+                continue
+
+            if not power_profile.is_entity_domain_supported(source_entity.domain):
+                continue
+
+            self._init_entity_discovery(source_entity, power_profile)
+
+        _LOGGER.debug("Done auto discovering entities")
+
+    @callback
+    def _init_entity_discovery(
+        self, source_entity: SourceEntity, power_profile: PowerProfile
+    ):
+        """Dispatch the discovery flow for a given entity"""
+        existing_entries = [
+            entry
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
+            if entry.unique_id == source_entity.unique_id
+        ]
+        if existing_entries:
+            _LOGGER.debug(
+                f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery"
+            )
+            return
+
+        discovery_flow.async_create_flow(
+            self.hass,
+            DOMAIN,
+            context={"source": SOURCE_INTEGRATION_DISCOVERY},
+            data={
+                CONF_UNIQUE_ID: source_entity.unique_id,
+                CONF_NAME: source_entity.name,
+                CONF_ENTITY_ID: source_entity.entity_id,
+                CONF_MANUFACTURER: power_profile.manufacturer,
+                CONF_MODEL: power_profile.model,
+            },
+        )
+
+        # Code below if for legacy discovery routine, will be removed somewhere in the future
+        discovery_info = {
+            CONF_ENTITY_ID: source_entity.entity_id,
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+            DISCOVERY_POWER_PROFILE: power_profile,
+            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
+        }
+        self.hass.async_create_task(
+            discovery.async_load_platform(
+                self.hass, SENSOR_DOMAIN, DOMAIN, discovery_info, self.ha_config
+            )
+        )
+
+    def _is_user_configured(self, entity_id: str) -> bool:
+        """
+        Check if user have setup powercalc sensors for a given entity_id.
+        Either with the YAML or GUI method.
+        """
+        if not self.manually_configured_entities:
+            self.manually_configured_entities = (
+                self._load_manually_configured_entities()
+            )
+
+        return entity_id in self.manually_configured_entities
+
+    def _load_manually_configured_entities(self) -> list[str]:
+        """Looks at the YAML and GUI config entries for all the configured entity_id's"""
+        entities = []
+
+        # Find entity ids in yaml config
+        if SENSOR_DOMAIN in self.ha_config:
+            sensor_config = self.ha_config.get(SENSOR_DOMAIN)
+            platform_entries = [
+                item
+                for item in sensor_config
+                if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
+            ]
+            for entry in platform_entries:
+                entities.extend(self._find_entity_ids_in_yaml_config(entry))
+
+        # Add entities from existing config entries
+        entities.extend(
+            [
+                entry.data.get(CONF_ENTITY_ID)
+                for entry in self.hass.config_entries.async_entries(DOMAIN)
+                if entry.source == SOURCE_USER
+            ]
+        )
+
+        return entities
+
+    def _find_entity_ids_in_yaml_config(self, search_dict: dict):
+        """
+        Takes a dict with nested lists and dicts,
+        and searches all dicts for a key of the field
+        provided.
+        """
+        found_entity_ids = []
+
+        for key, value in search_dict.items():
+
+            if key == "entity_id":
+                found_entity_ids.append(value)
+
+            elif isinstance(value, dict):
+                results = self._find_entity_ids_in_yaml_config(value)
+                for result in results:
+                    found_entity_ids.append(result)
+
+            elif isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        results = self._find_entity_ids_in_yaml_config(item)
+                        for result in results:
+                            found_entity_ids.append(result)
+
+        return found_entity_ids

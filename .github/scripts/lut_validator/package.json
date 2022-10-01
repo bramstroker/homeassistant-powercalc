@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "validate.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^5.0.1",
     "csval": "^1.1.1",
     "node-gzip": "^1.1.2",
     "readdirp": "^3.6.0"

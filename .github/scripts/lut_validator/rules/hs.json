@@ -1,17 +1,17 @@
 {
     "properties": {
       "bri": {
-        "type": "number",
+        "type": "integer",
         "minimum": 0,
         "maximum": 255
       },
       "hue": {
-        "type": "number",
+        "type": "integer",
         "minimum": 0,
         "maximum": 65535
       },
       "sat": {
-        "type": "number",
+        "type": "integer",
         "minimum": 0,
         "maximum": 255
       },

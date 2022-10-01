@@ -1,6 +1,11 @@
+import logging
+from unittest.mock import AsyncMock, call, patch
+
+import pytest
 from homeassistant.components import input_boolean, light
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntryState
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import (
@@ -23,6 +28,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
@@ -41,7 +47,16 @@ from .common import (
 )
 
 
-async def test_autodiscovery(hass: HomeAssistant):
+@pytest.fixture
+def mock_flow_init(hass):
+    """Mock hass.config_entries.flow.async_init."""
+    with patch.object(
+        hass.config_entries.flow, "async_init", return_value=AsyncMock()
+    ) as mock_init:
+        yield mock_init
+
+
+async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
     """Test that models are automatically discovered and power sensors created"""
 
     lighta = MockLight("testa")
@@ -60,9 +75,67 @@ async def test_autodiscovery(hass: HomeAssistant):
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
+    # Check that two discovery flows have been initialized
+    # LightA and LightB should be discovered, LightC not
+    assert mock_flow_init.mock_calls == [
+        call(
+            DOMAIN,
+            context={"source": SOURCE_INTEGRATION_DISCOVERY},
+            data={
+                CONF_UNIQUE_ID: lighta.unique_id,
+                CONF_NAME: lighta.name,
+                CONF_ENTITY_ID: lighta.entity_id,
+                CONF_MANUFACTURER: lighta.manufacturer,
+                CONF_MODEL: lighta.model,
+            },
+        ),
+        call(
+            DOMAIN,
+            context={"source": SOURCE_INTEGRATION_DISCOVERY},
+            data={
+                CONF_UNIQUE_ID: lightb.unique_id,
+                CONF_NAME: lightb.name,
+                CONF_ENTITY_ID: lightb.entity_id,
+                CONF_MANUFACTURER: lightb.manufacturer,
+                CONF_MODEL: lightb.model,
+            },
+        ),
+    ]
+
+    # Also check if power sensors are created.
+    # Currently, we also create them directly, even without the user finishing the discovery flow
+    # In the future this behaviour may change.
     assert hass.states.get("sensor.testa_power")
     assert hass.states.get("sensor.testb_power")
     assert not hass.states.get("sensor.testc_power")
+
+
+async def test_discovery_skipped_when_confirmed_by_user(
+    hass: HomeAssistant, mock_flow_init
+):
+    light_entity = MockLight("test")
+    light_entity.manufacturer = "lidl"
+    light_entity.model = "HG06106C"
+    await create_mock_light_entity(hass, light_entity)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_UNIQUE_ID: light_entity.unique_id,
+            CONF_NAME: light_entity.name,
+            CONF_ENTITY_ID: light_entity.entity_id,
+            CONF_MANUFACTURER: light_entity.manufacturer,
+            CONF_MODEL: light_entity.model,
+        },
+        source=SOURCE_INTEGRATION_DISCOVERY,
+        unique_id=light_entity.unique_id,
+    )
+    config_entry.add_to_hass(hass)
+
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not mock_flow_init.mock_calls
 
 
 async def test_autodiscovery_disabled(hass: HomeAssistant):
@@ -79,6 +152,32 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.testa_power")
+    assert not hass.config_entries.async_entries(DOMAIN)
+
+
+async def test_autodiscovery_skipped_for_lut_with_subprofiles(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
+    """
+    Lights which can be autodiscovered and have sub profiles need to de skipped
+    User needs to configure this because we cannot know which sub profile to select
+    No power sensor should be created and no error should appear in the logs
+    """
+    caplog.set_level(logging.ERROR)
+
+    light_entity = MockLight("testa")
+    light_entity.manufacturer = "Yeelight"
+    light_entity.model = "strip6"
+    light_entity.supported_color_modes = [ColorMode.COLOR_TEMP, ColorMode.HS]
+    await create_mock_light_entity(hass, light_entity)
+
+    await async_setup_component(
+        hass, DOMAIN, {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: True}}
+    )
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.testa_power")
+    assert not caplog.records
 
 
 async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssistant):
@@ -94,6 +193,45 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     state = hass.states.get("sensor.testing_power")
     assert state
     assert state.state == "25.00"
+
+
+async def test_config_entry_overrides_autodiscovered(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
+    caplog.set_level(logging.ERROR)
+
+    light_entity = MockLight("testing", unique_id="abcdef")
+    light_entity.manufacturer = "signify"
+    light_entity.model = "LWA017"
+    light_entity.color_mode = ColorMode.BRIGHTNESS
+    await create_mock_light_entity(hass, light_entity)
+
+    hass.states.async_set(
+        "light.testing",
+        STATE_ON,
+        {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
+    )
+
+    await run_powercalc_setup_yaml_config(hass, {}, {})
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "testing",
+            CONF_ENTITY_ID: "light.testing",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LWA017",
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testing_power")
+    assert not caplog.records
 
 
 async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant):

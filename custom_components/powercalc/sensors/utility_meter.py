@@ -4,6 +4,7 @@ import inspect
 import logging
 from typing import cast
 
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.components.utility_meter.const import (
@@ -13,6 +14,7 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 
@@ -98,27 +100,36 @@ async def create_tariff_select(
     """Create tariff selection entity"""
 
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
-    utility_meter_component = cast(
-        EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
-    )
-    if utility_meter_component is None:
-        utility_meter_component = (
-            hass.data.get("utility_meter_legacy_component") or None
-        )
-
-    if utility_meter_component is None:
-        raise SensorConfigurationError("Cannot find utility_meter component")
 
     select_component = cast(EntityComponent, hass.data[SELECT_DOMAIN])
     select_unique_id = None
     if unique_id:
         select_unique_id = f"{unique_id}_select"
-    tariff_select = TariffSelect(
-        name,
-        list(tariffs),
-        utility_meter_component.async_add_entities,
-        select_unique_id,
-    )
+
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.9.0"):
+        utility_meter_component = cast(
+            EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
+        )
+        if utility_meter_component is None:
+            utility_meter_component = (
+                hass.data.get("utility_meter_legacy_component") or None
+            )
+
+        if utility_meter_component is None:
+            raise SensorConfigurationError("Cannot find utility_meter component")
+
+        tariff_select = TariffSelect(
+            name,
+            list(tariffs),
+            utility_meter_component.async_add_entities,
+            select_unique_id,
+        )
+    else:
+        tariff_select = TariffSelect(
+            name,
+            list(tariffs),
+            select_unique_id,
+        )
 
     await select_component.async_add_entities([tariff_select])
 

@@ -13,7 +13,6 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
@@ -21,6 +20,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -71,7 +71,6 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "group_unique_id",
             CONF_CREATE_UTILITY_METERS: True,
@@ -206,7 +205,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
 async def test_entities_with_incompatible_unit_of_measurement_are_removed(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
-    caplog.set_level(logging.ERROR)
+    caplog.set_level(logging.WARNING)
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
@@ -335,12 +334,15 @@ async def test_mega_watt_hour(hass: HomeAssistant):
 
 
 async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
+    """
+    When any of the group members becomes unavailable the energy group should also be unavailable
+    Group power sensor must only be unavailable when ALL group members are unavailable
+    """
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
@@ -356,14 +358,17 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state.state == STATE_UNAVAILABLE
 
-    energy_state = hass.states.get("sensor.testgroup_power")
-    assert energy_state.state == STATE_UNAVAILABLE
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNKNOWN
 
     hass.states.async_set("input_boolean.test1", STATE_ON)
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state == "50.00"
+    assert power_state.state != STATE_UNAVAILABLE
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNAVAILABLE
 
 
 async def test_hide_members(hass: HomeAssistant):
@@ -373,7 +378,6 @@ async def test_hide_members(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: True,
             CONF_ENTITIES: [
@@ -415,7 +419,6 @@ async def test_unhide_members(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: False,
             CONF_ENTITIES: [
@@ -427,7 +430,45 @@ async def test_unhide_members(hass: HomeAssistant):
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by == None
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+
+async def test_members_are_unhiden_after_group_removed(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+    )
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
+            CONF_HIDE_MEMBERS: True,
+        },
+        unique_id="group_unique_id",
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.mygroup_power")
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
+    )
+
+    # Remove the config entry
+    assert await hass.config_entries.async_remove(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+    assert not hass.states.get("sensor.mygroup_power")
+    assert not entity_reg.async_get("sensor.mygroup_power")
 
 
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
@@ -443,7 +484,6 @@ async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegist
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "abcdef",
             CONF_CREATE_UTILITY_METERS: True,
@@ -581,7 +621,6 @@ async def test_custom_naming_pattern(hass: HomeAssistant):
     await run_powercalc_setup_yaml_config(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),

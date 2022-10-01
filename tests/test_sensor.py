@@ -4,6 +4,7 @@ import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import ColorMode
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
 from homeassistant.const import (
@@ -219,18 +220,32 @@ async def test_error_when_configuring_same_entity_twice(
 async def test_alternate_naming_strategy(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    assert await async_setup_component(
         hass,
-        [
-            get_simple_fixed_config("input_boolean.test", 50),
-        ],
+        DOMAIN,
         {
-            CONF_POWER_SENSOR_NAMING: "{} Power consumption",
-            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
-            CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
-            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+            DOMAIN: {
+                CONF_POWER_SENSOR_NAMING: "{} Power consumption",
+                CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
+                CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
+                CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+            }
         },
     )
+    await hass.async_block_till_done()
+
+    assert await async_setup_component(
+        hass,
+        SENSOR_DOMAIN,
+        {
+            SENSOR_DOMAIN: {
+                "platform": DOMAIN,
+                CONF_ENTITY_ID: "input_boolean.test",
+                CONF_FIXED: {CONF_POWER: 25},
+            }
+        },
+    )
+    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.test_power_consumption")
     assert power_state
@@ -279,7 +294,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     # Run powercalc setup with autodiscovery
     await run_powercalc_setup_yaml_config(hass, {}, {})
 
-    assert "Model not found in library, skipping auto configuration" in caplog.text
+    assert "Model not found in library, skipping discovery" in caplog.text
 
 
 async def test_can_include_autodiscovered_entity_in_group(
@@ -590,3 +605,43 @@ async def test_renaming_sensor_is_retained_after_startup(
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").name == "Renamed power"
+
+
+async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    """
+    When creating a group or setting up multiple entities in one platform entry,
+    a sensor with an error should be skipped and not prevent the whole group from being setup.
+    This should be logged as an error.
+    """
+    caplog.set_level(logging.ERROR)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 40},
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test2",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {},
+                },
+                {
+                    CONF_ENTITIES: [
+                        {
+                            CONF_ENTITY_ID: "input_boolean.test3",
+                            CONF_MODE: CalculationStrategy.FIXED,
+                            CONF_FIXED: {},
+                        },
+                    ]
+                }
+            ]
+        }
+    )
+    await hass.async_block_till_done()
+
+    assert len(caplog.records) == 2
+    assert "Skipping sensor setup" in caplog.text

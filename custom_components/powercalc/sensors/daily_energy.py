@@ -90,7 +90,7 @@ async def create_daily_fixed_energy_sensor(
             ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass
         )
         async_migrate_entity_id(
-            hass, SENSOR_DOMAIN, old_entity_id=old_entity_id, new_entity_id=entity_id
+            hass, old_entity_id=old_entity_id, new_entity_id=entity_id
         )
 
     _LOGGER.debug(

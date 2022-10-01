@@ -75,7 +75,7 @@ def create_discoverable_light(
 ) -> test_light_platform.MockLight:
     light = test_light_platform.MockLight(name, STATE_ON, unique_id)
     light.manufacturer = "lidl"
-    light.model = "HG06106C"
+    light.model = "HG06462A"
     light.supported_color_modes = [ColorMode.BRIGHTNESS]
     light.brightness = 125
     return light
@@ -88,9 +88,6 @@ async def run_powercalc_setup_yaml_config(
 ):
     if domain_config is None:
         domain_config = {}
-
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
-    await hass.async_block_till_done()
 
     if sensor_config:
         if isinstance(sensor_config, list):
@@ -106,6 +103,9 @@ async def run_powercalc_setup_yaml_config(
             hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
         )
         await hass.async_block_till_done()
+
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
+    await hass.async_block_till_done()
 
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):

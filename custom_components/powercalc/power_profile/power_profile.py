@@ -56,11 +56,18 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
-    def get_model_directory(self) -> str:
+    def get_model_directory(self, root_only: bool = False) -> str:
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
+        if root_only:
+            return self._directory
+
         return self._sub_profile_dir or self._directory
+
+    def get_sub_profiles(self) -> list[str]:
+        """Get listing op possible sub profiles"""
+        return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     def supports(self, model: str) -> bool:
         model = model.lower().replace("#slash#", "/")
@@ -136,13 +143,17 @@ class PowerProfile:
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        if self.sub_profile is not None:
+        if self.has_sub_profiles and self.sub_profile is None:
             return True
         return self._json_data.get("requires_additional_configuration") or False
 
     @property
     def device_type(self) -> str:
         return self._json_data.get("device_type") or DeviceType.LIGHT
+
+    @property
+    def has_sub_profiles(self) -> bool:
+        return len(self.get_sub_profiles()) > 0
 
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""

@@ -17,11 +17,8 @@ from homeassistant.components.light import (
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
-    COLOR_MODE_BRIGHTNESS,
-    COLOR_MODE_COLOR_TEMP,
-    COLOR_MODE_HS,
-    COLOR_MODE_UNKNOWN,
     COLOR_MODES_COLOR,
+    ColorMode,
 )
 from homeassistant.core import State
 
@@ -30,7 +27,7 @@ from ..errors import LutFileNotFound, ModelNotSupported, StrategyConfigurationEr
 from ..power_profile.power_profile import PowerProfile
 from .strategy_interface import PowerCalculationStrategyInterface
 
-LUT_COLOR_MODES = {COLOR_MODE_BRIGHTNESS, COLOR_MODE_COLOR_TEMP, COLOR_MODE_HS}
+LUT_COLOR_MODES = {ColorMode.BRIGHTNESS, ColorMode.COLOR_TEMP, ColorMode.HS}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,11 +51,11 @@ class LutRegistry:
 
                 line_count = 0
                 for row in csv_reader:
-                    if color_mode == COLOR_MODE_HS:
+                    if color_mode == ColorMode.HS:
                         lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(
                             row[3]
                         )
-                    elif color_mode == COLOR_MODE_COLOR_TEMP:
+                    elif color_mode == ColorMode.COLOR_TEMP:
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
                     else:
                         lookup_dict[int(row[0])] = float(row[1])
@@ -71,7 +68,7 @@ class LutRegistry:
 
         return lookup_dict
 
-    def get_lut_file(self, power_profile: PowerProfile, color_mode: str):
+    def get_lut_file(self, power_profile: PowerProfile, color_mode: ColorMode):
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
@@ -98,7 +95,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
         if color_mode in COLOR_MODES_COLOR:
-            color_mode = COLOR_MODE_HS
+            color_mode = ColorMode.HS
 
         brightness = attrs.get(ATTR_BRIGHTNESS)
         if brightness is None:
@@ -110,7 +107,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if brightness > 255:
             brightness = 255
 
-        if color_mode == COLOR_MODE_UNKNOWN:
+        if color_mode == ColorMode.UNKNOWN:
             _LOGGER.debug(
                 "%s: Could not calculate power. color mode unknown",
                 entity_state.entity_id,
@@ -130,9 +127,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             )
             return None
 
-        power = 0
         light_setting = LightSetting(color_mode=color_mode, brightness=brightness)
-        if color_mode == COLOR_MODE_HS:
+        if color_mode == ColorMode.HS:
             hs = attrs[ATTR_HS_COLOR]
             light_setting.hue = int(hs[0] / 360 * 65535)
             light_setting.saturation = int(hs[1] / 100 * 255)
@@ -143,7 +139,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 light_setting.hue,
                 light_setting.saturation,
             )
-        elif color_mode == COLOR_MODE_COLOR_TEMP:
+        elif color_mode == ColorMode.COLOR_TEMP:
             light_setting.color_temp = attrs[ATTR_COLOR_TEMP]
             _LOGGER.debug(
                 "%s: Looking up power usage for bri:%s mired:%s",
@@ -151,7 +147,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 brightness,
                 light_setting.color_temp,
             )
-        elif color_mode == COLOR_MODE_BRIGHTNESS:
+        elif color_mode == ColorMode.BRIGHTNESS:
             _LOGGER.debug(
                 "%s: Looking up power usage for bri:%s",
                 entity_state.entity_id,
@@ -188,9 +184,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
     def lookup_power_for_brightness(
         self, lut_value: Union[dict, int], light_setting: LightSetting
     ):
-        if light_setting.color_mode == COLOR_MODE_BRIGHTNESS:
+        if light_setting.color_mode == ColorMode.BRIGHTNESS:
             return lut_value
-        if light_setting.color_mode == COLOR_MODE_COLOR_TEMP:
+        if light_setting.color_mode == ColorMode.COLOR_TEMP:
             return self.get_nearest(lut_value, light_setting.color_temp)
         else:
             sat_values = self.get_nearest(lut_value, light_setting.hue)
@@ -244,7 +240,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
 @dataclass
 class LightSetting:
-    color_mode: str
+    color_mode: ColorMode
     brightness: int
     hue: Optional[int] = None
     saturation: Optional[int] = None
