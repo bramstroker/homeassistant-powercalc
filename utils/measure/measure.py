@@ -747,7 +747,9 @@ class Measure:
         input("Connect your light now and press enter to start measuring..")
         return average
 
-    def measure_average(self, duration: int):
+    def measure_average(self, duration: int) -> float:
+        """Measure average power consumption for a given time period in seconds"""
+        _LOGGER.info(f"Measuring average power for {duration} seconds")
         start_time = time.time()
         readings: list[float] = []
         while (time.time() - start_time) < duration:
@@ -755,8 +757,10 @@ class Measure:
             _LOGGER.info(f"Measured power: {power}")
             readings.append(power)
             time.sleep(SLEEP_TIME)
-        average = sum(readings) / len(readings)
-        _LOGGER.info(f"Average power: {round(average, 2)}")
+        average = round(sum(readings) / len(readings), 2)
+        _LOGGER.info(f"Average power: {average}")
+        return average
+
 
 class CsvWriter:
     def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
@@ -922,7 +926,11 @@ def main():
             exit(0)
 
         if args[0] == "average":
-            measure.measure_average(int(args[1]))
+            try:
+                duration = int(args[1])
+            except IndexError:
+                duration = 60
+            measure.measure_average(duration)
     except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
         exit(1)
