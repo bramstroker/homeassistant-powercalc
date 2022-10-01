@@ -3,7 +3,7 @@
 	"measure_method": "manual",
 	"measure_device": "Shelly Plug S",
 	"name": "Google Nest Mini",
-	"standby_power": 1.42,
+	"standby_power": 1.65,
 	"device_type": "media_player",
 	"supported_modes": ["linear"],
 	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') and not bool(state_attr('[[entity]]', 'is_volume_muted'))}}",
