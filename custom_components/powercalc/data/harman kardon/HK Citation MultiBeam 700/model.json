@@ -1,29 +1,28 @@
 {
-	"measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
-	"measure_method": "manual",
-	"measure_device": "Shelly Plug S",
-	"name": "HK Citation MultiBeam 700",
-	"standby_power": 7.58,
-	"device_type": "media_player",
-	"supported_modes": ["linear"],
-	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
-	"linear_config": {
-		"calibrate": [
-			"0 -> 7.68",
-			"1 -> 11.07",
-			"10 -> 11.07",
-			"20 -> 11.07",
-			"30 -> 11.07",
-			"40 -> 11.09",
-			"50 -> 11.24",
-			"60 -> ",
-			"70 -> ",
-			"80 -> ",
-			"90 -> ",
-			"100 -> "
-		]
-	},
-	"aliases": [
-		"HEOS 1"
-	]
+    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_method": "manual",
+    "measure_device": "Shelly Plug S",
+    "name": "HK Citation MultiBeam 700",
+    "standby_power": 7.58,
+    "device_type": "media_player",
+    "supported_modes": [
+        "linear"
+    ],
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 7.68",
+            "1 -> 11.07",
+            "10 -> 11.07",
+            "20 -> 11.07",
+            "30 -> 11.07",
+            "40 -> 11.09",
+            "50 -> 11.24",
+            "60 -> ",
+            "70 -> ",
+            "80 -> ",
+            "90 -> ",
+            "100 -> "
+        ]
+    }
 }

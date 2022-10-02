@@ -8,9 +8,9 @@
     "supported_modes": [
         "linear"
     ],
-	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
-	"linear_config": {
-		"min_power": 2.4,
-		"max_power": 3.87
-	}
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "min_power": 2.4,
+        "max_power": 3.87
+    }
 }
