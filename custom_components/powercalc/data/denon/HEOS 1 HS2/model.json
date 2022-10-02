@@ -1,5 +1,5 @@
 {
-    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_description": "Streamed 'Armin van Buuren - Coming Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
     "measure_method": "manual",
     "measure_device": "Shelly Plug S",
     "name": "HEOS 1 HS2",
@@ -17,11 +17,11 @@
             "30 -> 6.33",
             "40 -> 6.60",
             "50 -> 7.20",
-            "60 -> ",
-            "70 -> ",
-            "80 -> ",
-            "90 -> ",
-            "100 -> "
+            "60 -> 7.99",
+            "70 -> 9.41",
+            "80 -> 11.35",
+            "90 -> 12.50",
+            "100 -> 12.55"
         ]
     },
     "aliases": [

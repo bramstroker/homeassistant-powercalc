@@ -1,5 +1,5 @@
 {
-    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_description": "Streamed 'Armin van Buuren - Coming Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
     "measure_method": "manual",
     "measure_device": "Shelly Plug S",
     "name": "HK Citation MultiBeam 700",
@@ -18,11 +18,11 @@
             "30 -> 11.07",
             "40 -> 11.09",
             "50 -> 11.24",
-            "60 -> ",
-            "70 -> ",
-            "80 -> ",
-            "90 -> ",
-            "100 -> "
+            "60 -> 11.99",
+            "70 -> 15.22",
+            "80 -> 20.85",
+            "90 -> 22.36",
+            "100 -> 25.33"
         ]
     }
 }
