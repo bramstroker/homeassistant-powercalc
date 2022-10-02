@@ -72,6 +72,7 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_DELAY,
     CONF_DISABLE_STANDBY_POWER,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -96,6 +97,7 @@ from .const import (
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
     CONF_UTILITY_METER_OFFSET,
@@ -215,6 +217,12 @@ SENSOR_CONFIG = {
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
     vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): cv.template,
+    vol.Optional(CONF_SLEEP_POWER): vol.Schema(
+        {
+            vol.Required(CONF_POWER): vol.Coerce(float),
+            vol.Required(CONF_DELAY): cv.positive_int
+        }
+    )
 }
 
 

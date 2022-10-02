@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal, DecimalException
-from typing import Optional, cast
+from typing import Any, cast
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import (
@@ -18,14 +18,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.core import HomeAssistant, State, callback, CALLBACK_TYPE
 from homeassistant.helpers import start
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
     async_track_state_change_event,
     async_track_template_result,
-    async_track_time_interval,
+    async_track_time_interval, async_call_later,
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, StateType
@@ -38,6 +38,7 @@ from ..const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_DELAY,
     CONF_DISABLE_STANDBY_POWER,
     CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
@@ -47,9 +48,11 @@ from ..const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
@@ -306,6 +309,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         self.entity_id = entity_id
         self._sensor_config = sensor_config
         self._track_entities: list = []
+        self._sleep_power_timer: CALLBACK_TYPE | None = None
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
         self._attr_extra_state_attributes = {
@@ -374,6 +378,11 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         self, trigger_entity_id: str, state: State | None
     ) -> bool:
         """Update power sensor based on new dependant entity state."""
+
+        if self._sleep_power_timer:
+            self._sleep_power_timer()
+            self._sleep_power_timer = None
+
         if self.source_entity == DUMMY_ENTITY_ID:
             state = State(self.source_entity, STATE_ON)
 
@@ -421,18 +430,12 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
 
         return True
 
-    async def calculate_power(self, state: State) -> Optional[Decimal]:
+    async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if state.state in OFF_STATES or not is_calculation_enabled:
-            standby_power = self._standby_power
-            if self._power_calculator.can_calculate_standby():
-                standby_power = await self._power_calculator.calculate(state)
-
-            if self._multiply_factor_standby and self._multiply_factor:
-                standby_power *= Decimal(self._multiply_factor)
-            return Decimal(standby_power)
+            return await self.calculate_standby_power(state)
 
         power = await self._power_calculator.calculate(state)
         if power is None:
@@ -454,6 +457,30 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
                 f"{state.entity_id}: Could not convert value '{power}' to decimal"
             )
             return None
+
+    async def calculate_standby_power(self, state: State) -> Decimal:
+        """Calculate the power of the device in OFF state"""
+        sleep_power: dict[str, Any] = self._sensor_config.get(CONF_SLEEP_POWER)
+        if sleep_power:
+            delay = sleep_power.get(CONF_DELAY)
+
+            @callback
+            def _update_sleep_power(_):
+                power = Decimal(sleep_power.get(CONF_POWER))
+                if self._multiply_factor_standby and self._multiply_factor:
+                    power *= Decimal(self._multiply_factor)
+                self._power = round(power, self._rounding_digits)
+                self.async_write_ha_state()
+
+            self._sleep_power_timer = async_call_later(self.hass, delay, _update_sleep_power)
+
+        standby_power = self._standby_power
+        if self._power_calculator.can_calculate_standby():
+            standby_power = await self._power_calculator.calculate(state)
+
+        if self._multiply_factor_standby and self._multiply_factor:
+            standby_power *= Decimal(self._multiply_factor)
+        return Decimal(standby_power)
 
     async def is_calculation_enabled(self) -> bool:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
