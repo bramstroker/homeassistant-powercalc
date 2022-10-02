@@ -1,12 +1,12 @@
 {
-	"measure_description": "Manually sampled at 10% volume increases, radio, listening to EDM. Max power is from manufacturer specs",
+	"measure_description": "Manually sampled at 10% volume increases, radio, listening to EDM.",
 	"measure_method": "manual",
 	"measure_device": "TP-Link Tapo P110",
 	"name": "Lenovo Smart Clock with Google Assistant",
-	"standby_power": 2.511,
-	"requires_additional_configuration": true,
+	"standby_power": 2.51,
 	"device_type": "media_player",
 	"supported_modes": ["linear"],
+	"calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
 	"linear_config": {
 		"calibrate": [
 			"10 -> 3.12",
@@ -19,7 +19,6 @@
 			"80 -> 4.28",
 			"90 -> 4.33",
 			"100 -> 4.41"
-		],
-		"max_watt": 6.00
+		]
 	}
 }

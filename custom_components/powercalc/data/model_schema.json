@@ -29,13 +29,20 @@
       "minItems": 1,
       "items": {
         "type": "string",
-        "enum": ["lut", "linear", "fixed"]
+        "enum": [
+          "lut",
+          "linear",
+          "fixed"
+        ]
       },
       "description": "Supported calculation modes"
     },
     "measure_method": {
       "type": "string",
-      "enum": ["manual", "script"],
+      "enum": [
+        "manual",
+        "script"
+      ],
       "description": "How the device was measured"
     },
     "measure_device": {
@@ -61,9 +68,9 @@
     "device_type": {
       "type": "string",
       "enum": [
-	      "light", 
-	      "smart_switch",
-	      "media_player"
+        "light",
+        "smart_switch",
+        "media_player"
       ],
       "description": "Type of device"
     },
@@ -82,39 +89,69 @@
       "type": "object",
       "description": "Configuration for linear calculation mode",
       "properties": {
-        "min_watt": {
+        "min_power": {
           "type": "number"
         },
-        "max_watt": {
+        "max_power": {
           "type": "number"
         },
-	"calibrate": {
-	  "type": "array",
-	  "items": {
-	    "type": "string"
-	  }
-	}
+        "calibrate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "fixed_config": {
       "type": "object",
       "description": "Configuration for fixed calculation mode",
       "properties": {
-        "watt": {
+        "power": {
           "type": "number"
         },
-	"states_power": {
-	  "type": "object",
-	  "description": "A dict of state attributes and the power. See https://github.com/bramstroker/homeassistant-powercalc#power-per-state.",
+        "states_power": {
+          "type": "object",
+          "description": "A dict of state attributes and the power. See https://github.com/bramstroker/homeassistant-powercalc#power-per-state.",
           "properties": {
-            "idle": { "type": ["number", "string"] },
-	    "playing": { "type": ["number", "string"] },
-	    "paused": {"type": ["number", "string"] },
-            "off": {"type": ["number", "string"] },
-	    "unavailable": {"type": ["number", "string"] }
-	  },
-          "additionalProperties": {"type": ["number", "string"] }
-	}
+            "idle": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "playing": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "paused": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "off": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "unavailable": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "additionalProperties": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        }
       }
     },
     "sensor_config": {
