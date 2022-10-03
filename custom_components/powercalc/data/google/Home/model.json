@@ -4,7 +4,7 @@
     "measure_device": "TP-Link Tapo P110",
     "name": "Google Home",
     "standby_power": 2.4,
-    "device_type": "media_player",
+    "device_type": "smart_speaker",
     "supported_modes": [
         "linear"
     ],

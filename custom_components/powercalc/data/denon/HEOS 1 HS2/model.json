@@ -4,7 +4,7 @@
     "measure_device": "Shelly Plug S",
     "name": "HEOS 1 HS2",
     "standby_power": 3.99,
-    "device_type": "media_player",
+    "device_type": "smart_speaker",
     "supported_modes": [
         "linear"
     ],

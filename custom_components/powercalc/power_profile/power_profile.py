@@ -7,6 +7,8 @@ from enum import Enum
 from typing import Optional
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
@@ -19,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 class DeviceType(Enum):
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
-
+    SMART_SPEAKER = "smart_speaker"
 
 class PowerProfile:
     def __init__(
@@ -158,6 +160,12 @@ class PowerProfile:
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
         if self.device_type == DeviceType.LIGHT and domain != LIGHT_DOMAIN:
+            return False
+
+        if self.device_type == DeviceType.SMART_SPEAKER and domain != MEDIA_PLAYER_DOMAIN:
+            return False
+
+        if self.device_type == DeviceType.SMART_SWITCH and domain != SWITCH_DOMAIN:
             return False
 
         return True

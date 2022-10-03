@@ -4,7 +4,7 @@
     "measure_device": "Shelly Plug S",
     "name": "HK Citation MultiBeam 700",
     "standby_power": 7.58,
-    "device_type": "media_player",
+    "device_type": "smart_speaker",
     "supported_modes": [
         "linear"
     ],

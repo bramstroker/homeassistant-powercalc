@@ -70,7 +70,7 @@
       "enum": [
         "light",
         "smart_switch",
-        "media_player"
+        "smart_speaker"
       ],
       "description": "Type of device"
     },
