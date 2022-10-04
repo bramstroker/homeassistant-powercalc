@@ -336,7 +336,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             self._async_hide_members(False)
 
     @callback
-    def _async_hide_members(self, hide: True):
+    def _async_hide_members(self, hide: True) -> None:
         """Hide/unhide group members"""
         registry = er.async_get(self.hass)
         for entity_id in self._entities:
@@ -348,7 +348,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, event):
+    def on_state_change(self, event) -> None:
         """Triggered when one of the group entities changes state"""
         if self.hass.state != CoreState.running:
             return

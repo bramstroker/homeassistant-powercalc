@@ -37,7 +37,7 @@ class LutRegistry:
         self._lookup_dictionaries = {}
 
     async def get_lookup_dictionary(
-        self, power_profile: PowerProfile, color_mode: str
+        self, power_profile: PowerProfile, color_mode: ColorMode
     ) -> dict | None:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
@@ -68,7 +68,8 @@ class LutRegistry:
 
         return lookup_dict
 
-    def get_lut_file(self, power_profile: PowerProfile, color_mode: ColorMode):
+    @staticmethod
+    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode):
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
@@ -90,7 +91,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         self._lut_registry = lut_registry
         self._profile = profile
 
-    async def calculate(self, entity_state: State) -> Optional[Decimal]:
+    async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the power consumption based on brightness, mired, hsl values."""
         attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)
@@ -219,7 +220,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
 
-    async def validate_config(self):
+    async def validate_config(self) -> None:
         if self._source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError(
                 "Only light entities can use the LUT mode", "lut_unsupported_color_mode"

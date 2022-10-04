@@ -250,7 +250,7 @@ async def async_setup_platform(
     config: ConfigType,
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
-):
+) -> None:
     """Setup sensors from YAML config sensor entries"""
 
     await _async_setup_entities(hass, config, async_add_entities, discovery_info)
@@ -258,7 +258,7 @@ async def async_setup_platform(
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
-):
+) -> None:
     """Setup sensors from config entry (GUI config flow)"""
     sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
@@ -289,7 +289,7 @@ async def _async_setup_entities(
     config: dict[str, Any],
     async_add_entities: AddEntitiesCallback,
     discovery_info: DiscoveryInfoType | None = None,
-):
+) -> None:
     """Main routine to setup power/energy sensors from provided configuration"""
 
     register_entity_services()
@@ -307,7 +307,7 @@ async def _async_setup_entities(
 
 
 @callback
-def register_entity_services():
+def register_entity_services() -> None:
     """Register the different entity services"""
     platform = entity_platform.async_get_current_platform()
     platform.async_register_entity_service(
@@ -323,7 +323,7 @@ def register_entity_services():
     )
 
 
-def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> dict[str, Any]:
+def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigType:
     """Convert the config entry structure to the sensor config which we use to create the entities"""
     sensor_config = dict(config_entry.data.copy())
 
@@ -598,7 +598,7 @@ async def check_entity_not_already_configured(
     hass: HomeAssistant,
     used_unique_ids: list[str],
     is_discovered: True,
-):
+) -> None:
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
 

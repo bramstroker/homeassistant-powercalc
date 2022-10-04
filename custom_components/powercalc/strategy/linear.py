@@ -47,7 +47,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._standby_power = standby_power
         self._calibration: list[tuple] | None = None
 
-    async def calculate(self, entity_state: State) -> Optional[Decimal]:
+    async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption"""
 
         if self._calibration is None:
@@ -114,10 +114,10 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def get_entity_value_range(self) -> tuple:
         """Get the min/max range for a given entity domain"""
         if self._source_entity.domain == fan.DOMAIN:
-            return (0, 100)
+            return 0, 100
 
         if self._source_entity.domain == light.DOMAIN:
-            return (0, 255)
+            return 0, 255
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
@@ -156,7 +156,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         return None
 
-    async def validate_config(self):
+    async def validate_config(self) -> None:
         """Validate correct setup of the strategy"""
 
         if not self._config.get(CONF_CALIBRATE):
