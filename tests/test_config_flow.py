@@ -454,6 +454,29 @@ async def test_create_group_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.my_group_sensor_power")
 
 
+async def test_create_group_entry_without_unique_id(hass: HomeAssistant):
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
+        CONF_UNIQUE_ID: "My group sensor",
+        CONF_CREATE_UTILITY_METERS: False,
+    }
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.my_group_sensor_power")
+
+
 async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAssistant):
     """
     Test if we can select previously created virtual power config entries as the group member.

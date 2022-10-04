@@ -123,6 +123,9 @@ async def create_group_sensors_from_config_entry(
 
     group_name = entry.data.get(CONF_NAME)
 
+    if CONF_UNIQUE_ID not in sensor_config:
+        sensor_config[CONF_UNIQUE_ID] = entry.entry_id
+
     power_sensor_ids: set[str] = set(
         resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
     )
@@ -242,7 +245,7 @@ def create_grouped_power_sensor(
     power_sensor_ids: set[str],
 ) -> GroupedPowerSensor:
     name = generate_power_sensor_name(sensor_config, group_name)
-    unique_id = sensor_config.get(CONF_UNIQUE_ID)
+    unique_id = sensor_config.get(CONF_UNIQUE_ID) or sensor_config.get(group_name)
     entity_id = generate_power_sensor_entity_id(
         hass, sensor_config, name=group_name, unique_id=unique_id
     )

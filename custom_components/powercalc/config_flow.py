@@ -271,12 +271,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = _validate_daily_energy_input(user_input)
 
         if user_input is not None and not errors:
+            self.selected_sensor_type = SensorType.DAILY_ENERGY
+            self.name = user_input.get(CONF_NAME)
             unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
-
-            self.selected_sensor_type = SensorType.DAILY_ENERGY
-            self.name = user_input.get(CONF_NAME)
 
             self.sensor_config.update(
                 {CONF_DAILY_FIXED_ENERGY: _build_daily_energy_config(user_input)}
@@ -295,6 +294,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
+
+            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
+            await self.async_set_unique_id(unique_id)
+            self._abort_if_unique_id_configured()
+
             if not errors:
                 return self.create_config_entry()
 
@@ -486,13 +490,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     @callback
     def create_config_entry(self) -> FlowResult:
+        if self.unique_id:
+            self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
+
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         if self.name:
             self.sensor_config.update({CONF_NAME: self.name})
         if self.source_entity_id:
             self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
-        if self.unique_id:
-            self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
+
         return self.async_create_entry(title=self.name, data=self.sensor_config)
 
 
