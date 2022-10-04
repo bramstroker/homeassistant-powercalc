@@ -1,4 +1,4 @@
-# Supported models (195 total)
+# Supported models (196 total)
 | manufacturer |        model id         |                                       name                                        |calculation modes| color modes |                                            aliases                                            |
 |--------------|-------------------------|-----------------------------------------------------------------------------------|-----------------|-------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                                |lut              |color_temp   |                                                                                               |
@@ -162,6 +162,7 @@
 |signify       |LWA005                   |Hue Filament E26                                                                   |lut              |brightness   |                                                                                               |
 |signify       |LWA008                   |Hue White Bulb A21 E26 1600lm with Bluetooth                                       |lut              |brightness   |                                                                                     9290023351|
 |signify       |LWA009                   |Hue White 1600 A67 E27 1600lm                                                      |lut              |brightness   |                                                                                               |
+|signify       |LWA011                   |Hue White A60 E27 Bluetooth (800 lm)                                               |lut              |brightness   |                                                                                   929001821618|
 |signify       |LWA017                   |Hue white A60 bulb E27 1050lm with Bluetooth                                       |lut              |brightness   |                                                                                               |
 |signify       |LWB004                   |Hue Lux E27 750lm                                                                  |lut              |brightness   |                                                                                         433714|
 |signify       |LWB006                   |Hue White A60 E27 800lm                                                            |lut              |brightness   |                                                                                               |
