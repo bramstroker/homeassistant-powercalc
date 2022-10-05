@@ -15,7 +15,6 @@ from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_device_registry,
 )
 
 import custom_components.test.light as test_light_platform
