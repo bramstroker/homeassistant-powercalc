@@ -3,7 +3,7 @@
 - [Smart switches](#Smart-switches)
 
 ## Lights
-#### 176 total
+#### 178 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -78,8 +78,10 @@
 |lifx          |LIFX A19 US              |LIFX A19 US                                                                      |lut              |                                                                                               |
 |lifx          |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                                           |lut              |                                                                                               |
 |lifx          |LIFX Candle              |LIFX Candle                                                                      |lut              |                                                                                               |
+|lifx          |LIFX Downlight Color     |Downlight                                                                        |lut              |LIFX Downlight                                                                                 |
 |lifx          |LIFX Mini Color          |LIFX Mini Color                                                                  |lut              |                                                                                               |
 |lifx          |LIFX Mini White          |LIFX Mini White                                                                  |lut              |                                                                                               |
+|lifx          |LIFX Mini White to Warm  |Mini White to Warm                                                               |lut              |                                                                                               |
 |lifx          |LIFX Original 1000       |LIFX Original 1000                                                               |lut              |                                                                                               |
 |lifx          |LIFX Z                   |LIFX Z                                                                           |lut              |                                                                                               |
 |malmbergs     |9970020                  |Malmbergs Sirius III                                                             |lut              |                                                                                               |
