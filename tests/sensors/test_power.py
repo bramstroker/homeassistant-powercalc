@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -14,7 +13,6 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     STATE_OFF,
     STATE_ON,
 )
@@ -50,9 +48,7 @@ from ..common import (
 
 
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
+    await create_input_boolean(hass)
 
     platform = MockEntityPlatform(hass)
     entity = MockEntity(
@@ -62,26 +58,22 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
 
     await hass.async_block_till_done()
 
-    await async_setup_component(
+    await run_powercalc_setup_yaml_config(
         hass,
-        sensor.DOMAIN,
         {
-            sensor.DOMAIN: {
-                CONF_PLATFORM: DOMAIN,
-                CONF_CREATE_GROUP: "TestGroup",
-                CONF_ENTITIES: [
-                    {
-                        CONF_ENTITY_ID: "sensor.dummy",
-                        CONF_POWER_SENSOR_ID: "sensor.existing_power",
-                    },
-                    {
-                        CONF_ENTITY_ID: "input_boolean.test",
-                        CONF_MODE: CalculationStrategy.FIXED,
-                        CONF_FIXED: {CONF_POWER: 50},
-                    },
-                ],
-            }
-        },
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "sensor.dummy",
+                    CONF_POWER_SENSOR_ID: "sensor.existing_power",
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 50},
+                },
+            ],
+        }
     )
 
     await hass.async_block_till_done()

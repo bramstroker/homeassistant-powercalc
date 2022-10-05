@@ -29,11 +29,7 @@ async def test_simple_power():
 
 
 async def test_template_power(hass: HomeAssistant):
-    assert await async_setup_component(
-        hass,
-        input_number.DOMAIN,
-        {"input_number": {"test": {"min": "0", "max": "100", "initial": "42"}}},
-    )
+    await create_input_number(hass, "test", 42)
 
     await hass.async_block_till_done()
 

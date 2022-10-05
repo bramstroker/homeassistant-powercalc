@@ -20,12 +20,11 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
+from ..common import create_input_boolean
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant):
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
+    await create_input_boolean(hass)
 
     assert await async_setup_component(hass, utility_meter.DOMAIN, {})
 

@@ -36,7 +36,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         self,
         source_entity: SourceEntity,
         power: Optional[Union[Template, float]],
-        per_state_power: Optional[dict[str, float]],
+        per_state_power: Optional[dict[str, Union[float, Template]]],
     ) -> None:
         self._source_entity = source_entity
         self._power = power
