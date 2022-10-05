@@ -216,20 +216,20 @@ sensor:
 ```
 
 ### Linear mode
-Supported domains: `light`, `fan`
+Supported domains: `light`, `fan`, `media_player`
 
 The linear mode can be used for dimmable devices which don't have a lookup table available.
 You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
 Power consumpion is calculated by ratio. So when you have your fan running at 50% speed and define watt range 2 - 6, than the estimated consumption will be 4 watt.
 
 #### Configuration options
-| Name              | Type    | Requirement  | Description                                 |
-| ----------------- | ------- | ------------ | ------------------------------------------- |
-| attribute         | string  | **Optional** | State attribute to use for the linear range. When not supplied will be `brightness` for lights, and `percentage` for fans     |
-| min_power         | float   | **Optional** | Power usage for lowest brightness level     |
-| max_power         | float   | **Optional** | Power usage for highest brightness level    |
-| calibrate         | string  | **Optional** | Calibration values                          |
-| gamma_curve       | float   | **Optional** | Apply a gamma correction, for example 2.8   |
+| Name              | Type    | Requirement  | Description                                                                                                                                           |
+| ----------------- | ------- | ------------ |-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| attribute         | string  | **Optional** | State attribute to use for the linear range. When not supplied will be `brightness` for lights, `percentage` for fans and `volume` for media players. |
+| min_power         | float   | **Optional** | Power usage for lowest brightness level                                                                                                               |
+| max_power         | float   | **Optional** | Power usage for highest brightness level                                                                                                              |
+| calibrate         | string  | **Optional** | Calibration values                                                                                                                                    |
+| gamma_curve       | float   | **Optional** | Apply a gamma correction, for example 2.8                                                                                                             |
 
 #### Example configuration
 

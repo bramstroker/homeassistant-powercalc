@@ -9,6 +9,7 @@ import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
@@ -299,7 +300,7 @@ class DiscoveryManager:
             if entity_entry.disabled:
                 continue
 
-            if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
+            if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN, MEDIA_PLAYER_DOMAIN):
                 continue
 
             if not await has_manufacturer_and_model_information(
