@@ -6,6 +6,7 @@ on:
       - '**/model.json'
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   format:
