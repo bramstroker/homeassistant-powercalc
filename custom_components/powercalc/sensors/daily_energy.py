@@ -45,7 +45,6 @@ from ..const import (
     CONF_VALUE,
     UnitPrefix,
 )
-from ..migrate import async_migrate_entity_id
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
 from .power import VirtualPowerSensor, create_virtual_power_sensor
@@ -85,13 +84,6 @@ async def create_daily_fixed_energy_sensor(
     entity_id = generate_energy_sensor_entity_id(
         hass, sensor_config, unique_id=unique_id, source_entity=source_entity
     )
-    if not unique_id:
-        old_entity_id = async_generate_entity_id(
-            ENTITY_ID_FORMAT, sensor_config.get(CONF_NAME), hass=hass
-        )
-        async_migrate_entity_id(
-            hass, old_entity_id=old_entity_id, new_entity_id=entity_id
-        )
 
     _LOGGER.debug(
         "Creating daily_fixed_energy energy sensor (name=%s, entity_id=%s, unique_id=%s)",
