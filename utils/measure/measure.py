@@ -341,6 +341,7 @@ class Measure:
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
+
     def nudge_and_remeasure(self, color_mode: str, variation: Variation):
         for nudge_count in range(MAX_NUDGES):
             try:
@@ -746,6 +747,21 @@ class Measure:
         input("Connect your light now and press enter to start measuring..")
         return average
 
+    def measure_average(self, duration: int) -> float:
+        """Measure average power consumption for a given time period in seconds"""
+        _LOGGER.info(f"Measuring average power for {duration} seconds")
+        start_time = time.time()
+        readings: list[float] = []
+        while (time.time() - start_time) < duration:
+            power = self.power_meter.get_power().power
+            _LOGGER.info(f"Measured power: {power}")
+            readings.append(power)
+            time.sleep(SLEEP_TIME)
+        average = round(sum(readings) / len(readings), 2)
+        _LOGGER.info(f"Average power: {average}")
+        return average
+
+
 class CsvWriter:
     def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
         self.csv_file = csv_file
@@ -903,7 +919,18 @@ def main():
         light_controller = light_controller_factory.create()
     
         measure = Measure(light_controller, power_meter)
-        measure.start()
+
+        args = sys.argv[1:]
+        if not args:
+            measure.start()
+            exit(0)
+
+        if args[0] == "average":
+            try:
+                duration = int(args[1])
+            except IndexError:
+                duration = 60
+            measure.measure_average(duration)
     except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
         exit(1)

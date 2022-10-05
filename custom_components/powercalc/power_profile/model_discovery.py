@@ -43,8 +43,8 @@ async def get_power_profile(
             hass.config.config_dir, custom_model_directory
         )
 
-    libary = ProfileLibrary.factory(hass)
-    profile = await libary.get_profile(
+    library = ProfileLibrary.factory(hass)
+    profile = await library.get_profile(
         ModelInfo(manufacturer, model), custom_model_directory
     )
     if profile is None:

@@ -1,6 +1,12 @@
 import logging
 
+from datetime import timedelta
+from unittest import mock
+
 import pytest
+from homeassistant.util import dt
+from pytest_homeassistant_custom_component.common import async_fire_time_changed
+from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -27,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
+    CONF_DELAY,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -37,6 +44,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -321,3 +329,52 @@ async def test_error_when_model_not_supported(hass: HomeAssistant, caplog: pytes
     assert not hass.states.get("sensor.test_power")
 
     assert "Skipping sensor setup" in caplog.text
+
+async def test_sleep_power(hass: HomeAssistant):
+    """Test sleep power for devices having a sleep mode"""
+    entity_id = "media_player.test"
+    power_entity_id = "sensor.test_power"
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_STANDBY_POWER: 20,
+            CONF_SLEEP_POWER: {
+                CONF_POWER: 5,
+                CONF_DELAY: 10
+            },
+            CONF_FIXED: {
+                CONF_POWER: 100
+            },
+        },
+    )
+
+    hass.states.async_set(entity_id, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity_id).state == "20.00"
+
+    # After 10 seconds the device goes into sleep mode, check the sleep power is set on the power sensor
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=10))
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity_id).state == "5.00"
+
+    hass.states.async_set(entity_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity_id).state == "100.00"
+
+    hass.states.async_set(entity_id, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity_id).state == "20.00"
+
+    # Check that the sleepmode timer is reset correctly when the device goes to a non OFF state again
+    hass.states.async_set(entity_id, STATE_ON)
+    await hass.async_block_till_done()
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=20))
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_entity_id).state == "100.00"
