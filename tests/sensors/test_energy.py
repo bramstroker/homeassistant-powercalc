@@ -1,13 +1,9 @@
-from homeassistant.components import input_boolean
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
-    MockEntity,
-    MockEntityPlatform,
     mock_device_registry,
     mock_registry,
 )
@@ -18,15 +14,13 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
 )
 
-from ..common import run_powercalc_setup_yaml_config
+from ..common import run_powercalc_setup_yaml_config, create_input_boolean
 
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     hass: HomeAssistant,
 ):
-    assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {"test": None}}
-    )
+    await create_input_boolean(hass)
 
     mock_device_registry(
         hass,
