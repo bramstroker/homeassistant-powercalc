@@ -15,6 +15,8 @@ from homeassistant.const import (
     CONF_NAME,
     STATE_OFF,
     STATE_ON,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
@@ -27,7 +29,9 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_MANUFACTURER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER,
@@ -283,3 +287,37 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "15.00"
 
 
+async def test_unknown_source_entity_state(hass: HomeAssistant):
+    """Power sensor should be unavailable when source entity state is unknown"""
+    await create_input_boolean(hass)
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_FIXED: {
+                CONF_POWER: 20
+            },
+        },
+    )
+    hass.states.async_set("input_boolean.test", STATE_UNKNOWN)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+
+async def test_error_when_model_not_supported(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+
+    await create_input_boolean(hass)
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MANUFACTURER: "Foo",
+            CONF_MODEL: "Bar"
+        },
+    )
+
+    assert not hass.states.get("sensor.test_power")
+
+    assert "Skipping sensor setup" in caplog.text
