@@ -1,10 +1,10 @@
-"""Update the manifest file."""
+from __future__ import annotations
+
 import glob
 import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(
     1,
