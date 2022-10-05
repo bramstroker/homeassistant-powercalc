@@ -300,7 +300,11 @@ class DiscoveryManager:
             if entity_entry.disabled:
                 continue
 
-            if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN, MEDIA_PLAYER_DOMAIN):
+            if entity_entry.domain not in (
+                LIGHT_DOMAIN,
+                SWITCH_DOMAIN,
+                MEDIA_PLAYER_DOMAIN,
+            ):
                 continue
 
             if not await has_manufacturer_and_model_information(

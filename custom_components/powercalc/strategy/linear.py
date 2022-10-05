@@ -9,7 +9,11 @@ import voluptuous as vol
 from homeassistant.components import fan, light, media_player
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL, ATTR_MEDIA_VOLUME_MUTED, STATE_PLAYING
+from homeassistant.components.media_player import (
+    ATTR_MEDIA_VOLUME_LEVEL,
+    ATTR_MEDIA_VOLUME_MUTED,
+    STATE_PLAYING,
+)
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
 

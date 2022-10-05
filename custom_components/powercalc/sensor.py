@@ -220,9 +220,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_SLEEP_POWER): vol.Schema(
         {
             vol.Required(CONF_POWER): vol.Coerce(float),
-            vol.Required(CONF_DELAY): cv.positive_int
+            vol.Required(CONF_DELAY): cv.positive_int,
         }
-    )
+    ),
 }
 
 

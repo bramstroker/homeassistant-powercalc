@@ -1,10 +1,15 @@
 import os
 
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import (
+    CONF_ENTITY_ID,
+    STATE_OFF,
+    STATE_ON,
+    STATE_PAUSED,
+    STATE_PLAYING,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.const import STATE_PLAYING, STATE_PAUSED
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
@@ -62,17 +67,23 @@ async def test_media_player(hass: HomeAssistant):
     assert power_state
     assert power_state.state == "unavailable"
 
-    hass.states.async_set(entity_id, STATE_PLAYING, {"volume_level": 0.20, "is_volume_muted": False})
+    hass.states.async_set(
+        entity_id, STATE_PLAYING, {"volume_level": 0.20, "is_volume_muted": False}
+    )
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "2.04"
 
-    hass.states.async_set(entity_id, STATE_PAUSED, {"volume_level": 0.20, "is_volume_muted": False})
+    hass.states.async_set(
+        entity_id, STATE_PAUSED, {"volume_level": 0.20, "is_volume_muted": False}
+    )
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "1.65"
 
-    hass.states.async_set(entity_id, STATE_PLAYING, {"volume_level": 0.20, "is_volume_muted": True})
+    hass.states.async_set(
+        entity_id, STATE_PLAYING, {"volume_level": 0.20, "is_volume_muted": True}
+    )
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "2.01"

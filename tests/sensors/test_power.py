@@ -1,11 +1,8 @@
 import logging
-
 from datetime import timedelta
 from unittest import mock
 
 import pytest
-from homeassistant.util import dt
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
@@ -25,7 +22,12 @@ from homeassistant.const import (
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockEntity, MockEntityPlatform
+from homeassistant.util import dt
+from pytest_homeassistant_custom_component.common import (
+    MockEntity,
+    MockEntityPlatform,
+    async_fire_time_changed,
+)
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -283,13 +285,8 @@ async def test_sleep_power(hass: HomeAssistant):
         {
             CONF_ENTITY_ID: entity_id,
             CONF_STANDBY_POWER: 20,
-            CONF_SLEEP_POWER: {
-                CONF_POWER: 5,
-                CONF_DELAY: 10
-            },
-            CONF_FIXED: {
-                CONF_POWER: 100
-            },
+            CONF_SLEEP_POWER: {CONF_POWER: 5, CONF_DELAY: 10},
+            CONF_FIXED: {CONF_POWER: 100},
         },
     )
 

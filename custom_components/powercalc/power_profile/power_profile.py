@@ -23,6 +23,7 @@ class DeviceType(Enum):
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
 
+
 class PowerProfile:
     def __init__(
         self,
@@ -162,7 +163,10 @@ class PowerProfile:
         if self.device_type == DeviceType.LIGHT and domain != LIGHT_DOMAIN:
             return False
 
-        if self.device_type == DeviceType.SMART_SPEAKER and domain != MEDIA_PLAYER_DOMAIN:
+        if (
+            self.device_type == DeviceType.SMART_SPEAKER
+            and domain != MEDIA_PLAYER_DOMAIN
+        ):
             return False
 
         if self.device_type == DeviceType.SMART_SWITCH and domain != SWITCH_DOMAIN:

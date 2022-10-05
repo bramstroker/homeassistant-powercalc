@@ -18,14 +18,15 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.core import HomeAssistant, State, callback, CALLBACK_TYPE
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers import start
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
+    async_call_later,
     async_track_state_change_event,
     async_track_template_result,
-    async_track_time_interval, async_call_later,
+    async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import DiscoveryInfoType, StateType
@@ -472,7 +473,9 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
                 self._power = round(power, self._rounding_digits)
                 self.async_write_ha_state()
 
-            self._sleep_power_timer = async_call_later(self.hass, delay, _update_sleep_power)
+            self._sleep_power_timer = async_call_later(
+                self.hass, delay, _update_sleep_power
+            )
 
         standby_power = self._standby_power
         if self._power_calculator.can_calculate_standby():

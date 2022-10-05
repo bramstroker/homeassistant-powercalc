@@ -19,12 +19,10 @@ from pytablewriter import MarkdownTableWriter
 DEVICE_TYPES = [
     ("light", "Lights"),
     ("smart_speaker", "Smart speakers"),
-    ("smart_switch", "Smart switches")
+    ("smart_switch", "Smart switches"),
 ]
 
-PROJECT_ROOT = os.path.realpath(
-    os.path.join(os.path.abspath(__file__), "../../../../")
-)
+PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 
 
 def generate_supported_model_list():
@@ -46,7 +44,11 @@ def generate_supported_model_list():
 
         writer.header_list = headers
 
-        relevant_models = [model for model in models if (model.get("device_type") or "light") == device_type[0]]
+        relevant_models = [
+            model
+            for model in models
+            if (model.get("device_type") or "light") == device_type[0]
+        ]
         rows = []
         for model in relevant_models:
             row = [
@@ -87,7 +89,7 @@ def get_model_list() -> list[dict]:
                 {
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
-                    "color_modes": color_modes
+                    "color_modes": color_modes,
                 }
             )
             models.append(model_data)
