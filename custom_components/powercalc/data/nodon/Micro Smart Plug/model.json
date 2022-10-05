@@ -14,5 +14,8 @@
 	],
 	"fixed_config": {
 		"power": 0.96
-	}
+	},
+	"aliases": [
+		"MSP-3-1-X1"
+	]
 }
