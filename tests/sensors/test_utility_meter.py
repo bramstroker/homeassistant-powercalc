@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
+
 from ..common import create_input_boolean
 
 

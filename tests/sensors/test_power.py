@@ -87,7 +87,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
                     CONF_FIXED: {CONF_POWER: 50},
                 },
             ],
-        }
+        },
     )
 
     await hass.async_block_till_done()
@@ -280,9 +280,7 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
-            CONF_FIXED: {
-                CONF_POWER: "{{ states('input_number.test') }}"
-            },
+            CONF_FIXED: {CONF_POWER: "{{ states('input_number.test') }}"},
         },
     )
 
@@ -304,9 +302,7 @@ async def test_unknown_source_entity_state(hass: HomeAssistant):
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
-            CONF_FIXED: {
-                CONF_POWER: 20
-            },
+            CONF_FIXED: {CONF_POWER: 20},
         },
     )
     hass.states.async_set("input_boolean.test", STATE_UNKNOWN)
@@ -315,7 +311,9 @@ async def test_unknown_source_entity_state(hass: HomeAssistant):
     assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
 
 
-async def test_error_when_model_not_supported(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_error_when_model_not_supported(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.ERROR)
 
     await create_input_boolean(hass)
@@ -324,13 +322,14 @@ async def test_error_when_model_not_supported(hass: HomeAssistant, caplog: pytes
         {
             CONF_ENTITY_ID: "input_boolean.test",
             CONF_MANUFACTURER: "Foo",
-            CONF_MODEL: "Bar"
+            CONF_MODEL: "Bar",
         },
     )
 
     assert not hass.states.get("sensor.test_power")
 
     assert "Skipping sensor setup" in caplog.text
+
 
 async def test_sleep_power(hass: HomeAssistant):
     """Test sleep power for devices having a sleep mode"""
