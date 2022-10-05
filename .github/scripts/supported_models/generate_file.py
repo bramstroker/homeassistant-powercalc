@@ -29,7 +29,11 @@ def generate_supported_model_list():
     """Generate static file containing the supported models."""
     models = get_model_list()
 
-    output = ""
+    output = "".join([
+        f"- [{device_type[1]}](#{device_type[1]})\n" for device_type
+        in DEVICE_TYPES
+    ])
+
     for device_type in DEVICE_TYPES:
         writer = MarkdownTableWriter()
         headers = [
@@ -64,8 +68,8 @@ def generate_supported_model_list():
 
         rows = sorted(rows, key=lambda x: (x[0], x[1]))
         writer.value_matrix = rows
-        writer.table_name = f"{device_type[1]} ({len(rows)} total)"
-        output += "\n" + writer.dumps()
+        output += f"\n## {device_type[1]}\n#### {len(rows)} total\n\n"
+        output += writer.dumps()
 
     md_file = open(os.path.join(PROJECT_ROOT, "docs/supported_models.md"), "w")
     md_file.write(output)
