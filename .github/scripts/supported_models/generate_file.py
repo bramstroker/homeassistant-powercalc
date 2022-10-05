@@ -29,9 +29,10 @@ def generate_supported_model_list():
     """Generate static file containing the supported models."""
     models = get_model_list()
 
-    output = "".join(
-        [f"- [{device_type[1]}](#{device_type[1]})\n" for device_type in DEVICE_TYPES]
-    )
+    output = ""
+    for device_type in DEVICE_TYPES:
+        anchor = device_type[1].replace(" ", "-")
+        output += f"- [{device_type[1]}](#{anchor})\n"
 
     for device_type in DEVICE_TYPES:
         writer = MarkdownTableWriter()
