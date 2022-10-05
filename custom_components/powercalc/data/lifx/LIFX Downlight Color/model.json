@@ -11,5 +11,8 @@
     "standby_power": 0.68,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "LIFX Downlight"
     ]
 }
