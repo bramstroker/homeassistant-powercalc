@@ -13,7 +13,8 @@
         "lut"
     ],
     "aliases": [
-        "TRADFRI bulb GU10 CWS 345lm"
+        "TRADFRI bulb GU10 CWS 345lm",
+        "TRADFRIbulbGU10WS345lm"
     ]
 }
 
