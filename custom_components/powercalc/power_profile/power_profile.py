@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from ..const import CalculationStrategy
-from ..errors import ModelNotSupported, UnsupportedMode
+from ..errors import ModelNotSupported, UnsupportedMode, PowercalcSetupError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +44,13 @@ class PowerProfile:
 
     def select_sub_profile(self, sub_profile: str) -> None:
         """Load the model.json file data containing information about the light model"""
+
+        if not self.has_sub_profiles:
+            return None
+
+        # Sub profile already selected, no need to load it again
+        if self.sub_profile == sub_profile:
+            return None
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
         _LOGGER.debug(f"Loading sub LUT directory {sub_profile}")
@@ -181,10 +188,12 @@ class PowerProfile:
 
 
 class SubProfileSelector:
-    def select_sub_profile(self, power_profile: PowerProfile, entity_state: State) -> str | None:
+    def select_sub_profile(self, power_profile: PowerProfile, entity_state: State) -> str:
         select_config = power_profile.sub_profile_select
         if not select_config:
-            return None
+            raise PowercalcSetupError(
+                "Cannot dynamically select sub profile, no `sub_profile_select` defined in model.json"
+            )
 
         matchers: list[dict] = select_config["matchers"]
         for matcher_config in matchers:

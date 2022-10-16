@@ -439,8 +439,9 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
 
         if self._power_profile and self._power_profile.sub_profile_select:
             sub_profile_selector = SubProfileSelector()
-            sub_profile = sub_profile_selector.select_sub_profile(self._power_profile, state)
-            self._power_profile.select_sub_profile(sub_profile)
+            self._power_profile.select_sub_profile(
+                sub_profile_selector.select_sub_profile(self._power_profile, state)
+            )
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if state.state in OFF_STATES or not is_calculation_enabled:

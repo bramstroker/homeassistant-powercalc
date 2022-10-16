@@ -19,8 +19,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import run_powercalc_setup_yaml_config
-
+from tests.common import run_powercalc_setup_yaml_config, get_test_profile_dir
 
 async def test_media_player(hass: HomeAssistant):
     """
@@ -92,8 +91,3 @@ async def test_media_player(hass: HomeAssistant):
 
     assert hass.states.get(power_sensor_id).state == "1.65"
 
-
-def get_test_profile_dir(sub_dir: str) -> str:
-    return os.path.join(
-        os.path.dirname(__file__), "../../testing_config/powercalc_profiles", sub_dir
-    )

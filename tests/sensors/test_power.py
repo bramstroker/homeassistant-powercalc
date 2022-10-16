@@ -458,4 +458,3 @@ async def test_dynamic_sub_profile_selection(hass: HomeAssistant):
 
     assert hass.states.get(power_sensor_id).state == "1.18"
 
-    
