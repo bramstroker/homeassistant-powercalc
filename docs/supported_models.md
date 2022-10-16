@@ -3,7 +3,7 @@
 - [Smart switches](#Smart-switches)
 
 ## Lights
-#### 179 total
+#### 180 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -142,6 +142,7 @@
 |signify       |LTE002                   |Hue White Ambiance E14 w/ BT                                                     |lut              |                                                                                     9290022944|
 |signify       |LTG002                   |Hue White Ambiance GU10 w/ BT                                                    |lut              |                                                                                   929001953301|
 |signify       |LTO001                   |Hue G93 E27 Filament Globe Bulb                                                  |lut              |                                                                                               |
+|signify       |LTP002                   |Hue ambiance pendant                                                             |lut              |                                                                                               |
 |signify       |LTP003                   |Hue Fair Pendant                                                                 |lut              |                                                                                               |
 |signify       |LTP008                   |Hue Being Pendant Light                                                          |lut              |                                                                                               |
 |signify       |LTW001                   |Hue White Ambiance A19                                                           |lut              |                                                                                  8718696548738|
