@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Sonoff S31",
+    "measure_device": "Kasa KP115",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -8,7 +8,7 @@
         "VERSION": "v0.26.1:docker"
     },
     "name": "Govee Lyra RGBICWW Corner Floor Lamp",
-    "standby_power": 2.0,
+    "standby_power": 1.78,
     "supported_modes": [
         "lut"
     ]
