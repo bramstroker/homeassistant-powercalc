@@ -53,10 +53,10 @@ class PowerProfile:
             return None
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
-        _LOGGER.debug(f"Loading sub LUT directory {sub_profile}")
+        _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupported(
-                f"LUT subdirectory not found (manufacturer: {self._manufacturer}, model: {self._model})"
+                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})"
             )
 
         # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
@@ -81,6 +81,10 @@ class PowerProfile:
         return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     def supports(self, model: str) -> bool:
+        """
+        Check whether this power profile supports a given model ID.
+        Also looks at possible aliases
+        """
         model = model.lower().replace("#slash#", "/")
 
         if self._model.lower() == model:
@@ -118,11 +122,11 @@ class PowerProfile:
         return self._json_data.get("supported_modes") or [CalculationStrategy.LUT]
 
     @property
-    def linked_lut(self) -> Optional[str]:
+    def linked_lut(self) -> str | None:
         return self._json_data.get("linked_lut")
 
     @property
-    def calculation_enabled_condition(self) -> Optional[str]:
+    def calculation_enabled_condition(self) -> str | None:
         return self._json_data.get("calculation_enabled_condition")
 
     @property
@@ -130,7 +134,7 @@ class PowerProfile:
         return self._json_data.get("aliases") or []
 
     @property
-    def linear_mode_config(self) -> Optional[dict]:
+    def linear_mode_config(self) -> ConfigType | None:
         if not self.is_mode_supported(CalculationStrategy.LINEAR):
             raise UnsupportedMode(
                 f"Mode linear is not supported by model: {self._model}"
@@ -138,7 +142,7 @@ class PowerProfile:
         return self._json_data.get("linear_config")
 
     @property
-    def fixed_mode_config(self) -> Optional[dict]:
+    def fixed_mode_config(self) -> ConfigType | None:
         if not self.is_mode_supported(CalculationStrategy.FIXED):
             raise UnsupportedMode(
                 f"Mode fixed is not supported by model: {self._model}"
