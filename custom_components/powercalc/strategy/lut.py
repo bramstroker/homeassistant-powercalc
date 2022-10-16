@@ -39,7 +39,7 @@ class LutRegistry:
     async def get_lookup_dictionary(
         self, power_profile: PowerProfile, color_mode: ColorMode
     ) -> dict | None:
-        cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}"
+        cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}_{power_profile.sub_profile}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if lookup_dict is None:
             defaultdict_of_dict = partial(defaultdict, dict)

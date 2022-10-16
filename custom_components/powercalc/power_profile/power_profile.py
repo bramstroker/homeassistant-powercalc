@@ -4,8 +4,9 @@ import json
 import logging
 import os
 from enum import Enum
-from typing import Optional
+from typing import Optional, Protocol
 
+from homeassistant.core import State
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -41,7 +42,7 @@ class PowerProfile:
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
 
-    def load_sub_profile(self, sub_profile: str) -> None:
+    def select_sub_profile(self, sub_profile: str) -> None:
         """Load the model.json file data containing information about the light model"""
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
@@ -158,6 +159,10 @@ class PowerProfile:
     def has_sub_profiles(self) -> bool:
         return len(self.get_sub_profiles()) > 0
 
+    @property
+    def sub_profile_select(self) -> dict | None:
+        return self._json_data.get("sub_profile_select")
+
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
         if self.device_type == DeviceType.LIGHT and domain != LIGHT_DOMAIN:
@@ -173,3 +178,42 @@ class PowerProfile:
             return False
 
         return True
+
+
+class SubProfileSelector:
+    def select_sub_profile(self, power_profile: PowerProfile, entity_state: State) -> str | None:
+        select_config = power_profile.sub_profile_select
+        if not select_config:
+            return None
+
+        matchers: list[dict] = select_config["matchers"]
+        for matcher_config in matchers:
+            matcher = self.create_matcher(matcher_config)
+            sub_profile = matcher.match(entity_state)
+            if sub_profile:
+                return sub_profile
+
+        return select_config["default"]
+
+    @staticmethod
+    def create_matcher(matcher_config: dict) -> SubProfileMatcher:
+        return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
+
+
+class SubProfileMatcher(Protocol):
+    def match(self, entity_state: State) -> str | None:
+        pass
+
+
+class AttributeMatcher(SubProfileMatcher):
+    def __init__(self, attribute: str, mapping: dict[str, str]):
+        self._attribute = attribute
+        self._mapping = mapping
+        pass
+
+    def match(self, entity_state: State) -> str | None:
+        val = entity_state.attributes.get(self._attribute)
+        if val is None:
+            return None
+
+        return self._mapping.get(val)

@@ -157,6 +157,29 @@
     "sensor_config": {
       "type": "object",
       "description": "Sensor configuration options. See the README"
+    },
+    "sub_profile_select": {
+      "type": "object",
+      "description": "Configuration to automatically select a sub profile",
+      "required": [
+        "default",
+        "matchers"
+      ],
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Default profile to select when non of the matchers apply"
+        },
+        "matchers": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object"
+            }
+          ],
+          "description": "List of matchers which will be checked"
+        }
+      }
     }
   }
 }

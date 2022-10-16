@@ -3,7 +3,6 @@ import os
 from homeassistant.const import (
     CONF_ENTITY_ID,
     STATE_OFF,
-    STATE_ON,
     STATE_PAUSED,
     STATE_PLAYING,
 )

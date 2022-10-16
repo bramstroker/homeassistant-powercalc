@@ -1,10 +1,14 @@
 import logging
 from datetime import timedelta
-from unittest import mock
 
 import pytest
-from homeassistant.components import input_boolean, sensor
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_MODE,
+    ATTR_HS_COLOR,
+    ColorMode,
+)
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     STATE_CLEANING,
@@ -24,7 +28,11 @@ from homeassistant.const import (
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
@@ -35,6 +43,7 @@ from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
     CONF_FIXED,
     CONF_LINEAR,
@@ -57,6 +66,7 @@ from ..common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
+    get_test_profile_dir,
     run_powercalc_setup_yaml_config,
 )
 
@@ -374,3 +384,78 @@ async def test_sleep_power(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "100.00"
+
+
+async def test_dynamic_sub_profile_selection(hass: HomeAssistant):
+    """
+    Test that media player can be setup from profile library
+    """
+    entity_id = "light.test"
+    manufacturer = "LIFX"
+    model = "LIFX A19 Night Vision"
+
+    mock_registry(
+        hass,
+        {
+            entity_id: RegistryEntry(
+                entity_id=entity_id,
+                unique_id="1234",
+                platform="light",
+                device_id="nest-device-id",
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "nest-device": DeviceEntry(
+                id="nest-device-id", manufacturer=manufacturer, model=model
+            )
+        },
+    )
+
+    power_sensor_id = "sensor.test_power"
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_MANUFACTURER: manufacturer,
+            CONF_MODEL: model,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("infrared_light"),
+        },
+    )
+
+    power_state = hass.states.get(power_sensor_id)
+    assert power_state
+    assert power_state.state == "unavailable"
+
+    hass.states.async_set(
+        entity_id,
+        STATE_ON,
+        {
+            "infrared_brightness": "50%",
+            ATTR_COLOR_MODE: ColorMode.HS,
+            ATTR_BRIGHTNESS: 100,
+            ATTR_HS_COLOR: (200, 300)
+        }
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "1.19"
+
+    hass.states.async_set(
+        entity_id,
+        STATE_ON,
+        {
+            "infrared_brightness": "Disabled",
+            ATTR_COLOR_MODE: ColorMode.HS,
+            ATTR_BRIGHTNESS: 100,
+            ATTR_HS_COLOR: (200, 300)
+        }
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "1.18"
+
+    

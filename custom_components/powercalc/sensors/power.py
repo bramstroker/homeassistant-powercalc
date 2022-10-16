@@ -65,7 +65,7 @@ from ..const import (
 )
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedMode
 from ..power_profile.model_discovery import get_power_profile
-from ..power_profile.power_profile import PowerProfile
+from ..power_profile.power_profile import PowerProfile, SubProfileSelector
 from ..strategy.factory import PowerCalculatorStrategyFactory
 from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 from .abstract import (
@@ -200,6 +200,7 @@ async def create_virtual_power_sensor(
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE),
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
         sensor_config=sensor_config,
+        power_profile=power_profile,
     )
 
 
@@ -290,6 +291,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         ignore_unavailable_state: bool,
         rounding_digits: int,
         sensor_config: dict,
+        power_profile: PowerProfile | None
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator
@@ -319,6 +321,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
             ATTR_SOURCE_ENTITY: source_entity,
             ATTR_SOURCE_DOMAIN: source_domain,
         }
+        self._power_profile = power_profile
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -433,6 +436,11 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
+
+        if self._power_profile and self._power_profile.sub_profile_select:
+            sub_profile_selector = SubProfileSelector()
+            sub_profile = sub_profile_selector.select_sub_profile(self._power_profile, state)
+            self._power_profile.select_sub_profile(sub_profile)
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if state.state in OFF_STATES or not is_calculation_enabled:
