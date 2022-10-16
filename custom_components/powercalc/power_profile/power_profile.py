@@ -158,7 +158,7 @@ class PowerProfile:
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        if self.has_sub_profiles and self.sub_profile is None:
+        if self.has_sub_profiles and self.sub_profile is None and self.sub_profile_select is None:
             return True
         return self._json_data.get("requires_additional_configuration") or False
 
@@ -193,6 +193,10 @@ class PowerProfile:
 
 class SubProfileSelector:
     def select_sub_profile(self, power_profile: PowerProfile, entity_state: State) -> str:
+        """
+        Dynamically tries to select a sub profile depending on the entity state.
+        This method always need to return a sub profile, when nothing is matched it will return a default
+        """
         select_config = power_profile.sub_profile_select
         if not select_config:
             raise PowercalcSetupError(
@@ -210,6 +214,7 @@ class SubProfileSelector:
 
     @staticmethod
     def create_matcher(matcher_config: dict) -> SubProfileMatcher:
+        """Create a matcher from json config. Can be extended for more matches in the future"""
         return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
 
 
