@@ -4,6 +4,10 @@
     "supported_modes": [
         "lut"
     ],
+    "aliases": [
+        "929002294203",
+        "LCE002"
+    ],
     "measure_method": "script",
     "measure_device": "AVM FRITZ!DECT 200",
     "measure_description": "Measured with own custom script"
