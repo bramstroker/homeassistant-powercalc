@@ -3,7 +3,7 @@
 - [Smart switches](#Smart-switches)
 
 ## Lights
-#### 178 total
+#### 180 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -25,6 +25,7 @@
 |gledopto      |GL-B-001P                |GL-B-001P                                                                        |lut              |                                                                                               |
 |gledopto      |GL-S-005Z                |Gledopto 4W MR16 Dual White and Color 120°                                       |lut              |                                                                                               |
 |gledopto      |GL-S-007Z                |Gledopto 5W GU10 Dual White And Color Spotlight                                  |lut              |                                                                                               |
+|govee         |H6072                    |Govee Lyra RGBICWW Corner Floor Lamp                                             |lut              |                                                                                               |
 |ikea          |L1527                    |FLOALT panel WS 30x30                                                            |lut              |FLOALT panel WS 30x30                                                                          |
 |ikea          |L1528                    |FLOALT panel WS 30x90                                                            |lut              |FLOALT panel WS 30x90                                                                          |
 |ikea          |L1529                    |FLOALT panel WS 60x60                                                            |lut              |FLOALT panel WS 60x60                                                                          |
@@ -141,6 +142,7 @@
 |signify       |LTE002                   |Hue White Ambiance E14 w/ BT                                                     |lut              |                                                                                     9290022944|
 |signify       |LTG002                   |Hue White Ambiance GU10 w/ BT                                                    |lut              |                                                                                   929001953301|
 |signify       |LTO001                   |Hue G93 E27 Filament Globe Bulb                                                  |lut              |                                                                                               |
+|signify       |LTP002                   |Hue ambiance pendant                                                             |lut              |                                                                                               |
 |signify       |LTP003                   |Hue Fair Pendant                                                                 |lut              |                                                                                               |
 |signify       |LTP008                   |Hue Being Pendant Light                                                          |lut              |                                                                                               |
 |signify       |LTW001                   |Hue White Ambiance A19                                                           |lut              |                                                                                  8718696548738|
