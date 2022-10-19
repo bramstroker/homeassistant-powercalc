@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script behind a GE Zwave Dimmer plugged into a kasa smartswitch generic 6in recessed light",
+    "measure_device": "HS110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 10,
+        "SLEEP_TIME": 6,
+        "VERSION": "v0.26.1:docker"
+    },
+    "name": "WD6L27D1A 10W",
+    "standby_power": 0.44,
+    "supported_modes": [
+        "lut"
+    ]
+}

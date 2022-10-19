@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script - Non smart br30 bulb measured behind zwave switch for dimming",
+    "measure_device": "Kasa HS110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 3,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.26.1:docker"
+    },
+    "name": "L10BR30N1 10W",
+    "standby_power": 0.43,
+    "supported_modes": [
+        "lut"
+    ]
+}
