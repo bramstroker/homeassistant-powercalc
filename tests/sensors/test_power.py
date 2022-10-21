@@ -2,13 +2,13 @@ import logging
 from datetime import timedelta
 
 import pytest
-from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_HS_COLOR,
     ColorMode,
 )
+from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
     STATE_CLEANING,
@@ -26,16 +26,16 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
-from homeassistant.setup import async_setup_component
-from homeassistant.util import dt
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.setup import async_setup_component
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
-    mock_registry,
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
+    mock_device_registry,
+    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -437,8 +437,8 @@ async def test_dynamic_sub_profile_selection(hass: HomeAssistant):
             "infrared_brightness": "50%",
             ATTR_COLOR_MODE: ColorMode.HS,
             ATTR_BRIGHTNESS: 100,
-            ATTR_HS_COLOR: (200, 300)
-        }
+            ATTR_HS_COLOR: (200, 300),
+        },
     )
     await hass.async_block_till_done()
 
@@ -451,10 +451,9 @@ async def test_dynamic_sub_profile_selection(hass: HomeAssistant):
             "infrared_brightness": "Disabled",
             ATTR_COLOR_MODE: ColorMode.HS,
             ATTR_BRIGHTNESS: 100,
-            ATTR_HS_COLOR: (200, 300)
-        }
+            ATTR_HS_COLOR: (200, 300),
+        },
     )
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "1.18"
-

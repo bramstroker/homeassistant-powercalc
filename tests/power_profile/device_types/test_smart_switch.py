@@ -14,7 +14,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import run_powercalc_setup_yaml_config, get_test_profile_dir
+from tests.common import get_test_profile_dir, run_powercalc_setup_yaml_config
 
 
 async def test_smart_switch(hass: HomeAssistant):
@@ -70,4 +70,3 @@ async def test_smart_switch(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.52"
-

@@ -291,7 +291,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         ignore_unavailable_state: bool,
         rounding_digits: int,
         sensor_config: dict,
-        power_profile: PowerProfile | None
+        power_profile: PowerProfile | None,
     ):
         """Initialize the sensor."""
         self._power_calculator = power_calculator

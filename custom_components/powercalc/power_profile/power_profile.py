@@ -6,15 +6,14 @@ import os
 from enum import Enum
 from typing import Optional, Protocol
 
-from homeassistant.core import State
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
 from ..const import CalculationStrategy
-from ..errors import ModelNotSupported, UnsupportedMode, PowercalcSetupError
+from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -158,7 +157,11 @@ class PowerProfile:
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        if self.has_sub_profiles and self.sub_profile is None and self.sub_profile_select is None:
+        if (
+            self.has_sub_profiles
+            and self.sub_profile is None
+            and self.sub_profile_select is None
+        ):
             return True
         return self._json_data.get("requires_additional_configuration") or False
 
@@ -192,7 +195,9 @@ class PowerProfile:
 
 
 class SubProfileSelector:
-    def select_sub_profile(self, power_profile: PowerProfile, entity_state: State) -> str:
+    def select_sub_profile(
+        self, power_profile: PowerProfile, entity_state: State
+    ) -> str:
         """
         Dynamically tries to select a sub profile depending on the entity state.
         This method always need to return a sub profile, when nothing is matched it will return a default

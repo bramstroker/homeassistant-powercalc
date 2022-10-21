@@ -1,8 +1,8 @@
 import os
 
 import pytest
-from homeassistant.core import HomeAssistant, State
 from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.core import HomeAssistant, State
 
 from custom_components.powercalc.const import (
     CONF_MAX_POWER,
@@ -10,9 +10,16 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CalculationStrategy,
 )
-from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode, PowercalcSetupError
+from custom_components.powercalc.errors import (
+    ModelNotSupported,
+    PowercalcSetupError,
+    UnsupportedMode,
+)
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
-from custom_components.powercalc.power_profile.power_profile import DeviceType, SubProfileSelector
+from custom_components.powercalc.power_profile.power_profile import (
+    DeviceType,
+    SubProfileSelector,
+)
 
 from ..common import get_test_profile_dir
 
@@ -94,7 +101,8 @@ async def test_unsupported_entity_domain(hass: HomeAssistant):
 async def test_sub_profile_attribute_match(hass: HomeAssistant):
     selector = SubProfileSelector()
     power_profile = await ProfileLibrary.factory(hass).get_profile(
-        ModelInfo("LIFX", "LIFX A19 Night Vision"), get_test_profile_dir("infrared_light")
+        ModelInfo("LIFX", "LIFX A19 Night Vision"),
+        get_test_profile_dir("infrared_light"),
     )
 
     state = State("light.test", STATE_OFF)
@@ -120,7 +128,9 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
     assert not power_profile.sub_profile
 
 
-async def test_sub_profile_selector_raises_exception_on_missing_config(hass: HomeAssistant) -> None:
+async def test_sub_profile_selector_raises_exception_on_missing_config(
+    hass: HomeAssistant,
+) -> None:
     selector = SubProfileSelector()
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"), get_test_profile_dir("smart_switch")
