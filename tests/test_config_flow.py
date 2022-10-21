@@ -646,7 +646,7 @@ async def test_lut_options_flow(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_CREATE_ENERGY_SENSOR] == False
+    assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 
 async def test_group_options_flow(hass: HomeAssistant):
@@ -718,8 +718,42 @@ async def test_strategy_raises_unknown_error(hass: HomeAssistant):
         assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
-def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
-    entry = MockConfigEntry(domain=DOMAIN, data=entry_data)
+async def test_autodiscovered_option_flow(hass: HomeAssistant):
+    """
+    Test that we can open an option flow for an auto discovered config entry
+    """
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_NAME: "Test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+        config_entries.SOURCE_INTEGRATION_DISCOVERY,
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    user_input = {CONF_CREATE_ENERGY_SENSOR: False}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
+
+
+def _create_mock_entry(
+    hass: HomeAssistant,
+    entry_data: ConfigType,
+    source: str = config_entries.SOURCE_USER,
+) -> MockConfigEntry:
+    entry = MockConfigEntry(domain=DOMAIN, data=entry_data, source=source)
     entry.add_to_hass(hass)
 
     assert not entry.options

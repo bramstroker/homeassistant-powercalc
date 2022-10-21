@@ -558,21 +558,21 @@ class OptionsFlowHandler(OptionsFlow):
             self.current_config.update(generic_options)
 
             strategy = self.current_config.get(CONF_MODE)
+            if strategy:
+                strategy_options = _build_strategy_config(
+                    strategy, self.source_entity_id, user_input
+                )
 
-            strategy_options = _build_strategy_config(
-                strategy, self.source_entity_id, user_input
-            )
+                if strategy != CalculationStrategy.LUT:
+                    self.current_config.update({strategy: strategy_options})
 
-            if strategy != CalculationStrategy.LUT:
-                self.current_config.update({strategy: strategy_options})
-
-            strategy_object = await _create_strategy_object(
-                self.hass, strategy, self.current_config, self.source_entity
-            )
-            try:
-                await strategy_object.validate_config()
-            except StrategyConfigurationError as error:
-                return {"base": error.get_config_flow_translate_key()}
+                strategy_object = await _create_strategy_object(
+                    self.hass, strategy, self.current_config, self.source_entity
+                )
+                try:
+                    await strategy_object.validate_config()
+                except StrategyConfigurationError as error:
+                    return {"base": error.get_config_flow_translate_key()}
 
         if self.sensor_type == SensorType.GROUP:
             self.current_config.update(user_input)
@@ -589,7 +589,10 @@ class OptionsFlowHandler(OptionsFlow):
         data_schema = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             strategy: str = self.current_config.get(CONF_MODE)
-            strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
+            if strategy:
+                strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
+            else:
+                strategy_schema = vol.Schema({})
             data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
                 SCHEMA_POWER_ADVANCED.schema
             )

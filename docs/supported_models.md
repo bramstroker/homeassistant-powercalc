@@ -3,7 +3,7 @@
 - [Smart switches](#Smart-switches)
 
 ## Lights
-#### 178 total
+#### 180 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -25,6 +25,7 @@
 |gledopto      |GL-B-001P                |GL-B-001P                                                                        |lut              |                                                                                               |
 |gledopto      |GL-S-005Z                |Gledopto 4W MR16 Dual White and Color 120°                                       |lut              |                                                                                               |
 |gledopto      |GL-S-007Z                |Gledopto 5W GU10 Dual White And Color Spotlight                                  |lut              |                                                                                               |
+|govee         |H6072                    |Govee Lyra RGBICWW Corner Floor Lamp                                             |lut              |                                                                                               |
 |ikea          |L1527                    |FLOALT panel WS 30x30                                                            |lut              |FLOALT panel WS 30x30                                                                          |
 |ikea          |L1528                    |FLOALT panel WS 30x90                                                            |lut              |FLOALT panel WS 30x90                                                                          |
 |ikea          |L1529                    |FLOALT panel WS 60x60                                                            |lut              |FLOALT panel WS 60x60                                                                          |
@@ -99,20 +100,20 @@
 |signify       |1742930P7                |Hue Impress Outdoor Wall Light Small                                             |lut              |                                                                                               |
 |signify       |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                                 |lut              |9290022166,929003053401,LCA005,9290022266A                                                     |
 |signify       |LCA003                   |Hue White and Color Ambiance A19 E26                                             |lut              |                                                                                               |
-|signify       |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)                       |lut              |                                                                                               |
+|signify       |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)                       |lut              |                                                                                     9290024689|
 |signify       |LCA007                   |Hue White and Color Ambiance A19 E26 1100lm                                      |lut              |                                                                                     9290024687|
 |signify       |LCA008                   |Hue White and Color Ambiance E27 1600lm                                          |lut              |                                                                                   929002471601|
 |signify       |LCA009                   |Hue color lamp (LCA009)                                                          |lut              |                                                                                               |
 |signify       |LCB001                   |Hue White and Color Ambiance BR30 Bluetooth                                      |lut              |                                                                                               |
 |signify       |LCD002                   |Hue White and Color Ambiance Downlight 5/6 Inch                                  |lut              |                                                                                               |
-|signify       |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                                    |lut              |                                                                                               |
-|signify       |LCF002                   |Hue Calla Outdoor Pedestal                                                       |lut              |                                                                                               |
+|signify       |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                                    |lut              |                                                                                   929002294203|
+|signify       |LCF002                   |Hue Calla Outdoor Pedestal                                                       |lut              |1742030P7                                                                                      |
 |signify       |LCG002                   |Hue White and Color Ambiance GU10 BT                                             |lut              |                                                                                   929001953101|
 |signify       |LCL001                   |Hue white and color ambiance LightStrip plus                                     |lut              |                                                                                  8718699703424|
 |signify       |LCL003                   |Hue Lily Outdoor Lightstrip                                                      |lut              |                                                                                               |
 |signify       |LCS001                   |Hue Lily Outdoor Spot Light RGBCCT                                               |lut              |1741430P7,1741530P7                                                                            |
 |signify       |LCT001                   |Philips Hue White and Color Ambience (1 gen)                                     |lut              |                                                                                               |
-|signify       |LCT003                   |Hue White and Color Ambiance Spot GU10                                           |lut              |                                                                                               |
+|signify       |LCT003                   |Hue White and Color Ambiance Spot GU10                                           |lut              |                                                                                  8718696485880|
 |signify       |LCT007                   |Hue White and Color E27 Gen2 (2015)                                              |lut              |                                                                                               |
 |signify       |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)                                     |lut              |                                                                                               |
 |signify       |LCT012                   |Hue White and Color Ambiance Candle E12                                          |lut              |                                                                                               |
@@ -141,6 +142,7 @@
 |signify       |LTE002                   |Hue White Ambiance E14 w/ BT                                                     |lut              |                                                                                     9290022944|
 |signify       |LTG002                   |Hue White Ambiance GU10 w/ BT                                                    |lut              |                                                                                   929001953301|
 |signify       |LTO001                   |Hue G93 E27 Filament Globe Bulb                                                  |lut              |                                                                                               |
+|signify       |LTP002                   |Hue ambiance pendant                                                             |lut              |                                                                                               |
 |signify       |LTP003                   |Hue Fair Pendant                                                                 |lut              |                                                                                               |
 |signify       |LTP008                   |Hue Being Pendant Light                                                          |lut              |                                                                                               |
 |signify       |LTW001                   |Hue White Ambiance A19                                                           |lut              |                                                                                  8718696548738|
@@ -199,7 +201,7 @@
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
 
 ## Smart switches
-#### 20 total
+#### 22 total
 
 |manufacturer|    model id    |                                       name                                        |calculation modes| aliases  |
 |------------|----------------|-----------------------------------------------------------------------------------|-----------------|----------|
@@ -211,6 +213,7 @@
 |everspring  |AN158           |Everspring AN158                                                                   |fixed            |          |
 |fibaro      |FGWP102         |Fibaro FGWP102                                                                     |fixed            |          |
 |greenwave   |GWPN1           |Greenwave GWPN1                                                                    |fixed            |          |
+|innr        |SP 120          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |innr        |SP 224          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |neo-coolcam |NAS-WR01Z       |Smart Power Plug                                                                   |fixed            |          |
 |nodon       |Micro Smart Plug|NodOn Micro Smart Plug                                                             |fixed            |MSP-3-1-X1|
@@ -219,6 +222,7 @@
 |shelly      |shelly plug s   |Shelly Plug S                                                                      |fixed            |          |
 |signify     |LOM001          |Hue smart plug LOM001                                                              |fixed            |          |
 |signify     |LOM002          |Hue smart plug LOM002                                                              |fixed            |          |
+|signify     |LOM007          |Hue smart plug LOM007                                                              |fixed            |          |
 |tp-link     |HS100           |HS100                                                                              |fixed            |          |
 |tp-link     |HS110           |HS110                                                                              |fixed            |          |
 |tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |          |
