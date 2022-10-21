@@ -1,3 +1,5 @@
+import os
+
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light, sensor
 from homeassistant.components.light import ColorMode
@@ -131,6 +133,12 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
         CONF_MODE: CalculationStrategy.FIXED,
         CONF_FIXED: {CONF_POWER: power},
     }
+
+
+def get_test_profile_dir(sub_dir: str) -> str:
+    return os.path.join(
+        os.path.dirname(__file__), "testing_config/powercalc_profiles", sub_dir
+    )
 
 
 async def create_mocked_virtual_power_sensor_entry(

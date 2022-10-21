@@ -81,7 +81,7 @@ class ProfileLibrary:
         for profile in profiles:
             if profile.supports(model_info.model):
                 if sub_profile:
-                    profile.load_sub_profile(sub_profile)
+                    profile.select_sub_profile(sub_profile)
                 return profile
 
         return None
