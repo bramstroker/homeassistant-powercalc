@@ -731,7 +731,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant):
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
         },
-        config_entries.SOURCE_INTEGRATION_DISCOVERY
+        config_entries.SOURCE_INTEGRATION_DISCOVERY,
     )
 
     result = await _initialize_options_flow(hass, entry)
@@ -748,7 +748,11 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant):
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 
-def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType, source: str = config_entries.SOURCE_USER) -> MockConfigEntry:
+def _create_mock_entry(
+    hass: HomeAssistant,
+    entry_data: ConfigType,
+    source: str = config_entries.SOURCE_USER,
+) -> MockConfigEntry:
     entry = MockConfigEntry(domain=DOMAIN, data=entry_data, source=source)
     entry.add_to_hass(hass)
 
