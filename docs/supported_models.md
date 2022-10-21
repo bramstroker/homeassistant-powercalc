@@ -3,7 +3,7 @@
 - [Smart switches](#Smart-switches)
 
 ## Lights
-#### 180 total
+#### 181 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -77,6 +77,7 @@
 |lifx          |LIFX A19                 |LIFX A19                                                                         |lut              |                                                                                               |
 |lifx          |LIFX A19 Night Vision    |LIFX A19 Night Vision                                                            |lut              |                                                                                               |
 |lifx          |LIFX A19 US              |LIFX A19 US                                                                      |lut              |                                                                                               |
+|lifx          |LIFX BR30                |LIFX BR30                                                                        |lut              |                                                                                               |
 |lifx          |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                                           |lut              |                                                                                               |
 |lifx          |LIFX Candle              |LIFX Candle                                                                      |lut              |                                                                                               |
 |lifx          |LIFX Downlight Color     |Downlight                                                                        |lut              |LIFX Downlight                                                                                 |
