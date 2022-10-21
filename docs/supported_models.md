@@ -201,7 +201,7 @@
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
 
 ## Smart switches
-#### 20 total
+#### 22 total
 
 |manufacturer|    model id    |                                       name                                        |calculation modes| aliases  |
 |------------|----------------|-----------------------------------------------------------------------------------|-----------------|----------|
@@ -213,6 +213,7 @@
 |everspring  |AN158           |Everspring AN158                                                                   |fixed            |          |
 |fibaro      |FGWP102         |Fibaro FGWP102                                                                     |fixed            |          |
 |greenwave   |GWPN1           |Greenwave GWPN1                                                                    |fixed            |          |
+|innr        |SP 120          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |innr        |SP 224          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |neo-coolcam |NAS-WR01Z       |Smart Power Plug                                                                   |fixed            |          |
 |nodon       |Micro Smart Plug|NodOn Micro Smart Plug                                                             |fixed            |MSP-3-1-X1|
@@ -221,6 +222,7 @@
 |shelly      |shelly plug s   |Shelly Plug S                                                                      |fixed            |          |
 |signify     |LOM001          |Hue smart plug LOM001                                                              |fixed            |          |
 |signify     |LOM002          |Hue smart plug LOM002                                                              |fixed            |          |
+|signify     |LOM007          |Hue smart plug LOM007                                                              |fixed            |          |
 |tp-link     |HS100           |HS100                                                                              |fixed            |          |
 |tp-link     |HS110           |HS110                                                                              |fixed            |          |
 |tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |          |
