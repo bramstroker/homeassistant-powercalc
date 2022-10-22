@@ -8,11 +8,12 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CalculationStrategy,
 )
-from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode
+from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode, PowercalcSetupError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import (
     DeviceType,
     SubProfileSelector,
+    PowerProfile,
 )
 
 from ..common import get_test_profile_dir
@@ -108,6 +109,27 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant):
 
     state = State("light.test", STATE_ON, {"some": "b"})
     assert selector.select_sub_profile(state) == "b"
+
+
+async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(hass: HomeAssistant):
+    with pytest.raises(PowercalcSetupError):
+        power_profile = PowerProfile(
+            hass,
+            manufacturer="Foo",
+            model="Bar",
+            directory=None,
+            json_data={
+                "sub_profile_select": {
+                    "matchers": [
+                        {
+                            "type": "invalid_type"
+                        }
+                    ],
+                    "default": "henkie"
+                }
+            },
+        )
+        SubProfileSelector(hass, power_profile)
 
 
 async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
