@@ -3,7 +3,8 @@ import logging
 import pytest
 from homeassistant.components.fan import ATTR_PERCENTAGE
 from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITY_ID, STATE_ON
+from homeassistant.components.media_player import ATTR_MEDIA_VOLUME_LEVEL
+from homeassistant.const import CONF_ATTRIBUTE, CONF_ENTITY_ID, STATE_ON, STATE_PLAYING, STATE_IDLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -187,3 +188,16 @@ async def test_config_entry_with_calibrate_list(hass: HomeAssistant):
     state = hass.states.get("sensor.test_power")
     assert state
     assert state.state == "1.20"
+
+
+async def test_media_player_volume_level(hass: HomeAssistant):
+    strategy = await _create_strategy_instance(
+        hass, create_source_entity("media_player"), {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100}
+    )
+
+    state = State("media_player.test", STATE_PLAYING, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
+    assert await strategy.calculate(state) == 60
+
+    state = State("media_player.test", STATE_IDLE, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
+    assert not await strategy.calculate(state)
+

@@ -125,7 +125,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return 0, 255
 
         if self._source_entity.domain == media_player.DOMAIN:
-            return (0, 100)
+            return 0, 100
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
