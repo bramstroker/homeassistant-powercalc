@@ -46,21 +46,30 @@ async def test_infrared_light(hass: HomeAssistant):
     power_state = hass.states.get(power_sensor_id)
     assert power_state
 
+    # hass.states.async_set(
+    #     light_id,
+    #     STATE_ON,
+    #     {
+    #         ATTR_BRIGHTNESS: 11,
+    #         ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+    #         ATTR_COLOR_TEMP: 601,
+    #     },
+    # )
+    # hass.states.async_set(infrared_brightness_select_id, "50%")
+    # await hass.async_block_till_done()
+    #
+    # assert hass.states.get(power_sensor_id).state == "4.37"
+    #
+    # hass.states.async_set(infrared_brightness_select_id, "25%")
+    # await hass.async_block_till_done()
+    #
+    # assert hass.states.get(power_sensor_id).state == "2.59"
+
     hass.states.async_set(
         light_id,
-        STATE_ON,
-        {
-            ATTR_BRIGHTNESS: 11,
-            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP: 601,
-        },
+        STATE_OFF,
     )
     hass.states.async_set(infrared_brightness_select_id, "50%")
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "4.37"
-
-    hass.states.async_set(infrared_brightness_select_id, "25%")
-    await hass.async_block_till_done()
-
-    assert hass.states.get(power_sensor_id).state == "2.59"
+    assert hass.states.get(power_sensor_id).state == "4.36"

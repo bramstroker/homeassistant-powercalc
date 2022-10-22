@@ -404,6 +404,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
             self.async_write_ha_state()
             return False
 
+        self._switch_sub_profile_dynamically(state)
         self._power = await self.calculate_power(state)
 
         if self._power is not None:
@@ -442,17 +443,12 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
 
-        if self._power_profile and self._power_profile.sub_profile_select:
-            self._power_profile.select_sub_profile(
-                self._sub_profile_selector.select_sub_profile(state)
-            )
-
         entity_state = state
         if state.entity_id != self._source_entity.entity_id:
             entity_state = self.hass.states.get(self._source_entity.entity_id)
 
         is_calculation_enabled = await self.is_calculation_enabled()
-        if state.state in OFF_STATES or not is_calculation_enabled:
+        if entity_state.state in OFF_STATES or not is_calculation_enabled:
             return await self.calculate_standby_power(entity_state)
 
         power = await self._power_calculator.calculate(entity_state)
@@ -475,6 +471,20 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
                 f"{state.entity_id}: Could not convert value '{power}' to decimal"
             )
             return None
+
+    def _switch_sub_profile_dynamically(self, state: State) -> None:
+        """
+        Dynamically select a different sub profile depending on the entity state or attributes
+        Uses SubProfileSelect class which contains all the matching logic
+        """
+        if not self._power_profile or not self._power_profile.sub_profile_select:
+            return
+
+        self._power_profile.select_sub_profile(
+            self._sub_profile_selector.select_sub_profile(state)
+        )
+        self._standby_power = self._power_profile.standby_power
+        self._standby_power_on = self._power_profile.standby_power_on
 
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state"""
