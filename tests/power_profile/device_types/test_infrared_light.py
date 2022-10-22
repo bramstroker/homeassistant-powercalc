@@ -1,16 +1,21 @@
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_MODE,
+    ATTR_COLOR_TEMP,
+    ColorMode,
+)
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.components.light import ColorMode, ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_COLOR_TEMP
-from custom_components.test.light import MockLight
-
-from ...common import create_mock_light_entity
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
+from custom_components.test.light import MockLight
 from tests.common import get_test_profile_dir, run_powercalc_setup_yaml_config
+
+from ...common import create_mock_light_entity
 
 
 async def test_infrared_light(hass: HomeAssistant):
@@ -47,8 +52,8 @@ async def test_infrared_light(hass: HomeAssistant):
             "infrared_brightness": "50%",
             ATTR_BRIGHTNESS: 11,
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP: 601
-        }
+            ATTR_COLOR_TEMP: 601,
+        },
     )
     await hass.async_block_till_done()
 
@@ -61,10 +66,9 @@ async def test_infrared_light(hass: HomeAssistant):
             "infrared_brightness": "25%",
             ATTR_BRIGHTNESS: 11,
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP: 601
-        }
+            ATTR_COLOR_TEMP: 601,
+        },
     )
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "2.59"
-
