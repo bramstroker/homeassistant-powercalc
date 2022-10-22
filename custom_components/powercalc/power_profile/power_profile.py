@@ -117,7 +117,7 @@ class PowerProfile:
         return self._json_data.get("standby_power_on") or 0
 
     @property
-    def supported_modes(self) -> list:
+    def supported_modes(self) -> list[CalculationStrategy]:
         return self._json_data.get("supported_modes") or [CalculationStrategy.LUT]
 
     @property
