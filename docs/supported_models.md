@@ -1,6 +1,6 @@
-- [Lights](#Lights)
-- [Smart speakers](#Smart-speakers)
-- [Smart switches](#Smart-switches)
+- [Lights](#Lights) (181)
+- [Smart speakers](#Smart-speakers) (6)
+- [Smart switches](#Smart-switches) (22)
 
 ## Lights
 #### 181 total
