@@ -4,7 +4,7 @@
     "measure_device": "Shelly Plug S",
     "name": "Google Nest Mini",
     "standby_power": 1.65,
-    "device_type": "media_player",
+    "device_type": "smart_speaker",
     "supported_modes": [
         "linear"
     ],

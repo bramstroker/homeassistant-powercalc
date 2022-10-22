@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
@@ -12,7 +10,6 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import (
     ModelNotSupported,
-    PowercalcSetupError,
     UnsupportedMode,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
@@ -104,6 +101,7 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant):
         get_test_profile_dir("sub_profile_attribute_match"),
     )
     selector = SubProfileSelector(hass, power_profile)
+    assert len(selector.get_tracking_entities()) == 0
 
     state = State("light.test", STATE_OFF)
     assert selector.select_sub_profile(state) == "a"
@@ -126,3 +124,11 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
 
     power_profile.select_sub_profile("foo")
     assert not power_profile.sub_profile
+
+
+async def test_device_type(hass: HomeAssistant) -> None:
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("dummy", "dummy"), get_test_profile_dir("media_player")
+    )
+
+    assert power_profile.device_type == DeviceType.SMART_SPEAKER

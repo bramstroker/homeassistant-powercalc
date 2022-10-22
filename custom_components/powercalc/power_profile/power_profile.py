@@ -25,6 +25,13 @@ class DeviceType(Enum):
     SMART_SPEAKER = "smart_speaker"
 
 
+DEVICE_DOMAINS = {
+    DeviceType.LIGHT: LIGHT_DOMAIN,
+    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
+    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN
+}
+
+
 class PowerProfile:
     def __init__(
         self,
@@ -142,8 +149,11 @@ class PowerProfile:
         return self._json_data.get("requires_additional_configuration") or False
 
     @property
-    def device_type(self) -> str:
-        return self._json_data.get("device_type") or DeviceType.LIGHT
+    def device_type(self) -> DeviceType:
+        device_type = self._json_data.get("device_type")
+        if not device_type:
+            return DeviceType.LIGHT
+        return DeviceType(device_type)
 
     def get_sub_profiles(self) -> list[str]:
         """Get listing op possible sub profiles"""
@@ -188,19 +198,7 @@ class PowerProfile:
 
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
-        if self.device_type == DeviceType.LIGHT and domain != LIGHT_DOMAIN:
-            return False
-
-        if (
-            self.device_type == DeviceType.SMART_SPEAKER
-            and domain != MEDIA_PLAYER_DOMAIN
-        ):
-            return False
-
-        if self.device_type == DeviceType.SMART_SWITCH and domain != SWITCH_DOMAIN:
-            return False
-
-        return True
+        return DEVICE_DOMAINS[self.device_type] == domain
 
 
 class SubProfileSelector:
