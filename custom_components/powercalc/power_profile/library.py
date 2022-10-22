@@ -33,7 +33,7 @@ class ProfileLibrary:
     def factory(hass: HomeAssistant) -> ProfileLibrary:
         """
         Creates and loads the profile library
-        Makes sure it is only loaded once and instance is save in hass data registry
+        Makes sure it is only loaded once and instance is saved in hass data registry
         """
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {}
@@ -95,7 +95,7 @@ class ProfileLibrary:
         Using the following lookup fallback mechanism:
          - check in user defined directory (config/powercalc-custom-models)
          - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
-         - check in buildin directory (config/custom_components/powercalc/data)
+         - check in built-in directory (config/custom_components/powercalc/data)
         """
 
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
