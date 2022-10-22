@@ -139,7 +139,7 @@ class ProfileLibrary:
                 )
                 # When the power profile supplies multiple sub profiles we select one by default
                 if not profile.sub_profile and profile.sub_profile_select:
-                    profile.select_sub_profile(profile.sub_profile_select["default"])
+                    profile.select_sub_profile(profile.sub_profile_select.default)
 
         except FileNotFoundError:
             _LOGGER.error("model.json file not found in directory %s", directory)

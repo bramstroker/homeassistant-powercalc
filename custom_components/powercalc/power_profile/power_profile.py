@@ -4,7 +4,7 @@ import json
 import logging
 import os
 from enum import Enum
-from typing import Optional, Protocol
+from typing import NamedTuple, Protocol
 
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
@@ -174,8 +174,11 @@ class PowerProfile:
         return len(self.get_sub_profiles()) > 0
 
     @property
-    def sub_profile_select(self) -> dict | None:
-        return self._json_data.get("sub_profile_select")
+    def sub_profile_select(self) -> SubProfileSelectConfig | None:
+        select_dict = self._json_data.get("sub_profile_select")
+        if not select_dict:
+            return None
+        return SubProfileSelectConfig(**select_dict)
 
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
@@ -208,19 +211,23 @@ class SubProfileSelector:
                 "Cannot dynamically select sub profile, no `sub_profile_select` defined in model.json"
             )
 
-        matchers: list[dict] = select_config["matchers"]
-        for matcher_config in matchers:
+        for matcher_config in select_config.matchers:
             matcher = self.create_matcher(matcher_config)
             sub_profile = matcher.match(entity_state)
             if sub_profile:
                 return sub_profile
 
-        return select_config["default"]
+        return select_config.default
 
     @staticmethod
     def create_matcher(matcher_config: dict) -> SubProfileMatcher:
         """Create a matcher from json config. Can be extended for more matches in the future"""
         return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
+
+
+class SubProfileSelectConfig(NamedTuple):
+    default: str
+    matchers: list[dict]
 
 
 class SubProfileMatcher(Protocol):
