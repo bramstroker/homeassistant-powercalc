@@ -41,32 +41,8 @@ class PowerProfile:
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
 
-    def select_sub_profile(self, sub_profile: str) -> None:
-        """Load the model.json file data containing information about the light model"""
-
-        if not self.has_sub_profiles:
-            return None
-
-        # Sub profile already selected, no need to load it again
-        if self.sub_profile == sub_profile:
-            return None
-
-        self._sub_profile_dir = os.path.join(self._directory, sub_profile)
-        _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
-        if not os.path.exists(self._sub_profile_dir):
-            raise ModelNotSupported(
-                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})"
-            )
-
-        # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
-        file_path = os.path.join(self._sub_profile_dir, "model.json")
-        if os.path.exists(file_path):
-            json_file = open(file_path)
-            self._json_data = {**self._json_data, **json.load(json_file)}
-
-        self.sub_profile = sub_profile
-
     def get_model_directory(self, root_only: bool = False) -> str:
+        """Get the model directory containing the data files"""
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
@@ -74,10 +50,6 @@ class PowerProfile:
             return self._directory
 
         return self._sub_profile_dir or self._directory
-
-    def get_sub_profiles(self) -> list[str]:
-        """Get listing op possible sub profiles"""
-        return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     def supports(self, model: str) -> bool:
         """
@@ -134,6 +106,7 @@ class PowerProfile:
 
     @property
     def linear_mode_config(self) -> ConfigType | None:
+        """Get configuration to setup linear strategy"""
         if not self.is_mode_supported(CalculationStrategy.LINEAR):
             raise UnsupportedMode(
                 f"Mode linear is not supported by model: {self._model}"
@@ -142,6 +115,7 @@ class PowerProfile:
 
     @property
     def fixed_mode_config(self) -> ConfigType | None:
+        """Get configuration to setup fixed strategy"""
         if not self.is_mode_supported(CalculationStrategy.FIXED):
             raise UnsupportedMode(
                 f"Mode fixed is not supported by model: {self._model}"
@@ -150,6 +124,7 @@ class PowerProfile:
 
     @property
     def sensor_config(self) -> ConfigType:
+        """Additional sensor configuration"""
         return self._json_data.get("sensor_config") or {}
 
     def is_mode_supported(self, mode: str) -> bool:
@@ -169,16 +144,46 @@ class PowerProfile:
     def device_type(self) -> str:
         return self._json_data.get("device_type") or DeviceType.LIGHT
 
+    def get_sub_profiles(self) -> list[str]:
+        """Get listing op possible sub profiles"""
+        return sorted(next(os.walk(self.get_model_directory(True)))[1])
+
     @property
     def has_sub_profiles(self) -> bool:
         return len(self.get_sub_profiles()) > 0
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
+        """Get the configuration for automatic sub profile switching"""
         select_dict = self._json_data.get("sub_profile_select")
         if not select_dict:
             return None
         return SubProfileSelectConfig(**select_dict)
+
+    def select_sub_profile(self, sub_profile: str) -> None:
+        """Select a sub profile. Only applicable when to profile actually supports sub profiles"""
+
+        if not self.has_sub_profiles:
+            return None
+
+        # Sub profile already selected, no need to load it again
+        if self.sub_profile == sub_profile:
+            return None
+
+        self._sub_profile_dir = os.path.join(self._directory, sub_profile)
+        _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
+        if not os.path.exists(self._sub_profile_dir):
+            raise ModelNotSupported(
+                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})"
+            )
+
+        # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
+        file_path = os.path.join(self._sub_profile_dir, "model.json")
+        if os.path.exists(file_path):
+            json_file = open(file_path)
+            self._json_data = {**self._json_data, **json.load(json_file)}
+
+        self.sub_profile = sub_profile
 
     def is_entity_domain_supported(self, domain: str) -> bool:
         """Check whether this power profile supports a given entity domain"""
