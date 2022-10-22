@@ -8,10 +8,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CalculationStrategy,
 )
-from custom_components.powercalc.errors import (
-    ModelNotSupported,
-    UnsupportedMode,
-)
+from custom_components.powercalc.errors import ModelNotSupported, UnsupportedMode
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import (
     DeviceType,
