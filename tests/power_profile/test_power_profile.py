@@ -126,4 +126,3 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
 
     power_profile.select_sub_profile("foo")
     assert not power_profile.sub_profile
-

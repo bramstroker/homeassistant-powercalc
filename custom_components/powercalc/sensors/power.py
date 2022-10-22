@@ -319,7 +319,7 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
             ATTR_SOURCE_DOMAIN: source_entity.domain,
         }
         self._power_profile = power_profile
-        self._sub_profile_selector: SubProfileSelector | None  = None
+        self._sub_profile_selector: SubProfileSelector | None = None
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -351,7 +351,9 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
             track_entities = [self._source_entity.entity_id]
 
         if self._power_profile:
-            self._sub_profile_selector = SubProfileSelector(self.hass, self._power_profile, self._source_entity)
+            self._sub_profile_selector = SubProfileSelector(
+                self.hass, self._power_profile, self._source_entity
+            )
             track_entities.extend(self._sub_profile_selector.get_tracking_entities())
 
         self._track_entities = track_entities

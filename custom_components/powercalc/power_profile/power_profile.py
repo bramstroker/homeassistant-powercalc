@@ -12,9 +12,9 @@ from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
+from ..common import SourceEntity
 from ..const import CalculationStrategy
 from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedMode
-from ..common import SourceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -204,7 +204,12 @@ class PowerProfile:
 
 
 class SubProfileSelector:
-    def __init__(self, hass: HomeAssistant, power_profile: PowerProfile, source_entity: SourceEntity | None = None):
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        power_profile: PowerProfile,
+        source_entity: SourceEntity | None = None,
+    ):
         self._hass = hass
         self._power_profile = power_profile
         self._source_entity = source_entity
@@ -220,9 +225,7 @@ class SubProfileSelector:
             matchers.append(self._create_matcher(matcher_config))
         return matchers
 
-    def select_sub_profile(
-        self, entity_state: State
-    ) -> str:
+    def select_sub_profile(self, entity_state: State) -> str:
         """
         Dynamically tries to select a sub profile depending on the entity state.
         This method always need to return a sub profile, when nothing is matched it will return a default
@@ -236,7 +239,11 @@ class SubProfileSelector:
 
     def get_tracking_entities(self) -> list[str]:
         """Get additional list of entities to track for state changes"""
-        return [entity_id for matcher in self._matchers for entity_id in matcher.get_tracking_entities()]
+        return [
+            entity_id
+            for matcher in self._matchers
+            for entity_id in matcher.get_tracking_entities()
+        ]
 
     def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
         """Create a matcher from json config. Can be extended for more matchers in the future"""
@@ -244,7 +251,12 @@ class SubProfileSelector:
         if matcher_type == "attribute":
             return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
         if matcher_type == "entity_state":
-            return EntityStateMatcher(self._hass, self._source_entity, matcher_config["entity_id"], matcher_config["map"])
+            return EntityStateMatcher(
+                self._hass,
+                self._source_entity,
+                matcher_config["entity_id"],
+                matcher_config["map"],
+            )
         raise PowercalcSetupError(f"Unknown sub profile matcher type: {matcher_type}")
 
 
@@ -264,10 +276,18 @@ class SubProfileMatcher(Protocol):
 
 
 class EntityStateMatcher(SubProfileMatcher):
-    def __init__(self, hass: HomeAssistant, source_entity: SourceEntity, entity_id: str, mapping: dict[str, str]):
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        source_entity: SourceEntity,
+        entity_id: str,
+        mapping: dict[str, str],
+    ):
         self._hass = hass
         if source_entity:
-            entity_id = entity_id.replace("{{source_object_id}}", source_entity.object_id)
+            entity_id = entity_id.replace(
+                "{{source_object_id}}", source_entity.object_id
+            )
         self._entity_id = entity_id
         self._mapping = mapping
         pass

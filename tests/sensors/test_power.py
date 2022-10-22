@@ -384,4 +384,3 @@ async def test_sleep_power(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "100.00"
-
