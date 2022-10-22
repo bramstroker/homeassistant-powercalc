@@ -28,7 +28,7 @@ class DeviceType(Enum):
 DEVICE_DOMAINS = {
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
-    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN
+    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
 }
 
 
