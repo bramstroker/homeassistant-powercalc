@@ -99,20 +99,20 @@ async def test_unsupported_entity_domain(hass: HomeAssistant):
 
 
 async def test_sub_profile_attribute_match(hass: HomeAssistant):
-    selector = SubProfileSelector()
     power_profile = await ProfileLibrary.factory(hass).get_profile(
-        ModelInfo("LIFX", "LIFX A19 Night Vision"),
-        get_test_profile_dir("infrared_light"),
+        ModelInfo("Test", "Test"),
+        get_test_profile_dir("sub_profile_attribute_match"),
     )
+    selector = SubProfileSelector(hass, power_profile)
 
     state = State("light.test", STATE_OFF)
-    assert selector.select_sub_profile(power_profile, state) == "infrared_off"
+    assert selector.select_sub_profile(state) == "a"
 
-    state = State("light.test", STATE_ON, {"infrared_brightness": "50%"})
-    assert selector.select_sub_profile(power_profile, state) == "infrared_50"
+    state = State("light.test", STATE_ON, {"some": "a"})
+    assert selector.select_sub_profile(state) == "a"
 
-    state = State("light.test", STATE_ON, {"infrared_brightness": "75%"})
-    assert selector.select_sub_profile(power_profile, state) == "infrared_off"
+    state = State("light.test", STATE_ON, {"some": "b"})
+    assert selector.select_sub_profile(state) == "b"
 
 
 async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
@@ -127,14 +127,3 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
     power_profile.select_sub_profile("foo")
     assert not power_profile.sub_profile
 
-
-async def test_sub_profile_selector_raises_exception_on_missing_config(
-    hass: HomeAssistant,
-) -> None:
-    selector = SubProfileSelector()
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
-        ModelInfo("dummy", "dummy"), get_test_profile_dir("smart_switch")
-    )
-
-    with pytest.raises(PowercalcSetupError):
-        selector.select_sub_profile(power_profile, State("switch.test", STATE_OFF))

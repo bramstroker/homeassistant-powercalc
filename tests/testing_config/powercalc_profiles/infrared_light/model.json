@@ -15,8 +15,8 @@
     "sub_profile_select": {
         "matchers": [
             {
-                "type": "attribute",
-                "attribute": "infrared_brightness",
+                "type": "entity_state",
+                "entity_id": "select.{{source_object_id}}_infrared_brightness",
                 "map": {
                     "Disabled": "infrared_off",
                     "25%": "infrared_25",
