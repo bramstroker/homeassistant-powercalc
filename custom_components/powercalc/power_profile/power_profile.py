@@ -315,3 +315,6 @@ class AttributeMatcher(SubProfileMatcher):
             return None
 
         return self._mapping.get(val)
+
+    def get_tracking_entities(self) -> list[str]:
+        return []
