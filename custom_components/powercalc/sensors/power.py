@@ -196,7 +196,8 @@ async def create_virtual_power_sensor(
         update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
         multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
-        ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) or False,
+        ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
+        or False,
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
         sensor_config=sensor_config,
         power_profile=power_profile,
