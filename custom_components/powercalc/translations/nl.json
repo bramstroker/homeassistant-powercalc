@@ -115,10 +115,15 @@
                 "title": "Geavanceerde opties",
                 "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
                 "data": {
-                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie"
+                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
+                    "energy_integration_method": "Energie integratie methode",
+                    "ignore_unavailable_state": "Negeer unavailable status",
+                    "multiply_factor": "Multiplicatie factor"
                 },
                 "data_description": {
-                    "calculation_enabled_condition": "De geconfigureerde stroom calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen"
+                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen",
+                    "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen."
                 }
             },
             "user": {
@@ -175,12 +180,15 @@
                     "calibrate": "Kalibratie waardes",
                     "create_energy_sensor": "Creëer energie sensoren",
                     "create_utility_meters": "Creëer utiliteit meters",
+                    "energy_integration_method": "Energie integratie methode",
                     "gamma_curve": "Gamma curve",
                     "group_member_sensors": "Individuele Powercalc sensoren",
                     "group_energy_entities": "Additionele energie entiteiten",
                     "group_power_entities": "Additionele stroom entiteiten",
+                    "ignore_unavailable_state": "Negeer unavailable status",
                     "max_power": "Max stroom",
                     "min_power": "Min stroom",
+                    "multiply_factor": "Multiplicatie factor",
                     "name": "Naam",
                     "on_time": "Tijd aan per dag",
                     "power": "Stroom",
@@ -203,7 +211,9 @@
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele stroom entiteiten (W)",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
-                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+                    "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen."
                 }
             }
         }
