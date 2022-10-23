@@ -168,7 +168,7 @@ SCHEMA_POWER_LUT_AUTODISCOVERED = vol.Schema(
 SCHEMA_POWER_ADVANCED = vol.Schema(
     {
         vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): selector.TemplateSelector(),
-        vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): selector.BooleanSelector(),
         vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
         vol.Optional(CONF_ENERGY_INTEGRATION_METHOD, default=ENERGY_INTEGRATION_METHOD_LEFT): selector.SelectSelector(
             selector.SelectSelectorConfig(

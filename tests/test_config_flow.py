@@ -30,6 +30,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_FIXED,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -50,6 +51,7 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     CONF_VOLTAGE,
     CONF_WLED,
+    ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
@@ -790,6 +792,7 @@ def _assert_default_virtual_power_entry_data(
             CONF_CREATE_UTILITY_METERS: False,
             CONF_NAME: "test",
             CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,
         }
         | expected_strategy_options
     )
