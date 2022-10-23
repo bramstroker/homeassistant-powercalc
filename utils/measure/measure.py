@@ -322,7 +322,7 @@ class Measure:
                 try:
                     power = self.take_power_measurement(variation_start_time)
                 except OutdatedMeasurementError as error:
-                    self.nudge_and_remeasure(self.color_mode, variation)
+                    power = self.nudge_and_remeasure(self.color_mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
                     _LOGGER.warning(f"Discarding measurement: {error}")
