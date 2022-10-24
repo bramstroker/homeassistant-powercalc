@@ -1,9 +1,9 @@
-- [Lights](#Lights) (181)
+- [Lights](#Lights) (182)
 - [Smart speakers](#Smart-speakers) (6)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 181 total
+#### 182 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -135,6 +135,7 @@
 |signify       |LTA001                   |Hue White Ambiance E27                                                           |lut              |                                                                                     9290022169|
 |signify       |LTA003                   |Hue White Ambiance E26                                                           |lut              |                                                                                               |
 |signify       |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                                     |lut              |                                                                                  8719514328242|
+|signify       |LTA005                   |Hue White Ambiance Filament Standard                                             |lut              |                                                                                               |
 |signify       |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                            |lut              |                                                                                     9290024684|
 |signify       |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                                |lut              |                                                                                     9290024719|
 |signify       |LTC001                   |Hue Being Ceiling Light                                                          |lut              |3261030P6,3261031P6,3261048P6,3261030P7                                                        |
