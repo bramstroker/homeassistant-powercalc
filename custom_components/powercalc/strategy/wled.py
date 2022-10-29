@@ -5,8 +5,8 @@ from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol
-from homeassistant.core import HomeAssistant, State
 from homeassistant.const import DEVICE_CLASS_CURRENT
+from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
 
