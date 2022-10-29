@@ -156,7 +156,8 @@ All these settings are completely optional. You can skip this section if you don
 | energy_integration_method     | string  | **Optional** | trapezoid              | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 | energy_sensor_precision       | numeric | **Optional** | 4                      | Number of decimals you want for the energy sensors. See [HA docs](https://www.home-assistant.io/integrations/integration/#round) |
 | energy_sensor_unit_prefix | string  | **Optional** | Unit prefix for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#unit_prefix). Set to `none` for to create a Wh sensor |
-| create_domain_groups          | list    | **Optional** |                        | Create grouped power sensor aggregating all powercalc sensors of given domains, see [Group sensors per domain](#group-sensors-per-domain)
+| create_domain_groups          | list    | **Optional** |                        | Create grouped power sensor aggregating all powercalc sensors of given domains, see [Group sensors per domain](#group-sensors-per-domain) |
+| ignore_unavailable_state      | boolean | **Optional** | false                  | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. |
 
 **Example:**
 
