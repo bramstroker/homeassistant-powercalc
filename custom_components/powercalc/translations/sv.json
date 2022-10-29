@@ -79,7 +79,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "Om du väljer att inte konfirmera kan du ange tillverkare och modell själv"
                 },
-                "description": "Tillverkare '({manufacturer})' och modell '({model})' var automatiskt detekterade för din lampa",
+                "description": "Tillverkare '{manufacturer}' och modell '{model}' var automatiskt detekterade för din lampa",
                 "title": "Bibliotek"
             },
             "manufacturer": {
