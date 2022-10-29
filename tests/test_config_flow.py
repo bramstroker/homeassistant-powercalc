@@ -275,6 +275,10 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "library"
+    assert result["description_placeholders"] == {
+        "manufacturer": "ikea",
+        "model": "LED1545G12"
+    }
 
     result = await _set_virtual_power_configuration(
         hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
