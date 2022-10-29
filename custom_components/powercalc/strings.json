@@ -104,9 +104,9 @@
           "power_factor": "Power factor"
         }
       },
-      "lut": {
-        "title": "LUT config",
-        "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light",
+      "library": {
+        "title": "Library",
+        "description": "Manufacturer '{manufacturer}' and model '{model}' were automatically detected for your device",
         "data": {
           "confirm_autodisovered_model": "Confirm model"
         },
@@ -114,22 +114,22 @@
           "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
         }
       },
-      "lut_manufacturer": {
-        "title": "LUT config",
+      "manufacturer": {
+        "title": "Manufacturer",
         "description": "Select the device manufacturer",
         "data": {
           "manufacturer": "Manufacturer"
         }
       },
-      "lut_model": {
-        "title": "LUT config",
+      "model": {
+        "title": "Model",
         "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
         "data": {
           "model": "Model ID"
         }
       },
-      "lut_subprofile": {
-        "title": "LUT config",
+      "sub_profile": {
+        "title": "Sub profile",
         "description": "This model has multiple sub profiles. Select one that suites your device",
         "data": {
           "sub_profile": "Sub profile"

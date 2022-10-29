@@ -76,7 +76,7 @@
                 },
                 "title": "Konfiguracja liniowa"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Potwierdź model"
                 },
@@ -84,28 +84,28 @@
                     "confirm_autodisovered_model": "Jeśli zdecydujesz się nie potwierdzać, możesz samodzielnie wprowadzić producenta i model"
                 },
                 "description": "Producent '({manufacturer})' i model '({model})' zostały automatycznie wykryte dla twojego światła",
-                "title": "Konfiguracja LUT"
+                "title": "Biblioteka"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Producent"
                 },
                 "description": "Wybierz producenta urządzenia",
-                "title": "Konfiguracja LUT"
+                "title": "Konfiguracja Producent"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Identyfikator modelu"
                 },
                 "description": "Wybierz model urządzenia",
-                "title": "Konfiguracja LUT"
+                "title": "Konfiguracja modelu"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Sub profile"
                 },
                 "description": "This model has multiple sub profiles. Select one that suites your device",
-                "title": "LUT config"
+                "title": "Sub profile config"
             },
             "user": {
                 "data": {
