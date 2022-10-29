@@ -88,7 +88,7 @@
                     "confirm_autodisovered_model": "Se decidir não confirmar, poderá inserir manualmente o fabricante e o modelo"
                 },
                 "description": "O fabricante '({manufacturer})' e o modelo '({model})' foram detectados automaticamente para sua luz.",
-                "title": "Configuração LUT""
+                "title": "Configuração LUT"
             },
             "lut_manufacturer": {
                 "data": {
