@@ -350,7 +350,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     @callback
     def on_state_change(self, event) -> None:
         """Triggered when one of the group entities changes state"""
-        if self.hass.state != CoreState.running: # pragma: no cover
+        if self.hass.state != CoreState.running:  # pragma: no cover
             return
 
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
