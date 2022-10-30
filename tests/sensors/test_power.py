@@ -2,12 +2,6 @@ import logging
 from datetime import timedelta
 
 import pytest
-from homeassistant.components.light import (
-    ATTR_BRIGHTNESS,
-    ATTR_COLOR_MODE,
-    ATTR_HS_COLOR,
-    ColorMode,
-)
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -26,16 +20,12 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
-    mock_device_registry,
-    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -43,7 +33,6 @@ from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
-    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
     CONF_FIXED,
     CONF_LINEAR,
@@ -57,6 +46,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_UNAVAILABLE_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -66,7 +56,6 @@ from ..common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
-    get_test_profile_dir,
     run_powercalc_setup_yaml_config,
 )
 
@@ -384,3 +373,23 @@ async def test_sleep_power(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_entity_id).state == "100.00"
+
+
+async def test_unavailable_power(hass: HomeAssistant):
+    """Test specifying an alternative power value if the source entity is unavailable"""
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_STANDBY_POWER: 20,
+            CONF_UNAVAILABLE_POWER: 0,
+            CONF_FIXED: {CONF_POWER: 100},
+        },
+    )
+
+    hass.states.async_set("input_boolean.test", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "0.00"
