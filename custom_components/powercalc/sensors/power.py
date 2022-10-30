@@ -322,7 +322,10 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         }
         self._power_profile = power_profile
         self._sub_profile_selector: SubProfileSelector | None = None
-        if not self._ignore_unavailable_state and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None:
+        if (
+            not self._ignore_unavailable_state
+            and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None
+        ):
             self._ignore_unavailable_state = True
 
     async def async_added_to_hass(self):

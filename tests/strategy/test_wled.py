@@ -87,7 +87,9 @@ async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant
     assert estimated_current_entity == "sensor.test_current"
 
 
-async def test_exception_is_raised_when_no_estimated_current_entity_found(hass: HomeAssistant):
+async def test_exception_is_raised_when_no_estimated_current_entity_found(
+    hass: HomeAssistant,
+):
     with pytest.raises(StrategyConfigurationError):
         mock_registry(
             hass,
@@ -98,7 +100,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(hass: 
                     platform="light",
                     device_id="wled-device-id",
                 )
-            }
+            },
         )
 
         strategy = WledStrategy(
