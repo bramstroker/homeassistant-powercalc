@@ -93,6 +93,7 @@ They are as follows:
 | manufacturer              | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                     | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
 | standby_power             | float   | **Optional** | Supply the wattage when the device is off                                  |
+| unavailable_power         | float   | **Optional** | Supply the wattage when the device has `unavailable` state. When not specified `standby_power` will be used, or 0.     |
 | disable_standby_power     | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                      | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor      | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
@@ -119,7 +120,7 @@ They are as follows:
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 | energy_sensor_id           | string  | **Optional** | Entity id of an existing energy sensor. Mostly used in conjunction with `power_sensor_id`.
-| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off. |
+| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (`unavailable_power`, `standby_power` or 0) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off. |
 | calculation_enabled_condition | template | **Optional** | The configured power calculation strategy will only be executed when this template results in True, otherwise the power sensor will display 0  |
 
 **Minimalistic example creating two power sensors:**
