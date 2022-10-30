@@ -288,7 +288,6 @@ class EntityStateMatcher(SubProfileMatcher):
             )
         self._entity_id = entity_id
         self._mapping = mapping
-        pass
 
     def match(self, entity_state: State) -> str | None:
         state = self._hass.states.get(self._entity_id)
@@ -305,7 +304,6 @@ class AttributeMatcher(SubProfileMatcher):
     def __init__(self, attribute: str, mapping: dict[str, str]):
         self._attribute = attribute
         self._mapping = mapping
-        pass
 
     def match(self, entity_state: State) -> str | None:
         val = entity_state.attributes.get(self._attribute)
