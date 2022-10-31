@@ -18,6 +18,7 @@ from homeassistant.config_entries import (
     SOURCE_INTEGRATION_DISCOVERY,
     SOURCE_USER,
     ConfigEntry,
+    ConfigEntryState,
 )
 from homeassistant.const import (
     CONF_DOMAIN,
@@ -243,7 +244,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         updated_group_entry = await update_associated_group_entry(
             hass, config_entry, remove=True
         )
-        if updated_group_entry:
+        if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
             await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
