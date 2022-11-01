@@ -155,7 +155,7 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        title=name
+        title=name,
     )
 
     config_entry.add_to_hass(hass)

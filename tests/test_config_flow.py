@@ -501,7 +501,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        title="VirtualPower3"
+        title="VirtualPower3",
     )
     config_entry_3.add_to_hass(hass)
     assert await hass.config_entries.async_setup(config_entry_3.entry_id)
