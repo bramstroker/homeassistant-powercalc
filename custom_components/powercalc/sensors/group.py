@@ -168,6 +168,10 @@ async def update_associated_group_entry(
         return None
 
     group_entry_id = config_entry.data.get(CONF_GROUP)
+    if not group_entry_id:
+        _LOGGER.error(f"Cannot add/remove power sensor to group {group_entry_id}. It does not exist.")
+        return None
+
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
     member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
 
