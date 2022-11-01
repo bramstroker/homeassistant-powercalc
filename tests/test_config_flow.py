@@ -491,6 +491,21 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
     config_entry_2 = await create_mocked_virtual_power_sensor_entry(
         hass, "VirtualPower2", None
     )
+    config_entry_3 = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "abcdefg",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        title="VirtualPower3"
+    )
+    config_entry_3.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_3.entry_id)
+    await hass.async_block_till_done()
 
     result = await _select_sensor_type(hass, SensorType.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
