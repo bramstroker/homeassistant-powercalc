@@ -663,7 +663,7 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
     """Create config schema for groups"""
     member_sensors = [
         selector.SelectOptionDict(
-            value=config_entry.entry_id, label=config_entry.data.get(CONF_NAME)
+            value=config_entry.entry_id, label=config_entry.title
         )
         for config_entry in hass.config_entries.async_entries(DOMAIN)
         if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
