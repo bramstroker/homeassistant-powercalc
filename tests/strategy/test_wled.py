@@ -72,7 +72,7 @@ async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant
                 platform="sensor",
                 device_id="wled-device-id",
                 unit_of_measurement="mA",
-                device_class=DEVICE_CLASS_CURRENT,
+                original_device_class=DEVICE_CLASS_CURRENT,
             ),
         },
     )
