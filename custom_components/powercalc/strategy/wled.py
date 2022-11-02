@@ -72,7 +72,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
             for entity_entry in entity_registry.async_entries_for_device(
                 entity_reg, device_id
             )
-            if entity_entry.device_class == DEVICE_CLASS_CURRENT
+            if (entity_entry.device_class or entity_entry.original_device_class) == DEVICE_CLASS_CURRENT
         ]
         if estimated_current_entities:
             return estimated_current_entities[0]
