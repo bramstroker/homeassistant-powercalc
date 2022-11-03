@@ -55,6 +55,7 @@ from ..const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_UNAVAILABLE_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DISCOVERY_POWER_PROFILE,
@@ -321,6 +322,11 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         }
         self._power_profile = power_profile
         self._sub_profile_selector: SubProfileSelector | None = None
+        if (
+            not self._ignore_unavailable_state
+            and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None
+        ):
+            self._ignore_unavailable_state = True
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -447,6 +453,10 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         entity_state = state
         if state.entity_id != self._source_entity.entity_id:
             entity_state = self.hass.states.get(self._source_entity.entity_id)
+
+        unavailable_power = self._sensor_config.get(CONF_UNAVAILABLE_POWER)
+        if entity_state.state == STATE_UNAVAILABLE and unavailable_power is not None:
+            return Decimal(unavailable_power)
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if entity_state.state in OFF_STATES or not is_calculation_enabled:

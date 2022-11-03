@@ -4,18 +4,23 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_STATES_POWER,
     DOMAIN,
+    CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
 from ..common import create_input_boolean, create_input_number
@@ -36,10 +41,12 @@ async def test_template_power(hass: HomeAssistant):
     template = "{{states('input_number.test')}}"
 
     source_entity = create_source_entity("switch")
-    strategy = FixedStrategy(
+    strategy = _create_strategy(
+        hass,
+        {
+            CONF_POWER: Template(template),
+        },
         source_entity,
-        power=Template(template, hass),
-        per_state_power=None,
     )
 
     assert 42 == await strategy.calculate(State(source_entity.entity_id, STATE_ON))
@@ -49,13 +56,15 @@ async def test_template_power(hass: HomeAssistant):
     assert track_entity.template.template == template
 
 
-async def test_states_power():
+async def test_states_power(hass: HomeAssistant):
     source_entity = create_source_entity("media_player")
-
-    strategy = FixedStrategy(
+    strategy = _create_strategy(
+        hass,
+        {
+            CONF_POWER: 20,
+            CONF_STATES_POWER: {"playing": 8.3, "paused": 2.25, "idle": 1.5},
+        },
         source_entity,
-        power=20,
-        per_state_power={"playing": 8.3, "paused": 2.25, "idle": 1.5},
     )
     assert 8.3 == await strategy.calculate(State(source_entity.entity_id, "playing"))
     assert 2.25 == await strategy.calculate(State(source_entity.entity_id, "paused"))
@@ -78,15 +87,17 @@ async def test_states_power_with_template(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     source_entity = create_source_entity("climate")
-
-    strategy = FixedStrategy(
-        source_entity,
-        power=None,
-        per_state_power={
-            "heat": Template("{{states('input_number.test_number42')}}", hass),
-            "cool": Template("{{states('input_number.test_number60')}}", hass),
+    strategy = _create_strategy(
+        hass,
+        {
+            CONF_STATES_POWER: {
+                "heat": Template("{{states('input_number.test_number42')}}"),
+                "cool": Template("{{states('input_number.test_number60')}}"),
+            }
         },
+        source_entity,
     )
+
     assert 42 == await strategy.calculate(State(source_entity.entity_id, "heat"))
     assert 60 == await strategy.calculate(State(source_entity.entity_id, "cool"))
     assert not await strategy.calculate(State(source_entity.entity_id, "not_defined"))
@@ -102,13 +113,19 @@ async def test_states_power_with_template(hass: HomeAssistant):
     )
 
 
-async def test_states_power_with_attributes():
+async def test_states_power_with_attributes(hass: HomeAssistant):
     source_entity = create_source_entity("media_player")
 
-    strategy = FixedStrategy(
+    strategy = _create_strategy(
+        hass,
+        {
+            CONF_POWER: 12,
+            CONF_STATES_POWER: {
+                "media_content_id|Spotify": 5,
+                "media_content_id|Youtube": 10,
+            },
+        },
         source_entity,
-        power=12,
-        per_state_power={"media_content_id|Spotify": 5, "media_content_id|Youtube": 10},
     )
 
     assert 5 == await strategy.calculate(
@@ -169,3 +186,17 @@ async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant
     state = hass.states.get("sensor.test_power")
     assert state
     assert state.state == "40.00"
+
+
+def _create_strategy(
+    hass: HomeAssistant, config: ConfigType, source_entity: SourceEntity
+) -> FixedStrategy:
+    factory = PowerCalculatorStrategyFactory(hass)
+    strategy_instance = factory.create(
+        {CONF_FIXED: config},
+        CalculationStrategy.FIXED,
+        None,
+        source_entity=source_entity,
+    )
+    assert isinstance(strategy_instance, FixedStrategy)
+    return strategy_instance

@@ -18,6 +18,7 @@ from homeassistant.config_entries import (
     SOURCE_INTEGRATION_DISCOVERY,
     SOURCE_USER,
     ConfigEntry,
+    ConfigEntryState,
 )
 from homeassistant.const import (
     CONF_DOMAIN,
@@ -48,6 +49,7 @@ from .const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
@@ -151,6 +153,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
                         cv.ensure_list, [cv.string]
                     ),
+                    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
                 }
             ),
         )
@@ -179,6 +182,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+        CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
@@ -240,7 +244,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         updated_group_entry = await update_associated_group_entry(
             hass, config_entry, remove=True
         )
-        if updated_group_entry:
+        if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
             await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
