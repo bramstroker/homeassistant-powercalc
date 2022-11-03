@@ -225,7 +225,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
@@ -237,7 +237,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_model"
+    assert result["step_id"] == "model"
     data_schema: vol.Schema = result["data_schema"]
     model_select: SelectSelector = data_schema.schema["model"]
     model_options = model_select.config["options"]
@@ -274,7 +274,11 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut"
+    assert result["step_id"] == "library"
+    assert result["description_placeholders"] == {
+        "manufacturer": "ikea",
+        "model": "LED1545G12"
+    }
 
     result = await _set_virtual_power_configuration(
         hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
@@ -301,7 +305,7 @@ async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_not_autodiscovered(hass: HomeAssistant):
@@ -311,7 +315,7 @@ async def test_lut_not_autodiscovered(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
@@ -326,14 +330,14 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut"
+    assert result["step_id"] == "library"
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: False}
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
@@ -350,7 +354,7 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_subprofile"
+    assert result["step_id"] == "sub_profile"
     data_schema: vol.Schema = result["data_schema"]
     model_select: SelectSelector = data_schema.schema["sub_profile"]
     select_options = model_select.config["options"]

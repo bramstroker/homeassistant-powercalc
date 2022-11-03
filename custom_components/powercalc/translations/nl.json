@@ -80,36 +80,36 @@
                 },
                 "title": "Lineaire configuratie"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Bevestig model ID"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
                 },
-                "description": "Fabrikant '({manufacturer})' en model '({model})' zijn automatisch gedecteerd voor de lamp",
-                "title": "LUT configuratie"
+                "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat",
+                "title": "Bibliotheek"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Fabrikant"
                 },
                 "description": "Selecteer de fabrikant",
-                "title": "LUT configuratie"
+                "title": "Fabrikant configuratie"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Model ID"
                 },
                 "description": "Select het model. Zie de [lijst]({supported_models_link}) van ondersteunde verlichting voor meer informatie",
-                "title": "LUT configuratie"
+                "title": "Model configuratie"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Sub profiel"
                 },
                 "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
-                "title": "LUT config"
+                "title": "Sub profiel configuratie"
             },
             "power_advanced": {
                 "title": "Geavanceerde opties",

@@ -80,36 +80,36 @@
                 },
                 "title": "Linear config"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Confirm model"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
                 },
-                "description": "Manufacturer '({manufacturer})' and model '({model})' were automatically detected for your light.",
-                "title": "LUT config"
+                "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.",
+                "title": "Library"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Manufacturer"
                 },
                 "description": "Select the device manufacturer",
-                "title": "LUT config"
+                "title": "Manufacturer config"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Model ID"
                 },
                 "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
-                "title": "LUT config"
+                "title": "Model config"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Sub profile"
                 },
                 "description": "This model has multiple sub profiles. Select one that suites your device",
-                "title": "LUT config"
+                "title": "Sub profile config"
             },
             "power_advanced": {
                 "title": "Advanced options",
