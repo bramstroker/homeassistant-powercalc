@@ -1,19 +1,21 @@
 import pytest
 from homeassistant import loader
+from homeassistant.const import CONF_ENTITY_ID
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     mock_area_registry,
     mock_device_registry,
     mock_registry,
-    MockConfigEntry
 )
-from homeassistant.const import CONF_ENTITY_ID
+
 from custom_components.powercalc.const import (
-    DOMAIN,
     CONF_FIXED,
     CONF_POWER,
     CONF_SENSOR_TYPE,
-    SensorType
+    DOMAIN,
+    SensorType,
 )
+
 
 @pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations):
@@ -54,8 +56,8 @@ def mock_config_entry() -> MockConfigEntry:
             CONF_ENTITY_ID: "input_boolean.test",
             CONF_FIXED: {
                 CONF_POWER: 50,
-            }
+            },
         },
         unique_id="aabbccddeeff",
-        title="test"
+        title="test",
     )
