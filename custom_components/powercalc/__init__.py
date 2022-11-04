@@ -383,6 +383,8 @@ class DiscoveryManager:
                 CONF_ENTITY_ID: source_entity.entity_id,
                 CONF_MANUFACTURER: power_profile.manufacturer,
                 CONF_MODEL: power_profile.model,
+                DISCOVERY_SOURCE_ENTITY: source_entity,
+                DISCOVERY_POWER_PROFILE: power_profile,
             },
         )
 

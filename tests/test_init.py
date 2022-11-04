@@ -51,7 +51,7 @@ from .common import (
 def mock_flow_init(hass):
     """Mock hass.config_entries.flow.async_init."""
     with patch.object(
-        hass.config_entries.flow, "async_init", return_value=AsyncMock()
+            hass.config_entries.flow, "async_init", return_value=AsyncMock()
     ) as mock_init:
         yield mock_init
 
@@ -77,30 +77,12 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
 
     # Check that two discovery flows have been initialized
     # LightA and LightB should be discovered, LightC not
-    assert mock_flow_init.mock_calls == [
-        call(
-            DOMAIN,
-            context={"source": SOURCE_INTEGRATION_DISCOVERY},
-            data={
-                CONF_UNIQUE_ID: lighta.unique_id,
-                CONF_NAME: lighta.name,
-                CONF_ENTITY_ID: lighta.entity_id,
-                CONF_MANUFACTURER: lighta.manufacturer,
-                CONF_MODEL: lighta.model,
-            },
-        ),
-        call(
-            DOMAIN,
-            context={"source": SOURCE_INTEGRATION_DISCOVERY},
-            data={
-                CONF_UNIQUE_ID: lightb.unique_id,
-                CONF_NAME: lightb.name,
-                CONF_ENTITY_ID: lightb.entity_id,
-                CONF_MANUFACTURER: lightb.manufacturer,
-                CONF_MODEL: lightb.model,
-            },
-        ),
-    ]
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 2
+    assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == "light.testa"
+    assert mock_calls[1][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[1][2]["data"][CONF_ENTITY_ID] == "light.testb"
 
     # Also check if power sensors are created.
     # Currently, we also create them directly, even without the user finishing the discovery flow
@@ -111,7 +93,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
 
 
 async def test_discovery_skipped_when_confirmed_by_user(
-    hass: HomeAssistant, mock_flow_init
+        hass: HomeAssistant, mock_flow_init
 ):
     light_entity = MockLight("test")
     light_entity.manufacturer = "lidl"
@@ -156,7 +138,7 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
 
 
 async def test_autodiscovery_skipped_for_lut_with_subprofiles(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     """
     Lights which can be autodiscovered and have sub profiles need to de skipped
@@ -196,7 +178,7 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
 
 
 async def test_config_entry_overrides_autodiscovered(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
 
