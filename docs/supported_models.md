@@ -1,9 +1,9 @@
-- [Lights](#Lights) (183)
+- [Lights](#Lights) (184)
 - [Smart speakers](#Smart-speakers) (6)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 183 total
+#### 184 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -87,6 +87,7 @@
 |lifx          |LIFX Original 1000       |LIFX Original 1000                                                               |lut              |                                                                                               |
 |lifx          |LIFX Z                   |LIFX Z                                                                           |lut              |                                                                                               |
 |malmbergs     |9970020                  |Malmbergs Sirius III                                                             |lut              |                                                                                               |
+|melitec       |DP15                     |LightZone DP15 LED-Pendelleuchte                                                 |lut              |                                                                                               |
 |meross        |msl120d 2.0.0            |Smart Wi-Fi LED Bulb                                                             |lut              |                                                                                               |
 |mueller-licht |43961                    |Müller Licht GU10 Spot tint white                                                |lut              |                                                                                               |
 |mueller-licht |45311                    |Müller Licht E27 Globe Gold                                                      |lut              |                                                                                               |
