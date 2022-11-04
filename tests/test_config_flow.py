@@ -51,12 +51,16 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     CONF_VOLTAGE,
     CONF_WLED,
+    DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_POWER_PROFILE,
     ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.test.light import MockLight
+from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.power_profile.model_discovery import get_power_profile
 
 from .common import (
     MockConfigEntry,
@@ -74,6 +78,9 @@ async def test_discovery_flow(hass: HomeAssistant):
     light_entity.model = "LCT010"
     await create_mock_light_entity(hass, light_entity)
 
+    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
@@ -83,6 +90,8 @@ async def test_discovery_flow(hass: HomeAssistant):
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+            DISCOVERY_POWER_PROFILE: power_profile
         },
     )
 

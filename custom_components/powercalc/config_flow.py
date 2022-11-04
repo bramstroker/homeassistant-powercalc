@@ -60,6 +60,8 @@ from .const import (
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     CONF_WLED,
+    DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_POWER_PROFILE,
     DOMAIN,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
@@ -220,17 +222,22 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.skip_advanced_step = (
             True  # We don't want to ask advanced option when discovered
         )
-        self.sensor_config.update(discovery_info)
+
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.name = discovery_info[CONF_NAME]
         unique_id = discovery_info[CONF_UNIQUE_ID]
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
+        sensor_config = discovery_info.copy()
+
         self.source_entity_id = discovery_info[CONF_ENTITY_ID]
-        self.source_entity = await create_source_entity(
-            self.source_entity_id, self.hass
-        )
+        self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
+        self.power_profile = discovery_info[DISCOVERY_POWER_PROFILE]
+
+        del sensor_config[DISCOVERY_SOURCE_ENTITY]
+        del sensor_config[DISCOVERY_POWER_PROFILE]
+        self.sensor_config.update(sensor_config)
 
         self.context["title_placeholders"] = {
             "name": self.sensor_config.get(CONF_NAME),
@@ -379,6 +386,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         Ask the user to confirm this or forward to manual library selection
         """
         if user_input is not None:
+            _LOGGER.debug("discovery flow 1")
             if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.power_profile:
                 self.sensor_config.update(
                     {
@@ -390,12 +398,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_manufacturer()
 
-        if self.source_entity.entity_entry:
+        if self.source_entity.entity_entry and self.power_profile is None:
             try:
                 self.power_profile = await get_power_profile(
                     self.hass, {}, self.source_entity.entity_entry
                 )
+                _LOGGER.debug("discovery flow 2")
             except ModelNotSupported:
+                _LOGGER.debug("discovery flow 3")
                 self.power_profile = None
         if self.power_profile:
             return self.async_show_form(
@@ -407,7 +417,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
             )
-
+        _LOGGER.debug("discovery flow 4")
         return await self.async_step_manufacturer()
 
     async def async_step_manufacturer(
