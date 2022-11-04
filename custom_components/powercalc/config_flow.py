@@ -215,6 +215,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle integration discovery."""
 
+        _LOGGER.debug("Starting discovery flow: %s", discovery_info)
+
         self.skip_advanced_step = (
             True  # We don't want to ask advanced option when discovered
         )
