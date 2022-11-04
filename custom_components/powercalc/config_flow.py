@@ -386,7 +386,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         Ask the user to confirm this or forward to manual library selection
         """
         if user_input is not None:
-            _LOGGER.debug("discovery flow 1")
             if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.power_profile:
                 self.sensor_config.update(
                     {
@@ -403,9 +402,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self.power_profile = await get_power_profile(
                     self.hass, {}, self.source_entity.entity_entry
                 )
-                _LOGGER.debug("discovery flow 2")
             except ModelNotSupported:
-                _LOGGER.debug("discovery flow 3")
                 self.power_profile = None
         if self.power_profile:
             return self.async_show_form(
@@ -417,7 +414,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
             )
-        _LOGGER.debug("discovery flow 4")
+
         return await self.async_step_manufacturer()
 
     async def async_step_manufacturer(
