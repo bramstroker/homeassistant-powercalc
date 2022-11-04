@@ -21,6 +21,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 
 import custom_components.test.sensor as test_sensor_platform
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
@@ -51,16 +52,15 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     CONF_VOLTAGE,
     CONF_WLED,
-    DISCOVERY_SOURCE_ENTITY,
     DISCOVERY_POWER_PROFILE,
+    DISCOVERY_SOURCE_ENTITY,
     ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.test.light import MockLight
-from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.power_profile.model_discovery import get_power_profile
+from custom_components.test.light import MockLight
 
 from .common import (
     MockConfigEntry,
@@ -91,7 +91,7 @@ async def test_discovery_flow(hass: HomeAssistant):
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
             DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile
+            DISCOVERY_POWER_PROFILE: power_profile,
         },
     )
 

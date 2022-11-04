@@ -51,7 +51,7 @@ from .common import (
 def mock_flow_init(hass):
     """Mock hass.config_entries.flow.async_init."""
     with patch.object(
-            hass.config_entries.flow, "async_init", return_value=AsyncMock()
+        hass.config_entries.flow, "async_init", return_value=AsyncMock()
     ) as mock_init:
         yield mock_init
 
@@ -93,7 +93,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init):
 
 
 async def test_discovery_skipped_when_confirmed_by_user(
-        hass: HomeAssistant, mock_flow_init
+    hass: HomeAssistant, mock_flow_init
 ):
     light_entity = MockLight("test")
     light_entity.manufacturer = "lidl"
@@ -138,7 +138,7 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
 
 
 async def test_autodiscovery_skipped_for_lut_with_subprofiles(
-        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     """
     Lights which can be autodiscovered and have sub profiles need to de skipped
@@ -178,7 +178,7 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
 
 
 async def test_config_entry_overrides_autodiscovered(
-        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
 
