@@ -10,11 +10,14 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    ATTR_SOURCE_DOMAIN,
+    ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_POWER_SENSOR_ID,
 )
 
-from ..common import create_input_boolean, run_powercalc_setup_yaml_config
+from ..common import create_input_boolean, run_powercalc_setup_yaml_config, get_simple_fixed_config
 
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
@@ -79,3 +82,20 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.existing_energy",
     }
+
+
+async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+        {
+            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
+        }
+    )
+
+    energy_state = hass.states.get("sensor.test_energy")
+    assert ATTR_SOURCE_DOMAIN not in energy_state.attributes
+    assert ATTR_SOURCE_ENTITY not in energy_state.attributes
+

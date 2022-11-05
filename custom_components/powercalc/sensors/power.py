@@ -40,6 +40,7 @@ from ..const import (
     ATTR_SOURCE_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_DELAY,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
     CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
@@ -314,12 +315,13 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
         self._sleep_power_timer: CALLBACK_TYPE | None = None
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
-        self._attr_extra_state_attributes = {
-            ATTR_CALCULATION_MODE: calculation_strategy,
-            ATTR_INTEGRATION: DOMAIN,
-            ATTR_SOURCE_ENTITY: source_entity.entity_id,
-            ATTR_SOURCE_DOMAIN: source_entity.domain,
-        }
+        if not sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
+            self._attr_extra_state_attributes = {
+                ATTR_CALCULATION_MODE: calculation_strategy,
+                ATTR_INTEGRATION: DOMAIN,
+                ATTR_SOURCE_ENTITY: source_entity.entity_id,
+                ATTR_SOURCE_DOMAIN: source_entity.domain,
+            }
         self._power_profile = power_profile
         self._sub_profile_selector: SubProfileSelector | None = None
         if (
@@ -552,6 +554,8 @@ class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
 
     def set_energy_sensor_attribute(self, entity_id: str):
         """Set the energy sensor on the state attributes"""
+        if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
+            return
         self._attr_extra_state_attributes.update(
             {ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id}
         )

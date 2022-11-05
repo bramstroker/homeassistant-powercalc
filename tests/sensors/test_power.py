@@ -30,10 +30,13 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    ATTR_SOURCE_ENTITY,
+    ATTR_SOURCE_DOMAIN,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
     CONF_DELAY,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MANUFACTURER,
@@ -393,3 +396,20 @@ async def test_unavailable_power(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "0.00"
+
+
+async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+        {
+            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
+        }
+    )
+
+    power_state = hass.states.get("sensor.test_power")
+    assert ATTR_SOURCE_ENTITY not in power_state.attributes
+    assert ATTR_SOURCE_DOMAIN not in power_state.attributes
+
