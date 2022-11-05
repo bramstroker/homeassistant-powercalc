@@ -41,6 +41,7 @@ from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -123,6 +124,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
                     ): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
@@ -182,6 +184,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+        CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,

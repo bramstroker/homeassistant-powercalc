@@ -33,6 +33,7 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_GROUP,
@@ -312,10 +313,11 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     ):
         self._attr_name = name
         self._entities = entities
-        self._attr_extra_state_attributes = {
-            ATTR_ENTITIES: self._entities,
-            ATTR_IS_GROUP: True,
-        }
+        if not sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
+            self._attr_extra_state_attributes = {
+                ATTR_ENTITIES: self._entities,
+                ATTR_IS_GROUP: True,
+            }
         self._rounding_digits = rounding_digits
         self._sensor_config = sensor_config
         if unique_id:
