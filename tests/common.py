@@ -88,6 +88,8 @@ async def run_powercalc_setup_yaml_config(
     if domain_config is None:
         domain_config = {}
 
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
+    await hass.async_block_till_done()
     if sensor_config:
         if isinstance(sensor_config, list):
             for entry in sensor_config:
@@ -102,9 +104,6 @@ async def run_powercalc_setup_yaml_config(
             hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
         )
         await hass.async_block_till_done()
-
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
-    await hass.async_block_till_done()
 
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):

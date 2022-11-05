@@ -32,8 +32,10 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    ATTR_IS_GROUP,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
@@ -633,3 +635,30 @@ async def test_custom_naming_pattern(hass: HomeAssistant):
     assert energy_state
     assert energy_state.name == "TestGroup - Energie"
     assert energy_state.attributes["friendly_name"] == "TestGroup - Energie"
+
+
+async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ]
+        },
+        {
+            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
+        }
+    )
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert ATTR_ENTITIES not in power_state.attributes
+    assert ATTR_IS_GROUP not in power_state.attributes
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert ATTR_ENTITIES not in energy_state.attributes
+    assert ATTR_IS_GROUP not in energy_state.attributes
+
