@@ -100,7 +100,7 @@ async def create_energy_sensor(
         or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
-        sensor_config=sensor_config
+        sensor_config=sensor_config,
     )
 
 
@@ -150,7 +150,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
         integration_method,
         powercalc_source_entity: str,
         powercalc_source_domain: str,
-        sensor_config: ConfigType
+        sensor_config: ConfigType,
     ):
         super().__init__(
             source_entity=source_entity,

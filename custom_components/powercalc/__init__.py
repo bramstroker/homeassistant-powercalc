@@ -124,7 +124,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
                     ): vol.In(ENTITY_CATEGORIES),
-                    vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): cv.boolean,
+                    vol.Optional(
+                        CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False
+                    ): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,

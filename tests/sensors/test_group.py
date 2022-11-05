@@ -647,11 +647,9 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
                 get_simple_fixed_config("input_boolean.test2", 50),
-            ]
+            ],
         },
-        {
-            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
-        }
+        {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},
     )
 
     power_state = hass.states.get("sensor.testgroup_power")
@@ -661,4 +659,3 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert ATTR_ENTITIES not in energy_state.attributes
     assert ATTR_IS_GROUP not in energy_state.attributes
-

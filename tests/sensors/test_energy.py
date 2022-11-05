@@ -17,7 +17,11 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
 )
 
-from ..common import create_input_boolean, run_powercalc_setup_yaml_config, get_simple_fixed_config
+from ..common import (
+    create_input_boolean,
+    get_simple_fixed_config,
+    run_powercalc_setup_yaml_config,
+)
 
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
@@ -90,12 +94,9 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     await run_powercalc_setup_yaml_config(
         hass,
         get_simple_fixed_config("input_boolean.test"),
-        {
-            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
-        }
+        {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},
     )
 
     energy_state = hass.states.get("sensor.test_energy")
     assert ATTR_SOURCE_DOMAIN not in energy_state.attributes
     assert ATTR_SOURCE_ENTITY not in energy_state.attributes
-

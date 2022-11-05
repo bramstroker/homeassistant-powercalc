@@ -30,8 +30,8 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
-    ATTR_SOURCE_ENTITY,
     ATTR_SOURCE_DOMAIN,
+    ATTR_SOURCE_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
@@ -404,12 +404,9 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     await run_powercalc_setup_yaml_config(
         hass,
         get_simple_fixed_config("input_boolean.test"),
-        {
-            CONF_DISABLE_EXTENDED_ATTRIBUTES: True
-        }
+        {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},
     )
 
     power_state = hass.states.get("sensor.test_power")
     assert ATTR_SOURCE_ENTITY not in power_state.attributes
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
-
