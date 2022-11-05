@@ -659,3 +659,35 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert ATTR_ENTITIES not in energy_state.attributes
     assert ATTR_IS_GROUP not in energy_state.attributes
+
+
+async def test_config_entry_is_removed_from_associated_groups_on_removal(hass: HomeAssistant) -> None:
+    config_entry_sensor = await create_mocked_virtual_power_sensor_entry(
+        hass, "VirtualSensor1", "xyz"
+    )
+
+    groups: list[str] = ["GroupA", "GroupB", "GroupC"]
+    group_entry_ids: list[str] = []
+    for group in groups:
+        config_entry_group = MockConfigEntry(
+            domain=DOMAIN,
+            data={
+                CONF_SENSOR_TYPE: SensorType.GROUP,
+                CONF_NAME: group,
+                CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id],
+            },
+        )
+        config_entry_group.add_to_hass(hass)
+        assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+        await hass.async_block_till_done()
+        group_entry_ids.append(config_entry_group.entry_id)
+
+    await hass.config_entries.async_remove(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    for group_entry_id in group_entry_ids:
+        group_entry = hass.config_entries.async_get_entry(group_entry_id)
+        assert len(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS)) == 0
+
+
+
