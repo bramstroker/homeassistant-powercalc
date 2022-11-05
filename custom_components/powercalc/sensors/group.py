@@ -166,8 +166,7 @@ async def remove_from_associated_group_entries(
 
     group_entries = [
         entry
-        for entry in
-        hass.config_entries.async_entries(DOMAIN)
+        for entry in hass.config_entries.async_entries(DOMAIN)
         if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
         and config_entry.entry_id in entry.data.get(CONF_GROUP_MEMBER_SENSORS)
     ]
@@ -184,7 +183,9 @@ async def remove_from_associated_group_entries(
     return group_entries
 
 
-async def add_to_associated_group(hass: HomeAssistant, config_entry: ConfigEntry) -> ConfigEntry | None:
+async def add_to_associated_group(
+    hass: HomeAssistant, config_entry: ConfigEntry
+) -> ConfigEntry | None:
     """
     When the user has set a group on a virtual power config entry,
     we need to add this config entry to the group members sensors and update the group

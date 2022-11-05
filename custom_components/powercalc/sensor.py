@@ -139,9 +139,9 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import create_energy_sensor
 from .sensors.group import (
+    add_to_associated_group,
     create_group_sensors,
     create_group_sensors_from_config_entry,
-    add_to_associated_group,
 )
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters

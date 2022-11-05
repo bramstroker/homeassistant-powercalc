@@ -257,9 +257,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """Called after a config entry is removed."""
-    updated_entries = await remove_from_associated_group_entries(
-        hass, config_entry
-    )
+    updated_entries = await remove_from_associated_group_entries(hass, config_entry)
     for group_entry in updated_entries:
         if group_entry.state == ConfigEntryState.LOADED:
             await hass.config_entries.async_reload(group_entry.entry_id)
