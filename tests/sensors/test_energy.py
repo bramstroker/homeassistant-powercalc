@@ -14,6 +14,9 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_ENERGY_SENSOR_ID,
+    CONF_FIXED,
+    CONF_POWER,
     CONF_POWER_SENSOR_ID,
 )
 
@@ -100,3 +103,46 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     energy_state = hass.states.get("sensor.test_energy")
     assert ATTR_SOURCE_DOMAIN not in energy_state.attributes
     assert ATTR_SOURCE_ENTITY not in energy_state.attributes
+
+
+async def test_real_energy_sensor(hass: HomeAssistant) -> None:
+    """Test user can refer an existing real energy sensor to create utility meters for it or add to group with YAML"""
+
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_energy": RegistryEntry(
+                entity_id="sensor.existing_energy",
+                unique_id="12345",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "sensor.dummy",
+                    CONF_FIXED: {
+                        CONF_POWER: 50
+                    },
+                    CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+                },
+            ],
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state
+    assert energy_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.existing_energy",
+    }
+
