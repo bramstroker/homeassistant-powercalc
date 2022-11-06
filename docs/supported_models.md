@@ -203,8 +203,7 @@
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini|
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                |
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
-|sonos        |One                              |Sonos One                               |linear           |Sonos ONE       |
-
+|sonos        |one                              |Sonos One                               |linear           |Sonos ONE       |
 
 ## Smart switches
 #### 22 total
