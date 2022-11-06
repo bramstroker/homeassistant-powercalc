@@ -7,7 +7,7 @@
         "SLEEP_TIME": 5,
         "VERSION": "v1.0.3:docker"
     },
-    "name": "Ajax Online AJ_ZIGPROA60",
+    "name": "Smart Zigbee pro 12W A60 bulb",
     "standby_power": 0.5,
     "supported_modes": [
         "lut"
