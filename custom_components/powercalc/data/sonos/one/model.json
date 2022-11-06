@@ -1,0 +1,30 @@
+{
+    "measure_description": "Streamed 'Come Around Again by Armin van Buuren' using spotify, and took average measurements using the docker container",
+    "measure_method": "manual",
+    "measure_device": "TPlink HS110 (kasa)",
+    "name": "Sonos One",
+    "standby_power": 2.92,
+    "device_type": "smart_speaker",
+    "supported_modes": [
+        "linear"
+    ],
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 3.25",
+            "10 -> 5.03",
+            "20 -> 5.51",
+            "30 -> 5.94",
+            "40 -> 6.95",
+            "50 -> 8.44",
+            "60 -> 9.62",
+            "70 -> 11.14",
+            "80 -> 14.38",
+            "90 -> 16.48",
+            "100 -> 17.75"
+        ]
+    },
+    "aliases": [
+        "Sonos ONE"
+    ]
+}

@@ -1,13 +1,14 @@
-- [Lights](#Lights) (184)
-- [Smart speakers](#Smart-speakers) (6)
+- [Lights](#Lights) (185)
+- [Smart speakers](#Smart-speakers) (7)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 184 total
+#### 185 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                              |lut              |                                                                                               |
+|Ajax Online   |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                    |lut              |                                                                                               |
 |anko          |42997610                 |Anko Smart String Lights 42997610                                                |lut              |                                                                                               |
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                             |lut              |                                                                                               |
 |arlec         |GLD115HA                 |Arlec Smart R80 9.5W 806lm CCT Bulb                                              |lut              |                                                                                               |
@@ -193,7 +194,7 @@
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
-#### 6 total
+#### 7 total
 
 |manufacturer |            model id             |                  name                  |calculation modes|    aliases     |
 |-------------|---------------------------------|----------------------------------------|-----------------|----------------|
@@ -203,6 +204,7 @@
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini|
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                |
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
+|sonos        |one                              |Sonos One                               |linear           |Sonos ONE       |
 
 ## Smart switches
 #### 22 total

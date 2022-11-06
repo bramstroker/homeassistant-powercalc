@@ -11,4 +11,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD [ "python3", "measure.py"]
+ENTRYPOINT [ "python3", "measure.py"]
