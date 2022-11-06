@@ -1,13 +1,14 @@
-- [Lights](#Lights) (184)
+- [Lights](#Lights) (185)
 - [Smart speakers](#Smart-speakers) (7)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 184 total
+#### 185 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                              |lut              |                                                                                               |
+|Ajax Online   |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                    |lut              |                                                                                               |
 |anko          |42997610                 |Anko Smart String Lights 42997610                                                |lut              |                                                                                               |
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                             |lut              |                                                                                               |
 |arlec         |GLD115HA                 |Arlec Smart R80 9.5W 806lm CCT Bulb                                              |lut              |                                                                                               |
