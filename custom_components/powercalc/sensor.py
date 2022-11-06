@@ -139,9 +139,9 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import create_energy_sensor
 from .sensors.group import (
+    add_to_associated_group,
     create_group_sensors,
     create_group_sensors_from_config_entry,
-    update_associated_group_entry,
 )
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
@@ -284,7 +284,7 @@ async def async_setup_entry(
         return
 
     # Add entry to an existing group
-    updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
+    updated_group_entry = await add_to_associated_group(hass, entry)
 
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id

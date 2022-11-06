@@ -90,7 +90,7 @@ from .power_profile.model_discovery import (
     get_power_profile,
     has_manufacturer_and_model_information,
 )
-from .sensors.group import update_associated_group_entry
+from .sensors.group import remove_from_associated_group_entries
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -246,12 +246,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     )
 
     if unload_ok:
-        updated_group_entry = await update_associated_group_entry(
-            hass, config_entry, remove=True
-        )
-        if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
-            await hass.config_entries.async_reload(updated_group_entry.entry_id)
-
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
         try:
             used_unique_ids.remove(config_entry.unique_id)
@@ -259,6 +253,14 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             return True
 
     return unload_ok
+
+
+async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """Called after a config entry is removed."""
+    updated_entries = await remove_from_associated_group_entries(hass, config_entry)
+    for group_entry in updated_entries:
+        if group_entry.state == ConfigEntryState.LOADED:
+            await hass.config_entries.async_reload(group_entry.entry_id)
 
 
 async def create_domain_groups(
