@@ -129,9 +129,7 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
             CONF_ENTITIES: [
                 {
                     CONF_ENTITY_ID: "sensor.dummy",
-                    CONF_FIXED: {
-                        CONF_POWER: 50
-                    },
+                    CONF_FIXED: {CONF_POWER: 50},
                     CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
                 },
             ],
@@ -145,4 +143,3 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.existing_energy",
     }
-
