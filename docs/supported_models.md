@@ -1,5 +1,5 @@
 - [Lights](#Lights) (185)
-- [Smart speakers](#Smart-speakers) (7)
+- [Smart speakers](#Smart-speakers) (8)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
@@ -194,17 +194,18 @@
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
-#### 7 total
+#### 8 total
 
-|manufacturer |            model id             |                  name                  |calculation modes|    aliases     |
-|-------------|---------------------------------|----------------------------------------|-----------------|----------------|
-|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |linear           |HEOS 1          |
-|google       |Home                             |Google Home                             |linear           |                |
-|google       |Home Mini (HOA)                  |Google Home Mini                        |linear           |Google Home Mini|
-|google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini|
-|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                |
-|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
-|sonos        |one                              |Sonos One                               |linear           |Sonos ONE       |
+|manufacturer |            model id             |                  name                  |calculation modes|        aliases         |
+|-------------|---------------------------------|----------------------------------------|-----------------|------------------------|
+|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |linear           |HEOS 1                  |
+|google       |Home                             |Google Home                             |linear           |                        |
+|google       |Home Mini (HOA)                  |Google Home Mini                        |linear           |Google Home Mini        |
+|google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini        |
+|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                        |
+|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                        |
+|sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
+|sonos        |symfonisk                        |SYMFONISK Bookshelf                     |linear           |IKEA SYMFONISK Bookshelf|
 
 ## Smart switches
 #### 22 total
