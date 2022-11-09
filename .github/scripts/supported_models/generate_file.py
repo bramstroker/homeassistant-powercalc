@@ -29,12 +29,20 @@ def generate_supported_model_list():
     """Generate static file containing the supported models."""
     models = get_model_list()
 
-    output = ""
-    for device_type in DEVICE_TYPES:
-        anchor = device_type[1].replace(" ", "-")
-        output += f"- [{device_type[1]}](#{anchor})\n"
+    toc_links: list[str] = []
+    tables_output: str = ""
 
     for device_type in DEVICE_TYPES:
+        relevant_models = [
+            model
+            for model in models
+            if (model.get("device_type") or "light") == device_type[0]
+        ]
+        num_devices = len(relevant_models)
+
+        anchor = device_type[1].replace(" ", "-")
+        toc_links.append(f"- [{device_type[1]}](#{anchor}) ({num_devices})\n")
+
         writer = MarkdownTableWriter()
         headers = [
             "manufacturer",
@@ -47,12 +55,6 @@ def generate_supported_model_list():
             headers.append("color modes")
 
         writer.header_list = headers
-
-        relevant_models = [
-            model
-            for model in models
-            if (model.get("device_type") or "light") == device_type[0]
-        ]
         rows = []
         for model in relevant_models:
             row = [
@@ -68,11 +70,11 @@ def generate_supported_model_list():
 
         rows = sorted(rows, key=lambda x: (x[0], x[1]))
         writer.value_matrix = rows
-        output += f"\n## {device_type[1]}\n#### {len(rows)} total\n\n"
-        output += writer.dumps()
+        tables_output += f"\n## {device_type[1]}\n#### {num_devices} total\n\n"
+        tables_output += writer.dumps()
 
     md_file = open(os.path.join(PROJECT_ROOT, "docs/supported_models.md"), "w")
-    md_file.write(output)
+    md_file.write("".join(toc_links) + tables_output)
     md_file.close()
 
     print("Generated supported_models.md")

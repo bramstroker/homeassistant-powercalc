@@ -33,6 +33,7 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_GROUP,
@@ -153,28 +154,60 @@ async def create_group_sensors_from_config_entry(
     return group_sensors
 
 
-async def update_associated_group_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, remove: bool
+async def remove_from_associated_group_entries(
+    hass: HomeAssistant, config_entry: ConfigEntry
+) -> list[ConfigEntry]:
+    """
+    When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to
+    """
+    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type != SensorType.VIRTUAL_POWER:
+        return []
+
+    group_entries = [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+        and config_entry.entry_id in entry.data.get(CONF_GROUP_MEMBER_SENSORS)
+    ]
+
+    for group_entry in group_entries:
+        member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+        member_sensors.remove(config_entry.entry_id)
+
+        hass.config_entries.async_update_entry(
+            group_entry,
+            data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
+        )
+
+    return group_entries
+
+
+async def add_to_associated_group(
+    hass: HomeAssistant, config_entry: ConfigEntry
 ) -> ConfigEntry | None:
     """
-    Update the group config entry when the virtual power config entry is associated to a group
-    Adds the sensor to the group on creation of the config entry
-    Removes the sensor from the group on removal of the config entry
+    When the user has set a group on a virtual power config entry,
+    we need to add this config entry to the group members sensors and update the group
     """
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type != SensorType.VIRTUAL_POWER:
         return None
+
     if CONF_GROUP not in config_entry.data:
         return None
 
     group_entry_id = config_entry.data.get(CONF_GROUP)
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
-    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
 
-    if remove and config_entry.entry_id in member_sensors:
-        member_sensors.remove(config_entry.entry_id)
-    elif config_entry.entry_id not in member_sensors:
-        member_sensors.append(config_entry.entry_id)
+    if not group_entry:
+        _LOGGER.error(
+            f"Cannot add/remove power sensor to group {group_entry_id}. It does not exist."
+        )
+        return None
+
+    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+    member_sensors.append(config_entry.entry_id)
 
     hass.config_entries.async_update_entry(
         group_entry,
@@ -306,10 +339,11 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     ):
         self._attr_name = name
         self._entities = entities
-        self._attr_extra_state_attributes = {
-            ATTR_ENTITIES: self._entities,
-            ATTR_IS_GROUP: True,
-        }
+        if not sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
+            self._attr_extra_state_attributes = {
+                ATTR_ENTITIES: self._entities,
+                ATTR_IS_GROUP: True,
+            }
         self._rounding_digits = rounding_digits
         self._sensor_config = sensor_config
         if unique_id:
@@ -350,7 +384,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
     @callback
     def on_state_change(self, event) -> None:
         """Triggered when one of the group entities changes state"""
-        if self.hass.state != CoreState.running:
+        if self.hass.state != CoreState.running:  # pragma: no cover
             return
 
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]

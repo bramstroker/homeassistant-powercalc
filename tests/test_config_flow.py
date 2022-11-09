@@ -21,6 +21,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
 
 import custom_components.test.sensor as test_sensor_platform
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
@@ -30,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_FIXED,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -50,10 +52,14 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     CONF_VOLTAGE,
     CONF_WLED,
+    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_SOURCE_ENTITY,
+    ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.power_profile.model_discovery import get_power_profile
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -72,6 +78,9 @@ async def test_discovery_flow(hass: HomeAssistant):
     light_entity.model = "LCT010"
     await create_mock_light_entity(hass, light_entity)
 
+    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
@@ -81,6 +90,8 @@ async def test_discovery_flow(hass: HomeAssistant):
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MANUFACTURER: "signify",
             CONF_MODEL: "LCT010",
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+            DISCOVERY_POWER_PROFILE: power_profile,
         },
     )
 
@@ -223,7 +234,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
@@ -235,7 +246,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_model"
+    assert result["step_id"] == "model"
     data_schema: vol.Schema = result["data_schema"]
     model_select: SelectSelector = data_schema.schema["model"]
     model_options = model_select.config["options"]
@@ -272,7 +283,11 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut"
+    assert result["step_id"] == "library"
+    assert result["description_placeholders"] == {
+        "manufacturer": "ikea",
+        "model": "LED1545G12",
+    }
 
     result = await _set_virtual_power_configuration(
         hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
@@ -299,7 +314,7 @@ async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_not_autodiscovered(hass: HomeAssistant):
@@ -309,7 +324,7 @@ async def test_lut_not_autodiscovered(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
@@ -324,14 +339,14 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut"
+    assert result["step_id"] == "library"
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: False}
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_manufacturer"
+    assert result["step_id"] == "manufacturer"
 
 
 async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
@@ -348,7 +363,7 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "lut_subprofile"
+    assert result["step_id"] == "sub_profile"
     data_schema: vol.Schema = result["data_schema"]
     model_select: SelectSelector = data_schema.schema["sub_profile"]
     select_options = model_select.config["options"]
@@ -489,6 +504,21 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
     config_entry_2 = await create_mocked_virtual_power_sensor_entry(
         hass, "VirtualPower2", None
     )
+    config_entry_3 = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "abcdefg",
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        title="VirtualPower3",
+    )
+    config_entry_3.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_3.entry_id)
+    await hass.async_block_till_done()
 
     result = await _select_sensor_type(hass, SensorType.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -646,7 +676,7 @@ async def test_lut_options_flow(hass: HomeAssistant):
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_CREATE_ENERGY_SENSOR] == False
+    assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 
 async def test_group_options_flow(hass: HomeAssistant):
@@ -718,8 +748,42 @@ async def test_strategy_raises_unknown_error(hass: HomeAssistant):
         assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
-def _create_mock_entry(hass: HomeAssistant, entry_data: ConfigType) -> MockConfigEntry:
-    entry = MockConfigEntry(domain=DOMAIN, data=entry_data)
+async def test_autodiscovered_option_flow(hass: HomeAssistant):
+    """
+    Test that we can open an option flow for an auto discovered config entry
+    """
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_NAME: "Test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+        config_entries.SOURCE_INTEGRATION_DISCOVERY,
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    user_input = {CONF_CREATE_ENERGY_SENSOR: False}
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
+
+
+def _create_mock_entry(
+    hass: HomeAssistant,
+    entry_data: ConfigType,
+    source: str = config_entries.SOURCE_USER,
+) -> MockConfigEntry:
+    entry = MockConfigEntry(domain=DOMAIN, data=entry_data, source=source)
     entry.add_to_hass(hass)
 
     assert not entry.options
@@ -756,6 +820,7 @@ def _assert_default_virtual_power_entry_data(
             CONF_CREATE_UTILITY_METERS: False,
             CONF_NAME: "test",
             CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,
         }
         | expected_strategy_options
     )

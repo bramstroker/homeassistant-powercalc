@@ -72,29 +72,29 @@
                 },
                 "title": "Linjär konfig"
             },
-            "lut": {
+            "library": {
                 "data": {
-                    "confirm_autodisovered_model": "Konfirmera modell"
+                    "confirm_autodisovered_model": "Bekräfta modell"
                 },
                 "data_description": {
-                    "confirm_autodisovered_model": "Om du väljer att inte konfirmera kan du ange tillverkare och modell själv"
+                    "confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
                 },
-                "description": "Tillverkare '({manufacturer})' och modell '({model})' var automatiskt detekterade för din lampa",
-                "title": "LUT konfig"
+                "description": "Tillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa",
+                "title": "Bibliotek"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Tillverkare"
                 },
                 "description": "Välj tillverkare",
-                "title": "LUT konfig"
+                "title": "Tillverkare konfig"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Modell ID"
                 },
                 "description": "Välj enhetsmodell",
-                "title": "LUT konfig"
+                "title": "Modell konfig"
             },
             "user": {
                 "data": {

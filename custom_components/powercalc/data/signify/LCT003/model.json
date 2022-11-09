@@ -3,6 +3,9 @@
     "supported_modes": [
         "lut"
     ],
+    "aliases": [
+        "8718696485880"
+    ],
     "measure_method": "script",
     "measure_device": "Shelly plug S",
     "measure_description": "Used script utils/measure_shelly.py from repository",

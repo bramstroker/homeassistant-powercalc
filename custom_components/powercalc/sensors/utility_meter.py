@@ -45,7 +45,7 @@ async def create_utility_meters(
 
     utility_meters = []
 
-    if DATA_UTILITY not in hass.data:
+    if DATA_UTILITY not in hass.data:  # pragma: no cover
         hass.data[DATA_UTILITY] = {}
 
     tariffs = sensor_config.get(CONF_UTILITY_METER_TARIFFS)
@@ -106,7 +106,7 @@ async def create_tariff_select(
     if unique_id:
         select_unique_id = f"{unique_id}_select"
 
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.9.0"):
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.9.0"):  # pragma: no cover
         utility_meter_component = cast(
             EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
         )

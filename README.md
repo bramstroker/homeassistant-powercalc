@@ -9,7 +9,9 @@
 
 # :zap: PowerCalc: Home Assistant Virtual Power Sensors
 
-PowerCalc is a custom component for Home Assistant to estimate the power consumption (as virtual meters) of lights, fans and other devices, which don't have a built-in power meter. The consumption of light entities is calculated using different strategies to estimate the power usage by looking at brightness, hue/saturation and color temperature. For other entities a generic calculation can be applied, based on the attributes relevant for that entity.
+PowerCalc is a custom component for Home Assistant to estimate the power consumption (as virtual meters) of lights, fans, smart speakers and other devices, which don't have a built-in power meter. The consumption of light entities is calculated using different strategies to estimate the power usage by looking at brightness, hue/saturation and color temperature. For other entities a generic calculation can be applied, based on the attributes relevant for that entity.
+
+See [supported models](docs/supported_models.md) for the listing of supported devices which can be added out of the box without any further configuration.
 
 ![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
 
@@ -93,6 +95,7 @@ They are as follows:
 | manufacturer              | string  | **Optional** | Manufacturer, most of the time this can be automatically discovered        |
 | model                     | string  | **Optional** | Model id, most of the time this can be automatically discovered            |
 | standby_power             | float   | **Optional** | Supply the wattage when the device is off                                  |
+| unavailable_power         | float   | **Optional** | Supply the wattage when the device has `unavailable` state. When not specified `standby_power` will be used, or 0.     |
 | disable_standby_power     | boolean | **Optional** | Set to `true` to not show any power consumption when the device is standby |
 | name                      | string  | **Optional** | Override the name                                                          |
 | create_energy_sensor      | boolean | **Optional** | Set to disable/enable energy sensor creation. When set this will override global setting `create_energy_sensors` |
@@ -119,7 +122,7 @@ They are as follows:
 | include                   | object  | **Optional** | Use this in combination with `create_group` to automatically include entities from a certain area, group or template. See [Include entities](#dynamically-including-entities)
 | power_sensor_id           | string  | **Optional** | Entity id of an existing power sensor. This can be used to let powercalc create energy sensors and utility meters. This will create no virtual power sensor.
 | energy_sensor_id           | string  | **Optional** | Entity id of an existing energy sensor. Mostly used in conjunction with `power_sensor_id`.
-| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off. |
+| ignore_unavailable_state  | boolean | **Optional** | Set this to `true` when you want the power sensor to display a value (`unavailable_power`, `standby_power` or 0) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off. |
 | calculation_enabled_condition | template | **Optional** | The configured power calculation strategy will only be executed when this template results in True, otherwise the power sensor will display 0  |
 
 **Minimalistic example creating two power sensors:**
@@ -139,30 +142,32 @@ See [Calculation modes](#calculation-modes) for all possible sensor configuratio
 
 All these settings are completely optional. You can skip this section if you don't need any advanced configuration.
 
-| Name                          | Type    | Requirement  | Default                | Description                                                                                                                                        |
-| ----------------------------- | ------- | ------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| enable_autodiscovery          | boolean | **Optional** | true                   | Whether you want powercalc to automatically setup power sensors for supported models in your HA instance.
-| force_update_frequency        | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS                                           |
-| create_energy_sensors         | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor                                                                 |
+| Name                          | Type    | Requirement  | Default                | Description|
+| ----------------------------- | ------- | ------------ | ---------------------- | -----------|
+| enable_autodiscovery          | boolean | **Optional** | true                   | Whether you want powercalc to automatically setup power sensors for supported models in your HA instance.  |
+| force_update_frequency        | string  | **Optional** | 00:10:00               | Interval at which the sensor state is updated, even when the power value stays the same. Format HH:MM:SS  |
+| create_energy_sensors         | boolean | **Optional** | true                   | Let the component automatically create energy sensors (kWh) for every power sensor |
 | power_sensor_naming           | string  | **Optional** | {} power               | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
 | power_sensor_friendly_naming  | string  | **Optional** |                        | Change the friendly name of the sensors, Use `{}` placehorder for the original entity name. |
-| power_sensor_category         | string  | **Optional** | Category for the created power sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
+| power_sensor_category         | string  | **Optional** |                        | Category for the created power sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | energy_sensor_naming          | string  | **Optional** | {} energy              | Change the name of the sensors. Use the `{}` placeholder for the entity name of your appliance. This will also change the entity_id of your sensor |
 | energy_sensor_friendly_naming | string  | **Optional** |                        | Change the friendly name of the sensors, Use `{}` placehorder for the original entity name. |
-| energy_sensor_category        | string  | **Optional** | Category for the created energy sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
+| energy_sensor_category        | string  | **Optional** |                        | Category for the created energy sensors. See [generic-properties](https://developers.home-assistant.io/docs/core/entity/#generic-properties). |
 | create_utility_meters         | boolean | **Optional** | false                  | Set to `true` to automatically create utility meters of your energy sensors. See [utility_meters](#utility-meters) |
 | utility_meter_types           | list    | **Optional** | daily, weekly, monthly | Define which cycles you want to create utility meters for. See [cycle](https://www.home-assistant.io/integrations/utility_meter/#cycle) |
-| utility_meter_tariffs         | list    | **Optional** | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
+| utility_meter_tariffs         | list    | **Optional** |                        | Define different tariffs. See [tariffs](https://www.home-assistant.io/integrations/utility_meter/#tariffs). |
 | energy_integration_method     | string  | **Optional** | trapezoid              | Integration method for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#method) |
 | energy_sensor_precision       | numeric | **Optional** | 4                      | Number of decimals you want for the energy sensors. See [HA docs](https://www.home-assistant.io/integrations/integration/#round) |
-| energy_sensor_unit_prefix | string  | **Optional** | Unit prefix for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#unit_prefix). Set to `none` for to create a Wh sensor |
-| create_domain_groups          | list    | **Optional** |                        | Create grouped power sensor aggregating all powercalc sensors of given domains, see [Group sensors per domain](#group-sensors-per-domain)
+| energy_sensor_unit_prefix     | string  | **Optional** |                        | Unit prefix for the energy sensor. See [HA docs](https://www.home-assistant.io/integrations/integration/#unit_prefix). Set to `none` for to create a Wh sensor |
+| create_domain_groups          | list    | **Optional** |                        | Create grouped power sensor aggregating all powercalc sensors of given domains, see [Group sensors per domain](#group-sensors-per-domain) |
+| ignore_unavailable_state      | boolean | **Optional** | false                  | Set to `true` when you want the power sensor to display a value (0 or `standby_power`) regardless of whether the source entity is available. |
+| disable_extended_attributes   | boolean | **Optional** | false                  | Set to `true` to disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small especially when you have a lot of powercalc sensors and frequent update ratio |
 
 **Example:**
 
 ```yaml
 powercalc:
-  scan_interval: 00:01:00 #Each minute
+  force_update_frequency: 00:01:00 #Each minute
   power_sensor_naming: "{} Powersensor"
   create_energy_sensors: false
 ```

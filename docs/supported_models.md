@@ -1,13 +1,15 @@
-- [Lights](#Lights)
-- [Smart speakers](#Smart-speakers)
-- [Smart switches](#Smart-switches)
+- [Lights](#Lights) (186)
+- [Smart speakers](#Smart-speakers) (8)
+- [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 180 total
+#### 186 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                              |lut              |                                                                                               |
+|Ajax Online   |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                    |lut              |                                                                                               |
+|Teckin        |SB50                     |Teckin SB50                                                                      |lut              |                                                                                               |
 |anko          |42997610                 |Anko Smart String Lights 42997610                                                |lut              |                                                                                               |
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                             |lut              |                                                                                               |
 |arlec         |GLD115HA                 |Arlec Smart R80 9.5W 806lm CCT Bulb                                              |lut              |                                                                                               |
@@ -42,7 +44,7 @@
 |ikea          |LED1733G7                |TRADFRI bulb E14 WS opal 600lm                                                   |lut              |TRADFRI bulb E14 WS opal 600lm                                                                 |
 |ikea          |LED1736G9                |TRADFRI bulb E27 WS clear 806lm                                                  |lut              |TRADFRI bulb E27 WS clear 806lm                                                                |
 |ikea          |LED1738G7                |TRADFRI bulb E14 WS opal 600lm                                                   |lut              |TRADFRI bulb E14 WS opal 600lm                                                                 |
-|ikea          |LED1835C6                |TRADFRI bulb E14 WS 470lm                                                        |lut              |TRADFRI bulb E14 WS 470lm                                                                      |
+|ikea          |LED1835C6                |TRADFRI bulb E14 WS 470lm                                                        |lut              |TRADFRI bulb E14 WS 470lm,LED1903C5/LED1835C6                                                  |
 |ikea          |LED1836G9                |TRADFRI bulb E27 WW 806lm                                                        |lut              |TRADFRI bulb E27 WW 806lm                                                                      |
 |ikea          |LED1837R5                |TRADFRI bulb GU10 WW 400lm                                                       |lut              |TRADFRI bulb GU10 WW 400lm                                                                     |
 |ikea          |LED1842G3                |TRADFRI bulb E27 WW clear 250lm                                                  |lut              |TRADFRI bulb E27 WW clear 250lm                                                                |
@@ -65,7 +67,7 @@
 |innr          |RS 227 T                 |Smart spot comfort                                                               |lut              |                                                                                               |
 |innr          |RS 230 C                 |RS 230 C                                                                         |lut              |                                                                                               |
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
-|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |4058075168572                                                                                  |
+|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
 |lidl          |HG06106B                 |Livarno Lux E14 candle RGB                                                       |lut              |                                                                                               |
 |lidl          |HG06106C                 |Livarno Lux E27 bulb RGB                                                         |lut              |                                                                                               |
@@ -77,6 +79,7 @@
 |lifx          |LIFX A19                 |LIFX A19                                                                         |lut              |                                                                                               |
 |lifx          |LIFX A19 Night Vision    |LIFX A19 Night Vision                                                            |lut              |                                                                                               |
 |lifx          |LIFX A19 US              |LIFX A19 US                                                                      |lut              |                                                                                               |
+|lifx          |LIFX BR30                |LIFX BR30                                                                        |lut              |                                                                                               |
 |lifx          |LIFX BR30 Night Vision   |LIFX BR30 Night Vision                                                           |lut              |                                                                                               |
 |lifx          |LIFX Candle              |LIFX Candle                                                                      |lut              |                                                                                               |
 |lifx          |LIFX Downlight Color     |Downlight                                                                        |lut              |LIFX Downlight                                                                                 |
@@ -86,6 +89,7 @@
 |lifx          |LIFX Original 1000       |LIFX Original 1000                                                               |lut              |                                                                                               |
 |lifx          |LIFX Z                   |LIFX Z                                                                           |lut              |                                                                                               |
 |malmbergs     |9970020                  |Malmbergs Sirius III                                                             |lut              |                                                                                               |
+|melitec       |DP15                     |LightZone DP15 LED-Pendelleuchte                                                 |lut              |                                                                                               |
 |meross        |msl120d 2.0.0            |Smart Wi-Fi LED Bulb                                                             |lut              |                                                                                               |
 |mueller-licht |43961                    |Müller Licht GU10 Spot tint white                                                |lut              |                                                                                               |
 |mueller-licht |45311                    |Müller Licht E27 Globe Gold                                                      |lut              |                                                                                               |
@@ -98,22 +102,23 @@
 |paulmann licht|371000002                |Amaris RGBW LED Panels 595x295mm                                                 |lut              |                                                                                               |
 |rye           |Candlebra                |Candlebra                                                                        |lut              |                                                                                               |
 |signify       |1742930P7                |Hue Impress Outdoor Wall Light Small                                             |lut              |                                                                                               |
+|signify       |915005996601             |Hue Enrave Medium                                                                |lut              |                                                                                               |
 |signify       |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                                 |lut              |9290022166,929003053401,LCA005,9290022266A                                                     |
 |signify       |LCA003                   |Hue White and Color Ambiance A19 E26                                             |lut              |                                                                                               |
-|signify       |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)                       |lut              |                                                                                               |
+|signify       |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)                       |lut              |                                                                                     9290024689|
 |signify       |LCA007                   |Hue White and Color Ambiance A19 E26 1100lm                                      |lut              |                                                                                     9290024687|
 |signify       |LCA008                   |Hue White and Color Ambiance E27 1600lm                                          |lut              |                                                                                   929002471601|
 |signify       |LCA009                   |Hue color lamp (LCA009)                                                          |lut              |                                                                                               |
 |signify       |LCB001                   |Hue White and Color Ambiance BR30 Bluetooth                                      |lut              |                                                                                               |
 |signify       |LCD002                   |Hue White and Color Ambiance Downlight 5/6 Inch                                  |lut              |                                                                                               |
-|signify       |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                                    |lut              |                                                                                               |
+|signify       |LCE002                   |Hue White and Color Ambiance E14 Candle w/ BT                                    |lut              |                                                                                   929002294203|
 |signify       |LCF002                   |Hue Calla Outdoor Pedestal                                                       |lut              |1742030P7                                                                                      |
 |signify       |LCG002                   |Hue White and Color Ambiance GU10 BT                                             |lut              |                                                                                   929001953101|
 |signify       |LCL001                   |Hue white and color ambiance LightStrip plus                                     |lut              |                                                                                  8718699703424|
 |signify       |LCL003                   |Hue Lily Outdoor Lightstrip                                                      |lut              |                                                                                               |
 |signify       |LCS001                   |Hue Lily Outdoor Spot Light RGBCCT                                               |lut              |1741430P7,1741530P7                                                                            |
 |signify       |LCT001                   |Philips Hue White and Color Ambience (1 gen)                                     |lut              |                                                                                               |
-|signify       |LCT003                   |Hue White and Color Ambiance Spot GU10                                           |lut              |                                                                                               |
+|signify       |LCT003                   |Hue White and Color Ambiance Spot GU10                                           |lut              |                                                                                  8718696485880|
 |signify       |LCT007                   |Hue White and Color E27 Gen2 (2015)                                              |lut              |                                                                                               |
 |signify       |LCT010                   |Hue White and Color Ambiance A19 E26 (Gen 3)                                     |lut              |                                                                                               |
 |signify       |LCT012                   |Hue White and Color Ambiance Candle E12                                          |lut              |                                                                                               |
@@ -134,6 +139,7 @@
 |signify       |LTA001                   |Hue White Ambiance E27                                                           |lut              |                                                                                     9290022169|
 |signify       |LTA003                   |Hue White Ambiance E26                                                           |lut              |                                                                                               |
 |signify       |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                                     |lut              |                                                                                  8719514328242|
+|signify       |LTA005                   |Hue White Ambiance Filament Standard                                             |lut              |                                                                                               |
 |signify       |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                            |lut              |                                                                                     9290024684|
 |signify       |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                                |lut              |                                                                                     9290024719|
 |signify       |LTC001                   |Hue Being Ceiling Light                                                          |lut              |3261030P6,3261031P6,3261048P6,3261030P7                                                        |
@@ -189,19 +195,21 @@
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
-#### 6 total
+#### 8 total
 
-|manufacturer |            model id             |                  name                  |calculation modes|    aliases     |
-|-------------|---------------------------------|----------------------------------------|-----------------|----------------|
-|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |linear           |HEOS 1          |
-|google       |Home                             |Google Home                             |linear           |                |
-|google       |Home Mini (HOA)                  |Google Home Mini                        |linear           |Google Home Mini|
-|google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini|
-|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                |
-|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                |
+|manufacturer |            model id             |                  name                  |calculation modes|        aliases         |
+|-------------|---------------------------------|----------------------------------------|-----------------|------------------------|
+|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |linear           |HEOS 1                  |
+|google       |Home                             |Google Home                             |linear           |                        |
+|google       |Home Mini (HOA)                  |Google Home Mini                        |linear           |Google Home Mini        |
+|google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini        |
+|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                        |
+|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                        |
+|sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
+|sonos        |symfonisk                        |SYMFONISK Bookshelf                     |linear           |IKEA SYMFONISK Bookshelf|
 
 ## Smart switches
-#### 20 total
+#### 22 total
 
 |manufacturer|    model id    |                                       name                                        |calculation modes| aliases  |
 |------------|----------------|-----------------------------------------------------------------------------------|-----------------|----------|
@@ -213,6 +221,7 @@
 |everspring  |AN158           |Everspring AN158                                                                   |fixed            |          |
 |fibaro      |FGWP102         |Fibaro FGWP102                                                                     |fixed            |          |
 |greenwave   |GWPN1           |Greenwave GWPN1                                                                    |fixed            |          |
+|innr        |SP 120          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |innr        |SP 224          |Innr Zigbee Smart Plug                                                             |fixed            |          |
 |neo-coolcam |NAS-WR01Z       |Smart Power Plug                                                                   |fixed            |          |
 |nodon       |Micro Smart Plug|NodOn Micro Smart Plug                                                             |fixed            |MSP-3-1-X1|
@@ -221,6 +230,7 @@
 |shelly      |shelly plug s   |Shelly Plug S                                                                      |fixed            |          |
 |signify     |LOM001          |Hue smart plug LOM001                                                              |fixed            |          |
 |signify     |LOM002          |Hue smart plug LOM002                                                              |fixed            |          |
+|signify     |LOM007          |Hue smart plug LOM007                                                              |fixed            |          |
 |tp-link     |HS100           |HS100                                                                              |fixed            |          |
 |tp-link     |HS110           |HS110                                                                              |fixed            |          |
 |tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |          |

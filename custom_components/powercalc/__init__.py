@@ -18,6 +18,7 @@ from homeassistant.config_entries import (
     SOURCE_INTEGRATION_DISCOVERY,
     SOURCE_USER,
     ConfigEntry,
+    ConfigEntryState,
 )
 from homeassistant.const import (
     CONF_DOMAIN,
@@ -40,6 +41,7 @@ from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -48,6 +50,7 @@ from .const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
@@ -87,7 +90,7 @@ from .power_profile.model_discovery import (
     get_power_profile,
     has_manufacturer_and_model_information,
 )
-from .sensors.group import update_associated_group_entry
+from .sensors.group import remove_from_associated_group_entries
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -121,6 +124,9 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(
                         CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
                     ): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(
+                        CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False
+                    ): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
@@ -151,6 +157,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
                         cv.ensure_list, [cv.string]
                     ),
+                    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
                 }
             ),
         )
@@ -179,6 +186,8 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+        CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
+        CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
@@ -237,12 +246,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     )
 
     if unload_ok:
-        updated_group_entry = await update_associated_group_entry(
-            hass, config_entry, remove=True
-        )
-        if updated_group_entry:
-            await hass.config_entries.async_reload(updated_group_entry.entry_id)
-
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
         try:
             used_unique_ids.remove(config_entry.unique_id)
@@ -250,6 +253,14 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             return True
 
     return unload_ok
+
+
+async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """Called after a config entry is removed."""
+    updated_entries = await remove_from_associated_group_entries(hass, config_entry)
+    for group_entry in updated_entries:
+        if group_entry.state == ConfigEntryState.LOADED:
+            await hass.config_entries.async_reload(group_entry.entry_id)
 
 
 async def create_domain_groups(
@@ -379,6 +390,8 @@ class DiscoveryManager:
                 CONF_ENTITY_ID: source_entity.entity_id,
                 CONF_MANUFACTURER: power_profile.manufacturer,
                 CONF_MODEL: power_profile.model,
+                DISCOVERY_SOURCE_ENTITY: source_entity,
+                DISCOVERY_POWER_PROFILE: power_profile,
             },
         )
 

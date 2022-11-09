@@ -1,3 +1,5 @@
+import os
+
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light, sensor
 from homeassistant.components.light import ColorMode
@@ -13,9 +15,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-)
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -88,6 +88,8 @@ async def run_powercalc_setup_yaml_config(
     if domain_config is None:
         domain_config = {}
 
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
+    await hass.async_block_till_done()
     if sensor_config:
         if isinstance(sensor_config, list):
             for entry in sensor_config:
@@ -102,9 +104,6 @@ async def run_powercalc_setup_yaml_config(
             hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
         )
         await hass.async_block_till_done()
-
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
-    await hass.async_block_till_done()
 
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
@@ -135,6 +134,12 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
     }
 
 
+def get_test_profile_dir(sub_dir: str) -> str:
+    return os.path.join(
+        os.path.dirname(__file__), "testing_config/powercalc_profiles", sub_dir
+    )
+
+
 async def create_mocked_virtual_power_sensor_entry(
     hass: HomeAssistant, name: str, unique_id: str | None
 ) -> config_entries.ConfigEntry:
@@ -149,6 +154,7 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
+        title=name,
     )
 
     config_entry.add_to_hass(hass)

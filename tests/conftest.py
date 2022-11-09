@@ -1,9 +1,19 @@
 import pytest
 from homeassistant import loader
+from homeassistant.const import CONF_ENTITY_ID
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     mock_area_registry,
     mock_device_registry,
     mock_registry,
+)
+
+from custom_components.powercalc.const import (
+    CONF_FIXED,
+    CONF_POWER,
+    CONF_SENSOR_TYPE,
+    DOMAIN,
+    SensorType,
 )
 
 
@@ -34,3 +44,20 @@ def device_reg(hass):
 def entity_reg(hass):
     """Return an empty, loaded, registry."""
     return mock_registry(hass)
+
+
+@pytest.fixture
+def mock_config_entry() -> MockConfigEntry:
+    """Return the default mocked config entry."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_FIXED: {
+                CONF_POWER: 50,
+            },
+        },
+        unique_id="aabbccddeeff",
+        title="test",
+    )

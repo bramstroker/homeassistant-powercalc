@@ -1,12 +1,6 @@
 import os
 
-from homeassistant.const import (
-    CONF_ENTITY_ID,
-    STATE_OFF,
-    STATE_ON,
-    STATE_PAUSED,
-    STATE_PLAYING,
-)
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -20,7 +14,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import run_powercalc_setup_yaml_config
+from tests.common import get_test_profile_dir, run_powercalc_setup_yaml_config
 
 
 async def test_media_player(hass: HomeAssistant):
@@ -92,9 +86,3 @@ async def test_media_player(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "1.65"
-
-
-def get_test_profile_dir(sub_dir: str) -> str:
-    return os.path.join(
-        os.path.dirname(__file__), "../../testing_config/powercalc_profiles", sub_dir
-    )

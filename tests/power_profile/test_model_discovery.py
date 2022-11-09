@@ -7,6 +7,7 @@ from homeassistant.helpers.entity_registry import EntityRegistry
 from custom_components.powercalc.power_profile.model_discovery import (
     autodiscover_model,
     get_power_profile,
+    is_autoconfigurable,
 )
 from custom_components.test.light import MockLight
 
@@ -93,3 +94,19 @@ async def test_get_power_profile_empty_manufacturer(
     profile = await get_power_profile(hass, {}, entity_entry)
     assert not profile
     assert not caplog.records
+
+
+async def test_is_autoconfigurable_returns_false(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+) -> None:
+    """
+    is_autoconfigurable should return False when the manufacturer / model is not found in the library
+    """
+    light_mock = MockLight("testa")
+    light_mock.manufacturer = "Foo"
+    light_mock.model = "Bar"
+
+    await create_mock_light_entity(hass, light_mock)
+
+    entity_entry = entity_reg.async_get("light.testa")
+    assert not await is_autoconfigurable(hass, entity_entry)

@@ -34,7 +34,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_DOMAIN,
@@ -100,6 +100,7 @@ from .const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_TEMPLATE,
+    CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -138,9 +139,9 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import create_energy_sensor
 from .sensors.group import (
+    add_to_associated_group,
     create_group_sensors,
     create_group_sensors_from_config_entry,
-    update_associated_group_entry,
 )
 from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
@@ -223,6 +224,7 @@ SENSOR_CONFIG = {
             vol.Required(CONF_DELAY): cv.positive_int,
         }
     ),
+    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
 }
 
 
@@ -282,13 +284,13 @@ async def async_setup_entry(
         return
 
     # Add entry to an existing group
-    updated_group_entry = await update_associated_group_entry(hass, entry, remove=False)
+    updated_group_entry = await add_to_associated_group(hass, entry)
 
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
     await _async_setup_entities(hass, sensor_config, async_add_entities)
-    if updated_group_entry:
+    if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
         await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
 

@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol
+from homeassistant.const import DEVICE_CLASS_CURRENT
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
@@ -71,7 +72,8 @@ class WledStrategy(PowerCalculationStrategyInterface):
             for entity_entry in entity_registry.async_entries_for_device(
                 entity_reg, device_id
             )
-            if "estimated_current" in entity_entry.entity_id
+            if (entity_entry.device_class or entity_entry.original_device_class)
+            == DEVICE_CLASS_CURRENT
         ]
         if estimated_current_entities:
             return estimated_current_entities[0]

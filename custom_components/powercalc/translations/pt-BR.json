@@ -80,36 +80,36 @@
                 },
                 "title": "Configuração linear"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Confirmar modelo"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "Se você optar por não confirmar, você mesmo pode inserir o fabricante e o modelo"
                 },
-                "description": "O fabricante '({manufacturer})' e o modelo '({model})' foram detectados automaticamente para sua luz.",
-                "title": "Configuração LUT"
+                "description": "O fabricante \"{manufacturer}\" e o modelo \"{model}\" foram detectados automaticamente para sua luz.",
+                "title": "Biblioteca"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Fabricante"
                 },
                 "description": "Selecione o fabricante do dispositivo",
-                "title": "Configuração LUT"
+                "title": "Configuração Fabricante"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "ID do modelo"
                 },
                 "description": "Selecione o modelo do dispositivo. Consulte a [lista]({supported_models_link}) de modelos compatíveis para obter mais informações",
-                "title": "Configuração LUT"
+                "title": "Configuração modelo"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Subperfil"
                 },
                 "description": "Este modelo tem vários subperfis. Selecione um adequado ao seu dispositivo",
-                "title": "Configuração LUT"
+                "title": "Configuração Subperfil"
             },
             "user": {
                 "data": {
