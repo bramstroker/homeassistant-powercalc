@@ -1,15 +1,15 @@
-- [Lights](#Lights) (186)
+- [Lights](#Lights) (188)
 - [Smart speakers](#Smart-speakers) (9)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 186 total
+#### 188 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
 |3a smarthome  |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                              |lut              |                                                                                               |
-|Ajax Online   |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                    |lut              |                                                                                               |
-|Teckin        |SB50                     |Teckin SB50                                                                      |lut              |                                                                                               |
+|ajax online   |AJ_ZB_GU10               |Smart Zigbee pro GU10 spotlight bulb                                             |lut              |                                                                                               |
+|ajax online   |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                    |lut              |                                                                                               |
 |anko          |42997610                 |Anko Smart String Lights 42997610                                                |lut              |                                                                                               |
 |aqara         |ZNLDP12LM                |Aqara LED light bulb (tunable white)                                             |lut              |                                                                                               |
 |arlec         |GLD115HA                 |Arlec Smart R80 9.5W 806lm CCT Bulb                                              |lut              |                                                                                               |
@@ -66,6 +66,7 @@
 |innr          |RS 125                   |RS125 GU10 350lm 2700K                                                           |lut              |                                                                                               |
 |innr          |RS 227 T                 |Smart spot comfort                                                               |lut              |                                                                                               |
 |innr          |RS 230 C                 |RS 230 C                                                                         |lut              |                                                                                               |
+|ledvance      |AC25697                  |LEDVANCE SMART+ CLASSIC MULTICOLOUR 60 10W E27                                   |lut              |                                                                                               |
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
 |ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
@@ -180,6 +181,7 @@
 |signify       |LWV002                   |Hue Single Filament Bulb ST19 E26                                                |lut              |                                                                                    46677551780|
 |signify       |LWW001                   |Hue white A60 bulb E27                                                           |lut              |                                                                                               |
 |sonoff        |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                     |lut              |                                                                                               |
+|teckin        |SB50                     |Teckin SB50                                                                      |lut              |                                                                                               |
 |tuya          |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                 |lut              |                                                                                               |
 |tuya          |SL20                     |Treatlife SL20                                                                   |lut              |                                                                                               |
 |wiz           |7DGU10LEDCCTWVB-K        |Wiz (Evoluziona) Spot PAR16 GU10 TW (type SHTW, model 7DGU10LEDCCTWVB-K, 7W 120V)|lut              |                                                                                               |
