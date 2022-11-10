@@ -911,23 +911,45 @@ class PowerMeterFactory:
 def main():
     print(f"Powercalc measure: {_VERSION}\n")
 
+    device = inquirer.list_input("What kind of device do you want to measure the power of?",
+                              choices=['Light bulb(s)', 'Smart speaker', 'Other'])
+
     light_controller_factory = LightControllerFactory()
     power_meter_factory = PowerMeterFactory()
 
     try:
         power_meter = power_meter_factory.create()
         light_controller = light_controller_factory.create()
-    
+
         measure = Measure(light_controller, power_meter)
 
         args = sys.argv[1:]
-        if not args:
+
+        if device == 'Light bulb(s)':
             measure.start()
             exit(0)
-
-        if args[0] == "average":
+        elif device == 'Smart speaker':
             try:
-                duration = int(args[1])
+                if args[0] == "average":
+                    duration = int(args[1])
+            except IndexError:
+                duration = 20
+            if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)'):
+                measure.measure_average(duration)
+            else:
+                exit(0)
+            print(f'Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)')
+            print('Recommend to stream Pink Sound from https://www.genelec.com/audio-test-signals')
+            continue_measure = True
+            while continue_measure:
+                continue_measure = inquirer.confirm('Confirm to start next measurement (N to finish)')
+                if continue_measure:
+                    measure.measure_average(duration)
+            exit(0)
+        elif device == 'Other':
+            try:
+                if args[0] == "average":
+                    duration = int(args[1])
             except IndexError:
                 duration = 60
             measure.measure_average(duration)
