@@ -206,7 +206,7 @@
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                        |
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                        |
 |sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
-|sonos        |symfonisk                        |SYMFONISK Bookshelf                     |linear           |IKEA SYMFONISK Bookshelf|
+|sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |linear           |IKEA SYMFONISK Bookshelf|
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |linear           |SYMFONISK Picture frame |
 
 ## Smart switches
