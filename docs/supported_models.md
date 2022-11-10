@@ -1,9 +1,9 @@
-- [Lights](#Lights) (188)
+- [Lights](#Lights) (190)
 - [Smart speakers](#Smart-speakers) (9)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 188 total
+#### 190 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -53,9 +53,11 @@
 |ikea          |LED1925G6                |TRADFRI bulb E14 CWS 470lm                                                       |lut              |TRADFRI bulb E14 CWS 470lm                                                                     |
 |ikea          |LED1934G3                |TRADFRI bulb E27 WW clear 250lm                                                  |lut              |TRADFRIbulbE27WWclear250lm,LED1934G3_E27                                                       |
 |ikea          |LED1935C3                |TRADFRI bulb E14 WW clear 250lm                                                  |lut              |TRADFRIbulbE14WWclear250lm                                                                     |
+|ikea          |LED1937T5_E27            |TRADFRI LED bulb E27 470 lumen, dimmable, opal white                             |lut              |TRADFRIbulbT120E27WSopal470lm,TRADFRI bulb E27 W opal 470lm,TRADFRI bulb E27 opal 470lm        |
 |ikea          |LED1949C5                |TRADFRI bulb E14 WS candle opal 470lm                                            |lut              |TRADFRIbulbE14WScandleopal470lm                                                                |
 |ikea          |LED2002G5                |TRADFRI bulb E14 WS globe opal 470lm                                             |lut              |TRADFRIbulbE14WSglobeopal470lm                                                                 |
 |ikea          |LED2003G10               |TRADFRI LED bulb E27 1055 lumen, dimmable, white spectrum, opal white            |lut              |TRADFRIbulbE27WSglobeopal1055lm                                                                |
+|ikea          |LED2004G8                |TRADFRI LED bulb E27 806 lumen, dimmable, white spectrum, clear                  |lut              |TRADFRIbulbE27WSglobeclear806lm,TRADFRIbulbE26WSglobeclear800lm                                |
 |ikea          |LED2005R5                |TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum                        |lut              |TRADFRI bulb GU10 WS 345lm,TRADFRI bulb GU10 WW 345lm,TRADFRIbulbGU10WS345lm                   |
 |ikea          |T1820                    |LEPTITER Recessed spot light                                                     |lut              |LEPTITER Recessed spot light                                                                   |
 |innr          |AE 280 C                 |Smart Bulb Color E27                                                             |lut              |                                                                                               |
@@ -68,7 +70,7 @@
 |innr          |RS 230 C                 |RS 230 C                                                                         |lut              |                                                                                               |
 |ledvance      |AC25697                  |LEDVANCE SMART+ CLASSIC MULTICOLOUR 60 10W E27                                   |lut              |                                                                                               |
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
-|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
+|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |4058075168572                                                                                  |
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
 |lidl          |HG06106B                 |Livarno Lux E14 candle RGB                                                       |lut              |                                                                                               |
 |lidl          |HG06106C                 |Livarno Lux E27 bulb RGB                                                         |lut              |                                                                                               |
