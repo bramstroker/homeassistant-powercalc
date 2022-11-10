@@ -7,9 +7,13 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.0.3:docker"
     },
-    "name": "TRADFRIbulbE27WSglobeclear806lm",
+    "name": "TRADFRI LED bulb E27 806 lumen, dimmable, white spectrum, clear",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRIbulbE27WSglobeclear806lm",
+        "TRADFRIbulbE26WSglobeclear800lm"
     ]
 }
