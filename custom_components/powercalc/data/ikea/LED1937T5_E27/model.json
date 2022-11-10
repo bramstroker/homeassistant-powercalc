@@ -7,9 +7,14 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.0.3:docker"
     },
-    "name": "TRADFRIbulbT120E27WSopal470lm",
+    "name": "TRADFRI LED bulb E27 470 lumen, dimmable, opal white",
     "standby_power": 0.2,
     "supported_modes": [
         "lut"
+    ],
+    "aliases": [
+        "TRADFRIbulbT120E27WSopal470lm",
+        "TRADFRI bulb E27 W opal 470lm",
+        "TRADFRI bulb E27 opal 470lm"
     ]
 }
