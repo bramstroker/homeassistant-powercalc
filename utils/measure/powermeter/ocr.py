@@ -5,7 +5,7 @@ import os
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class OcrPowerMeter:
+class OcrPowerMeter(PowerMeter):
     def __init__(self) -> None:
         filepath = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),

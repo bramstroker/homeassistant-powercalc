@@ -5,6 +5,6 @@ import time
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class DummyPowerMeter:
+class DummyPowerMeter(PowerMeter):
     def get_power(self) -> PowerMeasurementResult:
         return PowerMeasurementResult(20.5, time.time())

@@ -10,7 +10,7 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 STATUS_OK = "OK"
 
 
-class TuyaPowerMeter:
+class TuyaPowerMeter(PowerMeter):
     def __init__(
         self,
         device_id: str,

@@ -11,7 +11,7 @@ from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class HassPowerMeter:
+class HassPowerMeter(PowerMeter):
     def __init__(self, api_url: str, token: str, call_update_entity: bool):
         self._call_update_entity = call_update_entity
         self._entity_id: str | None = None

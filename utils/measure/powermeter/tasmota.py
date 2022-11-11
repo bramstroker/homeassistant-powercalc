@@ -8,7 +8,7 @@ from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class TasmotaPowerMeter:
+class TasmotaPowerMeter(PowerMeter):
     def __init__(self, device_ip: str):
         self._device_ip = device_ip
 
