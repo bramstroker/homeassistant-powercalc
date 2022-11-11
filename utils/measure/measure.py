@@ -930,20 +930,25 @@ def main():
             measure.start()
             exit(0)
         elif device == 'Smart speaker':
+            summary = {}
             try:
                 if args[0] == "average":
                     duration = int(args[1])
             except IndexError:
                 duration = 20
             if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)'):
-                measure.measure_average(duration)
+                summary['standby'] = measure.measure_average(duration)
             else:
                 exit(0)
             print(f'Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)')
             print('Recommend to stream Pink Sound from https://www.genelec.com/audio-test-signals')
+
             for volume in range(10,101, 10):
                 if inquirer.confirm(f'Set volume to {volume}% and confirm to start next {duration} second measurement'):
-                    measure.measure_average(duration)
+                    summary[volume] = measure.measure_average(duration)
+            print('Summary of all average measurements:')
+            for key in summary:
+                print(key, ' : ', summary[key])
             exit(0)
         elif device == 'Other':
             try:
