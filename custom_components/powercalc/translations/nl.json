@@ -6,11 +6,12 @@
         },
         "error": {
             "daily_energy_mandatory": "Je moet mimimaal waarde or waarde template opgeven",
-            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; stroom, stroom template of stroom per status",
+            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; vermogen, vermogen template of vermogen per status",
+            "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
             "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
-            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, stroom entiteiten of energie entiteiten",
-            "linear_mandatory": "Je moet mimimaal max stroom of kalibratie waardes instellen",
-            "linear_min_higher_as_max": "Maximale stroom kan niet lager zijn dan mimimale stroom",
+            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, vermogen entiteiten of energie entiteiten",
+            "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
+            "linear_min_higher_as_max": "Maximale vemrogen kan niet lager zijn dan mimimale vermogen",
             "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
             "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
             "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
@@ -35,16 +36,16 @@
             },
             "fixed": {
                 "data": {
-                    "power": "Stroom",
-                    "power_template": "Stroom template",
-                    "states_power": "Stroom per status"
+                    "power": "Vermogen",
+                    "power_template": "Vermogen template",
+                    "states_power": "Vermogen per status"
                 },
                 "data_description": {
-                    "power": "Een vastgestelde stroomsterkte in Watt wanneer de gekoppelde entiteit AAN is",
-                    "power_template": "Template die geevalueerd wordt om de stroomsterkte (W) te bepalen",
-                    "states_power": "Eén 'status: stroom' paar op elke rij, zie het voorbeeld boven"
+                    "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
+                    "power_template": "Template die geevalueerd wordt om het vermogen (W) te bepalen",
+                    "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
                 },
-                "description": "Definieer een vaste stroomsterkte voor je entiteit. Eventueel kan je ook een stroomsterkte per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
+                "description": "Definieer een vaste vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
                 "title": "Gefixeerde configuratie"
             },
             "group": {
@@ -52,7 +53,7 @@
                     "create_utility_meters": "Creëer utiliteit meters",
                     "group_member_sensors": "Individuele Powercalc sensoren",
                     "group_energy_entities": "Additionele energie entiteiten",
-                    "group_power_entities": "Additionele stroom entiteiten",
+                    "group_power_entities": "Additionele vermogen entiteiten",
                     "name": "Naam",
                     "sub_groups": "Sub groepen",
                     "hide_members": "Verberg onderliggende sensoren",
@@ -60,7 +61,7 @@
                 },
                 "data_description": {
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-                    "group_power_entities": "Additionele stroom entiteiten (W)",
+                    "group_power_entities": "Additionele vermogen entiteiten (W)",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
                 },
@@ -71,8 +72,8 @@
                     "attribute": "Attribuut",
                     "calibrate": "Kalibratie waardes",
                     "gamma_curve": "Gamma curve",
-                    "max_power": "Max stroom",
-                    "min_power": "Min stroom"
+                    "max_power": "Max vermogen",
+                    "min_power": "Min vermogen"
                 },
                 "data_description": {
                     "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
@@ -121,7 +122,7 @@
                     "multiply_factor": "Multiplicatie factor"
                 },
                 "data_description": {
-                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen",
+                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
                     "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen."
                 }
@@ -140,19 +141,19 @@
                     "group": "Aan groep toevoegen",
                     "mode": "Calculatie strategie",
                     "name": "Naam",
-                    "standby_power": "Standby stroom",
+                    "standby_power": "Standby vermogen",
                     "unique_id": "Uniek id"
                 },
                 "data_description": {
                     "create_energy_sensor": "Laat powercalc een kWh meter maken",
                     "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc.",
-                    "entity_id": "entiteit waarop de virtuele stroom sensor is gebaseerd, de stroomsensor update zichzelf wanneer deze entiteit van status wijzigt",
+                    "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
                     "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
-                    "standby_power": "Definieer het stroomverbruik wanneer het apparaat uit staat (OFF status in Home Assistant)",
-                    "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele stroommeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
+                    "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)",
+                    "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele energiemeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
                 },
                 "description": "Zie de readme voor meer information over de mogelijke strategieen en configuratie opties.",
-                "title": "Creëer een virtuele stroom meter"
+                "title": "Creëer een virtuele energie meter"
             },
             "wled": {
                 "data": {
@@ -165,11 +166,12 @@
     },
     "options": {
         "error": {
-            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; stroom, stroom template of stroom per status",
+            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren; vermogen, vermogen template of vermogen per status",
             "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
-            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, stroom entiteiten of energie entiteiten",
-            "linear_mandatory": "Je moet mimimaal max stroom of kalibratie waardes instellen",
-            "linear_min_higher_as_max": "Maximale stroom kan niet lager zijn dan mimimale stroom",
+            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren; sub groepen, vermogen entiteiten of energie entiteiten",
+            "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
+            "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
+            "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
             "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
         },
         "step": {
@@ -184,17 +186,17 @@
                     "gamma_curve": "Gamma curve",
                     "group_member_sensors": "Individuele Powercalc sensoren",
                     "group_energy_entities": "Additionele energie entiteiten",
-                    "group_power_entities": "Additionele stroom entiteiten",
+                    "group_power_entities": "Additionele vermogen entiteiten",
                     "ignore_unavailable_state": "Negeer unavailable status",
-                    "max_power": "Max stroom",
-                    "min_power": "Min stroom",
+                    "max_power": "Max vermogen",
+                    "min_power": "Min vermogen",
                     "multiply_factor": "Multiplicatie factor",
                     "name": "Naam",
                     "on_time": "Tijd aan per dag",
-                    "power": "Stroom",
-                    "power_template": "Stroom template",
-                    "standby_power": "Standby stroom",
-                    "states_power": "Stroom per status",
+                    "power": "Vermogen",
+                    "power_template": "Vermogen template",
+                    "standby_power": "Standby vermogen",
+                    "states_power": "Vermogen per status",
                     "sub_groups": "Sub groepen",
                     "hide_members": "Verberg onderliggende sensoren",
                     "unit_of_measurement": "Eenheid",
@@ -204,12 +206,12 @@
                 },
                 "data_description": {
                     "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
-                    "calculation_enabled_condition": "De geconfigureerde stroom calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de stroomsensor 0 tonen",
+                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
                     "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
-                    "power_template": "Template die geevalueerd wordt om de stroomsterkte (W) te bepalen",
-                    "states_power": "Eén 'status: stroom' paar op elke rij, zie het voorbeeld boven",
+                    "power_template": "Template die geevalueerd wordt om het vermogen (W) te bepalen",
+                    "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven",
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-                    "group_power_entities": "Additionele stroom entiteiten (W)",
+                    "group_power_entities": "Additionele vermogen entiteiten (W)",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
