@@ -14,13 +14,12 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    UnitOfEnergy,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -117,7 +116,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
     )
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
@@ -204,51 +203,6 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
     }
 
 
-async def test_entities_with_incompatible_unit_of_measurement_are_removed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
-    caplog.set_level(logging.WARNING)
-    await create_input_booleans(hass, ["test1", "test2"])
-
-    await run_powercalc_setup_yaml_config(
-        hass,
-        {
-            CONF_CREATE_GROUP: "TestGroup",
-            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
-            CONF_ENTITIES: [
-                {
-                    CONF_ENTITY_ID: "input_boolean.test1",
-                    CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 10.5},
-                },
-                {
-                    CONF_ENTITY_ID: "input_boolean.test2",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
-                    CONF_FIXED: {CONF_POWER: 50},
-                },
-            ],
-        },
-    )
-
-    hass.states.async_set("input_boolean.test1", STATE_OFF)
-    hass.states.async_set("input_boolean.test2", STATE_OFF)
-    await hass.async_block_till_done()
-
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-    await hass.async_block_till_done()
-
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state
-    assert energy_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.test1_energy",
-    }
-
-    assert "Removing this entity from the total sum" in caplog.text
-
-
 async def test_reset_service(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
@@ -265,10 +219,10 @@ async def test_reset_service(hass: HomeAssistant):
 
     # Set the individual entities to some initial values
     hass.states.async_set(
-        "sensor.test1_energy", "0.8", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR}
+        "sensor.test1_energy", "0.8", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
     )
     hass.states.async_set(
-        "sensor.test2_energy", "1.2", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR}
+        "sensor.test2_energy", "1.2", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
     )
     await hass.async_block_till_done()
 
@@ -332,7 +286,7 @@ async def test_mega_watt_hour(hass: HomeAssistant):
 
     state = hass.states.get("sensor.testgroup_energy")
 
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_MEGA_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.MEGA_WATT_HOUR
 
 
 async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
@@ -715,3 +669,26 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
         "Cannot add/remove power sensor to group non-existing-config-entry-id. It does not exist"
         in caplog.text
     )
+
+
+async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.energy_Wh", "sensor.energy_kWh", "sensor.energy_MWh"]
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.energy_Wh", "200", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR})
+    hass.states.async_set("sensor.energy_kWh", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
+    hass.states.async_set("sensor.energy_MWh", "0.01", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.MEGA_WATT_HOUR})
+
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == "10.3000"

@@ -25,10 +25,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
+from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
+from awesomeversion.awesomeversion import AwesomeVersion
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
+    from homeassistant.util.unit_conversion import EnergyConverter, PowerConverter, BaseUnitConverter
 
 from ..const import (
     ATTR_ENTITIES,
@@ -349,6 +353,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         if unique_id:
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
+        self.unit_converter: BaseUnitConverter | None = None
+        if hasattr(self, 'get_unit_converter'):
+            self.unit_converter = self.get_unit_converter()
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -410,31 +417,45 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
 
-        # Remove members with an incompatible unit of measurement for now
-        # Maybe we will convert these units in the future
-        for state in available_states:
-            unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            if (
-                unit_of_measurement is None
-            ):  # No unit of measurement, probably sensor has been reset
-                continue
-            if unit_of_measurement != self._attr_native_unit_of_measurement:
-                _LOGGER.warning(
-                    f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
-                )
-                available_states.remove(state)
-                self._entities.remove(state.entity_id)
+        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0")
+        if not apply_unit_conversions:
+            self._remove_incompatible_unit_entities(available_states)
 
         if not available_states:
             self._attr_available = False
             self.async_schedule_update_ha_state(True)
             return
 
-        summed = sum(Decimal(state.state) for state in available_states)
+        summed = sum(self._get_state_values(available_states, apply_unit_conversions))
 
         self._attr_native_value = round(summed, self._rounding_digits)
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
+
+    def _get_state_values(self, states: list[State], apply_unit_conversions: bool) -> list[Decimal]:
+        """Get the state value from all individual entity state. Apply unit conversions"""
+        values = []
+        for state in states:
+            value = float(state.state)
+            unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+            if unit_of_measurement and apply_unit_conversions and self._attr_native_unit_of_measurement != unit_of_measurement:
+                unit_converter = EnergyConverter if isinstance(self, GroupedEnergySensor) else PowerConverter
+                value = unit_converter.convert(value, unit_of_measurement, self._attr_native_unit_of_measurement)
+            values.append(Decimal(value))
+        return values
+
+    def _remove_incompatible_unit_entities(self, states: list[State]) -> None:
+        """Remove members with an incompatible unit of measurements"""
+        for state in states:
+            unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+            if unit_of_measurement is None:  # No unit of measurement, probably sensor has been reset
+                continue
+            if unit_of_measurement != self._attr_native_unit_of_measurement:
+                _LOGGER.warning(
+                    f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
+                )
+                states.remove(state)
+                self._entities.remove(state.entity_id)
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
@@ -485,3 +506,4 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
+
