@@ -11,6 +11,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
+from enum import Enum
 from io import TextIOWrapper
 from pathlib import Path
 from typing import Any, Iterator, Optional
@@ -159,6 +160,13 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+class DeviceType(str, Enum):
+    """Type of devices to measure power of"""
+
+    LIGHT = "Light bulb(s)"
+    SPEAKER = "Smart speaker"
+    OTHER = "Other"
 
 _LOGGER = logging.getLogger("measure")
 
@@ -913,7 +921,7 @@ def main():
     print(f"Powercalc measure: {_VERSION}\n")
 
     device = inquirer.list_input("What kind of device do you want to measure the power of?",
-                              choices=['Light bulb(s)', 'Smart speaker', 'Other'])
+                              choices=[cls.value for cls in DeviceType])
 
     light_controller_factory = LightControllerFactory()
     power_meter_factory = PowerMeterFactory()
@@ -926,10 +934,10 @@ def main():
 
         args = sys.argv[1:]
 
-        if device == 'Light bulb(s)':
+        if device == DeviceType.LIGHT:
             measure.start()
             exit(0)
-        elif device == 'Smart speaker':
+        elif device == DeviceType.SPEAKER:
             summary = {}
             try:
                 if args[0] == "average":
@@ -950,7 +958,7 @@ def main():
             for key in summary:
                 print(key, ' : ', summary[key])
             exit(0)
-        elif device == 'Other':
+        elif device == DeviceType.OTHER:
             try:
                 if args[0] == "average":
                     duration = int(args[1])
