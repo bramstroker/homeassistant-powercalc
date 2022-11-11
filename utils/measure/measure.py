@@ -941,10 +941,8 @@ def main():
                 exit(0)
             print(f'Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)')
             print('Recommend to stream Pink Sound from https://www.genelec.com/audio-test-signals')
-            continue_measure = True
-            while continue_measure:
-                continue_measure = inquirer.confirm('Confirm to start next measurement (N to finish)')
-                if continue_measure:
+            for volume in range(10,101, 10):
+                if inquirer.confirm(f'Set volume to {volume}% and confirm to start next {duration} second measurement'):
                     measure.measure_average(duration)
             exit(0)
         elif device == 'Other':
