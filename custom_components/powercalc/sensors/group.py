@@ -444,7 +444,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             values.append(Decimal(value))
         return values
 
-    def _remove_incompatible_unit_entities(self, states: list[State]) -> None:
+    def _remove_incompatible_unit_entities(self, states: list[State]) -> None: # pragma: no cover
         """Remove members with an incompatible unit of measurements"""
         for state in states:
             unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
