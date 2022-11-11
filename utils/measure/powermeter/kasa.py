@@ -8,7 +8,7 @@ from kasa import SmartPlug
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class KasaPowerMeter(PowerMeter):
+class KasaPowerMeter:
     def __init__(self, device_ip: str):
         self._smartplug = SmartPlug(device_ip)
 

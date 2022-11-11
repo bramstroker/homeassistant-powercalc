@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, Protocol
 
 
-class PowerMeter:
+class PowerMeter(Protocol):
     def get_power(self) -> PowerMeasurementResult:
-        pass
+        """Get a power measurement from the meter"""
+        ...
 
     def get_questions(self) -> list[dict]:
-        return []
+        """Get questions to ask for the chosen powermeter"""
+        ...
 
     def process_answers(self, answers: dict[str, Any]):
-        pass
+        """Process the answers to the asked questions"""
+        ...
 
 
 class PowerMeasurementResult(NamedTuple):

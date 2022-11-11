@@ -9,7 +9,6 @@ from phue import Bridge, PhueRegistrationException
 from .controller import LightController, LightInfo
 from .errors import LightControllerError, ModelNotDiscoveredError
 
-NAME = "hue"
 TYPE_LIGHT = "light"
 TYPE_GROUP = "group"
 

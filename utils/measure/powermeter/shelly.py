@@ -41,7 +41,7 @@ class ShellyApiGen2(ShellyApi):
         )
 
 
-class ShellyPowerMeter(PowerMeter):
+class ShellyPowerMeter:
     def __init__(self, shelly_ip: str, timeout: int = 5):
         self.timeout = timeout
         self.ip_address = shelly_ip

@@ -5,7 +5,7 @@ import time
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 
-class ManualPowerMeter(PowerMeter):
+class ManualPowerMeter:
     def get_power(self) -> PowerMeasurementResult:
         power = input('Input power measurement:')
         return PowerMeasurementResult(float(power), time.time())
