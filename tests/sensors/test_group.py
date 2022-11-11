@@ -15,11 +15,11 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     POWER_WATT,
-    STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -692,3 +692,26 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
 
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state.state == "10.3000"
+
+
+async def test_power_unit_conversions(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.power_w", "sensor.power_kw"],
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.power_w", "100", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT})
+    hass.states.async_set("sensor.power_kw", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT})
+
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_power")
+    assert energy_state.state == "200.00"
