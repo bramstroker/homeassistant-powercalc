@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
+from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import ATTR_STATE_CLASS
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -30,9 +31,13 @@ from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
-from awesomeversion.awesomeversion import AwesomeVersion
+
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
-    from homeassistant.util.unit_conversion import EnergyConverter, PowerConverter, BaseUnitConverter
+    from homeassistant.util.unit_conversion import (
+        EnergyConverter,
+        PowerConverter,
+        BaseUnitConverter,
+    )
 
 from ..const import (
     ATTR_ENTITIES,
@@ -354,7 +359,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
         self.unit_converter: BaseUnitConverter | None = None
-        if hasattr(self, 'get_unit_converter'):
+        if hasattr(self, "get_unit_converter"):
             self.unit_converter = self.get_unit_converter()
 
     async def async_added_to_hass(self) -> None:
@@ -417,7 +422,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
 
-        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0")
+        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
+            "2022.10.0"
+        )
         if not apply_unit_conversions:
             self._remove_incompatible_unit_entities(available_states)
 
@@ -432,23 +439,39 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
 
-    def _get_state_values(self, states: list[State], apply_unit_conversions: bool) -> list[Decimal]:
+    def _get_state_values(
+        self, states: list[State], apply_unit_conversions: bool
+    ) -> list[Decimal]:
         """Get the state value from all individual entity state. Apply unit conversions"""
         values = []
         for state in states:
             value = float(state.state)
             unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            if unit_of_measurement and apply_unit_conversions and self._attr_native_unit_of_measurement != unit_of_measurement:
-                unit_converter = EnergyConverter if isinstance(self, GroupedEnergySensor) else PowerConverter
-                value = unit_converter.convert(value, unit_of_measurement, self._attr_native_unit_of_measurement)
+            if (
+                unit_of_measurement
+                and apply_unit_conversions
+                and self._attr_native_unit_of_measurement != unit_of_measurement
+            ):
+                unit_converter = (
+                    EnergyConverter
+                    if isinstance(self, GroupedEnergySensor)
+                    else PowerConverter
+                )
+                value = unit_converter.convert(
+                    value, unit_of_measurement, self._attr_native_unit_of_measurement
+                )
             values.append(Decimal(value))
         return values
 
-    def _remove_incompatible_unit_entities(self, states: list[State]) -> None: # pragma: no cover
+    def _remove_incompatible_unit_entities(
+        self, states: list[State]
+    ) -> None:  # pragma: no cover
         """Remove members with an incompatible unit of measurements"""
         for state in states:
             unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            if unit_of_measurement is None:  # No unit of measurement, probably sensor has been reset
+            if (
+                unit_of_measurement is None
+            ):  # No unit of measurement, probably sensor has been reset
                 continue
             if unit_of_measurement != self._attr_native_unit_of_measurement:
                 _LOGGER.warning(
@@ -506,4 +529,3 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
-

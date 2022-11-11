@@ -116,7 +116,8 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
+        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        == UnitOfEnergy.KILO_WATT_HOUR
     )
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
@@ -219,10 +220,14 @@ async def test_reset_service(hass: HomeAssistant):
 
     # Set the individual entities to some initial values
     hass.states.async_set(
-        "sensor.test1_energy", "0.8", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
+        "sensor.test1_energy",
+        "0.8",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
     )
     hass.states.async_set(
-        "sensor.test2_energy", "1.2", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR}
+        "sensor.test2_energy",
+        "1.2",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
     )
     await hass.async_block_till_done()
 
@@ -677,16 +682,30 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
         data={
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
-            CONF_GROUP_ENERGY_ENTITIES: ["sensor.energy_Wh", "sensor.energy_kWh", "sensor.energy_MWh"]
+            CONF_GROUP_ENERGY_ENTITIES: [
+                "sensor.energy_Wh",
+                "sensor.energy_kWh",
+                "sensor.energy_MWh",
+            ],
         },
     )
     config_entry_group.add_to_hass(hass)
     assert await hass.config_entries.async_setup(config_entry_group.entry_id)
     await hass.async_block_till_done()
 
-    hass.states.async_set("sensor.energy_Wh", "200", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR})
-    hass.states.async_set("sensor.energy_kWh", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
-    hass.states.async_set("sensor.energy_MWh", "0.01", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.MEGA_WATT_HOUR})
+    hass.states.async_set(
+        "sensor.energy_Wh", "200", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR}
+    )
+    hass.states.async_set(
+        "sensor.energy_kWh",
+        "0.1",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+    )
+    hass.states.async_set(
+        "sensor.energy_MWh",
+        "0.01",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.MEGA_WATT_HOUR},
+    )
 
     await hass.async_block_till_done()
 
@@ -701,15 +720,19 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
             CONF_GROUP_POWER_ENTITIES: ["sensor.power_w", "sensor.power_kw"],
-            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
         },
     )
     config_entry_group.add_to_hass(hass)
     assert await hass.config_entries.async_setup(config_entry_group.entry_id)
     await hass.async_block_till_done()
 
-    hass.states.async_set("sensor.power_w", "100", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT})
-    hass.states.async_set("sensor.power_kw", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT})
+    hass.states.async_set(
+        "sensor.power_w", "100", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
+    )
+    hass.states.async_set(
+        "sensor.power_kw", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT}
+    )
 
     await hass.async_block_till_done()
 
