@@ -151,29 +151,11 @@ from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_ENTITY_DOMAINS = [
-    light.DOMAIN,
-    switch.DOMAIN,
-    fan.DOMAIN,
-    humidifier.DOMAIN,
-    binary_sensor.DOMAIN,
-    climate.DOMAIN,
-    device_tracker.DOMAIN,
-    remote.DOMAIN,
-    media_player.DOMAIN,
-    input_boolean.DOMAIN,
-    input_number.DOMAIN,
-    input_select.DOMAIN,
-    sensor.DOMAIN,
-    vacuum.DOMAIN,
-    water_heater.DOMAIN,
-]
-
 MAX_GROUP_NESTING_LEVEL = 5
 
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
-    vol.Optional(CONF_ENTITY_ID): cv.entity_domain(SUPPORTED_ENTITY_DOMAINS),
+    vol.Optional(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
