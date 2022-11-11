@@ -10,27 +10,31 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 
+
 class ShellyApi:
     status_endpoint = "/status"
     meter_endpoint = "/meter/0"
 
-    def parse_json(self, json: str) -> tuple(float, float):
+    def parse_json(self, json: dict) -> tuple[float, float]:
         pass
+
 
 class ShellyApiGen1(ShellyApi):
     api_version = 1
-    def parse_json(self, json) -> tuple(float, float):
+
+    def parse_json(self, json: dict) -> tuple[float, float]:
         return (
             float(json["power"]),
             float(json["timestamp"])
         )
+
 
 class ShellyApiGen2(ShellyApi):
     api_version = 2
     status_endpoint = "/rpc/Shelly.GetStatus"
     meter_endpoint = "/rpc/Switch.GetStatus?id=0"
 
-    def parse_json(self, json) -> tuple(float, float):
+    def parse_json(self, json: dict) -> tuple[float, float]:
         return (
             float(json["apower"]),
             time.time()
