@@ -9,15 +9,17 @@ from phue import Bridge, PhueRegistrationException
 from .controller import LightController, LightInfo
 from .errors import LightControllerError, ModelNotDiscoveredError
 
-NAME = "hue"
 TYPE_LIGHT = "light"
 TYPE_GROUP = "group"
+
 
 class HueLightController(LightController):
     def __init__(self, bridge_ip: str):
         self.bridge = self.initialize_hue_bridge(bridge_ip)
         self.lights = {light.light_id: light.name for light in self.bridge.lights}
         self.groups = {group.group_id: group.name for group in self.bridge.groups}
+        self.is_group: bool = False
+        self.light_id: int | None = None
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         kwargs["on"] = on
@@ -45,7 +47,7 @@ class HueLightController(LightController):
 
         return lightinfo
 
-    def find_group_model(self, group_id: str) -> str:
+    def find_group_model(self, group_id: int) -> str:
         model_ids = set()
         for light_id in self.bridge.get_group(group_id, "lights"):
             light = self.bridge.get_light(int(light_id))
@@ -59,7 +61,6 @@ class HueLightController(LightController):
             raise LightControllerError("The Hue group contains lights of multiple models, this is not supported")
         
         return model_ids.pop()
-
 
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(os.path.dirname(__file__), "../.persistent/.python_hue")

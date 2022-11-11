@@ -153,6 +153,7 @@
     },
     "error": {
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
       "linear_min_higher_as_max": "Max power cannot be lower than min power",
       "daily_energy_mandatory": "You must supply at least one of Value or Value template",
       "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
@@ -211,6 +212,7 @@
     },
     "error": {
       "linear_mandatory": "[%key:component::powercalc::config::error::linear_mandatory%]",
+      "linear_unsupported_domain": "[%key:component::powercalc::config::error::linear_unsupported_domain%]",
       "linear_min_higher_as_max": "[%key:component::powercalc::config::error::linear_min_higher_as_max%]",
       "fixed_mandatory": "[%key:component::powercalc::config::error::fixed_mandatory%]",
       "fixed_states_power_only": "[%key:component::powercalc::config::error::fixed_states_power_only%]",
