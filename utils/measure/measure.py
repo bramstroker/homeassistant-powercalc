@@ -21,6 +21,7 @@ from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
+from light_controller.dummy import DummyLightController
 from light_controller.errors import LightControllerError
 from light_controller.hass import HassLightController
 from light_controller.hue import HueLightController
@@ -845,7 +846,7 @@ class LightControllerFactory:
         return HueLightController(HUE_BRIDGE_IP)
 
     def dummy(self):
-        return LightController()
+        return DummyLightController()
 
     def create(self) -> LightController:
         """Create the light controller object"""

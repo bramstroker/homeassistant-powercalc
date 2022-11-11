@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Protocol
 
 from .const import MAX_MIRED, MIN_MIRED
 
@@ -33,15 +33,19 @@ class LightInfo:
     max_mired = property(get_max_mired, set_max_mired)
 
 
-class LightController:
+class LightController(Protocol):
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
-        pass
+        """Changes the light to a certain setting"""
+        ...
 
     def get_light_info(self) -> LightInfo:
-        return LightInfo("")
+        """Get device information about the light"""
+        ...
 
     def get_questions(self) -> list[dict]:
-        return []
+        """Get questions to ask for the chosen light controller"""
+        ...
 
     def process_answers(self, answers: dict[str, Any]):
-        pass
+        """Process the answers of the questions"""
+        ...

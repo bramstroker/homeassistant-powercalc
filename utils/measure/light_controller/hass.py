@@ -6,21 +6,22 @@ import inquirer
 from homeassistant_api import Client
 
 from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
-from .controller import LightController, LightInfo
+from .controller import LightInfo
 from .errors import LightControllerError
 
-NAME = "hass"
 
+class HassLightController:
 
-class HassLightController(LightController):
     def __init__(self, api_url: str, token: str):
+        self._entity_id: str | None = None
+        self._model_id: str | None = None
         try:
             self.client = Client(api_url, token)
         except Exception as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
-        if on == False:
+        if not on:
             self.client.trigger_service('light', 'turn_off', entity_id=self._entity_id)
             return
 
