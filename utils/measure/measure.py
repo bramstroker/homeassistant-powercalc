@@ -952,7 +952,7 @@ def main():
             print('Recommend to stream Pink Sound from https://www.genelec.com/audio-test-signals')
 
             for volume in range(10, 101, 10):
-                if inquirer.confirm(f'Set volume to {volume}% and confirm to start next {duration} second measurement'):
+                if inquirer.confirm(f'Set volume to {volume}% and confirm to start next {duration} second measurement', default=True):
                     summary[volume] = measure.measure_average(duration)
             print('Summary of all average measurements:')
             for key in summary:
