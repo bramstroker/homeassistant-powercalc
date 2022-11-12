@@ -9,6 +9,7 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
@@ -332,11 +333,15 @@ class DiscoveryManager:
                 entity_entry.entity_id, self.hass
             )
 
-            if model_info.manufacturer == MANUFACTURER_WLED:
+            if model_info.manufacturer == MANUFACTURER_WLED and entity_entry.domain == LIGHT_DOMAIN:
                 self._init_entity_discovery(
                     source_entity,
                     power_profile=None,
-                    extra_discovery_data={CONF_MODE: CalculationStrategy.WLED},
+                    extra_discovery_data={
+                        CONF_MODE: CalculationStrategy.WLED,
+                        CONF_MANUFACTURER: model_info.manufacturer,
+                        CONF_MODEL: model_info.model,
+                    },
                 )
                 continue
 
