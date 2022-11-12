@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, NamedTuple
 from abc import ABC, abstractmethod
+from typing import Any, NamedTuple
 
 
 class PowerMeter(ABC):

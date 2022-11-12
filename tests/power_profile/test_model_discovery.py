@@ -55,7 +55,7 @@ async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRe
             "LED1649C5",
         ),
         ("MLI", 45317, "mueller-licht", "45317"),
-        ("TP-Link", "KP115(AU)", "tp-link", "KP115")
+        ("TP-Link", "KP115(AU)", "tp-link", "KP115"),
     ],
 )
 async def test_autodiscover_model_from_entity_entry(
