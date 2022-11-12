@@ -944,7 +944,7 @@ def main():
                     duration = int(args[1])
             except IndexError:
                 duration = 20
-            if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)'):
+            if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)', default=True):
                 summary['standby'] = measure.measure_average(duration)
             else:
                 exit(0)
