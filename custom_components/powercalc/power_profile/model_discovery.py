@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-import re
 from typing import Optional
 
 import homeassistant.helpers.device_registry as dr
@@ -72,7 +71,7 @@ async def is_autoconfigurable(
 
 async def autodiscover_model(
     hass: HomeAssistant, entity_entry: er.RegistryEntry
-) -> Optional[ModelInfo]:
+) -> ModelInfo | None:
     """Try to auto discover manufacturer and model from the known device information"""
 
     if not await has_manufacturer_and_model_information(hass, entity_entry):

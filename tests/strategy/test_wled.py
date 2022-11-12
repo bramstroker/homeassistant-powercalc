@@ -3,17 +3,20 @@ from homeassistant.components import sensor
 from homeassistant.const import CONF_PLATFORM, DEVICE_CLASS_CURRENT, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import mock_registry
+from pytest_homeassistant_custom_component.common import mock_registry, mock_device_registry
 
 import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE
+from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, DOMAIN
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 from custom_components.test.light import MockLight
 
-from ..common import create_mock_light_entity
+from ..common import create_mock_light_entity, run_powercalc_setup_yaml_config
 
 
 async def test_can_calculate_power(hass: HomeAssistant):
@@ -110,3 +113,46 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
             standby_power=0.1,
         )
         await strategy.find_estimated_current_entity()
+
+async def test_wled_autodiscovery_flow(hass: HomeAssistant):
+    mock_device_registry(
+        hass,
+        {
+            "wled-device": DeviceEntry(
+                id="wled-device", manufacturer="WLED", model="FOSS"
+            )
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="wled-device",
+            ),
+            "sensor.test_current": RegistryEntry(
+                entity_id="sensor.test_current",
+                unique_id="1234",
+                platform="sensor",
+                device_id="wled-device",
+                unit_of_measurement="mA",
+                original_device_class=DEVICE_CLASS_CURRENT,
+            ),
+        },
+    )
+
+    await run_powercalc_setup_yaml_config(hass, {}, {})
+    await hass.async_block_till_done()
+
+    flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert len(flows) == 1
+
+    flow = flows[0]
+    context = flow["context"]
+    assert context["source"] == SOURCE_INTEGRATION_DISCOVERY
+    assert flow["step_id"] == "wled"
+
+    result = await hass.config_entries.flow.async_configure(flow["flow_id"], {CONF_VOLTAGE: 5})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
