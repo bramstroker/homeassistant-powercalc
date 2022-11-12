@@ -933,17 +933,17 @@ def main():
         measure = Measure(light_controller, power_meter)
 
         args = sys.argv[1:]
+        try:
+            if args[0] == "average":
+                    duration = int(args[1])
+        except IndexError:
+            duration = 60
 
         if device == DeviceType.LIGHT:
             measure.start()
             exit(0)
         elif device == DeviceType.SPEAKER:
             summary = {}
-            try:
-                if args[0] == "average":
-                    duration = int(args[1])
-            except IndexError:
-                duration = 20
             if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)', default=True):
                 summary['standby'] = measure.measure_average(duration)
             else:
@@ -958,12 +958,7 @@ def main():
             for key in summary:
                 print(key, ' : ', summary[key])
             exit(0)
-        elif device == DeviceType.OTHER:
-            try:
-                if args[0] == "average":
-                    duration = int(args[1])
-            except IndexError:
-                duration = 60
+        else:
             measure.measure_average(duration)
     except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
