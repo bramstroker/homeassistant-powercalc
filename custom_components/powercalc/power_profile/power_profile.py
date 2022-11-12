@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from enum import Enum
 from typing import NamedTuple, Protocol
 
@@ -73,6 +74,10 @@ class PowerProfile:
         for alias in self.aliases:
             if alias.lower() == model:
                 return True
+
+        # Also try to match model ID between parentheses.
+        if match := re.search(r"\(([^\(\)]+)\)$", model):
+            return self.supports(match.group(1))
 
         return False
 
