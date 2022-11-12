@@ -14,5 +14,8 @@
 	],
 	"fixed_config": {
 		"power": 0.9
-	}
+	},
+	"aliases": [
+		"KP115(AU)"
+	]
 }

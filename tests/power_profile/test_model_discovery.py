@@ -41,20 +41,21 @@ async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRe
             "ikea",
             "L1528",
         ),
-        ("IKEA", "LED1649C5", "IKEA of Sweden", "LED1649C5"),
+        ("IKEA", "LED1649C5", "ikea", "LED1649C5"),
         (
             "IKEA",
             "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)",
-            "IKEA of Sweden",
+            "ikea",
             "LED1650R5",
         ),
         (
             "ikea",
             "TRADFRI bulb E14 W op/ch 400lm",
             "ikea",
-            "TRADFRI bulb E14 W op#slash#ch 400lm",
+            "LED1649C5",
         ),
-        ("MLI", 45317, "Müller Licht", "45317"),
+        ("MLI", 45317, "mueller-licht", "45317"),
+        ("TP-Link", "KP115(AU)", "tp-link", "KP115")
     ],
 )
 async def test_autodiscover_model_from_entity_entry(
@@ -65,6 +66,10 @@ async def test_autodiscover_model_from_entity_entry(
     expected_manufacturer: str,
     expected_model: str,
 ):
+    """
+    Test the autodiscovery lookup from the library by manufacturer and model information
+    A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
+    """
     light_mock = MockLight("testa")
     light_mock.manufacturer = manufacturer
     light_mock.model = model
@@ -73,10 +78,10 @@ async def test_autodiscover_model_from_entity_entry(
 
     entity_entry = entity_reg.async_get("light.testa")
 
-    model_info = await autodiscover_model(hass, entity_entry)
+    power_profile = await get_power_profile(hass, {}, entity_entry)
 
-    assert model_info.manufacturer == expected_manufacturer
-    assert model_info.model == expected_model
+    assert power_profile.manufacturer == expected_manufacturer
+    assert power_profile.model == expected_model
 
 
 async def test_get_power_profile_empty_manufacturer(
