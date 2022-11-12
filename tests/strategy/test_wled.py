@@ -1,13 +1,16 @@
 import pytest
 from homeassistant.components import sensor
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_PLATFORM, DEVICE_CLASS_CURRENT, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import mock_registry, mock_device_registry
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
 import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
@@ -114,6 +117,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
         )
         await strategy.find_estimated_current_entity()
 
+
 async def test_wled_autodiscovery_flow(hass: HomeAssistant):
     mock_device_registry(
         hass,
@@ -154,5 +158,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
     assert context["source"] == SOURCE_INTEGRATION_DISCOVERY
     assert flow["step_id"] == "wled"
 
-    result = await hass.config_entries.flow.async_configure(flow["flow_id"], {CONF_VOLTAGE: 5})
+    result = await hass.config_entries.flow.async_configure(
+        flow["flow_id"], {CONF_VOLTAGE: 5}
+    )
     assert result["type"] == FlowResultType.CREATE_ENTRY

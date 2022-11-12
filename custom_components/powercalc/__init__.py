@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-
 from typing import Optional
+
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
@@ -88,8 +88,8 @@ from .const import (
 from .errors import ModelNotSupported
 from .power_profile.model_discovery import (
     PowerProfile,
-    get_power_profile,
     autodiscover_model,
+    get_power_profile,
 )
 from .power_profile.power_profile import DEVICE_DOMAINS
 from .sensors.group import remove_from_associated_group_entries
@@ -336,7 +336,7 @@ class DiscoveryManager:
                 self._init_entity_discovery(
                     source_entity,
                     power_profile=None,
-                    extra_discovery_data={CONF_MODE: CalculationStrategy.WLED}
+                    extra_discovery_data={CONF_MODE: CalculationStrategy.WLED},
                 )
                 continue
 
@@ -353,9 +353,7 @@ class DiscoveryManager:
                 )
                 continue
 
-            if (
-                power_profile.is_additional_configuration_required
-            ):
+            if power_profile.is_additional_configuration_required:
                 _LOGGER.warning(
                     f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
                 )
@@ -370,7 +368,10 @@ class DiscoveryManager:
 
     @callback
     def _init_entity_discovery(
-        self, source_entity: SourceEntity, power_profile: PowerProfile | None, extra_discovery_data: Optional[dict]
+        self,
+        source_entity: SourceEntity,
+        power_profile: PowerProfile | None,
+        extra_discovery_data: Optional[dict],
     ):
         """Dispatch the discovery flow for a given entity"""
         existing_entries = [
