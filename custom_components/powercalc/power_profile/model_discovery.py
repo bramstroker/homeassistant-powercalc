@@ -24,14 +24,16 @@ async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
     entity_entry: Optional[er.RegistryEntry] = None,
+    model_info: Optional[ModelInfo] = None,
 ) -> PowerProfile | None:
+    if not model_info and entity_entry:
+        model_info = await autodiscover_model(hass, entity_entry)
+
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
-    if (manufacturer is None or model is None) and entity_entry:
-        model_info = await autodiscover_model(hass, entity_entry)
-        if model_info:
-            manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
-            model = config.get(CONF_MODEL) or model_info.model
+    if (manufacturer is None or model is None) and model_info:
+        manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
+        model = config.get(CONF_MODEL) or model_info.model
 
     if not manufacturer or not model:
         return None

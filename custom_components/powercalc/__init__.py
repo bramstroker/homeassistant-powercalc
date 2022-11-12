@@ -347,7 +347,7 @@ class DiscoveryManager:
 
             try:
                 power_profile = await get_power_profile(
-                    self.hass, {}, source_entity.entity_entry
+                    self.hass, {}, model_info=model_info
                 )
                 if not power_profile:
                     continue
