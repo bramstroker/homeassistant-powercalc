@@ -233,10 +233,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self.source_entity_id = discovery_info[CONF_ENTITY_ID]
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
-        self.power_profile = discovery_info[DISCOVERY_POWER_PROFILE]
-
         del sensor_config[DISCOVERY_SOURCE_ENTITY]
-        del sensor_config[DISCOVERY_POWER_PROFILE]
+
+        if DISCOVERY_POWER_PROFILE in discovery_info:
+            self.power_profile = discovery_info[DISCOVERY_POWER_PROFILE]
+            del sensor_config[DISCOVERY_POWER_PROFILE]
+
         self.sensor_config.update(sensor_config)
 
         self.context["title_placeholders"] = {
@@ -244,6 +246,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
             "model": self.sensor_config.get(CONF_MODEL),
         }
+
+        if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
+            return await self.async_step_wled()
+
         return await self.async_step_library()
 
     async def async_step_user(self, user_input=None) -> FlowResult:

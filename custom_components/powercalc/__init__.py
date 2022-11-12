@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import logging
 
+from typing import Optional
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import (
@@ -36,6 +34,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
 from homeassistant.helpers.typing import ConfigType
 
+from .aliases import MANUFACTURER_WLED
 from .common import SourceEntity, create_source_entity, validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
@@ -52,6 +51,7 @@ from .const import (
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MANUFACTURER,
+    CONF_MODE,
     CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
@@ -81,6 +81,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
+    CalculationStrategy,
     PowercalcDiscoveryType,
     UnitPrefix,
 )
@@ -88,8 +89,9 @@ from .errors import ModelNotSupported
 from .power_profile.model_discovery import (
     PowerProfile,
     get_power_profile,
-    has_manufacturer_and_model_information,
+    autodiscover_model,
 )
+from .power_profile.power_profile import DEVICE_DOMAINS
 from .sensors.group import remove_from_associated_group_entries
 from .strategy.factory import PowerCalculatorStrategyFactory
 
@@ -311,21 +313,33 @@ class DiscoveryManager:
             if entity_entry.disabled:
                 continue
 
-            if entity_entry.domain not in (
-                LIGHT_DOMAIN,
-                SWITCH_DOMAIN,
-                MEDIA_PLAYER_DOMAIN,
-            ):
+            if entity_entry.domain not in DEVICE_DOMAINS.values():
                 continue
 
-            if not await has_manufacturer_and_model_information(
-                self.hass, entity_entry
-            ):
+            has_user_config = self._is_user_configured(entity_entry.entity_id)
+            if has_user_config:
+                _LOGGER.debug(
+                    "%s: Entity is manually configured, skipping auto configuration",
+                    entity_entry.entity_id,
+                )
+                continue
+
+            model_info = await autodiscover_model(self.hass, entity_entry)
+            if not model_info:
                 continue
 
             source_entity = await create_source_entity(
                 entity_entry.entity_id, self.hass
             )
+
+            if model_info.manufacturer == MANUFACTURER_WLED:
+                self._init_entity_discovery(
+                    source_entity,
+                    power_profile=None,
+                    extra_discovery_data={CONF_MODE: CalculationStrategy.WLED}
+                )
+                continue
+
             try:
                 power_profile = await get_power_profile(
                     self.hass, {}, source_entity.entity_entry
@@ -339,34 +353,24 @@ class DiscoveryManager:
                 )
                 continue
 
-            has_user_config = self._is_user_configured(entity_entry.entity_id)
-
             if (
                 power_profile.is_additional_configuration_required
-                and not has_user_config
             ):
                 _LOGGER.warning(
                     f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
                 )
                 continue
 
-            if has_user_config:
-                _LOGGER.debug(
-                    "%s: Entity is manually configured, skipping auto configuration",
-                    entity_entry.entity_id,
-                )
-                continue
-
             if not power_profile.is_entity_domain_supported(source_entity.domain):
                 continue
 
-            self._init_entity_discovery(source_entity, power_profile)
+            self._init_entity_discovery(source_entity, power_profile, {})
 
         _LOGGER.debug("Done auto discovering entities")
 
     @callback
     def _init_entity_discovery(
-        self, source_entity: SourceEntity, power_profile: PowerProfile
+        self, source_entity: SourceEntity, power_profile: PowerProfile | None, extra_discovery_data: Optional[dict]
     ):
         """Dispatch the discovery flow for a given entity"""
         existing_entries = [
@@ -380,19 +384,26 @@ class DiscoveryManager:
             )
             return
 
+        discovery_data = {
+            CONF_UNIQUE_ID: source_entity.unique_id,
+            CONF_NAME: source_entity.name,
+            CONF_ENTITY_ID: source_entity.entity_id,
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+        }
+
+        if power_profile:
+            discovery_data[DISCOVERY_POWER_PROFILE] = power_profile
+            discovery_data[CONF_MANUFACTURER] = power_profile.manufacturer
+            discovery_data[CONF_MODEL] = power_profile.model
+
+        if extra_discovery_data:
+            discovery_data.update(extra_discovery_data)
+
         discovery_flow.async_create_flow(
             self.hass,
             DOMAIN,
             context={"source": SOURCE_INTEGRATION_DISCOVERY},
-            data={
-                CONF_UNIQUE_ID: source_entity.unique_id,
-                CONF_NAME: source_entity.name,
-                CONF_ENTITY_ID: source_entity.entity_id,
-                CONF_MANUFACTURER: power_profile.manufacturer,
-                CONF_MODEL: power_profile.model,
-                DISCOVERY_SOURCE_ENTITY: source_entity,
-                DISCOVERY_POWER_PROFILE: power_profile,
-            },
+            data=discovery_data,
         )
 
         # Code below if for legacy discovery routine, will be removed somewhere in the future
