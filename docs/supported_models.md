@@ -238,5 +238,5 @@
 |signify     |LOM007          |Hue smart plug LOM007                                                              |fixed            |          |
 |tp-link     |HS100           |HS100                                                                              |fixed            |          |
 |tp-link     |HS110           |HS110                                                                              |fixed            |          |
-|tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |          |
+|tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |KP115(AU) |
 |tp-link     |P100            |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |fixed            |          |
