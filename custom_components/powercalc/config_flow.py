@@ -399,7 +399,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_MODEL: self.power_profile.model,
                     }
                 )
-                if self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
+                if (
+                    self.power_profile.has_sub_profiles
+                    and not self.power_profile.sub_profile_select
+                ):
                     return await self.async_step_sub_profile()
 
                 return await self.async_step_power_advanced()

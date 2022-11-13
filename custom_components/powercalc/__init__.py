@@ -333,7 +333,10 @@ class DiscoveryManager:
                 entity_entry.entity_id, self.hass
             )
 
-            if model_info.manufacturer == MANUFACTURER_WLED and entity_entry.domain == LIGHT_DOMAIN:
+            if (
+                model_info.manufacturer == MANUFACTURER_WLED
+                and entity_entry.domain == LIGHT_DOMAIN
+            ):
                 self._init_entity_discovery(
                     source_entity,
                     power_profile=None,
