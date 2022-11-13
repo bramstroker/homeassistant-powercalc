@@ -112,6 +112,51 @@ async def test_discovery_flow(hass: HomeAssistant):
     }
 
 
+async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    light_entity.manufacturer = "lifx"
+    light_entity.model = "LIFX Z"
+    await create_mock_light_entity(hass, light_entity)
+
+    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+
+    result: FlowResult = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
+        data={
+            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+            CONF_NAME: "test",
+            CONF_MANUFACTURER: "lifx",
+            CONF_MODEL: "LIFX Z",
+            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+            DISCOVERY_POWER_PROFILE: power_profile,
+        },
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "sub_profile"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_SUB_PROFILE: "length_6"}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "lifx",
+        CONF_MODEL: "LIFX Z/length_6",
+        CONF_NAME: "test",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+    }
+
+
 async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     """Test a menu is diplayed with sensor type selection"""
 

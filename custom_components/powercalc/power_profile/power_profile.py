@@ -145,12 +145,6 @@ class PowerProfile:
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        if (
-            self.has_sub_profiles
-            and self.sub_profile is None
-            and self.sub_profile_select is None
-        ):
-            return True
         return self._json_data.get("requires_additional_configuration") or False
 
     @property

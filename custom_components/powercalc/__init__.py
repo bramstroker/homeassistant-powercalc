@@ -413,17 +413,18 @@ class DiscoveryManager:
         )
 
         # Code below if for legacy discovery routine, will be removed somewhere in the future
-        discovery_info = {
-            CONF_ENTITY_ID: source_entity.entity_id,
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-            DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
-        }
-        self.hass.async_create_task(
-            discovery.async_load_platform(
-                self.hass, SENSOR_DOMAIN, DOMAIN, discovery_info, self.ha_config
+        if power_profile and not power_profile.has_sub_profiles:
+            discovery_info = {
+                CONF_ENTITY_ID: source_entity.entity_id,
+                DISCOVERY_SOURCE_ENTITY: source_entity,
+                DISCOVERY_POWER_PROFILE: power_profile,
+                DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
+            }
+            self.hass.async_create_task(
+                discovery.async_load_platform(
+                    self.hass, SENSOR_DOMAIN, DOMAIN, discovery_info, self.ha_config
+                )
             )
-        )
 
     def _is_user_configured(self, entity_id: str) -> bool:
         """
