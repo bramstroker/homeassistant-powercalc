@@ -136,6 +136,20 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
                 platform="light",
                 device_id="wled-device",
             ),
+            "light.test_master": RegistryEntry(
+                entity_id="light.test_master",
+                unique_id="1234-master",
+                platform="light",
+                original_name="Master",
+                device_id="wled-device",
+            ),
+            "light.test_segment1": RegistryEntry(
+                entity_id="light.test_segment1",
+                unique_id="1234-segment",
+                platform="light",
+                original_name="WLED Segment1",
+                device_id="wled-device",
+            ),
             "sensor.test_current": RegistryEntry(
                 entity_id="sensor.test_current",
                 unique_id="1234",
