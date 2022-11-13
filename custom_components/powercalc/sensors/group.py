@@ -390,6 +390,10 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             if not registry_entry:
                 continue
 
+            # We don't want to touch devices which are forced hidden by the user
+            if registry_entry.hidden_by == er.RegistryEntryHider.USER:
+                continue
+
             hidden_by = er.RegistryEntryHider.INTEGRATION if hide else None
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
