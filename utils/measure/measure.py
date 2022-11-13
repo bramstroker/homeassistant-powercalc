@@ -11,6 +11,7 @@ import sys
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
+from enum import Enum
 from io import TextIOWrapper
 from pathlib import Path
 from typing import Any, Iterator, Optional
@@ -159,6 +160,13 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+class DeviceType(str, Enum):
+    """Type of devices to measure power of"""
+
+    LIGHT = "Light bulb(s)"
+    SPEAKER = "Smart speaker"
+    OTHER = "Other"
 
 _LOGGER = logging.getLogger("measure")
 
@@ -912,25 +920,45 @@ class PowerMeterFactory:
 def main():
     print(f"Powercalc measure: {_VERSION}\n")
 
+    device = inquirer.list_input("What kind of device do you want to measure the power of?",
+                              choices=[cls.value for cls in DeviceType])
+
     light_controller_factory = LightControllerFactory()
     power_meter_factory = PowerMeterFactory()
 
     try:
         power_meter = power_meter_factory.create()
         light_controller = light_controller_factory.create()
-    
+
         measure = Measure(light_controller, power_meter)
 
         args = sys.argv[1:]
-        if not args:
+        try:
+            if args[0] == "average":
+                    duration = int(args[1])
+        except IndexError:
+            duration = 60
+
+        if device == DeviceType.LIGHT:
             measure.start()
             exit(0)
+        elif device == DeviceType.SPEAKER:
+            summary = {}
+            if inquirer.confirm('Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)', default=True):
+                summary['standby'] = measure.measure_average(duration)
+            else:
+                exit(0)
+            print(f'Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)')
+            print('Recommend to stream Pink Sound from https://www.genelec.com/audio-test-signals')
 
-        if args[0] == "average":
-            try:
-                duration = int(args[1])
-            except IndexError:
-                duration = 60
+            for volume in range(10, 101, 10):
+                if inquirer.confirm(f'Set volume to {volume}% and confirm to start next {duration} second measurement', default=True):
+                    summary[volume] = measure.measure_average(duration)
+            print('Summary of all average measurements:')
+            for key in summary:
+                print(key, ' : ', summary[key])
+            exit(0)
+        else:
             measure.measure_average(duration)
     except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
