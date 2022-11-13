@@ -64,9 +64,9 @@ async def is_autoconfigurable(
         power_profile = await get_power_profile(hass, sensor_config, entry)
         if not power_profile:
             return False
-        return bool(
-            power_profile and not power_profile.is_additional_configuration_required
-        )
+        if power_profile.has_sub_profiles and power_profile.sub_profile:
+            return True
+        return not power_profile.is_additional_configuration_required
     except ModelNotSupported:
         return False
 

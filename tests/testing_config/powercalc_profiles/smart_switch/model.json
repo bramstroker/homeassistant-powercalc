@@ -5,7 +5,6 @@
   "name": "Shelly Plug S",
   "standby_power": 0.52,
   "standby_power_on": 0.82,
-  "requires_additional_configuration": true,
   "device_type": "smart_switch",
   "supported_modes": [
     "fixed"
