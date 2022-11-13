@@ -419,7 +419,10 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by is er.RegistryEntryHider.USER
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        is er.RegistryEntryHider.USER
+    )
 
 
 async def test_members_are_unhiden_after_group_removed(

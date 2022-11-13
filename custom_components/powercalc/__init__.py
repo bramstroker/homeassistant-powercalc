@@ -337,7 +337,11 @@ class DiscoveryManager:
             if (
                 model_info.manufacturer == MANUFACTURER_WLED
                 and entity_entry.domain == LIGHT_DOMAIN
-                and not re.search("master|segment", str(entity_entry.original_name), flags=re.IGNORECASE)
+                and not re.search(
+                    "master|segment",
+                    str(entity_entry.original_name),
+                    flags=re.IGNORECASE,
+                )
             ):
                 self._init_entity_discovery(
                     source_entity,
