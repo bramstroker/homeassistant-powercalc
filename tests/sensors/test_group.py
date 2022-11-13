@@ -394,6 +394,34 @@ async def test_unhide_members(hass: HomeAssistant):
     assert entity_reg.async_get("sensor.test_power").hidden_by is None
 
 
+async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
+    entity_reg = er.async_get(hass)
+    entity_reg.async_get_or_create(
+        SENSOR_DOMAIN,
+        DOMAIN,
+        "abcdef",
+        suggested_object_id="test_power",
+        hidden_by=er.RegistryEntryHider.USER,
+    )
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_HIDE_MEMBERS: False,
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+                    CONF_POWER_SENSOR_ID: "sensor.test_power",
+                },
+            ],
+        },
+    )
+
+    assert entity_reg.async_get("sensor.test_power").hidden_by is er.RegistryEntryHider.USER
+
+
 async def test_members_are_unhiden_after_group_removed(
     hass: HomeAssistant, entity_reg: EntityRegistry
 ):
