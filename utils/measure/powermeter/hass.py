@@ -16,7 +16,7 @@ class HassPowerMeter(PowerMeter):
         self._call_update_entity = call_update_entity
         self._entity_id: str | None = None
         try:
-            self.client = Client(api_url, token)
+            self.client = Client(api_url, token, global_request_kwargs={"verify": False})
         except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}")
 
@@ -29,7 +29,7 @@ class HassPowerMeter(PowerMeter):
         last_updated = parse(state.get("last_updated")).timestamp()
         return PowerMeasurementResult(float(state.get("state")), last_updated)
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[Question]:
         power_sensor_list = self.get_power_sensors()
 
         return [
