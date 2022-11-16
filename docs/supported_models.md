@@ -1,9 +1,9 @@
-- [Lights](#Lights) (190)
+- [Lights](#Lights) (193)
 - [Smart speakers](#Smart-speakers) (9)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
-#### 190 total
+#### 193 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -28,6 +28,7 @@
 |gledopto      |GL-S-005Z                |Gledopto 4W MR16 Dual White and Color 120°                                       |lut              |                                                                                               |
 |gledopto      |GL-S-007Z                |Gledopto 5W GU10 Dual White And Color Spotlight                                  |lut              |                                                                                               |
 |govee         |H6072                    |Govee Lyra RGBICWW Corner Floor Lamp                                             |lut              |                                                                                               |
+|govee         |h6061                    |Govee Glide Hexa Light Panels (10 panels)                                        |lut              |                                                                                               |
 |ikea          |L1527                    |FLOALT panel WS 30x30                                                            |lut              |FLOALT panel WS 30x30                                                                          |
 |ikea          |L1528                    |FLOALT panel WS 30x90                                                            |lut              |FLOALT panel WS 30x90                                                                          |
 |ikea          |L1529                    |FLOALT panel WS 60x60                                                            |lut              |FLOALT panel WS 60x60                                                                          |
@@ -68,9 +69,11 @@
 |innr          |RS 125                   |RS125 GU10 350lm 2700K                                                           |lut              |                                                                                               |
 |innr          |RS 227 T                 |Smart spot comfort                                                               |lut              |                                                                                               |
 |innr          |RS 230 C                 |RS 230 C                                                                         |lut              |                                                                                               |
+|ledvance      |40580754884474           |SMART+ WIFI PLANON FRAMELESS TW RGB 600x600                                      |lut              |                                                                                               |
 |ledvance      |AC25697                  |LEDVANCE SMART+ CLASSIC MULTICOLOUR 60 10W E27                                   |lut              |                                                                                               |
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
-|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |4058075168572                                                                                  |
+|ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
+|ledvance      |ac264430155              |LEDVANCE SMART+ Wifi Planon 30x30 TW                                             |lut              |                                                                                               |
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
 |lidl          |HG06106B                 |Livarno Lux E14 candle RGB                                                       |lut              |                                                                                               |
 |lidl          |HG06106C                 |Livarno Lux E27 bulb RGB                                                         |lut              |                                                                                               |
