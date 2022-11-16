@@ -348,6 +348,9 @@ class Measure:
             csv_file.close()
             _LOGGER.info(f"Hooray! measurements finished. Exported CSV file {csv_file_path}")
 
+            self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
+            _LOGGER.info("Turning off the light")
+
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
 
