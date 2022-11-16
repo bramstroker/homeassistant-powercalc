@@ -16,7 +16,7 @@ class HassLightController:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
-            self.client = Client(api_url, token)
+            self.client = Client(api_url, token, global_request_kwargs={"verify": False})
         except Exception as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
