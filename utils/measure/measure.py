@@ -36,7 +36,7 @@ from powermeter.hass import HassPowerMeter
 from powermeter.kasa import KasaPowerMeter
 from powermeter.manual import ManualPowerMeter
 from powermeter.ocr import OcrPowerMeter
-from powermeter.powermeter import PowerMeter
+from powermeter.powermeter import PowerMeter, PowerMeasurementResult
 from powermeter.shelly import ShellyPowerMeter
 from powermeter.tasmota import TasmotaPowerMeter
 from powermeter.tuya import TuyaPowerMeter
@@ -161,6 +161,7 @@ logging.basicConfig(
     ]
 )
 
+
 class DeviceType(str, Enum):
     """Type of devices to measure power of"""
 
@@ -168,10 +169,12 @@ class DeviceType(str, Enum):
     SPEAKER = "Smart speaker"
     OTHER = "Other"
 
+
 _LOGGER = logging.getLogger("measure")
 
 with open(os.path.join(sys.path[0], ".VERSION"), "r") as f:
     _VERSION = f.read().strip()
+
 
 class Measure:
     """Measure the power usage of a light.
@@ -355,6 +358,7 @@ class Measure:
             self.gzip_csv(csv_file_path)
 
     def nudge_and_remeasure(self, color_mode: str, variation: Variation):
+        nudge_count = 0
         for nudge_count in range(MAX_NUDGES):
             try:
                 # Likely not significant enough change for PM to detect. Try nudging it
@@ -381,7 +385,8 @@ class Measure:
                 continue
         raise OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries")
 
-    def should_resume(self, csv_file_path: str) -> bool:
+    @staticmethod
+    def should_resume(csv_file_path: str) -> bool:
         """This method checks if a CSV file already exists for the current color mode.
         
         If so, it asks the user if he wants to resume measurements or start over.
@@ -427,7 +432,6 @@ class Measure:
                 message="CSV File already exists. Do you want to resume measurements?",
                 default=True
             )
-
 
     def get_resume_variation(self, csv_file_path: str) -> Variation | None:
         """This method returns the variation to resume at.
@@ -477,7 +481,6 @@ class Measure:
 
         raise Exception(f"Color mode {self.color_mode} not supported")
 
-
     def take_power_measurement(self, start_timestamp: float, retry_count: int=0) -> float:
         """Request a power reading from the configured power meter"""
         measurements = []
@@ -485,6 +488,7 @@ class Measure:
         for i in range(1, SAMPLE_COUNT + 1):
             _LOGGER.debug(f"Taking sample {i}")
             error = None
+            measurement: PowerMeasurementResult | None = None
             try:
                 measurement = self.power_meter.get_power()
                 updated_at = dt.fromtimestamp(measurement.updated).strftime("%d-%m-%Y, %H:%M:%S")
@@ -492,13 +496,14 @@ class Measure:
             except PowerMeterError as err:
                 error = err
 
-            # Check if measurement is not outdated
-            if measurement.updated < start_timestamp:
-                error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} successive retries")
+            if measurement:
+                # Check if measurement is not outdated
+                if measurement.updated < start_timestamp:
+                    error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} successive retries")
 
-            # Check if we not have a 0 measurument
-            if measurement.power == 0:
-                error = ZeroReadingError("0 watt was read from the power meter")
+                # Check if we not have a 0 measurument
+                if measurement.power == 0:
+                    error = ZeroReadingError("0 watt was read from the power meter")
 
             if error:
                 # Prevent endless recursion. Throw error when max retries is reached
@@ -517,19 +522,19 @@ class Measure:
 
         # Subtract Dummy Load (if present)
         if self.is_dummy_load_connected:
-            value = value - self.dummy_load_value
+            value -= self.dummy_load_value
         
         # Determine per load power consumption
         value /= self.num_lights
 
         return round(value, 2)
 
-    def gzip_csv(self, csv_file_path: str):
+    @staticmethod
+    def gzip_csv(csv_file_path: str):
         """Gzip the CSV file"""
         with open(csv_file_path, "rb") as csv_file:
             with gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
                 shutil.copyfileobj(csv_file, gzip_file)
-
 
     def measure_standby_power(self) -> float:
         """Measures the standby power (when the light is OFF)"""
@@ -587,7 +592,8 @@ class Measure:
         for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
-    def inclusive_range(self, start: int, end: int, step: int) -> Iterator[int]:
+    @staticmethod
+    def inclusive_range(start: int, end: int, step: int) -> Iterator[int]:
         """Get an iterator including the min and max, with steps in between"""
         i = start
         while i < end:
@@ -595,7 +601,8 @@ class Measure:
             i += step
         yield end
 
-    def calculate_time_left(self, variations: list[Variation], current_variation: Variation = None, progress: int = 0) -> str:
+    @staticmethod
+    def calculate_time_left(variations: list[Variation], current_variation: Variation = None, progress: int = 0) -> str:
         """Try to guess the remaining time left. This will not account for measuring errors / retries obviously"""
         num_variations_left = len(variations) - progress
 
@@ -628,8 +635,9 @@ class Measure:
 
         return formatted_time
 
+    @staticmethod
     def write_model_json(
-        self, directory: str, standby_power: float, name: str, measure_device: str
+            directory: str, standby_power: float, name: str, measure_device: str
     ):
         """Write model.json manifest file"""
         json_data = json.dumps(
@@ -652,7 +660,6 @@ class Measure:
         json_file = open(os.path.join(directory, "model.json"), "w")
         json_file.write(json_data)
         json_file.close()
-    
 
     def get_questions(self) -> list[Question]:
         """Build list of questions to ask"""
@@ -708,7 +715,6 @@ class Measure:
 
         return questions
 
-    
     def ask_questions(self) -> dict[str, Any]:
         """Ask question and return a dictionary with the answers"""
         all_questions = self.get_questions()
@@ -806,11 +812,13 @@ def config_key_exists(key: str) -> bool:
     except UndefinedValueError:
         return False
 
+
 def validate_required(_, val):
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
         raise ValidationError("", reason="This question cannot be empty, please put in a value")
     return True
+
 
 def str_to_bool(value: Any) -> bool:
     """Return whether the provided string (or any value really) represents true."""
@@ -818,12 +826,14 @@ def str_to_bool(value: Any) -> bool:
         return False
     return str(value).lower() in ("y", "yes", "t", "true", "on", "1")
 
+
 @dataclass(frozen=True)
 class Variation:
     bri: int
 
     def to_csv_row(self) -> list:
         return [self.bri]
+
 
 @dataclass(frozen=True)
 class HsVariation(Variation):
@@ -839,6 +849,7 @@ class HsVariation(Variation):
     def is_sat_changed(self, other_variation: HsVariation):
         return self.sat != other_variation.sat
 
+
 @dataclass(frozen=True)
 class ColorTempVariation(Variation):
     ct: int
@@ -848,6 +859,7 @@ class ColorTempVariation(Variation):
     
     def is_ct_changed(self, other_variation: ColorTempVariation):
         return self.ct != other_variation.ct
+
 
 class LightControllerFactory:
     def hass(self):
@@ -920,11 +932,13 @@ class PowerMeterFactory:
         _LOGGER.info(f"Selected powermeter: {SELECTED_POWER_METER}")
         return factory()
 
+
 def main():
     print(f"Powercalc measure: {_VERSION}\n")
 
-    device = inquirer.list_input("What kind of device do you want to measure the power of?",
-                              choices=[cls.value for cls in DeviceType])
+    # device = inquirer.list_input("What kind of device do you want to measure the power of?",
+    #                           choices=[cls.value for cls in DeviceType])
+    device = DeviceType.LIGHT
 
     light_controller_factory = LightControllerFactory()
     power_meter_factory = PowerMeterFactory()
@@ -938,7 +952,7 @@ def main():
         args = sys.argv[1:]
         try:
             if args[0] == "average":
-                    duration = int(args[1])
+                duration = int(args[1])
         except IndexError:
             duration = 60
 
@@ -966,6 +980,7 @@ def main():
     except (PowerMeterError, LightControllerError) as e:
         _LOGGER.error(f"Aborting: {e}")
         exit(1)
+
 
 if __name__ == "__main__":
     main()
