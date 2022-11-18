@@ -9,12 +9,12 @@ import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from io import TextIOWrapper
-from typing import Iterator, Optional
+from typing import Any, Iterator, Optional
 import re
 
 import inquirer
 import config
-from light_controller.controller import LightController
+from light_controller.controller import LightController, LightInfo
 from light_controller.factory import LightControllerFactory
 from light_controller.errors import LightControllerError
 from light_controller.const import ColorMode
@@ -25,7 +25,7 @@ from powermeter.errors import (
 )
 from powermeter.powermeter import PowerMeter, PowerMeasurementResult
 from powermeter.factory import PowerMeterFactory
-from runner.runner import MeasurementRunner
+from runner.runner import MeasurementRunner, RunnerResult
 from runner.speaker import SpeakerRunner
 from measure_util import MeasureUtil
 
@@ -51,11 +51,9 @@ class LightRunner(MeasurementRunner):
         self.is_dummy_load_connected: bool = False
         self.dummy_load_value: float = 0
         self.num_0_readings: int = 0
+        self.light_info: LightInfo | None = None
 
-    def prepare(self) -> None:
-        pass
-
-    def run(self, answers: dict) -> None:
+    def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
         self.color_mode = answers["color_mode"]
         self.num_lights = int(answers.get("num_lights") or 1)
@@ -66,12 +64,10 @@ class LightRunner(MeasurementRunner):
 
         self.light_info = self.light_controller.get_light_info()
 
-        export_directory = os.path.join(
-            os.path.dirname(__file__), "export", self.light_info.model_id
-        )
-        if not os.path.exists(export_directory):
-            os.makedirs(export_directory)
+    def get_export_directory(self) -> str:
+        return f"{self.light_info.model_id}"
 
+    def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
 
         resume_at = None
@@ -151,6 +147,11 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
+
+        return RunnerResult(
+            model_json_data={"supported_modes": ["lut"]},
+            skip_model_json_generation=resume_at is not None
+        )
 
     def get_dummy_load_value(self) -> float:
         """Get the previously measured dummy load value"""
@@ -272,7 +273,7 @@ class LightRunner(MeasurementRunner):
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")
                 # If brightness is low, set brightness high. Else, turn light off
-                self.light_controller.change_light_state(MODE_BRIGHTNESS, on=(variation.bri < 128), bri=255)
+                self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=(variation.bri < 128), bri=255)
                 time.sleep(config.PULSE_TIME_NUDGE)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(

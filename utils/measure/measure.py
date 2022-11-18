@@ -1,18 +1,11 @@
 from __future__ import annotations
 
-import csv
-import gzip
 import json
 import logging
 import os
-import shutil
 import sys
-import time
-from dataclasses import asdict, dataclass
-from datetime import datetime as dt
 from enum import Enum
-from io import TextIOWrapper
-from typing import Any, Iterator, Optional
+from typing import Any
 
 import inquirer
 import config
@@ -21,14 +14,11 @@ from decouple import UndefinedValueError
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from light_controller.controller import LightController
-from light_controller.factory import LightControllerFactory
 from light_controller.errors import LightControllerError
 from powermeter.errors import (
-    OutdatedMeasurementError,
     PowerMeterError,
-    ZeroReadingError,
 )
-from powermeter.powermeter import PowerMeter, PowerMeasurementResult
+from powermeter.powermeter import PowerMeter
 from powermeter.factory import PowerMeterFactory
 from runner.runner import MeasurementRunner
 from runner.light import LightRunner
@@ -103,6 +93,7 @@ class Measure:
         self.measure_util = MeasureUtil()
         self.power_meter = power_meter
         self.runner: MeasurementRunner | None = None
+        self.device_type: DeviceType = DeviceType.LIGHT
 
     def start(self) -> None:
         """Starts the measurement session.
@@ -122,6 +113,8 @@ class Measure:
         -----
         This method is the main entry point for the measurement
         session.
+        It selects a runner based on the selected device type
+        This runner is responsible for executing the measurement session for the given device type
 
         Examples
         --------
@@ -133,54 +126,68 @@ class Measure:
         if DeviceType.LIGHT:
             _LOGGER.info(f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}")
 
-        device = inquirer.list_input("What kind of device do you want to measure the power of?",
+        self.device_type = inquirer.list_input("What kind of device do you want to measure the power of?",
                                      choices=[cls.value for cls in DeviceType])
-        self.runner = RunnerFactory().create_runner(device)
+        self.runner = RunnerFactory().create_runner(self.device_type)
 
         answers = self.ask_questions()
         self.power_meter.process_answers(answers)
+        self.runner.prepare(answers)
 
-        self.runner.prepare()
-        self.runner.run(answers)
+        export_directory = os.path.join(
+            os.path.dirname(__file__), "export", self.runner.get_export_directory()
+        )
+        if not os.path.exists(export_directory):
+            os.makedirs(export_directory)
 
-        # if answers["generate_model_json"] and not resume_at:
-        #     try:
-        #         standby_power = self.measure_standby_power()
-        #     except PowerMeterError as error:
-        #         _LOGGER.error(f"Aborting: {error}")
-        #         return
-        #
-        #     self.write_model_json(
-        #         directory=export_directory,
-        #         standby_power=standby_power,
-        #         name=answers["model_name"],
-        #         measure_device=answers["measure_device"],
-        #     )
+        runner_result = self.runner.run(answers, export_directory)
+        if not runner_result:
+            _LOGGER.error("Some error occured during the measurement session")
+
+        if answers["generate_model_json"] and not runner_result.skip_model_json_generation:
+            try:
+                standby_power = self.runner.measure_standby_power()
+            except PowerMeterError as error:
+                _LOGGER.error(f"Aborting: {error}")
+                return
+
+            self.write_model_json(
+                directory=export_directory,
+                standby_power=standby_power,
+                name=answers["model_name"],
+                measure_device=answers["measure_device"],
+            )
+
+        _LOGGER.info(f"Measurement session finished. Files exported to {export_directory}")
 
     @staticmethod
     def write_model_json(
-            directory: str, standby_power: float, name: str, measure_device: str
+            directory: str, standby_power: float, name: str, measure_device: str, extra_json_data: dict | None = None
     ):
         """Write model.json manifest file"""
-        json_data = json.dumps(
-            {
-                "measure_device": measure_device,
-                "measure_method": "script",
-                "measure_description": "Measured with utils/measure script",
-                "measure_settings": {
-                    "VERSION": _VERSION,
-                    "SAMPLE_COUNT": config.SAMPLE_COUNT,
-                    "SLEEP_TIME": config.SLEEP_TIME
-                },
-                "name": name,
-                "standby_power": standby_power,
-                "supported_modes": ["lut"],
+        json_data = {
+            "measure_device": measure_device,
+            "measure_method": "script",
+            "measure_description": "Measured with utils/measure script",
+            "measure_settings": {
+                "VERSION": _VERSION,
+                "SAMPLE_COUNT": config.SAMPLE_COUNT,
+                "SLEEP_TIME": config.SLEEP_TIME
             },
+            "name": name,
+            "standby_power": standby_power,
+            "supported_modes": ["lut"],
+        }
+        if extra_json_data:
+            json_data.update(extra_json_data)
+
+        json_string = json.dumps(
+            json_data,
             indent=4,
             sort_keys=True,
         )
         json_file = open(os.path.join(directory, "model.json"), "w")
-        json_file.write(json_data)
+        json_file.write(json_string)
         json_file.close()
 
     def get_questions(self) -> list[Question]:
@@ -191,10 +198,9 @@ class Measure:
                 message="Do you want to generate model.json?",
                 default=True
             ),
-            # Todo don't call light anymore
             inquirer.Text(
                 name="model_name",
-                message="Specify the full light model name",
+                message=f"Specify the full {self.device_type} model name",
                 ignore=lambda answers: not answers.get("generate_model_json"),
                 validate=validate_required,
             ),

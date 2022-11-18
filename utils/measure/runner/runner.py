@@ -1,11 +1,15 @@
-from typing import Protocol
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Protocol
 
 
 class MeasurementRunner(Protocol):
-    def prepare(self) -> None:
+
+    def prepare(self, answers: dict[str, Any]) -> None:
         ...
 
-    def run(self, answers: dict) -> None:
+    def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         ...
 
     def get_questions(self) -> list[dict]:
@@ -13,3 +17,12 @@ class MeasurementRunner(Protocol):
 
     def measure_standby_power(self) -> float:
         ...
+
+    def get_export_directory(self) -> str:
+        ...
+
+
+@dataclass
+class RunnerResult:
+    model_json_data: dict
+    skip_model_json_generation: bool = False

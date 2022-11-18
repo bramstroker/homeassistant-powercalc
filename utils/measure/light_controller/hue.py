@@ -62,7 +62,8 @@ class HueLightController(LightController):
         
         return model_ids.pop()
 
-    def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
+    @staticmethod
+    def initialize_hue_bridge(bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(os.path.dirname(__file__), "../.persistent/.python_hue")
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
@@ -73,7 +74,7 @@ class HueLightController(LightController):
 
         return bridge
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
 
         def get_message(answers) -> str:
             if answers.get("multiple_lights"):

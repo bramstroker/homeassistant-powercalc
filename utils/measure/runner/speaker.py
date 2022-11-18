@@ -1,21 +1,19 @@
-from .runner import MeasurementRunner
+from .runner import MeasurementRunner, RunnerResult
 from measure_util import MeasureUtil
+from typing import Any
 import inquirer
 
+DURATION_PER_VOLUME_LEVEL = 20
 
 class SpeakerRunner(MeasurementRunner):
     def __init__(self):
         self.measure_util: MeasureUtil = MeasureUtil()
         pass
 
-    def prepare(self) -> None:
-        pass
-
-    def run(self, answers: dict) -> None:
+    def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         summary = {}
 
-        # @todo configurable duration
-        duration = 1
+        duration = DURATION_PER_VOLUME_LEVEL
         if inquirer.confirm(
                 'Ready to measure the standby-power? (Make sure your devices is in off or idle state in HA)',
                 default=True):
@@ -34,9 +32,14 @@ class SpeakerRunner(MeasurementRunner):
         for key in summary:
             print(key, ' : ', summary[key])
 
+        return RunnerResult(model_json_data={})
+
     def get_questions(self) -> list[dict]:
         return []
 
     def measure_standby_power(self) -> float:
         #todo implement
         return 0
+
+    def get_export_directory(self) -> str:
+        return "speaker"
