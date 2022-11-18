@@ -34,5 +34,4 @@ class LightControllerFactory:
         if factory is None:
             raise Exception(f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}")
 
-        _LOGGER.info(f"Selected Light controller: {config.SELECTED_LIGHT_CONTROLLER}")
         return factory()

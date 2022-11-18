@@ -66,5 +66,4 @@ class PowerMeterFactory:
         if factory is None:
             raise PowerMeterError(f"Could not find a factory for {config.SELECTED_POWER_METER}")
 
-        _LOGGER.info(f"Selected powermeter: {config.SELECTED_POWER_METER}")
         return factory()
