@@ -17,29 +17,22 @@ from pathlib import Path
 from typing import Any, Iterator, Optional
 
 import inquirer
-from decouple import Choices, UndefinedValueError, config
+import config
+from decouple import config as decouple_config
+from decouple import UndefinedValueError
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from light_controller.const import MODE_BRIGHTNESS, MODE_COLOR_TEMP, MODE_HS
 from light_controller.controller import LightController
-from light_controller.dummy import DummyLightController
+from light_controller.factory import LightControllerFactory
 from light_controller.errors import LightControllerError
-from light_controller.hass import HassLightController
-from light_controller.hue import HueLightController
-from powermeter.dummy import DummyPowerMeter
 from powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.hass import HassPowerMeter
-from powermeter.kasa import KasaPowerMeter
-from powermeter.manual import ManualPowerMeter
-from powermeter.ocr import OcrPowerMeter
 from powermeter.powermeter import PowerMeter, PowerMeasurementResult
-from powermeter.shelly import ShellyPowerMeter
-from powermeter.tasmota import TasmotaPowerMeter
-from powermeter.tuya import TuyaPowerMeter
+from powermeter.factory import PowerMeterFactory
 
 CSV_HEADERS = {
     MODE_HS: ["bri", "hue", "sat", "watt"],
@@ -47,113 +40,11 @@ CSV_HEADERS = {
     MODE_BRIGHTNESS: ["bri", "watt"],
 }
 
-MIN_BRIGHTNESS = min(max(
-    config(
-        "MIN_BRIGHTNESS",
-        default=config("START_BRIGHTNESS", default=1, cast=int),
-        cast=int
-    ), 1), 255
-)
-MAX_BRIGHTNESS = 255
-MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
-MAX_SAT = min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
-MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
-MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
-CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
-CT_MIRED_STEPS = min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
-BRI_BRI_STEPS = 1
-
-HS_BRI_PRECISION = config("HS_BRI_PRECISION", default=1, cast=float)
-HS_BRI_PRECISION = min(HS_BRI_PRECISION, 4)
-HS_BRI_PRECISION = max(HS_BRI_PRECISION, 0.5)
-HS_BRI_STEPS = round(32 / HS_BRI_PRECISION)
-del HS_BRI_PRECISION
-
-HS_HUE_PRECISION = config("HS_HUE_PRECISION", default=1, cast=float)
-HS_HUE_PRECISION = min(HS_HUE_PRECISION, 4)
-HS_HUE_PRECISION = max(HS_HUE_PRECISION, 0.5)
-HS_HUE_STEPS = round(2731 / HS_HUE_PRECISION)
-del HS_HUE_PRECISION
-
-HS_SAT_PRECISION = config("HS_SAT_PRECISION", default=1, cast=float)
-HS_SAT_PRECISION = min(HS_SAT_PRECISION, 4)
-HS_SAT_PRECISION = max(HS_SAT_PRECISION, 0.5)
-HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
-del HS_SAT_PRECISION
-
-POWER_METER_DUMMY = "dummy"
-POWER_METER_HASS = "hass"
-POWER_METER_KASA = "kasa"
-POWER_METER_MANUAL = "manual"
-POWER_METER_OCR = "ocr"
-POWER_METER_SHELLY = "shelly"
-POWER_METER_TASMOTA = "tasmota"
-POWER_METER_TUYA = "tuya"
-POWER_METERS = [
-    POWER_METER_DUMMY,
-    POWER_METER_HASS,
-    POWER_METER_KASA,
-    POWER_METER_MANUAL,
-    POWER_METER_OCR,
-    POWER_METER_SHELLY,
-    POWER_METER_TASMOTA,
-    POWER_METER_TUYA,
-]
-
-SELECTED_POWER_METER = config("POWER_METER", cast=Choices(POWER_METERS))
-
-LIGHT_CONTROLLER_DUMMY = "dummy"
-LIGHT_CONTROLLER_HUE = "hue"
-LIGHT_CONTROLLER_HASS = "hass"
-LIGHT_CONTROLLERS = [
-    LIGHT_CONTROLLER_DUMMY,
-    LIGHT_CONTROLLER_HUE,
-    LIGHT_CONTROLLER_HASS
-]
-
-SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER", cast=Choices(LIGHT_CONTROLLERS))
-
-LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
-SLEEP_INITIAL = 10
-SLEEP_STANDBY = config("SLEEP_STANDBY", default=20, cast=int)
-SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
-SLEEP_TIME_SAMPLE = config("SLEEP_TIME_SAMPLE", default=1, cast=int)
-SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
-SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
-SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
-SLEEP_TIME_NUDGE = config("SLEEP_TIME_NUDGE", default=10, cast=float)
-PULSE_TIME_NUDGE = config("PULSE_TIME_NUDGE", default=2, cast=float)
-MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
-MAX_NUDGES = config("MAX_NUDGES", default=0, cast=int)
-SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
-
-SHELLY_IP = config("SHELLY_IP")
-SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
-TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
-TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
-TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
-TUYA_DEVICE_VERSION = config("TUYA_DEVICE_VERSION", default="3.3")
-HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
-HASS_URL = config("HASS_URL")
-HASS_TOKEN = config("HASS_TOKEN")
-HASS_CALL_UPDATE_ENTITY_SERVICE = config("HASS_CALL_UPDATE_ENTITY_SERVICE", default=False, cast=bool)
-TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
-KASA_DEVICE_IP = config("KASA_DEVICE_IP")
-
-CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
-
-# Change some settings when selected power meter is manual
-if SELECTED_POWER_METER == POWER_METER_MANUAL:
-    SAMPLE_COUNT = 1
-    BRI_BRI_STEPS = 3
-    CT_BRI_STEPS = 15
-    CT_MIRED_STEPS = 50
-
 CSV_WRITE_BUFFER = 50
 MAX_ALLOWED_0_READINGS = 50
 
 logging.basicConfig(
-    level=logging.getLevelName(LOG_LEVEL),
+    level=logging.getLevelName(config.LOG_LEVEL),
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(os.path.join(sys.path[0], "measure.log")),
@@ -302,8 +193,8 @@ class Measure:
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
-            _LOGGER.info(f"Waiting {SLEEP_INITIAL} seconds...")
-            time.sleep(SLEEP_INITIAL)
+            _LOGGER.info(f"Waiting {config.SLEEP_INITIAL} seconds...")
+            time.sleep(config.SLEEP_INITIAL)
 
             previous_variation = None
             for count, variation in enumerate(variations):
@@ -319,21 +210,21 @@ class Measure:
 
                 if previous_variation and isinstance(variation, ColorTempVariation) and variation.ct < previous_variation.ct:
                     _LOGGER.info("Extra waiting for significant CT change...")
-                    time.sleep(SLEEP_TIME_CT)
+                    time.sleep(config.SLEEP_TIME_CT)
 
                 if previous_variation and isinstance(variation, HsVariation) and variation.sat < previous_variation.sat:
                     _LOGGER.info("Extra waiting for significant SAT change...")
-                    time.sleep(SLEEP_TIME_SAT)
+                    time.sleep(config.SLEEP_TIME_SAT)
 
                 if previous_variation and isinstance(variation, HsVariation) and variation.hue < previous_variation.hue:
                     _LOGGER.info("Extra waiting for significant HUE change...")
-                    time.sleep(SLEEP_TIME_HUE)
+                    time.sleep(config.SLEEP_TIME_HUE)
 
                 previous_variation = variation
-                time.sleep(SLEEP_TIME)
+                time.sleep(config.SLEEP_TIME)
                 try:
                     power = self.take_power_measurement(variation_start_time)
-                except OutdatedMeasurementError as error:
+                except OutdatedMeasurementError:
                     power = self.nudge_and_remeasure(self.color_mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
@@ -359,19 +250,19 @@ class Measure:
 
     def nudge_and_remeasure(self, color_mode: str, variation: Variation):
         nudge_count = 0
-        for nudge_count in range(MAX_NUDGES):
+        for nudge_count in range(config.MAX_NUDGES):
             try:
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")
                 # If brightness is low, set brightness high. Else, turn light off
                 self.light_controller.change_light_state(MODE_BRIGHTNESS, on=(variation.bri < 128), bri=255)
-                time.sleep(PULSE_TIME_NUDGE)
+                time.sleep(config.PULSE_TIME_NUDGE)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
                     color_mode, on=True, **asdict(variation)
                 )
                 # Wait a longer amount of time for the PM to settle
-                time.sleep(SLEEP_TIME_NUDGE)
+                time.sleep(config.SLEEP_TIME_NUDGE)
                 power = self.take_power_measurement(variation_start_time)
                 return power
             except OutdatedMeasurementError:
@@ -425,13 +316,13 @@ class Measure:
             if len(list(rows)) == 1:
                 return False 
 
-        try:
-            return config("RESUME", cast=bool)
-        except UndefinedValueError:
+        should_resume = config.RESUME
+        if should_resume is None:
             return inquirer.confirm(
                 message="CSV File already exists. Do you want to resume measurements?",
                 default=True
             )
+        return should_resume
 
     def get_resume_variation(self, csv_file_path: str) -> Variation | None:
         """This method returns the variation to resume at.
@@ -485,7 +376,7 @@ class Measure:
         """Request a power reading from the configured power meter"""
         measurements = []
         # Take multiple samples to reduce noise
-        for i in range(1, SAMPLE_COUNT + 1):
+        for i in range(1, config.SAMPLE_COUNT + 1):
             _LOGGER.debug(f"Taking sample {i}")
             error = None
             measurement: PowerMeasurementResult | None = None
@@ -499,7 +390,7 @@ class Measure:
             if measurement:
                 # Check if measurement is not outdated
                 if measurement.updated < start_timestamp:
-                    error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {MAX_RETRIES} successive retries")
+                    error = OutdatedMeasurementError(f"Power measurement is outdated. Aborting after {config.MAX_RETRIES} successive retries")
 
                 # Check if we not have a 0 measurument
                 if measurement.power == 0:
@@ -507,15 +398,15 @@ class Measure:
 
             if error:
                 # Prevent endless recursion. Throw error when max retries is reached
-                if retry_count == MAX_RETRIES:
+                if retry_count == config.MAX_RETRIES:
                     raise error
                 retry_count += 1
-                time.sleep(SLEEP_TIME)
+                time.sleep(config.SLEEP_TIME)
                 return self.take_power_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
-            if SAMPLE_COUNT > 1:
-                time.sleep(SLEEP_TIME_SAMPLE)
+            if config.SAMPLE_COUNT > 1:
+                time.sleep(config.SLEEP_TIME_SAMPLE)
 
         # Determine Average PM reading
         value = sum(measurements) / len(measurements)
@@ -540,8 +431,8 @@ class Measure:
         """Measures the standby power (when the light is OFF)"""
         self.light_controller.change_light_state(MODE_BRIGHTNESS, on=False)
         start_time = time.time()
-        _LOGGER.info(f"Measuring standby power. Waiting for {SLEEP_STANDBY} seconds...")
-        time.sleep(SLEEP_STANDBY)
+        _LOGGER.info(f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds...")
+        time.sleep(config.SLEEP_STANDBY)
         try:
             return self.take_power_measurement(start_time)
         except OutdatedMeasurementError:
@@ -576,20 +467,20 @@ class Measure:
         """Get color_temp variations"""
         min_mired = round(self.light_info.min_mired)
         max_mired = round(self.light_info.max_mired)
-        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, CT_BRI_STEPS):
-            for mired in self.inclusive_range(min_mired, max_mired, CT_MIRED_STEPS):
+        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS):
+            for mired in self.inclusive_range(min_mired, max_mired, config.CT_MIRED_STEPS):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
         """Get hue/sat variations"""
-        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, HS_BRI_STEPS):
-            for sat in self.inclusive_range(MIN_SAT, MAX_SAT, HS_SAT_STEPS):
-                for hue in self.inclusive_range(MIN_HUE, MAX_HUE, HS_HUE_STEPS):
+        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS):
+            for sat in self.inclusive_range(config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS):
+                for hue in self.inclusive_range(config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
         """Get brightness variations"""
-        for bri in self.inclusive_range(MIN_BRIGHTNESS, MAX_BRIGHTNESS, BRI_BRI_STEPS):
+        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS):
             yield Variation(bri=bri)
 
     @staticmethod
@@ -611,20 +502,20 @@ class Measure:
 
         time_left = 0
         if progress == 0:
-            time_left += SLEEP_STANDBY + SLEEP_INITIAL
-        time_left += num_variations_left * (SLEEP_TIME + estimated_step_delay)
-        if SAMPLE_COUNT > 1:
-            time_left += num_variations_left * SAMPLE_COUNT * (SLEEP_TIME_SAMPLE + estimated_step_delay)
+            time_left += config.SLEEP_STANDBY + config.SLEEP_INITIAL
+        time_left += num_variations_left * (config.SLEEP_TIME + estimated_step_delay)
+        if config.SAMPLE_COUNT > 1:
+            time_left += num_variations_left * config.SAMPLE_COUNT * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
 
         if isinstance(current_variation, HsVariation):
-            sat_steps_left = round((MAX_BRIGHTNESS - current_variation.bri) / HS_BRI_STEPS) - 1
-            time_left += sat_steps_left * SLEEP_TIME_SAT
-            hue_steps_left = round(MAX_HUE / HS_HUE_STEPS * sat_steps_left)
-            time_left += hue_steps_left * SLEEP_TIME_HUE
+            sat_steps_left = round((config.MAX_BRIGHTNESS - current_variation.bri) / config.HS_BRI_STEPS) - 1
+            time_left += sat_steps_left * config.SLEEP_TIME_SAT
+            hue_steps_left = round(config.MAX_HUE / config.HS_HUE_STEPS * sat_steps_left)
+            time_left += hue_steps_left * config.SLEEP_TIME_HUE
 
         if isinstance(current_variation, ColorTempVariation):
-            ct_steps_left = round((MAX_BRIGHTNESS - current_variation.bri) / CT_BRI_STEPS) - 1
-            time_left += ct_steps_left * SLEEP_TIME_CT
+            ct_steps_left = round((config.MAX_BRIGHTNESS - current_variation.bri) / config.CT_BRI_STEPS) - 1
+            time_left += ct_steps_left * config.SLEEP_TIME_CT
 
         if time_left > 3600:
             formatted_time = f"{round(time_left / 3600, 1)}h"
@@ -647,8 +538,8 @@ class Measure:
                 "measure_description": "Measured with utils/measure script",
                 "measure_settings": {
                     "VERSION": _VERSION,
-                    "SAMPLE_COUNT": SAMPLE_COUNT,
-                    "SLEEP_TIME": SLEEP_TIME
+                    "SAMPLE_COUNT": config.SAMPLE_COUNT,
+                    "SLEEP_TIME": config.SLEEP_TIME
                 },
                 "name": name,
                 "standby_power": standby_power,
@@ -727,7 +618,7 @@ class Measure:
             question_name = str(question.name)
             env_var = question_name.upper()
             if config_key_exists(env_var):
-                conf_value = config(env_var)
+                conf_value = decouple_config(env_var)
                 if isinstance(question, inquirer.Confirm):
                     conf_value = bool(str_to_bool(conf_value))
                 predefined_answers[question_name] = conf_value
@@ -756,7 +647,7 @@ class Measure:
             result = self.power_meter.get_power()
             values.append(result.power)
             _LOGGER.info(f"Dummy load watt: {result.power}")
-            time.sleep(SLEEP_TIME)
+            time.sleep(config.SLEEP_TIME)
         average = sum(values) / len(values)
 
         with open(file_path, "w") as f:
@@ -774,7 +665,7 @@ class Measure:
             power = self.power_meter.get_power().power
             _LOGGER.info(f"Measured power: {power}")
             readings.append(power)
-            time.sleep(SLEEP_TIME)
+            time.sleep(config.SLEEP_TIME)
         average = round(sum(readings) / len(readings), 2)
         _LOGGER.info(f"Average power: {average}")
         return average
@@ -787,7 +678,7 @@ class CsvWriter:
         self.rows_written = 0
         if add_header:
             header_row = CSV_HEADERS[color_mode]
-            if CSV_ADD_DATETIME_COLUMN:
+            if config.CSV_ADD_DATETIME_COLUMN:
                 header_row.append("time")
             self.writer.writerow(header_row)
     
@@ -795,7 +686,7 @@ class CsvWriter:
         """Write row with measurement to the CSV"""
         row = variation.to_csv_row()
         row.append(power)
-        if CSV_ADD_DATETIME_COLUMN:
+        if config.CSV_ADD_DATETIME_COLUMN:
             row.append(dt.now().strftime("%Y%m%d%H%M%S"))
         self.writer.writerow(row)
         self.rows_written += 1
@@ -807,7 +698,7 @@ class CsvWriter:
 def config_key_exists(key: str) -> bool:
     """Check whether a certain configuration exists in dot env file"""
     try:
-        config(key)
+        decouple_config(key)
         return True
     except UndefinedValueError:
         return False
@@ -859,78 +750,6 @@ class ColorTempVariation(Variation):
     
     def is_ct_changed(self, other_variation: ColorTempVariation):
         return self.ct != other_variation.ct
-
-
-class LightControllerFactory:
-    def hass(self):
-        return HassLightController(HASS_URL, HASS_TOKEN)
-
-    def hue(self):
-        return HueLightController(HUE_BRIDGE_IP)
-
-    def dummy(self):
-        return DummyLightController()
-
-    def create(self) -> LightController:
-        """Create the light controller object"""
-        factories = {
-            LIGHT_CONTROLLER_DUMMY: self.dummy,
-            LIGHT_CONTROLLER_HUE: self.hue,
-            LIGHT_CONTROLLER_HASS: self.hass
-        }
-        factory = factories.get(SELECTED_LIGHT_CONTROLLER)
-        if factory is None:
-            raise Exception(f"Could not find a factory for {SELECTED_LIGHT_CONTROLLER}")
-
-        _LOGGER.info(f"Selected Light controller: {SELECTED_LIGHT_CONTROLLER}")
-        return factory()
-
-
-class PowerMeterFactory:
-    def dummy(self):
-        return DummyPowerMeter()
-
-    def hass(self):
-        return HassPowerMeter(HASS_URL, HASS_TOKEN, HASS_CALL_UPDATE_ENTITY_SERVICE)
-
-    def kasa(self):
-        return KasaPowerMeter(KASA_DEVICE_IP)
-    
-    def manual(self):
-        return ManualPowerMeter()
-    
-    def ocr(self):
-        return OcrPowerMeter()
-
-    def shelly(self):
-        return ShellyPowerMeter(SHELLY_IP, SHELLY_TIMEOUT)
-
-    def tasmota(self):
-        return TasmotaPowerMeter(TASMOTA_DEVICE_IP)
-
-    def tuya(self):
-        return TuyaPowerMeter(
-            TUYA_DEVICE_ID, TUYA_DEVICE_IP, TUYA_DEVICE_KEY, TUYA_DEVICE_VERSION
-        )
-
-    def create(self) -> PowerMeter:
-        """Create the power meter object"""
-        factories = {
-            POWER_METER_HASS: self.hass,
-            POWER_METER_KASA: self.kasa,
-            POWER_METER_MANUAL: self.manual,
-            POWER_METER_OCR: self.ocr,
-            POWER_METER_SHELLY: self.shelly,
-            POWER_METER_TASMOTA: self.tasmota,
-            POWER_METER_TUYA: self.tuya,
-            POWER_METER_DUMMY: self.dummy
-        }
-        factory = factories.get(SELECTED_POWER_METER)
-        if factory is None:
-            raise PowerMeterError(f"Could not find a factory for {SELECTED_POWER_METER}")
-
-        _LOGGER.info(f"Selected powermeter: {SELECTED_POWER_METER}")
-        return factory()
 
 
 def main():
