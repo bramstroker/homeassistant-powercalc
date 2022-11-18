@@ -5,6 +5,7 @@ import inquirer
 
 DURATION_PER_VOLUME_LEVEL = 20
 
+
 class SpeakerRunner(MeasurementRunner):
     def __init__(self):
         self.measure_util: MeasureUtil = MeasureUtil()

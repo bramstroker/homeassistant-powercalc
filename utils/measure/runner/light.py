@@ -8,25 +8,22 @@ import shutil
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
-from io import TextIOWrapper
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator, Optional, TextIO
+from pathlib import Path
 import re
 
 import inquirer
 import config
-from light_controller.controller import LightController, LightInfo
+from light_controller.controller import LightInfo
 from light_controller.factory import LightControllerFactory
-from light_controller.errors import LightControllerError
 from light_controller.const import ColorMode
 from powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.powermeter import PowerMeter, PowerMeasurementResult
 from powermeter.factory import PowerMeterFactory
-from runner.runner import MeasurementRunner, RunnerResult
-from runner.speaker import SpeakerRunner
+from .runner import MeasurementRunner, RunnerResult
 from measure_util import MeasureUtil
 
 CSV_HEADERS = {
@@ -42,11 +39,25 @@ _LOGGER = logging.getLogger("measure")
 
 
 class LightRunner(MeasurementRunner):
+    """
+    This class is responsible for measuring the power usage of a light. It uses a LightController to control the light, and a PowerMeter
+    to measure the power usage. The measurements are exported as CSV files in export/<model_id>/<color_mode>.csv (or .csv.gz). The
+    model_id is retrieved from the LightController and color mode can be selected by user input or config file (.env). The CSV files
+    contain one row per variation, where each column represents one property of that variation (e.g., brightness, hue, saturation). The last
+    column contains the measured power value in watt.
+    If you want to generate model JSON files for the LUT model, you can do so by answering yes to the question "Do you want to generate
+    model.json?".
+
+    # CSV file export/<model-id>/hs.csv will be created with measurements for HS
+    color mode (e.g., hue and saturation). The last column contains the measured
+    power value in watt.
+    """
+
     def __init__(self):
         self.light_controller = LightControllerFactory().create()
         self.measure_util: MeasureUtil = MeasureUtil()
         self.power_meter = PowerMeterFactory().create()
-        self.color_mode: str | None = None
+        self.color_mode: ColorMode | None = None
         self.num_lights: int = 1
         self.is_dummy_load_connected: bool = False
         self.dummy_load_value: float = 0
@@ -68,6 +79,7 @@ class LightRunner(MeasurementRunner):
         return f"{self.light_info.model_id}"
 
     def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
+        """Run the measurement session for lights"""
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
 
         resume_at = None
@@ -181,7 +193,7 @@ class LightRunner(MeasurementRunner):
         input("Connect your light now and press enter to start measuring..")
         return average
 
-    def get_variations(self, color_mode: str, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
+    def get_variations(self, color_mode: ColorMode, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
         """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == ColorMode.HS:
             variations = self.get_hs_variations()
@@ -427,6 +439,7 @@ class LightRunner(MeasurementRunner):
             return 0
 
     def get_questions(self) -> list[inquirer.questions.Question]:
+        """Get questions to ask for the light runner"""
         questions = [
             inquirer.List(
                 name="color_mode",
@@ -495,7 +508,7 @@ class ColorTempVariation(Variation):
 
 
 class CsvWriter:
-    def __init__(self, csv_file: TextIOWrapper, color_mode: str, add_header: bool):
+    def __init__(self, csv_file: TextIO, color_mode: ColorMode, add_header: bool):
         self.csv_file = csv_file
         self.writer = csv.writer(csv_file)
         self.rows_written = 0

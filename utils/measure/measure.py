@@ -13,7 +13,6 @@ from decouple import config as decouple_config
 from decouple import UndefinedValueError
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
-from light_controller.controller import LightController
 from light_controller.errors import LightControllerError
 from powermeter.errors import (
     PowerMeterError,
@@ -24,6 +23,8 @@ from runner.runner import MeasurementRunner
 from runner.light import LightRunner
 from runner.speaker import SpeakerRunner
 from measure_util import MeasureUtil
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 logging.basicConfig(
     level=logging.getLevelName(config.LOG_LEVEL),
@@ -49,44 +50,17 @@ with open(os.path.join(sys.path[0], ".VERSION"), "r") as f:
 
 
 class Measure:
-    """Measure the power usage of a light.
+    """
+    Main class to measure the power usage of a device.
 
-    This class is responsible for measuring the power usage of a light. It uses a LightController to control the light, and a PowerMeter
-    to measure the power usage. The measurements are exported as CSV files in export/<model_id>/<color_mode>.csv (or .csv.gz). The
-    model_id is retrieved from the LightController and color mode can be selected by user input or config file (.env). The CSV files
-    contain one row per variation, where each column represents one property of that variation (e.g., brightness, hue, saturation). The last
-    column contains the measured power value in watt.
-    If you want to generate model JSON files for the LUT model, you can do so by answering yes to the question "Do you want to generate
-    model.json?".
-
-    Example
-    -------
-    
-    >>> from light_controller import LightController
-    >>> from power_meter import PowerMeter
-
-    >>> light_controller = LightController()
-    >>> power_meter = PowerMeter()
-
-    >>> measure = Measure(light_controller, power_meter)
-    >>> measure.start()
-
-    # CSV file export/<model-id>/hs.csv will be created with measurements for HS
-    color mode (e.g., hue and saturation). The last column contains the measured
-    power value in watt.
-
-    # If you answered yes to generating a model JSON file, a model.json will be
-    created in export/<model-id>
-    
+    If you answered yes to generating a model JSON file, a model.json will be created in export/<model-id>
     """
 
     def __init__(self, power_meter: PowerMeter) -> None:
-        """This class measures the power consumption of the light bulb.
+        """This class measures the power consumption of a device.
 
         Parameters
         ----------
-        light_controller : LightController
-            The light controller to use.
         power_meter : PowerMeter
             The power meter to use.
         """
@@ -98,16 +72,8 @@ class Measure:
     def start(self) -> None:
         """Starts the measurement session.
 
-        This method asks the user for the required information, sets up the light controller and power meter and starts the measurement
+        This method asks the user for the required information, sets up the runner and power meter and starts the measurement
         session.
-
-        Raises
-        ------
-        PowerMeterError
-            If the power meter is not connected.
-
-        ZeroReadingError
-            If the power meter returns a 0 reading.
 
         Notes
         -----
@@ -156,6 +122,7 @@ class Measure:
                 standby_power=standby_power,
                 name=answers["model_name"],
                 measure_device=answers["measure_device"],
+                extra_json_data=runner_result.model_json_data
             )
 
         _LOGGER.info(f"Measurement session finished. Files exported to {export_directory}")
@@ -176,7 +143,6 @@ class Measure:
             },
             "name": name,
             "standby_power": standby_power,
-            "supported_modes": ["lut"],
         }
         if extra_json_data:
             json_data.update(extra_json_data)
@@ -191,7 +157,11 @@ class Measure:
         json_file.close()
 
     def get_questions(self) -> list[Question]:
-        """Build list of questions to ask"""
+        """
+        Build list of questions to ask.
+        Returns generic questions which are asked regardless of the choosen device type
+        Additionally the configured runner and power_meter can also provide further questions
+        """
         questions = [
             inquirer.Confirm(
                 name="generate_model_json",
@@ -218,7 +188,10 @@ class Measure:
         return questions
 
     def ask_questions(self) -> dict[str, Any]:
-        """Ask question and return a dictionary with the answers"""
+        """
+        Ask question and return a dictionary with the answers.
+        It will also check if any predefined answers are defined in .env, and will skip asking these
+        """
         all_questions = self.get_questions()
 
         # Only ask questions which answers are not predefined in .env file
@@ -267,6 +240,7 @@ def str_to_bool(value: Any) -> bool:
 class RunnerFactory:
     @staticmethod
     def create_runner(device_type: DeviceType) -> MeasurementRunner:
+        """Creates a runner instance based on selected device type"""
         if device_type == DeviceType.LIGHT:
             return LightRunner()
         if device_type == DeviceType.SPEAKER:

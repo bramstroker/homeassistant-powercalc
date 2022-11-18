@@ -51,16 +51,6 @@ SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
 SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
 SLEEP_TIME_NUDGE = config("SLEEP_TIME_NUDGE", default=10, cast=float)
 
-# @todo. Temporary / remove
-SLEEP_INITIAL = 1
-SLEEP_STANDBY = 1
-SLEEP_TIME = 0
-SLEEP_TIME_SAMPLE = 0
-SLEEP_TIME_HUE = 0
-SLEEP_TIME_SAT = 0
-SLEEP_TIME_CT = 0
-SLEEP_TIME_NUDGE = 0
-
 PULSE_TIME_NUDGE = config("PULSE_TIME_NUDGE", default=2, cast=float)
 MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
 MAX_NUDGES = config("MAX_NUDGES", default=0, cast=int)

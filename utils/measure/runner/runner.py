@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from inquirer.questions import Question
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -12,7 +13,7 @@ class MeasurementRunner(Protocol):
     def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         ...
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[Question]:
         ...
 
     def measure_standby_power(self) -> float:
