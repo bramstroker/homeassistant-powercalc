@@ -45,7 +45,7 @@ class HassMediaController:
             ),
             inquirer.Text(
                 name="media_player_model_id",
-                message="What model is your media player? Ex: ..",
+                message="What model is your media player? Ex: Sonos One SL",
                 validate=lambda _, x: len(x) > 0,
             )
         ]
