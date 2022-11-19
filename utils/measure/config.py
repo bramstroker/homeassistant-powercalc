@@ -1,6 +1,7 @@
 import logging
 from decouple import Choices, UndefinedValueError, config
 from light_controller.const import LightControllerType
+from media_controller.const import MediaControllerType
 from powermeter.const import PowerMeterType
 
 MIN_BRIGHTNESS = min(max(
@@ -38,7 +39,7 @@ HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
 del HS_SAT_PRECISION
 
 SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER", cast=Choices([t.value for t in LightControllerType]))
-
+SELECTED_MEDIA_CONTROLLER = config("MEDIA_CONTROLLER", cast=Choices([t.value for t in MediaControllerType]), default=MediaControllerType.HASS)
 SELECTED_POWER_METER = config("POWER_METER", cast=Choices([t.value for t in PowerMeterType]))
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)

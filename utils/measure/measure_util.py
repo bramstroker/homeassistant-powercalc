@@ -28,7 +28,7 @@ class MeasureUtil:
         _LOGGER.info(f"Average power: {average}")
         return average
 
-    def take_measurement(self, start_timestamp: float, retry_count: int = 0) -> float:
+    def take_measurement(self, start_timestamp: float | None = None, retry_count: int = 0) -> float:
         """Get a measurement from the powermeter, take multiple samples and calculate the average"""
         measurements = []
         # Take multiple samples to reduce noise
