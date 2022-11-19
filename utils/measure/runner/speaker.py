@@ -9,7 +9,7 @@ import time
 import logging
 import config
 
-DURATION_PER_VOLUME_LEVEL = 2
+DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://assets.ctfassets.net/4zjnzn055a4v/5d3omOpQeliAWkVm1QmZBj/308d35fbb226a4643aeb7b132949dbd3/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
 
