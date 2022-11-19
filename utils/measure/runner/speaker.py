@@ -12,6 +12,7 @@ import config
 DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://assets.ctfassets.net/4zjnzn055a4v/5d3omOpQeliAWkVm1QmZBj/308d35fbb226a4643aeb7b132949dbd3/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
+SLEEP_MUTE = 5
 
 _LOGGER = logging.getLogger("measure")
 
@@ -27,7 +28,6 @@ class SpeakerRunner(MeasurementRunner):
 
     def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
         summary = {}
-
         duration = DURATION_PER_VOLUME_LEVEL
 
         print(
@@ -42,6 +42,10 @@ class SpeakerRunner(MeasurementRunner):
             self.media_controller.play_audio(STREAM_URL)
             time.sleep(SLEEP_PRE_MEASURE)
             summary[volume] = self.measure_util.take_average_measurement(duration)
+
+        _LOGGER.info(f"Muting volume and waiting for {SLEEP_MUTE} seconds")
+        time.sleep(SLEEP_MUTE)
+        summary[0] = self.measure_util.take_average_measurement(duration)
 
         print('Summary of all average measurements:')
         for volume in summary:
@@ -65,7 +69,6 @@ class SpeakerRunner(MeasurementRunner):
                 "calibrate": calibrate_list
             },
         }
-
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return self.media_controller.get_questions()

@@ -6,6 +6,9 @@ class DummyMediaController:
     def set_volume(self, volume: int) -> None:
         pass
 
+    def mute_volume(self) -> None:
+        pass
+
     def play_audio(self, stream_url: str) -> None:
         pass
 

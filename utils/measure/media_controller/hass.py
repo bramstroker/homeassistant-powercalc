@@ -2,18 +2,23 @@ from homeassistant_api import Client
 from typing import Any
 import inquirer
 
+from media_controller.errors import MediaPlayerError
+
 
 class HassMediaController:
     def __init__(self, api_url: str, token: str):
         self._entity_id: str | None = None
         self._model_id: str | None = None
-        #try:
-        self.client = Client(api_url, token, global_request_kwargs={"verify": False})
-        #except Exception as e:
-            #raise LightControllerError(f"Failed to connect to HA API: {e}")
+        try:
+            self.client = Client(api_url, token, global_request_kwargs={"verify": False})
+        except Exception as e:
+            raise MediaPlayerError(f"Failed to connect to HA API: {e}")
 
     def set_volume(self, volume: int) -> None:
-        self.client.trigger_service('media_player', 'volume_set', entity_id=self._entity_id, volume_level=round(volume/100, 2))
+        self.client.trigger_service("media_player", "volume_set", entity_id=self._entity_id, volume_level=round(volume/100, 2))
+
+    def mute_volume(self) -> None:
+        self.client.trigger_service("media_player", "mute_volume")
 
     def play_audio(self, stream_url: str) -> None:
         self.client.trigger_service(

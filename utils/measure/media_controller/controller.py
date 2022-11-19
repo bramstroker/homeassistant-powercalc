@@ -6,6 +6,9 @@ class MediaController(Protocol):
     def set_volume(self, volume: int) -> None:
         ...
 
+    def mute_volume(self) -> None:
+        ...
+
     def play_audio(self, stream_url: str) -> None:
         ...
 
