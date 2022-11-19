@@ -29,7 +29,7 @@ class HassPowerMeter(PowerMeter):
         last_updated = parse(state.get("last_updated")).timestamp()
         return PowerMeasurementResult(float(state.get("state")), last_updated)
 
-    def get_questions(self) -> list[Question]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
         power_sensor_list = self.get_power_sensors()
 
         return [

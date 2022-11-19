@@ -24,8 +24,8 @@ class MediaControllerFactory:
             MediaControllerType.DUMMY: self.dummy,
             MediaControllerType.HASS: self.hass
         }
-        factory = factories.get(config.SELECTED_LIGHT_CONTROLLER)
+        factory = factories.get(config.SELECTED_MEDIA_CONTROLLER)
         if factory is None:
-            raise Exception(f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}")
+            raise Exception(f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}")
 
         return factory()
