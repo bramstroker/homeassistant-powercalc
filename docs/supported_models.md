@@ -1,5 +1,5 @@
 - [Lights](#Lights) (193)
-- [Smart speakers](#Smart-speakers) (10)
+- [Smart speakers](#Smart-speakers) (11)
 - [Smart switches](#Smart-switches) (22)
 
 ## Lights
@@ -202,7 +202,7 @@
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
-#### 10 total
+#### 11 total
 
 |manufacturer |            model id             |                  name                  |calculation modes|        aliases         |
 |-------------|---------------------------------|----------------------------------------|-----------------|------------------------|
@@ -214,6 +214,7 @@
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                        |
 |sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
 |sonos        |one sl                           |Sonos One SL                            |linear           |                        |
+|sonos        |play 3                           |Sonos Play:3                            |linear           |Play:3                  |
 |sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |linear           |IKEA SYMFONISK Bookshelf|
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |linear           |SYMFONISK Picture frame |
 
