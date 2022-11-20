@@ -11,6 +11,7 @@
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "linear_config": {
         "calibrate": [
+            "0 -> 3.48",
             "10 -> 5.28",
             "20 -> 5.38",
             "30 -> 5.46",
