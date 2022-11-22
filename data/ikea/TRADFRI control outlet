@@ -2,7 +2,7 @@
  	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
  	"measure_method": "manual",
  	"measure_device": "Shelly Plug S",
- 	"name": "Ikea Wall plug",
+ 	"name": "TRADFRI control outlet",
  	"standby_power": 0.4,
  	"sensor_config": {
  		"power_sensor_naming": "{} Device Power",
