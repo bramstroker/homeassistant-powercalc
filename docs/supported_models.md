@@ -1,6 +1,6 @@
 - [Lights](#Lights) (193)
 - [Smart speakers](#Smart-speakers) (11)
-- [Smart switches](#Smart-switches) (22)
+- [Smart switches](#Smart-switches) (23)
 
 ## Lights
 #### 193 total
@@ -219,29 +219,30 @@
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |linear           |SYMFONISK Picture frame |
 
 ## Smart switches
-#### 22 total
+#### 23 total
 
-|manufacturer|    model id    |                                       name                                        |calculation modes| aliases  |
-|------------|----------------|-----------------------------------------------------------------------------------|-----------------|----------|
-|arlec       |PC191HA         |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |fixed            |          |
-|arlec       |PC192HA         |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |fixed            |          |
-|arlec       |PC287HA         |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|fixed            |          |
-|blitzwolf   |SHP6            |Blitzwolf BW-SHP6 version 10A                                                      |fixed            |          |
-|blitzwolf   |SHP6-15A        |Blitzwolf BW-SHP6 version 15A                                                      |fixed            |          |
-|everspring  |AN158           |Everspring AN158                                                                   |fixed            |          |
-|fibaro      |FGWP102         |Fibaro FGWP102                                                                     |fixed            |          |
-|greenwave   |GWPN1           |Greenwave GWPN1                                                                    |fixed            |          |
-|innr        |SP 120          |Innr Zigbee Smart Plug                                                             |fixed            |          |
-|innr        |SP 224          |Innr Zigbee Smart Plug                                                             |fixed            |          |
-|neo-coolcam |NAS-WR01Z       |Smart Power Plug                                                                   |fixed            |          |
-|nodon       |Micro Smart Plug|NodOn Micro Smart Plug                                                             |fixed            |MSP-3-1-X1|
-|osram       |LIGHTIFY Plug 01|Osram Lightify Plug 01                                                             |fixed            |          |
-|qubino      |Smart Plug 16A  |Qubino Smart Plug 16A                                                              |fixed            |          |
-|shelly      |shelly plug s   |Shelly Plug S                                                                      |fixed            |          |
-|signify     |LOM001          |Hue smart plug LOM001                                                              |fixed            |          |
-|signify     |LOM002          |Hue smart plug LOM002                                                              |fixed            |          |
-|signify     |LOM007          |Hue smart plug LOM007                                                              |fixed            |          |
-|tp-link     |HS100           |HS100                                                                              |fixed            |          |
-|tp-link     |HS110           |HS110                                                                              |fixed            |          |
-|tp-link     |KP115           |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |KP115(AU) |
-|tp-link     |P100            |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |fixed            |          |
+|manufacturer|       model id       |                                       name                                        |calculation modes| aliases  |
+|------------|----------------------|-----------------------------------------------------------------------------------|-----------------|----------|
+|arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |fixed            |          |
+|arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |fixed            |          |
+|arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|fixed            |          |
+|blitzwolf   |SHP6                  |Blitzwolf BW-SHP6 version 10A                                                      |fixed            |          |
+|blitzwolf   |SHP6-15A              |Blitzwolf BW-SHP6 version 15A                                                      |fixed            |          |
+|everspring  |AN158                 |Everspring AN158                                                                   |fixed            |          |
+|fibaro      |FGWP102               |Fibaro FGWP102                                                                     |fixed            |          |
+|greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |fixed            |          |
+|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |fixed            |          |
+|innr        |SP 120                |Innr Zigbee Smart Plug                                                             |fixed            |          |
+|innr        |SP 224                |Innr Zigbee Smart Plug                                                             |fixed            |          |
+|neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |fixed            |          |
+|nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |fixed            |MSP-3-1-X1|
+|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |fixed            |          |
+|qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |fixed            |          |
+|shelly      |shelly plug s         |Shelly Plug S                                                                      |fixed            |          |
+|signify     |LOM001                |Hue smart plug LOM001                                                              |fixed            |          |
+|signify     |LOM002                |Hue smart plug LOM002                                                              |fixed            |          |
+|signify     |LOM007                |Hue smart plug LOM007                                                              |fixed            |          |
+|tp-link     |HS100                 |HS100                                                                              |fixed            |          |
+|tp-link     |HS110                 |HS110                                                                              |fixed            |          |
+|tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |fixed            |KP115(AU) |
+|tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |fixed            |          |
