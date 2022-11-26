@@ -577,10 +577,8 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     config_entry_group = hass.config_entries.async_get_entry(
         config_entry_group.entry_id
     )
-    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
-        config_entry_sensor1.entry_id,
-        config_entry_sensor2.entry_id,
-    ]
+    assert config_entry_sensor1.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
+    assert config_entry_sensor2.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
 
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state
@@ -605,6 +603,55 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     assert group_state.attributes.get("entities") == {
         "sensor.virtualsensor1_power",
     }
+
+
+async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(hass: HomeAssistant):
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1298"""
+
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_sensor = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="xyz",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "xyz",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: config_entry_group.entry_id
+        },
+        title="Test",
+    )
+
+    config_entry_sensor.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        config_entry_group,
+        data={**config_entry_group.data, CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id]},
+    )
+    await hass.async_block_till_done()
+    assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
+
+    # Trigger a reload
+    assert await hass.config_entries.async_reload(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_group = hass.config_entries.async_get_entry(
+        config_entry_group.entry_id
+    )
+    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
+        config_entry_sensor.entry_id,
+    ]
 
 
 async def test_custom_naming_pattern(hass: HomeAssistant):
