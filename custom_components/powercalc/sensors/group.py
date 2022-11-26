@@ -215,12 +215,13 @@ async def add_to_associated_group(
         )
         return None
 
-    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-    member_sensors.append(config_entry.entry_id)
+    member_sensors = set(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
+    if config_entry.entry_id not in member_sensors:
+        member_sensors.add(config_entry.entry_id)
 
     hass.config_entries.async_update_entry(
         group_entry,
-        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
+        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: list(member_sensors)},
     )
     return group_entry
 
