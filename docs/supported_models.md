@@ -211,7 +211,7 @@
 |google       |Home Mini (HOA)                  |Google Home Mini                        |linear           |Google Home Mini        |
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini        |
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                        |
-|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |                        |
+|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |Lenovo Smart Clock      |
 |sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
 |sonos        |one sl                           |Sonos One SL                            |linear           |                        |
 |sonos        |play 3                           |Sonos Play:3                            |linear           |Play:3                  |
