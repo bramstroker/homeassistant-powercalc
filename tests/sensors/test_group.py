@@ -577,10 +577,8 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     config_entry_group = hass.config_entries.async_get_entry(
         config_entry_group.entry_id
     )
-    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
-        config_entry_sensor1.entry_id,
-        config_entry_sensor2.entry_id,
-    ]
+    assert config_entry_sensor1.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
+    assert config_entry_sensor2.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
 
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state
