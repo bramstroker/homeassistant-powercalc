@@ -577,8 +577,12 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     config_entry_group = hass.config_entries.async_get_entry(
         config_entry_group.entry_id
     )
-    assert config_entry_sensor1.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
-    assert config_entry_sensor2.entry_id in config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS)
+    assert config_entry_sensor1.entry_id in config_entry_group.data.get(
+        CONF_GROUP_MEMBER_SENSORS
+    )
+    assert config_entry_sensor2.entry_id in config_entry_group.data.get(
+        CONF_GROUP_MEMBER_SENSORS
+    )
 
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state
@@ -605,7 +609,9 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     }
 
 
-async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(hass: HomeAssistant):
+async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
+    hass: HomeAssistant,
+):
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1298"""
 
     config_entry_group = MockConfigEntry(
@@ -629,7 +635,7 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(has
             CONF_NAME: "Test",
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
-            CONF_GROUP: config_entry_group.entry_id
+            CONF_GROUP: config_entry_group.entry_id,
         },
         title="Test",
     )
@@ -637,7 +643,10 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(has
     config_entry_sensor.add_to_hass(hass)
     hass.config_entries.async_update_entry(
         config_entry_group,
-        data={**config_entry_group.data, CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id]},
+        data={
+            **config_entry_group.data,
+            CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id],
+        },
     )
     await hass.async_block_till_done()
     assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
