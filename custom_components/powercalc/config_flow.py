@@ -417,9 +417,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ModelNotSupported:
                 self.power_profile = None
         if self.power_profile:
+            # remarks = self.power_profile.config_flow_discovery_remarks
+            # if remarks:
+            #     remarks += "\n\n"
             return self.async_show_form(
                 step_id="library",
                 description_placeholders={
+                    "remarks": "",
                     "manufacturer": self.power_profile.manufacturer,
                     "model": self.power_profile.model,
                 },

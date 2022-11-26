@@ -26,5 +26,6 @@
     },
     "aliases": [
         "Sonos ONE"
-    ]
+    ],
+    "config_flow_discovery_remarks": "Bla bla bla"
 }

@@ -154,6 +154,10 @@ class PowerProfile:
             return DeviceType.LIGHT
         return DeviceType(device_type)
 
+    @property
+    def config_flow_discovery_remarks(self) -> str | None:
+        return self._json_data.get("config_flow_discovery_remarks")
+
     def get_sub_profiles(self) -> list[str]:
         """Get listing op possible sub profiles"""
         return sorted(next(os.walk(self.get_model_directory(True)))[1])
