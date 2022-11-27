@@ -47,6 +47,8 @@ class SpeakerRunner(MeasurementRunner):
         time.sleep(SLEEP_MUTE)
         summary[0] = self.measure_util.take_average_measurement(duration)
 
+        self.media_controller.set_volume(10)
+
         print('Summary of all average measurements:')
         for volume in summary:
             print(volume, ' : ', summary[volume])

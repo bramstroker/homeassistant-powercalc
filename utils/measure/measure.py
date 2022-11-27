@@ -110,7 +110,9 @@ class Measure:
         if not runner_result:
             _LOGGER.error("Some error occured during the measurement session")
 
-        if answers["generate_model_json"] and not runner_result.skip_model_json_generation:
+        generate_model_json: bool = answers["generate_model_json"] and not runner_result.skip_model_json_generation
+
+        if generate_model_json:
             try:
                 standby_power = self.runner.measure_standby_power()
             except PowerMeterError as error:
@@ -125,7 +127,8 @@ class Measure:
                 extra_json_data=runner_result.model_json_data
             )
 
-        _LOGGER.info(f"Measurement session finished. Files exported to {export_directory}")
+        if generate_model_json or isinstance(self.runner, LightRunner):
+            _LOGGER.info(f"Measurement session finished. Files exported to {export_directory}")
 
     @staticmethod
     def write_model_json(
