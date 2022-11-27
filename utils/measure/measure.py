@@ -92,8 +92,12 @@ class Measure:
         if DeviceType.LIGHT:
             _LOGGER.info(f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}")
 
-        self.device_type = inquirer.list_input("What kind of device do you want to measure the power of?",
-                                     choices=[cls.value for cls in DeviceType])
+        if config.SELECTED_DEVICE_TYPE:
+            self.device_type = DeviceType(config.SELECTED_DEVICE_TYPE)
+        else:
+            self.device_type = inquirer.list_input("What kind of device do you want to measure the power of?",
+                                         choices=[cls.value for cls in DeviceType])
+
         self.runner = RunnerFactory().create_runner(self.device_type)
 
         answers = self.ask_questions()

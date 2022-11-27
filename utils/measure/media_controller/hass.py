@@ -18,7 +18,7 @@ class HassMediaController:
         self.client.trigger_service("media_player", "volume_set", entity_id=self._entity_id, volume_level=round(volume/100, 2))
 
     def mute_volume(self) -> None:
-        self.client.trigger_service("media_player", "mute_volume")
+        self.client.trigger_service("media_player", "mute_volume", entity_id=self._entity_id)
 
     def play_audio(self, stream_url: str) -> None:
         self.client.trigger_service(
@@ -30,7 +30,7 @@ class HassMediaController:
         )
 
     def turn_off(self) -> None:
-        self.client.trigger_service('media_player', 'turn_off')
+        self.client.trigger_service("media_player", "turn_off", entity_id=self._entity_id)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         entities = self.client.get_entities()
