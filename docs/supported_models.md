@@ -1,9 +1,9 @@
-- [Lights](#Lights) (193)
+- [Lights](#Lights) (195)
 - [Smart speakers](#Smart-speakers) (11)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 193 total
+#### 195 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -74,6 +74,7 @@
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
 |ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
 |ledvance      |ac264430155              |LEDVANCE SMART+ Wifi Planon 30x30 TW                                             |lut              |                                                                                               |
+|ledvance      |orbis_cylinder           |LEDVANCE SMART+ WIFI Orbis Cylinder 450 TW                                       |lut              |                                                                                               |
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
 |lidl          |HG06106B                 |Livarno Lux E14 candle RGB                                                       |lut              |                                                                                               |
 |lidl          |HG06106C                 |Livarno Lux E27 bulb RGB                                                         |lut              |                                                                                               |
@@ -199,6 +200,7 @@
 |yeelight      |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                                 |lut              |mono1                                                                                          |
 |yeelight      |YLDP06YL                 |Yeelight Smart LED Bulb II Color                                                 |lut              |color2                                                                                         |
 |yeelight      |YLDP13YL                 |Yeelight LED Bulb 1S                                                             |lut              |                                                                                               |
+|zemismart     |moonlamp                 |ZemiSmart Moonlamp (esphome)                                                     |lut              |                                                                                               |
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
