@@ -1,9 +1,9 @@
-- [Lights](#Lights) (195)
+- [Lights](#Lights) (196)
 - [Smart speakers](#Smart-speakers) (11)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 195 total
+#### 196 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -148,6 +148,7 @@
 |signify       |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                                     |lut              |                                                                                  8719514328242|
 |signify       |LTA005                   |Hue White Ambiance Filament Standard                                             |lut              |                                                                                               |
 |signify       |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                            |lut              |                                                                                     9290024684|
+|signify       |LTA010                   |LTA010                                                                           |lut              |                                                                                               |
 |signify       |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                                |lut              |                                                                                     9290024719|
 |signify       |LTC001                   |Hue Being Ceiling Light                                                          |lut              |3261030P6,3261031P6,3261048P6,3261030P7                                                        |
 |signify       |LTC002                   |Hue Fair Ceiling Lamp                                                            |lut              |                                                                                               |
