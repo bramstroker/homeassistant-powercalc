@@ -7,7 +7,7 @@
         "SLEEP_TIME": 5,
         "VERSION": "master"
     },
-    "name": "LTA010",
+    "name": "Hue ambiance lamp",
     "standby_power": 0,
     "supported_modes": [
         "lut"
