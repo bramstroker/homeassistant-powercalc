@@ -280,13 +280,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
 
-    async def async_step_menu_library(self) -> FlowResult:
+    async def async_step_menu_library(self, user_input: dict[str, str] = None) -> FlowResult:
         """
         Handle the Virtual power (library) step.
         We forward to the virtual_power step, but without the strategy selector displayed
         """
         self.is_library_flow = True
-        return await self.async_step_virtual_power()
+        return await self.async_step_virtual_power(user_input)
 
     async def async_step_virtual_power(
         self, user_input: dict[str, str] = None, strategy_selection: bool = True
@@ -309,7 +309,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.selected_sensor_type = SensorType.VIRTUAL_POWER
             self.sensor_config.update(user_input)
 
-            if user_input.get(CONF_MODE) == CalculationStrategy.LUT or not strategy_selection:
+            if user_input.get(CONF_MODE) == CalculationStrategy.LUT or self.is_library_flow:
                 return await self.async_step_library()
 
             if user_input.get(CONF_MODE) == CalculationStrategy.FIXED:

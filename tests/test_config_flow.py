@@ -25,6 +25,7 @@ from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
+    MENU_OPTION_LIBRARY,
 )
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
@@ -425,6 +426,36 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
         result["data"],
         {CONF_MANUFACTURER: "yeelight", CONF_MODEL: "YLDL01YL/ambilight"},
     )
+
+
+async def test_manually_setup_from_library(hass: HomeAssistant) -> None:
+    light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    light_entity.manufacturer = "ikea"
+    light_entity.model = "LED1545G12"
+    await create_mock_light_entity(hass, light_entity)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": MENU_OPTION_LIBRARY}
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "virtual_power"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_ENTITY_ID: "light.test"}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "library"
+
+    result = await _set_virtual_power_configuration(
+        hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
 async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
