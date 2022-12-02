@@ -87,7 +87,7 @@ SENSOR_TYPE_MENU = {
     SensorType.DAILY_ENERGY: "Daily energy",
     SensorType.GROUP: "Group",
     SensorType.VIRTUAL_POWER: "Virtual power (manual)",
-    MENU_OPTION_LIBRARY: "Virtual power (library)"
+    MENU_OPTION_LIBRARY: "Virtual power (library)",
 }
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
@@ -280,7 +280,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
 
-    async def async_step_menu_library(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_menu_library(
+        self, user_input: dict[str, str] = None
+    ) -> FlowResult:
         """
         Handle the Virtual power (library) step.
         We forward to the virtual_power step, but without the strategy selector displayed
@@ -309,7 +311,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.selected_sensor_type = SensorType.VIRTUAL_POWER
             self.sensor_config.update(user_input)
 
-            if user_input.get(CONF_MODE) == CalculationStrategy.LUT or self.is_library_flow:
+            if (
+                user_input.get(CONF_MODE) == CalculationStrategy.LUT
+                or self.is_library_flow
+            ):
                 return await self.async_step_library()
 
             if user_input.get(CONF_MODE) == CalculationStrategy.FIXED:
@@ -323,7 +328,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="virtual_power",
-            data_schema=_create_virtual_power_schema(self.hass, not self.is_library_flow),
+            data_schema=_create_virtual_power_schema(
+                self.hass, not self.is_library_flow
+            ),
             errors={},
         )
 
@@ -702,12 +709,20 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return vol.Schema({})
 
 
-def _create_virtual_power_schema(hass: HomeAssistant, strategy_selection: bool = True) -> vol.Schema:
+def _create_virtual_power_schema(
+    hass: HomeAssistant, strategy_selection: bool = True
+) -> vol.Schema:
     base_schema: vol.Schema = SCHEMA_POWER_BASE.extend(
         {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
     )
     if strategy_selection:
-        base_schema = base_schema.extend({vol.Optional(CONF_MODE, default=CalculationStrategy.FIXED): STRATEGY_SELECTOR})
+        base_schema = base_schema.extend(
+            {
+                vol.Optional(
+                    CONF_MODE, default=CalculationStrategy.FIXED
+                ): STRATEGY_SELECTOR
+            }
+        )
         return base_schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)
 
     return base_schema.extend(SCHEMA_POWER_OPTIONS.schema)
