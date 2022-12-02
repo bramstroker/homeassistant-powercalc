@@ -57,6 +57,7 @@ from .const import (
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
     CONF_UPDATE_FREQUENCY,
+    CONF_UNAVAILABLE_POWER,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     CONF_WLED,
@@ -192,6 +193,7 @@ SCHEMA_POWER_ADVANCED = vol.Schema(
     {
         vol.Optional(CONF_CALCULATION_ENABLED_CONDITION): selector.TemplateSelector(),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): selector.BooleanSelector(),
+        vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
         vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
         vol.Optional(
             CONF_ENERGY_INTEGRATION_METHOD, default=ENERGY_INTEGRATION_METHOD_LEFT
