@@ -22,10 +22,10 @@ class HassMediaController:
 
     def play_audio(self, stream_url: str) -> None:
         self.client.trigger_service(
-            'media_player',
-            'play_media',
+            "media_player",
+            "play_media",
             entity_id=self._entity_id,
-            media_content_type="audio",
+            media_content_type="music",
             media_content_id=stream_url
         )
 
