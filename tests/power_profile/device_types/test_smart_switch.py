@@ -70,3 +70,58 @@ async def test_smart_switch(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.52"
+
+
+async def test_smart_switch_power_input(hass: HomeAssistant):
+    """
+    Test that smart plug can be setup from profile library
+    """
+    switch_id = "switch.heater"
+    manufacturer = "IKEA"
+    model = "Smart Control Outlet"
+
+    mock_registry(
+        hass,
+        {
+            switch_id: RegistryEntry(
+                entity_id=switch_id,
+                unique_id="1234",
+                platform="switch",
+                device_id="ikea-device-id",
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "ikea-device": DeviceEntry(
+                id="ikea-device-id", manufacturer=manufacturer, model=model
+            )
+        },
+    )
+
+    power_sensor_id = "sensor.heater_device_power"
+
+    await run_powercalc_setup_yaml_config(
+        hass,
+        {
+            CONF_ENTITY_ID: switch_id,
+            CONF_MANUFACTURER: manufacturer,
+            CONF_MODEL: model,
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch"),
+        },
+    )
+
+    power_state = hass.states.get(power_sensor_id)
+    assert power_state
+    assert power_state.state == "unavailable"
+
+    hass.states.async_set(switch_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "0.82"
+
+    hass.states.async_set(switch_id, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "0.52"
