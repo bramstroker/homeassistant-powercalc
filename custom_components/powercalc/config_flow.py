@@ -81,10 +81,13 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
 
+MENU_OPTION_LIBRARY = "menu_library"
+
 SENSOR_TYPE_MENU = {
     SensorType.DAILY_ENERGY: "Daily energy",
-    SensorType.VIRTUAL_POWER: "Virtual power",
     SensorType.GROUP: "Group",
+    SensorType.VIRTUAL_POWER: "Virtual power (manual)",
+    MENU_OPTION_LIBRARY: "Virtual power (library)"
 }
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
@@ -113,9 +116,28 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
     }
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
+SCHEMA_POWER_LIBRARY = vol.Schema(
+    {
+        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
+        vol.Optional(CONF_NAME): selector.TextSelector(),
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+    }
+)
+
 SCHEMA_POWER_OPTIONS = vol.Schema(
     {
         vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
+        vol.Optional(
+            CONF_CREATE_ENERGY_SENSOR, default=True
+        ): selector.BooleanSelector(),
+        vol.Optional(
+            CONF_CREATE_UTILITY_METERS, default=False
+        ): selector.BooleanSelector(),
+    }
+)
+
+SCHEMA_POWER_OPTIONS_LIBRARY = vol.Schema(
+    {
         vol.Optional(
             CONF_CREATE_ENERGY_SENSOR, default=True
         ): selector.BooleanSelector(),
@@ -130,20 +152,19 @@ SCHEMA_POWER_BASE = vol.Schema(
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
         vol.Optional(CONF_NAME): selector.TextSelector(),
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
-        vol.Optional(
-            CONF_MODE, default=CalculationStrategy.FIXED
-        ): selector.SelectSelector(
-            selector.SelectSelectorConfig(
-                options=[
-                    CalculationStrategy.FIXED,
-                    CalculationStrategy.LINEAR,
-                    CalculationStrategy.WLED,
-                    CalculationStrategy.LUT,
-                ],
-                mode=selector.SelectSelectorMode.DROPDOWN,
-            )
-        ),
     }
+)
+
+STRATEGY_SELECTOR = selector.SelectSelector(
+    selector.SelectSelectorConfig(
+        options=[
+            CalculationStrategy.FIXED,
+            CalculationStrategy.LINEAR,
+            CalculationStrategy.WLED,
+            CalculationStrategy.LUT,
+        ],
+        mode=selector.SelectSelectorMode.DROPDOWN,
+    )
 )
 
 SCHEMA_POWER_FIXED = vol.Schema(
@@ -205,6 +226,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.source_entity_id: str | None = None
         self.power_profile: PowerProfile | None = None
         self.skip_advanced_step: bool = False
+        self.is_library_flow: bool = False
 
     @staticmethod
     @callback
@@ -246,6 +268,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
             "model": self.sensor_config.get(CONF_MODEL),
         }
+        self.is_library_flow = True
 
         if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
             return await self.async_step_wled()
@@ -257,8 +280,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
 
+    async def async_step_menu_library(self) -> FlowResult:
+        """
+        Handle the Virtual power (library) step.
+        We forward to the virtual_power step, but without the strategy selector displayed
+        """
+        self.is_library_flow = True
+        return await self.async_step_virtual_power()
+
     async def async_step_virtual_power(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, str] = None, strategy_selection: bool = True
     ) -> FlowResult:
         if user_input is not None:
             self.source_entity_id = user_input[CONF_ENTITY_ID]
@@ -278,6 +309,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.selected_sensor_type = SensorType.VIRTUAL_POWER
             self.sensor_config.update(user_input)
 
+            if user_input.get(CONF_MODE) == CalculationStrategy.LUT or not strategy_selection:
+                return await self.async_step_library()
+
             if user_input.get(CONF_MODE) == CalculationStrategy.FIXED:
                 return await self.async_step_fixed()
 
@@ -287,12 +321,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if user_input.get(CONF_MODE) == CalculationStrategy.WLED:
                 return await self.async_step_wled()
 
-            if user_input.get(CONF_MODE) == CalculationStrategy.LUT:
-                return await self.async_step_library()
-
         return self.async_show_form(
             step_id="virtual_power",
-            data_schema=_create_virtual_power_schema(self.hass),
+            data_schema=_create_virtual_power_schema(self.hass, not self.is_library_flow),
             errors={},
         )
 
@@ -671,10 +702,14 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return vol.Schema({})
 
 
-def _create_virtual_power_schema(hass: HomeAssistant) -> vol.Schema:
+def _create_virtual_power_schema(hass: HomeAssistant, strategy_selection: bool = True) -> vol.Schema:
     base_schema: vol.Schema = SCHEMA_POWER_BASE.extend(
         {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
     )
+    if strategy_selection:
+        base_schema = base_schema.extend({vol.Optional(CONF_MODE, default=CalculationStrategy.FIXED): STRATEGY_SELECTOR})
+        return base_schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)
+
     return base_schema.extend(SCHEMA_POWER_OPTIONS.schema)
 
 
