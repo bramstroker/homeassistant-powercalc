@@ -722,6 +722,9 @@ Use the following configuration to use an existing power sensor and let powercal
   power_sensor_id: sensor.toilet_light_power
 ```
 
+This enables you to combine virtual power sensors (created with powercalc) and existing power sensors in your HA installation into
+a group. Without this configuration option power_sensor_id that would not be possible.
+
 ### Resetting energy sensor
 
 > Available from v0.23 and higher
