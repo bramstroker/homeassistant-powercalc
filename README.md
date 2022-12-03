@@ -714,7 +714,8 @@ Assume you have a light `light.floorlamp_livingroom`, than you should have the f
 
 > Available from v0.14 and higher
 
-Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+In the yaml configuration (functionnality not available through the webUI) you can add the following configuration 
+to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
 
 ```yaml
 - platform: powercalc
