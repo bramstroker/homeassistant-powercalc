@@ -1,0 +1,10 @@
+{
+    "name": "Fixed mode profile",
+    "standby_power": 0.5,
+    "supported_modes": [
+        "fixed"
+    ],
+    "fixed_config": {
+        "power": 50
+    }
+}

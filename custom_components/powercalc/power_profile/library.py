@@ -17,17 +17,19 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
-    def __init__(self, hass: HomeAssistant):
+    def __init__(self, hass: HomeAssistant, extra_data_directories: list = None):
         self._hass = hass
         self._data_directories: list[str] = [
-            dir
-            for dir in (
+            d
+            for d in (
                 os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
                 os.path.join(os.path.dirname(__file__), "../custom_data"),
                 os.path.join(os.path.dirname(__file__), "../data"),
             )
-            if os.path.exists(dir)
+            if os.path.exists(d)
         ]
+        if extra_data_directories:
+            self._data_directories.extend(extra_data_directories)
         self._profiles: dict[str, list[PowerProfile]] = {}
 
     def factory(hass: HomeAssistant) -> ProfileLibrary:
@@ -111,6 +113,8 @@ class ProfileLibrary:
             if not os.path.exists(manufacturer_dir):
                 continue
             for model in next(os.walk(manufacturer_dir))[1]:
+                if model[0] in [".", "@"]:
+                    continue
                 power_profile = await self._create_power_profile(
                     ModelInfo(manufacturer, model),
                     os.path.join(manufacturer_dir, model),

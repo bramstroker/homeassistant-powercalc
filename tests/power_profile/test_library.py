@@ -1,5 +1,9 @@
+import logging
+
 from homeassistant.core import HomeAssistant
 
+import pytest
+from tests.common import get_test_profile_dir
 from custom_components.powercalc.aliases import MANUFACTURER_IKEA, MANUFACTURER_SIGNIFY
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 
@@ -67,3 +71,11 @@ async def test_get_non_existing_profile(hass: HomeAssistant):
     library = ProfileLibrary(hass)
     profile = await library.get_profile(ModelInfo("foo", "bar"))
     assert not profile
+
+
+async def test_hidden_directories_are_skipped_from_model_listing(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.ERROR)
+    library = ProfileLibrary(hass)
+    profiles = await library.get_profiles_by_manufacturer(get_test_profile_dir("hidden-directories"))
+    assert len(profiles) == 1
+    assert len(caplog.records) == 0
