@@ -553,9 +553,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def validate_strategy_config(self) -> dict:
-        strategy_name = self.sensor_config.get(CONF_MODE) or self.power_profile.supported_strategies[0]
+        strategy_name = (
+            self.sensor_config.get(CONF_MODE)
+            or self.power_profile.supported_strategies[0]
+        )
         strategy = await _create_strategy_object(
-            self.hass, strategy_name, self.sensor_config, self.source_entity, self.power_profile
+            self.hass,
+            strategy_name,
+            self.sensor_config,
+            self.source_entity,
+            self.power_profile,
         )
         try:
             await strategy.validate_config()
@@ -691,7 +698,11 @@ class OptionsFlowHandler(OptionsFlow):
 
 
 async def _create_strategy_object(
-    hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity, power_profile: PowerProfile | None = None
+    hass: HomeAssistant,
+    strategy: str,
+    config: dict,
+    source_entity: SourceEntity,
+    power_profile: PowerProfile | None = None,
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
