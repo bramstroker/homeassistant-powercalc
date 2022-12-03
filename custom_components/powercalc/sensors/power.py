@@ -244,7 +244,7 @@ def select_calculation_strategy(
         return CalculationStrategy.WLED
 
     if power_profile:
-        return power_profile.supported_modes[0]
+        return power_profile.supported_strategies[0]
 
     raise UnsupportedMode(
         "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme"
