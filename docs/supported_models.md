@@ -1,9 +1,9 @@
-- [Lights](#Lights) (193)
+- [Lights](#Lights) (196)
 - [Smart speakers](#Smart-speakers) (11)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 193 total
+#### 196 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -74,6 +74,7 @@
 |ledvance      |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                       |lut              |                                                                                               |
 |ledvance      |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                             |lut              |                                                                                  4058075168572|
 |ledvance      |ac264430155              |LEDVANCE SMART+ Wifi Planon 30x30 TW                                             |lut              |                                                                                               |
+|ledvance      |orbis_cylinder           |LEDVANCE SMART+ WIFI Orbis Cylinder 450 TW                                       |lut              |                                                                                               |
 |lexman        |IG-CDZOTAAG014RA-MAN     |ENKI Lexman E27 14W to 100W LED RGBW v2                                          |lut              |                                                                                               |
 |lidl          |HG06106B                 |Livarno Lux E14 candle RGB                                                       |lut              |                                                                                               |
 |lidl          |HG06106C                 |Livarno Lux E27 bulb RGB                                                         |lut              |                                                                                               |
@@ -147,6 +148,7 @@
 |signify       |LTA004                   |Philips Hue White Ambiance 800 E27 Bluetooth                                     |lut              |                                                                                  8719514328242|
 |signify       |LTA005                   |Hue White Ambiance Filament Standard                                             |lut              |                                                                                               |
 |signify       |LTA009                   |Hue White Ambiance 1100 E27 Bluetooth                                            |lut              |                                                                                     9290024684|
+|signify       |LTA010                   |Hue ambiance lamp                                                                |lut              |                                                                                               |
 |signify       |LTA011                   |Hue White Ambiance 1600 E27 w/ BT                                                |lut              |                                                                                     9290024719|
 |signify       |LTC001                   |Hue Being Ceiling Light                                                          |lut              |3261030P6,3261031P6,3261048P6,3261030P7                                                        |
 |signify       |LTC002                   |Hue Fair Ceiling Lamp                                                            |lut              |                                                                                               |
@@ -164,7 +166,7 @@
 |signify       |LTW017                   |Hue Adore Bathroom Mirror Light                                                  |lut              |3417711P6                                                                                      |
 |signify       |LWA001                   |Hue White Ambiance Bulb A60 E27                                                  |lut              |                                                                                  8718699673147|
 |signify       |LWA003                   |Hue White A19 E26 Bluetooth                                                      |lut              |                                                                                     9290022268|
-|signify       |LWA004                   |Hue White Filament Bulb A60 E27                                                  |lut              |                                                                                               |
+|signify       |LWA004                   |Hue White Filament Bulb A60 E27                                                  |lut              |                                                                                  8718699688820|
 |signify       |LWA005                   |Hue Filament E26                                                                 |lut              |                                                                                               |
 |signify       |LWA008                   |Hue White Bulb A21 E26 1600lm with Bluetooth                                     |lut              |                                                                                     9290023351|
 |signify       |LWA009                   |Hue White 1600 A67 E27 1600lm                                                    |lut              |                                                                                               |
@@ -199,6 +201,7 @@
 |yeelight      |YLDP01YL                 |Yeelight LED 600lm 4000K 8W WiFi                                                 |lut              |mono1                                                                                          |
 |yeelight      |YLDP06YL                 |Yeelight Smart LED Bulb II Color                                                 |lut              |color2                                                                                         |
 |yeelight      |YLDP13YL                 |Yeelight LED Bulb 1S                                                             |lut              |                                                                                               |
+|zemismart     |moonlamp                 |ZemiSmart Moonlamp (esphome)                                                     |lut              |                                                                                               |
 |zipato        |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
