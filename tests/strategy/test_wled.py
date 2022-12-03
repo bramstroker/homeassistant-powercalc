@@ -19,7 +19,7 @@ from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 from custom_components.test.light import MockLight
 
-from ..common import create_mock_light_entity, run_powercalc_setup_yaml_config
+from ..common import create_mock_light_entity, run_powercalc_setup
 
 
 async def test_can_calculate_power(hass: HomeAssistant):
@@ -161,7 +161,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
         },
     )
 
-    await run_powercalc_setup_yaml_config(hass, {}, {})
+    await run_powercalc_setup(hass, {}, {})
     await hass.async_block_till_done()
 
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)

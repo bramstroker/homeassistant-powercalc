@@ -23,7 +23,7 @@ from custom_components.powercalc.const import (
 from ..common import (
     create_input_boolean,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -63,7 +63,7 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
 
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -94,7 +94,7 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),
         {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},
@@ -122,7 +122,7 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",

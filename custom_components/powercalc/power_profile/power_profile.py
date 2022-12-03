@@ -162,7 +162,7 @@ class PowerProfile:
         Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow
         """
-        return self.is_strategy_supported(CalculationStrategy.FIXED) and not self.fixed_mode_config
+        return self.is_strategy_supported(CalculationStrategy.FIXED) and not self._json_data.get("fixed_config")
 
     @property
     def device_type(self) -> DeviceType:

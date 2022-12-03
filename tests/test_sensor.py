@@ -60,14 +60,14 @@ from .common import (
     create_input_booleans,
     create_mock_light_entity,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),
     )
@@ -98,7 +98,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
     """Test that utility meters are succesfully created when `create_utility_meter: true`"""
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -125,7 +125,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
 async def test_create_nested_group_sensor(hass: HomeAssistant):
     await create_input_booleans(hass, ["test", "test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup1",
@@ -186,7 +186,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 
     (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass, {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id}
     )
 
@@ -204,7 +204,7 @@ async def test_error_when_configuring_same_entity_twice(
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             get_simple_fixed_config("input_boolean.test", 50),
@@ -258,7 +258,7 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
 async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             {
@@ -292,7 +292,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     await create_mock_light_entity(hass, light)
 
     # Run powercalc setup with autodiscovery
-    await run_powercalc_setup_yaml_config(hass, {}, {})
+    await run_powercalc_setup(hass, {}, {})
 
     assert "Model not found in library, skipping discovery" in caplog.text
 
@@ -311,7 +311,7 @@ async def test_can_include_autodiscovered_entity_in_group(
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             {
@@ -339,7 +339,7 @@ async def test_include_area(
     entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {CONF_CREATE_GROUP: "Test include", CONF_INCLUDE: {CONF_AREA: "bathroom_1"}},
     )
@@ -348,7 +348,7 @@ async def test_include_area(
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test include area by name",
@@ -363,7 +363,7 @@ async def test_include_area_not_found(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test area not found",
@@ -397,7 +397,7 @@ async def test_include_light_group(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test include lightgroup",
@@ -430,7 +430,7 @@ async def test_user_can_rename_entity_id(
 
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -511,7 +511,7 @@ async def test_entities_are_bound_to_source_device(
 async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2", "test3"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITIES: [
@@ -617,7 +617,7 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
     """
     caplog.set_level(logging.ERROR)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITIES: [
