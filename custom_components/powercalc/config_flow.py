@@ -607,10 +607,14 @@ class OptionsFlowHandler(OptionsFlow):
             self.source_entity = await create_source_entity(
                 self.source_entity_id, self.hass
             )
-            if self.source_entity.entity_entry and self.power_profile is None:
+            if self.current_config.get(CONF_MANUFACTURER) and self.current_config.get(CONF_MODEL):
                 try:
+                    model_info = ModelInfo(
+                        self.current_config.get(CONF_MANUFACTURER),
+                        self.current_config.get(CONF_MODEL)
+                    )
                     self.power_profile = await get_power_profile(
-                        self.hass, {}, self.source_entity.entity_entry
+                        self.hass, {}, None, model_info
                     )
                     if self.power_profile and self.power_profile.needs_fixed_config:
                         self.strategy = CalculationStrategy.FIXED
