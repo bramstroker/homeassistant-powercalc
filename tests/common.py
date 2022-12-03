@@ -80,7 +80,7 @@ def create_discoverable_light(
     return light
 
 
-async def run_powercalc_setup_yaml_config(
+async def run_powercalc_setup(
     hass: HomeAssistant,
     sensor_config: list[ConfigType] | ConfigType,
     domain_config: ConfigType | None = None,

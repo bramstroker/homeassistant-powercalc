@@ -4,6 +4,7 @@
  	"measure_device": "Shelly Plug S",
  	"name": "TRADFRI control outlet",
  	"standby_power": 0.4,
+	"standby_power_on": 0.8,
  	"sensor_config": {
  		"power_sensor_naming": "{} Device Power",
  		"energy_sensor_naming": "{} Device Energy"
@@ -11,8 +12,5 @@
  	"device_type": "smart_switch",
  	"supported_modes": [
  		"fixed"
- 	],
- 	"fixed_config": {
- 		"power": 0.8
- 	}
+ 	]
  }

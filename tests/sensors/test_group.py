@@ -61,7 +61,7 @@ from ..common import (
     create_input_booleans,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -69,7 +69,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     ent_reg = er.async_get(hass)
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -207,7 +207,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
 async def test_reset_service(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -262,7 +262,7 @@ async def test_restore_state(hass: HomeAssistant):
         ],
     )
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -278,7 +278,7 @@ async def test_restore_state(hass: HomeAssistant):
 async def test_mega_watt_hour(hass: HomeAssistant):
     await create_input_boolean(hass, "test1")
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -301,7 +301,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     """
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -336,7 +336,7 @@ async def test_hide_members(hass: HomeAssistant):
     entity_reg = er.async_get(hass)
     await create_input_booleans(hass, ["one", "two"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -377,7 +377,7 @@ async def test_unhide_members(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -405,7 +405,7 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -473,7 +473,7 @@ async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegist
 
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -666,7 +666,7 @@ async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
 async def test_custom_naming_pattern(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -686,7 +686,7 @@ async def test_custom_naming_pattern(hass: HomeAssistant):
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",

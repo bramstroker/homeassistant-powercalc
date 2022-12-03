@@ -439,13 +439,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_MODEL: self.power_profile.model,
                     }
                 )
-                if (
-                    self.power_profile.has_sub_profiles
-                    and not self.power_profile.sub_profile_select
-                ):
-                    return await self.async_step_sub_profile()
-
-                return await self.async_step_power_advanced()
+                return await self.async_step_post_library(user_input)
 
             return await self.async_step_manufacturer()
 
@@ -497,11 +491,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.sensor_config.get(CONF_MODEL),
                 )
             )
-            if profile.has_sub_profiles:
-                return await self.async_step_sub_profile()
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
+            self.power_profile = profile
+            return await self.async_step_post_library()
 
         return self.async_show_form(
             step_id="model",
@@ -513,6 +504,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             },
             errors=errors,
         )
+
+    async def async_step_post_library(self, user_input: dict[str, str] = None):
+        """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered"""
+        if (
+            self.power_profile.has_sub_profiles
+            and not self.power_profile.sub_profile_select
+        ):
+            return await self.async_step_sub_profile()
+
+        if self.power_profile.needs_fixed_config:
+            return await self.async_step_fixed()
+
+        return await self.async_step_power_advanced()
 
     async def async_step_sub_profile(
         self, user_input: dict[str, str] = None
@@ -549,9 +553,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def validate_strategy_config(self) -> dict:
-        strategy_name = self.sensor_config.get(CONF_MODE)
+        strategy_name = self.sensor_config.get(CONF_MODE) or self.power_profile.supported_strategies[0]
         strategy = await _create_strategy_object(
-            self.hass, strategy_name, self.sensor_config, self.source_entity
+            self.hass, strategy_name, self.sensor_config, self.source_entity, self.power_profile
         )
         try:
             await strategy.validate_config()
@@ -687,12 +691,11 @@ class OptionsFlowHandler(OptionsFlow):
 
 
 async def _create_strategy_object(
-    hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity
+    hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity, power_profile: PowerProfile | None = None
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
-    power_profile: PowerProfile | None = None
-    if strategy == CalculationStrategy.LUT:
+    if power_profile is None and CONF_MANUFACTURER in config:
         power_profile = await ProfileLibrary.factory(hass).get_profile(
             ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
         )

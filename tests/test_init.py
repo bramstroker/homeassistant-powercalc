@@ -43,7 +43,7 @@ from .common import (
     create_input_boolean,
     create_mock_light_entity,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -168,7 +168,7 @@ async def test_manual_configured_light_overrides_autodiscovered(hass: HomeAssist
     light_entity.model = "LCA001"
     await create_mock_light_entity(hass, light_entity)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass, {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}}, {}
     )
 
@@ -194,7 +194,7 @@ async def test_config_entry_overrides_autodiscovered(
         {ATTR_BRIGHTNESS: 200, ATTR_COLOR_MODE: ColorMode.BRIGHTNESS},
     )
 
-    await run_powercalc_setup_yaml_config(hass, {}, {})
+    await run_powercalc_setup(hass, {}, {})
 
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -280,7 +280,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
         ],
     }
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass, get_simple_fixed_config("input_boolean.test", 100), domain_config
     )
 
@@ -348,7 +348,7 @@ async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant
         CONF_UTILITY_METER_TYPES: ["daily"],
     }
 
-    await run_powercalc_setup_yaml_config(hass, {}, domain_config)
+    await run_powercalc_setup(hass, {}, domain_config)
 
     await create_domain_groups(hass, hass.data[DOMAIN][DOMAIN_CONFIG], [light.DOMAIN])
     await hass.async_block_till_done()

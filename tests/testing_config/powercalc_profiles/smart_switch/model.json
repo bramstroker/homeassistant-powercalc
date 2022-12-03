@@ -1,17 +1,11 @@
 {
-  "measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
-  "measure_method": "manual",
-  "measure_device": "Zhirui PR10-D",
-  "name": "Shelly Plug S",
+  "name": "IKEA Control outlet",
   "standby_power": 0.52,
   "standby_power_on": 0.82,
   "device_type": "smart_switch",
   "supported_modes": [
     "fixed"
   ],
-  "fixed_config": {
-    "power": 0
-  },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power"
   }
