@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
-from ..const import CalculationStrategy
+from ..const import CalculationStrategy, CONF_POWER
 from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedStrategy
 
 _LOGGER = logging.getLogger(__name__)
@@ -127,13 +127,16 @@ class PowerProfile:
         return self._json_data.get("linear_config")
 
     @property
-    def fixed_mode_config(self) -> ConfigType | None:
+    def fixed_mode_config(self) -> ConfigType:
         """Get configuration to setup fixed strategy"""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
             raise UnsupportedStrategy(
                 f"Strategy fixed is not supported by model: {self._model}"
             )
-        return self._json_data.get("fixed_config")
+        fixed_config = self._json_data.get("fixed_config")
+        if fixed_config is None and self.standby_power_on:
+            fixed_config = {CONF_POWER: 0}
+        return fixed_config
 
     @property
     def sensor_config(self) -> ConfigType:

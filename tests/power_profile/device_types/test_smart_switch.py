@@ -1,5 +1,3 @@
-import os
-
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -11,8 +9,10 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_FIXED,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_POWER,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup_yaml_config
 
@@ -72,9 +72,11 @@ async def test_smart_switch(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input(hass: HomeAssistant):
+async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
     """
-    Test that smart plug can be setup from profile library
+    Test a smart switch can be setup with YAML and a fixed power value for the appliance configured by the user
+    The values for standby power on and off should be taken from the power profile library.
+    The fixed power value from the user should be added to the total power consumption. standby_power_on + power
     """
     switch_id = "switch.heater"
     manufacturer = "IKEA"
@@ -109,6 +111,9 @@ async def test_smart_switch_power_input(hass: HomeAssistant):
             CONF_MANUFACTURER: manufacturer,
             CONF_MODEL: model,
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch"),
+            CONF_FIXED: {
+                CONF_POWER: 50
+            }
         },
     )
 
@@ -119,7 +124,7 @@ async def test_smart_switch_power_input(hass: HomeAssistant):
     hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.82"
+    assert hass.states.get(power_sensor_id).state == "50.82"
 
     hass.states.async_set(switch_id, STATE_OFF)
     await hass.async_block_till_done()
