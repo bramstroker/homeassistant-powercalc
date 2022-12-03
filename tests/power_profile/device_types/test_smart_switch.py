@@ -2,6 +2,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
@@ -178,10 +179,16 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
     assert result["step_id"] == "fixed"
-    await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.flow.async_configure(
         flow["flow_id"], {CONF_POWER: 50}
     )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
 
+    entries = hass.config_entries.async_entries(DOMAIN)
+    assert len(entries) == 1
+    config_entry = entries[0]
+
+    # Toggle the switch to different states and check for correct power values
     power_state = hass.states.get(power_sensor_id)
     assert power_state
     assert power_state.state == "unavailable"
@@ -195,3 +202,20 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.40"
+
+    # Change the power value via the options
+    result = await hass.config_entries.options.async_init(
+        config_entry.entry_id,
+        data=None,
+    )
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_POWER: 100},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+
+    # Set the switch on again and see if it has the updated power value
+    hass.states.async_set(switch_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(power_sensor_id).state == "100.80"
