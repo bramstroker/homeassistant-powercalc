@@ -5,7 +5,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 
 from custom_components.powercalc.power_profile.model_discovery import (
-    autodiscover_model,
     get_power_profile,
     is_autoconfigurable,
 )
