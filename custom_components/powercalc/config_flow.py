@@ -553,9 +553,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def validate_strategy_config(self) -> dict:
-        strategy_name = self.sensor_config.get(CONF_MODE) or self.power_profile.supported_strategies[0]
+        strategy_name = (
+            self.sensor_config.get(CONF_MODE)
+            or self.power_profile.supported_strategies[0]
+        )
         strategy = await _create_strategy_object(
-            self.hass, strategy_name, self.sensor_config, self.source_entity, self.power_profile
+            self.hass,
+            strategy_name,
+            self.sensor_config,
+            self.source_entity,
+            self.power_profile,
         )
         try:
             await strategy.validate_config()
@@ -607,11 +614,13 @@ class OptionsFlowHandler(OptionsFlow):
             self.source_entity = await create_source_entity(
                 self.source_entity_id, self.hass
             )
-            if self.current_config.get(CONF_MANUFACTURER) and self.current_config.get(CONF_MODEL):
+            if self.current_config.get(CONF_MANUFACTURER) and self.current_config.get(
+                CONF_MODEL
+            ):
                 try:
                     model_info = ModelInfo(
                         self.current_config.get(CONF_MANUFACTURER),
-                        self.current_config.get(CONF_MODEL)
+                        self.current_config.get(CONF_MODEL),
                     )
                     self.power_profile = await get_power_profile(
                         self.hass, {}, None, model_info
@@ -682,7 +691,9 @@ class OptionsFlowHandler(OptionsFlow):
         data_schema = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy:
-                strategy_schema = _get_strategy_schema(self.strategy, self.source_entity_id)
+                strategy_schema = _get_strategy_schema(
+                    self.strategy, self.source_entity_id
+                )
             else:
                 strategy_schema = vol.Schema({})
             data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
@@ -704,7 +715,11 @@ class OptionsFlowHandler(OptionsFlow):
 
 
 async def _create_strategy_object(
-    hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity, power_profile: PowerProfile | None = None
+    hass: HomeAssistant,
+    strategy: str,
+    config: dict,
+    source_entity: SourceEntity,
+    power_profile: PowerProfile | None = None,
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)

@@ -1,12 +1,13 @@
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
 )
+
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -113,9 +114,7 @@ async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
             CONF_MANUFACTURER: manufacturer,
             CONF_MODEL: model,
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("smart_switch"),
-            CONF_FIXED: {
-                CONF_POWER: 50
-            }
+            CONF_FIXED: {CONF_POWER: 50},
         },
     )
 
