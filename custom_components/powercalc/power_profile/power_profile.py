@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
-from ..const import CONF_POWER, CalculationStrategy
+from ..const import CalculationStrategy, CONF_POWER
 from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedStrategy
 
 _LOGGER = logging.getLogger(__name__)
@@ -162,9 +162,7 @@ class PowerProfile:
         Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow
         """
-        return self.is_strategy_supported(
-            CalculationStrategy.FIXED
-        ) and not self._json_data.get("fixed_config")
+        return self.is_strategy_supported(CalculationStrategy.FIXED) and not self._json_data.get("fixed_config")
 
     @property
     def device_type(self) -> DeviceType:

@@ -20,7 +20,11 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
 )
 
-from ..common import create_input_boolean, get_simple_fixed_config, run_powercalc_setup
+from ..common import (
+    create_input_boolean,
+    get_simple_fixed_config,
+    run_powercalc_setup,
+)
 
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(

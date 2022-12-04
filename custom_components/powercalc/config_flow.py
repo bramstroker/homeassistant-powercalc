@@ -553,16 +553,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def validate_strategy_config(self) -> dict:
-        strategy_name = (
-            self.sensor_config.get(CONF_MODE)
-            or self.power_profile.supported_strategies[0]
-        )
+        strategy_name = self.sensor_config.get(CONF_MODE) or self.power_profile.supported_strategies[0]
         strategy = await _create_strategy_object(
-            self.hass,
-            strategy_name,
-            self.sensor_config,
-            self.source_entity,
-            self.power_profile,
+            self.hass, strategy_name, self.sensor_config, self.source_entity, self.power_profile
         )
         try:
             await strategy.validate_config()
@@ -600,12 +593,15 @@ class OptionsFlowHandler(OptionsFlow):
         )
         self.source_entity_id: str | None = self.current_config.get(CONF_ENTITY_ID)
         self.source_entity: SourceEntity | None = None
+        self.power_profile: PowerProfile | None = None
+        self.strategy: CalculationStrategy | None = self.current_config.get(CONF_MODE)
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
 
+        errors = {}
         self.current_config = dict(self.config_entry.data)
         if self.source_entity_id:
             self.source_entity = await create_source_entity(
@@ -625,7 +621,6 @@ class OptionsFlowHandler(OptionsFlow):
                 except ModelNotSupported:
                     errors["not_supported"] = "Power profile could not be loaded"
 
-        errors = {}
         if user_input is not None:
             errors = await self.save_options(user_input)
             if not errors:
@@ -656,17 +651,16 @@ class OptionsFlowHandler(OptionsFlow):
 
             self.current_config.update(generic_options)
 
-            strategy = self.current_config.get(CONF_MODE)
-            if strategy:
+            if self.strategy:
                 strategy_options = _build_strategy_config(
-                    strategy, self.source_entity_id, user_input
+                    self.strategy, self.source_entity_id, user_input
                 )
 
-                if strategy != CalculationStrategy.LUT:
-                    self.current_config.update({strategy: strategy_options})
+                if self.strategy != CalculationStrategy.LUT:
+                    self.current_config.update({self.strategy: strategy_options})
 
                 strategy_object = await _create_strategy_object(
-                    self.hass, strategy, self.current_config, self.source_entity
+                    self.hass, self.strategy, self.current_config, self.source_entity
                 )
                 try:
                     await strategy_object.validate_config()
@@ -687,15 +681,14 @@ class OptionsFlowHandler(OptionsFlow):
         strategy_options = {}
         data_schema = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            strategy: str = self.current_config.get(CONF_MODE)
-            if strategy:
-                strategy_schema = _get_strategy_schema(strategy, self.source_entity_id)
+            if self.strategy:
+                strategy_schema = _get_strategy_schema(self.strategy, self.source_entity_id)
             else:
                 strategy_schema = vol.Schema({})
             data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
                 SCHEMA_POWER_ADVANCED.schema
             )
-            strategy_options = self.current_config.get(strategy) or {}
+            strategy_options = self.current_config.get(self.strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
@@ -711,11 +704,7 @@ class OptionsFlowHandler(OptionsFlow):
 
 
 async def _create_strategy_object(
-    hass: HomeAssistant,
-    strategy: str,
-    config: dict,
-    source_entity: SourceEntity,
-    power_profile: PowerProfile | None = None,
+    hass: HomeAssistant, strategy: str, config: dict, source_entity: SourceEntity, power_profile: PowerProfile | None = None
 ) -> PowerCalculationStrategyInterface:
     """Create the calculation strategy object"""
     factory = PowerCalculatorStrategyFactory(hass)
