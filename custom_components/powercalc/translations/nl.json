@@ -118,13 +118,15 @@
                 "data": {
                     "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
                     "energy_integration_method": "Energie integratie methode",
-                    "ignore_unavailable_state": "Negeer unavailable status",
-                    "multiply_factor": "Multiplicatie factor"
+                    "ignore_unavailable_state": "Negeer onbeschikbaar status",
+                    "multiply_factor": "Multiplicatie factor",
+                    "unavailable_power": "Vermogen indien onbeschikbaar"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
-                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen."
+                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+                    "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
                 }
             },
             "user": {
@@ -199,6 +201,7 @@
                     "states_power": "Vermogen per status",
                     "sub_groups": "Sub groepen",
                     "hide_members": "Verberg onderliggende sensoren",
+                    "unavailable_power": "Vermogen indien onbeschikbaar",
                     "unit_of_measurement": "Eenheid",
                     "update_frequency": "Update frequentie",
                     "value": "Waarde",
@@ -215,7 +218,8 @@
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
-                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen."
+                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+                    "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
                 }
             }
         }

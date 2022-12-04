@@ -1,9 +1,9 @@
-- [Lights](#Lights) (196)
+- [Lights](#Lights) (197)
 - [Smart speakers](#Smart-speakers) (11)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 196 total
+#### 197 total
 
 | manufacturer |        model id         |                                      name                                       |calculation modes|                                            aliases                                            |
 |--------------|-------------------------|---------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -109,6 +109,7 @@
 |paulmann licht|371000002                |Amaris RGBW LED Panels 595x295mm                                                 |lut              |                                                                                               |
 |rye           |Candlebra                |Candlebra                                                                        |lut              |                                                                                               |
 |signify       |1742930P7                |Hue Impress Outdoor Wall Light Small                                             |lut              |                                                                                               |
+|signify       |1743130P7                |Hue Impress Pedestal Low                                                         |lut              |                                                                                               |
 |signify       |915005996601             |Hue Enrave Medium                                                                |lut              |                                                                                               |
 |signify       |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                                 |lut              |9290022166,929003053401,LCA005,9290022266A                                                     |
 |signify       |LCA003                   |Hue White and Color Ambiance A19 E26                                             |lut              |                                                                                               |
