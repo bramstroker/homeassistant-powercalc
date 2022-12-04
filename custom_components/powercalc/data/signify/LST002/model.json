@@ -4,7 +4,7 @@
    "supported_modes":[
       "lut"
    ],
-   "measure_device":"FRITZ!DECT 200",
+   "measure_device":"AVM FRITZ!DECT 200",
    "measure_description":"Measured by custom script with all lightstrip extensions detached. Measured standby power with ELV Energy Master Profi 2",
    "measure_method":"script",
    "aliases": [

@@ -1,7 +1,7 @@
 {
     "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals, and took average measurements over 20s. Sonos microphone (voice assistant) on.",
     "measure_method": "manual",
-    "measure_device": "TPlink HS110 (kasa)",
+    "measure_device": "TP-Link Kasa HS110",
     "name": "Sonos One",
     "standby_power": 2.92,
     "device_type": "smart_speaker",

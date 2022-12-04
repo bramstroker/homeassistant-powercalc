@@ -4,7 +4,7 @@
    "supported_modes":[
       "lut"
    ],
-   "measure_device":"Zhurui PR10",
+   "measure_device":"Zhurui PR10-D",
    "measure_description":"Measured with utils/measure script using OCR",
    "measure_method":"script",
    "linked_lut":"signify/1742930P7",
