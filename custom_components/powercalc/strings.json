@@ -142,12 +142,14 @@
           "calculation_enabled_condition": "Calculation enabled condition",
           "energy_integration_method": "Energy integration method",
           "ignore_unavailable_state": "Ignore unavailable state",
-          "multiply_factor": "Multiply factor"
+          "multiply_factor": "Multiply factor",
+          "unavailable_power": "Unavailable power"
         },
         "data_description": {
           "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
           "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups"
+          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state"
         }
       }
     },
@@ -193,7 +195,8 @@
           "hide_members": "[%key:component::powercalc::config::step::group::data::hide_members%]",
           "energy_integration_method": "[%key:component::powercalc::config::step::power_advanced::data::energy_integration_method%]",
           "ignore_unavailable_state": "[%key:component::powercalc::config::step::power_advanced::data::ignore_unavailable_state%]",
-          "multiply_factor": "[%key:component::powercalc::config::step::power_advanced::data::multiply_factor%]"
+          "multiply_factor": "[%key:component::powercalc::config::step::power_advanced::data::multiply_factor%]",
+          "unavailable_power": "[%key:component::powercalc::config::step::power_advanced::data::unavailable_power%]"
         },
         "data_description": {
           "calculation_enabled_condition": "[%key:component::powercalc::config::step::power_advanced::data_description::calculation_enabled_condition%]",
@@ -206,7 +209,8 @@
           "group_power_entities": "[%key:component::powercalc::config::step::group::data_description::group_power_entities%]",
           "group_energy_entities": "[%key:component::powercalc::config::step::group::data_description::group_energy_entities%]",
           "ignore_unavailable_state": "[%key:component::powercalc::config::step::power_advanced::data_description::ignore_unavailable_state%]",
-          "multiply_factor": "[%key:component::powercalc::config::step::power_advanced::data_description::multiply_factor%]"
+          "multiply_factor": "[%key:component::powercalc::config::step::power_advanced::data_description::multiply_factor%]",
+          "unavailable_power": "[%key:component::powercalc::config::step::power_advanced::data_description::unavailable_power%]"
         }
       }
     },

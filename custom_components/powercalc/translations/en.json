@@ -119,12 +119,14 @@
                     "calculation_enabled_condition": "Calculation enabled condition",
                     "energy_integration_method": "Energy integration method",
                     "ignore_unavailable_state": "Ignore unavailable state",
-                    "multiply_factor": "Multiply factor"
+                    "multiply_factor": "Multiply factor",
+                    "unavailable_power": "Unavailable power"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
                     "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups"
+                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
                 }
             },
             "user": {
@@ -199,6 +201,7 @@
                     "states_power": "States power",
                     "sub_groups": "Sub groups",
                     "hide_members": "Hide members",
+                    "unavailable_power": "Unavailable power",
                     "unit_of_measurement": "Unit of measurement",
                     "update_frequency": "Update frequency",
                     "value": "Value",
@@ -215,7 +218,8 @@
                     "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
                     "power_template": "Template will be evaluated to get the power value in W",
                     "states_power": "One 'state: power' pair on each row, see example above",
-                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
                 }
             }
         }
