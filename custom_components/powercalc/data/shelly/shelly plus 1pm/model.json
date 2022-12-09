@@ -1,0 +1,21 @@
+{
+	"measure_description": "Manually measured.",
+	"measure_method": "manual",
+	"measure_device": "TP-Link Kasa KP115",
+	"name": "Shelly Plus 1PM",
+	"standby_power": 0.6,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"supported_modes": [
+		"fixed"
+	],
+	"fixed_config": {
+		"power": 0.9
+	},
+	"aliases": [
+		"KP115(AU)"
+	]
+}
