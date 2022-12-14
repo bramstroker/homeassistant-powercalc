@@ -11,8 +11,5 @@
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "fixed_config": {
         "power": 5.33
-    },
-    "aliases": [
-        "Connect"
-    ]
+    }
 }
