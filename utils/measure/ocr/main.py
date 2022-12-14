@@ -10,13 +10,18 @@ def main():
     """
     parser = argparse.ArgumentParser()
 
-    required_named = parser.add_argument_group('required named arguments')
+    required_named = parser.add_argument_group("required named arguments")
 
-    required_named.add_argument('-t', '--tess_path',
-                               help="path to the cmd root of tesseract install (see docs for further help)",
-                               metavar='', required=True)
-    parser.add_argument("-s", "--src", help="SRC video source for video capture",
-                        default=0, type=str)
+    required_named.add_argument(
+        "-t",
+        "--tess_path",
+        help="path to the cmd root of tesseract install (see docs for further help)",
+        metavar="",
+        required=True,
+    )
+    parser.add_argument(
+        "-s", "--src", help="SRC video source for video capture", default=0, type=str
+    )
 
     args = parser.parse_args()
 
@@ -24,5 +29,5 @@ def main():
     ocr.ocr_stream(source=args.src)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()  # '/usr/local/Cellar/tesseract/4.1.1/bin/tesseract'

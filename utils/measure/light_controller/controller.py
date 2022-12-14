@@ -8,7 +8,9 @@ from .const import MAX_MIRED, MIN_MIRED
 class LightInfo:
     model_id: str
 
-    def __init__(self, model_id: str, min_mired: int = MIN_MIRED, max_mired: int = MAX_MIRED):
+    def __init__(
+        self, model_id: str, min_mired: int = MIN_MIRED, max_mired: int = MAX_MIRED
+    ):
         self.model_id = model_id
         self._min_mired = min_mired
         self._max_mired = max_mired

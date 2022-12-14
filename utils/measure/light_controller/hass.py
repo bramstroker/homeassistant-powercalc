@@ -11,7 +11,6 @@ from .errors import LightControllerError
 
 
 class HassLightController:
-
     def __init__(self, api_url: str, token: str):
         self._entity_id: str | None = None
         self._model_id: str | None = None
@@ -22,7 +21,7 @@ class HassLightController:
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         if not on:
-            self.client.trigger_service('light', 'turn_off', entity_id=self._entity_id)
+            self.client.trigger_service("light", "turn_off", entity_id=self._entity_id)
             return
 
         if color_mode == MODE_HS:
@@ -32,7 +31,7 @@ class HassLightController:
         else:
             json = self.build_bri_json_body(**kwargs)
 
-        self.client.trigger_service('light', 'turn_on', **json)
+        self.client.trigger_service("light", "turn_on", **json)
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(self._entity_id)
@@ -47,15 +46,13 @@ class HassLightController:
 
         return [
             inquirer.List(
-                name="light_entity_id",
-                message="Select the light",
-                choices=light_list
+                name="light_entity_id", message="Select the light", choices=light_list
             ),
             inquirer.Text(
                 name="light_model_id",
                 message="What model is your light? Ex: LED1837R5",
                 validate=lambda _, x: len(x) > 0,
-            )
+            ),
         ]
 
     def process_answers(self, answers: dict[str, Any]):
@@ -71,7 +68,12 @@ class HassLightController:
         }
 
     def build_ct_json_body(self, bri: int, ct: int) -> dict:
-        return {"entity_id": self._entity_id, "transition": 0, "brightness": bri, "color_temp": ct}
+        return {
+            "entity_id": self._entity_id,
+            "transition": 0,
+            "brightness": bri,
+            "color_temp": ct,
+        }
 
     def build_bri_json_body(self, bri: int) -> dict:
         return {"entity_id": self._entity_id, "transition": 0, "brightness": bri}

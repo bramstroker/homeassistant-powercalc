@@ -22,7 +22,9 @@ class HassPowerMeter(PowerMeter):
 
     def get_power(self) -> PowerMeasurementResult:
         if self._call_update_entity:
-            self.client.trigger_service("homeassistant", "update_entity", entity_id=self._entity_id)
+            self.client.trigger_service(
+                "homeassistant", "update_entity", entity_id=self._entity_id
+            )
             time.sleep(1)
 
         state = self.client.get_state(self._entity_id)
@@ -36,7 +38,7 @@ class HassPowerMeter(PowerMeter):
             inquirer.List(
                 name="powermeter_entity_id",
                 message="Select the powermeter",
-                choices=power_sensor_list
+                choices=power_sensor_list,
             )
         ]
 
@@ -44,10 +46,11 @@ class HassPowerMeter(PowerMeter):
         entities = self.client.get_entities()
         sensors = entities["sensor"].entities.values()
         power_sensors = [
-            entity.entity_id for entity in sensors if 
-            hasattr(entity.state, 'attributes') and 
-            hasattr(entity.state.attributes, 'unit_of_measurement') and 
-            entity.state.attributes['unit_of_measurement'] == "W"
+            entity.entity_id
+            for entity in sensors
+            if hasattr(entity.state, "attributes")
+            and hasattr(entity.state.attributes, "unit_of_measurement")
+            and entity.state.attributes["unit_of_measurement"] == "W"
         ]
         return sorted(power_sensors)
 

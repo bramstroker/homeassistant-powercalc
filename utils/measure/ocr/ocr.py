@@ -17,8 +17,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(os.path.join(sys.path[0], "ocr.log")),
-        logging.StreamHandler()
-    ]
+        logging.StreamHandler(),
+    ],
 )
 
 _LOGGER = logging.getLogger("ocr")
@@ -26,6 +26,7 @@ _LOGGER = logging.getLogger("ocr")
 WINDOW_NAME = "Realtime OCR"
 
 OCR_SLEEP = 0.5
+
 
 def tesseract_location(root):
     """
@@ -38,7 +39,9 @@ def tesseract_location(root):
     try:
         pytesseract.pytesseract.tesseract_cmd = root
     except FileNotFoundError:
-        print("Please double check the Tesseract file directory or ensure it's installed.")
+        print(
+            "Please double check the Tesseract file directory or ensure it's installed."
+        )
         sys.exit(1)
 
 
@@ -79,7 +82,7 @@ class RateCounter:
         """
         Returns the iterations/seconds
         """
-        elapsed_time = (time.perf_counter() - self.start_time)
+        elapsed_time = time.perf_counter() - self.start_time
         return self.iterations / elapsed_time
 
     def render(self, frame: numpy.ndarray, rate: float) -> numpy.ndarray:
@@ -94,19 +97,26 @@ class RateCounter:
         :return: CV2 display frame with rate added
         """
 
-        cv2.putText(frame, "{} Iterations/Second".format(int(rate)),
-                    (10, 35), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255))
+        cv2.putText(
+            frame,
+            "{} Iterations/Second".format(int(rate)),
+            (10, 35),
+            cv2.FONT_HERSHEY_DUPLEX,
+            1.0,
+            (255, 255, 255),
+        )
         return frame
 
+
 class VideoStream:
-    """Class for grabbing frames from CV2 video capture. """
+    """Class for grabbing frames from CV2 video capture."""
 
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
         if self.frame is None:
             print("Could not find camera")
-            #exit(1)
+            # exit(1)
         self.stopped = False
         cv2.namedWindow(WINDOW_NAME)
 
@@ -141,7 +151,7 @@ class VideoStream:
         Sets the self.stopped attribute as True and kills the VideoCapture stream read
         """
         self.stopped = True
-    
+
     def capture_image(self, frame: numpy.ndarray = None, captures=0):
         """
         Capture a .jpg during CV2 video stream. Saves to a folder /images in working directory.
@@ -155,26 +165,33 @@ class VideoStream:
             frame = self.frame
 
         cwd_path = os.getcwd()
-        Path(cwd_path + '/images').mkdir(parents=False, exist_ok=True)
+        Path(cwd_path + "/images").mkdir(parents=False, exist_ok=True)
 
         now = datetime.now()
         # Example: "OCR 2021-04-8 at 12:26:21-1.jpg"  ...Handles multiple captures taken in the same second
-        name = "OCR " + now.strftime("%Y-%m-%d") + " at " + now.strftime("%H:%M:%S") + '-' + str(captures + 1) + '.jpg'
-        path = 'images/' + name
+        name = (
+            "OCR "
+            + now.strftime("%Y-%m-%d")
+            + " at "
+            + now.strftime("%H:%M:%S")
+            + "-"
+            + str(captures + 1)
+            + ".jpg"
+        )
+        path = "images/" + name
         cv2.imwrite(path, frame)
         captures += 1
         print(name)
         return captures
-    
-    
+
 
 class OcrRegionSelection:
     def __init__(self, video_stream: VideoStream) -> None:
-        self.selection = None 
-        self.drag_start = None 
+        self.selection = None
+        self.drag_start = None
         self.is_selecting = False
         self.stream = video_stream
-    
+
     def start(self):
         """
         Creates a thread targeted at get(), which reads frames from CV2 VideoCapture
@@ -183,18 +200,18 @@ class OcrRegionSelection:
         """
         Thread(target=self.register_mouse_callback, args=()).start()
         return self
-    
+
     def register_mouse_callback(self):
         cv2.setMouseCallback(WINDOW_NAME, self.draw_rectangle)
 
-    # Method to track mouse events 
-    def draw_rectangle(self, event, x, y, flags, param): 
-        x, y = numpy.int16([x, y]) 
+    # Method to track mouse events
+    def draw_rectangle(self, event, x, y, flags, param):
+        x, y = numpy.int16([x, y])
 
         if event == cv2.EVENT_LBUTTONDOWN:
             # Start selection
             if not self.is_selecting:
-                self.drag_start = (x, y) 
+                self.drag_start = (x, y)
                 self.is_selecting = True
             # Confirm selection
             else:
@@ -205,25 +222,49 @@ class OcrRegionSelection:
 
         if event == cv2.EVENT_MOUSEMOVE:
             if self.is_selecting and self.drag_start:
-                x_start, y_start = self.drag_start 
-                self.selection = (x_start, y_start, x, y) 
-    
+                x_start, y_start = self.drag_start
+                self.selection = (x_start, y_start, x, y)
+
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
         if self.selection:
-            cv2.rectangle(frame, (self.selection[0], self.selection[1]), (self.selection[2], self.selection[3]), (0, 255, 0), 2)
+            cv2.rectangle(
+                frame,
+                (self.selection[0], self.selection[1]),
+                (self.selection[2], self.selection[3]),
+                (0, 255, 0),
+                2,
+            )
         else:
             (h, w) = frame.shape[:2]
-            y_center = h//2
-            cv2.rectangle(frame, (100, y_center - 40), (1400, y_center + 90), (0,0,0), -1)
-            cv2.putText(frame, "Start drawing the OCR region", (100, h//2), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
-            cv2.putText(frame, "Click, drag, and click another time to confirm", (100, h//2+50), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
+            y_center = h // 2
+            cv2.rectangle(
+                frame, (100, y_center - 40), (1400, y_center + 90), (0, 0, 0), -1
+            )
+            cv2.putText(
+                frame,
+                "Start drawing the OCR region",
+                (100, h // 2),
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.5,
+                (0, 255, 0),
+            )
+            cv2.putText(
+                frame,
+                "Click, drag, and click another time to confirm",
+                (100, h // 2 + 50),
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.5,
+                (0, 255, 0),
+            )
         return frame
-    
+
     def has_selection(self):
         return self.selection is not None
 
     def get_cropped_frame(self, frame: numpy.ndarray) -> numpy.ndarray:
-        return frame[self.selection[1]:self.selection[3], self.selection[0]:self.selection[2]]
+        return frame[
+            self.selection[1] : self.selection[3], self.selection[0] : self.selection[2]
+        ]
 
 
 class OCR:
@@ -254,12 +295,11 @@ class OCR:
                     frame = self.video_stream.frame
                     frame = self.region_selection.get_cropped_frame(frame)
 
-                    #Convert to grayscale for easier OCR detection
+                    # Convert to grayscale for easier OCR detection
                     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-                    
+
                     match = pytesseract.image_to_string(
-                        frame,
-                        config="-c tessedit_char_whitelist='0123456789.'"
+                        frame, config="-c tessedit_char_whitelist='0123456789.'"
                     )
                     _LOGGER.debug(f"OCR match: {match.strip()}")
                     if len(match) > 0:
@@ -276,15 +316,14 @@ class OCR:
                     time.sleep(OCR_SLEEP)
                 except Exception as e:
                     _LOGGER.error(f"OCR error: {e}")
-    
+
     def write_result(self, measurement: Decimal):
         if self.file is None:
             file_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "ocr_results.txt"
+                os.path.dirname(os.path.abspath(__file__)), "ocr_results.txt"
             )
             self.file = open(file_path, "a")
-        
+
         self.file.write(f"{time.time()};{str(measurement)}\n")
         self.file.flush()
 
@@ -293,13 +332,20 @@ class OCR:
         Sets the self.stopped attribute to True and kills the ocr() process
         """
         self.stopped = True
-    
+
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
         if self.measurement is None:
             return frame
-        frame = cv2.putText(frame, str(self.measurement), (100, 100), cv2.FONT_HERSHEY_DUPLEX, 1.5, (0, 255, 0))
+        frame = cv2.putText(
+            frame,
+            str(self.measurement),
+            (100, 100),
+            cv2.FONT_HERSHEY_DUPLEX,
+            1.5,
+            (0, 255, 0),
+        )
         return frame
-    
+
     def validate_measurement(self, measurement: Decimal) -> bool:
         if measurement > 100:
             _LOGGER.info("Measurement was too high, discarding")
@@ -313,16 +359,18 @@ class OCR:
             diff_percentage = self.get_percentage_change(self.measurement, measurement)
             _LOGGER.debug(f"Percentage diff: {diff_percentage}")
             if diff_percentage > 120:
-                _LOGGER.info("Difference between measurements is too high, this must be wrong")
+                _LOGGER.info(
+                    "Difference between measurements is too high, this must be wrong"
+                )
                 return False
-        
+
         return True
-    
+
     def get_percentage_change(self, current: Decimal, previous: Decimal) -> int:
         try:
             if current == previous:
                 return 0
-            elif(current > previous):
+            elif current > previous:
                 return int((abs(current - previous) / previous) * 100)
             else:
                 return int((abs(previous - current) / current) * 100)
@@ -336,9 +384,13 @@ def ocr_stream(source: str = "0"):
     boxes overlaid in real-time.
     """
 
-    video_stream = VideoStream(source).start()  # Starts reading the video stream in dedicated thread
+    video_stream = VideoStream(
+        source
+    ).start()  # Starts reading the video stream in dedicated thread
     region_selection = OcrRegionSelection(video_stream).start()
-    ocr = OCR(video_stream, region_selection).start()  # Starts optical character recognition in dedicated thread
+    ocr = OCR(
+        video_stream, region_selection
+    ).start()  # Starts optical character recognition in dedicated thread
     cps1 = RateCounter().start()
 
     print("OCR stream started")
@@ -349,7 +401,7 @@ def ocr_stream(source: str = "0"):
     while True:
         # Quit condition:
         pressed_key = cv2.waitKey(1) & 0xFF
-        if pressed_key == ord('q'):
+        if pressed_key == ord("q"):
             video_stream.stop_process()
             ocr.stop_process()
             print("OCR stream stopped\n")
