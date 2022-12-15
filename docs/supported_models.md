@@ -1,5 +1,5 @@
 - [Lights](#Lights) (198)
-- [Smart speakers](#Smart-speakers) (11)
+- [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
@@ -207,7 +207,7 @@
 |zipato         |RGBWE2                   |Zipato RGBW Bulb V2                                                              |lut              |                                                                                               |
 
 ## Smart speakers
-#### 11 total
+#### 12 total
 
 |manufacturer |            model id             |                  name                  |calculation modes|        aliases         |
 |-------------|---------------------------------|----------------------------------------|-----------------|------------------------|
@@ -217,6 +217,7 @@
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |linear           |Google Nest Mini        |
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |linear           |                        |
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|linear           |Lenovo Smart Clock      |
+|sonos        |connect                          |Sonos Connect                           |fixed            |                        |
 |sonos        |one                              |Sonos One                               |linear           |Sonos ONE               |
 |sonos        |one sl                           |Sonos One SL                            |linear           |                        |
 |sonos        |play 3                           |Sonos Play:3                            |linear           |Play:3                  |
