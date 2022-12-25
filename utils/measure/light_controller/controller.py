@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+import inquirer.questions
+
 from .const import MAX_MIRED, MIN_MIRED
 
 
@@ -44,7 +46,7 @@ class LightController(Protocol):
         """Get device information about the light"""
         ...
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
         """Get questions to ask for the chosen light controller"""
         ...
 

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import inquirer.questions
+
 from .controller import LightInfo
 
 
@@ -10,9 +12,9 @@ class DummyLightController:
         pass
 
     def get_light_info(self) -> LightInfo:
-        return LightInfo("")
+        return LightInfo("dummy")
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
         return []
 
     def process_answers(self, answers: dict[str, Any]):

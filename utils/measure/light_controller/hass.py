@@ -5,7 +5,7 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 
-from .const import MAX_MIRED, MIN_MIRED, MODE_COLOR_TEMP, MODE_HS
+from .const import MAX_MIRED, MIN_MIRED, ColorMode
 from .controller import LightInfo
 from .errors import LightControllerError
 
@@ -24,9 +24,9 @@ class HassLightController:
             self.client.trigger_service("light", "turn_off", entity_id=self._entity_id)
             return
 
-        if color_mode == MODE_HS:
+        if color_mode == ColorMode.HS:
             json = self.build_hs_json_body(**kwargs)
-        elif color_mode == MODE_COLOR_TEMP:
+        elif color_mode == ColorMode.COLOR_TEMP:
             json = self.build_ct_json_body(**kwargs)
         else:
             json = self.build_bri_json_body(**kwargs)
@@ -39,7 +39,7 @@ class HassLightController:
         max_mired = state.attributes.get("max_mireds") or MAX_MIRED
         return LightInfo(self._model_id, min_mired, max_mired)
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
         entities = self.client.get_entities()
         lights = entities["light"].entities.values()
         light_list = sorted([entity.entity_id for entity in lights])
