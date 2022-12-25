@@ -1,9 +1,9 @@
-- [Lights](#Lights) (202)
+- [Lights](#Lights) (204)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 202 total
+#### 204 total
 
 | manufacturer  |        model id         |                                         name                                          |calculation modes|                                            aliases                                            |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|-----------------|-----------------------------------------------------------------------------------------------|
@@ -111,6 +111,8 @@
 |rye            |Candlebra                |Candlebra                                                                              |lut              |                                                                                               |
 |signify        |1742930P7                |Hue Impress Outdoor Wall Light Small                                                   |lut              |                                                                                               |
 |signify        |1743130P7                |Hue Impress Pedestal Low                                                               |lut              |1743430P7,1745430P7                                                                            |
+|signify        |3216231P6                |Hue White Ambiance Aurelle Square                                                      |lut              |                                                                                               |
+|signify        |3216331P6                |Hue White Ambiance Aurelle Rectangular                                                 |lut              |                                                                                               |
 |signify        |915005996601             |Hue Enrave Medium                                                                      |lut              |                                                                                               |
 |signify        |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                                       |lut              |9290022166,929003053401,LCA005,9290022266A                                                     |
 |signify        |LCA003                   |Hue White and Color Ambiance A19 E26                                                   |lut              |                                                                                               |
