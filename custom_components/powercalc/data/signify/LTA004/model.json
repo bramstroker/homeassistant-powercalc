@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Fibargroup, FGWP102",
+    "measure_device": "Fibaro FGWP102",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,

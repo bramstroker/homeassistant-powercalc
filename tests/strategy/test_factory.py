@@ -4,7 +4,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.const import CalculationStrategy
 from custom_components.powercalc.errors import (
     StrategyConfigurationError,
-    UnsupportedMode,
+    UnsupportedStrategy,
 )
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 
@@ -12,7 +12,7 @@ from .common import create_source_entity
 
 
 async def test_exception_raised_on_not_supported_strategy(hass: HomeAssistant) -> None:
-    with pytest.raises(UnsupportedMode):
+    with pytest.raises(UnsupportedStrategy):
         factory = PowerCalculatorStrategyFactory(hass)
         factory.create(
             {},

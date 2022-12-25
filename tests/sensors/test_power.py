@@ -59,7 +59,7 @@ from ..common import (
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -74,7 +74,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
 
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -108,7 +108,7 @@ async def test_rounding_precision(hass: HomeAssistant):
     config = {CONF_POWER_SENSOR_PRECISION: 4}
     await async_setup_component(hass, DOMAIN, {DOMAIN: config})
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test", 50),
     )
@@ -130,7 +130,7 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
     """
     hass.state = CoreState.not_running
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -150,7 +150,7 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
 async def test_standby_power(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -175,7 +175,7 @@ async def test_standby_power(hass: HomeAssistant):
 async def test_multiply_factor(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -202,7 +202,7 @@ async def test_error_when_no_strategy_has_been_configured(
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {CONF_ENTITY_ID: "input_boolean.test"},
     )
@@ -223,7 +223,7 @@ async def test_strategy_enabled_condition(hass: HomeAssistant):
     vacuum_entity_id = "vacuum.my_robot_cleaner"
     power_entity_id = "sensor.my_robot_cleaner_power"
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: vacuum_entity_id,
@@ -278,7 +278,7 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     await create_input_number(hass, "test", 0)
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -300,7 +300,7 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
 async def test_unknown_source_entity_state(hass: HomeAssistant):
     """Power sensor should be unavailable when source entity state is unknown"""
     await create_input_boolean(hass)
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -319,7 +319,7 @@ async def test_error_when_model_not_supported(
     caplog.set_level(logging.ERROR)
 
     await create_input_boolean(hass)
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -338,7 +338,7 @@ async def test_sleep_power(hass: HomeAssistant):
     entity_id = "media_player.test"
     power_entity_id = "sensor.test_power"
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: entity_id,
@@ -382,7 +382,7 @@ async def test_unavailable_power(hass: HomeAssistant):
     """Test specifying an alternative power value if the source entity is unavailable"""
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -401,7 +401,7 @@ async def test_unavailable_power(hass: HomeAssistant):
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),
         {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},

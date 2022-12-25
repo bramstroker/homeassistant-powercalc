@@ -11,6 +11,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_FIXED,
+    CONF_MULTIPLY_FACTOR,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
@@ -23,7 +24,7 @@ from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
 
-from ..common import create_input_boolean, create_input_number
+from ..common import create_input_boolean, create_input_number, run_powercalc_setup
 from .common import create_source_entity
 
 
@@ -186,6 +187,32 @@ async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant
     state = hass.states.get("sensor.test_power")
     assert state
     assert state.state == "40.00"
+
+
+async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant):
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/1369
+    """
+
+    await create_input_boolean(hass, "test")
+    await create_input_number(hass, "test", 30)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_FIXED: {CONF_POWER: "{{states('input_number.test')}}"},
+            CONF_MULTIPLY_FACTOR: 100,
+        },
+    )
+
+    hass.states.async_set("input_boolean.test", STATE_ON)
+    hass.states.async_set("input_number.test", "20.5")
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "2050.00"
 
 
 def _create_strategy(

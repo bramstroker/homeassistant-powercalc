@@ -23,10 +23,7 @@ class ShellyApiGen1(ShellyApi):
     api_version = 1
 
     def parse_json(self, json: dict) -> tuple[float, float]:
-        return (
-            float(json["power"]),
-            float(json["timestamp"])
-        )
+        return (float(json["power"]), float(json["timestamp"]))
 
 
 class ShellyApiGen2(ShellyApi):
@@ -35,10 +32,7 @@ class ShellyApiGen2(ShellyApi):
     meter_endpoint = "/rpc/Switch.GetStatus?id=0"
 
     def parse_json(self, json: dict) -> tuple[float, float]:
-        return (
-            float(json["apower"]),
-            time.time()
-        )
+        return (float(json["apower"]), time.time())
 
 
 class ShellyPowerMeter(PowerMeter):
@@ -49,7 +43,10 @@ class ShellyPowerMeter(PowerMeter):
 
     def get_power(self) -> PowerMeasurementResult:
         try:
-            r = requests.get("http://{}{}".format(self.ip_address, self.api.meter_endpoint), timeout=self.timeout)
+            r = requests.get(
+                "http://{}{}".format(self.ip_address, self.api.meter_endpoint),
+                timeout=self.timeout,
+            )
         except requests.RequestException as e:
             _LOGGER.error("Problem connecting to Shelly plug: %s", e)
             raise ConnectionError("Could not connect to Shelly Plug")
@@ -71,7 +68,7 @@ class ShellyPowerMeter(PowerMeter):
             if response.status_code != 200:
                 _LOGGER.debug(f"Unexpected status code {response.status_code}")
                 continue
-        
+
             _LOGGER.debug(f"Shelly API version {api.api_version} detected")
             return api
 

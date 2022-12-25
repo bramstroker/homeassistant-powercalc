@@ -14,7 +14,7 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from tests.common import get_test_profile_dir, run_powercalc_setup_yaml_config
+from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
 async def test_media_player(hass: HomeAssistant):
@@ -47,7 +47,7 @@ async def test_media_player(hass: HomeAssistant):
 
     power_sensor_id = "sensor.nest_mini_power"
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: entity_id,

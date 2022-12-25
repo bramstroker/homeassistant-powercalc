@@ -367,12 +367,6 @@ class DiscoveryManager:
                 )
                 continue
 
-            if power_profile.is_additional_configuration_required:
-                _LOGGER.warning(
-                    f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-                )
-                continue
-
             if not power_profile.is_entity_domain_supported(source_entity.domain):
                 continue
 
@@ -422,7 +416,7 @@ class DiscoveryManager:
         )
 
         # Code below if for legacy discovery routine, will be removed somewhere in the future
-        if power_profile and not power_profile.has_sub_profiles:
+        if power_profile and not power_profile.is_additional_configuration_required:
             discovery_info = {
                 CONF_ENTITY_ID: source_entity.entity_id,
                 DISCOVERY_SOURCE_ENTITY: source_entity,
