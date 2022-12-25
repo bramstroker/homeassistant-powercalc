@@ -201,10 +201,8 @@ async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant)
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
-            CONF_FIXED: {
-                CONF_POWER: "{{states('input_number.test')}}"
-            },
-            CONF_MULTIPLY_FACTOR: 100
+            CONF_FIXED: {CONF_POWER: "{{states('input_number.test')}}"},
+            CONF_MULTIPLY_FACTOR: 100,
         },
     )
 
