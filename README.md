@@ -48,7 +48,13 @@ See [supported models](docs/supported_models.md) for the listing of supported de
 ## Installation
 
 ### HACS
-This integration is part of the default HACS repository. Just click "Explore and add repository" to install
+This integration is part of the default HACS repository. Just click "Explore and add repository" to install.
+
+You _could_ also use the link below
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
+
+**Important**: After you installed follow the post installation steps. This will make auto discovery work correctly.
 
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
@@ -354,6 +360,8 @@ sensor:
         paused: 2.25
         idle: 1.5
 ```
+
+> Remark: You cannot use `off` in states_power as this is handled separately by powercalc. You'll need to use `standby_power` to indicate the power when the device is off.
 
 You can also use state attributes. Use the `|` delimiter to seperate the attribute and value. Here is en example:
 
