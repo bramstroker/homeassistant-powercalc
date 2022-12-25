@@ -1,16 +1,18 @@
-import config
 import logging
+
+import config
+
 from .const import PowerMeterType
 from .dummy import DummyPowerMeter
+from .errors import PowerMeterError
 from .hass import HassPowerMeter
 from .kasa import KasaPowerMeter
 from .manual import ManualPowerMeter
 from .ocr import OcrPowerMeter
+from .powermeter import PowerMeter
 from .shelly import ShellyPowerMeter
 from .tasmota import TasmotaPowerMeter
 from .tuya import TuyaPowerMeter
-from .powermeter import PowerMeter
-from .errors import PowerMeterError
 
 _LOGGER = logging.getLogger("measure")
 
@@ -22,7 +24,9 @@ class PowerMeterFactory:
 
     @staticmethod
     def hass():
-        return HassPowerMeter(config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE)
+        return HassPowerMeter(
+            config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE
+        )
 
     @staticmethod
     def kasa():
@@ -47,7 +51,10 @@ class PowerMeterFactory:
     @staticmethod
     def tuya():
         return TuyaPowerMeter(
-            config.TUYA_DEVICE_ID, config.TUYA_DEVICE_IP, config.TUYA_DEVICE_KEY, config.TUYA_DEVICE_VERSION
+            config.TUYA_DEVICE_ID,
+            config.TUYA_DEVICE_IP,
+            config.TUYA_DEVICE_KEY,
+            config.TUYA_DEVICE_VERSION,
         )
 
     def create(self) -> PowerMeter:
@@ -60,10 +67,12 @@ class PowerMeterFactory:
             PowerMeterType.SHELLY: self.shelly,
             PowerMeterType.TASMOTA: self.tasmota,
             PowerMeterType.TUYA: self.tuya,
-            PowerMeterType.DUMMY: self.dummy
+            PowerMeterType.DUMMY: self.dummy,
         }
         factory = factories.get(config.SELECTED_POWER_METER)
         if factory is None:
-            raise PowerMeterError(f"Could not find a factory for {config.SELECTED_POWER_METER}")
+            raise PowerMeterError(
+                f"Could not find a factory for {config.SELECTED_POWER_METER}"
+            )
 
         return factory()

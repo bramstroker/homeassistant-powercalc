@@ -1,11 +1,12 @@
 import logging
 
-from .hass import HassLightController
-from .hue import HueLightController
-from .dummy import DummyLightController
+import config
+
 from .const import LightControllerType
 from .controller import LightController
-import config
+from .dummy import DummyLightController
+from .hass import HassLightController
+from .hue import HueLightController
 
 _LOGGER = logging.getLogger("measure")
 
@@ -28,10 +29,12 @@ class LightControllerFactory:
         factories = {
             LightControllerType.DUMMY: self.dummy,
             LightControllerType.HUE: self.hue,
-            LightControllerType.HASS: self.hass
+            LightControllerType.HASS: self.hass,
         }
         factory = factories.get(config.SELECTED_LIGHT_CONTROLLER)
         if factory is None:
-            raise Exception(f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}")
+            raise Exception(
+                f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}"
+            )
 
         return factory()

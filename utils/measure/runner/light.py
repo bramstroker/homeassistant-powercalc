@@ -4,27 +4,28 @@ import csv
 import gzip
 import logging
 import os
+import re
 import shutil
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
-from typing import Any, Iterator, Optional, TextIO
 from pathlib import Path
-import re
+from typing import Any, Iterator, Optional, TextIO
 
-import inquirer
 import config
+import inquirer
+from light_controller.const import ColorMode
 from light_controller.controller import LightInfo
 from light_controller.factory import LightControllerFactory
-from light_controller.const import ColorMode
+from measure_util import MeasureUtil
 from powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
 from powermeter.factory import PowerMeterFactory
+
 from .runner import MeasurementRunner, RunnerResult
-from measure_util import MeasureUtil
 
 CSV_HEADERS = {
     ColorMode.HS: ["bri", "hue", "sat", "watt"],
@@ -78,7 +79,9 @@ class LightRunner(MeasurementRunner):
     def get_export_directory(self) -> str:
         return f"{self.light_info.model_id}"
 
-    def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
+    def run(
+        self, answers: dict[str, Any], export_directory: str
+    ) -> RunnerResult | None:
         """Run the measurement session for lights"""
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
 
@@ -95,13 +98,16 @@ class LightRunner(MeasurementRunner):
         num_variations = len(variations)
 
         _LOGGER.info(
-            f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}")
+            f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}"
+        )
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
             csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
             if resume_at is None:
-                self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=True, bri=1)
+                self.light_controller.change_light_state(
+                    ColorMode.BRIGHTNESS, on=True, bri=1
+                )
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
@@ -113,22 +119,36 @@ class LightRunner(MeasurementRunner):
                 if count % 10 == 0:
                     time_left = self.calculate_time_left(variations, variation, count)
                     progress_percentage = round(count / num_variations * 100)
-                    _LOGGER.info(f"Progress: {progress_percentage}%, Estimated time left: {time_left}")
+                    _LOGGER.info(
+                        f"Progress: {progress_percentage}%, Estimated time left: {time_left}"
+                    )
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
                     self.color_mode, on=True, **asdict(variation)
                 )
 
-                if previous_variation and isinstance(variation, ColorTempVariation) and variation.ct < previous_variation.ct:
+                if (
+                    previous_variation
+                    and isinstance(variation, ColorTempVariation)
+                    and variation.ct < previous_variation.ct
+                ):
                     _LOGGER.info("Extra waiting for significant CT change...")
                     time.sleep(config.SLEEP_TIME_CT)
 
-                if previous_variation and isinstance(variation, HsVariation) and variation.sat < previous_variation.sat:
+                if (
+                    previous_variation
+                    and isinstance(variation, HsVariation)
+                    and variation.sat < previous_variation.sat
+                ):
                     _LOGGER.info("Extra waiting for significant SAT change...")
                     time.sleep(config.SLEEP_TIME_SAT)
 
-                if previous_variation and isinstance(variation, HsVariation) and variation.hue < previous_variation.hue:
+                if (
+                    previous_variation
+                    and isinstance(variation, HsVariation)
+                    and variation.hue < previous_variation.hue
+                ):
                     _LOGGER.info("Extra waiting for significant HUE change...")
                     time.sleep(config.SLEEP_TIME_HUE)
 
@@ -142,7 +162,9 @@ class LightRunner(MeasurementRunner):
                     self.num_0_readings += 1
                     _LOGGER.warning(f"Discarding measurement: {error}")
                     if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                        _LOGGER.error("Aborting measurement session. Received too many 0 readings")
+                        _LOGGER.error(
+                            "Aborting measurement session. Received too many 0 readings"
+                        )
                         return
                     continue
                 except PowerMeterError as error:
@@ -152,7 +174,9 @@ class LightRunner(MeasurementRunner):
                 csv_writer.write_measurement(variation, power)
 
             csv_file.close()
-            _LOGGER.info(f"Hooray! measurements finished. Exported CSV file {csv_file_path}")
+            _LOGGER.info(
+                f"Hooray! measurements finished. Exported CSV file {csv_file_path}"
+            )
 
             self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
             _LOGGER.info("Turning off the light")
@@ -162,13 +186,15 @@ class LightRunner(MeasurementRunner):
 
         return RunnerResult(
             model_json_data={"supported_modes": ["lut"]},
-            skip_model_json_generation=resume_at is not None
+            skip_model_json_generation=resume_at is not None,
         )
 
     def get_dummy_load_value(self) -> float:
         """Get the previously measured dummy load value"""
 
-        dummy_load_file = os.path.join(Path(__file__).parent.absolute(), ".persistent/dummy_load")
+        dummy_load_file = os.path.join(
+            Path(__file__).parent.absolute(), ".persistent/dummy_load"
+        )
         if not os.path.exists(dummy_load_file):
             return self.measure_dummy_load(dummy_load_file)
 
@@ -178,7 +204,8 @@ class LightRunner(MeasurementRunner):
     def measure_dummy_load(self, file_path: str) -> float:
         """Measure the dummy load and persist the value for future measurement session"""
         input(
-            "Only connect your dummy load to your smart plug, not the light! Press enter to start measuring the dummy load..")
+            "Only connect your dummy load to your smart plug, not the light! Press enter to start measuring the dummy load.."
+        )
         values = []
         for i in range(1):
             result = self.power_meter.get_power()
@@ -193,7 +220,9 @@ class LightRunner(MeasurementRunner):
         input("Connect your light now and press enter to start measuring..")
         return average
 
-    def get_variations(self, color_mode: ColorMode, resume_at: Optional[Variation] = None) -> Iterator[Variation]:
+    def get_variations(
+        self, color_mode: ColorMode, resume_at: Optional[Variation] = None
+    ) -> Iterator[Variation]:
         """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == ColorMode.HS:
             variations = self.get_hs_variations()
@@ -219,20 +248,32 @@ class LightRunner(MeasurementRunner):
         """Get color_temp variations"""
         min_mired = round(self.light_info.min_mired)
         max_mired = round(self.light_info.max_mired)
-        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS):
-            for mired in self.inclusive_range(min_mired, max_mired, config.CT_MIRED_STEPS):
+        for bri in self.inclusive_range(
+            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS
+        ):
+            for mired in self.inclusive_range(
+                min_mired, max_mired, config.CT_MIRED_STEPS
+            ):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
         """Get hue/sat variations"""
-        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS):
-            for sat in self.inclusive_range(config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS):
-                for hue in self.inclusive_range(config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS):
+        for bri in self.inclusive_range(
+            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS
+        ):
+            for sat in self.inclusive_range(
+                config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS
+            ):
+                for hue in self.inclusive_range(
+                    config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS
+                ):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
         """Get brightness variations"""
-        for bri in self.inclusive_range(config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS):
+        for bri in self.inclusive_range(
+            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS
+        ):
             yield Variation(bri=bri)
 
     @staticmethod
@@ -245,7 +286,11 @@ class LightRunner(MeasurementRunner):
         yield end
 
     @staticmethod
-    def calculate_time_left(variations: list[Variation], current_variation: Variation = None, progress: int = 0) -> str:
+    def calculate_time_left(
+        variations: list[Variation],
+        current_variation: Variation = None,
+        progress: int = 0,
+    ) -> str:
         """Try to guess the remaining time left. This will not account for measuring errors / retries obviously"""
         num_variations_left = len(variations) - progress
 
@@ -257,16 +302,34 @@ class LightRunner(MeasurementRunner):
             time_left += config.SLEEP_STANDBY + config.SLEEP_INITIAL
         time_left += num_variations_left * (config.SLEEP_TIME + estimated_step_delay)
         if config.SAMPLE_COUNT > 1:
-            time_left += num_variations_left * config.SAMPLE_COUNT * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
+            time_left += (
+                num_variations_left
+                * config.SAMPLE_COUNT
+                * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
+            )
 
         if isinstance(current_variation, HsVariation):
-            sat_steps_left = round((config.MAX_BRIGHTNESS - current_variation.bri) / config.HS_BRI_STEPS) - 1
+            sat_steps_left = (
+                round(
+                    (config.MAX_BRIGHTNESS - current_variation.bri)
+                    / config.HS_BRI_STEPS
+                )
+                - 1
+            )
             time_left += sat_steps_left * config.SLEEP_TIME_SAT
-            hue_steps_left = round(config.MAX_HUE / config.HS_HUE_STEPS * sat_steps_left)
+            hue_steps_left = round(
+                config.MAX_HUE / config.HS_HUE_STEPS * sat_steps_left
+            )
             time_left += hue_steps_left * config.SLEEP_TIME_HUE
 
         if isinstance(current_variation, ColorTempVariation):
-            ct_steps_left = round((config.MAX_BRIGHTNESS - current_variation.bri) / config.CT_BRI_STEPS) - 1
+            ct_steps_left = (
+                round(
+                    (config.MAX_BRIGHTNESS - current_variation.bri)
+                    / config.CT_BRI_STEPS
+                )
+                - 1
+            )
             time_left += ct_steps_left * config.SLEEP_TIME_CT
 
         if time_left > 3600:
@@ -285,7 +348,9 @@ class LightRunner(MeasurementRunner):
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")
                 # If brightness is low, set brightness high. Else, turn light off
-                self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=(variation.bri < 128), bri=255)
+                self.light_controller.change_light_state(
+                    ColorMode.BRIGHTNESS, on=(variation.bri < 128), bri=255
+                )
                 time.sleep(config.PULSE_TIME_NUDGE)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
@@ -301,11 +366,14 @@ class LightRunner(MeasurementRunner):
                 self.num_0_readings += 1
                 _LOGGER.warning(f"Discarding measurement: {error}")
                 if self.num_0_readings > MAX_ALLOWED_0_READINGS:
-                    _LOGGER.error("Aborting measurement session. Received too many 0 readings")
+                    _LOGGER.error(
+                        "Aborting measurement session. Received too many 0 readings"
+                    )
                     return
                 continue
         raise OutdatedMeasurementError(
-            f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries")
+            f"Power measurement is outdated. Aborting after {nudge_count + 1} nudged retries"
+        )
 
     @staticmethod
     def should_resume(csv_file_path: str) -> bool:
@@ -351,7 +419,7 @@ class LightRunner(MeasurementRunner):
         if should_resume is None:
             return inquirer.confirm(
                 message="CSV File already exists. Do you want to resume measurements?",
-                default=True
+                default=True,
             )
         return should_resume
 
@@ -399,11 +467,15 @@ class LightRunner(MeasurementRunner):
             return ColorTempVariation(bri=int(last_row[0]), ct=int(last_row[1]))
 
         if self.color_mode == ColorMode.HS:
-            return HsVariation(bri=int(last_row[0]), hue=int(last_row[1]), sat=int(last_row[2]))
+            return HsVariation(
+                bri=int(last_row[0]), hue=int(last_row[1]), sat=int(last_row[2])
+            )
 
         raise Exception(f"Color mode {self.color_mode} not supported")
 
-    def take_power_measurement(self, start_timestamp: float, retry_count: int = 0) -> float:
+    def take_power_measurement(
+        self, start_timestamp: float, retry_count: int = 0
+    ) -> float:
         """Request a power reading from the configured power meter"""
         value = self.measure_util.take_measurement(start_timestamp, retry_count)
 
@@ -427,7 +499,9 @@ class LightRunner(MeasurementRunner):
         """Measures the standby power (when the light is OFF)"""
         self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
         start_time = time.time()
-        _LOGGER.info(f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds...")
+        _LOGGER.info(
+            f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds..."
+        )
         time.sleep(config.SLEEP_STANDBY)
         try:
             return self.take_power_measurement(start_time)
@@ -435,7 +509,8 @@ class LightRunner(MeasurementRunner):
             self.nudge_and_remeasure(ColorMode.BRIGHTNESS, Variation(0))
         except ZeroReadingError:
             _LOGGER.error(
-                "Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load.")
+                "Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load."
+            )
             return 0
 
     def get_questions(self) -> list[inquirer.questions.Question]:
@@ -445,28 +520,26 @@ class LightRunner(MeasurementRunner):
                 name="color_mode",
                 message="Select the color mode",
                 choices=[ColorMode.HS, ColorMode.COLOR_TEMP, ColorMode.BRIGHTNESS],
-                default=ColorMode.HS
+                default=ColorMode.HS,
             ),
             inquirer.Confirm(
-                name="gzip",
-                message="Do you want to gzip CSV files?",
-                default=True
+                name="gzip", message="Do you want to gzip CSV files?", default=True
             ),
             inquirer.Confirm(
                 name="dummy_load",
                 message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
-                default=False
+                default=False,
             ),
             inquirer.Confirm(
                 name="multiple_lights",
                 message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
-                default=False
+                default=False,
             ),
             inquirer.Text(
                 name="num_lights",
                 message="How many lights are you measuring?",
                 ignore=lambda answers: not answers.get("multiple_lights"),
-                validate=lambda _, current: re.match('\d+', current),
+                validate=lambda _, current: re.match("\d+", current),
             ),
         ]
         questions.extend(self.light_controller.get_questions())

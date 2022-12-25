@@ -7,22 +7,20 @@ import sys
 from enum import Enum
 from typing import Any
 
-import inquirer
 import config
-from decouple import config as decouple_config
+import inquirer
 from decouple import UndefinedValueError
+from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from light_controller.errors import LightControllerError
-from powermeter.errors import (
-    PowerMeterError,
-)
-from powermeter.powermeter import PowerMeter
-from powermeter.factory import PowerMeterFactory
-from runner.runner import MeasurementRunner
-from runner.light import LightRunner
-from runner.speaker import SpeakerRunner
 from measure_util import MeasureUtil
+from powermeter.errors import PowerMeterError
+from powermeter.factory import PowerMeterFactory
+from powermeter.powermeter import PowerMeter
+from runner.light import LightRunner
+from runner.runner import MeasurementRunner
+from runner.speaker import SpeakerRunner
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -31,8 +29,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(os.path.join(sys.path[0], "measure.log")),
-        logging.StreamHandler()
-    ]
+        logging.StreamHandler(),
+    ],
 )
 
 
@@ -90,13 +88,17 @@ class Measure:
 
         _LOGGER.info(f"Selected powermeter: {config.SELECTED_POWER_METER}")
         if DeviceType.LIGHT:
-            _LOGGER.info(f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}")
+            _LOGGER.info(
+                f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}"
+            )
 
         if config.SELECTED_DEVICE_TYPE:
             self.device_type = DeviceType(config.SELECTED_DEVICE_TYPE)
         else:
-            self.device_type = inquirer.list_input("What kind of device do you want to measure the power of?",
-                                         choices=[cls.value for cls in DeviceType])
+            self.device_type = inquirer.list_input(
+                "What kind of device do you want to measure the power of?",
+                choices=[cls.value for cls in DeviceType],
+            )
 
         self.runner = RunnerFactory().create_runner(self.device_type)
 
@@ -114,7 +116,10 @@ class Measure:
         if not runner_result:
             _LOGGER.error("Some error occured during the measurement session")
 
-        generate_model_json: bool = answers["generate_model_json"] and not runner_result.skip_model_json_generation
+        generate_model_json: bool = (
+            answers["generate_model_json"]
+            and not runner_result.skip_model_json_generation
+        )
 
         if generate_model_json:
             try:
@@ -128,15 +133,21 @@ class Measure:
                 standby_power=standby_power,
                 name=answers["model_name"],
                 measure_device=answers["measure_device"],
-                extra_json_data=runner_result.model_json_data
+                extra_json_data=runner_result.model_json_data,
             )
 
         if generate_model_json or isinstance(self.runner, LightRunner):
-            _LOGGER.info(f"Measurement session finished. Files exported to {export_directory}")
+            _LOGGER.info(
+                f"Measurement session finished. Files exported to {export_directory}"
+            )
 
     @staticmethod
     def write_model_json(
-            directory: str, standby_power: float, name: str, measure_device: str, extra_json_data: dict | None = None
+        directory: str,
+        standby_power: float,
+        name: str,
+        measure_device: str,
+        extra_json_data: dict | None = None,
     ):
         """Write model.json manifest file"""
         json_data = {
@@ -146,7 +157,7 @@ class Measure:
             "measure_settings": {
                 "VERSION": _VERSION,
                 "SAMPLE_COUNT": config.SAMPLE_COUNT,
-                "SLEEP_TIME": config.SLEEP_TIME
+                "SLEEP_TIME": config.SLEEP_TIME,
             },
             "name": name,
             "standby_power": standby_power,
@@ -173,7 +184,7 @@ class Measure:
             inquirer.Confirm(
                 name="generate_model_json",
                 message="Do you want to generate model.json?",
-                default=True
+                default=True,
             ),
             inquirer.Text(
                 name="model_name",
@@ -202,7 +213,11 @@ class Measure:
         all_questions = self.get_questions()
 
         # Only ask questions which answers are not predefined in .env file
-        questions_to_ask = [question for question in all_questions if not config_key_exists(str(question.name).upper())]
+        questions_to_ask = [
+            question
+            for question in all_questions
+            if not config_key_exists(str(question.name).upper())
+        ]
 
         predefined_answers = {}
         for question in all_questions:
@@ -233,7 +248,9 @@ def config_key_exists(key: str) -> bool:
 def validate_required(_, val):
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
-        raise ValidationError("", reason="This question cannot be empty, please put in a value")
+        raise ValidationError(
+            "", reason="This question cannot be empty, please put in a value"
+        )
     return True
 
 

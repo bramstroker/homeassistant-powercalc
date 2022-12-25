@@ -1,15 +1,20 @@
 import logging
+
 from decouple import Choices, UndefinedValueError, config
 from light_controller.const import LightControllerType
 from media_controller.const import MediaControllerType
 from powermeter.const import PowerMeterType
 
-MIN_BRIGHTNESS = min(max(
-    config(
-        "MIN_BRIGHTNESS",
-        default=config("START_BRIGHTNESS", default=1, cast=int),
-        cast=int
-    ), 1), 255
+MIN_BRIGHTNESS = min(
+    max(
+        config(
+            "MIN_BRIGHTNESS",
+            default=config("START_BRIGHTNESS", default=1, cast=int),
+            cast=int,
+        ),
+        1,
+    ),
+    255,
 )
 MAX_BRIGHTNESS = 255
 MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
@@ -38,9 +43,17 @@ HS_SAT_PRECISION = max(HS_SAT_PRECISION, 0.5)
 HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
 del HS_SAT_PRECISION
 
-SELECTED_LIGHT_CONTROLLER = config("LIGHT_CONTROLLER", cast=Choices([t.value for t in LightControllerType]))
-SELECTED_MEDIA_CONTROLLER = config("MEDIA_CONTROLLER", cast=Choices([t.value for t in MediaControllerType]), default=MediaControllerType.HASS)
-SELECTED_POWER_METER = config("POWER_METER", cast=Choices([t.value for t in PowerMeterType]))
+SELECTED_LIGHT_CONTROLLER = config(
+    "LIGHT_CONTROLLER", cast=Choices([t.value for t in LightControllerType])
+)
+SELECTED_MEDIA_CONTROLLER = config(
+    "MEDIA_CONTROLLER",
+    cast=Choices([t.value for t in MediaControllerType]),
+    default=MediaControllerType.HASS,
+)
+SELECTED_POWER_METER = config(
+    "POWER_METER", cast=Choices([t.value for t in PowerMeterType])
+)
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
 SLEEP_INITIAL = 10
@@ -66,7 +79,9 @@ TUYA_DEVICE_VERSION = config("TUYA_DEVICE_VERSION", default="3.3")
 HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
 HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
-HASS_CALL_UPDATE_ENTITY_SERVICE = config("HASS_CALL_UPDATE_ENTITY_SERVICE", default=False, cast=bool)
+HASS_CALL_UPDATE_ENTITY_SERVICE = config(
+    "HASS_CALL_UPDATE_ENTITY_SERVICE", default=False, cast=bool
+)
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 

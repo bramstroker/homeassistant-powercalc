@@ -1,10 +1,11 @@
 import logging
 
-from .controller import MediaController
+import config
+
 from .const import MediaControllerType
+from .controller import MediaController
 from .dummy import DummyMediaController
 from .hass import HassMediaController
-import config
 
 _LOGGER = logging.getLogger("measure")
 
@@ -22,10 +23,12 @@ class MediaControllerFactory:
         """Create the media controller instance"""
         factories = {
             MediaControllerType.DUMMY: self.dummy,
-            MediaControllerType.HASS: self.hass
+            MediaControllerType.HASS: self.hass,
         }
         factory = factories.get(config.SELECTED_MEDIA_CONTROLLER)
         if factory is None:
-            raise Exception(f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}")
+            raise Exception(
+                f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}"
+            )
 
         return factory()

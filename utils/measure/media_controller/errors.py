@@ -1,3 +1,2 @@
 class MediaPlayerError(Exception):
     pass
-
