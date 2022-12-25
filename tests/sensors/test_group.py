@@ -825,3 +825,39 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
 
     energy_state = hass.states.get("sensor.testgroup_power")
     assert energy_state.state == "200.00"
+
+
+async def test_gui_discovered_entity_in_yaml_group(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """
+    Test if a powercalc entity setup with the GUI (either discovered or manually) can be added to a YAML group
+    """
+
+    caplog.set_level(logging.ERROR)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "media_player.mediabox",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50}
+        },
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "GroupA",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "media_player.mediabox"
+                }
+            ]
+        }
+    )
+
+    assert len(caplog.records) == 0
