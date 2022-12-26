@@ -738,10 +738,48 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
         assert len(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS)) == 0
 
 
+async def test_group_is_removed_from_virtual_power_entry_on_removal(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_sensor = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="xyz",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "xyz",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: config_entry_group.entry_id,
+        },
+        title="Test",
+    )
+    config_entry_sensor.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    # Remove the group from HA
+    await hass.config_entries.async_remove(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    sensor_entry = hass.config_entries.async_get_entry(config_entry_sensor.entry_id)
+    assert sensor_entry.data.get(CONF_GROUP) is None
+
+
 async def test_error_is_logged_when_config_entry_associated_to_non_existing_group(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
-    caplog.set_level(logging.ERROR)
+    caplog.set_level(logging.WARNING)
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -758,7 +796,7 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
     await hass.async_block_till_done()
 
     assert (
-        "Cannot add/remove power sensor to group non-existing-config-entry-id. It does not exist"
+        "ConfigEntry Mock Title: Cannot add/remove to group non-existing-config-entry-id. It does not exist"
         in caplog.text
     )
 
