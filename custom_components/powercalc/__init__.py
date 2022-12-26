@@ -96,7 +96,10 @@ from .power_profile.model_discovery import (
     get_power_profile,
 )
 from .power_profile.power_profile import DEVICE_DOMAINS
-from .sensors.group import remove_power_sensor_from_associated_groups, remove_group_from_power_sensor_entry
+from .sensors.group import (
+    remove_group_from_power_sensor_entry,
+    remove_power_sensor_from_associated_groups,
+)
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -267,7 +270,9 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.VIRTUAL_POWER:
-        updated_entries = await remove_power_sensor_from_associated_groups(hass, config_entry)
+        updated_entries = await remove_power_sensor_from_associated_groups(
+            hass, config_entry
+        )
     if sensor_type == SensorType.GROUP:
         updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
 

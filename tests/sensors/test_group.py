@@ -738,7 +738,9 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
         assert len(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS)) == 0
 
 
-async def test_group_is_removed_from_virtual_power_entry_on_removal(hass: HomeAssistant) -> None:
+async def test_group_is_removed_from_virtual_power_entry_on_removal(
+    hass: HomeAssistant,
+) -> None:
     config_entry_group = MockConfigEntry(
         domain=DOMAIN,
         data={
