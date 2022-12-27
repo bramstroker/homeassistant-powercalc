@@ -9,7 +9,5 @@
     },
     "name": "Livarno Lux E14 candle CCT",
     "standby_power": 0.31,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

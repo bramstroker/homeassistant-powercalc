@@ -9,7 +9,5 @@
     },
     "name": "Elgato Key Light Air",
     "standby_power": 0.41,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -1,8 +1,6 @@
 {
     "name": "Hue White Ambiance A19",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Used script utils/measure_shelly.py from repository. Standby power is guessed",

@@ -9,7 +9,5 @@
     },
     "name": "SMART+ WIFI PLANON FRAMELESS TW RGB 600x600",
     "standby_power": 1.0,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

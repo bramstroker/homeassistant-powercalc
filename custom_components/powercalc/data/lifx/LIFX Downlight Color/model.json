@@ -9,9 +9,7 @@
     },
     "name": "Downlight",
     "standby_power": 0.68,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "LIFX Downlight"
     ]

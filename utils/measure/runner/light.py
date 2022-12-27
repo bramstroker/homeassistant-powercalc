@@ -185,7 +185,7 @@ class LightRunner(MeasurementRunner):
             self.gzip_csv(csv_file_path)
 
         return RunnerResult(
-            model_json_data={"supported_modes": ["lut"]},
+            model_json_data={"calculation_strategy": "lut"},
             skip_model_json_generation=resume_at is not None,
         )
 

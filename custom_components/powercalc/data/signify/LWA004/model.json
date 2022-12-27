@@ -1,8 +1,6 @@
 {
     "name": "Hue White Filament Bulb A60 E27",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
         "aliases": [
         "8718699688820" 
     ],

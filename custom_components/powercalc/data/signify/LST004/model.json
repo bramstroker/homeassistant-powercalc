@@ -1,7 +1,7 @@
 {
    "name":"Hue White and Color Ambiance LED Outdoor Lightstrip (5m)",
    "standby_power":0.4,
-   "supported_modes":[
+   "calculation_strategy":[
       "lut"
    ],
    "measure_device":"Gosund SP111 on Tasmota 9.5.0",

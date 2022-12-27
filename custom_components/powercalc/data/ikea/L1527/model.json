@@ -9,9 +9,7 @@
     },
     "name": "FLOALT panel WS 30x30",
     "standby_power": 0.08,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "FLOALT panel WS 30x30"
     ]

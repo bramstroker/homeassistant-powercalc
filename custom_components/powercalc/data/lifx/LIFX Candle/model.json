@@ -9,7 +9,5 @@
     },
     "name": "LIFX Candle",
     "standby_power": 0.56,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

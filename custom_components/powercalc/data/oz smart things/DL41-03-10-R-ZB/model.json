@@ -9,9 +9,7 @@
     },
     "name": "Oz Smart Things Zigbee Downlight",
     "standby_power": 0.72,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "DL41-03-10-R-ZB"
     ]

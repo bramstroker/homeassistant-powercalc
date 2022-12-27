@@ -9,7 +9,5 @@
     },
     "name": "Wiz Bulb A19 E26 Color (type SHRGB1C, model 9290022656, 8.8W 120V)",
     "standby_power": 0.31,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -9,9 +9,7 @@
     },
     "name": "Hue Impress Outdoor Wall Light Small",
     "standby_power": 0.17,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }
 

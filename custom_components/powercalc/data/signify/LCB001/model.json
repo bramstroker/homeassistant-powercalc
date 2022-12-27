@@ -9,7 +9,5 @@
     },
     "name": "Hue White and Color Ambiance BR30 Bluetooth",
     "standby_power": 0.12,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

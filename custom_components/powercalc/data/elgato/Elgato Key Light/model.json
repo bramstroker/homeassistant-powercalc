@@ -9,7 +9,5 @@
     },
     "name": "Elgato Key Light",
     "standby_power": 0.86,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

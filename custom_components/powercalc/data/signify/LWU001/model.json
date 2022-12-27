@@ -9,9 +9,7 @@
     },
     "name": "Hue P45 light bulb",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "9290024406"
     ]

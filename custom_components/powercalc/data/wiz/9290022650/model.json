@@ -9,9 +9,7 @@
     },
     "name": "Philips A19 Warm White Dimmable WiFi LED (Type: SHDW1, Model: 9290022650)",
     "standby_power": 0.42,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "SHDW1"
     ]

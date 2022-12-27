@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI LED bulb E27 806 lumen, dimmable, white spectrum, clear",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRIbulbE27WSglobeclear806lm",
         "TRADFRIbulbE26WSglobeclear800lm"

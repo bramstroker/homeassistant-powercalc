@@ -1,9 +1,7 @@
 {
     "name": "TRADFRI bulb GU10 WS 400lm",
     "standby_power": 0.44,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured once with old version script made by bramstroker using 6 sec pauses and partially verified and fixed manual",

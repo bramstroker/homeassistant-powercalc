@@ -1,8 +1,6 @@
 {
     "name": "Linked profile",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "linked_lut": "signify/LCA006"
 }

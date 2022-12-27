@@ -9,9 +9,7 @@
     },
     "name": "Hue White Ambiance E14 w/ BT",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "9290022944"
     ]

@@ -9,7 +9,5 @@
     },
     "name": "Govee Glide Hexa Light Panels (10 panels)",
     "standby_power": 0.85,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

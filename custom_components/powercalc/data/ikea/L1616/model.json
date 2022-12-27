@@ -9,9 +9,7 @@
     },
     "name": "Ikea Slagsida (60cm)",
     "standby_power": 0.62,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "Slagsida"
     ]

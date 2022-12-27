@@ -9,7 +9,5 @@
     },
     "name": "Ledvance LDVWF30FILE27RGBW",
     "standby_power": 1.04,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

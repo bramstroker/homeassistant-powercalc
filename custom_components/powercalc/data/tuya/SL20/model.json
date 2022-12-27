@@ -9,7 +9,5 @@
     },
     "name": "Treatlife SL20",
     "standby_power": 0.1,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

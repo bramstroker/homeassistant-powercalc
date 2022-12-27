@@ -9,7 +9,5 @@
     },
     "name": "Candlebra",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

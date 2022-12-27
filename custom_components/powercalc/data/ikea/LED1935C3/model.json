@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E14 WW clear 250lm",
     "standby_power": 0.1,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRIbulbE14WWclear250lm"
     ]

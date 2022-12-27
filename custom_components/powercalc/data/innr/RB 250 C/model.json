@@ -9,7 +9,5 @@
     },
     "name": "RB 250 C 470lm E14 RGBW",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

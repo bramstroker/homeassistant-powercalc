@@ -9,7 +9,5 @@
     },
     "name": "LEDVANCE SMART+ WIFI Orbis Cylinder 450 TW",
     "standby_power": 0.75,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

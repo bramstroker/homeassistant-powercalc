@@ -9,7 +9,5 @@
     },
     "name": "Smart spot comfort",
     "standby_power": 0.33,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

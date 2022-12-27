@@ -9,7 +9,5 @@
     },
     "name": "M\u00fcller Licht GU10 Spot tint white",
     "standby_power": 0.33,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -9,7 +9,5 @@
     },
     "name": "Smart Zigbee pro 12W A60 bulb",
     "standby_power": 0.5,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

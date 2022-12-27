@@ -1,7 +1,7 @@
 {
    "name":"Hue LightStrip Plus (2m)",
    "standby_power":0.18,
-   "supported_modes":[
+   "calculation_strategy":[
       "lut"
    ],
    "measure_device":"AVM FRITZ!DECT 200",

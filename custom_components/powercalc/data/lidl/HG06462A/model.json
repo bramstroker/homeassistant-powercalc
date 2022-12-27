@@ -9,7 +9,5 @@
     },
     "name": "Livarno Lux E27 filament bulb",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

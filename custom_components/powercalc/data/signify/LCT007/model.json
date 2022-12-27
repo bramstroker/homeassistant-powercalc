@@ -11,9 +11,7 @@
     },
     "name": "Hue White and Color E27 Gen2 (2015)",
     "standby_power": 0.33,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }
 

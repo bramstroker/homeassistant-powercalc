@@ -1,9 +1,7 @@
 {
     "name": "Fixed mode profile",
     "standby_power": 0.5,
-    "supported_modes": [
-        "fixed"
-    ],
+    "calculation_strategy": "fixed",
     "fixed_config": {
         "power": 50
     }

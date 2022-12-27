@@ -766,9 +766,7 @@ Example lut mode:
 {
     "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S"
 }
@@ -779,9 +777,7 @@ Example linear mode
 ```json
 {
     "name": "Hue Go",
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "standby_power": 0.2,
     "linear_config": {
         "min_power": 0,

@@ -9,7 +9,5 @@
     },
     "name": "Govee Lyra RGBICWW Corner Floor Lamp",
     "standby_power": 1.78,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

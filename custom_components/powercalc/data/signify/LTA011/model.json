@@ -9,9 +9,7 @@
     },
     "name": "Hue White Ambiance 1600 E27 w/ BT",
     "standby_power": 0.21,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "9290024719"
     ]

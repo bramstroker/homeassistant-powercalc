@@ -9,7 +9,5 @@
     },
     "name": "Teckin SB50",
     "standby_power": 0.81,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

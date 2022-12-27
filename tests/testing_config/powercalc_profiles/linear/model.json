@@ -1,9 +1,7 @@
 {
     "name": "Linear mode profile",
     "standby_power": 0.5,
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "linear_config": {
         "min_power": 10,
         "max_power": 30

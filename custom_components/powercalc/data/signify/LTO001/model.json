@@ -9,8 +9,6 @@
     },
     "name": "Hue G93 E27 Filament Globe Bulb",
     "standby_power": 0.17,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }

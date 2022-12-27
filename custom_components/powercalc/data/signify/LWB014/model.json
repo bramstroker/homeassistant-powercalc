@@ -9,5 +9,5 @@
   },
   "name": "Philips Hue 840 Lumen White A19",
   "standby_power": 0.34,
-  "supported_modes": ["lut"]
+  "calculation_strategy": "lut"
 }
