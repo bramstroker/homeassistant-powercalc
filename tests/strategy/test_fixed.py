@@ -189,6 +189,35 @@ async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant
     assert state.state == "40.00"
 
 
+async def test_config_entry_with_states_power_template(hass: HomeAssistant):
+    await create_input_number(hass, "test", 30)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "media_player.test",
+            CONF_FIXED: {
+                CONF_STATES_POWER: {
+                    "playing": "{{ states('input_number.test')|float }}",
+                    "paused": 1.8
+                }
+            },
+        },
+    )
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("media_player.test", "playing")
+    hass.states.async_set("input_number.test", 40)
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == "40.00"
+
+
 async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant):
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/1369
