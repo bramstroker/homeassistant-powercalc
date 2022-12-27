@@ -103,6 +103,14 @@ class PowerProfile:
 
     @property
     def calculation_strategy(self) -> CalculationStrategy:
+        """
+        Get the calculation strategy this profile provides.
+        supported modes is here for BC purposes.
+        """
+        if "supported_modes" in self._json_data:
+            _LOGGER.warning("Deprecation: supported_modes detected in model.json file. "
+                            "You must rename this to calculation_strategy for this to keep working in the future")
+            return self._json_data.get("supported_modes")[0]
         return self._json_data.get("calculation_strategy") or CalculationStrategy.LUT
 
     @property
