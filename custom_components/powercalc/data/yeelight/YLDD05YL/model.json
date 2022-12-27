@@ -9,9 +9,7 @@
     },
     "name": "Yeelight LED Light Strip 1S",
     "standby_power": 0.69,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "strip6"
     ]

@@ -9,9 +9,7 @@
     },
     "name": "LEPTITER Recessed spot light",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "LEPTITER Recessed spot light"
     ]

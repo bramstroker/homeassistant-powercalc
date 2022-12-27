@@ -9,7 +9,5 @@
     },
     "name": "WiZ Bulb A67 E27 Tunable White (type SHTW1W, model 9290024496, 13 W 220-240 V, 1521 lm)",
     "standby_power": 0.13,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -9,7 +9,5 @@
     },
     "name": "LIFX Mini White",
     "standby_power": 0.74,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

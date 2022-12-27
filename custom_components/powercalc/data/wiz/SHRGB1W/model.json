@@ -9,7 +9,5 @@
     },
     "name": "WiZ Bulb A67 E27 RGBWW (type SHRGB1W, model 9290024497, 13 W 220-240 V, 1521 lm)",
     "standby_power": 0.26,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

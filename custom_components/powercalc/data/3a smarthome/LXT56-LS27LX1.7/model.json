@@ -9,7 +9,5 @@
     },
     "name": "Smart Nue ZigBee 12W RGBW downlight",
     "standby_power": 0.72,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -1,8 +1,6 @@
 {
     "name": "Hue White and Color Ambiance Spot GU10",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "8718696485880"
     ],

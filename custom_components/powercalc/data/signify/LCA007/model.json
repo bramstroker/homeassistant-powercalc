@@ -4,9 +4,7 @@
     "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
     "name": "Hue White and Color Ambiance A19 E26 1100lm",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "linked_lut": "signify/LCA006",
     "aliases": [
         "9290024687"

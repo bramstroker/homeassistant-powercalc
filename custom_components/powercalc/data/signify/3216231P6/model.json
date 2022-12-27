@@ -9,8 +9,6 @@
     },
     "name": "Hue White Ambiance Aurelle Square",
     "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "linked_lut": "signify/3216331P6"
 }

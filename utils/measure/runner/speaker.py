@@ -70,7 +70,7 @@ class SpeakerRunner(MeasurementRunner):
 
         return {
             "device_type": "smart_speaker",
-            "supported_modes": ["linear"],
+            "calculation_strategy": "linear",
             "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
             "linear_config": {"calibrate": calibrate_list},
         }

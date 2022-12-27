@@ -9,9 +9,7 @@
     },
     "name": "Hue White E14 SES Candle 470lm w/ BT (LWE002)",
     "standby_power": 0.25,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "8718699671211",
         "9290020399"

@@ -9,7 +9,5 @@
     },
     "name": "LIFX Original 1000",
     "standby_power": 2.46,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

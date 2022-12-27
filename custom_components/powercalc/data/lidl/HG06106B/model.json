@@ -9,7 +9,5 @@
     },
     "name": "Livarno Lux E14 candle RGB",
     "standby_power": 0.29,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

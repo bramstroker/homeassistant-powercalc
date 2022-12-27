@@ -9,8 +9,6 @@
     },
     "name": "Hue color lamp (LCA009)",
     "standby_power": 0.19,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }

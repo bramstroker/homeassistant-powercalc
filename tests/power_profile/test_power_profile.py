@@ -27,7 +27,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA001"), get_test_profile_dir("signify-LCA001")
     )
-    assert power_profile.supported_strategies == [CalculationStrategy.LUT]
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
     assert power_profile.model == "LCA001"
     assert power_profile.is_strategy_supported(CalculationStrategy.LUT)
@@ -40,7 +40,7 @@ async def test_load_fixed_profile(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"), get_test_profile_dir("fixed")
     )
-    assert power_profile.supported_strategies == [CalculationStrategy.FIXED]
+    assert power_profile.calculation_strategy == CalculationStrategy.FIXED
     assert power_profile.standby_power == 0.5
     assert power_profile.fixed_mode_config == {CONF_POWER: 50}
 
@@ -52,7 +52,7 @@ async def test_load_linear_profile(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"), get_test_profile_dir("linear")
     )
-    assert power_profile.supported_strategies == [CalculationStrategy.LINEAR]
+    assert power_profile.calculation_strategy == CalculationStrategy.LINEAR
     assert power_profile.standby_power == 0.5
     assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
@@ -64,7 +64,7 @@ async def test_load_linked_profile(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA007"), get_test_profile_dir("linked_profile")
     )
-    assert power_profile.supported_strategies == [CalculationStrategy.LUT]
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
     assert power_profile.model == "LCA007"
     assert power_profile.name == "Linked profile"
@@ -74,7 +74,7 @@ async def test_load_sub_lut(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("yeelight", "YLDL01YL/ambilight")
     )
-    assert power_profile.supported_strategies == [CalculationStrategy.LUT]
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "yeelight"
     assert power_profile.model == "YLDL01YL"
     assert power_profile.name == "Yeelight YLDL01YL Downlight"

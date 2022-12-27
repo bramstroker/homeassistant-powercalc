@@ -1,9 +1,7 @@
 {
     "name": "tint GU10 Spot 350lm",
     "standby_power": 0.31,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured once with script made by bramstroker using 9 sec pauses and partially verified manual"

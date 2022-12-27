@@ -9,9 +9,7 @@
     },
     "name": "Hue white ambiance GU10",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "8718696598283"
     ]

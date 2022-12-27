@@ -9,7 +9,5 @@
     },
     "name": "LIFX Mini Color",
     "standby_power": 0.5,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

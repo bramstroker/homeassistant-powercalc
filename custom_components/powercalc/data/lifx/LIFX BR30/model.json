@@ -9,7 +9,5 @@
     },
     "name": "LIFX BR30",
     "standby_power": 0.63,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

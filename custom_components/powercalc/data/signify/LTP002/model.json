@@ -9,7 +9,5 @@
     },
     "name": "Hue ambiance pendant",
     "standby_power": 0.59,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

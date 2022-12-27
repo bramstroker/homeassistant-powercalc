@@ -9,8 +9,6 @@
     },
     "name": "LivingColors Iris Table Lamp Gen3",
     "standby_power": 0.37,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }

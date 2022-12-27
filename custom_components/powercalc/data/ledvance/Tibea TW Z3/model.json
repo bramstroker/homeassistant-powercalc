@@ -1,9 +1,7 @@
 {
     "name": "Tibea Lamp E27 Tuneable White 2000lm",
     "standby_power": 0.51,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured twice with script made by bramstroker and partially verified manual",

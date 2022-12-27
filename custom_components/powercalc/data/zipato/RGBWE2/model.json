@@ -9,7 +9,5 @@
     },
     "name": "Zipato RGBW Bulb V2",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

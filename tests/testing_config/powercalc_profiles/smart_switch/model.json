@@ -3,9 +3,7 @@
   "standby_power": 0.52,
   "standby_power_on": 0.82,
   "device_type": "smart_switch",
-  "supported_modes": [
-    "fixed"
-  ],
+  "calculation_strategy": "fixed",
   "sensor_config": {
     "power_sensor_naming": "{} Device Power"
   }

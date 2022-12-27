@@ -48,7 +48,6 @@ def generate_supported_model_list():
             "manufacturer",
             "model id",
             "name",
-            "calculation modes",
             "aliases",
         ]
         if device_type == "light":
@@ -61,7 +60,6 @@ def generate_supported_model_list():
                 model["manufacturer"],
                 model["model"],
                 model["name"],
-                ",".join(model["supported_modes"]),
                 ",".join(model.get("aliases") or []),
             ]
             if device_type == "light":

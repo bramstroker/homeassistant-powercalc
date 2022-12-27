@@ -1,9 +1,7 @@
 {
     "name": "TRADFRI bulb E27 WS opal 1000lm",
     "standby_power": 0.26,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured with script made by bramstroker and partially verified manual",

@@ -9,7 +9,5 @@
     },
     "name": "RS 230 C",
     "standby_power": 0.37,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -557,7 +557,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def validate_strategy_config(self) -> dict:
         strategy_name = (
             self.sensor_config.get(CONF_MODE)
-            or self.power_profile.supported_strategies[0]
+            or self.power_profile.calculation_strategy
         )
         strategy = await _create_strategy_object(
             self.hass,

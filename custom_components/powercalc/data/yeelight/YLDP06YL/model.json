@@ -9,9 +9,7 @@
     },
     "name": "Yeelight Smart LED Bulb II Color",
     "standby_power": 1.07,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "color2"
     ]

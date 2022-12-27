@@ -9,7 +9,5 @@
     },
     "name": "Genio Wi-Fi Dimmable Warm White BC 9W LED GLS Bulb",
     "standby_power": 0.87,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

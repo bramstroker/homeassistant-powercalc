@@ -7,7 +7,7 @@
     "standby_power",
     "measure_method",
     "measure_device",
-    "supported_modes"
+    "calculation_strategy"
   ],
   "properties": {
     "name": {
@@ -24,17 +24,13 @@
       "minimum": 0.05,
       "description": "Power draw when the device is turned on."
     },
-    "supported_modes": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "enum": [
-          "lut",
-          "linear",
-          "fixed"
-        ]
-      },
+    "calculation_strategy": {
+      "type": "string",
+      "enum": [
+        "lut",
+        "linear",
+        "fixed"
+      ],
       "description": "Supported calculation modes"
     },
     "measure_method": {

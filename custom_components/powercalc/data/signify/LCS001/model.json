@@ -8,9 +8,7 @@
     },
     "name": "Hue Lily Outdoor Spot Light RGBCCT",
     "standby_power": 0.36,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "1741430P7",
         "1741530P7"

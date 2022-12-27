@@ -9,7 +9,5 @@
     },
     "name": "Hue White Ambiance Filament Standard",
     "standby_power": 0.13,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

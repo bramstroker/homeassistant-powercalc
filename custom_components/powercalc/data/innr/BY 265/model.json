@@ -9,7 +9,5 @@
     },
     "name": "BY 265 806lm B22 2700k",
     "standby_power": 0.44,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

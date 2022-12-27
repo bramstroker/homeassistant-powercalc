@@ -102,8 +102,8 @@ class PowerProfile:
         return self._json_data.get("standby_power_on") or 0
 
     @property
-    def supported_strategies(self) -> list[CalculationStrategy]:
-        return self._json_data.get("supported_modes") or [CalculationStrategy.LUT]
+    def calculation_strategy(self) -> CalculationStrategy:
+        return self._json_data.get("calculation_strategy") or CalculationStrategy.LUT
 
     @property
     def linked_lut(self) -> str | None:
@@ -145,7 +145,7 @@ class PowerProfile:
 
     def is_strategy_supported(self, mode: CalculationStrategy) -> bool:
         """Whether a certain calculation strategy is supported by this profile"""
-        return mode in self.supported_strategies
+        return mode == self.calculation_strategy
 
     @property
     def is_additional_configuration_required(self) -> bool:

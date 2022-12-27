@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E14 WS 470lm",
     "standby_power": 0.25,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb E14 WS 470lm",
         "LED1903C5/LED1835C6"
