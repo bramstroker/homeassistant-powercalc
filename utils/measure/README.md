@@ -74,7 +74,7 @@ After the measurements are finished you will find the files in `export` director
 
 ## More information about measuring
 
-See the WIKI article for further documentation https://github.com/bramstroker/homeassistant-powercalc/wiki/Contributing-new-lights
+See the WIKI article for further documentation https://github.com/bramstroker/homeassistant-powercalc/wiki/Contributing-measurements
 
 ## Building and running docker image locally
 docker build -t measure .
