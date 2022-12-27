@@ -219,7 +219,9 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.FIXED, result["data"], {CONF_FIXED: {CONF_STATES_POWER: {"playing": 1.8}}}
+        CalculationStrategy.FIXED,
+        result["data"],
+        {CONF_FIXED: {CONF_STATES_POWER: {"playing": 1.8}}},
     )
 
     await hass.async_block_till_done()

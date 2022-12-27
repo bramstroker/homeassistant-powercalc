@@ -200,7 +200,7 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant):
             CONF_FIXED: {
                 CONF_STATES_POWER: {
                     "playing": "{{ states('input_number.test')|float }}",
-                    "paused": 1.8
+                    "paused": 1.8,
                 }
             },
         },
