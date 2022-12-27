@@ -99,6 +99,7 @@ from .const import (
     CONF_SENSOR_TYPE,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_STATES_POWER,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
@@ -345,6 +346,13 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
         if CONF_POWER_TEMPLATE in fixed_config:
             fixed_config[CONF_POWER] = Template(fixed_config[CONF_POWER_TEMPLATE])
             del fixed_config[CONF_POWER_TEMPLATE]
+        if CONF_STATES_POWER in fixed_config:
+            new_states_power = {}
+            for key, value in fixed_config[CONF_STATES_POWER].items():
+                if isinstance(value, str) and "{{" in value:
+                    value = Template(value)
+                new_states_power[key] = value
+            fixed_config[CONF_STATES_POWER] = new_states_power
         sensor_config[CONF_FIXED] = fixed_config
 
     if CONF_LINEAR in sensor_config:
