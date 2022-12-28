@@ -80,7 +80,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
                 },
-                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru lumina dvs.",
+                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru lumina dvs.{remarks}",
                 "title": "Bibliotecă"
             },
             "manufacturer": {

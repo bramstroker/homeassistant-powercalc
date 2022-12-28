@@ -87,7 +87,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "Jeśli zdecydujesz się nie potwierdzać, możesz samodzielnie wprowadzić producenta i model"
                 },
-                "description": "Producent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego światła",
+                "description": "Producent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego światła.{remarks}",
                 "title": "Biblioteka"
             },
             "manufacturer": {
