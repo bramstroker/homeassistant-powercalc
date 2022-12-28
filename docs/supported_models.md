@@ -1,9 +1,9 @@
-- [Lights](#Lights) (204)
+- [Lights](#Lights) (206)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 204 total
+#### 206 total
 
 | manufacturer  |        model id         |                                         name                                          |                                            aliases                                            |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
@@ -174,8 +174,10 @@
 |signify        |LWA005                   |Hue Filament E26                                                                       |                                                                                               |
 |signify        |LWA008                   |Hue White Bulb A21 E26 1600lm with Bluetooth                                           |                                                                                     9290023351|
 |signify        |LWA009                   |Hue White 1600 A67 E27 1600lm                                                          |                                                                                               |
+|signify        |LWA010                   |Hue White Bulb A67 B22 1600lm with Bluetooth                                           |                                                                                               |
 |signify        |LWA011                   |Hue White A60 E27 Bluetooth (800 lm)                                                   |                                                                                   929001821618|
 |signify        |LWA017                   |Hue white A60 bulb E27 1050lm with Bluetooth                                           |                                                                                               |
+|signify        |LWA018                   |Hue White Bulb A60 B22 1100lm with Bluetooth                                           |                                                                                               |
 |signify        |LWB004                   |Hue Lux E27 750lm                                                                      |                                                                                         433714|
 |signify        |LWB006                   |Hue White A60 E27 800lm                                                                |                                                                                               |
 |signify        |LWB010                   |Hue White A60 E27 806lm                                                                |                                                                                  8718696449691|
