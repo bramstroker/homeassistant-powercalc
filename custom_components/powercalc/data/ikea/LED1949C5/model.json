@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E14 WS candle opal 470lm",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRIbulbE14WScandleopal470lm"
     ]

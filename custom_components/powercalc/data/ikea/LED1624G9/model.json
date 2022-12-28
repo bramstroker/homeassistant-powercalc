@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E27 CWS opal 600lm",
     "standby_power": 0.48,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb E14 CWS opal 600lm",
         "TRADFRI bulb E26 CWS opal 600lm",

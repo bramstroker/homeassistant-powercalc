@@ -4,9 +4,9 @@ import json
 import logging
 import os
 import re
-from enum import Enum
 from typing import NamedTuple, Protocol
 
+from homeassistant.backports.enum import StrEnum
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -14,13 +14,13 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
-from ..const import CalculationStrategy
-from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedMode
+from ..const import CONF_POWER, CalculationStrategy
+from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedStrategy
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeviceType(Enum):
+class DeviceType(StrEnum):
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
@@ -102,8 +102,18 @@ class PowerProfile:
         return self._json_data.get("standby_power_on") or 0
 
     @property
-    def supported_modes(self) -> list[CalculationStrategy]:
-        return self._json_data.get("supported_modes") or [CalculationStrategy.LUT]
+    def calculation_strategy(self) -> CalculationStrategy:
+        """
+        Get the calculation strategy this profile provides.
+        supported modes is here for BC purposes.
+        """
+        if "supported_modes" in self._json_data:
+            _LOGGER.warning(
+                "Deprecation: supported_modes detected in model.json file. "
+                "You must rename this to calculation_strategy for this to keep working in the future"
+            )
+            return self._json_data.get("supported_modes")[0]
+        return self._json_data.get("calculation_strategy") or CalculationStrategy.LUT
 
     @property
     def linked_lut(self) -> str | None:
@@ -120,32 +130,51 @@ class PowerProfile:
     @property
     def linear_mode_config(self) -> ConfigType | None:
         """Get configuration to setup linear strategy"""
-        if not self.is_mode_supported(CalculationStrategy.LINEAR):
-            raise UnsupportedMode(
-                f"Mode linear is not supported by model: {self._model}"
+        if not self.is_strategy_supported(CalculationStrategy.LINEAR):
+            raise UnsupportedStrategy(
+                f"Strategy linear is not supported by model: {self._model}"
             )
         return self._json_data.get("linear_config")
 
     @property
-    def fixed_mode_config(self) -> ConfigType | None:
+    def fixed_mode_config(self) -> ConfigType:
         """Get configuration to setup fixed strategy"""
-        if not self.is_mode_supported(CalculationStrategy.FIXED):
-            raise UnsupportedMode(
-                f"Mode fixed is not supported by model: {self._model}"
+        if not self.is_strategy_supported(CalculationStrategy.FIXED):
+            raise UnsupportedStrategy(
+                f"Strategy fixed is not supported by model: {self._model}"
             )
-        return self._json_data.get("fixed_config")
+        fixed_config = self._json_data.get("fixed_config")
+        if fixed_config is None and self.standby_power_on:
+            fixed_config = {CONF_POWER: 0}
+        return fixed_config
 
     @property
     def sensor_config(self) -> ConfigType:
         """Additional sensor configuration"""
         return self._json_data.get("sensor_config") or {}
 
-    def is_mode_supported(self, mode: str) -> bool:
-        return mode in self.supported_modes
+    def is_strategy_supported(self, mode: CalculationStrategy) -> bool:
+        """Whether a certain calculation strategy is supported by this profile"""
+        return mode == self.calculation_strategy
 
     @property
     def is_additional_configuration_required(self) -> bool:
-        return self._json_data.get("requires_additional_configuration") or False
+        """Checks if the power profile can be setup without any additional user configuration."""
+        if self.has_sub_profiles and self.sub_profile is None:
+            return True
+        if self.needs_fixed_config:
+            return True
+        return False
+
+    @property
+    def needs_fixed_config(self) -> bool:
+        """
+        Used for smart switches which only provides standby power values.
+        This indicates the user must supply the power values in the config flow
+        """
+        return self.is_strategy_supported(
+            CalculationStrategy.FIXED
+        ) and not self._json_data.get("fixed_config")
 
     @property
     def device_type(self) -> DeviceType:

@@ -1,7 +1,7 @@
 {
 	"measure_description": "Manually measured w/3.65W Incandescent nightlight.",
 	"measure_method": "manual",
-	"measure_device": "Kasa KP115(US)",
+	"measure_device": "TP-Link Kasa KP115(US)",
 	"name": "Innr Zigbee Smart Plug",
 	"standby_power": 0.18,
 	"sensor_config": {
@@ -9,9 +9,7 @@
 		"energy_sensor_naming": "{} Device Energy"
   	},
 	"device_type": "smart_switch",
-	"supported_modes": [
-		"fixed"
-	],
+	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 0.83
 	}

@@ -9,7 +9,5 @@
     },
     "name": "M\u00fcller Licht E27 Bulb white+color",
     "standby_power": 0.43,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -3,9 +3,7 @@
     "measure_method": "script",
     "name": "Hue Bloom Table Lamp",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }
 

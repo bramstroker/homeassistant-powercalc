@@ -5,9 +5,7 @@
     "name": "Google Home",
     "standby_power": 2.4,
     "device_type": "smart_speaker",
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "linear_config": {
         "min_power": 2.4,

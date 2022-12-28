@@ -9,9 +9,7 @@
 		"energy_sensor_naming": "{} Device Energy"
   	},
 	"device_type": "smart_switch",
-	"supported_modes": [
-		"fixed"
-	],
+	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 0.5
 	}

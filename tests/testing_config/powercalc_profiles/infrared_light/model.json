@@ -9,9 +9,7 @@
     },
     "name": "LIFX A19 Night Vision",
     "standby_power": 0.47,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "sub_profile_select": {
         "matchers": [
             {

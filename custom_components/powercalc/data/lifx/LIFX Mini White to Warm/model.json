@@ -9,7 +9,5 @@
     },
     "name": "Mini White to Warm",
     "standby_power": 0.54,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -1,11 +1,9 @@
 {
     "name": "Hue White Ambiance E27",
     "standby_power": 0.29,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
-    "measure_device": "TP-Link HS110",
+    "measure_device": "TP-Link Kasa HS110",
     "measure_description": "Measured with script made by smonesi (steps: bri 30/mired 30) and linearly interpolated to provide more data",
     "aliases": [
         "9290022169"

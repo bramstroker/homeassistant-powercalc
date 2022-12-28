@@ -9,9 +9,7 @@
     },
     "name": "Hue Struana Ceiling Light",
     "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "3418931P6"
     ]

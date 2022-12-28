@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Shelly, Shelly Plug S",
+    "measure_device": "Shelly Plug S",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,5 @@
     },
     "name": "RS 230 C",
     "standby_power": 0.37,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

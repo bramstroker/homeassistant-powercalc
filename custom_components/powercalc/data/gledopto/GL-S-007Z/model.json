@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 1, Dummy Load: None",
-    "measure_device": "Kasa, KP115(US)",
+    "measure_device": "TP-Link Kasa KP115(US)",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,5 @@
     },
     "name": "Gledopto 5W GU10 Dual White And Color Spotlight",
     "standby_power": 0.7,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -9,7 +9,5 @@
     },
     "name": "Smart Wi-Fi LED Bulb",
     "standby_power": 0.56,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

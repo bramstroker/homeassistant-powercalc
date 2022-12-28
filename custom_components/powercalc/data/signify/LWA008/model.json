@@ -1,9 +1,7 @@
 {
     "name": "Hue White Bulb A21 E26 1600lm with Bluetooth",
     "standby_power": 0.41,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured twice with script made by bramstroker using 9 sec pauses and partially verified manual",

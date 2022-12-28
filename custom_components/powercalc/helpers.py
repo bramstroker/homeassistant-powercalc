@@ -8,6 +8,6 @@ async def evaluate_power(power: Union[Template, Decimal, float]) -> Decimal:
     """When power is a template render it."""
 
     if isinstance(power, Template):
-        return power.async_render()
+        return Decimal(power.async_render())
 
     return Decimal(power)

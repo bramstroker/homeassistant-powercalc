@@ -99,6 +99,7 @@ from .const import (
     CONF_SENSOR_TYPE,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
+    CONF_STATES_POWER,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
@@ -345,6 +346,13 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
         if CONF_POWER_TEMPLATE in fixed_config:
             fixed_config[CONF_POWER] = Template(fixed_config[CONF_POWER_TEMPLATE])
             del fixed_config[CONF_POWER_TEMPLATE]
+        if CONF_STATES_POWER in fixed_config:
+            new_states_power = {}
+            for key, value in fixed_config[CONF_STATES_POWER].items():
+                if isinstance(value, str) and "{{" in value:
+                    value = Template(value)
+                new_states_power[key] = value
+            fixed_config[CONF_STATES_POWER] = new_states_power
         sensor_config[CONF_FIXED] = fixed_config
 
     if CONF_LINEAR in sensor_config:
@@ -620,7 +628,10 @@ async def check_entity_not_already_configured(
     if unique_id and unique_id in used_unique_ids:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
-    if unique_id is None and source_entity.entity_id in existing_entities:
+    entity_id = source_entity.entity_id
+    if unique_id is None and (
+        entity_id in existing_entities or entity_id in configured_entities
+    ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 

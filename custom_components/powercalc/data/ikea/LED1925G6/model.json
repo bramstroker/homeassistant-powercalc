@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E14 CWS 470lm",
     "standby_power": 0.23,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb E14 CWS 470lm"
     ]

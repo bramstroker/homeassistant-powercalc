@@ -9,9 +9,7 @@
     },
     "name": "M\u00fcller Licht GU10 Spot white+color",
     "standby_power": 0.15,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "45327"
     ]

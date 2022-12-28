@@ -23,19 +23,18 @@ DEVICE_TYPES = [
 ]
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
+DATA_DIR = f"{PROJECT_ROOT}/custom_components/powercalc/data"
 
 
-def generate_supported_model_list():
+def generate_supported_model_list(model_listing: list[dict]):
     """Generate static file containing the supported models."""
-    models = get_model_list()
-
     toc_links: list[str] = []
     tables_output: str = ""
 
     for device_type in DEVICE_TYPES:
         relevant_models = [
             model
-            for model in models
+            for model in model_listing
             if (model.get("device_type") or "light") == device_type[0]
         ]
         num_devices = len(relevant_models)
@@ -48,7 +47,6 @@ def generate_supported_model_list():
             "manufacturer",
             "model id",
             "name",
-            "calculation modes",
             "aliases",
         ]
         if device_type == "light":
@@ -61,7 +59,6 @@ def generate_supported_model_list():
                 model["manufacturer"],
                 model["model"],
                 model["name"],
-                ",".join(model["supported_modes"]),
                 ",".join(model.get("aliases") or []),
             ]
             if device_type == "light":
@@ -80,17 +77,34 @@ def generate_supported_model_list():
     print("Generated supported_models.md")
 
 
+def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
+    manufacturer_device_types: dict[str, list] = {}
+    for model in model_listing:
+        device_type = model.get("device_type") or "light"
+        manufacturer = model.get("manufacturer")
+        if manufacturer not in manufacturer_device_types:
+            manufacturer_device_types[manufacturer] = []
+        if device_type not in manufacturer_device_types[manufacturer]:
+            manufacturer_device_types[manufacturer].append(device_type)
+    with open(
+        os.path.join(DATA_DIR, "manufacturer_device_types.json"), "w"
+    ) as json_file:
+        json_file.write(json.dumps(manufacturer_device_types))
+
+    print("Generated manufacturer_device_types.json")
+
+
 def get_model_list() -> list[dict]:
+    """Get a listing of all available powercalc models"""
     models = []
-    data_dir = f"{PROJECT_ROOT}/custom_components/powercalc/data"
     for json_path in glob.glob(
-        f"{data_dir}/*/*/model.json",
+        f"{DATA_DIR}/*/*/model.json",
         recursive=True,
     ):
         with open(json_path) as json_file:
             model_directory = os.path.dirname(json_path)
             model_data: dict = json.load(json_file)
-            color_modes = get_color_modes(model_directory, data_dir, model_data)
+            color_modes = get_color_modes(model_directory, DATA_DIR, model_data)
             model_data.update(
                 {
                     "model": os.path.basename(model_directory),
@@ -124,4 +138,6 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
     return None
 
 
-generate_supported_model_list()
+model_list = get_model_list()
+generate_supported_model_list(model_list)
+generate_manufacturer_device_types_file(model_list)

@@ -48,7 +48,13 @@ See [supported models](docs/supported_models.md) for the listing of supported de
 ## Installation
 
 ### HACS
-This integration is part of the default HACS repository. Just click "Explore and add repository" to install
+This integration is part of the default HACS repository. Just click "Explore and add repository" to install.
+
+You _could_ also use the link below
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration)
+
+**Important**: After you installed follow the post installation steps. This will make auto discovery work correctly.
 
 ### Manual
 Copy `custom_components/powercalc` into your Home Assistant `config` directory.
@@ -354,6 +360,8 @@ sensor:
         paused: 2.25
         idle: 1.5
 ```
+
+> Remark: You cannot use `off` in states_power as this is handled separately by powercalc. You'll need to use `standby_power` to indicate the power when the device is off.
 
 You can also use state attributes. Use the `|` delimiter to seperate the attribute and value. Here is en example:
 
@@ -714,13 +722,17 @@ Assume you have a light `light.floorlamp_livingroom`, than you should have the f
 
 > Available from v0.14 and higher
 
-Use the following configuration to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+In the yaml configuration (functionality not available through the webUI) you can add the following configuration 
+to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
 
 ```yaml
 - platform: powercalc
   entity_id: light.toilet
   power_sensor_id: sensor.toilet_light_power
 ```
+
+This also enables you to combine virtual power sensors (created with powercalc) and existing power sensors in your HA installation into
+a group. Without this configuration option power_sensor_id that would not be possible.
 
 ### Resetting energy sensor
 
@@ -754,9 +766,7 @@ Example lut mode:
 {
     "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S"
 }
@@ -767,9 +777,7 @@ Example linear mode
 ```json
 {
     "name": "Hue Go",
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "standby_power": 0.2,
     "linear_config": {
         "min_power": 0,

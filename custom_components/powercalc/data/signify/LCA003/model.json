@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 3, Dummy Load: None",
-    "measure_device": "Kasa, KP115(US)",
+    "measure_device": "TP-Link Kasa KP115(US)",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,5 @@
     },
     "name": "Hue White and Color Ambiance A19 E26",
     "standby_power": 0.17,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

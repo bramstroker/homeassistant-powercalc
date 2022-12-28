@@ -1,13 +1,11 @@
 {
     "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals, and took average measurements over 60s using the docker container",
     "measure_method": "manual",
-    "measure_device": "Kasa KP115",
+    "measure_device": "TP-Link Kasa KP115",
     "name": "SYMFONISK Picture Frame",
     "standby_power": 2.40,
     "device_type": "smart_speaker",
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "linear_config": {
         "calibrate": [

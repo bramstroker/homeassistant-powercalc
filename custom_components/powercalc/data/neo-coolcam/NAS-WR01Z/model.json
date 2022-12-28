@@ -1,7 +1,7 @@
 {
 	"measure_description": "Manually measured",
 	"measure_method": "manual",
-	"measure_device": "Zhirui PR10-D",
+	"measure_device": "Zhurui PR10-D",
 	"name": "Smart Power Plug",
 	"standby_power": 0.31,
 	"sensor_config": {
@@ -9,9 +9,7 @@
 		"energy_sensor_naming": "{} Device Energy"
   	},
 	"device_type": "smart_switch",
-	"supported_modes": [
-		"fixed"
-	],
+	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 0.58
 	}

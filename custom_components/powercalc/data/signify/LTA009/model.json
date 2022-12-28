@@ -9,9 +9,7 @@
     },
     "name": "Hue White Ambiance 1100 E27 Bluetooth",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "9290024684"
     ]

@@ -163,16 +163,12 @@ async def create_group_sensors_from_config_entry(
     return group_sensors
 
 
-async def remove_from_associated_group_entries(
+async def remove_power_sensor_from_associated_groups(
     hass: HomeAssistant, config_entry: ConfigEntry
 ) -> list[ConfigEntry]:
     """
     When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to
     """
-    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
-    if sensor_type != SensorType.VIRTUAL_POWER:
-        return []
-
     group_entries = [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
@@ -190,6 +186,28 @@ async def remove_from_associated_group_entries(
         )
 
     return group_entries
+
+
+async def remove_group_from_power_sensor_entry(
+    hass: HomeAssistant, config_entry: ConfigEntry
+) -> list[ConfigEntry]:
+    """
+    When the user removes a group config entry we need to update all the virtual power sensors which reference this group
+    """
+    entries_to_update = [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
+        and entry.data.get(CONF_GROUP) == config_entry.entry_id
+    ]
+
+    for group_entry in entries_to_update:
+        hass.config_entries.async_update_entry(
+            group_entry,
+            data={**group_entry.data, CONF_GROUP: None},
+        )
+
+    return entries_to_update
 
 
 async def add_to_associated_group(
@@ -210,17 +228,18 @@ async def add_to_associated_group(
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
 
     if not group_entry:
-        _LOGGER.error(
-            f"Cannot add/remove power sensor to group {group_entry_id}. It does not exist."
+        _LOGGER.warning(
+            f"ConfigEntry {config_entry.title}: Cannot add/remove to group {group_entry_id}. It does not exist."
         )
         return None
 
-    member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-    member_sensors.append(config_entry.entry_id)
+    member_sensors = set(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
+    if config_entry.entry_id not in member_sensors:
+        member_sensors.add(config_entry.entry_id)
 
     hass.config_entries.async_update_entry(
         group_entry,
-        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
+        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: list(member_sensors)},
     )
     return group_entry
 

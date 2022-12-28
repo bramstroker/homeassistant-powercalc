@@ -12,4 +12,3 @@ class ZeroReadingError(PowerMeterError):
 
 class ConnectionError(PowerMeterError):
     pass
-

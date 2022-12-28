@@ -59,6 +59,7 @@ from .const import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -85,6 +86,7 @@ from .const import (
     MIN_HA_VERSION,
     CalculationStrategy,
     PowercalcDiscoveryType,
+    SensorType,
     UnitPrefix,
 )
 from .errors import ModelNotSupported
@@ -94,7 +96,10 @@ from .power_profile.model_discovery import (
     get_power_profile,
 )
 from .power_profile.power_profile import DEVICE_DOMAINS
-from .sensors.group import remove_from_associated_group_entries
+from .sensors.group import (
+    remove_group_from_power_sensor_entry,
+    remove_power_sensor_from_associated_groups,
+)
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -261,10 +266,19 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """Called after a config entry is removed."""
-    updated_entries = await remove_from_associated_group_entries(hass, config_entry)
-    for group_entry in updated_entries:
-        if group_entry.state == ConfigEntryState.LOADED:
-            await hass.config_entries.async_reload(group_entry.entry_id)
+    updated_entries: list[ConfigEntry] = []
+
+    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type == SensorType.VIRTUAL_POWER:
+        updated_entries = await remove_power_sensor_from_associated_groups(
+            hass, config_entry
+        )
+    if sensor_type == SensorType.GROUP:
+        updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
+
+    for entry in updated_entries:
+        if entry.state == ConfigEntryState.LOADED:
+            await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def create_domain_groups(
@@ -367,12 +381,6 @@ class DiscoveryManager:
                 )
                 continue
 
-            if power_profile.is_additional_configuration_required:
-                _LOGGER.warning(
-                    f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-                )
-                continue
-
             if not power_profile.is_entity_domain_supported(source_entity.domain):
                 continue
 
@@ -422,7 +430,7 @@ class DiscoveryManager:
         )
 
         # Code below if for legacy discovery routine, will be removed somewhere in the future
-        if power_profile and not power_profile.has_sub_profiles:
+        if power_profile and not power_profile.is_additional_configuration_required:
             discovery_info = {
                 CONF_ENTITY_ID: source_entity.entity_id,
                 DISCOVERY_SOURCE_ENTITY: source_entity,

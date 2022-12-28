@@ -8,8 +8,7 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 class OcrPowerMeter(PowerMeter):
     def __init__(self) -> None:
         filepath = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "../ocr/ocr_results.txt"
+            os.path.dirname(os.path.abspath(__file__)), "../ocr/ocr_results.txt"
         )
 
         self.file = open(filepath, "rb")
@@ -21,11 +20,11 @@ class OcrPowerMeter(PowerMeter):
         power = float(power)
         timestamp = float(timestamp)
         return PowerMeasurementResult(power, timestamp)
-    
+
     def read_last_line(self):
         try:
             self.file.seek(-2, os.SEEK_END)
-            while self.file.read(1) != b'\n':
+            while self.file.read(1) != b"\n":
                 self.file.seek(-2, os.SEEK_CUR)
         except OSError:
             self.file.seek(0)

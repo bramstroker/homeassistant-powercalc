@@ -9,7 +9,5 @@
     },
     "name": "Smart Zigbee pro GU10 spotlight bulb",
     "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

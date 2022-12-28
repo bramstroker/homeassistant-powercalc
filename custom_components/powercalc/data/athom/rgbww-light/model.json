@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "athom, smart-plug-v2",
+    "measure_device": "Athom Smart Plug v2",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,7 +9,5 @@
     },
     "name": "rgbww-light",
     "standby_power": 0.47,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

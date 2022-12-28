@@ -33,3 +33,7 @@ jobs:
         with:
           add: 'docs/supported_models.md'
           message: 'Update support model list'
+      - uses: EndBug/add-and-commit@v7
+        with:
+          add: 'custom_components/data/manufacturer_device_types.json'
+          message: 'Update manufacturer_device_types.json'

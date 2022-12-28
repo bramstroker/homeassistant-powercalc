@@ -1,7 +1,7 @@
 {
 	"measure_description": "Manually measured. Set to 0.29 as fell below detection range in standby mode",
 	"measure_method": "manual",
-	"measure_device": "Tapo P110 Smart Plug",
+	"measure_device": "TP-Link Tapo P110",
 	"name": "Arlec Grid Connect Smart Plug In Multi-Function Socket With USB",
 	"standby_power": 0.66,
 	"sensor_config": {
@@ -9,9 +9,7 @@
 		"energy_sensor_naming": "{} Device Energy"
   	},
 	"device_type": "smart_switch",
-	"supported_modes": [
-		"fixed"
-	],
+	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 1.596
 	}

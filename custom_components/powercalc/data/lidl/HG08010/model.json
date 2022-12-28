@@ -9,7 +9,5 @@
     },
     "name": "Livarno Lux LED Outdoor Floodlight RGBW",
     "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

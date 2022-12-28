@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script using OCR",
-    "measure_device": "Zhurui PR10",
+    "measure_device": "Zhurui PR10-D",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,9 +9,7 @@
     },
     "name": "Hue Impress Outdoor Wall Light Small",
     "standby_power": 0.17,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }
 

@@ -5,9 +5,7 @@
     "name": "Sonos One SL",
     "standby_power": 2.83,
     "device_type": "smart_speaker",
-    "supported_modes": [
-        "linear"
-    ],
+    "calculation_strategy": "linear",
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
     "linear_config": {
         "calibrate": [

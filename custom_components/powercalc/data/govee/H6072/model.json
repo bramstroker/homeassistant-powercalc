@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Kasa KP115",
+    "measure_device": "TP-Link Kasa KP115",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,5 @@
     },
     "name": "Govee Lyra RGBICWW Corner Floor Lamp",
     "standby_power": 1.78,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

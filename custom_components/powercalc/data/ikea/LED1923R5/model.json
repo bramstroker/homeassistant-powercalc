@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script, manual correction of values measured as 0.0",
-    "measure_device": "Shelly, 1PM",
+    "measure_device": "Shelly 1PM",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb GU10 CWS 345lm",
     "standby_power": 0.18,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb GU10 CWS 345lm"
     ]
