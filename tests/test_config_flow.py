@@ -335,6 +335,7 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert result["description_placeholders"] == {
         "manufacturer": "ikea",
         "model": "LED1545G12",
+        "remarks": None
     }
 
     result = await _set_virtual_power_configuration(
