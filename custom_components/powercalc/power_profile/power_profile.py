@@ -4,9 +4,9 @@ import json
 import logging
 import os
 import re
-from enum import Enum
 from typing import NamedTuple, Protocol
 
+from homeassistant.backports.enum import StrEnum
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -20,7 +20,7 @@ from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedStrategy
 _LOGGER = logging.getLogger(__name__)
 
 
-class DeviceType(Enum):
+class DeviceType(StrEnum):
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
