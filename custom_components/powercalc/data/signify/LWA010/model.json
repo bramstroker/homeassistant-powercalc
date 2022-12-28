@@ -8,6 +8,6 @@
         "VERSION": "v1.2.0:docker"
     },
     "name": "Hue White Bulb A67 B22 1600lm with Bluetooth",
-    "standby_power": 0.05,
+    "standby_power": 0.4,
     "calculation_strategy": "lut"
 }
