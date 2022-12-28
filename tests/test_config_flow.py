@@ -460,7 +460,9 @@ async def test_manually_setup_from_library(hass: HomeAssistant) -> None:
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
-async def test_manufacturer_listing_is_filtered_by_entity_domain(hass: HomeAssistant) -> None:
+async def test_manufacturer_listing_is_filtered_by_entity_domain(
+    hass: HomeAssistant,
+) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 

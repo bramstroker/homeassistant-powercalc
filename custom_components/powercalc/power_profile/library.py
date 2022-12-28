@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from ..aliases import MANUFACTURER_DIRECTORY_MAPPING
 from ..const import DATA_PROFILE_LIBRARY, DOMAIN
-from .power_profile import PowerProfile, DeviceType, DEVICE_DOMAINS
+from .power_profile import DEVICE_DOMAINS, DeviceType, PowerProfile
 
 BUILT_IN_DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), "../data")
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
@@ -59,17 +59,29 @@ class ProfileLibrary:
         """
 
         if self._manufacturer_device_types is None:
-            with open(os.path.join(BUILT_IN_DATA_DIRECTORY, "manufacturer_device_types.json"), "r") as file:
+            with open(
+                os.path.join(BUILT_IN_DATA_DIRECTORY, "manufacturer_device_types.json"),
+                "r",
+            ) as file:
                 self._manufacturer_device_types = json.load(file)
 
         manufacturers: list[str] = []
         for data_dir in self._data_directories:
             for manufacturer in next(os.walk(data_dir))[1]:
-                if entity_domain and len([
-                    device_type for device_type in
-                    self._manufacturer_device_types.get(manufacturer) or []
-                    if DEVICE_DOMAINS[device_type] == entity_domain
-                ]) == 0:
+                if (
+                    entity_domain
+                    and len(
+                        [
+                            device_type
+                            for device_type in self._manufacturer_device_types.get(
+                                manufacturer
+                            )
+                            or []
+                            if DEVICE_DOMAINS[device_type] == entity_domain
+                        ]
+                    )
+                    == 0
+                ):
                     continue
 
                 manufacturers.append(manufacturer)

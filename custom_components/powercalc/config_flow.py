@@ -499,7 +499,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="model",
             data_schema=await _create_schema_model(
-                self.hass, self.sensor_config.get(CONF_MANUFACTURER), self.source_entity.domain
+                self.hass,
+                self.sensor_config.get(CONF_MANUFACTURER),
+                self.source_entity.domain,
             ),
             description_placeholders={
                 "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
@@ -871,7 +873,9 @@ def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.
     )
 
 
-async def _create_schema_model(hass: HomeAssistant, manufacturer: str, entity_domain: str) -> vol.Schema:
+async def _create_schema_model(
+    hass: HomeAssistant, manufacturer: str, entity_domain: str
+) -> vol.Schema:
     """Create model schema"""
     library = ProfileLibrary(hass)
     models = [
