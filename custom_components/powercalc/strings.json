@@ -106,7 +106,7 @@
       },
       "library": {
         "title": "Library",
-        "description": "{remarks}Manufacturer '{manufacturer}' and model '{model}' were automatically detected for your device",
+        "description": "{remarks}Manufacturer '{manufacturer}' and model '{model}' were automatically detected for your device. Uncheck to select a manufacturer and model yourself.",
         "data": {
           "confirm_autodisovered_model": "Confirm model"
         },

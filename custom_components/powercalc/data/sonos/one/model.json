@@ -25,5 +25,5 @@
     "aliases": [
         "Sonos ONE"
     ],
-    "config_flow_discovery_remarks": "Bla bla bla"
+    "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore."
 }

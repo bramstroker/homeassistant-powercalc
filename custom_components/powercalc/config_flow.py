@@ -293,7 +293,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return await self.async_step_virtual_power(user_input)
 
     async def async_step_virtual_power(
-        self, user_input: dict[str, str] = None, strategy_selection: bool = True
+        self, user_input: dict[str, str] = None
     ) -> FlowResult:
         if user_input is not None:
             self.source_entity_id = user_input[CONF_ENTITY_ID]
@@ -451,13 +451,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ModelNotSupported:
                 self.power_profile = None
         if self.power_profile:
-            # remarks = self.power_profile.config_flow_discovery_remarks
-            # if remarks:
-            #     remarks += "\n\n"
+            remarks = self.power_profile.config_flow_discovery_remarks
+            if remarks:
+                remarks = "\n\n" + remarks
             return self.async_show_form(
                 step_id="library",
                 description_placeholders={
-                    "remarks": "",
+                    "remarks": remarks,
                     "manufacturer": self.power_profile.manufacturer,
                     "model": self.power_profile.model,
                 },
