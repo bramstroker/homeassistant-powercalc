@@ -473,7 +473,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
             return await self.async_step_model()
 
-        schema = _create_schema_manufacturer(self.hass)
+        schema = _create_schema_manufacturer(self.hass, self.source_entity.domain)
         return self.async_show_form(
             step_id="manufacturer",
             data_schema=schema,
@@ -498,8 +498,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="model",
-            data_schema=_create_schema_model(
-                self.hass, self.sensor_config.get(CONF_MANUFACTURER)
+            data_schema=await _create_schema_model(
+                self.hass, self.sensor_config.get(CONF_MANUFACTURER), self.source_entity.domain
             ),
             description_placeholders={
                 "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
@@ -853,12 +853,12 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     )
 
 
-def _create_schema_manufacturer(hass: HomeAssistant) -> vol.Schema:
+def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.Schema:
     """Create manufacturer schema"""
     library = ProfileLibrary(hass)
     manufacturers = [
         selector.SelectOptionDict(value=manufacturer, label=manufacturer)
-        for manufacturer in library.get_manufacturer_listing()
+        for manufacturer in library.get_manufacturer_listing(entity_domain)
     ]
     return vol.Schema(
         {
@@ -871,12 +871,13 @@ def _create_schema_manufacturer(hass: HomeAssistant) -> vol.Schema:
     )
 
 
-def _create_schema_model(hass: HomeAssistant, manufacturer: str) -> vol.Schema:
+async def _create_schema_model(hass: HomeAssistant, manufacturer: str, entity_domain: str) -> vol.Schema:
     """Create model schema"""
     library = ProfileLibrary(hass)
     models = [
-        selector.SelectOptionDict(value=model, label=model)
-        for model in library.get_model_listing(manufacturer)
+        selector.SelectOptionDict(value=profile.model, label=profile.model)
+        for profile in await library.get_profiles_by_manufacturer(manufacturer)
+        if profile.is_entity_domain_supported(entity_domain)
     ]
     return vol.Schema(
         {
