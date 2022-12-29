@@ -52,6 +52,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.sensor import is_autoconfigurable
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -647,3 +648,19 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 
     assert len(caplog.records) == 2
     assert "Skipping sensor setup" in caplog.text
+
+
+async def test_is_autoconfigurable_returns_false(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+) -> None:
+    """
+    is_autoconfigurable should return False when the manufacturer / model is not found in the library
+    """
+    light_mock = MockLight("testa")
+    light_mock.manufacturer = "Foo"
+    light_mock.model = "Bar"
+
+    await create_mock_light_entity(hass, light_mock)
+
+    entity_entry = entity_reg.async_get("light.testa")
+    assert not await is_autoconfigurable(hass, entity_entry)

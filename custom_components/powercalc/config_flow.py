@@ -69,9 +69,10 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
+from .discovery import autodiscover_model
 from .errors import ModelNotSupported, StrategyConfigurationError
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.model_discovery import get_power_profile
+from .power_profile.factory import get_power_profile
 from .power_profile.power_profile import PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -446,7 +447,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self.source_entity.entity_entry and self.power_profile is None:
             try:
                 self.power_profile = await get_power_profile(
-                    self.hass, {}, self.source_entity.entity_entry
+                    self.hass, {}, await autodiscover_model(self.hass, self.source_entity.entity_entry)
                 )
             except ModelNotSupported:
                 self.power_profile = None
@@ -630,7 +631,7 @@ class OptionsFlowHandler(OptionsFlow):
                         self.current_config.get(CONF_MODEL),
                     )
                     self.power_profile = await get_power_profile(
-                        self.hass, {}, None, model_info
+                        self.hass, {}, model_info
                     )
                     if self.power_profile and self.power_profile.needs_fixed_config:
                         self.strategy = CalculationStrategy.FIXED

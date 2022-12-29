@@ -59,9 +59,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.power_profile.library import ModelInfo
-from custom_components.powercalc.power_profile.model_discovery import get_power_profile
+from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -81,7 +81,7 @@ async def test_discovery_flow(hass: HomeAssistant):
     await create_mock_light_entity(hass, light_entity)
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+    power_profile = await get_power_profile(hass, {}, await autodiscover_model(hass, source_entity.entity_entry))
 
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -121,7 +121,7 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
     await create_mock_light_entity(hass, light_entity)
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+    power_profile = await get_power_profile(hass, {}, await autodiscover_model(hass, source_entity.entity_entry))
 
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -157,27 +157,6 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
         CONF_NAME: "test",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
     }
-
-
-async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
-    """Model.json can provide remarks to show in the discovery flow. Check if these are displayed correctly"""
-    source_entity = await create_source_entity("media_player.test", hass)
-    power_profile = await get_power_profile(hass, {}, None, ModelInfo("sonos", "one"))
-
-    result: FlowResult = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
-        data={
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-            CONF_NAME: "test",
-            CONF_ENTITY_ID: "media_player.test",
-            CONF_MANUFACTURER: "sonos",
-            CONF_MODEL: "one",
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-        },
-    )
-    assert result["description_placeholders"]["remarks"] is not None
 
 
 async def test_sensor_type_menu_displayed(hass: HomeAssistant):
@@ -357,7 +336,6 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert result["description_placeholders"] == {
         "manufacturer": "ikea",
         "model": "LED1545G12",
-        "remarks": None
     }
 
     result = await _set_virtual_power_configuration(
