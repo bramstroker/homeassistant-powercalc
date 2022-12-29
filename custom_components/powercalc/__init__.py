@@ -78,11 +78,6 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
-from .power_profile.model_discovery import (
-    PowerProfile,
-    autodiscover_model,
-    get_power_profile,
-)
 from .power_profile.power_profile import DEVICE_DOMAINS
 from .sensors.group import (
     remove_group_from_power_sensor_entry,

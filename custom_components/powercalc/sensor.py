@@ -11,23 +11,6 @@ from typing import Any, Final, NamedTuple, Optional, cast
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components import (
-    binary_sensor,
-    climate,
-    device_tracker,
-    fan,
-    humidifier,
-    input_boolean,
-    input_number,
-    input_select,
-    light,
-    media_player,
-    remote,
-    sensor,
-    switch,
-    vacuum,
-    water_heater,
-)
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -126,12 +109,14 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
+from .discovery import autodiscover_model
 from .errors import (
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
+    ModelNotSupported,
 )
-from .power_profile.model_discovery import is_autoconfigurable
+from .power_profile.factory import get_power_profile
 from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
@@ -747,6 +732,23 @@ def resolve_area_entities(
     return {
         entity.entity_id: entity for entity in entities if entity.domain == LIGHT_DOMAIN
     }
+
+
+async def is_autoconfigurable(
+    hass: HomeAssistant, entity_entry: er.RegistryEntry, sensor_config: ConfigType = None
+) -> bool:
+    if sensor_config is None:
+        sensor_config = {}
+    try:
+        model_info = await autodiscover_model(hass, entity_entry)
+        power_profile = await get_power_profile(hass, sensor_config, model_info=model_info)
+        if not power_profile:
+            return False
+        if power_profile.has_sub_profiles and power_profile.sub_profile:
+            return True
+        return not power_profile.is_additional_configuration_required
+    except ModelNotSupported:
+        return False
 
 
 class EntitiesBucket(NamedTuple):

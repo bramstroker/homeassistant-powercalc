@@ -59,8 +59,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.errors import StrategyConfigurationError
-from custom_components.powercalc.power_profile.model_discovery import get_power_profile
+from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -80,7 +81,7 @@ async def test_discovery_flow(hass: HomeAssistant):
     await create_mock_light_entity(hass, light_entity)
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+    power_profile = await get_power_profile(hass, {}, await autodiscover_model(hass, source_entity.entity_entry))
 
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,
@@ -120,7 +121,7 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
     await create_mock_light_entity(hass, light_entity)
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    power_profile = await get_power_profile(hass, {}, source_entity.entity_entry)
+    power_profile = await get_power_profile(hass, {}, await autodiscover_model(hass, source_entity.entity_entry))
 
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,

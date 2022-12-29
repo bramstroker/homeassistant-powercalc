@@ -65,8 +65,9 @@ from ..const import (
     OFF_STATES,
     CalculationStrategy,
 )
+from ..discovery import autodiscover_model
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedStrategy
-from ..power_profile.model_discovery import get_power_profile
+from ..power_profile.factory import get_power_profile
 from ..power_profile.power_profile import PowerProfile, SubProfileSelector
 from ..strategy.factory import PowerCalculatorStrategyFactory
 from ..strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -116,8 +117,9 @@ async def create_virtual_power_sensor(
             power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
         else:
             try:
+                model_info = await autodiscover_model(hass, source_entity.entity_entry)
                 power_profile = await get_power_profile(
-                    hass, sensor_config, source_entity.entity_entry
+                    hass, sensor_config, model_info=model_info
                 )
             except ModelNotSupported as err:
                 if not is_fully_configured(sensor_config):

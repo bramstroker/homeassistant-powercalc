@@ -7,6 +7,7 @@ from typing import Optional
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 
 from homeassistant.config_entries import (
@@ -22,7 +23,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
 from homeassistant.helpers.typing import ConfigType
-from .aliases import MANUFACTURER_WLED
+from .aliases import MANUFACTURER_ALIASES, MANUFACTURER_WLED
 from .common import SourceEntity, create_source_entity
 from .const import (
     CONF_MANUFACTURER,
@@ -36,14 +37,66 @@ from .const import (
     PowercalcDiscoveryType,
 )
 from .errors import ModelNotSupported
-from .power_profile.model_discovery import (
-    PowerProfile,
-    autodiscover_model,
+from .power_profile.library import ModelInfo
+from .power_profile.factory import (
     get_power_profile,
 )
-from .power_profile.power_profile import DEVICE_DOMAINS
+from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
+
+
+async def autodiscover_model(
+    hass: HomeAssistant, entity_entry: er.RegistryEntry | None
+) -> ModelInfo | None:
+    """Try to auto discover manufacturer and model from the known device information"""
+    if not entity_entry:
+        return None
+
+    if not await has_manufacturer_and_model_information(hass, entity_entry):
+        _LOGGER.debug(
+            "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
+            entity_entry.entity_id,
+        )
+        return None
+
+    device_registry = dr.async_get(hass)
+    device_entry = device_registry.async_get(entity_entry.device_id)
+    model_id = device_entry.model
+
+    manufacturer = device_entry.manufacturer
+    if MANUFACTURER_ALIASES.get(manufacturer):
+        manufacturer = MANUFACTURER_ALIASES.get(manufacturer)
+
+    # Make sure we don't have a literal / in model_id, so we don't get issues with sublut directory matching down the road
+    # See github #658
+    model_id = str(model_id).replace("/", "#slash#")
+
+    model_info = ModelInfo(manufacturer, model_id)
+
+    _LOGGER.debug(
+        "%s: Auto discovered model (manufacturer=%s, model=%s)",
+        entity_entry.entity_id,
+        model_info.manufacturer,
+        model_info.model,
+    )
+    return model_info
+
+
+async def has_manufacturer_and_model_information(
+    hass: HomeAssistant, entity_entry: er.RegistryEntry
+) -> bool:
+    """See if we have enough information in device registry to automatically setup the power sensor"""
+
+    device_registry = dr.async_get(hass)
+    device_entry = device_registry.async_get(entity_entry.device_id)
+    if device_entry is None:
+        return False
+
+    if len(str(device_entry.manufacturer)) == 0 or len(str(device_entry.model)) == 0:
+        return False
+
+    return True
 
 
 class DiscoveryManager:
