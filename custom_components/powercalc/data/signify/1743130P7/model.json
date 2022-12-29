@@ -1,9 +1,7 @@
 {
    "name":"Hue Impress Pedestal Low",
    "standby_power":0.17,
-   "calculation_strategy":[
-      "lut"
-   ],
+   "calculation_strategy": "lut",
    "measure_device":"Zhurui PR10-D",
    "measure_description":"Measured with utils/measure script using OCR",
    "measure_method":"script",
