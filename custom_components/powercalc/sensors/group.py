@@ -173,7 +173,7 @@ async def remove_power_sensor_from_associated_groups(
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
         if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-        and config_entry.entry_id in entry.data.get(CONF_GROUP_MEMBER_SENSORS)
+        and config_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
     ]
 
     for group_entry in group_entries:

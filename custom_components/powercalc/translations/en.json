@@ -88,7 +88,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
                 },
-                "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.",
+                "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
                 "title": "Library"
             },
             "manufacturer": {

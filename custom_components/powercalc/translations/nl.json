@@ -88,7 +88,7 @@
                 "data_description": {
                     "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
                 },
-                "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat",
+                "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
                 "title": "Bibliotheek"
             },
             "manufacturer": {

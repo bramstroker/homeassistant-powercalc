@@ -146,6 +146,10 @@
         }
       }
     },
+    "config_flow_discovery_remarks": {
+      "type": "string",
+      "description": "Some remarks to show in the GUI config flow on first step of discovery"
+    },
     "sensor_config": {
       "type": "object",
       "description": "Sensor configuration options. See the README"
