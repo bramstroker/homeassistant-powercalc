@@ -71,8 +71,8 @@ from .const import (
 )
 from .discovery import autodiscover_model
 from .errors import ModelNotSupported, StrategyConfigurationError
-from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.factory import get_power_profile
+from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -447,7 +447,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self.source_entity.entity_entry and self.power_profile is None:
             try:
                 self.power_profile = await get_power_profile(
-                    self.hass, {}, await autodiscover_model(self.hass, self.source_entity.entity_entry)
+                    self.hass,
+                    {},
+                    await autodiscover_model(
+                        self.hass, self.source_entity.entity_entry
+                    ),
                 )
             except ModelNotSupported:
                 self.power_profile = None

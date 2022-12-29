@@ -97,9 +97,7 @@ async def run_powercalc_setup(
         config.update({sensor.DOMAIN: sensor_config})
         if "sensor" in hass.config.components:
             hass.config.components.remove("sensor")
-        assert await async_setup_component(
-            hass, sensor.DOMAIN, config
-        )
+        assert await async_setup_component(hass, sensor.DOMAIN, config)
         await hass.async_block_till_done()
 
     assert await async_setup_component(hass, DOMAIN, config)

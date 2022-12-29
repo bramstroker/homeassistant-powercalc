@@ -10,10 +10,7 @@ from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import (
-    ConfigEntry,
-    ConfigEntryState,
-)
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,

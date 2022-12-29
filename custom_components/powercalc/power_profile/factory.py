@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+
 from homeassistant.core import HomeAssistant
 
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL

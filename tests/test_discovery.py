@@ -1,5 +1,4 @@
 import logging
-
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -30,14 +29,11 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
-from custom_components.test.light import MockLight
-
-from .common import (
-    create_mock_light_entity,
-    run_powercalc_setup,
-)
 from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.test.light import MockLight
+
+from .common import create_mock_light_entity, run_powercalc_setup
 
 
 @pytest.fixture
@@ -155,7 +151,9 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
     assert not caplog.records
 
 
-async def test_manually_configured_light_overrides_autodiscovered(hass: HomeAssistant, mock_flow_init) -> None:
+async def test_manually_configured_light_overrides_autodiscovered(
+    hass: HomeAssistant, mock_flow_init
+) -> None:
     light_entity = MockLight("testing")
     light_entity.manufacturer = "signify"
     light_entity.model = "LCA001"
@@ -239,7 +237,9 @@ async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant) -> None
     assert not hass.states.get("sensor.test_power")
 
 
-async def test_autodiscover_skips_entities_with_empty_manufacturer(hass: HomeAssistant) -> None:
+async def test_autodiscover_skips_entities_with_empty_manufacturer(
+    hass: HomeAssistant,
+) -> None:
     mock_registry(
         hass,
         {
@@ -277,7 +277,9 @@ async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRe
 
     entity_entry = entity_reg.async_get("light.testa")
 
-    profile = await get_power_profile(hass, {}, await autodiscover_model(hass, entity_entry))
+    profile = await get_power_profile(
+        hass, {}, await autodiscover_model(hass, entity_entry)
+    )
     assert profile
     assert profile.manufacturer == light_mock.manufacturer
     assert profile.model == "LED1649C5"
@@ -329,7 +331,9 @@ async def test_autodiscover_model_from_entity_entry(
 
     entity_entry = entity_reg.async_get("light.testa")
 
-    power_profile = await get_power_profile(hass, {}, await autodiscover_model(hass, entity_entry))
+    power_profile = await get_power_profile(
+        hass, {}, await autodiscover_model(hass, entity_entry)
+    )
 
     assert power_profile.manufacturer == expected_manufacturer
     assert power_profile.model == expected_model
@@ -347,6 +351,8 @@ async def test_get_power_profile_empty_manufacturer(
 
     entity_entry = entity_reg.async_get("light.test")
 
-    profile = await get_power_profile(hass, {}, await autodiscover_model(hass, entity_entry))
+    profile = await get_power_profile(
+        hass, {}, await autodiscover_model(hass, entity_entry)
+    )
     assert not profile
     assert not caplog.records

@@ -1,28 +1,19 @@
 from __future__ import annotations
 
 import logging
-
 import re
 from typing import Optional
 
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
-
-from homeassistant.config_entries import (
-    SOURCE_INTEGRATION_DISCOVERY,
-    SOURCE_USER,
-)
-from homeassistant.const import (
-    CONF_ENTITY_ID,
-    CONF_NAME,
-    CONF_PLATFORM,
-    CONF_UNIQUE_ID,
-)
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_PLATFORM, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
 from homeassistant.helpers.typing import ConfigType
+
 from .aliases import MANUFACTURER_ALIASES, MANUFACTURER_WLED
 from .common import SourceEntity, create_source_entity
 from .const import (
@@ -37,10 +28,8 @@ from .const import (
     PowercalcDiscoveryType,
 )
 from .errors import ModelNotSupported
+from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo
-from .power_profile.factory import (
-    get_power_profile,
-)
 from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)

@@ -111,10 +111,10 @@ from .const import (
 )
 from .discovery import autodiscover_model
 from .errors import (
+    ModelNotSupported,
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
-    ModelNotSupported,
 )
 from .power_profile.factory import get_power_profile
 from .sensors.abstract import BaseEntity
@@ -735,13 +735,17 @@ def resolve_area_entities(
 
 
 async def is_autoconfigurable(
-    hass: HomeAssistant, entity_entry: er.RegistryEntry, sensor_config: ConfigType = None
+    hass: HomeAssistant,
+    entity_entry: er.RegistryEntry,
+    sensor_config: ConfigType = None,
 ) -> bool:
     if sensor_config is None:
         sensor_config = {}
     try:
         model_info = await autodiscover_model(hass, entity_entry)
-        power_profile = await get_power_profile(hass, sensor_config, model_info=model_info)
+        power_profile = await get_power_profile(
+            hass, sensor_config, model_info=model_info
+        )
         if not power_profile:
             return False
         if power_profile.has_sub_profiles and power_profile.sub_profile:
