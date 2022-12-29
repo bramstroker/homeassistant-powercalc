@@ -70,8 +70,8 @@ async def create_utility_meters(
                 platform=DOMAIN,
                 unique_id=unique_id
             )
-            # if existing_entity_id and hass.states.get(existing_entity_id):
-            #     continue
+            if existing_entity_id and hass.states.get(existing_entity_id):
+                continue
 
         if tariffs:
             tariff_select = await create_tariff_select(tariffs, hass, name, unique_id)
