@@ -59,7 +59,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.discovery import autodiscover_model, ModelInfo
+from custom_components.powercalc.discovery import ModelInfo, autodiscover_model
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.test.light import MockLight

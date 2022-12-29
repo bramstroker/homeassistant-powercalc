@@ -7,6 +7,7 @@ from typing import cast
 import homeassistant.helpers.entity_registry as er
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
@@ -14,7 +15,6 @@ from homeassistant.components.utility_meter.const import (
 from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
@@ -30,7 +30,7 @@ from ..const import (
 )
 from ..errors import SensorConfigurationError
 from .abstract import BaseEntity
-from .energy import VirtualEnergySensor, RealEnergySensor
+from .energy import RealEnergySensor, VirtualEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,9 +66,7 @@ async def create_utility_meters(
         if isinstance(energy_sensor, RealEnergySensor):
             entity_registry = er.async_get(hass)
             existing_entity_id = entity_registry.async_get_entity_id(
-                domain=SENSOR_DOMAIN,
-                platform=DOMAIN,
-                unique_id=unique_id
+                domain=SENSOR_DOMAIN, platform=DOMAIN, unique_id=unique_id
             )
             if existing_entity_id and hass.states.get(existing_entity_id):
                 continue

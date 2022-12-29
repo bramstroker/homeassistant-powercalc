@@ -6,13 +6,15 @@ from homeassistant.components.utility_meter.sensor import (
     ATTR_SOURCE_ID,
     ATTR_STATUS,
     ATTR_TARIFF,
-    CONF_UNIQUE_ID,
     COLLECTING,
+    CONF_UNIQUE_ID,
     PAUSED,
 )
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import mock_registry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -27,8 +29,6 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
-from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import mock_registry
 
 from ..common import create_input_boolean, run_powercalc_setup
 
@@ -76,7 +76,9 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
 
 
-async def test_utility_meter_is_not_created_twice(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_utility_meter_is_not_created_twice(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
     caplog.set_level(logging.ERROR)
     power_sensor_id = "sensor.test_power"
     energy_sensor_id = "sensor.test_energy"
@@ -113,7 +115,7 @@ async def test_utility_meter_is_not_created_twice(hass: HomeAssistant, caplog: p
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TYPES: ["daily"],
             CONF_POWER_SENSOR_ID: power_sensor_id,
-            CONF_ENERGY_SENSOR_ID: energy_sensor_id
+            CONF_ENERGY_SENSOR_ID: energy_sensor_id,
         },
     )
 
@@ -125,7 +127,7 @@ async def test_utility_meter_is_not_created_twice(hass: HomeAssistant, caplog: p
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TYPES: ["daily"],
             CONF_POWER_SENSOR_ID: power_sensor_id,
-            CONF_ENERGY_SENSOR_ID: energy_sensor_id
+            CONF_ENERGY_SENSOR_ID: energy_sensor_id,
         },
     )
 
