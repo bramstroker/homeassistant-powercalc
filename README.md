@@ -814,6 +814,7 @@ Example:
 #### Expected file structure
 
 - The file **MUST** contain a header row.
+- Watt value decimal point must be a `.` not a `,`. i.e. `18.4`
 - The data rows in the CSV files **MUST** have the following column order:
 
 **hs.csv**
