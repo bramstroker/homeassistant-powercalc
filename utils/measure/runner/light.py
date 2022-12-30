@@ -24,6 +24,7 @@ from powermeter.errors import (
     ZeroReadingError,
 )
 from powermeter.factory import PowerMeterFactory
+from powermeter.powermeter import PowerMeter
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -54,10 +55,9 @@ class LightRunner(MeasurementRunner):
     power value in watt.
     """
 
-    def __init__(self):
+    def __init__(self, measure_util: MeasureUtil):
         self.light_controller = LightControllerFactory().create()
-        self.measure_util: MeasureUtil = MeasureUtil()
-        self.power_meter = PowerMeterFactory().create()
+        self.measure_util = measure_util
         self.color_mode: ColorMode | None = None
         self.num_lights: int = 1
         self.is_dummy_load_connected: bool = False
@@ -206,14 +206,7 @@ class LightRunner(MeasurementRunner):
         input(
             "Only connect your dummy load to your smart plug, not the light! Press enter to start measuring the dummy load.."
         )
-        values = []
-        for i in range(1):
-            result = self.power_meter.get_power()
-            values.append(result.power)
-            _LOGGER.info(f"Dummy load watt: {result.power}")
-            time.sleep(config.SLEEP_TIME)
-        average = sum(values) / len(values)
-
+        average = self.measure_util.take_average_measurement(30)
         with open(file_path, "w") as f:
             f.write(str(average))
 
