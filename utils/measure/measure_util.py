@@ -8,15 +8,15 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.factory import PowerMeterFactory
+
 from powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 
 
 class MeasureUtil:
-    def __init__(self):
-        self.power_meter: PowerMeter = PowerMeterFactory().create()
+    def __init__(self, power_meter: PowerMeter):
+        self.power_meter = power_meter
 
     def take_average_measurement(self, duration: int) -> float:
         """Measure average power consumption for a given time period in seconds"""

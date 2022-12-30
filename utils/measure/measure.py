@@ -62,7 +62,6 @@ class Measure:
         power_meter : PowerMeter
             The power meter to use.
         """
-        self.measure_util = MeasureUtil()
         self.power_meter = power_meter
         self.runner: MeasurementRunner | None = None
         self.device_type: DeviceType = DeviceType.LIGHT
@@ -100,9 +99,9 @@ class Measure:
                 choices=[cls.value for cls in DeviceType],
             )
 
-        self.runner = RunnerFactory().create_runner(self.device_type)
-
-        answers = self.ask_questions()
+        self.runner = RunnerFactory().create_runner(self.device_type, self.power_meter)
+        
+        answers = self.ask_questions(self.get_questions())
         self.power_meter.process_answers(answers)
         self.runner.prepare(answers)
 
@@ -205,22 +204,22 @@ class Measure:
 
         return questions
 
-    def ask_questions(self) -> dict[str, Any]:
+    @staticmethod
+    def ask_questions(questions: list[Question]) -> dict[str, Any]:
         """
         Ask question and return a dictionary with the answers.
         It will also check if any predefined answers are defined in .env, and will skip asking these
         """
-        all_questions = self.get_questions()
 
         # Only ask questions which answers are not predefined in .env file
         questions_to_ask = [
             question
-            for question in all_questions
+            for question in questions
             if not config_key_exists(str(question.name).upper())
         ]
 
         predefined_answers = {}
-        for question in all_questions:
+        for question in questions:
             question_name = str(question.name)
             env_var = question_name.upper()
             if config_key_exists(env_var):
@@ -263,12 +262,13 @@ def str_to_bool(value: Any) -> bool:
 
 class RunnerFactory:
     @staticmethod
-    def create_runner(device_type: DeviceType) -> MeasurementRunner:
+    def create_runner(device_type: DeviceType, power_meter: PowerMeter) -> MeasurementRunner:
         """Creates a runner instance based on selected device type"""
+        measure_util = MeasureUtil(power_meter)
         if device_type == DeviceType.LIGHT:
-            return LightRunner()
+            return LightRunner(measure_util)
         if device_type == DeviceType.SPEAKER:
-            return SpeakerRunner()
+            return SpeakerRunner(measure_util)
 
 
 def main():
@@ -278,7 +278,7 @@ def main():
         power_meter = PowerMeterFactory().create()
 
         measure = Measure(power_meter)
-        measure_util = MeasureUtil()
+        measure_util = MeasureUtil(power_meter)
 
         args = sys.argv[1:]
         if len(args) > 0:
@@ -287,6 +287,10 @@ def main():
                     duration = int(args[1])
                 except IndexError:
                     duration = 60
+                questions = power_meter.get_questions()
+                if questions:
+                    answers = measure.ask_questions(questions)
+                    power_meter.process_answers(answers)
                 measure_util.take_average_measurement(duration)
                 exit(0)
 

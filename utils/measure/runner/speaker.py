@@ -20,10 +20,9 @@ _LOGGER = logging.getLogger("measure")
 
 
 class SpeakerRunner(MeasurementRunner):
-    def __init__(self):
-        self.measure_util: MeasureUtil = MeasureUtil()
+    def __init__(self, measure_util: MeasureUtil):
+        self.measure_util = measure_util
         self.media_controller: MediaController = MediaControllerFactory().create()
-        pass
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.media_controller.process_answers(answers)
