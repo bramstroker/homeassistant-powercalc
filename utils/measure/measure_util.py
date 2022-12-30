@@ -8,7 +8,6 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-
 from powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")

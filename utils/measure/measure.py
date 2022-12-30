@@ -100,7 +100,7 @@ class Measure:
             )
 
         self.runner = RunnerFactory().create_runner(self.device_type, self.power_meter)
-        
+
         answers = self.ask_questions(self.get_questions())
         self.power_meter.process_answers(answers)
         self.runner.prepare(answers)
@@ -262,7 +262,9 @@ def str_to_bool(value: Any) -> bool:
 
 class RunnerFactory:
     @staticmethod
-    def create_runner(device_type: DeviceType, power_meter: PowerMeter) -> MeasurementRunner:
+    def create_runner(
+        device_type: DeviceType, power_meter: PowerMeter
+    ) -> MeasurementRunner:
         """Creates a runner instance based on selected device type"""
         measure_util = MeasureUtil(power_meter)
         if device_type == DeviceType.LIGHT:
