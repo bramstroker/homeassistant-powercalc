@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 2.18",
+            "20 -> 2.25",
+            "30 -> 2.39",
+            "40 -> 2.26",
+            "50 -> 2.22",
+            "60 -> 2.55",
+            "70 -> 2.3",
+            "80 -> 2.46",
+            "90 -> 2.94",
+            "100 -> 3.08",
+            "0 -> 2.27"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TP-Link Tapo P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.2.3:docker"
+    },
+    "name": "Google Nest Hub (1st Gen)",
+    "standby_power": 2.069
+}
