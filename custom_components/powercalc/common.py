@@ -111,7 +111,10 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
             CONF_CREATE_ENERGY_SENSORS
         )
 
-    if (CONF_DAILY_FIXED_ENERGY in merged_config or CONF_POWER_SENSOR_ID in merged_config) and CONF_ENTITY_ID not in merged_config:
+    if (
+        CONF_DAILY_FIXED_ENERGY in merged_config
+        or CONF_POWER_SENSOR_ID in merged_config
+    ) and CONF_ENTITY_ID not in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
     if (
