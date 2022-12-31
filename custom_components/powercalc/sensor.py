@@ -123,7 +123,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
-from .sensors.energy import create_energy_sensor, EnergySensor
+from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
     create_group_sensors,

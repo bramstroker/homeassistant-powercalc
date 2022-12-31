@@ -30,7 +30,7 @@ from ..const import (
 )
 from ..errors import SensorConfigurationError
 from .abstract import BaseEntity
-from .energy import RealEnergySensor, EnergySensor
+from .energy import EnergySensor, RealEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
