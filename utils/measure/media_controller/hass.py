@@ -11,9 +11,7 @@ class HassMediaController:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
-            self.client = Client(
-                api_url, token, cache_session=False
-            )
+            self.client = Client(api_url, token, cache_session=False)
             self.client.get_config()
         except HomeassistantAPIError as e:
             raise MediaPlayerError(f"Failed to connect to HA API: {e}")

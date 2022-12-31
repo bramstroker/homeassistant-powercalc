@@ -107,7 +107,7 @@ class PowerProfile:
         Get the calculation strategy this profile provides.
         supported modes is here for BC purposes.
         """
-        if "supported_modes" in self._json_data: # pragma: no cover
+        if "supported_modes" in self._json_data:  # pragma: no cover
             _LOGGER.warning(
                 "Deprecation: supported_modes detected in model.json file. "
                 "You must rename this to calculation_strategy for this to keep working in the future"
