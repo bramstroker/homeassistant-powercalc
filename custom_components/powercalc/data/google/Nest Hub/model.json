@@ -26,5 +26,8 @@
         "VERSION": "v1.2.3:docker"
     },
     "name": "Google Nest Hub (1st Gen)",
+    "aliases": [
+        "Google Nest Hub"
+    ],
     "standby_power": 2.069
 }
