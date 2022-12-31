@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Fibargroup, FGWP102",
+    "measure_device": "Fibaro FGWP102",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,9 +9,7 @@
     },
     "name": "Philips Hue White Ambiance 800 E27 Bluetooth",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "8719514328242"
     ]

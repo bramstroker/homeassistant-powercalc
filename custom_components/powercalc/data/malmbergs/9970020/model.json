@@ -9,7 +9,5 @@
     },
     "name": "Malmbergs Sirius III",
     "standby_power": 0.89,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

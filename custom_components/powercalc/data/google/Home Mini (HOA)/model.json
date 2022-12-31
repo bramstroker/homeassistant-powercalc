@@ -1,0 +1,28 @@
+{
+    "measure_description": "Streamed 'Armin van Buuren - Come Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_method": "manual",
+    "measure_device": "Shelly Plug S",
+    "name": "Google Home Mini",
+    "standby_power": 1.65,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 1.80",
+            "10 -> 1.84",
+            "20 -> 1.87",
+            "30 -> 1.90",
+            "40 -> 1.92",
+            "50 -> 1.97",
+            "60 -> 2.07",
+            "70 -> 2.20",
+            "80 -> 2.35",
+            "90 -> 2.42",
+            "100 -> 2.49"
+        ]
+    },
+    "aliases": [
+        "Google Home Mini"
+    ]
+}

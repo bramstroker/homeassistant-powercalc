@@ -1,10 +1,11 @@
 {
     "name": "Hue White Ambiance A60 E27 806lm 9290012001A",
     "standby_power": 0.39,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
-    "measure_description": "Measured with script made by bramstroker and partially verified manual"
+    "measure_description": "Measured with script made by bramstroker and partially verified manual",
+    "aliases": [
+        "8718696548738"
+    ]
 }

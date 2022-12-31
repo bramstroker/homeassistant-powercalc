@@ -9,9 +9,7 @@
     },
     "name": "Hue white and color ambiance LightStrip plus",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "8718699703424"
     ]

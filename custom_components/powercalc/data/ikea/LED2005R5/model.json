@@ -9,12 +9,11 @@
     },
     "name": "TRADFRI LED bulb GU10 345 lumen, dimmable, white spectrum",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb GU10 WS 345lm",
-        "TRADFRI bulb GU10 WW 345lm"
+        "TRADFRI bulb GU10 WW 345lm",
+        "TRADFRIbulbGU10WS345lm"
     ]
 }
 

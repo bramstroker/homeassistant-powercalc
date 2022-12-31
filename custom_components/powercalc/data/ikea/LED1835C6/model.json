@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Shelly, 1PM",
+    "measure_device": "Shelly 1PM",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,10 +9,9 @@
     },
     "name": "TRADFRI bulb E14 WS 470lm",
     "standby_power": 0.25,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
-        "TRADFRI bulb E14 WS 470lm"
+        "TRADFRI bulb E14 WS 470lm",
+        "LED1903C5/LED1835C6"
     ]
 }

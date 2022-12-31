@@ -43,7 +43,7 @@ class ModelNotSupported(StrategyConfigurationError):
     """Raised when model is not supported."""
 
 
-class UnsupportedMode(PowercalcSetupError):
+class UnsupportedStrategy(PowercalcSetupError):
     """Mode not supported."""
 
 

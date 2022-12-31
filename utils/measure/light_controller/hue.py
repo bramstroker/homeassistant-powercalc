@@ -9,15 +9,17 @@ from phue import Bridge, PhueRegistrationException
 from .controller import LightController, LightInfo
 from .errors import LightControllerError, ModelNotDiscoveredError
 
-NAME = "hue"
 TYPE_LIGHT = "light"
 TYPE_GROUP = "group"
+
 
 class HueLightController(LightController):
     def __init__(self, bridge_ip: str):
         self.bridge = self.initialize_hue_bridge(bridge_ip)
         self.lights = {light.light_id: light.name for light in self.bridge.lights}
         self.groups = {group.group_id: group.name for group in self.bridge.groups}
+        self.is_group: bool = False
+        self.light_id: int | None = None
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
         kwargs["on"] = on
@@ -32,7 +34,7 @@ class HueLightController(LightController):
             return LightInfo(
                 model_id=model_id,
             )
-        
+
         # Individual light information
         light = self.bridge.get_light(self.light_id)
         lightinfo = LightInfo(
@@ -45,7 +47,7 @@ class HueLightController(LightController):
 
         return lightinfo
 
-    def find_group_model(self, group_id: str) -> str:
+    def find_group_model(self, group_id: int) -> str:
         model_ids = set()
         for light_id in self.bridge.get_group(group_id, "lights"):
             light = self.bridge.get_light(int(light_id))
@@ -54,15 +56,18 @@ class HueLightController(LightController):
 
         if len(model_ids) == 0:
             raise ModelNotDiscoveredError("Could not find a model id for the group")
-        
+
         if len(model_ids) > 1:
-            raise LightControllerError("The Hue group contains lights of multiple models, this is not supported")
-        
+            raise LightControllerError(
+                "The Hue group contains lights of multiple models, this is not supported"
+            )
+
         return model_ids.pop()
 
-
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
-        config_file_path = os.path.join(os.path.dirname(__file__), "../.persistent/.python_hue")
+        config_file_path = os.path.join(
+            os.path.dirname(__file__), "../.persistent/.python_hue"
+        )
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
         except PhueRegistrationException as err:
@@ -73,7 +78,6 @@ class HueLightController(LightController):
         return bridge
 
     def get_questions(self) -> list[dict]:
-
         def get_message(answers) -> str:
             if answers.get("multiple_lights"):
                 return "Select the lightgroup"
@@ -81,15 +85,13 @@ class HueLightController(LightController):
 
         def get_light_list(answers) -> list:
             if answers.get("multiple_lights"):
-                return [(name, f"{TYPE_GROUP}:{id}") for id, name in self.groups.items()]
+                return [
+                    (name, f"{TYPE_GROUP}:{id}") for id, name in self.groups.items()
+                ]
             return [(name, f"{TYPE_LIGHT}:{id}") for id, name in self.lights.items()]
 
         return [
-            inquirer.List(
-                name="light",
-                message=get_message,
-                choices=get_light_list
-            ),
+            inquirer.List(name="light", message=get_message, choices=get_light_list),
         ]
 
     def process_answers(self, answers: dict[str, Any]):

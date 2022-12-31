@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Protocol
+
+import inquirer.questions
 
 from .const import MAX_MIRED, MIN_MIRED
 
@@ -8,7 +10,9 @@ from .const import MAX_MIRED, MIN_MIRED
 class LightInfo:
     model_id: str
 
-    def __init__(self, model_id: str, min_mired: int = MIN_MIRED, max_mired: int = MAX_MIRED):
+    def __init__(
+        self, model_id: str, min_mired: int = MIN_MIRED, max_mired: int = MAX_MIRED
+    ):
         self.model_id = model_id
         self._min_mired = min_mired
         self._max_mired = max_mired
@@ -33,15 +37,19 @@ class LightInfo:
     max_mired = property(get_max_mired, set_max_mired)
 
 
-class LightController:
+class LightController(Protocol):
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
-        pass
+        """Changes the light to a certain setting"""
+        ...
 
     def get_light_info(self) -> LightInfo:
-        return LightInfo("")
+        """Get device information about the light"""
+        ...
 
-    def get_questions(self) -> list[dict]:
-        return []
+    def get_questions(self) -> list[inquirer.questions.Question]:
+        """Get questions to ask for the chosen light controller"""
+        ...
 
     def process_answers(self, answers: dict[str, Any]):
-        pass
+        """Process the answers of the questions"""
+        ...

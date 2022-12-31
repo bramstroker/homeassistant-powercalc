@@ -4,12 +4,14 @@ import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import ColorMode
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -41,18 +43,18 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
-    CONF_MANUFACTURER,
     CONF_MODE,
-    CONF_MODEL,
     CONF_POWER,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_SENSOR_TYPE,
+    CONF_TEMPLATE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.sensor import is_autoconfigurable
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -61,14 +63,14 @@ from .common import (
     create_input_booleans,
     create_mock_light_entity,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test"),
     )
@@ -99,7 +101,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
     """Test that utility meters are succesfully created when `create_utility_meter: true`"""
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -126,7 +128,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
 async def test_create_nested_group_sensor(hass: HomeAssistant):
     await create_input_booleans(hass, ["test", "test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup1",
@@ -187,7 +189,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 
     (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass, {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id}
     )
 
@@ -205,7 +207,7 @@ async def test_error_when_configuring_same_entity_twice(
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             get_simple_fixed_config("input_boolean.test", 50),
@@ -221,18 +223,32 @@ async def test_error_when_configuring_same_entity_twice(
 async def test_alternate_naming_strategy(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    assert await async_setup_component(
         hass,
-        [
-            get_simple_fixed_config("input_boolean.test", 50),
-        ],
+        DOMAIN,
         {
-            CONF_POWER_SENSOR_NAMING: "{} Power consumption",
-            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
-            CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
-            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+            DOMAIN: {
+                CONF_POWER_SENSOR_NAMING: "{} Power consumption",
+                CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
+                CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
+                CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
+            }
         },
     )
+    await hass.async_block_till_done()
+
+    assert await async_setup_component(
+        hass,
+        SENSOR_DOMAIN,
+        {
+            SENSOR_DOMAIN: {
+                "platform": DOMAIN,
+                CONF_ENTITY_ID: "input_boolean.test",
+                CONF_FIXED: {CONF_POWER: 25},
+            }
+        },
+    )
+    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.test_power_consumption")
     assert power_state
@@ -245,7 +261,7 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
 async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             {
@@ -279,9 +295,9 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
     await create_mock_light_entity(hass, light)
 
     # Run powercalc setup with autodiscovery
-    await run_powercalc_setup_yaml_config(hass, {}, {})
+    await run_powercalc_setup(hass, {}, {})
 
-    assert "Model not found in library, skipping auto configuration" in caplog.text
+    assert "Model not found in library, skipping discovery" in caplog.text
 
 
 async def test_can_include_autodiscovered_entity_in_group(
@@ -298,7 +314,7 @@ async def test_can_include_autodiscovered_entity_in_group(
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         [
             {
@@ -326,7 +342,7 @@ async def test_include_area(
     entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {CONF_CREATE_GROUP: "Test include", CONF_INCLUDE: {CONF_AREA: "bathroom_1"}},
     )
@@ -335,7 +351,7 @@ async def test_include_area(
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test include area by name",
@@ -350,7 +366,7 @@ async def test_include_area_not_found(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test area not found",
@@ -384,7 +400,7 @@ async def test_include_light_group(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "Test include lightgroup",
@@ -398,6 +414,65 @@ async def test_include_light_group(hass: HomeAssistant):
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+
+async def test_include_domain(hass: HomeAssistant) -> None:
+    """Test domain include option, which includes all entities where the source entity matches a certain domain"""
+    await create_mock_light_entity(
+        hass,
+        [
+            create_discoverable_light("bathroom_spots", "1111"),
+            create_discoverable_light("kitchen", "2222"),
+        ],
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Lights",
+                CONF_INCLUDE: {CONF_DOMAIN: "light"},
+            },
+        ],
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.lights_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.bathroom_spots_power",
+        "sensor.kitchen_power",
+    }
+
+
+async def test_include_template(hass: HomeAssistant) -> None:
+    await create_mock_light_entity(
+        hass,
+        [
+            create_discoverable_light("bathroom_spots", "1111"),
+            create_discoverable_light("kitchen", "2222"),
+        ],
+    )
+
+    template = "{{ states|selectattr('entity_id', 'eq', 'light.bathroom_spots')|map(attribute='entity_id')|list}}"
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Lights",
+                CONF_INCLUDE: {CONF_TEMPLATE: template},
+            },
+        ],
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.lights_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_spots_power"}
 
 
 async def test_user_can_rename_entity_id(
@@ -417,7 +492,7 @@ async def test_user_can_rename_entity_id(
 
     await create_input_boolean(hass)
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",
@@ -498,7 +573,7 @@ async def test_entities_are_bound_to_source_device(
 async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2", "test3"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITIES: [
@@ -516,3 +591,137 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
     assert hass.states.get("sensor.test1_power")
     assert hass.states.get("sensor.test2_power")
     assert not hass.states.get("sensor.test3_power")
+
+
+async def test_change_options_of_renamed_sensor(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy_daily").name == "test energy daily"
+
+    entity_reg.async_update_entity(
+        entity_id="sensor.test_energy_daily", name="Renamed daily utility meter"
+    )
+    await hass.async_block_till_done()
+
+    assert (
+        hass.states.get("sensor.test_energy_daily").name
+        == "Renamed daily utility meter"
+    )
+
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_CREATE_UTILITY_METERS: True, CONF_POWER: 100},
+    )
+    await hass.async_block_till_done()
+
+    assert (
+        hass.states.get("sensor.test_energy_daily").name
+        == "Renamed daily utility meter"
+    )
+
+
+async def test_renaming_sensor_is_retained_after_startup(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+    )
+    await hass.async_block_till_done()
+    entity_reg.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
+    await hass.async_block_till_done()
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcdef",
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").name == "Renamed power"
+
+
+async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
+    """
+    When creating a group or setting up multiple entities in one platform entry,
+    a sensor with an error should be skipped and not prevent the whole group from being setup.
+    This should be logged as an error.
+    """
+    caplog.set_level(logging.ERROR)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 40},
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test2",
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {},
+                },
+                {
+                    CONF_ENTITIES: [
+                        {
+                            CONF_ENTITY_ID: "input_boolean.test3",
+                            CONF_MODE: CalculationStrategy.FIXED,
+                            CONF_FIXED: {},
+                        },
+                    ]
+                },
+            ]
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert len(caplog.records) == 2
+    assert "Skipping sensor setup" in caplog.text
+
+
+async def test_is_autoconfigurable_returns_false(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+) -> None:
+    """
+    is_autoconfigurable should return False when the manufacturer / model is not found in the library
+    """
+    light_mock = MockLight("testa")
+    light_mock.manufacturer = "Foo"
+    light_mock.model = "Bar"
+
+    await create_mock_light_entity(hass, light_mock)
+
+    entity_entry = entity_reg.async_get("light.testa")
+    assert not await is_autoconfigurable(hass, entity_entry)

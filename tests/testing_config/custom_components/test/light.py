@@ -90,7 +90,7 @@ class MockLight(MockToggleEntity, LightEntity):
     @property
     def device_info(self):
         return {
-            "identifiers": {("hue", "1234")},
+            "identifiers": {("hue", self.unique_id)},
             "name": self.name,
             "manufacturer": self.manufacturer,
             "model": self.model,

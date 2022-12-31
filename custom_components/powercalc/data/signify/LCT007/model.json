@@ -1,5 +1,5 @@
 {
-    "measure_device": "Nous A1, Tuya w/ TASMOTA 9.5.0",
+    "measure_device": "Nous A1 with TASMOTA 9.5.0",
     "measure_method": "script",
     "measure_description": "Used script in utils/measure from repository",
     "measure_setting": {
@@ -11,9 +11,7 @@
     },
     "name": "Hue White and Color E27 Gen2 (2015)",
     "standby_power": 0.33,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }
 

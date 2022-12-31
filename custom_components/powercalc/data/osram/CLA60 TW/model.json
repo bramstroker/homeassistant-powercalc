@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Shelly, 1PM plus",
+    "measure_device": "Shelly Plus 1PM",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 3,
@@ -9,9 +9,7 @@
     },
     "name": "Smart+ Classic E27 tunable white",
     "standby_power": 0.5,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "AC03642"
     ]

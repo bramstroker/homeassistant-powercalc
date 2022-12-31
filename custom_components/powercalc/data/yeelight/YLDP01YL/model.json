@@ -1,9 +1,7 @@
 {
     "name": "Yeelight LED 600lm 4000K 8W WiFi",
     "standby_power": 1.1,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "manual",
     "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
     "measure_description": "No comments",

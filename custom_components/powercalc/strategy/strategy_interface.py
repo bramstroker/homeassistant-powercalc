@@ -1,16 +1,17 @@
+from __future__ import annotations
+
 from decimal import Decimal
-from typing import Optional
 
 from homeassistant.core import State
 from homeassistant.helpers.event import TrackTemplate
 
 
 class PowerCalculationStrategyInterface:
-    async def calculate(self, entity_state: State) -> Optional[Decimal]:
+    async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate power consumption based on entity state"""
         pass
 
-    async def validate_config(self):
+    async def validate_config(self) -> None:
         """Validate correct setup of the strategy"""
         pass
 

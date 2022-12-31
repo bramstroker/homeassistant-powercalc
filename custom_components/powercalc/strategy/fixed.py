@@ -36,13 +36,13 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         self,
         source_entity: SourceEntity,
         power: Optional[Union[Template, float]],
-        per_state_power: Optional[dict[str, float]],
+        per_state_power: Optional[dict[str, Union[float, Template]]],
     ) -> None:
         self._source_entity = source_entity
         self._power = power
         self._per_state_power = per_state_power
 
-    async def calculate(self, entity_state: State) -> Optional[Decimal]:
+    async def calculate(self, entity_state: State) -> Decimal | None:
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:
@@ -62,7 +62,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
 
         return await evaluate_power(self._power)
 
-    async def validate_config(self):
+    async def validate_config(self) -> None:
         """Validate correct setup of the strategy"""
         if self._power is None and self._per_state_power is None:
             raise StrategyConfigurationError(
@@ -78,7 +78,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 "fixed_states_power_only",
             )
 
-    def get_entities_to_track(self) -> list[str, TrackTemplate]:
+    def get_entities_to_track(self) -> list[Union[str, TrackTemplate]]:
         track_templates = []
 
         if isinstance(self._power, Template):

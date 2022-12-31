@@ -33,6 +33,8 @@ CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
 CONF_CREATE_ENERGY_SENSORS = "create_energy_sensors"
 CONF_CREATE_UTILITY_METERS = "create_utility_meters"
 CONF_DAILY_FIXED_ENERGY = "daily_fixed_energy"
+CONF_DELAY = "delay"
+CONF_DISABLE_EXTENDED_ATTRIBUTES = "disable_extended_attributes"
 CONF_ENABLE_AUTODISCOVERY = "enable_autodiscovery"
 CONF_ENERGY_INTEGRATION_METHOD = "energy_integration_method"
 CONF_ENERGY_SENSOR_CATEGORY = "energy_sensor_category"
@@ -71,6 +73,8 @@ CONF_ON_TIME = "on_time"
 CONF_TEMPLATE = "template"
 CONF_SENSOR_TYPE = "sensor_type"
 CONF_SUB_PROFILE = "sub_profile"
+CONF_SLEEP_POWER = "sleep_power"
+CONF_UNAVAILABLE_POWER = "unavailable_power"
 CONF_UPDATE_FREQUENCY = "update_frequency"
 CONF_VALUE = "value"
 CONF_VALUE_TEMPLATE = "value_template"
@@ -121,7 +125,7 @@ ENTITY_CATEGORIES = [
 DEFAULT_UPDATE_FREQUENCY = timedelta(minutes=10)
 DEFAULT_POWER_NAME_PATTERN = "{} power"
 DEFAULT_POWER_SENSOR_PRECISION = 2
-DEFAULT_ENERGY_INTEGRATION_METHOD = ENERGY_INTEGRATION_METHOD_TRAPEZODIAL
+DEFAULT_ENERGY_INTEGRATION_METHOD = ENERGY_INTEGRATION_METHOD_LEFT
 DEFAULT_ENERGY_NAME_PATTERN = "{} energy"
 DEFAULT_ENERGY_SENSOR_PRECISION = 4
 DEFAULT_ENTITY_CATEGORY = ENTITY_CATEGORY_NONE
@@ -129,6 +133,7 @@ DEFAULT_UTILITY_METER_TYPES = [DAILY, WEEKLY, MONTHLY]
 
 DISCOVERY_SOURCE_ENTITY = "source_entity"
 DISCOVERY_POWER_PROFILE = "power_profile"
+DISCOVERY_TYPE = "discovery_type"
 
 ATTR_CALCULATION_MODE = "calculation_mode"
 ATTR_ENERGY_SENSOR_ENTITY_ID = "energy_sensor_entity_id"
@@ -164,3 +169,8 @@ class SensorType(StrEnum):
     DAILY_ENERGY = "daily_energy"
     VIRTUAL_POWER = "virtual_power"
     GROUP = "group"
+
+
+class PowercalcDiscoveryType(StrEnum):
+    DOMAIN_GROUP = "domain_group"
+    LIBRARY = "library"

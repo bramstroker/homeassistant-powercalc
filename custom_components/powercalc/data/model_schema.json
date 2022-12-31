@@ -7,7 +7,7 @@
     "standby_power",
     "measure_method",
     "measure_device",
-    "supported_modes"
+    "calculation_strategy"
   ],
   "properties": {
     "name": {
@@ -24,18 +24,21 @@
       "minimum": 0.05,
       "description": "Power draw when the device is turned on."
     },
-    "supported_modes": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "string",
-        "enum": ["lut", "linear", "fixed"]
-      },
+    "calculation_strategy": {
+      "type": "string",
+      "enum": [
+        "lut",
+        "linear",
+        "fixed"
+      ],
       "description": "Supported calculation modes"
     },
     "measure_method": {
       "type": "string",
-      "enum": ["manual", "script"],
+      "enum": [
+        "manual",
+        "script"
+      ],
       "description": "How the device was measured"
     },
     "measure_device": {
@@ -54,13 +57,13 @@
       "type": "string",
       "description": "Use LUT data files from another model"
     },
-    "requires_additional_configuration": {
-      "type": "boolean",
-      "description": "Defines whether this model needs additional configuration by the user. Used for smart switches and lights where we can only know the standby power, but not the power of connected light bulb"
-    },
     "device_type": {
       "type": "string",
-      "enum": ["light", "smart_switch"],
+      "enum": [
+        "light",
+        "smart_switch",
+        "smart_speaker"
+      ],
       "description": "Type of device"
     },
     "calculation_enabled_condition": {
@@ -78,11 +81,17 @@
       "type": "object",
       "description": "Configuration for linear calculation mode",
       "properties": {
-        "min_watt": {
+        "min_power": {
           "type": "number"
         },
-        "max_watt": {
+        "max_power": {
           "type": "number"
+        },
+        "calibrate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -90,8 +99,81 @@
       "type": "object",
       "description": "Configuration for fixed calculation mode",
       "properties": {
-        "watt": {
+        "power": {
           "type": "number"
+        },
+        "states_power": {
+          "type": "object",
+          "description": "A dict of state attributes and the power. See https://github.com/bramstroker/homeassistant-powercalc#power-per-state.",
+          "properties": {
+            "idle": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "playing": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "paused": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "off": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "unavailable": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "additionalProperties": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "config_flow_discovery_remarks": {
+      "type": "string",
+      "description": "Some remarks to show in the GUI config flow on first step of discovery"
+    },
+    "sensor_config": {
+      "type": "object",
+      "description": "Sensor configuration options. See the README"
+    },
+    "sub_profile_select": {
+      "type": "object",
+      "description": "Configuration to automatically select a sub profile",
+      "required": [
+        "default",
+        "matchers"
+      ],
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Default profile to select when non of the matchers apply"
+        },
+        "matchers": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "object"
+            }
+          ],
+          "description": "List of matchers which will be checked"
         }
       }
     }

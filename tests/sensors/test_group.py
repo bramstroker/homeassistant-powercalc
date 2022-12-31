@@ -13,14 +13,13 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     CONF_UNIQUE_ID,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
     POWER_WATT,
-    STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+    UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
@@ -32,8 +31,11 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    ATTR_IS_GROUP,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_GROUP,
@@ -59,7 +61,7 @@ from ..common import (
     create_input_booleans,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -67,10 +69,9 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     ent_reg = er.async_get(hass)
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "group_unique_id",
             CONF_CREATE_UTILITY_METERS: True,
@@ -115,7 +116,8 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        == UnitOfEnergy.KILO_WATT_HOUR
     )
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
@@ -202,55 +204,10 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant):
     }
 
 
-async def test_entities_with_incompatible_unit_of_measurement_are_removed(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
-    caplog.set_level(logging.ERROR)
-    await create_input_booleans(hass, ["test1", "test2"])
-
-    await run_powercalc_setup_yaml_config(
-        hass,
-        {
-            CONF_CREATE_GROUP: "TestGroup",
-            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
-            CONF_ENTITIES: [
-                {
-                    CONF_ENTITY_ID: "input_boolean.test1",
-                    CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 10.5},
-                },
-                {
-                    CONF_ENTITY_ID: "input_boolean.test2",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
-                    CONF_FIXED: {CONF_POWER: 50},
-                },
-            ],
-        },
-    )
-
-    hass.states.async_set("input_boolean.test1", STATE_OFF)
-    hass.states.async_set("input_boolean.test2", STATE_OFF)
-    await hass.async_block_till_done()
-
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-    await hass.async_block_till_done()
-
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state
-    assert energy_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.test1_energy",
-    }
-
-    assert "Removing this entity from the total sum" in caplog.text
-
-
 async def test_reset_service(hass: HomeAssistant):
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -263,10 +220,14 @@ async def test_reset_service(hass: HomeAssistant):
 
     # Set the individual entities to some initial values
     hass.states.async_set(
-        "sensor.test1_energy", "0.8", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR}
+        "sensor.test1_energy",
+        "0.8",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
     )
     hass.states.async_set(
-        "sensor.test2_energy", "1.2", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR}
+        "sensor.test2_energy",
+        "1.2",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
     )
     await hass.async_block_till_done()
 
@@ -301,7 +262,7 @@ async def test_restore_state(hass: HomeAssistant):
         ],
     )
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -317,7 +278,7 @@ async def test_restore_state(hass: HomeAssistant):
 async def test_mega_watt_hour(hass: HomeAssistant):
     await create_input_boolean(hass, "test1")
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_CREATE_GROUP: "TestGroup",
@@ -330,16 +291,19 @@ async def test_mega_watt_hour(hass: HomeAssistant):
 
     state = hass.states.get("sensor.testgroup_energy")
 
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_MEGA_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.MEGA_WATT_HOUR
 
 
 async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
+    """
+    When any of the group members becomes unavailable the energy group should also be unavailable
+    Group power sensor must only be unavailable when ALL group members are unavailable
+    """
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1", 50),
@@ -355,24 +319,26 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state.state == STATE_UNAVAILABLE
 
-    energy_state = hass.states.get("sensor.testgroup_power")
-    assert energy_state.state == STATE_UNAVAILABLE
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNKNOWN
 
     hass.states.async_set("input_boolean.test1", STATE_ON)
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state == "50.00"
+    assert power_state.state != STATE_UNAVAILABLE
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == STATE_UNAVAILABLE
 
 
 async def test_hide_members(hass: HomeAssistant):
     entity_reg = er.async_get(hass)
     await create_input_booleans(hass, ["one", "two"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: True,
             CONF_ENTITIES: [
@@ -411,10 +377,9 @@ async def test_unhide_members(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_HIDE_MEMBERS: False,
             CONF_ENTITIES: [
@@ -426,7 +391,76 @@ async def test_unhide_members(hass: HomeAssistant):
         },
     )
 
-    assert entity_reg.async_get("sensor.test_power").hidden_by == None
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+
+async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
+    entity_reg = er.async_get(hass)
+    entity_reg.async_get_or_create(
+        SENSOR_DOMAIN,
+        DOMAIN,
+        "abcdef",
+        suggested_object_id="test_power",
+        hidden_by=er.RegistryEntryHider.USER,
+    )
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_HIDE_MEMBERS: False,
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+                    CONF_POWER_SENSOR_ID: "sensor.test_power",
+                },
+            ],
+        },
+    )
+
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        is er.RegistryEntryHider.USER
+    )
+
+
+async def test_members_are_unhiden_after_group_removed(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+):
+    entity_reg.async_get_or_create(
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+    )
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test_power"],
+            CONF_HIDE_MEMBERS: True,
+        },
+        unique_id="group_unique_id",
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.mygroup_power")
+    assert (
+        entity_reg.async_get("sensor.test_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
+    )
+
+    # Remove the config entry
+    assert await hass.config_entries.async_remove(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entity_reg.async_get("sensor.test_power").hidden_by is None
+
+    assert not hass.states.get("sensor.mygroup_power")
+    assert not entity_reg.async_get("sensor.mygroup_power")
 
 
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
@@ -439,10 +473,9 @@ async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegist
 
     await create_input_booleans(hass, ["test1", "test2"])
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_CREATE_GROUP: "TestGroup",
             CONF_UNIQUE_ID: "abcdef",
             CONF_CREATE_UTILITY_METERS: True,
@@ -544,10 +577,12 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     config_entry_group = hass.config_entries.async_get_entry(
         config_entry_group.entry_id
     )
-    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
-        config_entry_sensor1.entry_id,
-        config_entry_sensor2.entry_id,
-    ]
+    assert config_entry_sensor1.entry_id in config_entry_group.data.get(
+        CONF_GROUP_MEMBER_SENSORS
+    )
+    assert config_entry_sensor2.entry_id in config_entry_group.data.get(
+        CONF_GROUP_MEMBER_SENSORS
+    )
 
     group_state = hass.states.get("sensor.groupa_power")
     assert group_state
@@ -572,3 +607,295 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     assert group_state.attributes.get("entities") == {
         "sensor.virtualsensor1_power",
     }
+
+
+async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
+    hass: HomeAssistant,
+):
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1298"""
+
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_sensor = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="xyz",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "xyz",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: config_entry_group.entry_id,
+        },
+        title="Test",
+    )
+
+    config_entry_sensor.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        config_entry_group,
+        data={
+            **config_entry_group.data,
+            CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id],
+        },
+    )
+    await hass.async_block_till_done()
+    assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
+
+    # Trigger a reload
+    assert await hass.config_entries.async_reload(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_group = hass.config_entries.async_get_entry(
+        config_entry_group.entry_id
+    )
+    assert config_entry_group.data.get(CONF_GROUP_MEMBER_SENSORS) == [
+        config_entry_sensor.entry_id,
+    ]
+
+
+async def test_custom_naming_pattern(hass: HomeAssistant):
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+            CONF_ENERGY_SENSOR_NAMING: "{} - Energie",
+        },
+    )
+    energy_state = hass.states.get("sensor.testgroup_energie")
+    assert energy_state
+    assert energy_state.name == "TestGroup - Energie"
+    assert energy_state.attributes["friendly_name"] == "TestGroup - Energie"
+
+
+async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+        },
+        {CONF_DISABLE_EXTENDED_ATTRIBUTES: True},
+    )
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert ATTR_ENTITIES not in power_state.attributes
+    assert ATTR_IS_GROUP not in power_state.attributes
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert ATTR_ENTITIES not in energy_state.attributes
+    assert ATTR_IS_GROUP not in energy_state.attributes
+
+
+async def test_config_entry_is_removed_from_associated_groups_on_removal(
+    hass: HomeAssistant,
+) -> None:
+    config_entry_sensor = await create_mocked_virtual_power_sensor_entry(
+        hass, "VirtualSensor1", "xyz"
+    )
+
+    groups: list[str] = ["GroupA", "GroupB", "GroupC"]
+    group_entry_ids: list[str] = []
+    for group in groups:
+        config_entry_group = MockConfigEntry(
+            domain=DOMAIN,
+            data={
+                CONF_SENSOR_TYPE: SensorType.GROUP,
+                CONF_NAME: group,
+                CONF_GROUP_MEMBER_SENSORS: [config_entry_sensor.entry_id],
+            },
+        )
+        config_entry_group.add_to_hass(hass)
+        assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+        await hass.async_block_till_done()
+        group_entry_ids.append(config_entry_group.entry_id)
+
+    await hass.config_entries.async_remove(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    for group_entry_id in group_entry_ids:
+        group_entry = hass.config_entries.async_get_entry(group_entry_id)
+        assert len(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS)) == 0
+
+
+async def test_group_is_removed_from_virtual_power_entry_on_removal(
+    hass: HomeAssistant,
+) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupA",
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    config_entry_sensor = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="xyz",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "xyz",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: config_entry_group.entry_id,
+        },
+        title="Test",
+    )
+    config_entry_sensor.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_sensor.entry_id)
+    await hass.async_block_till_done()
+
+    # Remove the group from HA
+    await hass.config_entries.async_remove(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    sensor_entry = hass.config_entries.async_get_entry(config_entry_sensor.entry_id)
+    assert sensor_entry.data.get(CONF_GROUP) is None
+
+
+async def test_error_is_logged_when_config_entry_associated_to_non_existing_group(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.WARNING)
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: "non-existing-config-entry-id",
+        },
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert (
+        "ConfigEntry Mock Title: Cannot add/remove to group non-existing-config-entry-id. It does not exist"
+        in caplog.text
+    )
+
+
+async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: [
+                "sensor.energy_Wh",
+                "sensor.energy_kWh",
+                "sensor.energy_MWh",
+            ],
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set(
+        "sensor.energy_Wh", "200", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR}
+    )
+    hass.states.async_set(
+        "sensor.energy_kWh",
+        "0.1",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+    )
+    hass.states.async_set(
+        "sensor.energy_MWh",
+        "0.01",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.MEGA_WATT_HOUR},
+    )
+
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == "10.3000"
+
+
+async def test_power_unit_conversions(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.power_w", "sensor.power_kw"],
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set(
+        "sensor.power_w", "100", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
+    )
+    hass.states.async_set(
+        "sensor.power_kw", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT}
+    )
+
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_power")
+    assert energy_state.state == "200.00"
+
+
+async def test_gui_discovered_entity_in_yaml_group(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """
+    Test if a powercalc entity setup with the GUI (either discovered or manually) can be added to a YAML group
+    """
+
+    caplog.set_level(logging.ERROR)
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "media_player.mediabox",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "GroupA",
+            CONF_ENTITIES: [{CONF_ENTITY_ID: "media_player.mediabox"}],
+        },
+    )
+
+    assert len(caplog.records) == 0

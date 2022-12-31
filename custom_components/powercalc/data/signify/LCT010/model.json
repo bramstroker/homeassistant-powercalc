@@ -1,10 +1,8 @@
 {
     "name": "Hue White and Color Ambiance A19 E26 (Gen 3)",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
-    "measure_device": "Shelly plug S",
+    "measure_device": "Shelly Plug S",
     "measure_description": "Used script utils/measure_shelly.py from repository",
     "standby_power": 0.35
 }

@@ -4,7 +4,6 @@ import time
 from typing import Any
 
 import inquirer
-from dateutil.parser import parse
 from homeassistant_api import Client
 
 from .errors import PowerMeterError
@@ -14,28 +13,31 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 class HassPowerMeter(PowerMeter):
     def __init__(self, api_url: str, token: str, call_update_entity: bool):
         self._call_update_entity = call_update_entity
+        self._entity_id: str | None = None
         try:
-            self.client = Client(api_url, token)
+            self.client = Client(api_url, token, cache_session=False)
         except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}")
 
     def get_power(self) -> PowerMeasurementResult:
         if self._call_update_entity:
-            self.client.trigger_service("homeassistant", "update_entity", entity_id=self._entity_id)
+            self.client.trigger_service(
+                "homeassistant", "update_entity", entity_id=self._entity_id
+            )
             time.sleep(1)
 
-        state = self.client.get_state(self._entity_id)
-        last_updated = parse(state.get("last_updated")).timestamp()
-        return PowerMeasurementResult(float(state.get("state")), last_updated)
+        state = self.client.get_state(entity_id=self._entity_id)
+        last_updated = state.last_updated.timestamp()
+        return PowerMeasurementResult(float(state.state), last_updated)
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[inquirer.questions.Question]:
         power_sensor_list = self.get_power_sensors()
 
         return [
             inquirer.List(
                 name="powermeter_entity_id",
                 message="Select the powermeter",
-                choices=power_sensor_list
+                choices=power_sensor_list,
             )
         ]
 
@@ -43,10 +45,9 @@ class HassPowerMeter(PowerMeter):
         entities = self.client.get_entities()
         sensors = entities["sensor"].entities.values()
         power_sensors = [
-            entity.entity_id for entity in sensors if 
-            hasattr(entity.state, 'attributes') and 
-            hasattr(entity.state.attributes, 'unit_of_measurement') and 
-            entity.state.attributes['unit_of_measurement'] == "W"
+            entity.entity_id
+            for entity in sensors
+            if entity.state.attributes.get("unit_of_measurement") == "W"
         ]
         return sorted(power_sensors)
 

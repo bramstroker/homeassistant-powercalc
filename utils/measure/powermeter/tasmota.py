@@ -14,12 +14,14 @@ class TasmotaPowerMeter(PowerMeter):
 
     def get_power(self) -> PowerMeasurementResult:
 
-        r = requests.get("http://{}/cm?cmnd=STATUS+8".format(self._device_ip), timeout=10)
+        r = requests.get(
+            "http://{}/cm?cmnd=STATUS+8".format(self._device_ip), timeout=10
+        )
         json = r.json()
 
         try:
             power = json["StatusSNS"]["ENERGY"]["Power"]
         except KeyError:
             raise PowerMeterError("Unexpected JSON response format")
-        
+
         return PowerMeasurementResult(float(power), time.time())

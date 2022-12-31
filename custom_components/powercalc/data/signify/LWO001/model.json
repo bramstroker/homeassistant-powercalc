@@ -4,9 +4,9 @@
     "measure_description": "Measured with utils/measure, SAMPLE_COUNT=3",
     "name": "Hue White Filament Bulb G93 E27 w/ BT",
     "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ],
-    "aliases": []
+    "calculation_strategy": "lut",
+    "aliases": [
+        "8718699688882" 
+    ]
 }
 

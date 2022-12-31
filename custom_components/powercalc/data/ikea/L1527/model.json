@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Shelly, SHPLG-S",
+    "measure_device": "Shelly Plug S",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 25,
@@ -9,9 +9,7 @@
     },
     "name": "FLOALT panel WS 30x30",
     "standby_power": 0.08,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "FLOALT panel WS 30x30"
     ]

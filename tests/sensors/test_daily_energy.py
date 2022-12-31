@@ -47,7 +47,7 @@ from ..common import (
     assert_entity_state,
     create_input_boolean,
     create_input_number,
-    run_powercalc_setup_yaml_config,
+    run_powercalc_setup,
 )
 
 
@@ -91,7 +91,7 @@ async def test_create_daily_energy_sensor_unit_prefix_watt(
 
 
 async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant):
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_PLATFORM: DOMAIN,
@@ -130,7 +130,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
     When the user configured the value in W and the on_time is always on,
     then a power sensor should also be created
     """
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "IP camera upstairs",
@@ -153,7 +153,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
 
 
 async def test_power_sensor_not_created_when_not_on_whole_day(hass: HomeAssistant):
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "IP camera upstairs",
@@ -241,7 +241,7 @@ async def test_template_value(hass: HomeAssistant):
     await create_input_number(hass, "test", 50)
 
     update_frequency = 1800
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "Router",
@@ -308,7 +308,7 @@ async def test_config_flow_decimal_value(hass: HomeAssistant):
 
 
 async def test_reset_service(hass: HomeAssistant):
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "IP camera upstairs",
@@ -354,7 +354,7 @@ async def test_restore_state(hass: HomeAssistant):
         ],
     )
 
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "My daily",
@@ -367,8 +367,32 @@ async def test_restore_state(hass: HomeAssistant):
     assert hass.states.get("sensor.my_daily_energy").state == "0.5000"
 
 
+async def test_restore_state_catches_decimal_conversion_exception(hass: HomeAssistant):
+    mock_restore_cache(
+        hass,
+        [
+            State(
+                "sensor.my_daily_energy",
+                "unknown",
+            ),
+        ],
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "My daily",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 1.5,
+            },
+        },
+    )
+
+    assert hass.states.get("sensor.my_daily_energy").state == "0.0000"
+
+
 async def test_small_update_frequency_updates_correctly(hass: HomeAssistant):
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_NAME: "Router",
@@ -390,7 +414,7 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
     hass: HomeAssistant,
 ):
     await create_input_boolean(hass, "test")
-    await run_powercalc_setup_yaml_config(
+    await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: "input_boolean.test",

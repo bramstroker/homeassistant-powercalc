@@ -1,5 +1,6 @@
 {
     "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Senzorul este deja configurat, specificați un ID unic"
         },
@@ -72,29 +73,29 @@
                 },
                 "title": "Configurație liniară"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Confirmați modelul"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
                 },
-                "description": "Producătorul '({manufacturer})' și modelul '({model})' au fost detectate automat pentru lumina dvs.",
-                "title": "Configurare LUT"
+                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru lumina dvs.{remarks}",
+                "title": "Bibliotecă"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Producător"
                 },
                 "description": "Selectați producătorul dispozitivului",
-                "title": "Configurare LUT"
+                "title": "Configurare Producător"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "ID Model"
                 },
                 "description": "Selectați modelul dispozitivului",
-                "title": "Configurare LUT"
+                "title": "Configurare Model"
             },
             "user": {
                 "data": {

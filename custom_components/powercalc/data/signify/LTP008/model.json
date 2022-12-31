@@ -9,8 +9,6 @@
     },
     "name": "Hue Being Pendant Light",
     "standby_power": 0.38,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }

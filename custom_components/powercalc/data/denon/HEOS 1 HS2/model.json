@@ -1,0 +1,28 @@
+{
+    "measure_description": "Streamed 'Armin van Buuren - Coming Around Again' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_method": "manual",
+    "measure_device": "Shelly Plug S",
+    "name": "HEOS 1 HS2",
+    "standby_power": 3.99,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 6.20",
+            "10 -> 6.21",
+            "20 -> 6.25",
+            "30 -> 6.33",
+            "40 -> 6.60",
+            "50 -> 7.20",
+            "60 -> 7.99",
+            "70 -> 9.41",
+            "80 -> 11.35",
+            "90 -> 12.50",
+            "100 -> 12.55"
+        ]
+    },
+    "aliases": [
+        "HEOS 1"
+    ]
+}

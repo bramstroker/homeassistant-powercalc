@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 from homeassistant.core import HomeAssistant
@@ -13,7 +15,7 @@ from ..const import (
     CONF_WLED,
     CalculationStrategy,
 )
-from ..errors import StrategyConfigurationError, UnsupportedMode
+from ..errors import StrategyConfigurationError, UnsupportedStrategy
 from ..power_profile.power_profile import PowerProfile
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
@@ -47,7 +49,7 @@ class PowerCalculatorStrategyFactory:
         if strategy == CalculationStrategy.WLED:
             return self._create_wled(source_entity, config)
 
-        raise UnsupportedMode("Invalid calculation mode", strategy)
+        raise UnsupportedStrategy("Invalid calculation mode", strategy)
 
     def _create_linear(
         self, source_entity: SourceEntity, config: dict, power_profile: PowerProfile

@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Shelly, 1PM",
+    "measure_device": "Shelly 1PM",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,9 +9,7 @@
     },
     "name": "TRADFRI bulb E27 WS clear 806lm",
     "standby_power": 0.34,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "TRADFRI bulb E27 WS clear 806lm"
     ]

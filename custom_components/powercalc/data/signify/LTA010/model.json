@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script, standby measured with Kill-a-Watt",
+    "measure_device": "TP-Link Kasa KP115",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 4,
+        "SLEEP_TIME": 5,
+        "VERSION": "master"
+    },
+    "name": "Hue ambiance lamp",
+    "standby_power": 0.25,
+    "calculation_strategy": "lut"
+}

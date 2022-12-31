@@ -1,0 +1,199 @@
+{
+    "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
+        "abort": {
+            "already_configured": "O sensor já está configurado, especifique um unique_id"
+        },
+        "error": {
+            "daily_energy_mandatory": "Você deve fornecer pelo menos um modelo de Valor ou Valor",
+            "fixed_mandatory": "Você deve fornecer pelo menos um Power, Power template ou States power",
+            "fixed_states_power_only": "Esta entidade só pode trabalhar com 'states_power' e não 'power'",
+            "group_mandatory": "Você deve definir pelo menos subgrupos ou entidades de poder e energia",
+            "linear_mandatory": "Você deve fornecer pelo menos um de max_power ou calibrar",
+            "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
+            "lut_unsupported_color_mode": "O perfil LUT não suporta um dos modos de cor da sua luz. Veja os logs para mais informações",
+            "lut_wrong_domain": "Apenas entidades de luz podem usar o modo LUT",
+            "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
+        },
+        "step": {
+            "daily_energy": {
+                "data": {
+                    "name": "Nome",
+                    "on_time": "Na hora",
+                    "start_time": "Hora de início",
+                    "unique_id": "ID único",
+                    "unit_of_measurement": "Unidade de medida",
+                    "update_frequency": "Frequência de atualização",
+                    "value": "Valor",
+                    "value_template": "Modelo de valor"
+                },
+                "data_description": {
+                    "on_time": "Quando deixado vazio, o padrão é 1 dia. sempre",
+                    "update_frequency": "tempo em segundos entre as atualizações de estado do sensor"
+                },
+                "title": "Criar um sensor fixo diário"
+            },
+            "fixed": {
+                "data": {
+                    "power": "Potência",
+                    "power_template": "Modelo de potência",
+                    "states_power": "Poder dos Estados"
+                },
+                "data_description": {
+                    "power": "Um valor de potência fixo em Watts quando a entidade está LIGADA",
+                    "power_template": "O modelo será avaliado para obter o valor da potência em W",
+                    "states_power": "Um par 'estado: poder' em cada linha, veja o exemplo acima"
+                },
+                "description": "Defina um valor de poder fixo para sua entidade. Alternativamente, você pode definir um valor de energia por estado. Por exemplo:\n\n`reproduzindo: 8.3`\n`pausado: 2.25`",
+                "title": "Configuração fixa"
+            },
+            "group": {
+                "data": {
+                    "create_utility_meters": "Criar medidores de utilidade",
+                    "group_member_sensors": "Sensores powercalc membros",
+                    "group_power_entities": "Entidades de potência adicionais",
+                    "group_energy_entities": "Entidades de energia adicionais",
+                    "name": "Nome",
+                    "sub_groups": "Subgrupos",
+                    "hide_members": "Ocultar membros",
+                    "unique_id": "ID único"
+                },
+                "data_description": {
+                    "group_member_sensors": "Sensores Powercalc para incluir no grupo",
+                    "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
+                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
+                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+                },
+                "title": "Criar um sensor de grupo"
+            },
+            "linear": {
+                "data": {
+                    "attribute": "Atributo",
+                    "calibrate": "Valores de calibração",
+                    "gamma_curve": "Curva gama",
+                    "max_power": "poder maximo",
+                    "min_power": "Potência mínima"
+                },
+                "data_description": {
+                    "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e porcentagem para ventiladores",
+                    "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20"
+                },
+                "title": "Configuração linear"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirmar modelo"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Se você optar por não confirmar, você mesmo pode inserir o fabricante e o modelo"
+                },
+                "description": "O fabricante \"{manufacturer}\" e o modelo \"{model}\" foram detectados automaticamente para sua luz.{remarks}",
+                "title": "Biblioteca"
+            },
+            "manufacturer": {
+                "data": {
+                    "manufacturer": "Fabricante"
+                },
+                "description": "Selecione o fabricante do dispositivo",
+                "title": "Configuração Fabricante"
+            },
+            "model": {
+                "data": {
+                    "model": "ID do modelo"
+                },
+                "description": "Selecione o modelo do dispositivo. Consulte a [lista]({supported_models_link}) de modelos compatíveis para obter mais informações",
+                "title": "Configuração modelo"
+            },
+            "sub_profile": {
+                "data": {
+                    "sub_profile": "Subperfil"
+                },
+                "description": "Este modelo tem vários subperfis. Selecione um adequado ao seu dispositivo",
+                "title": "Configuração Subperfil"
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Tipo de sensor"
+                },
+                "title": "Escolha seu tipo de sensor"
+            },
+            "virtual_power": {
+                "data": {
+                    "create_energy_sensor": "Criar sensor de energia",
+                    "create_utility_meters": "Criar medidores de utilidade",
+                    "entity_id": "Entidade de origem",
+                    "group": "Adicionar ao grupo",
+                    "mode": "Estratégia de cálculo",
+                    "name": "Nome",
+                    "standby_power": "Energia em espera",
+                    "unique_id": "ID único"
+                },
+                "data_description": {
+                    "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
+                    "create_utility_meters": "Deixe o powercalc criar medidores de utilidade, que circulam diariamente, de hora em hora, etc.",
+                    "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
+                    "name": "Deixar em branco levará o nome da entidade de origem",
+                    "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando em estado OFF",
+                    "unique_id": "Especifique um unique_id. Isso permitirá configurar vários sensores de potência para a mesma entidade. Quando não especificado, levará o unique_id da entidade de origem"
+                },
+                "description": "Consulte o leia-me para obter mais informações sobre as possíveis estratégias e opções de configuração",
+                "title": "Criar um sensor de energia virtual"
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Fator de potência",
+                    "voltage": "Voltagem"
+                },
+                "title": "Configuração WLED"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "fixed_mandatory": "Você deve fornecer pelo menos um Power, Power template ou States power",
+            "fixed_states_power_only": "Esta entidade só pode trabalhar com 'states_power' e não 'power'",
+            "group_mandatory": "Você deve definir pelo menos subgrupos ou entidades de poder e energia",
+            "linear_mandatory": "Você deve fornecer pelo menos um de max_power ou calibrar",
+            "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
+            "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "attribute": "Atributo",
+                    "calibrate": "Valores de calibração",
+                    "create_energy_sensor": "Criar sensor de energia",
+                    "create_utility_meters": "Criar medidores de utilidade",
+                    "gamma_curve": "Curva gama",
+                    "group_member_sensors": "Sensores powercalc membros",
+                    "group_power_entities": "Entidades de potência adicionais",
+                    "group_energy_entities": "Entidades de energia adicionais",
+                    "max_power": "poder maximo",
+                    "min_power": "Potência mínima",
+                    "name": "Nome",
+                    "on_time": "Na hora",
+                    "power": "Potência",
+                    "power_template": "Modelo de energia",
+                    "standby_power": "Energia em espera",
+                    "states_power": "Potência dos Estados",
+                    "sub_groups": "Subgrupos",
+                    "hide_members": "Ocultar membros",
+                    "unit_of_measurement": "Unidade de medida",
+                    "update_frequency": "Frequência de atualização",
+                    "value": "Valor",
+                    "value_template": "Modelo de valor"
+                },
+                "data_description": {
+                    "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e porcentagem para ventiladores",
+                    "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20",
+                    "power_template": "O modelo será avaliado para obter o valor da potência em W",
+                    "states_power": "Um par 'estado: poder' em cada linha, veja o exemplo acima",
+                    "group_member_sensors": "Sensores Powercalc para incluir no grupo",
+                    "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
+                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
+                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+                }
+            }
+        }
+    }
+}

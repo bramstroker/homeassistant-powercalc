@@ -81,7 +81,7 @@ def _generate_sensor_name(
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ):
-    """Generates the name to use for an sensor"""
+    """Generates the name to use for a sensor"""
     name_pattern: str = sensor_config.get(naming_conf_key)
     if name is None and source_entity:
         name = source_entity.name

@@ -1,0 +1,14 @@
+{
+ 	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+ 	"measure_method": "manual",
+ 	"measure_device": "Shelly Plug S",
+ 	"name": "TRADFRI control outlet",
+ 	"standby_power": 0.4,
+	"standby_power_on": 0.8,
+ 	"sensor_config": {
+ 		"power_sensor_naming": "{} Device Power",
+ 		"energy_sensor_naming": "{} Device Energy"
+   	},
+ 	"device_type": "smart_switch",
+ 	"calculation_strategy": "fixed"
+ }

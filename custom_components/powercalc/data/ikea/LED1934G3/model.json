@@ -9,10 +9,9 @@
     },
     "name": "TRADFRI bulb E27 WW clear 250lm",
     "standby_power": 0.27,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
-        "TRADFRIbulbE27WWclear250lm"
+        "TRADFRIbulbE27WWclear250lm",
+        "LED1934G3_E27"
     ]
 }

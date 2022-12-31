@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "TPLink KP125",
+    "measure_device": "TP-Link Kasa KP125",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,8 +9,6 @@
     },
     "name": "Hue color lamp (LCA009)",
     "standby_power": 0.19,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": []
 }

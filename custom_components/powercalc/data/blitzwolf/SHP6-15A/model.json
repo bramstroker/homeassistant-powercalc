@@ -1,0 +1,16 @@
+{
+	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+	"measure_method": "manual",
+	"measure_device": "Zhurui PR10-D",
+	"name": "Blitzwolf BW-SHP6 version 15A",
+	"standby_power": 0.4,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 0.8
+	}
+}

@@ -1,15 +1,14 @@
 {
     "name": "Hue Being Ceiling Light",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
-    "measure_device": "Shelly plug S",
+    "measure_device": "Shelly Plug S",
     "measure_description": "Used script utils/measure_shelly.py from repository. standby_power is guessed",
     "standby_power": 0.35,
     "aliases": [
         "3261030P6",
         "3261031P6",
-        "3261048P6"
+        "3261048P6",
+        "3261030P7"
     ]
 }

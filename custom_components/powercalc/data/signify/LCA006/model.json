@@ -4,9 +4,9 @@
     "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
     "name": "Hue White and Color Ambiance 1100 E27 with BT (9290024688)",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ],
-    "aliases": []
+    "calculation_strategy": "lut",
+    "aliases": [
+        "9290024689"
+    ]
 }
 

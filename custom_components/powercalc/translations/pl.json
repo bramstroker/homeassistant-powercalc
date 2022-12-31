@@ -1,5 +1,6 @@
 {
     "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Czujnik jest już skonfigurowany, podaj Unikatowy identyfikator"
         },
@@ -49,6 +50,7 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+                    "group_member_sensors": "Członek czujników powercalc",
                     "group_energy_entities": "Członek encji energii",
                     "group_power_entities": "Członek encji mocy",
                     "name": "Nazwa",
@@ -57,6 +59,9 @@
                     "unique_id": "Unikatowy identyfikator"
                 },
                 "data_description": {
+                    "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
+                    "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
+                    "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
                     "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
                 },
                 "title": "Utwórz czujnik grupy"
@@ -75,36 +80,51 @@
                 },
                 "title": "Konfiguracja liniowa"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Potwierdź model"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "Jeśli zdecydujesz się nie potwierdzać, możesz samodzielnie wprowadzić producenta i model"
                 },
-                "description": "Producent '({manufacturer})' i model '({model})' zostały automatycznie wykryte dla twojego światła",
-                "title": "Konfiguracja LUT"
+                "description": "Producent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego światła.{remarks}",
+                "title": "Biblioteka"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Producent"
                 },
                 "description": "Wybierz producenta urządzenia",
-                "title": "Konfiguracja LUT"
+                "title": "Konfiguracja Producent"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Identyfikator modelu"
                 },
                 "description": "Wybierz model urządzenia",
-                "title": "Konfiguracja LUT"
+                "title": "Konfiguracja modelu"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Sub profile"
                 },
                 "description": "This model has multiple sub profiles. Select one that suites your device",
-                "title": "LUT config"
+                "title": "Sub profile config"
+            },
+            "power_advanced": {
+                "title": "Opcje zaawansowane",
+                "description": "Poniższe opcje dotyczą zaawansowanej konfiguracji powercalc. Większość użytkowników nie będzie z tego korzystać, więc możesz je pominąć",
+                "data": {
+                    "calculation_enabled_condition": "Warunek włączenia obliczeń",
+                    "energy_integration_method": "Metoda całkowania energii",
+                    "ignore_unavailable_state": "Ignoruj stan niedostępny",
+                    "multiply_factor": "Mnożnik"
+                },
+                "data_description": {
+                    "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
+                    "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
+                    "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł"
+                }
             },
             "user": {
                 "data": {
@@ -117,6 +137,7 @@
                     "create_energy_sensor": "Utwórz sensor energii",
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
                     "entity_id": "Encja źródłowa",
+                    "group": "Dodaj do grupy",
                     "mode": "Strategia obliczeniowa",
                     "name": "Nazwa",
                     "standby_power": "Moc w trybie czuwania",
@@ -155,14 +176,19 @@
             "init": {
                 "data": {
                     "attribute": "Atrybut",
+                    "calculation_enabled_condition": "Warunek włączenia obliczeń",
                     "calibrate": "Wartości kalibracji",
                     "create_energy_sensor": "Utwórz sensor energii",
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+                    "energy_integration_method": "Metoda całkowania energii",
                     "gamma_curve": "Krzywa gamma",
+                    "group_member_sensors": "Członek czujników powercalc",
                     "group_energy_entities": "Członek encji energii",
                     "group_power_entities": "Członek encji mocy",
+                    "ignore_unavailable_state": "Ignoruj stan niedostępny",
                     "max_power": "Maksymalna moc",
                     "min_power": "Minimalna moc",
+                    "multiply_factor": "Mnożnik",
                     "name": "Nazwa",
                     "on_time": "Sumaryczny czas włączenia",
                     "power": "Moc",
@@ -178,7 +204,13 @@
                 },
                 "data_description": {
                     "attribute": "Określ Atrybut. Gdy pole pozostanie puste, będzie to jasność dla świateł i procent dla wentylatorów",
+                    "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
                     "calibrate": "Umieść wartość kalibracji w każdym wierszu. Przykład\n\n1: 20",
+                    "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
+                    "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
+                    "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
+                    "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
+                    "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
                     "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
                     "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej",
                     "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"

@@ -1,8 +1,9 @@
 {
     "name": "Hue White and Color Ambiance E14 Candle w/ BT",
     "standby_power": 0.28,
-    "supported_modes": [
-        "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "929002294203"
     ],
     "measure_method": "script",
     "measure_device": "AVM FRITZ!DECT 200",

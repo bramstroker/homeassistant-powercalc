@@ -1,0 +1,28 @@
+{
+    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_method": "manual",
+    "measure_device": "Shelly Plug S",
+    "name": "Google Nest Mini",
+    "standby_power": 1.65,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 2.01",
+            "10 -> 2.01",
+            "20 -> 2.04",
+            "30 -> 2.10",
+            "40 -> 2.26",
+            "50 -> 2.49",
+            "60 -> 2.83",
+            "70 -> 3.13",
+            "80 -> 3.37",
+            "90 -> 3.50",
+            "100 -> 3.66"
+        ]
+    },
+    "aliases": [
+        "Google Nest Mini"
+    ]
+}

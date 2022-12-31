@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 2,
+        "VERSION": "v1.0.3:docker"
+    },
+    "name": "Smart Zigbee pro GU10 spotlight bulb",
+    "standby_power": 0.35,
+    "calculation_strategy": "lut"
+}

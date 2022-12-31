@@ -9,7 +9,5 @@
     },
     "name": "Anko Smart String Lights 42997610 ",
     "standby_power": 1.09,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

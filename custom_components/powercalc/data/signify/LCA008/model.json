@@ -9,9 +9,7 @@
     },
     "name": "Hue White and Color Ambiance E27 1600lm",
     "standby_power": 0.27,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "929002471601"
     ]

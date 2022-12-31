@@ -1,5 +1,6 @@
 {
     "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine Unique-Id an"
         },
@@ -79,36 +80,36 @@
                 },
                 "title": "Linear Konfiguration"
             },
-            "lut": {
+            "library": {
                 "data": {
                     "confirm_autodisovered_model": "Bestätigen Sie das Modell"
                 },
                 "data_description": {
                     "confirm_autodisovered_model": "Wenn Sie nicht bestätigen möchten, können Sie den Hersteller und das Modell selbst eingeben"
                 },
-                "description": "Hersteller '({manufacturer})' und Modell '({model})' wurden für Ihre Leuchte automatisch erkannt",
-                "title": "LUT Konfiguration"
+                "description": "Hersteller \"{manufacturer}\" und Modell \"{model}\" wurden für Ihre Gerät automatisch erkannt.{remarks}",
+                "title": "Bibliothek"
             },
-            "lut_manufacturer": {
+            "manufacturer": {
                 "data": {
                     "manufacturer": "Hersteller"
                 },
                 "description": "Wählen Sie den Gerätehersteller",
-                "title": "LUT Konfiguration"
+                "title": "Hersteller Konfiguration"
             },
-            "lut_model": {
+            "model": {
                 "data": {
                     "model": "Modelnummer"
                 },
                 "description": "Wählen Sie das Gerätemodell",
-                "title": "LUT Konfiguration"
+                "title": "Modelnummer Konfiguration"
             },
-            "lut_subprofile": {
+            "sub_profile": {
                 "data": {
                     "sub_profile": "Unterprofil"
                 },
                 "description": "Dieses Modell hat mehrere Unterprofile. Wählen Sie eines, das zu Ihrem Gerät passt",
-                "title": "LUT Konfiguration"
+                "title": "Unterprofil Konfiguration"
             },
             "user": {
                 "data": {

@@ -1,3 +1,5 @@
+import os
+
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light, sensor
 from homeassistant.components.light import ColorMode
@@ -13,10 +15,7 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-    mock_device_registry,
-)
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -75,20 +74,18 @@ def create_discoverable_light(
 ) -> test_light_platform.MockLight:
     light = test_light_platform.MockLight(name, STATE_ON, unique_id)
     light.manufacturer = "lidl"
-    light.model = "HG06106C"
+    light.model = "HG06462A"
     light.supported_color_modes = [ColorMode.BRIGHTNESS]
     light.brightness = 125
     return light
 
 
-async def run_powercalc_setup_yaml_config(
+async def run_powercalc_setup(
     hass: HomeAssistant,
     sensor_config: list[ConfigType] | ConfigType,
-    domain_config: ConfigType = {},
+    domain_config: ConfigType | None = None,
 ):
-    assert await async_setup_component(hass, DOMAIN, {DOMAIN: domain_config})
-    await hass.async_block_till_done()
-
+    config = {DOMAIN: domain_config or {}}
     if sensor_config:
         if isinstance(sensor_config, list):
             for entry in sensor_config:
@@ -97,12 +94,14 @@ async def run_powercalc_setup_yaml_config(
         elif CONF_PLATFORM not in sensor_config:
             sensor_config[CONF_PLATFORM] = DOMAIN
 
+        config.update({sensor.DOMAIN: sensor_config})
         if "sensor" in hass.config.components:
             hass.config.components.remove("sensor")
-        assert await async_setup_component(
-            hass, sensor.DOMAIN, {sensor.DOMAIN: sensor_config}
-        )
+        assert await async_setup_component(hass, sensor.DOMAIN, config)
         await hass.async_block_till_done()
+
+    assert await async_setup_component(hass, DOMAIN, config)
+    await hass.async_block_till_done()
 
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
@@ -133,6 +132,12 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
     }
 
 
+def get_test_profile_dir(sub_dir: str) -> str:
+    return os.path.join(
+        os.path.dirname(__file__), "testing_config/powercalc_profiles", sub_dir
+    )
+
+
 async def create_mocked_virtual_power_sensor_entry(
     hass: HomeAssistant, name: str, unique_id: str | None
 ) -> config_entries.ConfigEntry:
@@ -147,6 +152,7 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
+        title=name,
     )
 
     config_entry.add_to_hass(hass)

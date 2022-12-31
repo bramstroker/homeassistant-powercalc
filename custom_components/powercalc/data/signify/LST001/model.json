@@ -8,9 +8,7 @@
     },
     "name": "Hue LightStrip",
     "standby_power": 0.41,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "aliases": [
         "7299355PH"
     ]
