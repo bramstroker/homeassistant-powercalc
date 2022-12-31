@@ -263,13 +263,13 @@ def is_fully_configured(config) -> bool:
     return False
 
 
-class PowerSensor:
+class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from"""
 
     pass
 
 
-class VirtualPowerSensor(SensorEntity, BaseEntity, PowerSensor):
+class VirtualPowerSensor(SensorEntity, PowerSensor):
     """Virtual power sensor"""
 
     _attr_device_class = SensorDeviceClass.POWER
