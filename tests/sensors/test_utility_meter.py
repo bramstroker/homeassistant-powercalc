@@ -26,7 +26,6 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
-    DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
 
