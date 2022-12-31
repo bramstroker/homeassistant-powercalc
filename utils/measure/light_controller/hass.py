@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import inquirer
-from homeassistant_api import Client
+from homeassistant_api import Client, HomeassistantAPIError
 
 from .const import MAX_MIRED, MIN_MIRED, ColorMode
 from .controller import LightInfo
@@ -15,8 +15,9 @@ class HassLightController:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
-            self.client = Client(api_url, token)
-        except Exception as e:
+            self.client = Client(api_url, token, cache_session=False)
+            self.client.get_config()
+        except HomeassistantAPIError as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
@@ -34,7 +35,7 @@ class HassLightController:
         self.client.trigger_service("light", "turn_on", **json)
 
     def get_light_info(self) -> LightInfo:
-        state = self.client.get_state(self._entity_id)
+        state = self.client.get_state(entity_id=self._entity_id)
         min_mired = state.attributes.get("min_mireds") or MIN_MIRED
         max_mired = state.attributes.get("max_mireds") or MAX_MIRED
         return LightInfo(self._model_id, min_mired, max_mired)
