@@ -11,7 +11,7 @@ class HassMediaController:
         self._model_id: str | None = None
         try:
             self.client = Client(
-                api_url, token, global_request_kwargs={"verify": False}
+                api_url, token, cache_session=False
             )
         except Exception as e:
             raise MediaPlayerError(f"Failed to connect to HA API: {e}")

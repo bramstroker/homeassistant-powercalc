@@ -15,7 +15,7 @@ class HassLightController:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
-            self.client = Client(api_url, token)
+            self.client = Client(api_url, token, cache_session=False)
         except Exception as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
@@ -34,7 +34,7 @@ class HassLightController:
         self.client.trigger_service("light", "turn_on", **json)
 
     def get_light_info(self) -> LightInfo:
-        state = self.client.get_state(self._entity_id)
+        state = self.client.get_state(entity_id=self._entity_id)
         min_mired = state.attributes.get("min_mireds") or MIN_MIRED
         max_mired = state.attributes.get("max_mireds") or MAX_MIRED
         return LightInfo(self._model_id, min_mired, max_mired)
