@@ -110,7 +110,6 @@ async def test_utility_meter_is_not_created_twice(
     await run_powercalc_setup(
         hass,
         {
-            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_UNIQUE_ID: "1234",
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TYPES: ["daily"],
@@ -122,7 +121,6 @@ async def test_utility_meter_is_not_created_twice(
     await run_powercalc_setup(
         hass,
         {
-            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_UNIQUE_ID: "1234",
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TYPES: ["daily"],
