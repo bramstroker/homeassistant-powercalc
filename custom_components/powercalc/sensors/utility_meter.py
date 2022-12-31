@@ -210,11 +210,6 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
         """Return the unique id."""
         return self._attr_unique_id
 
-    @unique_id.setter
-    def unique_id(self, value):
-        """Set unique id."""
-        self._attr_unique_id = value
-
     @property
     def native_value(self):
         """Return the state of the sensor."""
