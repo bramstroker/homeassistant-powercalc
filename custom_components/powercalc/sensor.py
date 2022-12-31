@@ -215,7 +215,7 @@ SENSOR_CONFIG = build_nested_configuration_schema(SENSOR_CONFIG)
 
 PLATFORM_SCHEMA: Final = vol.All(  # noqa: F811
     cv.has_at_least_one_key(
-        CONF_ENTITY_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY
+        CONF_ENTITY_ID, CONF_POWER_SENSOR_ID, CONF_ENTITIES, CONF_INCLUDE, CONF_DAILY_FIXED_ENERGY
     ),
     PLATFORM_SCHEMA.extend(SENSOR_CONFIG),
 )
@@ -392,9 +392,7 @@ async def create_sensors(
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
     if (
-        CONF_ENTITY_ID in config
-        or discovery_info is not None
-        or CONF_DAILY_FIXED_ENERGY in config
+        CONF_ENTITIES not in config and CONF_INCLUDE not in config
     ):
         if discovery_info:
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
