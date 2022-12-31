@@ -2,6 +2,7 @@ from typing import Any
 
 import inquirer
 from homeassistant_api import Client
+from homeassistant_api.errors import HomeassistantAPIError, UnauthorizedError
 from media_controller.errors import MediaPlayerError
 
 
@@ -13,7 +14,8 @@ class HassMediaController:
             self.client = Client(
                 api_url, token, cache_session=False
             )
-        except Exception as e:
+            self.client.get_config()
+        except HomeassistantAPIError as e:
             raise MediaPlayerError(f"Failed to connect to HA API: {e}")
 
     def set_volume(self, volume: int) -> None:

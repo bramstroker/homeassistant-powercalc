@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import inquirer
-from homeassistant_api import Client
+from homeassistant_api import Client, HomeassistantAPIError
 
 from .const import MAX_MIRED, MIN_MIRED, ColorMode
 from .controller import LightInfo
@@ -16,7 +16,8 @@ class HassLightController:
         self._model_id: str | None = None
         try:
             self.client = Client(api_url, token, cache_session=False)
-        except Exception as e:
+            self.client.get_config()
+        except HomeassistantAPIError as e:
             raise LightControllerError(f"Failed to connect to HA API: {e}")
 
     def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
