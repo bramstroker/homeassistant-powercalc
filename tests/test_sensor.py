@@ -11,6 +11,7 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -39,6 +40,7 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
+    CONF_TEMPLATE,
     CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
@@ -412,6 +414,67 @@ async def test_include_light_group(hass: HomeAssistant):
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+
+async def test_include_domain(hass: HomeAssistant) -> None:
+    """Test domain include option, which includes all entities where the source entity matches a certain domain"""
+    await create_mock_light_entity(
+        hass,
+        [
+            create_discoverable_light("bathroom_spots", "1111"),
+            create_discoverable_light("kitchen", "2222")
+        ]
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Lights",
+                CONF_INCLUDE: {CONF_DOMAIN: "light"},
+            },
+        ]
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.lights_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.bathroom_spots_power",
+        "sensor.kitchen_power"
+    }
+
+
+async def test_include_template(hass: HomeAssistant) -> None:
+    await create_mock_light_entity(
+        hass,
+        [
+            create_discoverable_light("bathroom_spots", "1111"),
+            create_discoverable_light("kitchen", "2222")
+        ]
+    )
+
+    template = "{{ states|selectattr('entity_id', 'eq', 'light.bathroom_spots')|map(attribute='entity_id')|list}}"
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Lights",
+                CONF_INCLUDE: {CONF_TEMPLATE: template},
+            },
+        ]
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.lights_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.bathroom_spots_power"
+    }
 
 
 async def test_user_can_rename_entity_id(
