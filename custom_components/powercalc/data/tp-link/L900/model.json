@@ -9,5 +9,8 @@
         "VERSION": "v1.2.3:docker"
     },
     "name": "TP-Link Tapo L900",
+    "aliases": [
+        "L900"
+    ],
     "standby_power": 0.24
 }
