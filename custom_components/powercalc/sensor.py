@@ -129,7 +129,7 @@ from .sensors.group import (
     create_group_sensors,
     create_group_sensors_from_config_entry,
 )
-from .sensors.power import RealPowerSensor, VirtualPowerSensor, create_power_sensor
+from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
