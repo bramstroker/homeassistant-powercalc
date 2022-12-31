@@ -40,7 +40,6 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
-    CONF_TEMPLATE,
     CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
@@ -49,6 +48,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_SENSOR_TYPE,
+    CONF_TEMPLATE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     CalculationStrategy,
@@ -422,8 +422,8 @@ async def test_include_domain(hass: HomeAssistant) -> None:
         hass,
         [
             create_discoverable_light("bathroom_spots", "1111"),
-            create_discoverable_light("kitchen", "2222")
-        ]
+            create_discoverable_light("kitchen", "2222"),
+        ],
     )
 
     await run_powercalc_setup(
@@ -433,7 +433,7 @@ async def test_include_domain(hass: HomeAssistant) -> None:
                 CONF_CREATE_GROUP: "Lights",
                 CONF_INCLUDE: {CONF_DOMAIN: "light"},
             },
-        ]
+        ],
     )
 
     await hass.async_start()
@@ -443,7 +443,7 @@ async def test_include_domain(hass: HomeAssistant) -> None:
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.bathroom_spots_power",
-        "sensor.kitchen_power"
+        "sensor.kitchen_power",
     }
 
 
@@ -452,8 +452,8 @@ async def test_include_template(hass: HomeAssistant) -> None:
         hass,
         [
             create_discoverable_light("bathroom_spots", "1111"),
-            create_discoverable_light("kitchen", "2222")
-        ]
+            create_discoverable_light("kitchen", "2222"),
+        ],
     )
 
     template = "{{ states|selectattr('entity_id', 'eq', 'light.bathroom_spots')|map(attribute='entity_id')|list}}"
@@ -464,7 +464,7 @@ async def test_include_template(hass: HomeAssistant) -> None:
                 CONF_CREATE_GROUP: "Lights",
                 CONF_INCLUDE: {CONF_TEMPLATE: template},
             },
-        ]
+        ],
     )
 
     await hass.async_start()
@@ -472,9 +472,7 @@ async def test_include_template(hass: HomeAssistant) -> None:
 
     group_state = hass.states.get("sensor.lights_power")
     assert group_state
-    assert group_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.bathroom_spots_power"
-    }
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_spots_power"}
 
 
 async def test_user_can_rename_entity_id(
