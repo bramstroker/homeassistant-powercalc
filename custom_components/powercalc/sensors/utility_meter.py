@@ -30,17 +30,17 @@ from ..const import (
 )
 from ..errors import SensorConfigurationError
 from .abstract import BaseEntity
-from .energy import RealEnergySensor, VirtualEnergySensor
+from .energy import RealEnergySensor, EnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def create_utility_meters(
     hass: HomeAssistant,
-    energy_sensor: VirtualEnergySensor | RealEnergySensor,
+    energy_sensor: EnergySensor,
     sensor_config: dict,
     net_consumption: bool = False,
-) -> list[UtilityMeterSensor]:
+) -> list[VirtualUtilityMeter]:
     """Create the utility meters"""
 
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):

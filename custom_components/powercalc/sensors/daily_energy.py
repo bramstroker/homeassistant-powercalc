@@ -25,7 +25,6 @@ from homeassistant.const import (
     POWER_WATT,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template

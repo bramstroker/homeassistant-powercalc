@@ -129,11 +129,11 @@ def find_related_real_energy_sensor(
     return RealEnergySensor(energy_sensors[0])
 
 
-class EnergySensor(ABC):
+class EnergySensor(BaseEntity):
     """Class which all energy sensors should extend from"""
 
 
-class VirtualEnergySensor(IntegrationSensor, EnergySensor, BaseEntity):
+class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh"""
 
     def __init__(

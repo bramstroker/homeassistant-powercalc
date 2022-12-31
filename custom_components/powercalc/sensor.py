@@ -123,7 +123,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
-from .sensors.energy import create_energy_sensor
+from .sensors.energy import create_energy_sensor, EnergySensor
 from .sensors.group import (
     add_to_associated_group,
     create_group_sensors,
@@ -502,7 +502,7 @@ async def create_individual_sensors(  # noqa: C901
 
     entities_to_add: list[BaseEntity] = []
 
-    energy_sensor = None
+    energy_sensor: EnergySensor | None = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         energy_sensor = await create_daily_fixed_energy_sensor(
             hass, sensor_config, source_entity
@@ -530,9 +530,7 @@ async def create_individual_sensors(  # noqa: C901
                 hass, sensor_config, power_sensor, source_entity
             )
             entities_to_add.append(energy_sensor)
-            if isinstance(power_sensor, VirtualPowerSensor) and isinstance(
-                energy_sensor, SensorEntity
-            ):
+            if isinstance(power_sensor, VirtualPowerSensor):
                 power_sensor.set_energy_sensor_attribute(energy_sensor.entity_id)
 
     if energy_sensor:
@@ -735,14 +733,12 @@ def resolve_area_entities(
 async def is_autoconfigurable(
     hass: HomeAssistant,
     entity_entry: er.RegistryEntry,
-    sensor_config: ConfigType = None,
+    sensor_config: ConfigType | None = None,
 ) -> bool:
-    if sensor_config is None:
-        sensor_config = {}
     try:
         model_info = await autodiscover_model(hass, entity_entry)
         power_profile = await get_power_profile(
-            hass, sensor_config, model_info=model_info
+            hass, sensor_config or {}, model_info=model_info
         )
         if not power_profile:
             return False
@@ -754,8 +750,8 @@ async def is_autoconfigurable(
 
 
 class EntitiesBucket(NamedTuple):
-    new: list[Entity, RealPowerSensor] = []
-    existing: list[Entity, RealPowerSensor] = []
+    new: list[BaseEntity] = []
+    existing: list[BaseEntity] = []
 
 
 class CreationContext(NamedTuple):
