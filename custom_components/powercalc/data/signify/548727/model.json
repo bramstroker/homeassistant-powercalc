@@ -9,5 +9,5 @@
         "VERSION": "v1.1.1:docker"
     },
     "name": "Hue White and Color Ambiance BR30 with bluetooth",
-    "standby_power": 0.3,
+    "standby_power": 0.3
 }
