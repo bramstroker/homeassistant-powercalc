@@ -1,4 +1,5 @@
 {
+    "calculation_strategy": "lut",
     "measure_description": "Measured with utils/measure script",
     "measure_device": "Shelly 1PM",
     "measure_method": "script",
@@ -9,7 +10,4 @@
     },
     "name": "Hue White and Color Ambiance BR30 with bluetooth",
     "standby_power": 0.3,
-    "supported_modes": [
-        "lut"
-    ]
 }
