@@ -1,9 +1,9 @@
-- [Lights](#Lights) (207)
+- [Lights](#Lights) (208)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 207 total
+#### 208 total
 
 | manufacturer  |        model id         |                                         name                                          |                                            aliases                                            |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
@@ -196,6 +196,7 @@
 |signify        |LWW001                   |Hue white A60 bulb E27                                                                 |                                                                                               |
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                               |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                               |
+|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                               |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                               |
 |tuya           |SL20                     |Treatlife SL20                                                                         |                                                                                               |
 |wiz            |7DGU10LEDCCTWVB-K        |Wiz (Evoluziona) Spot PAR16 GU10 TW (type SHTW, model 7DGU10LEDCCTWVB-K, 7W 120V)      |                                                                                               |
