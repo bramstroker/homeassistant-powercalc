@@ -1,7 +1,8 @@
 import pytest
 from homeassistant.components import sensor
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_PLATFORM, DEVICE_CLASS_CURRENT, STATE_OFF, STATE_ON
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import CONF_PLATFORM, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -78,7 +79,7 @@ async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant
                 platform="sensor",
                 device_id="wled-device-id",
                 unit_of_measurement="mA",
-                original_device_class=DEVICE_CLASS_CURRENT,
+                original_device_class=SensorDeviceClass.CURRENT,
             ),
         },
     )
@@ -156,7 +157,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
                 platform="sensor",
                 device_id="wled-device",
                 unit_of_measurement="mA",
-                original_device_class=DEVICE_CLASS_CURRENT,
+                original_device_class=SensorDeviceClass.CURRENT,
             ),
         },
     )
