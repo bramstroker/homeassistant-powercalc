@@ -134,7 +134,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if attribute:
             value = entity_state.attributes.get(attribute)
             if value is None:
-                _LOGGER.error(
+                _LOGGER.warning(
                     f"No {attribute} attribute for entity: {entity_state.entity_id}"
                 )
                 return None
