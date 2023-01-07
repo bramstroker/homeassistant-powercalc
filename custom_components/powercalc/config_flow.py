@@ -264,7 +264,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.sensor_config = discovery_info.copy()
 
         self.context["title_placeholders"] = {
-            "name": self.sensor_config.get(CONF_NAME),
+            "name": self.source_entity.name,
             "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
             "model": self.sensor_config.get(CONF_MODEL),
         }
