@@ -1,9 +1,8 @@
 import logging
 
 import pytest
-from homeassistant.setup import async_setup_component
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components import light
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -26,6 +25,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_restore_cache,
@@ -57,15 +57,14 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-
 from custom_components.test.light import MockLight
 
 from ..common import (
     create_discoverable_light,
-    create_mocked_virtual_power_sensor_entry,
     create_input_boolean,
     create_input_booleans,
     create_mock_light_entity,
+    create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
@@ -939,9 +938,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                 get_simple_fixed_config("light.light_b", 50),
                 get_simple_fixed_config("light.light_c", 50),
             ],
-            "include": {
-                "group": "light.light_group"
-            }
+            "include": {"group": "light.light_group"},
         },
     )
 
@@ -950,5 +947,5 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     assert group_state.attributes.get("entities") == {
         "sensor.light_a_power",
         "sensor.light_b_power",
-        "sensor.light_c_power"
+        "sensor.light_c_power",
     }
