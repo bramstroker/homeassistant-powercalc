@@ -73,7 +73,7 @@ from .discovery import autodiscover_model
 from .errors import ModelNotSupported, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import PowerProfile
+from .power_profile.power_profile import PowerProfile, DEVICE_DOMAINS
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -151,7 +151,6 @@ SCHEMA_POWER_OPTIONS_LIBRARY = vol.Schema(
 
 SCHEMA_POWER_BASE = vol.Schema(
     {
-        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
         vol.Optional(CONF_NAME): selector.TextSelector(),
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     }
@@ -332,9 +331,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="virtual_power",
             data_schema=_create_virtual_power_schema(
-                self.hass, not self.is_library_flow
+                self.hass, self.is_library_flow
             ),
             errors={},
+            last_step=False
         )
 
     async def async_step_daily_energy(
@@ -397,6 +397,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="fixed",
             data_schema=SCHEMA_POWER_FIXED,
             errors=errors,
+            last_step=False,
         )
 
     async def async_step_linear(self, user_input: dict[str, str] = None) -> FlowResult:
@@ -411,6 +412,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="linear",
             data_schema=_create_linear_schema(self.source_entity_id),
             errors=errors,
+            last_step=False,
         )
 
     async def async_step_wled(self, user_input: dict[str, str] = None) -> FlowResult:
@@ -425,6 +427,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="wled",
             data_schema=SCHEMA_POWER_WLED,
             errors=errors,
+            last_step=False,
         )
 
     async def async_step_library(self, user_input: dict[str, str] = None) -> FlowResult:
@@ -468,6 +471,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 },
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
+                last_step=False,
             )
 
         return await self.async_step_manufacturer()
@@ -487,6 +491,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="manufacturer",
             data_schema=schema,
             errors={},
+            last_step=False,
         )
 
     async def async_step_model(self, user_input: dict[str, str] = None) -> FlowResult:
@@ -516,6 +521,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
             },
             errors=errors,
+            last_step=False,
         )
 
     async def async_step_post_library(self, user_input: dict[str, str] = None):
@@ -549,6 +555,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="sub_profile",
             data_schema=await _create_schema_sub_profile(self.hass, model_info),
             errors=errors,
+            last_step=False,
         )
 
     async def async_step_power_advanced(
@@ -755,22 +762,34 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
 
 
 def _create_virtual_power_schema(
-    hass: HomeAssistant, strategy_selection: bool = True
+    hass: HomeAssistant, is_library_flow: bool = True
 ) -> vol.Schema:
-    base_schema: vol.Schema = SCHEMA_POWER_BASE.extend(
+    if is_library_flow:
+        entity_selector = selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=list(DEVICE_DOMAINS.values()))
+        )
+    else:
+        entity_selector = selector.EntitySelector()
+
+    schema = vol.Schema(
+        {
+            vol.Required(CONF_ENTITY_ID): entity_selector,
+        }
+    ).extend(SCHEMA_POWER_BASE.schema)
+    schema = schema.extend(
         {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
     )
-    if strategy_selection:
-        base_schema = base_schema.extend(
+    if not is_library_flow:
+        schema = schema.extend(
             {
                 vol.Optional(
                     CONF_MODE, default=CalculationStrategy.FIXED
                 ): STRATEGY_SELECTOR
             }
         )
-        return base_schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)
+        return schema.extend(SCHEMA_POWER_OPTIONS.schema)
 
-    return base_schema.extend(SCHEMA_POWER_OPTIONS.schema)
+    return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)
 
 
 def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:

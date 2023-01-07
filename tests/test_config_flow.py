@@ -504,6 +504,25 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain(
     assert {"value": "signify", "label": "signify"} in manufacturer_options
 
 
+async def test_manufacturer_listing_is_filtered_by_entity_domain2(
+    hass: HomeAssistant,
+) -> None:
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT,
+                                                     {
+                                                         CONF_ENTITY_ID: "switch.test",
+                                                         CONF_MODE: CalculationStrategy.LUT,
+                                                         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+                                                     }
+                                                     )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "manufacturer"
+    data_schema: vol.Schema = result["data_schema"]
+    manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
+    manufacturer_options = manufacturer_select.config["options"]
+    assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
+    assert {"value": "shelly", "label": "shelly"} in manufacturer_options
+
 async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     advanced_options = {
