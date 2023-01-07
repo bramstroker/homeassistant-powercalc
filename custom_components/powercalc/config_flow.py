@@ -73,7 +73,7 @@ from .discovery import autodiscover_model
 from .errors import ModelNotSupported, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import PowerProfile, DEVICE_DOMAINS
+from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -330,11 +330,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="virtual_power",
-            data_schema=_create_virtual_power_schema(
-                self.hass, self.is_library_flow
-            ),
+            data_schema=_create_virtual_power_schema(self.hass, self.is_library_flow),
             errors={},
-            last_step=False
+            last_step=False,
         )
 
     async def async_step_daily_energy(
@@ -776,9 +774,7 @@ def _create_virtual_power_schema(
             vol.Required(CONF_ENTITY_ID): entity_selector,
         }
     ).extend(SCHEMA_POWER_BASE.schema)
-    schema = schema.extend(
-        {vol.Optional(CONF_GROUP): _create_group_selector(hass)}
-    )
+    schema = schema.extend({vol.Optional(CONF_GROUP): _create_group_selector(hass)})
     if not is_library_flow:
         schema = schema.extend(
             {

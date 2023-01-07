@@ -5,10 +5,10 @@ from decimal import Decimal
 from typing import Optional
 
 import voluptuous as vol
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
-from homeassistant.components.sensor import SensorDeviceClass
 
 from ..common import SourceEntity
 from ..const import CONF_POWER_FACTOR, CONF_VOLTAGE, OFF_STATES

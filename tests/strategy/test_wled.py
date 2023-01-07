@@ -1,7 +1,7 @@
 import pytest
 from homeassistant.components import sensor
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_PLATFORM, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
