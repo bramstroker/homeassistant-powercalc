@@ -112,7 +112,7 @@ async def test_discovery_flow(hass: HomeAssistant):
         CONF_MANUFACTURER: "signify",
         CONF_MODEL: "LCT010",
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
 
 
@@ -180,7 +180,7 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
         CONF_MANUFACTURER: "lifx",
         CONF_MODEL: "LIFX Z/length_6",
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
 
 

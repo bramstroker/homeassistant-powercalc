@@ -188,8 +188,6 @@ class DiscoveryManager:
             return
 
         discovery_data = {
-            CONF_UNIQUE_ID: source_entity.unique_id,
-            CONF_NAME: source_entity.name,
             CONF_ENTITY_ID: source_entity.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
         }

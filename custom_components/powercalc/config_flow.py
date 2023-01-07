@@ -248,22 +248,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
-        self.name = discovery_info[CONF_NAME]
-        unique_id = discovery_info[CONF_UNIQUE_ID]
+        self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
+        del discovery_info[DISCOVERY_SOURCE_ENTITY]
+
+        self.source_entity_id = self.source_entity.entity_id
+        self.name = self.source_entity.name
+        unique_id = f"pc_{self.source_entity.unique_id}"
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
-        sensor_config = discovery_info.copy()
-
-        self.source_entity_id = discovery_info[CONF_ENTITY_ID]
-        self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
-        del sensor_config[DISCOVERY_SOURCE_ENTITY]
-
         if DISCOVERY_POWER_PROFILE in discovery_info:
             self.power_profile = discovery_info[DISCOVERY_POWER_PROFILE]
-            del sensor_config[DISCOVERY_POWER_PROFILE]
+            del discovery_info[DISCOVERY_POWER_PROFILE]
 
-        self.sensor_config.update(sensor_config)
+        self.sensor_config = discovery_info.copy()
 
         self.context["title_placeholders"] = {
             "name": self.sensor_config.get(CONF_NAME),
@@ -300,11 +298,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.source_entity = await create_source_entity(
                 self.source_entity_id, self.hass
             )
-            unique_id = (
-                user_input.get(CONF_UNIQUE_ID)
-                or self.source_entity.unique_id
-                or self.source_entity_id
-            )
+            unique_id = user_input.get(CONF_UNIQUE_ID)
+            if not unique_id:
+                source_unique_id = self.source_entity.unique_id or self.source_entity_id
+                unique_id = f"pc_{source_unique_id}"
 
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
