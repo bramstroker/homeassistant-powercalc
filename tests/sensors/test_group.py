@@ -1,7 +1,9 @@
 import logging
 
 import pytest
+from homeassistant.setup import async_setup_component
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components import light
 from homeassistant.components.utility_meter.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -56,10 +58,14 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 
+from custom_components.test.light import MockLight
+
 from ..common import (
+    create_discoverable_light,
+    create_mocked_virtual_power_sensor_entry,
     create_input_boolean,
     create_input_booleans,
-    create_mocked_virtual_power_sensor_entry,
+    create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
@@ -899,3 +905,50 @@ async def test_gui_discovered_entity_in_yaml_group(
     )
 
     assert len(caplog.records) == 0
+
+
+async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
+    light_a = create_discoverable_light("light_a")
+    light_b = MockLight("light_b")
+    light_c = MockLight("light_c")
+    await create_mock_light_entity(hass, [light_a, light_b, light_c])
+
+    # Ugly hack, maybe I can figure out something better in the future.
+    # Light domain is already setup for platform test, remove the component so we can setup light group
+    if light.DOMAIN in hass.config.components:
+        hass.config.components.remove(light.DOMAIN)
+
+    await async_setup_component(
+        hass,
+        light.DOMAIN,
+        {
+            light.DOMAIN: {
+                "platform": "group",
+                "name": "Light Group",
+                "entities": ["light.light_a", "light.light_b", "light.light_c"],
+            }
+        },
+    )
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Powercalc Group",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("light.light_b", 50),
+                get_simple_fixed_config("light.light_c", 50),
+            ],
+            "include": {
+                "group": "light.light_group"
+            }
+        },
+    )
+
+    group_state = hass.states.get("sensor.powercalc_group_power")
+    assert group_state
+    assert group_state.attributes.get("entities") == {
+        "sensor.light_a_power",
+        "sensor.light_b_power",
+        "sensor.light_c_power"
+    }
