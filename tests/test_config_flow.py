@@ -823,6 +823,23 @@ async def test_lut_options_flow(hass: HomeAssistant):
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 
+async def test_library_options_flow_raises_error_on_non_existing_power_profile(hass: HomeAssistant) -> None:
+    entry = _create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "foo",
+            CONF_MODEL: "bar",
+        },
+    )
+
+    result = await _initialize_options_flow(hass, entry)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"] == {"not_supported": "Power profile could not be loaded"}
+
+
 async def test_group_options_flow(hass: HomeAssistant):
     entry = _create_mock_entry(
         hass,
