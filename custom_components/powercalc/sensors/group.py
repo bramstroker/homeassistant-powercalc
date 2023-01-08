@@ -448,7 +448,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
             "2022.10.0"
         )
-        if not apply_unit_conversions:  # pragma: no-cover
+        if not apply_unit_conversions:  # pragma: no cover
             self._remove_incompatible_unit_entities(available_states)
 
         if not available_states:

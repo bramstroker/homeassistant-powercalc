@@ -493,7 +493,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
-            library = ProfileLibrary(self.hass)
+            library = ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
                     self.sensor_config.get(CONF_MANUFACTURER),
@@ -878,7 +878,7 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
 
 def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.Schema:
     """Create manufacturer schema"""
-    library = ProfileLibrary(hass)
+    library = ProfileLibrary.factory(hass)
     manufacturers = [
         selector.SelectOptionDict(value=manufacturer, label=manufacturer)
         for manufacturer in library.get_manufacturer_listing(entity_domain)
@@ -898,7 +898,7 @@ async def _create_schema_model(
     hass: HomeAssistant, manufacturer: str, entity_domain: str
 ) -> vol.Schema:
     """Create model schema"""
-    library = ProfileLibrary(hass)
+    library = ProfileLibrary.factory(hass)
     models = [
         selector.SelectOptionDict(value=profile.model, label=profile.model)
         for profile in await library.get_profiles_by_manufacturer(manufacturer)
@@ -919,7 +919,7 @@ async def _create_schema_sub_profile(
     hass: HomeAssistant, model_info: ModelInfo
 ) -> vol.Schema:
     """Create sub profile schema"""
-    library = ProfileLibrary(hass)
+    library = ProfileLibrary.factory(hass)
     profile = await library.get_profile(model_info)
     sub_profiles = [
         selector.SelectOptionDict(value=sub_profile, label=sub_profile)

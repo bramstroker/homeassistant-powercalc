@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
-    def __init__(self, hass: HomeAssistant, extra_data_directories: list = None):
+    def __init__(self, hass: HomeAssistant):
         self._hass = hass
         self._data_directories: list[str] = [
             d
@@ -29,8 +29,6 @@ class ProfileLibrary:
             )
             if os.path.exists(d)
         ]
-        if extra_data_directories:
-            self._data_directories.extend(extra_data_directories)
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_device_types: dict[str, list] | None = None
 
@@ -150,7 +148,7 @@ class ProfileLibrary:
                     ModelInfo(manufacturer, model),
                     os.path.join(manufacturer_dir, model),
                 )
-                if power_profile is None:
+                if power_profile is None:  # pragma: no cover
                     continue
 
                 profiles.append(power_profile)
