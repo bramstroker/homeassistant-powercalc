@@ -12,7 +12,7 @@
 	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 1.5434
-	}
+	},
 	"aliases": [
 		"HS100(EU)"
 	]
