@@ -8,9 +8,10 @@
         "SLEEP_TIME": 3,
         "VERSION": "master"
     },
-    "name": "Hue Ensis",
+    "name": "Hue Centris 4-Spot Ceiling Light",
     "standby_power": 0.4,
     "aliases": [
-       "929003052501_02"
+        "5060730P7_01",
+        "5060731P7_01"
     ]
 }

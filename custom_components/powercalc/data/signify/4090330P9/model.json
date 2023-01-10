@@ -8,7 +8,18 @@
         "SLEEP_TIME": 3,
         "VERSION": "master"
     },
-    "name": "Hue Centris 4-spot ceiling",
+    "name": "Hue Ensis Pendant Light",
     "standby_power": 0.4,
-    "aliases": []
+    "aliases": [
+       "LCP001",
+       "LCP002",
+       "4090330P9_01",
+       "4090330P9_02",
+       "4090331P9_01",
+       "4090331P9_02",
+       "929003052501_01",
+       "929003052501_02",
+       "929003053301_01",
+       "929003053301_02"
+    ]
 }
