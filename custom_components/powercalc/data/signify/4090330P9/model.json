@@ -1,0 +1,26 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "name": "Hue Ensis Pendant Light",
+    "standby_power": 0.4,
+    "aliases": [
+       "LCP001",
+       "LCP002",
+       "4090331P9",
+       "4090330P9_01",
+       "4090330P9_02",
+       "4090331P9_01",
+       "4090331P9_02",
+       "929003052501_01",
+       "929003052501_02",
+       "929003053301_01",
+       "929003053301_02"
+    ]
+}
