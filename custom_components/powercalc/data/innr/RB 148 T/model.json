@@ -1,0 +1,15 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Sonoff POW R1",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "name": "RB 148 T",
+    "standby_power": 1.5,
+    "supported_modes": [
+        "lut"
+    ]
+}
