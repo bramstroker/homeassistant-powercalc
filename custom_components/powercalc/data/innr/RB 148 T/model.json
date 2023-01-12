@@ -9,7 +9,5 @@
     },
     "name": "RB 148 T",
     "standby_power": 1.5,
-    "calculation_strategy": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }
