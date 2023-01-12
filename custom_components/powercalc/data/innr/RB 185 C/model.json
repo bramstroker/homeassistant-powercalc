@@ -9,7 +9,7 @@
     },
     "name": "RB 185 C",
     "standby_power": 1.5,
-    "supported_modes": [
+    "calculation_strategy": [
         "lut"
     ]
 }
