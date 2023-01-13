@@ -2,7 +2,7 @@ import logging
 
 import pytest
 from homeassistant.components import light
-from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES
+from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
@@ -175,7 +175,8 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     light_c = MockLight("light_c")
     light_d = MockLight("light_d")
     light_e = create_discoverable_light("light_e", "6765765756")
-    await create_mock_light_entity(hass, [light_a, light_b, light_c, light_d, light_e])
+    light_f = create_discoverable_light("light_f", "676576575sds6")
+    await create_mock_light_entity(hass, [light_a, light_b, light_c, light_d, light_e, light_f])
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -197,7 +198,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "platform": "group",
                     "name": "Light Group B",
                     "unique_id": "groupb",
-                    "entities": ["light.light_c", "light.light_d", "light.light_e"],
+                    "entities": ["light.light_c", "light.light_d", "light.light_e", "light.light_f"],
                 },
                 {
                     "platform": "group",
@@ -214,12 +215,23 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_CREATE_GROUP: "Powercalc Group",
+            CONF_INCLUDE: {CONF_GROUP: "light.light_group_c"},
             CONF_ENTITIES: [
                 get_simple_fixed_config("light.light_b", 50),
                 get_simple_fixed_config("light.light_c", 50),
-                {"entity_id": "light.light_e"}
+                {
+                    CONF_CREATE_GROUP: "Subgroup A",
+                    CONF_ENTITIES: [
+                        {CONF_ENTITY_ID: "light.light_e"}
+                    ]
+                },
+                {
+                    CONF_CREATE_GROUP: "Subgroup B",
+                    CONF_ENTITIES: [
+                        {CONF_ENTITY_ID: "light.light_f"}
+                    ]
+                },
             ],
-            CONF_INCLUDE: {CONF_GROUP: "light.light_group_c"},
         },
     )
 
@@ -230,4 +242,5 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         "sensor.light_b_power",
         "sensor.light_c_power",
         "sensor.light_e_power",
+        "sensor.light_f_power",
     }
