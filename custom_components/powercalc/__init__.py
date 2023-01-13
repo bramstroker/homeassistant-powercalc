@@ -159,10 +159,13 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
-        _LOGGER.critical(
-            "Your HA version is outdated for this version of powercalc. Minimum required HA version is %s",
-            MIN_HA_VERSION,
+        msg = (
+            "This integration require at least HomeAssistant version "
+            f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
+            " Please upgrade HomeAssistant to continue use this integration."
         )
+        _notify_message(hass, "inv_ha_version", "PowerCalc", msg)
+        _LOGGER.critical(msg)
         return False
 
     domain_config = config.get(DOMAIN) or {
@@ -286,3 +289,20 @@ async def create_domain_groups(
                 global_config,
             )
         )
+
+
+def _notify_message(
+    hass: HomeAssistant, notification_id: str, title: str, message: str
+) -> None:
+    """Notify user with persistent notification"""
+    hass.async_create_task(
+        hass.services.async_call(
+            domain="persistent_notification",
+            service="create",
+            service_data={
+                "title": title,
+                "message": message,
+                "notification_id": f"{DOMAIN}.{notification_id}",
+            },
+        )
+    )
