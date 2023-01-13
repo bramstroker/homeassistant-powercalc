@@ -599,13 +599,13 @@ async def test_entities_are_bound_to_source_device2(hass: HomeAssistant, caplog:
                 entity_id=switch_id,
                 unique_id="1234",
                 platform="switch",
-                device_id="device.test",
+                device_id=device_id,
             ),
             power_sensor_id: RegistryEntry(
                 entity_id=power_sensor_id,
                 unique_id="12345",
                 platform="sensor",
-                device_id="device.test",
+                device_id=device_id,
             ),
         },
     )
