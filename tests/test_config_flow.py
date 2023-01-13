@@ -823,7 +823,9 @@ async def test_lut_options_flow(hass: HomeAssistant):
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
 
 
-async def test_library_options_flow_raises_error_on_non_existing_power_profile(hass: HomeAssistant) -> None:
+async def test_library_options_flow_raises_error_on_non_existing_power_profile(
+    hass: HomeAssistant,
+) -> None:
     entry = _create_mock_entry(
         hass,
         {

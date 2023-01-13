@@ -1,7 +1,7 @@
 import pytest
 import voluptuous as vol
 
-from custom_components.powercalc.common import validate_name_pattern, validate_is_number
+from custom_components.powercalc.common import validate_is_number, validate_name_pattern
 
 
 async def test_valid_name_pattern():

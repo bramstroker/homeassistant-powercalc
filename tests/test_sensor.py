@@ -23,10 +23,14 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceRegistry, DeviceEntry
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry, mock_device_registry
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    mock_device_registry,
+    mock_registry,
+)
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -571,7 +575,9 @@ async def test_entities_are_bound_to_source_device(
     assert utility_entity_entry.device_id == device_entry.id
 
 
-async def test_entities_are_bound_to_source_device2(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_entities_are_bound_to_source_device2(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     """
     When using the power_sensor_id option the energy sensors and utility meters must be bound to the same device.
     Also make sure no errors are logged
@@ -585,11 +591,7 @@ async def test_entities_are_bound_to_source_device2(hass: HomeAssistant, caplog:
 
     mock_device_registry(
         hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id, manufacturer="shelly", model="Plug S"
-            )
-        },
+        {device_id: DeviceEntry(id=device_id, manufacturer="shelly", model="Plug S")},
     )
 
     entity_reg = mock_registry(
@@ -614,11 +616,8 @@ async def test_entities_are_bound_to_source_device2(hass: HomeAssistant, caplog:
 
     await run_powercalc_setup(
         hass,
-        {
-            CONF_ENTITY_ID: "switch.shelly",
-            CONF_POWER_SENSOR_ID: "sensor.shelly_power"
-        },
-        {}
+        {CONF_ENTITY_ID: "switch.shelly", CONF_POWER_SENSOR_ID: "sensor.shelly_power"},
+        {},
     )
 
     energy_entity_entry = entity_reg.async_get("sensor.shelly_energy")
