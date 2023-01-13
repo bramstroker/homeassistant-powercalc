@@ -2,21 +2,18 @@ import logging
 
 import pytest
 from homeassistant.components import light
-from homeassistant.const import (
-    CONF_DOMAIN,
-    CONF_ENTITIES,
-)
+from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.setup import async_setup_component
-from homeassistant.helpers.area_registry import AreaRegistry
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
     CONF_CREATE_GROUP,
-    CONF_INCLUDE,
     CONF_GROUP,
+    CONF_INCLUDE,
     CONF_TEMPLATE,
 )
 from custom_components.test.light import MockLight
@@ -206,7 +203,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "name": "Light Group C",
                     "unique_id": "groupc",
                     "entities": ["light.light_group_a", "light.light_group_b"],
-                }
+                },
             ]
         },
     )

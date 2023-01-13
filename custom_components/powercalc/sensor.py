@@ -682,7 +682,11 @@ def resolve_include_groups(
     return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
 
 
-def resolve_light_group_entities(hass: HomeAssistant, group_id: str, resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None) -> dict[str, entity_registry.RegistryEntry]:
+def resolve_light_group_entities(
+    hass: HomeAssistant,
+    group_id: str,
+    resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None,
+) -> dict[str, entity_registry.RegistryEntry]:
     """
     Resolve all registry entries for a given light group.
     When the light group has sub light groups, we will recursively walk these as well
@@ -693,9 +697,7 @@ def resolve_light_group_entities(hass: HomeAssistant, group_id: str, resolved_en
     entity_reg = entity_registry.async_get(hass)
     light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
     light_group = next(
-        filter(
-            lambda entity: entity.entity_id == group_id, light_component.entities
-        ),
+        filter(lambda entity: entity.entity_id == group_id, light_component.entities),
         None,
     )
     if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
@@ -708,7 +710,9 @@ def resolve_light_group_entities(hass: HomeAssistant, group_id: str, resolved_en
             continue
 
         if registry_entry.platform == GROUP_DOMAIN:
-            resolve_light_group_entities(hass, registry_entry.entity_id, resolved_entities)
+            resolve_light_group_entities(
+                hass, registry_entry.entity_id, resolved_entities
+            )
 
         resolved_entities[entity_id] = registry_entry
 

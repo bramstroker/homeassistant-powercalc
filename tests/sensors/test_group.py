@@ -899,4 +899,3 @@ async def test_gui_discovered_entity_in_yaml_group(
     )
 
     assert len(caplog.records) == 0
-
