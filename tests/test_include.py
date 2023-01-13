@@ -176,7 +176,9 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     light_d = MockLight("light_d")
     light_e = create_discoverable_light("light_e", "6765765756")
     light_f = create_discoverable_light("light_f", "676576575sds6")
-    await create_mock_light_entity(hass, [light_a, light_b, light_c, light_d, light_e, light_f])
+    await create_mock_light_entity(
+        hass, [light_a, light_b, light_c, light_d, light_e, light_f]
+    )
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -198,14 +200,19 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "platform": "group",
                     "name": "Light Group B",
                     "unique_id": "groupb",
-                    "entities": ["light.light_c", "light.light_d", "light.light_e", "light.light_f"],
+                    "entities": [
+                        "light.light_c",
+                        "light.light_d",
+                        "light.light_e",
+                        "light.light_f",
+                    ],
                 },
                 {
                     "platform": "group",
                     "name": "Light Group C",
                     "unique_id": "groupc",
                     "entities": ["light.light_group_a", "light.light_group_b"],
-                }
+                },
             ]
         },
     )
@@ -221,15 +228,11 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                 get_simple_fixed_config("light.light_c", 50),
                 {
                     CONF_CREATE_GROUP: "Subgroup A",
-                    CONF_ENTITIES: [
-                        {CONF_ENTITY_ID: "light.light_e"}
-                    ]
+                    CONF_ENTITIES: [{CONF_ENTITY_ID: "light.light_e"}],
                 },
                 {
                     CONF_CREATE_GROUP: "Subgroup B",
-                    CONF_ENTITIES: [
-                        {CONF_ENTITY_ID: "light.light_f"}
-                    ]
+                    CONF_ENTITIES: [{CONF_ENTITY_ID: "light.light_f"}],
                 },
             ],
         },
