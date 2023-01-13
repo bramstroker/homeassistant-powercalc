@@ -35,7 +35,7 @@ from homeassistant.helpers import (
 )
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
-from homeassistant.helpers.template import expand, Template
+from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .common import (
