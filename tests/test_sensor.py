@@ -23,10 +23,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.device_registry import DeviceRegistry, DeviceEntry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry, mock_device_registry
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -46,6 +46,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
+    CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
     CONF_SENSOR_TYPE,
     CONF_TEMPLATE,
@@ -568,6 +569,63 @@ async def test_entities_are_bound_to_source_device(
     utility_entity_entry = entity_reg.async_get("sensor.google_home_energy_daily")
     assert utility_entity_entry
     assert utility_entity_entry.device_id == device_entry.id
+
+
+async def test_entities_are_bound_to_source_device2(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    """
+    When using the power_sensor_id option the energy sensors and utility meters must be bound to the same device.
+    Also make sure no errors are logged
+    """
+
+    caplog.set_level(logging.ERROR)
+
+    device_id = "device.test"
+    switch_id = "switch.shelly"
+    power_sensor_id = "sensor.shelly_power"
+
+    mock_device_registry(
+        hass,
+        {
+            device_id: DeviceEntry(
+                id=device_id, manufacturer="shelly", model="Plug S"
+            )
+        },
+    )
+
+    entity_reg = mock_registry(
+        hass,
+        {
+            switch_id: RegistryEntry(
+                entity_id=switch_id,
+                unique_id="1234",
+                platform="switch",
+                device_id="device.test",
+            ),
+            power_sensor_id: RegistryEntry(
+                entity_id=power_sensor_id,
+                unique_id="12345",
+                platform="sensor",
+                device_id="device.test",
+            ),
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.shelly",
+            CONF_POWER_SENSOR_ID: "sensor.shelly_power"
+        },
+        {}
+    )
+
+    energy_entity_entry = entity_reg.async_get("sensor.shelly_energy")
+    assert energy_entity_entry
+    assert energy_entity_entry.device_id == device_id
+
+    assert len(caplog.records) == 0
 
 
 async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):

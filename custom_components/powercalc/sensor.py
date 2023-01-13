@@ -543,7 +543,7 @@ async def create_individual_sensors(  # noqa: C901
     # Set the entity to same device as the source entity, if any available
     if source_entity.entity_entry and source_entity.device_entry:
         for entity in entities_to_add:
-            if not isinstance(entity, BaseEntity):
+            if not isinstance(entity, SensorEntity):
                 continue
             try:
                 setattr(entity, "device_id", source_entity.device_entry.id)
