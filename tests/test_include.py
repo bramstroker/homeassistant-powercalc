@@ -174,7 +174,8 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     light_b = MockLight("light_b")
     light_c = MockLight("light_c")
     light_d = MockLight("light_d")
-    await create_mock_light_entity(hass, [light_a, light_b, light_c, light_d])
+    light_e = create_discoverable_light("light_e", "6765765756")
+    await create_mock_light_entity(hass, [light_a, light_b, light_c, light_d, light_e])
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -196,14 +197,14 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "platform": "group",
                     "name": "Light Group B",
                     "unique_id": "groupb",
-                    "entities": ["light.light_c", "light.light_d"],
+                    "entities": ["light.light_c", "light.light_d", "light.light_e"],
                 },
                 {
                     "platform": "group",
                     "name": "Light Group C",
                     "unique_id": "groupc",
                     "entities": ["light.light_group_a", "light.light_group_b"],
-                },
+                }
             ]
         },
     )
@@ -216,6 +217,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
             CONF_ENTITIES: [
                 get_simple_fixed_config("light.light_b", 50),
                 get_simple_fixed_config("light.light_c", 50),
+                {"entity_id": "light.light_e"}
             ],
             CONF_INCLUDE: {CONF_GROUP: "light.light_group_c"},
         },
@@ -227,4 +229,5 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         "sensor.light_a_power",
         "sensor.light_b_power",
         "sensor.light_c_power",
+        "sensor.light_e_power",
     }
