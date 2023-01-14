@@ -9,11 +9,20 @@ Follow :doc:`quick-start` for the initial installation / setup
 
    This project is under active development.
 
-Contents
---------
+Get Started
+***********************
 
 .. toctree::
+   :maxdepth: 1
+
    quick-start
+
+Configuration
+***********************
+
+.. toctree::
+   :maxdepth: 2
+
    virtual-power
    energy-sensors
    utility-meters
@@ -22,6 +31,12 @@ Contents
    configuration/sensor-configuration
    group
    naming
-   debug-logging
+
+Contributing
+********************
+
+.. toctree::
+   :maxdepth: 1
+
    contributing/measure
 

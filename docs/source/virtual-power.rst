@@ -11,7 +11,7 @@ Powercalc offers various calculation methods that can be used to establish a new
 - :doc:`strategies/wled`
 
 GUI
-===
+---
 
 You can create new virtual power sensors with the GUI.
 
@@ -29,7 +29,7 @@ When this is not working.
 Select :guilabel:`Virtual power (manual)` and follow the instructions
 
 YAML
-======
+----
 
 To create a power sensor with YAML you'll have to add a new entry under the ``sensor:`` line in `configuration.yaml`.
 
