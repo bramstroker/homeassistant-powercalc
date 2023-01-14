@@ -8,12 +8,14 @@ This can be helpful for devices which are always on and have a relatively fixed 
 Configuration options
 ---------------------
 
-| Name                | Type    | Requirement  | Default  | Description                                           |
-| ------------------- | ------- | ------------ | -------- | ------------------------------------------- |
-| value               | float   | **Required** |          | Value either in watts or kWh. Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-| unit_of_measurement | string  | **Optional** | kWh      | `kWh` or `W` |
-| on_time             | period  | **Optional** | 24:00:00 | How long the device is on per day. Only applies when unit_of_measurement is set to `W`. Format HH:MM:SS |
-| update_frequency    | integer | **Optional** | 1800     | Seconds between each increase in kWh |
++----------------------+---------+--------------+----------+-----------------------------------------------------------------------------------------------------------------------+
+| Name                 | Type    | Requirement  | Default  | Description                                                                                                           |
++======================+=========+==============+==========+=======================================================================================================================+
+| value                | float   | **Required** |          | Value either in watts or kWh. Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/)  |
+| unit_of_measurement  | string  | **Optional** | kWh      | `kWh` or `W`                                                                                                          |
+| on_time              | period  | **Optional** | 24:00:00 | How long the device is on per day. Only applies when unit_of_measurement is set to `W`. Format HH:MM:SS               |
+| update_frequency     | integer | **Optional** | 1800     | Seconds between each increase in kWh                                                                                  |
++----------------------+---------+--------------+----------+-----------------------------------------------------------------------------------------------------------------------+
 
 Examples
 --------

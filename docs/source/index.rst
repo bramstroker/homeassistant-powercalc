@@ -13,13 +13,11 @@ Contents
 --------
 
 .. toctree::
-
-   :maxdepth: 2
    quick-start
    virtual-power
    energy-sensors
    utility-meters
-   strategies/*
+   daily-fixed-energy
    configuration/global-configuration
    configuration/sensor-configuration
    group
