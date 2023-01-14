@@ -25,6 +25,7 @@ The following configuration:
       energy_sensor_naming: "{} kWh consumed"
 
 will create following sensors:
+
 - sensor.patio_power (Patio power)
 - sensor.patio_kwh_consumed (Patio kWh consumed)
 
@@ -39,6 +40,7 @@ This option allows you to separately change only the name (shown in GUI), it wil
       energy_sensor_friendly_naming: "{} Energy consumed
 
 will create following sensors:
+
 - sensor.patio_kwh (Patio Energy consumed)
 
 Change full name
@@ -53,5 +55,6 @@ You can also change the base sensor name with the ``name`` option
         name: Patio Light
 
 will create:
+
 - sensor.patio_light_power (Patio light power)
 - sensor.patio_light_energy (Patio light energy)

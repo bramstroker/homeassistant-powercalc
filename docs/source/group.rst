@@ -2,7 +2,7 @@
 Groups
 ======
 
-Powercalc provides several options to group individual power sensors into a single one. This can be very useful to get a glance about the consumption of all your lights together for example.
+Powercalc provides several options to group individual power sensors into a single one which sums the total. This can be very useful to get a glance about the consumption of all your lights together for example.
 
 Create group with GUI
 ---------------------

@@ -14,10 +14,13 @@ When you use the GUI select :guilabel:`wled` in the calculation_strategy dropdow
 Configuration options
 ---------------------
 
-| Name              | Type    | Requirement  | Default | Description                                 |
-| ----------------- | ------- | ------------ | ------- | ------------------------------------------- |
-| voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
-| power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
++---------------+-------+--------------+----------+------------------------------------+
+| Name          | Type  | Requirement  | Default  | Description                        |
++===============+=======+==============+==========+====================================+
+| voltage       | float | **Required** |          | Voltage for the lightstrip         |
++---------------+-------+--------------+----------+------------------------------------+
+| power_factor  | float | **Optional** | 0.9      | Power factor, between 0.1 and 1.0  |
++---------------+-------+--------------+----------+------------------------------------+
 
 **Example**
 
