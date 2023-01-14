@@ -19,12 +19,12 @@ Configuration options
 | voltage           | float   | **Required** |         | Voltage for the lightstrip                  |
 | power_factor      | float   | **Optional** | 0.9     | Power factor, between 0.1 and 1.0           |
 
-#### Example configuration
+**Example**
 
-```yaml
-sensor:
-  - platform: powercalc
-    entity_id: light.wled_lightstrip
-    wled:
-      voltage: 5
-```
+.. code-block:: yaml
+
+    sensor:
+      - platform: powercalc
+        entity_id: light.wled_lightstrip
+        wled:
+          voltage: 5
