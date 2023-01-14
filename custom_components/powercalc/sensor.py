@@ -33,7 +33,6 @@ from homeassistant.helpers import (
     entity_platform,
     entity_registry,
 )
-from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
@@ -674,24 +673,50 @@ def resolve_include_groups(
 
     domain = split_entity_id(group_id)[0]
     if domain == LIGHT_DOMAIN:
-        light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
-        light_group = next(
-            filter(
-                lambda entity: entity.entity_id == group_id, light_component.entities
-            ),
-            None,
-        )
-        if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
-            raise SensorConfigurationError(f"Light group {group_id} not found")
+        return resolve_light_group_entities(hass, group_id)
 
-        entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
-    else:
-        group_state = hass.states.get(group_id)
-        if group_state is None:
-            raise SensorConfigurationError(f"Group state {group_id} not found")
-        entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
-
+    group_state = hass.states.get(group_id)
+    if group_state is None:
+        raise SensorConfigurationError(f"Group state {group_id} not found")
+    entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
     return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
+
+
+def resolve_light_group_entities(
+    hass: HomeAssistant,
+    group_id: str,
+    resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None,
+) -> dict[str, entity_registry.RegistryEntry]:
+    """
+    Resolve all registry entries for a given light group.
+    When the light group has sub light groups, we will recursively walk these as well
+    """
+    if resolved_entities is None:
+        resolved_entities = {}
+
+    entity_reg = entity_registry.async_get(hass)
+    light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
+    light_group = next(
+        filter(lambda entity: entity.entity_id == group_id, light_component.entities),
+        None,
+    )
+    if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
+        raise SensorConfigurationError(f"Light group {group_id} not found")
+
+    entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
+    for entity_id in entity_ids:
+        registry_entry = entity_reg.async_get(entity_id)
+        if registry_entry is None:
+            continue
+
+        if registry_entry.platform == GROUP_DOMAIN:
+            resolve_light_group_entities(
+                hass, registry_entry.entity_id, resolved_entities
+            )
+
+        resolved_entities[entity_id] = registry_entry
+
+    return resolved_entities
 
 
 @callback
