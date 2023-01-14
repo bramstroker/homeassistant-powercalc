@@ -3,13 +3,21 @@ Fixed
 
 When you have an appliance which only can be set on and off you can use this mode.
 You need to supply a single watt value in the configuration which will be used when the device is ON
+Also we provide an option to define power values for certain entity states.
+
+You can setup sensors both with YAML or GUI.
+When you use the GUI select `fixed` in the calculation_strategy dropdown.
 
 Configuration options
 ---------------------
-| Name              | Type    | Requirement  | Description                                           |
-| ----------------- | ------- | ------------ | ----------------------------------------------------- |
-| power             | float   | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
-| states_power      | dict    | **Optional** | Power usage per entity state. Values can also be a [template](https://www.home-assistant.io/docs/configuration/templating/) |
+
++--------------+--------+--------------+--------------------------------------------------------------------------------+
+| Name         | Type   | Requirement  | Description                                                                    |
++==============+========+==============+================================================================================+
+| power        | float  | **Optional** | Power usage when the appliance is turned on (in watt). Can also be a template_ |
++--------------+--------+--------------+--------------------------------------------------------------------------------+
+| states_power | dict   | **Optional** | Power usage per entity state. Values can also be a template_                   |
++--------------+--------+--------------+--------------------------------------------------------------------------------+
 
 **Simplest example**
 
@@ -72,3 +80,5 @@ You can also use state attributes. Use the `|` delimiter to seperate the attribu
             media_content_id|Youtube: 10
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
+
+.. _template: https://www.home-assistant.io/docs/configuration/templating/

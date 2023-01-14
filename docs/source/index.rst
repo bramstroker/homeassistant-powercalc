@@ -16,5 +16,8 @@ Contents
 
    quick-start
    strategies/fixed
+   global-configuration
+   group
+   debug-logging
 
 
