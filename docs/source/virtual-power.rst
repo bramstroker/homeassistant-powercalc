@@ -5,10 +5,13 @@ To manually add virtual power sensors for your devices you can use the GUI or ad
 
 Powercalc offers various calculation methods that can be used to establish a new virtual power sensor. Each method is suitable for specific use cases. To learn about all the configuration options, refer to the dedicated section.
 
-- :doc:`strategies/fixed`
-- :doc:`strategies/linear`
-- :doc:`strategies/lut`
-- :doc:`strategies/wled`
+.. toctree::
+   :maxdepth: 1
+
+   strategies/fixed
+   strategies/linear
+   strategies/lut
+   strategies/wled
 
 GUI
 ---

@@ -73,7 +73,7 @@ Some power sensors, such as Arlec PC191HA, PC287HA appear not able to sense smal
 
 Sometimes, measuring multiple of the same light is required to get an accurate set of readings.
 
-To do this, use the [group integration](https://www.home-assistant.io/integrations/group/) - ensure your lights are configured in an identical fashion.
+To do this, use the `group integration <https://www.home-assistant.io/integrations/group/>`_, ensure your lights are configured in an identical fashion.
 
 When this is also not working use one of the recommended smart plugs
 

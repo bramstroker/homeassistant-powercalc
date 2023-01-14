@@ -1,6 +1,6 @@
-=========
-WLED mode
-=========
+====
+WLED
+====
 
 Supported domains: ``light``
 
