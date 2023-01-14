@@ -27,6 +27,7 @@ You can combine the ``entities`` option and ``create_group`` to group individual
                max_power: 8
 
 This will create the following entities:
+
 - sensor.hallway_power
 - sensor.hallway_energy
 - sensor.living_room_power
@@ -55,6 +56,7 @@ You can also nest groups, this makes it possible to add an entity to multiple gr
                   - entity_id: light.d
 
 Each group will have power sensors created for the following lights:
+
 - All lights: `light.a`, `light.b`, `light.c`, `light.d`
 - Upstairs lights: `light.c`, `light.d`
 - Bedroom Bob lights: `light.d`

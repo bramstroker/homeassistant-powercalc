@@ -39,7 +39,7 @@ Powercalc has a built-in library of more than 190 power profiles. Currently, thi
 These profiles have been measured and provided by users. See [supported models](docs/supported_models.md) for the listing of supported devices.
 
 Powercalc scans your HA instance for entities which are supported for automatic configuration. It does that based on the manufacturer and model information known in HA.
-After following the installation steps above and restarting HA power and energy sensors should appear.
+After following the installation steps above and restarting HA power (W) and energy sensors (kWh) should appear.
 
 Todo:
 

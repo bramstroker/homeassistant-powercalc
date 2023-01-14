@@ -16,9 +16,10 @@ Contents
 
    quick-start
    virtual-power
-     strategies/fixed
-     strategies/linear
-   global-configuration
+   strategies/fixed
+   strategies/linear
+   configuration/global-configuration
+   configuration/sensor-configuration
    group
    naming
    debug-logging
