@@ -14,14 +14,20 @@ Contents
 
 .. toctree::
 
+   :maxdepth: 2
    quick-start
    virtual-power
-   strategies/fixed
-   strategies/linear
+   strategies/*
    configuration/global-configuration
    configuration/sensor-configuration
    group
    naming
    debug-logging
 
+.. toctree::
+    caption: Strategies
+    strategies/fixed
+    strategies/linear
+    strategies/lut
+    strategies/wled
 

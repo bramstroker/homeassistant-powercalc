@@ -3,8 +3,7 @@ Virtual power sensors
 
 To manually add virtual power sensors for your devices you can use the GUI or add some configuration to `configuration.yaml`.
 
-Powercalc provides different calculation strategies which you can utilize to set up a new virtual power sensor.
-Each strategy has it's own use case. If you want to know all about the configuration options check the dedicated section.
+Powercalc offers various calculation methods that can be used to establish a new virtual power sensor. Each method is suitable for specific use cases. To learn about all the configuration options, refer to the dedicated section.
 
 - :doc:`strategies/fixed`
 - :doc:`strategies/linear`
@@ -15,7 +14,19 @@ GUI
 ===
 
 You can create new virtual power sensors with the GUI.
-TODO, images / video / text
+
+Just click the button to directly add a powercalc sensor:
+
+.. image:: https://my.home-assistant.io/badges/config_flow_start.svg
+   :target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
+
+When this is not working.
+
+- Go to :guilabel:`Settings` -> :guilabel:`Devices & Services`
+- Click :guilabel:`Add integration`
+- Search and click :guilabel:`Powercalc`
+
+Select :guilabel:`Virtual power (manual)` and follow the instructions
 
 YAML
 ======
