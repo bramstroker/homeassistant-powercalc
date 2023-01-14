@@ -8,6 +8,9 @@ The linear mode can be used for dimmable devices which don't have a lookup table
 You need to supply the min and max power draw yourself, by either looking at the datasheet or measuring yourself with a smart plug / power meter.
 Power consumpion is calculated by ratio. So when you have your fan running at 50% speed and define watt range 2 - 6, than the estimated consumption will be 4 watt.
 
+You can setup sensors both with YAML or GUI.
+When you use the GUI select :guilabel:`linear` in the calculation_strategy dropdown.
+
 Configuration options
 ---------------------
 

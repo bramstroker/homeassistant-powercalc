@@ -9,7 +9,7 @@ You could either install with HACS (recommended) or manual.
 
 HACS
 ----
-This integration is part of the default HACS_ repository. Just click "Explore and add repository" and search for "powercalc" to install.
+This integration is part of the default HACS_ repository. Just click :guilabel:`Explore and add repository` and search for :guilabel:`powercalc` to install.
 
 You *could* also use this link
 
@@ -43,9 +43,9 @@ After following the installation steps above and restarting HA power and energy 
 
 Todo:
 
-When this is not the case please check the logs for any errors, you can also enable debug logging (TODO link) to get more details about the discovery routine.
+When this is not the case please check the logs for any errors, you can also enable :doc:`debug logging <debug-logging>` to get more details about the discovery routine.
 
-When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. These are explained below.
+When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. See :doc:`virtual-power` how to manually add power sensors.
 
 .. note::
 

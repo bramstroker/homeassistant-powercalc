@@ -6,7 +6,7 @@ You need to supply a single watt value in the configuration which will be used w
 Also we provide an option to define power values for certain entity states.
 
 You can setup sensors both with YAML or GUI.
-When you use the GUI select `fixed` in the calculation_strategy dropdown.
+When you use the GUI select :guilabel:`fixed` in the calculation_strategy dropdown.
 
 Configuration options
 ---------------------
