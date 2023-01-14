@@ -9,35 +9,38 @@ Preparation
 
 To start measuring you'll need the following:
 
-- A computer (Windows, Linux, MacOSX) with Python 3.8 or higher
-- Supported smartplug which can accurately measure small currents (Shelly, Kasa/Tapo, todo other recommendations)
+- A computer (running Windows, Linux, MacOSX).
+- Supported smartplug which can accurately measure small currents (Shelly Plug S, Shelly 1PM or Tapo P110 recommended)
 - A fixture in which you can fit your light and a power plug on the other end which you can connect to your smartplug (TODO, add some pictures)
+- Install the measure script as described here: https://github.com/bramstroker/homeassistant-powercalc/blob/master/utils/measure/README.md
 
 Taking measurements
 -------------------
 
-A script is available which will walk through different brightness and color settings and take measurements with your smart plug.
-The script can be found at the following location: https://github.com/bramstroker/homeassistant-powercalc/tree/master/utils/measure
-Follow the [readme](https://github.com/bramstroker/homeassistant-powercalc/tree/master/utils/measure/README.md) to get the script up and running.
+The measure script will walk through different brightness and color settings and take measurements with your smart plug.
 
 Before you are going to take the actual measurements you have to select a ``POWER_METER`` and ``LIGHT_CONTROLLER`` by editing the `.env` file. You also need to set the credentials and information depending on which power meter and light controller you are using.
 
-> NOTE: make sure you temporarily pause possible automations you have in HA for your lights, so the light won't be switched in the middle of measuring session.
-
-Next, you'll need to take note of the ``supported_color_modes`` of the light you are about to measure. You can find that in "Developer tools" -> "States". Search for your entity there and look at the attributes column. For each of the supported color modes you need to run the measure tool.
+Next, you'll need to take note of the ``supported_color_modes`` of the light you are about to measure. You can find that in :guilabel:`Developer tools` -> :guilabel:`States`. Search for your entity there and look at the attributes column. For each of the supported color modes you need to run the measure tool.
 When the ``xy`` is in the supported modes you'll need to choose ``hs`` in the measure tool, as this is just another representation of a color.
 
-Now start the script to begin the measurements:
+.. important::
+    make sure you temporarily pause possible automations you have in HA for your lights, so the light won't be switched in the middle of measuring session.
 
-`python3 measure.py`
+Now start the script to begin the measurement session:
+
+.. code-block:: bash
+
+    docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 
 The script will ask you a few questions and will start switching your light to all kind of different settings.
 Depending on the selected color mode and sleep settings this will take a while. This will take 1 hour to a few hours to complete.
+Time to take a cup of coffee.
 
 Measure smart speakers
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Version 1.2.0 of the measure script fully automates the measurement session for smart speakers. Just select "Smart speaker" in the first step of the wizard.
+Version 1.2.0 of the measure script fully automates the measurement session for smart speakers. Just select :guilabel:`Smart speaker` in the first step of the wizard.
 
 Prepare / finalize the files
 ----------------------------
@@ -52,7 +55,7 @@ Next create a manufacturer and model folders in data directory and copy the file
 Submitting your work with a Pull Request
 ----------------------------------------
 
-To create a Pull Request (PR) on a GitHub repository, follow these steps:
+To create a Pull Request (PR) on the Powercalc GitHub repository, follow these steps:
 
 1. Fork the repository by clicking on the "Fork" button on the top right of the repository page. This will create a copy of the repository under your own account.
 2. Next, upload the directory containing your changes to the custom_components/powercalc/data directory of your forked repository. Make sure to keep the manufacturer/model folders intact.
@@ -64,14 +67,16 @@ To create a Pull Request (PR) on a GitHub repository, follow these steps:
 Common Problems
 ---------------
 
+Getting lot of 0 readings
+^^^^^^^^^^^^^^^^^^^^^^^^^
 Some power sensors, such as Arlec PC191HA, PC287HA appear not able to sense small amounts of current/power.
-Use one of the suggested smart plugs.
-
-#### Tuya power plug will not connect
-For Tuya measuring devices, disable or delete the plug from local tuya and reboot the plug as they only support 1 connection at a time.
-
-#### The globe is not reading on my power meter
 
 Sometimes, measuring multiple of the same light is required to get an accurate set of readings.
 
 To do this, use the [group integration](https://www.home-assistant.io/integrations/group/) - ensure your lights are configured in an identical fashion.
+
+When this is also not working use one of the recommended smart plugs
+
+Tuya power plug will not connect
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For Tuya measuring devices, disable or delete the plug from local tuya and reboot the plug as they only support 1 connection at a time.

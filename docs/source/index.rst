@@ -25,4 +25,5 @@ Contents
    group
    naming
    debug-logging
+   contributing/measure
 
