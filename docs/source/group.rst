@@ -76,6 +76,40 @@ Each group will have power sensors created for the following lights:
 .. warning::
     a maximum nesting level of 5 groups is allowed!
 
+Hide individual sensors
+-----------------------
+
+To hide individual power sensors, and only have the group sensor available in HA GUI you can use the ``hide_members`` option.
+
+Adding non powercalc sensors
+----------------------------
+
+Sometimes you want to add some power and energy sensors to your group which already exist in your HA installation.
+For example some Zwave/Zigbee plug with built-in power monitoring.
+
+In YAML you can use the ``power_sensor_id`` and ``energy_sensor_id`` options for that.
+Let's assume your smart plug provides `sensor.heater_power` and `sensor.heater_kwh`. We want to add these to the group `Living Room`.
+
+You can use the following configuration:
+
+.. code-block:: yaml
+
+    sensor:
+      - platform: powercalc
+        create_group: Living Room
+        entities:
+          - power_sensor_id: sensor.heater_power
+            energy_sensor_id: sensor.heater_kwh
+          - entity_id: light.hallway #Powercalc sensor
+
+.. note::
+    When you don't supply ``energy_sensor_id``, but only ``power_sensor_id`` powercalc tries to find a related energy sensor on the same device.
+    When it cannot find one Powercalc will create an energy sensor.
+
+If you use the GUI to create the groups you can use :guilabel:`Additional power entities` and :guilabel:`Additional energy entities` options.
+
+.. image:: img/group_additional_entities.png
+
 Domain groups
 -------------
 
