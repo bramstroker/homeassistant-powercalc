@@ -110,6 +110,8 @@ If you use the GUI to create the groups you can use :guilabel:`Additional power 
 
 .. image:: img/group_additional_entities.png
 
+Also see :doc:`real-power-sensor`
+
 Domain groups
 -------------
 
@@ -125,3 +127,9 @@ For example let's assume you want group sensors for all your lights and media pl
 
 .. note::
     This will only include all virtual power sensors created with powercalc, not any other power sensors already available in your HA installation.
+
+Automatically include entities
+------------------------------
+
+TODO; write intro
+See :doc:`include-entities`
