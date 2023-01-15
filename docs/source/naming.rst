@@ -2,12 +2,13 @@
 Sensor Naming
 =============
 
-The page described how entities are named by default in Powercalc and the options to change that behaviour.
+This page described how entities are named by default in Powercalc and the options to change that behaviour.
 
 Default naming convention
 -------------------------
 Let's assume you have a source sensor `light.patio` with name "Patio".
 Powercalc will create the following sensors by default.
+
 - sensor.patio_power (Patio power)
 - sensor.patio_energy (Patio energy)
 

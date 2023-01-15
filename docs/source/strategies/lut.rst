@@ -9,7 +9,7 @@ For a lot of light models measurements are taken using smart plugs. All this dat
 - [Supported models](#supported-models) for LUT mode
 - [LUT file structure](#lut-data-files)
 
-These LUT files are created using the measurement tool Powercalc provides. When you are interested in taking measurements yourself and contribute to the profile library yourself see these intstructions.
+These LUT files are created using the measurement tool Powercalc provides. When you are interested in taking measurements yourself and contribute to the profile library yourself see :doc:`/contributing/measure`.
 
 You can setup sensors both with YAML or GUI.
 

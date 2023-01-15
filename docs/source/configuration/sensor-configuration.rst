@@ -2,8 +2,12 @@
 Sensor configuration
 ====================
 
-TODO: Rewrite introduction. For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml` or use the GUI config flow. Not all configuration params listed below are available in the GUI, when you want to use the "advanced" options you need to use YAML configuration.
-Each virtual power sensor have it's own configuration possibilities.
+For each entity you want to create a virtual power sensor for you'll need to add an entry in `configuration.yaml` or use the GUI config flow.
+Below you'll find a listing of possible configuration parameters for each sensor.
+Not all configuration params listed below are available in the GUI, when you want to use the "advanced" options you need to use YAML configuration.
+
+.. note::
+    When you define an option per sensor it will override any :doc:`global-configuration` option
 
 +-------------------------------------------+-----------+--------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Name                                      | Type      | Requirement  | Description                                                                                                                                                                                                                                                                                        |

@@ -26,7 +26,7 @@ You can change this behaviour with the ``utility_meter_types`` configuration opt
         - yearly
 
 .. note::
-    A note on sensor naming.
+    A note on :doc:`naming`.
     The utility meters have the same name as your energy sensor, but are extended by the meter cycle.
     Assume you have a light `light.floorlamp_livingroom`, than you should have the following sensors created:
 

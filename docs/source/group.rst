@@ -80,6 +80,7 @@ Hide individual sensors
 -----------------------
 
 To hide individual power sensors, and only have the group sensor available in HA GUI you can use the ``hide_members`` option.
+When you used the GUI to create the group sensor you can use the :guilabel:`Hide members` toggle.
 
 Adding non powercalc sensors
 ----------------------------
