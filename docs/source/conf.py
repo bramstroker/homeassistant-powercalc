@@ -1,33 +1,8 @@
-import sys, os
-
-sys.path.append(os.path.abspath('ext'))
-sys.path.append('.')
-
-"""
-Tells Sphinx which extensions to use.
-"""
-
-#extensions = ['xref']
-
-"""
-Imports all link files into project.
-"""
-
-# from links.link import *
-# from links import *
-
 # -- Project information
 
 project = 'Powercalc'
 copyright = '2023, Bram Gerritsen'
 author = 'Bramstroker'
-
-release = '0.1'
-version = '0.1.0'
-
-# -- General configuration
-
-templates_path = ['_templates']
 
 # -- Options for HTML output
 
@@ -43,3 +18,10 @@ html_static_path = ['_static']
 html_css_files = [
     'css/custom.css',
 ]
+
+# make rst_epilog a variable, so you can add other epilog parts to it
+rst_epilog = ""
+# Read link all targets from file
+with open('links.rst') as f:
+    rst_epilog += f.read()
+
