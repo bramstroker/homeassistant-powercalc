@@ -20,6 +20,7 @@ Taking measurements
 The measure script will walk through different brightness and color settings and take measurements with your smart plug.
 
 Before you are going to take the actual measurements you have to select a ``POWER_METER`` and ``LIGHT_CONTROLLER`` by editing the `.env` file. You also need to set the credentials and information depending on which power meter and light controller you are using.
+When you want to use the OCR method see :doc:`measure-ocr`.
 
 Next, you'll need to take note of the ``supported_color_modes`` of the light you are about to measure. You can find that in :guilabel:`Developer tools` -> :guilabel:`States`. Search for your entity there and look at the attributes column. For each of the supported color modes you need to run the measure tool.
 When the ``xy`` is in the supported modes you'll need to choose ``hs`` in the measure tool, as this is just another representation of a color.
