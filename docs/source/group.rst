@@ -132,5 +132,7 @@ For example let's assume you want group sensors for all your lights and media pl
 Automatically include entities
 ------------------------------
 
-TODO; write intro
-See :doc:`include-entities`
+Powercalc has some options to automatically include entities in your group matching certain criteria.
+This can be useful to you don't have to manually specify each and every sensor.
+
+See :doc:`include-entities` for more information.
