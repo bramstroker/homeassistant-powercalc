@@ -34,7 +34,6 @@ Also follow the post installation steps mentioned above.
 
 Setup power sensors
 -------------------
-
 Powercalc has a built-in library of more than 190 power profiles. Currently, this exists mostly of lights.
 These profiles have been measured and provided by users. See [supported models](docs/supported_models.md) for the listing of supported devices.
 
@@ -54,5 +53,15 @@ When your appliance is not supported out of the box (or you want to have more co
 
         powercalc:
             enable_autodisovery: false
+
+Energy dashboard
+----------------
+If you want to use the virtual power sensors in the energy dashboard you'll need an energy sensor. Powercalc automatically creates one for every virtual power sensor. No need for any custom configuration.
+These energy sensors then can be selected in the energy dashboard.
+
+You can disable the automatic creation of energy sensors with the option ``create_energy_sensors`` in your configuration (see :doc:`configuration/global-configuration`).
+
+.. note::
+    It can take some time for the energy sensors to appear in the energy dashboard, sometimes more than an hour. Just have a little patience ;-)
 
 .. _HACS: https://hacs.xyz/

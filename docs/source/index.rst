@@ -23,14 +23,24 @@ Configuration
 .. toctree::
    :maxdepth: 1
 
-   virtual-power
-   energy-sensors
-   utility-meters
+   virtual-power-sensor
+   energy-sensor
+   utility-meter
    daily-fixed-energy
+   real-power-sensor
    configuration/global-configuration
    configuration/sensor-configuration
    group
    naming
+
+Troubleshooting
+********************
+
+.. toctree::
+   :maxdepth: 1
+
+   troubleshooting/debug-logging
+   troubleshooting/faq
 
 Contributing
 ********************

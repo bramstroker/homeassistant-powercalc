@@ -29,7 +29,11 @@ When this is not working.
 - Click :guilabel:`Add integration`
 - Search and click :guilabel:`Powercalc`
 
-Select :guilabel:`Virtual power (manual)` and follow the instructions
+Select :guilabel:`Virtual power (manual)` and follow the instructions.
+
+After you have walked through the wizard the new powercalc sensor must be created and appear in the list.
+When you click on it you can see the entities which are created.
+Some options can be changed afterwards, just click :guilabel:`Configure`
 
 YAML
 ----

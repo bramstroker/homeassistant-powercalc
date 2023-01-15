@@ -2,12 +2,24 @@
 Groups
 ======
 
-Powercalc provides several options to group individual power sensors into a single one which sums the total. This can be very useful to get a glance about the consumption of all your lights together for example.
+Powercalc provides several options to group individual power sensors into a single one which sums the total.
+This can be very useful to get a glance about the consumption of all your lights together for example.
 
 Create group with GUI
 ---------------------
 
-Todo: write
+You can create a new group with the GUI using this button.
+
+.. image:: https://my.home-assistant.io/badges/config_flow_start.svg
+   :target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
+
+When this is not working.
+
+- Go to :guilabel:`Settings` -> :guilabel:`Devices & Services`
+- Click :guilabel:`Add integration`
+- Search and click :guilabel:`Powercalc`
+
+Select :guilabel:`Group` and follow the instructions.
 
 Create group with YAML
 ----------------------
