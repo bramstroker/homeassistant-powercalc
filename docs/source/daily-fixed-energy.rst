@@ -13,9 +13,9 @@ Configuration options
 +======================+=========+==============+==========+========================================================================================================================+
 | value                | float   | **Required** |          | Value either in watts or kWh. Can also be a `template <https://www.home-assistant.io/docs/configuration/templating/>`_ |
 +----------------------+---------+--------------+----------+------------------------------------------------------------------------------------------------------------------------+
-| unit_of_measurement  | string  | **Optional** | kWh      | `kWh` or `W`                                                                                                           |
+| unit_of_measurement  | string  | **Optional** | kWh      | ``kWh`` or ``W``                                                                                                       |
 +----------------------+---------+--------------+----------+------------------------------------------------------------------------------------------------------------------------+
-| on_time              | period  | **Optional** | 24:00:00 | How long the device is on per day. Only applies when unit_of_measurement is set to `W`. Format HH:MM:SS                |
+| on_time              | period  | **Optional** | 24:00:00 | How long the device is on per day. Only applies when ``unit_of_measurement`` is set to ``W``. Format `HH:MM:SS`        |
 +----------------------+---------+--------------+----------+------------------------------------------------------------------------------------------------------------------------+
 | update_frequency     | integer | **Optional** | 1800     | Seconds between each increase in kWh                                                                                   |
 +----------------------+---------+--------------+----------+------------------------------------------------------------------------------------------------------------------------+
