@@ -30,7 +30,7 @@ My light model is not supported, what can I do?
 -----------------------------------------------
 
 New LUT files are created by measuring the light bulbs using an automated script.
-To run this script you'll need the bulb itself, a smart plug , some technical affinity and some time. See [Contributing new light](https://github.com/bramstroker/homeassistant-powercalc/wiki/Contributing-new-lights) for some documentation how to do this.
+To run this script you'll need the bulb itself, a smart plug , some technical affinity and some time. See :doc:`/contributing/measure` for some documentation how to do this.
 
 When you can't contribute for whatever reason you can request a new light model on the `discussion section <https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/request-light-models>`_. However it is no certainty if and when it will be added.
 
