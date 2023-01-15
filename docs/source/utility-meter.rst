@@ -3,7 +3,11 @@ Utility meters
 ==============
 
 The energy sensors created by the component will keep increasing the total kWh, and never reset.
-When you want to know the energy consumed the last 24 hours, or last month you can use the [utility_meter](https://www.home-assistant.io/integrations/utility_meter/) component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
+When you want to know the energy consumed the last 24 hours, or last month you can use the `utility_meter <https://www.home-assistant.io/integrations/utility_meter/>`_ component of Home Assistant. Powercalc allows you to automatically create utility meters for all your powercalc sensors with a single line of configuration.
+
+Toggling utility meter creation on/off can also be done when creating power sensors with the GUI on a per sensor basis.
+
+To create utility meters for all powercalc sensors globally add the following configuration to `configuration.yaml`.
 
 .. code-block:: yaml
 
@@ -21,11 +25,13 @@ You can change this behaviour with the ``utility_meter_types`` configuration opt
         - daily
         - yearly
 
-The utility meters have the same name as your energy sensor, but are extended by the meter cycle.
-Assume you have a light `light.floorlamp_livingroom`, than you should have the following sensors created:
+.. note::
+    A note on sensor naming.
+    The utility meters have the same name as your energy sensor, but are extended by the meter cycle.
+    Assume you have a light `light.floorlamp_livingroom`, than you should have the following sensors created:
 
-- `sensor.floorlamp_livingroom_power`
-- `sensor.floorlamp_livingroom_energy`
-- `sensor.floorlamp_livingroom_energy_daily`
-- `sensor.floorlamp_livingroom_energy_weekly`
-- `sensor.floorlamp_livingroom_energy_monthly`
+    - `sensor.floorlamp_livingroom_power`
+    - `sensor.floorlamp_livingroom_energy`
+    - `sensor.floorlamp_livingroom_energy_daily`
+    - `sensor.floorlamp_livingroom_energy_weekly`
+    - `sensor.floorlamp_livingroom_energy_monthly`

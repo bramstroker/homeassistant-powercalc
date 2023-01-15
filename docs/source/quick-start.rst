@@ -34,7 +34,7 @@ Also follow the post installation steps mentioned above.
 
 Setup power sensors
 -------------------
-Powercalc has a built-in library of more than 190 power profiles. Currently, this exists mostly of lights.
+Powercalc has a built-in library of more than 250 power profiles. Currently, this exists mostly of lights.
 These profiles have been measured and provided by users. See [supported models](docs/supported_models.md) for the listing of supported devices.
 
 Powercalc scans your HA instance for entities which are supported for automatic configuration. It does that based on the manufacturer and model information known in HA.
@@ -42,9 +42,9 @@ After following the installation steps above and restarting HA power (W) and ene
 
 .. image:: img/discovery.png
 
-When this is not the case please check the logs for any errors, you can also enable :doc:`debug logging <debug-logging>` to get more details about the discovery routine.
+When this is not the case please check the logs for any errors, you can also enable :doc:`troubleshooting/debug-logging` to get more details about the discovery routine.
 
-When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. See :doc:`virtual-power` how to manually add power sensors.
+When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. See :doc:`virtual-power-sensor` how to manually add power sensors.
 
 .. tip::
     When you don't want powercalc to automatically discover sensors in your installation you can disable that behaviour to get full manual control:

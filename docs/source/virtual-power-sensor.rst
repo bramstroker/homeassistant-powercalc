@@ -65,7 +65,7 @@ Tip: You can also setup multiple sensors in one go using the ``entities`` option
               min_power: 2
               max_power: 9
 
-For all the possible options see the strategy sections as linked above and the rest of the Powercalc documentation.
+For all the possible options see the strategy sections as linked above, :doc:`configuration/sensor-configuration` and the rest of the Powercalc documentation.
 
 .. important::
 
