@@ -21,6 +21,9 @@ When this is not working.
 
 Select :guilabel:`Group` and follow the instructions.
 
+.. tip::
+    After you have created a group you can directly assign a virtual power sensor to it when creating the power sensor by selecting the group in the :guilabel:`Group` field
+
 Create group with YAML
 ----------------------
 
