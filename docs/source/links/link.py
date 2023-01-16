@@ -1,1 +1,1 @@
-xref_links = {"key" : ("link text", "URL")}
+xref_links = {"key": ("link text", "URL")}
