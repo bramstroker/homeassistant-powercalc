@@ -74,7 +74,7 @@ async def test_get_non_existing_profile(hass: HomeAssistant):
 
 
 async def test_hidden_directories_are_skipped_from_model_listing(
-    hass: HomeAssistant, `caplog: pytest.LogCaptureFixture`
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ):
     caplog.set_level(logging.ERROR)
     library = ProfileLibrary(hass)
