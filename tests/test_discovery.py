@@ -358,7 +358,9 @@ async def test_get_power_profile_empty_manufacturer(
     assert not caplog.records
 
 
-async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: HomeAssistant):
+async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.DEBUG)
+
     unique_id = "abc"
     mock_registry(
         hass,
@@ -380,17 +382,18 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: Hom
         },
     )
 
+    config_entry_unique_id = f"pc_{unique_id}"
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data={
-            CONF_UNIQUE_ID: unique_id,
+            CONF_UNIQUE_ID: config_entry_unique_id,
             CONF_NAME: "Test",
             CONF_ENTITY_ID: "light.test",
             CONF_MANUFACTURER: "Signify",
             CONF_MODEL: "LCT010",
         },
         source=SOURCE_IGNORE,
-        unique_id=unique_id,
+        unique_id=config_entry_unique_id,
     )
     config_entry.add_to_hass(hass)
 
@@ -398,3 +401,4 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: Hom
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.test_power")
+    assert "Already setup with discovery, skipping new discovery" in caplog.text
