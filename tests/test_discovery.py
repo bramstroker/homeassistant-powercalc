@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_IGNORE
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -356,3 +356,49 @@ async def test_get_power_profile_empty_manufacturer(
     )
     assert not profile
     assert not caplog.records
+
+
+async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+    caplog.set_level(logging.DEBUG)
+
+    unique_id = "abc"
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id=unique_id,
+                platform="light",
+                device_id="some-device-id",
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "some-device-id": DeviceEntry(
+                id="some-device-id", manufacturer="Signify", model="LCT010"
+            )
+        },
+    )
+
+    config_entry_unique_id = f"pc_{unique_id}"
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_UNIQUE_ID: config_entry_unique_id,
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "Signify",
+            CONF_MODEL: "LCT010",
+        },
+        source=SOURCE_IGNORE,
+        unique_id=config_entry_unique_id,
+    )
+    config_entry.add_to_hass(hass)
+
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.test_power")
+    assert "Already setup with discovery, skipping new discovery" in caplog.text
