@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_IGNORE
+from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -358,7 +358,9 @@ async def test_get_power_profile_empty_manufacturer(
     assert not caplog.records
 
 
-async def test_no_power_sensors_are_created_for_ignored_config_entries(hass: HomeAssistant, caplog: pytest.LogCaptureFixture):
+async def test_no_power_sensors_are_created_for_ignored_config_entries(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.DEBUG)
 
     unique_id = "abc"
