@@ -1,3 +1,7 @@
+import logging
+
+import pytest
+
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
@@ -139,3 +143,32 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.existing_energy",
     }
+
+
+async def test_real_energy_sensor_error_on_non_existing_entity(
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture
+) -> None:
+    """Test that an error is logged when user supplies unknown entity id in energy_sensor_id"""
+
+    caplog.set_level(logging.ERROR)
+
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "sensor.dummy",
+                    CONF_FIXED: {CONF_POWER: 50},
+                    CONF_ENERGY_SENSOR_ID: "sensor.invalid_energy",
+                }
+            ],
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    assert "No energy sensor with id" in caplog.text
