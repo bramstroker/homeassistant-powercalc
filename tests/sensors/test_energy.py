@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
@@ -146,8 +145,7 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_real_energy_sensor_error_on_non_existing_entity(
-    hass: HomeAssistant,
-    caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Test that an error is logged when user supplies unknown entity id in energy_sensor_id"""
 
