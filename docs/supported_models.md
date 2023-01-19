@@ -1,9 +1,9 @@
-- [Lights](#Lights) (211)
+- [Lights](#Lights) (212)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 211 total
+#### 212 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -115,6 +115,7 @@
 |signify        |3216331P6                |Hue White Ambiance Aurelle Rectangular                                                 |                                                                                                                                                                                                                      |
 |signify        |4090330P9                |Hue Ensis Pendant Light                                                                |LCP001,LCP002,4090331P9,4090330P9_01,4090330P9_02,4090331P9_01,4090331P9_02,929003052501_01,929003052501_02,929003053301_01,929003053301_02                                                                           |
 |signify        |5060730P7                |Hue Centris 4-Spot Ceiling Light                                                       |5060730P7_01,5060731P7_01                                                                                                                                                                                             |
+|signify        |5063431P7                |Hue White and Colour Ambiance Fugato quadruple spotlight                               |                                                                                                                                                                                                                      |
 |signify        |548727                   |Hue White and Color Ambiance BR30 with bluetooth                                       |                                                                                                                                                                                                                      |
 |signify        |915005996601             |Hue Enrave Medium                                                                      |                                                                                                                                                                                                                      |
 |signify        |929003056701             |Hue Adore Ceiling Light                                                                |                                                                                                                                                                                                                      |
