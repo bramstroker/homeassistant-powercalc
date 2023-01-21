@@ -24,7 +24,6 @@ from homeassistant.helpers.discovery import async_load_platform
 
 from .common import validate_name_pattern
 from .const import (
-    CONF_AREA,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,

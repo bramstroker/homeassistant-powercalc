@@ -23,8 +23,6 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.factory import PowerMeterFactory
-from powermeter.powermeter import PowerMeter
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -80,7 +78,7 @@ class LightRunner(MeasurementRunner):
         return f"{self.light_info.model_id}"
 
     def run(
-        self, answers: dict[str, Any], export_directory: str
+            self, answers: dict[str, Any], export_directory: str
     ) -> RunnerResult | None:
         """Run the measurement session for lights"""
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
@@ -129,25 +127,25 @@ class LightRunner(MeasurementRunner):
                 )
 
                 if (
-                    previous_variation
-                    and isinstance(variation, ColorTempVariation)
-                    and variation.ct < previous_variation.ct
+                        previous_variation
+                        and isinstance(variation, ColorTempVariation)
+                        and variation.ct < previous_variation.ct
                 ):
                     _LOGGER.info("Extra waiting for significant CT change...")
                     time.sleep(config.SLEEP_TIME_CT)
 
                 if (
-                    previous_variation
-                    and isinstance(variation, HsVariation)
-                    and variation.sat < previous_variation.sat
+                        previous_variation
+                        and isinstance(variation, HsVariation)
+                        and variation.sat < previous_variation.sat
                 ):
                     _LOGGER.info("Extra waiting for significant SAT change...")
                     time.sleep(config.SLEEP_TIME_SAT)
 
                 if (
-                    previous_variation
-                    and isinstance(variation, HsVariation)
-                    and variation.hue < previous_variation.hue
+                        previous_variation
+                        and isinstance(variation, HsVariation)
+                        and variation.hue < previous_variation.hue
                 ):
                     _LOGGER.info("Extra waiting for significant HUE change...")
                     time.sleep(config.SLEEP_TIME_HUE)
@@ -214,7 +212,7 @@ class LightRunner(MeasurementRunner):
         return average
 
     def get_variations(
-        self, color_mode: ColorMode, resume_at: Optional[Variation] = None
+            self, color_mode: ColorMode, resume_at: Optional[Variation] = None
     ) -> Iterator[Variation]:
         """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == ColorMode.HS:
@@ -242,30 +240,30 @@ class LightRunner(MeasurementRunner):
         min_mired = round(self.light_info.min_mired)
         max_mired = round(self.light_info.max_mired)
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS
+                config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS
         ):
             for mired in self.inclusive_range(
-                min_mired, max_mired, config.CT_MIRED_STEPS
+                    min_mired, max_mired, config.CT_MIRED_STEPS
             ):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
         """Get hue/sat variations"""
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS
+                config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS
         ):
             for sat in self.inclusive_range(
-                config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS
+                    config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS
             ):
                 for hue in self.inclusive_range(
-                    config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS
+                        config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS
                 ):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
         """Get brightness variations"""
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS
+                config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS
         ):
             yield Variation(bri=bri)
 
@@ -280,9 +278,9 @@ class LightRunner(MeasurementRunner):
 
     @staticmethod
     def calculate_time_left(
-        variations: list[Variation],
-        current_variation: Variation = None,
-        progress: int = 0,
+            variations: list[Variation],
+            current_variation: Variation = None,
+            progress: int = 0,
     ) -> str:
         """Try to guess the remaining time left. This will not account for measuring errors / retries obviously"""
         num_variations_left = len(variations) - progress
@@ -296,18 +294,18 @@ class LightRunner(MeasurementRunner):
         time_left += num_variations_left * (config.SLEEP_TIME + estimated_step_delay)
         if config.SAMPLE_COUNT > 1:
             time_left += (
-                num_variations_left
-                * config.SAMPLE_COUNT
-                * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
+                    num_variations_left
+                    * config.SAMPLE_COUNT
+                    * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
             )
 
         if isinstance(current_variation, HsVariation):
             sat_steps_left = (
-                round(
-                    (config.MAX_BRIGHTNESS - current_variation.bri)
-                    / config.HS_BRI_STEPS
-                )
-                - 1
+                    round(
+                        (config.MAX_BRIGHTNESS - current_variation.bri)
+                        / config.HS_BRI_STEPS
+                    )
+                    - 1
             )
             time_left += sat_steps_left * config.SLEEP_TIME_SAT
             hue_steps_left = round(
@@ -317,11 +315,11 @@ class LightRunner(MeasurementRunner):
 
         if isinstance(current_variation, ColorTempVariation):
             ct_steps_left = (
-                round(
-                    (config.MAX_BRIGHTNESS - current_variation.bri)
-                    / config.CT_BRI_STEPS
-                )
-                - 1
+                    round(
+                        (config.MAX_BRIGHTNESS - current_variation.bri)
+                        / config.CT_BRI_STEPS
+                    )
+                    - 1
             )
             time_left += ct_steps_left * config.SLEEP_TIME_CT
 
@@ -467,7 +465,7 @@ class LightRunner(MeasurementRunner):
         raise Exception(f"Color mode {self.color_mode} not supported")
 
     def take_power_measurement(
-        self, start_timestamp: float, retry_count: int = 0
+            self, start_timestamp: float, retry_count: int = 0
     ) -> float:
         """Request a power reading from the configured power meter"""
         value = self.measure_util.take_measurement(start_timestamp, retry_count)
@@ -532,7 +530,7 @@ class LightRunner(MeasurementRunner):
                 name="num_lights",
                 message="How many lights are you measuring?",
                 ignore=lambda answers: not answers.get("multiple_lights"),
-                validate=lambda _, current: re.match("\d+", current),
+                validate=lambda _, current: re.match(r"\d+", current),
             ),
         ]
         questions.extend(self.light_controller.get_questions())
