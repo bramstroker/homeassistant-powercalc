@@ -191,7 +191,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         return ENERGY_ICON
 
     @callback
-    def async_reset_energy(self) -> None:
+    def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
         self._attr_last_reset = dt_util.utcnow()
