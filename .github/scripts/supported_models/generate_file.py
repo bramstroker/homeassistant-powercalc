@@ -5,6 +5,7 @@ import json
 import os
 import sys
 from pathlib import Path
+
 from aliases import MANUFACTURER_DIRECTORY_MAPPING
 from pytablewriter import MarkdownTableWriter
 
