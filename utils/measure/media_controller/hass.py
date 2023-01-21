@@ -2,7 +2,7 @@ from typing import Any
 
 import inquirer
 from homeassistant_api import Client
-from homeassistant_api.errors import HomeassistantAPIError, UnauthorizedError
+from homeassistant_api.errors import HomeassistantAPIError
 from media_controller.errors import MediaPlayerError
 
 
