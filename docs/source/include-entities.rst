@@ -5,7 +5,7 @@ Dynamically including entities
 Powercalc provides several methods to automatically include a bunch of entities in a group with the ``include`` option.
 
 .. note::
-    only entities will be included which are in the supported models list (these can be auto configured). You can combine ``include`` and ``entities`` to extend the group with custom configured entities.
+    only entities will be included which are in the `supported models`_ list (these can be auto configured). You can combine ``include`` and ``entities`` to extend the group with custom configured entities.
 
 Area
 ----
