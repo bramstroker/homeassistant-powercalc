@@ -307,7 +307,7 @@ def register_entity_services() -> None:
     platform.async_register_entity_service(
         SERVICE_INCREASE_DAILY_ENERGY,
         {vol.Required(CONF_VALUE): validate_is_number},
-        "async_increase"
+        "async_increase",
     )
 
 

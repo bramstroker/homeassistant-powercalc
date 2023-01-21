@@ -360,10 +360,7 @@ async def test_increase_service(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         DOMAIN,
         SERVICE_INCREASE_DAILY_ENERGY,
-        {
-            ATTR_ENTITY_ID: entity_id,
-            "value": 1.2
-        },
+        {ATTR_ENTITY_ID: entity_id, "value": 1.2},
         blocking=True,
     )
     await hass.async_block_till_done()
@@ -373,10 +370,7 @@ async def test_increase_service(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         DOMAIN,
         SERVICE_INCREASE_DAILY_ENERGY,
-        {
-            ATTR_ENTITY_ID: entity_id,
-            "value": 1.5
-        },
+        {ATTR_ENTITY_ID: entity_id, "value": 1.5},
         blocking=True,
     )
     await hass.async_block_till_done()
