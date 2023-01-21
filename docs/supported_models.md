@@ -1,9 +1,9 @@
-- [Lights](#Lights) (212)
+- [Lights](#Lights) (213)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 212 total
+#### 213 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -200,6 +200,7 @@
 |signify        |LWW001                   |Hue white A60 bulb E27                                                                 |                                                                                                                                                                                                                      |
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                                                                                                                                                      |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                                                                                                                                                      |
+|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |                                                                                                                                                                                                                      |
 |tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                      |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                                                                                                                                                      |
 |tuya           |SL20                     |Treatlife SL20                                                                         |                                                                                                                                                                                                                      |
