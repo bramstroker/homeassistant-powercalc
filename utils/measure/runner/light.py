@@ -23,8 +23,6 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.factory import PowerMeterFactory
-from powermeter.powermeter import PowerMeter
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -532,7 +530,7 @@ class LightRunner(MeasurementRunner):
                 name="num_lights",
                 message="How many lights are you measuring?",
                 ignore=lambda answers: not answers.get("multiple_lights"),
-                validate=lambda _, current: re.match("\d+", current),
+                validate=lambda _, current: re.match(r"\d+", current),
             ),
         ]
         questions.extend(self.light_controller.get_questions())

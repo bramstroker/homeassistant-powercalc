@@ -5,6 +5,8 @@ import json
 import os
 import sys
 from pathlib import Path
+from aliases import MANUFACTURER_DIRECTORY_MAPPING
+from pytablewriter import MarkdownTableWriter
 
 sys.path.insert(
     1,
@@ -12,9 +14,6 @@ sys.path.insert(
         os.path.join(Path(__file__), "../../../../custom_components/powercalc")
     ),
 )
-
-from aliases import MANUFACTURER_DIRECTORY_MAPPING
-from pytablewriter import MarkdownTableWriter
 
 DEVICE_TYPES = [
     ("light", "Lights"),
