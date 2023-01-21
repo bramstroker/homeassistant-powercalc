@@ -22,7 +22,7 @@ from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.discovery import async_load_platform
 
-from .common import SourceEntity, create_source_entity, validate_name_pattern
+from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -37,9 +37,6 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_MANUFACTURER,
-    CONF_MODE,
-    CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -61,21 +58,17 @@ from .const import (
     DEFAULT_POWER_SENSOR_PRECISION,
     DEFAULT_UPDATE_FREQUENCY,
     DEFAULT_UTILITY_METER_TYPES,
-    DISCOVERY_POWER_PROFILE,
-    DISCOVERY_SOURCE_ENTITY,
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
-    CalculationStrategy,
     PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
-from .power_profile.power_profile import DEVICE_DOMAINS
 from .sensors.group import (
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
