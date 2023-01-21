@@ -332,6 +332,43 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     assert energy_state.state == STATE_UNAVAILABLE
 
 
+async def test_energy_group_available_when_members_temporarily_unavailable(hass: HomeAssistant) -> None:
+    """
+    When any of the member sensors of a grouped energy sensor become unavailable,
+     we try to use the last know correct state value of the member sensor
+    """
+    await create_input_booleans(hass, ["test1", "test2"])
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1", 50),
+                get_simple_fixed_config("input_boolean.test2", 50),
+            ],
+        },
+    )
+
+    hass.states.async_set("sensor.test1_energy", "1.0")
+    hass.states.async_set("sensor.test2_energy", "2.0")
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == "3.0000"
+
+    hass.states.async_set("sensor.test1_energy", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == "3.0000"
+
+    hass.states.async_set("sensor.test2_energy", "2.2")
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.state == "3.2000"
+
+
 async def test_hide_members(hass: HomeAssistant):
     entity_reg = er.async_get(hass)
     await create_input_booleans(hass, ["one", "two"])
