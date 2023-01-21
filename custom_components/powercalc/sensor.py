@@ -102,6 +102,7 @@ from .const import (
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     SERVICE_CALIBRATE_UTILITY_METER,
+    SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
     PowercalcDiscoveryType,
@@ -294,13 +295,19 @@ def register_entity_services() -> None:
     platform.async_register_entity_service(
         SERVICE_RESET_ENERGY,
         {},
-        "async_reset_energy",
+        "async_reset",
     )
 
     platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
         {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_INCREASE_DAILY_ENERGY,
+        {vol.Required(CONF_VALUE): validate_is_number},
+        "async_increase"
     )
 
 

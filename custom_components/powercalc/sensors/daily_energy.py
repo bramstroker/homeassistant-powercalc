@@ -256,8 +256,13 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         return round(self._state, self._rounding_digits)
 
     @callback
-    def async_reset_energy(self) -> None:
+    def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
         self._attr_last_reset = dt_util.utcnow()
+        self.async_write_ha_state()
+
+    def async_increase(self, value) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Increasing energy sensor with {value}")
+        self._state += Decimal(value)
         self.async_write_ha_state()
