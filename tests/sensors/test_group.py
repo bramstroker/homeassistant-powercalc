@@ -332,7 +332,9 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     assert energy_state.state == STATE_UNAVAILABLE
 
 
-async def test_energy_group_available_when_members_temporarily_unavailable(hass: HomeAssistant) -> None:
+async def test_energy_group_available_when_members_temporarily_unavailable(
+    hass: HomeAssistant,
+) -> None:
     """
     When any of the member sensors of a grouped energy sensor become unavailable,
      we try to use the last know correct state value of the member sensor
