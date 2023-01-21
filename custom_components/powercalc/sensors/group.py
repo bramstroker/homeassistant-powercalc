@@ -548,7 +548,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             self._attr_native_unit_of_measurement = ENERGY_MEGA_WATT_HOUR
 
     @callback
-    def async_reset_energy(self) -> None:
+    def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")
