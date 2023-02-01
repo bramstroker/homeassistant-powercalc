@@ -184,7 +184,6 @@ class LightRunner(MeasurementRunner):
 
         return RunnerResult(
             model_json_data={"calculation_strategy": "lut"},
-            skip_model_json_generation=resume_at is not None,
         )
 
     def get_dummy_load_value(self) -> float:
