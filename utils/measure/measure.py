@@ -117,7 +117,6 @@ class Measure:
 
         generate_model_json: bool = (
             answers["generate_model_json"]
-            and not runner_result.skip_model_json_generation
         )
 
         if generate_model_json:
