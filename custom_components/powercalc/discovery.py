@@ -269,7 +269,6 @@ class DiscoveryManager:
         found_entity_ids = []
 
         for key, value in search_dict.items():
-
             if key == "entity_id":
                 found_entity_ids.append(value)
 

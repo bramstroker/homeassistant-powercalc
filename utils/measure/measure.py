@@ -115,9 +115,7 @@ class Measure:
         if not runner_result:
             _LOGGER.error("Some error occured during the measurement session")
 
-        generate_model_json: bool = (
-            answers["generate_model_json"]
-        )
+        generate_model_json: bool = answers["generate_model_json"]
 
         if generate_model_json:
             try:
