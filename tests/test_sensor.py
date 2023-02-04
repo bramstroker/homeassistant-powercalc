@@ -21,8 +21,16 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry, DeviceEntryDisabler
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry, RegistryEntryDisabler
+from homeassistant.helpers.device_registry import (
+    DeviceEntry,
+    DeviceEntryDisabler,
+    DeviceRegistry,
+)
+from homeassistant.helpers.entity_registry import (
+    EntityRegistry,
+    RegistryEntry,
+    RegistryEntryDisabler,
+)
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -478,7 +486,9 @@ async def test_entities_are_bound_to_source_device2(
     assert len(caplog.records) == 0
 
 
-async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant) -> None:
+async def test_entities_are_bound_to_disabled_source_device(
+    hass: HomeAssistant,
+) -> None:
     device_id = "device.test"
     power_sensor_id = "sensor.test_power"
     light_id = "light.test"
@@ -490,7 +500,7 @@ async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant)
                 id=device_id,
                 manufacturer="signify",
                 model="LCA001",
-                disabled_by=DeviceEntryDisabler.USER
+                disabled_by=DeviceEntryDisabler.USER,
             )
         },
     )
@@ -511,7 +521,7 @@ async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant)
                 unique_id="1234",
                 platform="powercalc",
                 device_id=device_id,
-            )
+            ),
         },
     )
 
