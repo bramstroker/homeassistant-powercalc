@@ -4,5 +4,16 @@
     "standby_power": 0.22,
     "measure_method": "script",
     "measure_device": "Shelly 1PM",
-    "measure_description": "Used HASS based script"
+    "measure_description": "Used HASS based script",
+    "aliases": [
+        "LCT007",
+        "LCT010",
+        "LCT012",
+        "LCT014",
+        "LCT015",
+        "LCT016",
+        "LCT021",
+        "9290012573A"
+    ]
+
 }

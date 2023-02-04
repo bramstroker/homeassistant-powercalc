@@ -4,6 +4,10 @@
     "name": "Hue Bloom Table Lamp",
     "standby_power": 0.3,
     "calculation_strategy": "lut",
-    "aliases": []
+    "aliases": [
+        "LLC011",
+        "LLC013",
+        "7299760PH"
+    ]
 }
 

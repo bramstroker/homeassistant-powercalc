@@ -6,6 +6,8 @@
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured with script made by bramstroker and partially verified manual",
     "aliases": [
-        "8718696548738"
+        "8718696548738",
+        "LTW001",
+        "LTW004"
     ]
 }
