@@ -33,6 +33,7 @@ from homeassistant.helpers import (
     entity_platform,
     entity_registry,
 )
+from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import AddEntitiesCallback, split_entity_id
 from homeassistant.helpers.template import Template
@@ -283,9 +284,13 @@ async def _async_setup_entities(
         return
 
     if entities:
-        async_add_entities(
-            [entity for entity in entities.new if isinstance(entity, SensorEntity)]
-        )
+        entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
+        entity_reg = er.async_get(hass)
+        for entity in entities_to_add:
+            existing_entry = entity_reg.async_get(entity.entity_id)
+            if existing_entry and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE:
+                entities_to_add.remove(entity)
+        async_add_entities(entities_to_add)
 
 
 @callback

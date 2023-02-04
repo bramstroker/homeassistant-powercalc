@@ -480,6 +480,7 @@ async def test_entities_are_bound_to_source_device2(
 
 async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant) -> None:
     device_id = "device.test"
+    power_sensor_id = "sensor.test_power"
     light_id = "light.test"
 
     mock_device_registry(
@@ -489,7 +490,7 @@ async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant)
                 id=device_id,
                 manufacturer="signify",
                 model="LCA001",
-                disabled_by=DeviceEntryDisabler.INTEGRATION
+                disabled_by=DeviceEntryDisabler.USER
             )
         },
     )
@@ -499,11 +500,18 @@ async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant)
         {
             light_id: RegistryEntry(
                 entity_id=light_id,
-                disabled_by=RegistryEntryDisabler.INTEGRATION,
+                disabled_by=RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
                 platform="light",
                 device_id=device_id,
             ),
+            power_sensor_id: RegistryEntry(
+                entity_id=power_sensor_id,
+                disabled_by=RegistryEntryDisabler.DEVICE,
+                unique_id="1234",
+                platform="powercalc",
+                device_id=device_id,
+            )
         },
     )
 
@@ -515,7 +523,7 @@ async def test_entities_are_bound_to_disabled_source_device(hass: HomeAssistant)
         {},
     )
 
-    energy_entity_entry = entity_reg.async_get("sensor.test_power")
+    energy_entity_entry = entity_reg.async_get(power_sensor_id)
     assert energy_entity_entry
     assert energy_entity_entry.device_id == device_id
 
