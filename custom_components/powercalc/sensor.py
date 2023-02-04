@@ -285,11 +285,18 @@ async def _async_setup_entities(
 
     if entities:
         entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
+
+        # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
+        # Remove entities which are disabled because of a disabled device from the list of entities to add
+        # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
+        # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
+        # This causes the powercalc entity to never be bound to the device again and be disabled forever.
         entity_reg = er.async_get(hass)
         for entity in entities_to_add:
             existing_entry = entity_reg.async_get(entity.entity_id)
             if existing_entry and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE:
                 entities_to_add.remove(entity)
+
         async_add_entities(entities_to_add)
 
 
