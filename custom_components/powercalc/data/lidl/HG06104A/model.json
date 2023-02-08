@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Tapo P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 5,
+        "VERSION": "v1.3.1:docker"
+    },
+    "name": "Livarno Lux smart LED light strip 2.5m",
+    "standby_power": 0.34
+}
