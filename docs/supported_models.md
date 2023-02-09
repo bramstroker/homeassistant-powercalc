@@ -1,9 +1,9 @@
-- [Lights](#Lights) (218)
+- [Lights](#Lights) (219)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 218 total
+#### 219 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -125,6 +125,7 @@
 |signify        |929003056701             |Hue Adore Ceiling Light                                                                |                                                                                                                                                                                                                      |
 |signify        |LCA001                   |Hue White and Color Ambiance A19 E26/E27 (Gen 5)                                       |9290022166,929003053401,LCA005,9290022266A                                                                                                                                                                            |
 |signify        |LCA003                   |Hue White and Color Ambiance A19 E26                                                   |                                                                                                                                                                                                                      |
+|signify        |LCA004                   |LCA004                                                                                 |                                                                                                                                                                                                                      |
 |signify        |LCA006                   |Hue White and Color Ambiance 1100 E27 with BT (9290024688)                             |                                                                                                                                                                                                            9290024689|
 |signify        |LCA007                   |Hue White and Color Ambiance A19 E26 1100lm                                            |                                                                                                                                                                                                            9290024687|
 |signify        |LCA008                   |Hue White and Color Ambiance E27 1600lm                                                |                                                                                                                                                                                                          929002471601|
