@@ -8,7 +8,7 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.3.3:docker"
     },
-    "name": "HG06492C",
+    "name": "Livarno Lux E27 bulb CCT",
     "standby_power": 0.31,
     "calculation_strategy": "lut"
 }
