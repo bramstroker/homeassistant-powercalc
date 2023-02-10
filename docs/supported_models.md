@@ -1,9 +1,9 @@
-- [Lights](#Lights) (219)
+- [Lights](#Lights) (220)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 219 total
+#### 220 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -83,6 +83,7 @@
 |lidl           |HG06106C                 |Livarno Lux E27 bulb RGB                                                               |                                                                                                                                                                                                                      |
 |lidl           |HG06462A                 |Livarno Lux E27 filament bulb                                                          |                                                                                                                                                                                                                      |
 |lidl           |HG06492B                 |Livarno Lux E14 candle CCT                                                             |                                                                                                                                                                                                                      |
+|lidl           |HG06492C                 |Livarno Lux E27 bulb CCT                                                               |                                                                                                                                                                                                                      |
 |lidl           |HG07834A                 |Livarno Lux GU10 spot RGB                                                              |                                                                                                                                                                                                                      |
 |lidl           |HG07834B                 |Livarno Lux E14 candle RGB                                                             |                                                                                                                                                                                                                      |
 |lidl           |HG07834C                 |Livarno Lux E27 bulb RGB                                                               |                                                                                                                                                                                                                      |
