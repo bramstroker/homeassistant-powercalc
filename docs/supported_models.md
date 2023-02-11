@@ -1,9 +1,9 @@
-- [Lights](#Lights) (221)
+- [Lights](#Lights) (222)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 221 total
+#### 222 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -16,6 +16,7 @@
 |arlec          |GLD130P3HA               |Arlec 12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe                      |                                                                                                                                                                                                                      |
 |athom          |rgbww-light              |rgbww-light                                                                            |                                                                                                                                                                                                                      |
 |belkin         |F7C033                   |WeMo smart LED bulb                                                                    |                                                                                                                                                                                                                      |
+|cree           |B00TN589ZG               |Connected A-19 60W Equivalent                                                          |                                                                                                                                                                                                                      |
 |elgato         |Elgato Key Light         |Elgato Key Light                                                                       |                                                                                                                                                                                                                      |
 |elgato         |Elgato Key Light Air     |Elgato Key Light Air                                                                   |                                                                                                                                                                                                                      |
 |genio          |I002333                  |Genio Wi-Fi Dimmable Warm White BC 9W LED GLS Bulb                                     |                                                                                                                                                                                                                      |
