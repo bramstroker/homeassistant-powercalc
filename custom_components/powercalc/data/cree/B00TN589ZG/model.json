@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.3.3:docker"
     },
-    "name": "Cree Connected A-19 60W Equivalent",
+    "name": "Connected A-19 60W Equivalent",
     "standby_power": 0.25
 }
