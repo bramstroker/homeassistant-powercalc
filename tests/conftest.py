@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import AsyncMock, patch
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from pytest_homeassistant_custom_component.common import (
@@ -61,3 +62,12 @@ def mock_config_entry() -> MockConfigEntry:
         unique_id="aabbccddeeff",
         title="test",
     )
+
+
+@pytest.fixture
+def mock_flow_init(hass):
+    """Mock hass.config_entries.flow.async_init."""
+    with patch.object(
+        hass.config_entries.flow, "async_init", return_value=AsyncMock()
+    ) as mock_init:
+        yield mock_init

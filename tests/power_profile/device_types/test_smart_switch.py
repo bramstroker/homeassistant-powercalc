@@ -3,11 +3,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
 )
-
+from homeassistant.setup import async_setup_component
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -218,3 +219,43 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "100.80"
+
+
+async def test_switch_as_x_added_through_discovery(hass: HomeAssistant, mock_flow_init) -> None:
+    """
+    Test that smart plug can be setup from profile library
+    """
+    entity_id = "light.foo"
+    manufacturer = "Signify"
+    model = "LOM007"
+    device_id = "mydevice"
+
+    mock_registry(
+        hass,
+        {
+            entity_id: RegistryEntry(
+                entity_id=entity_id,
+                unique_id="1234",
+                platform="switch_as_x",
+                device_id=device_id,
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            device_id: DeviceEntry(
+                id=device_id, manufacturer=manufacturer, model=model
+            )
+        },
+    )
+
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    # Check that two discovery flows have been initialized
+    # LightA and LightB should be discovered, LightC not
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
+    assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == entity_id

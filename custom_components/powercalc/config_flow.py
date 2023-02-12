@@ -510,7 +510,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=await _create_schema_model(
                 self.hass,
                 self.sensor_config.get(CONF_MANUFACTURER),
-                self.source_entity.domain,
+                self.source_entity,
             ),
             description_placeholders={
                 "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
@@ -895,14 +895,14 @@ def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.
 
 
 async def _create_schema_model(
-    hass: HomeAssistant, manufacturer: str, entity_domain: str
+    hass: HomeAssistant, manufacturer: str, source_entity: SourceEntity
 ) -> vol.Schema:
     """Create model schema"""
     library = ProfileLibrary.factory(hass)
     models = [
         selector.SelectOptionDict(value=profile.model, label=profile.model)
         for profile in await library.get_profiles_by_manufacturer(manufacturer)
-        if profile.is_entity_domain_supported(entity_domain)
+        if profile.is_entity_domain_supported(source_entity)
     ]
     return vol.Schema(
         {
