@@ -6,8 +6,8 @@ from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
 from media_controller.errors import MediaPlayerError
 
-
 _LOGGER = logging.getLogger("measure")
+
 
 class HassMediaController:
     def __init__(self, api_url: str, token: str):
