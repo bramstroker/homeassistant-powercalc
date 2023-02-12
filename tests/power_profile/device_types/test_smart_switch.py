@@ -1,14 +1,15 @@
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
 )
-from homeassistant.setup import async_setup_component
+
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -221,7 +222,9 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "100.80"
 
 
-async def test_switch_as_x_added_through_discovery(hass: HomeAssistant, mock_flow_init) -> None:
+async def test_switch_as_x_added_through_discovery(
+    hass: HomeAssistant, mock_flow_init
+) -> None:
     """
     Test that smart plug can be setup from profile library
     """
@@ -243,11 +246,7 @@ async def test_switch_as_x_added_through_discovery(hass: HomeAssistant, mock_flo
     )
     mock_device_registry(
         hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id, manufacturer=manufacturer, model=model
-            )
-        },
+        {device_id: DeviceEntry(id=device_id, manufacturer=manufacturer, model=model)},
     )
 
     await async_setup_component(hass, DOMAIN, {})

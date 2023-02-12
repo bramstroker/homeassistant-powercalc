@@ -2,13 +2,13 @@ import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_POWER,
     CalculationStrategy,
 )
-from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import (
     ModelNotSupported,
     PowercalcSetupError,
@@ -94,8 +94,12 @@ async def test_unsupported_entity_domain(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA007"),
     )
-    assert power_profile.is_entity_domain_supported(SourceEntity("light.test", "test", "light"))
-    assert not power_profile.is_entity_domain_supported(SourceEntity("switch.test", "test", "switch"))
+    assert power_profile.is_entity_domain_supported(
+        SourceEntity("light.test", "test", "light")
+    )
+    assert not power_profile.is_entity_domain_supported(
+        SourceEntity("switch.test", "test", "switch")
+    )
 
 
 async def test_sub_profile_attribute_match(hass: HomeAssistant):

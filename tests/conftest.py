@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from pytest_homeassistant_custom_component.common import (

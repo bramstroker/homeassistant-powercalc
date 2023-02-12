@@ -263,7 +263,8 @@ class OcrRegionSelection:
 
     def get_cropped_frame(self, frame: numpy.ndarray) -> numpy.ndarray:
         return frame[
-            self.selection[1] : self.selection[3], self.selection[0] : self.selection[2]  # noqa E203
+            self.selection[1] : self.selection[3],
+            self.selection[0] : self.selection[2],  # noqa E203
         ]
 
 
