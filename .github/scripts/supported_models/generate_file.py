@@ -15,7 +15,7 @@ sys.path.insert(
     ),
 )
 
-from aliases import MANUFACTURER_DIRECTORY_MAPPING
+from aliases import MANUFACTURER_DIRECTORY_MAPPING  # noqa: E402
 
 DEVICE_TYPES = [
     ("light", "Lights"),
