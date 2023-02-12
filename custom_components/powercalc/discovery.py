@@ -161,7 +161,7 @@ class DiscoveryManager:
                 )
                 continue
 
-            if not power_profile.is_entity_domain_supported(source_entity.domain):
+            if not power_profile.is_entity_domain_supported(source_entity):
                 continue
 
             self._init_entity_discovery(source_entity, power_profile, {})

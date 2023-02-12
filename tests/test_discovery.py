@@ -1,5 +1,4 @@
 import logging
-from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
@@ -34,15 +33,6 @@ from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.test.light import MockLight
 
 from .common import create_mock_light_entity, run_powercalc_setup
-
-
-@pytest.fixture
-def mock_flow_init(hass):
-    """Mock hass.config_entries.flow.async_init."""
-    with patch.object(
-        hass.config_entries.flow, "async_init", return_value=AsyncMock()
-    ) as mock_init:
-        yield mock_init
 
 
 async def test_autodiscovery(hass: HomeAssistant, mock_flow_init) -> None:
