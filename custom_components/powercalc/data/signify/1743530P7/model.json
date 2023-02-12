@@ -8,6 +8,9 @@
         "SLEEP_TIME": 3,
         "VERSION": "master"
     },
+    "aliases": [
+        "17435/30/P7"
+    ],
     "name": "Hue Discover white and color ambiance flood light",
     "standby_power": 0.5
 }
