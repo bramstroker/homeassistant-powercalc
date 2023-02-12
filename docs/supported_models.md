@@ -1,9 +1,9 @@
-- [Lights](#Lights) (222)
+- [Lights](#Lights) (223)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 222 total
+#### 223 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -117,6 +117,7 @@
 |rye            |Candlebra                |Candlebra                                                                              |                                                                                                                                                                                                                      |
 |signify        |1742930P7                |Hue Impress Outdoor Wall Light Small                                                   |                                                                                                                                                                                                                      |
 |signify        |1743130P7                |Hue Impress Pedestal Low                                                               |1743430P7,1745430P7                                                                                                                                                                                                   |
+|signify        |1743530P7                |Hue Discover white and color ambiance flood light                                      |17435/30/P7                                                                                                                                                                                                           |
 |signify        |3216231P6                |Hue White Ambiance Aurelle Square                                                      |                                                                                                                                                                                                                      |
 |signify        |3216331P6                |Hue White Ambiance Aurelle Rectangular                                                 |                                                                                                                                                                                                                      |
 |signify        |4090330P9                |Hue Ensis Pendant Light                                                                |LCP001,LCP002,4090331P9,4090330P9_01,4090330P9_02,4090331P9_01,4090331P9_02,929003052501_01,929003052501_02,929003053301_01,929003053301_02                                                                           |
