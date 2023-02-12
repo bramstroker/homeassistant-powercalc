@@ -63,6 +63,7 @@ def mock_config_entry() -> MockConfigEntry:
         title="test",
     )
 
+
 @pytest.fixture
 def mock_flow_init(hass):
     """Mock hass.config_entries.flow.async_init."""
