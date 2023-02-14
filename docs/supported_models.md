@@ -1,9 +1,9 @@
-- [Lights](#Lights) (227)
+- [Lights](#Lights) (228)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 227 total
+#### 228 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -19,6 +19,7 @@
 |cree           |B00TN589ZG               |Connected A-19 60W Equivalent                                                          |                                                                                                                                                                                                                      |
 |elgato         |Elgato Key Light         |Elgato Key Light                                                                       |                                                                                                                                                                                                                      |
 |elgato         |Elgato Key Light Air     |Elgato Key Light Air                                                                   |                                                                                                                                                                                                                      |
+|elgato         |Elgato Ring Light        |Elgato Ring Light                                                                      |                                                                                                                                                                                                                      |
 |genio          |I002333                  |Genio Wi-Fi Dimmable Warm White BC 9W LED GLS Bulb                                     |                                                                                                                                                                                                                      |
 |genio          |I002334                  |Genio A60 9w LED GLS BK                                                                |                                                                                                                                                                                                                      |
 |genio          |I002579                  |Mirabella Genio Wi-Fi LED 3 metre Strip Light                                          |                                                                                                                                                                                                                      |
