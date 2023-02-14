@@ -1,9 +1,9 @@
-- [Lights](#Lights) (225)
+- [Lights](#Lights) (226)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 225 total
+#### 226 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -74,6 +74,7 @@
 |innr           |RS 230 C                 |RS 230 C                                                                               |                                                                                                                                                                                                                      |
 |ledvance       |40580754884474           |SMART+ WIFI PLANON FRAMELESS TW RGB 600x600                                            |                                                                                                                                                                                                                      |
 |ledvance       |73741                    |LIGHTIFY LED adjustable color RT 5/6                                                   |                                                                                                                                                                                                                      |
+|ledvance       |73742                    |LIGHTIFY LED adjustable white RT 5/6                                                   |                                                                                                                                                                                                                      |
 |ledvance       |AC25697                  |LEDVANCE SMART+ CLASSIC MULTICOLOUR 60 10W E27                                         |                                                                                                                                                                                                                      |
 |ledvance       |LDVWF30FILE27RGBW        |Ledvance LDVWF30FILE27RGBW                                                             |                                                                                                                                                                                                                      |
 |ledvance       |Tibea TW Z3              |Tibea Lamp E27 Tuneable White 2000lm                                                   |                                                                                                                                                                                                         4058075168572|
