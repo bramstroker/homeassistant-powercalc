@@ -9,7 +9,8 @@
         "VERSION": "master"
     },
     "aliases": [
-        "9290011370"
+        "9290011370",
+        "LWB014"
     ],
     "name": "Hue white A60 bulb E27/B22",
     "standby_power": 0.4
