@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.4:docker"
+    },
+    "name": "Xiaomi Mi Bedside Lamp 2",
+    "standby_power": 0.6
+}
