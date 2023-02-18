@@ -242,6 +242,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                         "lut_unsupported_color_mode",
                     )
 
+
 @dataclass
 class LightSetting:
     color_mode: ColorMode
