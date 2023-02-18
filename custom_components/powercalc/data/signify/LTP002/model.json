@@ -7,7 +7,11 @@
         "SLEEP_TIME": 3,
         "VERSION": "v0.26.1:docker"
     },
-    "name": "Hue ambiance pendant",
+    "name": "Hue Amaze Suspension Light",
     "standby_power": 0.59,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "929003054901",
+        "4023330P7"
+    ]
 }
