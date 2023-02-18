@@ -1,5 +1,3 @@
-import os
-
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry

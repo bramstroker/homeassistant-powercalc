@@ -6,6 +6,8 @@ import os
 import sys
 from pathlib import Path
 
+from pytablewriter import MarkdownTableWriter
+
 sys.path.insert(
     1,
     os.path.abspath(
@@ -13,8 +15,7 @@ sys.path.insert(
     ),
 )
 
-from aliases import MANUFACTURER_DIRECTORY_MAPPING
-from pytablewriter import MarkdownTableWriter
+from aliases import MANUFACTURER_DIRECTORY_MAPPING  # noqa: E402
 
 DEVICE_TYPES = [
     ("light", "Lights"),

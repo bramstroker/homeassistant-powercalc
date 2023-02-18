@@ -9,7 +9,7 @@ import homeassistant.helpers.entity_registry as er
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_PLATFORM, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
 from homeassistant.helpers.typing import ConfigType
@@ -161,7 +161,7 @@ class DiscoveryManager:
                 )
                 continue
 
-            if not power_profile.is_entity_domain_supported(source_entity.domain):
+            if not power_profile.is_entity_domain_supported(source_entity):
                 continue
 
             self._init_entity_discovery(source_entity, power_profile, {})
@@ -269,7 +269,6 @@ class DiscoveryManager:
         found_entity_ids = []
 
         for key, value in search_dict.items():
-
             if key == "entity_id":
                 found_entity_ids.append(value)
 

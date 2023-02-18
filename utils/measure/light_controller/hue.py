@@ -70,7 +70,7 @@ class HueLightController(LightController):
         )
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
-        except PhueRegistrationException as err:
+        except PhueRegistrationException:
             print("Please click the link button on the bridge, than hit enter..")
             input()
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)

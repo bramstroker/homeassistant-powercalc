@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
 
 from ..aliases import MANUFACTURER_DIRECTORY_MAPPING
 from ..const import DATA_PROFILE_LIBRARY, DOMAIN
-from .power_profile import DEVICE_DOMAINS, DeviceType, PowerProfile
+from .power_profile import DEVICE_DOMAINS, PowerProfile
 
 BUILT_IN_DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), "../data")
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"

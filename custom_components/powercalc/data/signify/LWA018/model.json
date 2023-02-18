@@ -9,5 +9,9 @@
     },
     "name": "Hue White Bulb A60 B22 1100lm with Bluetooth",
     "standby_power": 0.39,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "LWA028",
+        "9290024693"
+    ]
 }

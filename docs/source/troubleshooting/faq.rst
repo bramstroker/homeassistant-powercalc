@@ -16,6 +16,16 @@ Why is no power sensor appearing for my light?
 - Check if your light model is in the `supported models`_ list)
 - Check the HA logs for errors
 
+My light is in the supported model list but not discovered. What can I do?
+--------------------------------------------------------------------------
+
+Powercalc scans your HA installation for all devices having a manufacturer and model information.
+It tries to match this information against the model_id and aliases shown in the `supported models`_ list.
+Some integrations return different product codes / model id's for the same light which may cause a mismatch. For example Hue and Zigbee2Mqtt.
+To have a look at which model was discovered by powercalc you can enable debug logging.
+Now look for the lines `Auto discovered model (manufacturer=xx, model=xx)` in the logs, and see if the model id matches.
+When it does not match something powercalc known an aliases might be added. You can create an issue for that or better yet provide a Pull Request for the changes.
+
 I don't see energy appearing in the energy dashboard, why is that?
 ------------------------------------------------------------------
 
@@ -29,7 +39,7 @@ You can use :doc:`/daily-fixed-energy` for that.
 My light model is not supported, what can I do?
 -----------------------------------------------
 
-New LUT files are created by measuring the light bulbs using an automated script.
+The built-in power profiles in powercalc are created by taking measurements using a smart plug. These profiles are submitted by the community, and the actual hardware (light, switch, smart speaker) is needed. Powercalc includes a script to automate this process.
 To run this script you'll need the bulb itself, a smart plug , some technical affinity and some time. See :doc:`/contributing/measure` for some documentation how to do this.
 
 When you can't contribute for whatever reason you can request a new light model on the `discussion section <https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/request-light-models>`_. However it is no certainty if and when it will be added.

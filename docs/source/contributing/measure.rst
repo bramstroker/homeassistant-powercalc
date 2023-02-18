@@ -65,6 +65,9 @@ To create a Pull Request (PR) on the Powercalc GitHub repository, follow these s
 5. Once the PR is submitted, the repository maintainers will review your changes and may request additional changes or merge the PR into the main repository.
 6. You should also monitor the PR for any feedback and address them accordingly.
 
+.. note::
+    You don't have to modify `docs/supported_models.md` file manually. This will be done automatically after your PR is merged
+
 Common Problems
 ---------------
 

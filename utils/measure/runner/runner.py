@@ -28,4 +28,3 @@ class MeasurementRunner(Protocol):
 @dataclass
 class RunnerResult:
     model_json_data: dict
-    skip_model_json_generation: bool = False
