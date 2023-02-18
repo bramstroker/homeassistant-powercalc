@@ -9,5 +9,8 @@
         "VERSION": "v1.3.0:docker"
     },
     "name": "TP-Link Kasa KL135(US)",
-    "standby_power": 0.2
+    "standby_power": 0.2,
+    "aliases": [
+        "KL135(US)"
+    ]
 }
