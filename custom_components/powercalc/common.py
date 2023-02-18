@@ -6,7 +6,7 @@ from typing import NamedTuple
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES
+from homeassistant.components.light import ATTR_SUPPORTED_COLOR_MODES, ColorMode
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.template import is_number
@@ -28,7 +28,7 @@ class SourceEntity(NamedTuple):
     domain: str
     unique_id: str | None = None
     name: str | None = None
-    supported_color_modes: list[str] | None = None
+    supported_color_modes: list[ColorMode] | None = None
     entity_entry: er.RegistryEntry | None = None
     device_entry: dr.DeviceEntry | None = None
 
