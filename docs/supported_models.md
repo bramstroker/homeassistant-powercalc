@@ -1,9 +1,9 @@
-- [Lights](#Lights) (229)
+- [Lights](#Lights) (230)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 229 total
+#### 230 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -228,6 +228,7 @@
 |wiz            |SHRGBW                   |WiZ Bulb A67 E27 RGBWW (type SHRGBW, model 9290024497A, 13 W 220-240 V, 1521 lm)       |                                                                                                                                                                                                                      |
 |wiz            |SHTW1C                   |WiZ Bulb A67 E27 Tunable White (type SHTW1C, model 9290023835, 8 W 220-240 V, 806 lm)  |                                                                                                                                                                                                                      |
 |wiz            |SHTW1W                   |WiZ Bulb A67 E27 Tunable White (type SHTW1W, model 9290024496, 13 W 220-240 V, 1521 lm)|                                                                                                                                                                                                                      |
+|yeelight       |MJCTD02YL                |Xiaomi Mi Bedside Lamp 2                                                               |                                                                                                                                                                                                                      |
 |yeelight       |MJTD01SYL                |Mi LED Desk Lamp 1S                                                                    |                                                                                                                                                                                                                      |
 |yeelight       |YLDD05YL                 |Yeelight LED Light Strip 1S                                                            |strip6                                                                                                                                                                                                                |
 |yeelight       |YLDL01YL                 |Yeelight YLDL01YL Downlight                                                            |ceiling10                                                                                                                                                                                                             |
