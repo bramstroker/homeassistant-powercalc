@@ -1,9 +1,9 @@
-- [Lights](#Lights) (228)
+- [Lights](#Lights) (229)
 - [Smart speakers](#Smart-speakers) (12)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
-#### 228 total
+#### 229 total
 
 | manufacturer  |        model id         |                                         name                                          |                                                                                                       aliases                                                                                                        |
 |---------------|-------------------------|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -91,6 +91,7 @@
 |lidl           |HG07834A                 |Livarno Lux GU10 spot RGB                                                              |                                                                                                                                                                                                                      |
 |lidl           |HG07834B                 |Livarno Lux E14 candle RGB                                                             |                                                                                                                                                                                                                      |
 |lidl           |HG07834C                 |Livarno Lux E27 bulb RGB                                                               |                                                                                                                                                                                                                      |
+|lidl           |HG08008                  |HG08008                                                                                |                                                                                                                                                                                                                      |
 |lidl           |HG08010                  |HG08010                                                                                |                                                                                                                                                                                                                      |
 |lifx           |LIFX A19                 |LIFX A19                                                                               |                                                                                                                                                                                                                      |
 |lifx           |LIFX A19 Night Vision    |LIFX A19 Night Vision                                                                  |                                                                                                                                                                                                                      |
