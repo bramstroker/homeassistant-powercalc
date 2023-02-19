@@ -49,8 +49,9 @@ def generate_supported_model_list(model_listing: list[dict]):
             "model id",
             "name",
             "aliases",
+            "standby",
         ]
-        if device_type == "light":
+        if device_type[0] == "light":
             headers.append("color modes")
 
         writer.header_list = headers
@@ -60,9 +61,10 @@ def generate_supported_model_list(model_listing: list[dict]):
                 model["manufacturer"],
                 model["model"],
                 model["name"],
-                ",".join(model.get("aliases") or []),
+                "<br />".join(model.get("aliases") or []),
+                model["standby_power"],
             ]
-            if device_type == "light":
+            if device_type[0] == "light":
                 row.append(",".join(model.get("color_modes") or []))
             rows.append(row)
 
