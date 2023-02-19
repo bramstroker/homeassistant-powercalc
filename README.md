@@ -18,4 +18,4 @@ PowerCalc is a custom component for Home Assistant to estimate the power consump
 Go to the [Quick Start](https://homeassistant-powercalc.readthedocs.io/en/latest/quick-start.html) for installation instruction.
 
 - [Full Documentation](https://homeassistant-powercalc.readthedocs.io/en/latest/)
-- [supported model listing](docs/supported_models.md)
+- [Supported model listing](docs/supported_models.md)
