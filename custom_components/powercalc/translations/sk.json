@@ -1,0 +1,227 @@
+{
+    "config": {
+        "flow_title": "{name} ({manufacturer} {model})",
+        "abort": {
+            "already_configured": "Senzor je už nakonfigurovaný, zadajte jedinečné_id"
+        },
+        "error": {
+            "daily_energy_mandatory": "Musíte dodať aspoň jednu šablónu hodnoty alebo hodnoty",
+            "fixed_mandatory": "Musíte dodať aspoň jednu z možností Power, Power template alebo States power",
+            "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
+            "group_mandatory": "Musíte definovať aspoň podskupiny alebo silové a energetické entity",
+            "linear_mandatory": "Musíte dodať aspoň jeden z max_power alebo calibrate",
+            "linear_unsupported_domain": "Doména entity nie je podporovaná pre lineárny režim. Musí to byť jeden z: ventilátor, svetlo alebo prehrávač médií. Môžete však použiť možnosť kalibrácie",
+            "linear_min_higher_as_max": "Maximálny výkon nemôže byť nižší ako minimálny výkon",
+            "lut_unsupported_color_mode": "Profil LUT nepodporuje jeden z farebných režimov vášho svetla. Viac informácií nájdete v protokoloch",
+            "lut_wrong_domain": "Režim LUT môžu používať iba svetelné entity",
+            "unknown": "Vyskytla sa neznáma chyba. Ďalšie informácie nájdete v protokoloch"
+        },
+        "step": {
+            "daily_energy": {
+                "data": {
+                    "name": "Názov",
+                    "on_time": "V čase",
+                    "start_time": "Štart čas",
+                    "unique_id": "Jedinečné id",
+                    "unit_of_measurement": "Jednotky merania",
+                    "update_frequency": "Aktualizácia frekvencie",
+                    "value": "Hodnota",
+                    "value_template": "Šablóna hodnoty"
+                },
+                "data_description": {
+                    "on_time": "Keď ponecháte prázdne, predvolene je 1 deň. vždy zapnutý",
+                    "update_frequency": "čas v sekundách medzi aktualizáciami stavu snímača"
+                },
+                "title": "Vytvorte denný pevný snímač"
+            },
+            "fixed": {
+                "data": {
+                    "power": "Výkon",
+                    "power_template": "Šablóna výkonu",
+                    "states_power": "Stavy výkonu"
+                },
+                "data_description": {
+                    "power": "Pevná hodnota výkonu vo wattoch, keď je entita ZAPNUTÁ",
+                    "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
+                    "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie"
+                },
+                "description": "Definujte pevnú hodnotu výkonu pre vašu entitu. Prípadne môžete definovať hodnotu výkonu pre každý stav. Napríklad:\n\n`prehrávanie: 8.3`\n`pozastavené: 2.25`",
+                "title": "Opravená konfigurácia"
+            },
+            "group": {
+                "data": {
+                    "create_utility_meters": "Vytvorte merače spotreby",
+                    "group_member_sensors": "Členské snímače powercalc",
+                    "group_power_entities": "Ďalšie výkonové entity",
+                    "group_energy_entities": "Ďlšie energetické entity",
+                    "name": "Názov",
+                    "sub_groups": "Podskupiny",
+                    "hide_members": "Skrytý členovania",
+                    "unique_id": "Jedinečné id"
+                },
+                "data_description": {
+                    "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
+                    "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
+                    "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
+                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+                },
+                "title": "Vytvoriť skupinu snímača"
+            },
+            "linear": {
+                "data": {
+                    "attribute": "Attribút",
+                    "calibrate": "Kalibračné hodnoty",
+                    "gamma_curve": "Gamma krivka",
+                    "max_power": "Max výkon",
+                    "min_power": "Min výkon"
+                },
+                "data_description": {
+                    "attribute": "Zadajte atribút. Keď zostane prázdne, bude jas pre svetlá a percento pre ventilátory",
+                    "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20"
+                },
+                "title": "Lineárna konfigurácia"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Potvrďte model"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Ak sa rozhodnete nepotvrdiť, môžete zadať výrobcu a model sami"
+                },
+                "description": "Výrobca \"{manufacturer}\" a model \"{model}\" boli automaticky detekované pre vaše zariadenie.{remarks}",
+                "title": "Knižnica"
+            },
+            "manufacturer": {
+                "data": {
+                    "manufacturer": "Výrobca"
+                },
+                "description": "Vyberte výrobcu zariadenia",
+                "title": "Konfigurácia výrobcu"
+            },
+            "model": {
+                "data": {
+                    "model": "Model ID"
+                },
+                "description": "Vyberte model zariadenia. Pozrite si [list]({supported_models_link}) podporovaných modelov, kde nájdete ďalšie informácie",
+                "title": "Konfigurácia modelu"
+            },
+            "sub_profile": {
+                "data": {
+                    "sub_profile": "Pod profil"
+                },
+                "description": "Tento model má viacero podprofilov. Vyberte ten, ktorý vyhovuje vášmu zariadeniu",
+                "title": "Konfigurácia podprofilu"
+            },
+            "power_advanced": {
+                "title": "Pokročilé nastavenia",
+                "description": "Možnosti uvedené nižšie sú pre pokročilú konfiguráciu powercalc. Väčšina používateľov to nebude používať, takže ich môžete preskočiť",
+                "data": {
+                    "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
+                    "energy_integration_method": "Metóda energetickej integrácie",
+                    "ignore_unavailable_state": "Ignorovať nedostupný stav",
+                    "multiply_factor": "Násobný faktor",
+                    "unavailable_power": "Nedostupné napájanie"
+                },
+                "data_description": {
+                    "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
+                    "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
+                    "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
+                    "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
+                }
+            },
+            "user": {
+                "data": {
+                    "sensor_type": "Typ snímača"
+                },
+                "title": "Zvoľte váš typ snímača"
+            },
+            "virtual_power": {
+                "data": {
+                    "create_energy_sensor": "Vytvoriť snímač energie",
+                    "create_utility_meters": "Vytvorte merače spotreby",
+                    "entity_id": "Zdrojová entita",
+                    "group": "Pridať do skupiny",
+                    "mode": "Stratégia výpočtu",
+                    "name": "Názov",
+                    "standby_power": "Napájanie v pohotovostnom režime",
+                    "unique_id": "Jedninečné id"
+                },
+                "data_description": {
+                    "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
+                    "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
+                    "entity_id": "entita, na ktorej je založená virtuálna sila, bude snímač výkonu počúvať zmeny stavu tejto entity, aby sa aktualizoval",
+                    "name": "Ak ponecháte prázdne, názov sa prevezme zo zdrojovej entity",
+                    "standby_power": "Definujte množstvo energie, ktoré zariadenie spotrebuje, keď je vo vypnutom stave",
+                    "unique_id": "Zadajte jedinečný_id. To umožní nastaviť viacero výkonových senzorov pre tú istú entitu. Ak nie je zadaný, použije sa jedinečný_id zdrojovej entity"
+                },
+                "description": "Ďalšie informácie o možných stratégiách a možnostiach konfigurácie nájdete v súbore readme",
+                "title": "Vytvorte virtuálny snímač výkonu"
+            },
+            "wled": {
+                "data": {
+                    "power_factor": "Účiník",
+                    "voltage": "Napätie"
+                },
+                "title": "WLED konfigurácia"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "fixed_mandatory": "Musíte dodať aspoň jednu z možností Power, Power template alebo States power",
+            "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
+            "group_mandatory": "Musíte definovať aspoň podskupiny alebo výkonové a energetické entity",
+            "linear_mandatory": "Musíte dodať aspoň jeden z max_power alebo calibrate",
+            "linear_unsupported_domain": "Doména entity nie je podporovaná pre lineárny režim. Musí to byť jeden z: ventilátor, svetlo alebo prehrávač médií. Môžete však použiť možnosť kalibrácie",
+            "linear_min_higher_as_max": "Maximálny výkon nemôže byť nižší ako minimálny výkon",
+            "unknown": "Vyskytla sa neznáma chyba. Ďalšie informácie nájdete v protokoloch"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "attribute": "Attribút",
+                    "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
+                    "calibrate": "Kalibračné hodnoty",
+                    "create_energy_sensor": "Vytvoriť snímač energie",
+                    "create_utility_meters": "Vytvorte merače spotreby",
+                    "energy_integration_method": "Metóda energetickej integrácie",
+                    "gamma_curve": "Gamma krivka",
+                    "group_member_sensors": "Členské snímače powercalc",
+                    "group_power_entities": "Ďalšie výkonové entity",
+                    "group_energy_entities": "Ďalšie energetické entity",
+                    "ignore_unavailable_state": "Ignorovať nedostupný stav",
+                    "max_power": "Max výkon",
+                    "min_power": "Min výkon",
+                    "multiply_factor": "Násobný faktor",
+                    "name": "Názov",
+                    "on_time": "V čase",
+                    "power": "Výkon",
+                    "power_template": "Výkon šablóna",
+                    "standby_power": "Napájanie v pohotovostnom režime",
+                    "states_power": "Výkonové stavy",
+                    "sub_groups": "Podskupiny",
+                    "hide_members": "Skrytí členovia",
+                    "unavailable_power": "Nedostupný výkon",
+                    "unit_of_measurement": "Jednotka merania",
+                    "update_frequency": "Frekvencia aktualizácie",
+                    "value": "Hodnota",
+                    "value_template": "Šablóna hodnoty"
+                },
+                "data_description": {
+                    "attribute": "Zadajte atribút. Keď zostane prázdne, bude jas pre svetlá a percento pre ventilátory",
+                    "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
+                    "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20",
+                    "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
+                    "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
+                    "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
+                    "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
+                    "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
+                    "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
+                    "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie",
+                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
+                    "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
+                }
+            }
+        }
+    }
+}
