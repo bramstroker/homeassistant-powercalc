@@ -1,7 +1,7 @@
 ---
 name: "Bug report"
-description: "Report a bug with the integration"
-labels: "Bug"
+description: "Report a bug with Powercalc"
+labels: "bug"
 body:
 - type: markdown
   attributes:
@@ -22,7 +22,7 @@ body:
         required: true
       - label: This issue only contains 1 issue (if you have multiple issues, open one issue for each issue).
         required: true
-      - label: This issue is not a duplicate issue of currently [previous issues](https://github.com/ludeeus/integration_blueprint/issues?q=is%3Aissue+label%3A%22Bug%22+)..
+      - label: This issue is not a duplicate issue of currently [previous issues](https://github.com/bramstroker/homeassistant-powercalc/issues?q=is%3Aissue+label%3A%22bug%22+)..
         required: true
 - type: textarea
   attributes:
