@@ -228,9 +228,16 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
-    def is_entity_domain_supported(self, domain: str) -> bool:
+    def is_entity_domain_supported(self, source_entity: SourceEntity) -> bool:
         """Check whether this power profile supports a given entity domain"""
-        return DEVICE_DOMAINS[self.device_type] == domain
+        entity_entry = source_entity.entity_entry
+        if (
+            self.device_type == DeviceType.SMART_SWITCH
+            and entity_entry
+            and entity_entry.platform in ["switch_as_x", "hue"]
+        ):
+            return True
+        return DEVICE_DOMAINS[self.device_type] == source_entity.domain
 
 
 class SubProfileSelector:

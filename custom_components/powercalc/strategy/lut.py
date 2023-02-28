@@ -19,6 +19,7 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     COLOR_MODES_COLOR,
     ColorMode,
+    filter_supported_color_modes
 )
 from homeassistant.core import State
 
@@ -226,7 +227,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 "Only light entities can use the LUT mode", "lut_unsupported_color_mode"
             )
 
-        for color_mode in self._source_entity.supported_color_modes:
+        color_modes = self._source_entity.supported_color_modes
+        if not color_modes:
+            return
+        for color_mode in filter_supported_color_modes(color_modes):
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(

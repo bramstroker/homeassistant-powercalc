@@ -11,6 +11,7 @@
     "standby_power": 0.3,
     "calculation_strategy": "lut",
     "aliases": [
-        "9290011370B"
+        "9290011370B",
+        "LWF002"
     ]
 }

@@ -22,7 +22,7 @@ from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.discovery import async_load_platform
 
-from .common import SourceEntity, create_source_entity, validate_name_pattern
+from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -37,9 +37,6 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_MANUFACTURER,
-    CONF_MODE,
-    CONF_MODEL,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
@@ -61,21 +58,17 @@ from .const import (
     DEFAULT_POWER_SENSOR_PRECISION,
     DEFAULT_UPDATE_FREQUENCY,
     DEFAULT_UTILITY_METER_TYPES,
-    DISCOVERY_POWER_PROFILE,
-    DISCOVERY_SOURCE_ENTITY,
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
-    CalculationStrategy,
     PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
-from .power_profile.power_profile import DEVICE_DOMAINS
 from .sensors.group import (
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
@@ -159,10 +152,13 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
-        _LOGGER.critical(
-            "Your HA version is outdated for this version of powercalc. Minimum required HA version is %s",
-            MIN_HA_VERSION,
+        msg = (
+            "This integration require at least HomeAssistant version "
+            f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
+            " Please upgrade HomeAssistant to continue use this integration."
         )
+        _notify_message(hass, "inv_ha_version", "PowerCalc", msg)
+        _LOGGER.critical(msg)
         return False
 
     domain_config = config.get(DOMAIN) or {
@@ -286,3 +282,20 @@ async def create_domain_groups(
                 global_config,
             )
         )
+
+
+def _notify_message(
+    hass: HomeAssistant, notification_id: str, title: str, message: str
+) -> None:
+    """Notify user with persistent notification"""
+    hass.async_create_task(
+        hass.services.async_call(
+            domain="persistent_notification",
+            service="create",
+            service_data={
+                "title": title,
+                "message": message,
+                "notification_id": f"{DOMAIN}.{notification_id}",
+            },
+        )
+    )

@@ -89,13 +89,13 @@ async def create_group_sensors(
     def _get_filtered_entity_ids_by_class(
         all_entities: list, default_filters: list[Callable], class_name
     ) -> list[str]:
-        filters = default_filters.copy()
-        filters.append(lambda elm: not isinstance(elm, GroupedSensor))
-        filters.append(lambda elm: isinstance(elm, class_name))
+        filter_list = default_filters.copy()
+        filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
+        filter_list.append(lambda elm: isinstance(elm, class_name))
         return [
             x.entity_id
             for x in filter(
-                lambda x: all(f(x) for f in filters),
+                lambda x: all(f(x) for f in filter_list),
                 all_entities,
             )
         ]
@@ -380,6 +380,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.unit_converter: BaseUnitConverter | None = None
         if hasattr(self, "get_unit_converter"):
             self.unit_converter = self.get_unit_converter()
+        self.last_states: dict[str, State] = {}
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -424,26 +425,32 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
 
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
+        available_states = [
+            state
+            for state in states
+            if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
+        ]
         unavailable_entities = [
             state.entity_id
             for state in states
             if state and state.state == STATE_UNAVAILABLE
         ]
         if unavailable_entities and isinstance(self, GroupedEnergySensor):
-            _LOGGER.warning(
-                "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
-                self.entity_id,
-                ",".join(unavailable_entities),
-            )
-            self._attr_available = False
-            self.async_schedule_update_ha_state(True)
-            return
+            for entity_id in unavailable_entities:
+                last_state = self.last_states.get(entity_id)
+                if last_state:
+                    available_states.append(last_state)
+                    unavailable_entities.remove(entity_id)
 
-        available_states = [
-            state
-            for state in states
-            if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
-        ]
+            if unavailable_entities:
+                _LOGGER.warning(
+                    "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
+                    self.entity_id,
+                    ",".join(unavailable_entities),
+                )
+                self._attr_available = False
+                self.async_schedule_update_ha_state(True)
+                return
 
         apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
             "2022.10.0"
@@ -484,6 +491,8 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                     value, unit_of_measurement, self._attr_native_unit_of_measurement
                 )
             values.append(Decimal(value))
+
+            self.last_states[state.entity_id] = state
         return values
 
     def _remove_incompatible_unit_entities(
@@ -539,7 +548,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             self._attr_native_unit_of_measurement = ENERGY_MEGA_WATT_HOUR
 
     @callback
-    def async_reset_energy(self) -> None:
+    def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")

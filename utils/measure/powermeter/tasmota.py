@@ -13,7 +13,6 @@ class TasmotaPowerMeter(PowerMeter):
         self._device_ip = device_ip
 
     def get_power(self) -> PowerMeasurementResult:
-
         r = requests.get(
             "http://{}/cm?cmnd=STATUS+8".format(self._device_ip), timeout=10
         )

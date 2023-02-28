@@ -23,8 +23,6 @@ from powermeter.errors import (
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.factory import PowerMeterFactory
-from powermeter.powermeter import PowerMeter
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -186,7 +184,6 @@ class LightRunner(MeasurementRunner):
 
         return RunnerResult(
             model_json_data={"calculation_strategy": "lut"},
-            skip_model_json_generation=resume_at is not None,
         )
 
     def get_dummy_load_value(self) -> float:
@@ -532,7 +529,7 @@ class LightRunner(MeasurementRunner):
                 name="num_lights",
                 message="How many lights are you measuring?",
                 ignore=lambda answers: not answers.get("multiple_lights"),
-                validate=lambda _, current: re.match("\d+", current),
+                validate=lambda _, current: re.match(r"\d+", current),
             ),
         ]
         questions.extend(self.light_controller.get_questions())
