@@ -43,11 +43,14 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_SENSOR_TYPE,
+    CONF_STANDBY_POWER,
     CONF_SUB_GROUPS,
+    CONF_UNAVAILABLE_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SERVICE_RESET_ENERGY,
@@ -938,3 +941,40 @@ async def test_gui_discovered_entity_in_yaml_group(
     )
 
     assert len(caplog.records) == 0
+
+
+async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "input_boolean.test1",
+                    CONF_STANDBY_POWER: 1.5,
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 20},
+                },
+                {
+                    CONF_ENTITY_ID: "input_boolean.test2",
+                    CONF_STANDBY_POWER: 1.5,
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: {CONF_POWER: 30},
+                }
+            ],
+        },
+        {
+            CONF_UNAVAILABLE_POWER: 0,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        }
+    )
+
+    hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
+    hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
+
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_power").state == "0.00"
+
