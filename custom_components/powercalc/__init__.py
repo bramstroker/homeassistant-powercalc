@@ -45,6 +45,7 @@ from .const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    CONF_UNAVAILABLE_POWER,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
@@ -140,6 +141,7 @@ CONFIG_SCHEMA = vol.Schema(
                         cv.ensure_list, [cv.string]
                     ),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
+                    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
                 }
             ),
         )
