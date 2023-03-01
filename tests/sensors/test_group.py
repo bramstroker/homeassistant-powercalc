@@ -962,13 +962,13 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
                     CONF_STANDBY_POWER: 1.5,
                     CONF_MODE: CalculationStrategy.FIXED,
                     CONF_FIXED: {CONF_POWER: 30},
-                }
+                },
             ],
         },
         {
             CONF_UNAVAILABLE_POWER: 0,
             CONF_IGNORE_UNAVAILABLE_STATE: True,
-        }
+        },
     )
 
     hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
