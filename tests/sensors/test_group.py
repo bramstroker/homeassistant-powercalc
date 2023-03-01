@@ -977,4 +977,3 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
-
