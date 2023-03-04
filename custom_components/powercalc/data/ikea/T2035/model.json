@@ -9,5 +9,5 @@
         "VERSION": "v1.3.5:docker"
     },
     "name": "STOFTMOLN ceiling/wall lamp 24 warm light dimmable",
-    "standby_power": 0
+    "standby_power": 0.25
 }
