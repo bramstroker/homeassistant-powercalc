@@ -10,6 +10,7 @@ from ..const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_POWER,
+    CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     CONF_WLED,
@@ -73,6 +74,8 @@ class PowerCalculatorStrategyFactory:
             fixed_config = power_profile.fixed_mode_config
 
         power = fixed_config.get(CONF_POWER)
+        if power is None:
+            power = fixed_config.get(CONF_POWER_TEMPLATE)
         if isinstance(power, Template):
             power.hass = self._hass
 
