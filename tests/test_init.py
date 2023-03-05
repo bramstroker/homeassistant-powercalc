@@ -123,7 +123,7 @@ async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant
 
 async def test_legacy_power_template_config_is_converted_after_setup(hass: HomeAssistant) -> None:
     """
-    See https://github.com/bramstroker/homeassistant-powercalc/issues/939
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/1544
     """
     template = "{{ 100 * 20 | float}}"
 
