@@ -263,8 +263,6 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate old entry."""
     version = config_entry.version
-
-    # convert title and unique_id to string
     if version == 1:
         data = {**config_entry.data}
         if CONF_FIXED in data and CONF_POWER in data[CONF_FIXED] and CONF_POWER_TEMPLATE in data[CONF_FIXED]:
