@@ -155,4 +155,3 @@ async def test_legacy_power_template_config_is_converted_after_setup(hass: HomeA
         },
     }
     assert new_entry.version == 2
-
