@@ -121,7 +121,9 @@ async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant
     assert hass.states.get("sensor.all_light_energy_daily")
 
 
-async def test_legacy_power_template_config_is_converted_after_setup(hass: HomeAssistant) -> None:
+async def test_legacy_power_template_config_is_converted_after_setup(
+    hass: HomeAssistant,
+) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/1544
     """
@@ -133,10 +135,7 @@ async def test_legacy_power_template_config_is_converted_after_setup(hass: HomeA
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_NAME: "testentry",
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
-            CONF_FIXED: {
-                CONF_POWER: template,
-                CONF_POWER_TEMPLATE: template
-            },
+            CONF_FIXED: {CONF_POWER: template, CONF_POWER_TEMPLATE: template},
         },
         unique_id="abcd",
     )
