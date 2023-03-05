@@ -229,7 +229,7 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     _assert_default_virtual_power_entry_data(
         CalculationStrategy.FIXED,
         result["data"],
-        {CONF_FIXED: {CONF_POWER: template, CONF_POWER_TEMPLATE: template}},
+        {CONF_FIXED: {CONF_POWER_TEMPLATE: template}},
     )
 
     await hass.async_block_till_done()
