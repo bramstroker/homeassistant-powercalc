@@ -1,0 +1,24 @@
+{
+    "measure_description": "Streamed music and took manual measurements of the mean power in 10 second buckets",
+    "measure_method": "manual",
+    "measure_device": "Gosund, UP111",
+    "name": "Amazon Alexa Echo Dot Gen 3",
+    "standby_power": 1.75,
+    "device_type": "smart_speaker",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 2.09",
+            "20 -> 2.17",
+            "30 -> 2.26",
+            "40 -> 2.17",
+            "50 -> 2.43",
+            "60 -> 2.86",
+            "70 -> 3.03",
+            "80 -> 3.17",
+            "90 -> 3.27",
+            "100 -> 3.2"
+        ]
+    }
+}
