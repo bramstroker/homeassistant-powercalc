@@ -1,5 +1,5 @@
 - [Lights](#Lights) (242)
-- [Smart speakers](#Smart-speakers) (14)
+- [Smart speakers](#Smart-speakers) (16)
 - [Smart switches](#Smart-switches) (23)
 
 ## Lights
@@ -225,7 +225,7 @@
 |signify        |LWW001                   |Hue white A60 bulb E27                                                                 |                                                                                                                                                                                                                                                                                                      |  0.300|brightness              |
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                                                                                                                                                                                                                                      |  0.400|color_temp              |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                                                                                                                                                                                                                                      |  0.810|color_temp,hs           |
-|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|hs,color_temp,brightness|
+|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|color_temp,brightness,hs|
 |tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|hs,brightness           |
 |trust          |ZLED-G2705               |Trust ZLED-G2705                                                                       |                                                                                                                                                                                                                                                                                                      |  0.650|brightness              |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                                                                                                                                                                                                                                      |  1.050|color_temp,hs           |
@@ -251,11 +251,13 @@
 |zipato         |RGBWE2                   |Zipato RGBW Bulb V2                                                                    |                                                                                                                                                                                                                                                                                                      |  0.300|color_temp,hs           |
 
 ## Smart speakers
-#### 14 total
+#### 16 total
 
 |manufacturer |            model id             |                  name                  |        aliases         |standby|
 |-------------|---------------------------------|----------------------------------------|------------------------|------:|
-|bose         |                           416776|Bose SoundTouch 10                      |                        |   1.50|
+|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |                        |   0.90|
+|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |                        |   1.75|
+|bose         |416776                           |Bose SoundTouch 10                      |                        |   1.50|
 |bose         |767520-2100                      |Bose SoundTouch 300                     |                        |   1.50|
 |denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                  |   3.99|
 |google       |Home                             |Google Home                             |                        |   2.40|
