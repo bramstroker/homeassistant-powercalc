@@ -14,7 +14,7 @@
             "80 -> 4.57",
             "90 -> 6.96",
             "100 -> 8.54",
-            "0 -> 3.15"
+            "0 -> 2.56"
         ]
     },
     "measure_description": "Measured with utils/measure script",
