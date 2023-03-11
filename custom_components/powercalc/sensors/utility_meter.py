@@ -34,6 +34,8 @@ from .energy import EnergySensor, RealEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 
+GENERAL_TARIFF = "general"
+
 
 async def create_utility_meters(
     hass: HomeAssistant,
@@ -71,10 +73,25 @@ async def create_utility_meters(
             if existing_entity_id and hass.states.get(existing_entity_id):
                 continue
 
-        if tariffs:
-            tariff_select = await create_tariff_select(tariffs, hass, name, unique_id)
+        # Create generic utility meter (no specific tarrifs)
+        if not tariffs or GENERAL_TARIFF in tariffs:
+            utility_meter = await create_utility_meter(
+                energy_sensor.entity_id,
+                entity_id,
+                name,
+                sensor_config,
+                meter_type,
+                unique_id,
+                net_consumption=net_consumption,
+            )
+            utility_meters.append(utility_meter)
 
-            for tariff in tariffs:
+        # Create utility meter for each tariff, and the tariff select entity which allows you to select a tariff.
+        if tariffs:
+            filtered_tariffs = tariffs = [t for t in list(tariffs) if t != GENERAL_TARIFF]
+            tariff_select = await create_tariff_select(filtered_tariffs, hass, name, unique_id)
+
+            for tariff in filtered_tariffs:
                 utility_meter = await create_utility_meter(
                     energy_sensor.entity_id,
                     entity_id,
@@ -87,21 +104,7 @@ async def create_utility_meters(
                 )
                 tariff_sensors.append(utility_meter)
                 utility_meters.append(utility_meter)
-
-        else:
-            utility_meter = await create_utility_meter(
-                energy_sensor.entity_id,
-                entity_id,
-                name,
-                sensor_config,
-                meter_type,
-                unique_id,
-                net_consumption=net_consumption,
-            )
-            tariff_sensors.append(utility_meter)
-            utility_meters.append(utility_meter)
-
-        hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
+            hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
 
     return utility_meters
 
@@ -110,7 +113,6 @@ async def create_tariff_select(
     tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None
 ):
     """Create tariff selection entity"""
-
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
 
     select_component = cast(EntityComponent, hass.data[SELECT_DOMAIN])
@@ -132,14 +134,14 @@ async def create_tariff_select(
 
         tariff_select = TariffSelect(
             name,
-            list(tariffs),
+            tariffs,
             utility_meter_component.async_add_entities,
             select_unique_id,
         )
     else:
         tariff_select = TariffSelect(
             name,
-            list(tariffs),
+            tariffs,
             select_unique_id,
         )
 

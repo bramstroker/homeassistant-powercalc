@@ -50,7 +50,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
                     CONF_MODE: CalculationStrategy.FIXED,
                     CONF_FIXED: {CONF_POWER: 50},
                     CONF_CREATE_UTILITY_METERS: True,
-                    CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+                    CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
                     CONF_UTILITY_METER_TYPES: ["daily"],
                 }
             ]
@@ -73,6 +73,10 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
     assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
+
+    general_sensor = hass.states.get("sensor.test_energy_daily")
+    assert general_sensor
+    assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
 
 
 async def test_utility_meter_is_not_created_twice(

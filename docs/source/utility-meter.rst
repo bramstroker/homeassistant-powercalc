@@ -35,3 +35,30 @@ You can change this behaviour with the ``utility_meter_types`` configuration opt
     - `sensor.floorlamp_livingroom_energy_daily`
     - `sensor.floorlamp_livingroom_energy_weekly`
     - `sensor.floorlamp_livingroom_energy_monthly`
+
+Tariffs
+-------
+
+When your utility company uses different tariffs depending on the time of the day, i.e. `peak`, `offpeak` you can create multiple utility meters for that use case.
+Two `utility_meter` entities will be created and one `select` entity which allows you to select the active tariff.
+You can create an automation to set the active tariff depending on time of the day or some other logic, see https://www.home-assistant.io/integrations/utility_meter/#advanced-configuration
+
+Use the `utility_meter_tariffs` option to set the tariffs. In the example below we do it globally, but you can also configure per sensor.
+
+.. code-block:: yaml
+
+    powercalc:
+      utility_meter_tariffs:
+        - peak
+        - offpeak
+
+If you also would like to create an overall utility meter you can add `general` to the list of tariffs.
+This will also create a "normal" utility meter, which is also created when you omit the `utility_meter_tariffs` option.
+
+.. code-block:: yaml
+
+    powercalc:
+      utility_meter_tariffs:
+        - general
+        - peak
+        - offpeak
