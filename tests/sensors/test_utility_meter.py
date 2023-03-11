@@ -78,6 +78,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     assert general_sensor
     assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
 
+
 async def test_utility_meter_is_not_created_twice(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
