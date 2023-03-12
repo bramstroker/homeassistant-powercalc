@@ -108,20 +108,16 @@ def main():
     parser.add_argument('--output', required=False)
     args = parser.parse_args()
 
-    manufacturer = args.manufacturer
-    model = args.model
-    color_mode = args.color_mode
-
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data",
-                             manufacturer, model)
-    file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
+                             args.manufacturer, args.model)
+    file_path = os.path.join(data_path, f"{args.color_mode}.csv.gz")
 
     file = gzip.open(file_path, "rt")
 
     dataframe = pd.read_csv(file)
 
     plt.figure(figsize=(10, 6))
-    create_scatter_plot(dataframe, color_mode)
+    create_scatter_plot(dataframe, args.color_mode)
     plt.xlabel("brightness")
     plt.ylabel("watt")
     if args.output:
