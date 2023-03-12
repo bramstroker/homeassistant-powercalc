@@ -112,9 +112,9 @@ def main():
                              args.manufacturer, args.model)
     file_path = os.path.join(data_path, f"{args.color_mode}.csv.gz")
 
-    file = gzip.open(file_path, "rt")
+    csv_file = gzip.open(file_path, "rt")
 
-    dataframe = pd.read_csv(file)
+    dataframe = pd.read_csv(csv_file)
 
     plt.figure(figsize=(10, 6))
     create_scatter_plot(dataframe, args.color_mode)
