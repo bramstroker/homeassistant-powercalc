@@ -1,6 +1,6 @@
 {
     "measure_device": "See linked profile",
-    "measure_method": "See linked profile",
+    "measure_method": "script",
     "name": "Hue Devote",
     "standby_power": 0.29,
     "calculation_strategy": "lut",
