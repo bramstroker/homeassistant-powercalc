@@ -1,3 +1,5 @@
+import colorsys
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -7,10 +9,11 @@ import os
 import gzip
 
 manufacturer = "signify"
-model = "LCA003"
+model = "LCT014"
+color_mode = "hs"
 
 data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data", manufacturer, model)
-file_path = os.path.join(data_path, "color_temp.csv.gz")
+file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
 
 file = gzip.open(file_path, "rt")
 
@@ -18,11 +21,16 @@ df1 = pd.read_csv(file)
 
 
 def plot_data(df):
-    x = df['bri']
-    y = df['watt']
-    df['mired'] = df['mired'].apply(convert_mired_to_rgb)
-    color = df['mired']
-    plt.scatter(x, y, color=color, marker=".", s=10)
+    bri = df['bri']
+    watt = df['watt']
+    if color_mode == "color_temp":
+        df['color'] = df['mired'].apply(convert_mired_to_rgb)
+    else:
+        hue = df["hue"]
+        sat = df["sat"]
+        df['color'] = df.apply(lambda row: colorsys.hls_to_rgb(row.hue / 65535, row.bri / 255, row.sat / 255), axis = 1)
+
+    plt.scatter(bri, watt, color=df['color'], marker=".", s=10)
 
 
 def mired_to_rgb(mired):
