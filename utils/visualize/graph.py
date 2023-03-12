@@ -4,7 +4,6 @@ import numpy as np
 import colour
 import math
 import os
-from pathlib import Path
 import gzip
 
 manufacturer = "signify"
@@ -98,6 +97,7 @@ def convert_mired_to_rgb(mired):
 
     rgb = red, green, blue
     return list(map(lambda div: div / 255.0, rgb)) + [1]
+
 
 plot_data(df1)
 
