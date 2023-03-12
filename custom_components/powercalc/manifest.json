@@ -1,8 +1,11 @@
 {
   "domain": "powercalc",
   "name": "Powercalc",
-  "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
-  "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
+  "after_dependencies": [
+    "integration",
+    "utility_meter"
+  ],
+  "codeowners": ["@bramstroker"],
   "config_flow": true,
   "dependencies": [
     "light",
@@ -11,12 +14,9 @@
     "select",
     "utility_meter"
   ],
-  "after_dependencies": [
-    "integration",
-    "utility_meter"
-  ],
-  "codeowners": ["@bramstroker"],
+  "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "requirements": ["numpy>=1.21.1"],
-  "version": "0.1.0",
-  "iot_class": "local_polling"
+  "version": "0.1.0"
 }

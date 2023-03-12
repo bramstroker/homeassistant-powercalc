@@ -35,13 +35,17 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -140,6 +144,7 @@ CONFIG_SCHEMA = vol.Schema(
                         cv.ensure_list, [cv.string]
                     ),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
+                    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
                 }
             ),
         )
@@ -255,6 +260,23 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     for entry in updated_entries:
         if entry.state == ConfigEntryState.LOADED:
             await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    version = config_entry.version
+    if version == 1:
+        data = {**config_entry.data}
+        if (
+            CONF_FIXED in data
+            and CONF_POWER in data[CONF_FIXED]
+            and CONF_POWER_TEMPLATE in data[CONF_FIXED]
+        ):
+            data[CONF_FIXED].pop(CONF_POWER, None)
+        config_entry.version = 2
+        hass.config_entries.async_update_entry(config_entry, data=data)
+
+    return True
 
 
 async def create_domain_groups(

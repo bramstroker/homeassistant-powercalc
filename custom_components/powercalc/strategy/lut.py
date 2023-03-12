@@ -19,7 +19,7 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     COLOR_MODES_COLOR,
     ColorMode,
-    filter_supported_color_modes
+    filter_supported_color_modes,
 )
 from homeassistant.core import State
 
