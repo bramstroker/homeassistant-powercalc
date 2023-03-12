@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import colorsys
 
 import matplotlib.pyplot as plt
@@ -10,25 +12,8 @@ import os
 import gzip
 import argparse
 
-parser = argparse.ArgumentParser(description='CLI script to output powercalc LUT file as a plot')
-parser.add_argument('manufacturer')
-parser.add_argument('model')
-parser.add_argument('color_mode')
-args = parser.parse_args()
 
-manufacturer = args.manufacturer
-model = args.model
-color_mode = args.color_mode
-
-data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data", manufacturer, model)
-file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
-
-file = gzip.open(file_path, "rt")
-
-df1 = pd.read_csv(file)
-
-
-def create_scatter_plot(df: pandas.DataFrame):
+def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
     bri = df['bri']
     watt = df['watt']
     if color_mode == "brightness":
@@ -115,7 +100,34 @@ def convert_mired_to_rgb(mired):
     return list(map(lambda div: div / 255.0, rgb)) + [1]
 
 
-create_scatter_plot(df1)
-plt.xlabel("brightness")
-plt.ylabel("watt")
-plt.show()
+def main():
+    parser = argparse.ArgumentParser(description='CLI script to output powercalc LUT file as a plot')
+    parser.add_argument('manufacturer')
+    parser.add_argument('model')
+    parser.add_argument('color_mode')
+    parser.add_argument('--output', required=False)
+    args = parser.parse_args()
+
+    manufacturer = args.manufacturer
+    model = args.model
+    color_mode = args.color_mode
+
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data",
+                             manufacturer, model)
+    file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
+
+    file = gzip.open(file_path, "rt")
+
+    dataframe = pd.read_csv(file)
+
+    plt.figure(figsize=(10, 6))
+    create_scatter_plot(dataframe, color_mode)
+    plt.xlabel("brightness")
+    plt.ylabel("watt")
+    if args.output:
+        plt.savefig(args.output)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
