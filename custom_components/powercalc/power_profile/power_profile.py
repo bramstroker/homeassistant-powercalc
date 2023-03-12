@@ -234,7 +234,7 @@ class PowerProfile:
         if (
             self.device_type == DeviceType.SMART_SWITCH
             and entity_entry
-            and entity_entry.platform in ["switch_as_x", "hue"]
+            and entity_entry.platform in ["hue"]
         ):
             return True
         return DEVICE_DOMAINS[self.device_type] == source_entity.domain
