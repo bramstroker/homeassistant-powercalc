@@ -1,6 +1,6 @@
 - [Lights](#Lights) (242)
 - [Smart speakers](#Smart-speakers) (16)
-- [Smart switches](#Smart-switches) (23)
+- [Smart switches](#Smart-switches) (24)
 
 ## Lights
 #### 242 total
@@ -226,7 +226,7 @@
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                                                                                                                                                                                                                                      |  0.400|color_temp              |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                                                                                                                                                                                                                                      |  0.810|color_temp,hs           |
 |tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|color_temp,brightness,hs|
-|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|hs,brightness           |
+|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|brightness,hs           |
 |trust          |ZLED-G2705               |Trust ZLED-G2705                                                                       |                                                                                                                                                                                                                                                                                                      |  0.650|brightness              |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                                                                                                                                                                                                                                      |  1.050|color_temp,hs           |
 |tuya           |SL20                     |Treatlife SL20                                                                         |                                                                                                                                                                                                                                                                                                      |  0.100|color_temp              |
@@ -273,30 +273,31 @@
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame |   2.40|
 
 ## Smart switches
-#### 23 total
+#### 24 total
 
-|manufacturer|       model id       |                                       name                                        | aliases  |standby|
-|------------|----------------------|-----------------------------------------------------------------------------------|----------|------:|
-|arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |          |  0.267|
-|arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |          |  0.660|
-|arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|          |  0.290|
-|blitzwolf   |SHP6                  |Blitzwolf BW-SHP6 version 10A                                                      |          |  0.500|
-|blitzwolf   |SHP6-15A              |Blitzwolf BW-SHP6 version 15A                                                      |          |  0.400|
-|everspring  |AN158                 |Everspring AN158                                                                   |          |  0.300|
-|fibaro      |FGWP102               |Fibaro FGWP102                                                                     |          |  0.300|
-|greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |          |  0.300|
-|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |          |  0.400|
-|innr        |SP 120                |Innr Zigbee Smart Plug                                                             |          |  0.410|
-|innr        |SP 224                |Innr Zigbee Smart Plug                                                             |          |  0.180|
-|neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |          |  0.310|
-|nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |MSP-3-1-X1|  0.670|
-|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |          |  0.440|
-|qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |          |  0.300|
-|shelly      |shelly plug s         |Shelly Plug S                                                                      |          |  0.520|
-|signify     |LOM001                |Hue smart plug LOM001                                                              |          |  0.230|
-|signify     |LOM002                |Hue smart plug LOM002                                                              |          |  0.230|
-|signify     |LOM007                |Hue smart plug LOM007                                                              |          |  0.150|
-|tp-link     |HS100                 |HS100                                                                              |HS100(EU) |  0.890|
-|tp-link     |HS110                 |HS110                                                                              |HS110(EU) |  1.540|
-|tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU) |  0.500|
-|tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |          |  0.633|
+|manufacturer|       model id       |                                       name                                        |                     aliases                      |standby|
+|------------|----------------------|-----------------------------------------------------------------------------------|--------------------------------------------------|------:|
+|arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |                                                  |  0.267|
+|arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |                                                  |  0.660|
+|arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|                                                  |  0.290|
+|blitzwolf   |SHP6                  |Blitzwolf BW-SHP6 version 10A                                                      |                                                  |  0.500|
+|blitzwolf   |SHP6-15A              |Blitzwolf BW-SHP6 version 15A                                                      |                                                  |  0.400|
+|everspring  |AN158                 |Everspring AN158                                                                   |                                                  |  0.300|
+|fibaro      |FGWP102               |Fibaro FGWP102                                                                     |                                                  |  0.300|
+|greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |                                                  |  0.300|
+|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                  |  0.400|
+|innr        |SP 120                |Innr Zigbee Smart Plug                                                             |                                                  |  0.410|
+|innr        |SP 224                |Innr Zigbee Smart Plug                                                             |                                                  |  0.180|
+|neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |                                                  |  0.310|
+|nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |MSP-3-1-X1                                        |  0.670|
+|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |                                                  |  0.440|
+|qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |                                                  |  0.300|
+|shelly      |shelly plug s         |Shelly Plug S                                                                      |                                                  |  0.520|
+|signify     |LOM001                |Hue smart plug LOM001                                                              |                                                  |  0.230|
+|signify     |LOM002                |Hue smart plug LOM002                                                              |                                                  |  0.230|
+|signify     |LOM007                |Hue smart plug LOM007                                                              |                                                  |  0.150|
+|sonoff      |ZBMINI                |ZBMINI                                                                             |Zigbee two way smart switch (ZBMINI)<br />01MINIZB|  0.330|
+|tp-link     |HS100                 |HS100                                                                              |HS100(EU)                                         |  0.890|
+|tp-link     |HS110                 |HS110                                                                              |HS110(EU)                                         |  1.540|
+|tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU)                                         |  0.500|
+|tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |                                                  |  0.633|
