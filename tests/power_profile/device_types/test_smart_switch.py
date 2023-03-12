@@ -1,10 +1,8 @@
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     mock_device_registry,
     mock_registry,
@@ -220,4 +218,3 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "100.80"
-
