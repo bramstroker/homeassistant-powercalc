@@ -1,0 +1,14 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "PeakTech P 4250 (1 mV/10 mA) with VOLTCRAFT VC270",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.10"
+    },
+    "name": "Signify (Hue) 929002469202",
+    "standby_power": 0.8,
+    "device_type": "light"
+}
