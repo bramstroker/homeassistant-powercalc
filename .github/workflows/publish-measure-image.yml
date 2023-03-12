@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'feat/multi-platform'
   release:
     types: [published]
 
