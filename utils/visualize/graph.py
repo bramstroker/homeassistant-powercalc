@@ -8,10 +8,17 @@ import colour
 import math
 import os
 import gzip
+import argparse
 
-manufacturer = "signify"
-model = "LWA001"
-color_mode = "brightness"
+parser = argparse.ArgumentParser(description='CLI script to output powercalc LUT file as a plot')
+parser.add_argument('manufacturer')
+parser.add_argument('model')
+parser.add_argument('color_mode')
+args = parser.parse_args()
+
+manufacturer = args.manufacturer
+model = args.model
+color_mode = args.color_mode
 
 data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data", manufacturer, model)
 file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
