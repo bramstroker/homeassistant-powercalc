@@ -9,8 +9,8 @@ import os
 import gzip
 
 manufacturer = "signify"
-model = "LCT014"
-color_mode = "hs"
+model = "LWA001"
+color_mode = "brightness"
 
 data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data", manufacturer, model)
 file_path = os.path.join(data_path, f"{color_mode}.csv.gz")
@@ -25,7 +25,7 @@ def plot_data(df):
     watt = df['watt']
     if color_mode == "brightness":
         df['color'] = "#1f77b4"
-    if color_mode == "color_temp":
+    elif color_mode == "color_temp":
         df['color'] = df['mired'].apply(convert_mired_to_rgb)
     else:
         df['color'] = df.apply(lambda row: colorsys.hls_to_rgb(row.hue / 65535, row.bri / 255, row.sat / 255), axis=1)
