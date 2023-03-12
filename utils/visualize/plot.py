@@ -1,34 +1,39 @@
 from __future__ import annotations
 
+import argparse
 import colorsys
-
-import matplotlib.pyplot as plt
-import pandas
-import pandas as pd
-import numpy as np
-import colour
+import gzip
 import math
 import os
-import gzip
-import argparse
+
+import colour
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas
+import pandas as pd
 
 
 def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
-    bri = df['bri']
-    watt = df['watt']
+    bri = df["bri"]
+    watt = df["watt"]
     if color_mode == "brightness":
-        df['color'] = "#1f77b4"
+        df["color"] = "#1f77b4"
     elif color_mode == "color_temp":
-        df['color'] = df['mired'].apply(convert_mired_to_rgb)
+        df["color"] = df["mired"].apply(convert_mired_to_rgb)
     else:
-        df['color'] = df.apply(lambda row: colorsys.hls_to_rgb(row.hue / 65535, row.bri / 255, row.sat / 255), axis=1)
+        df["color"] = df.apply(
+            lambda row: colorsys.hls_to_rgb(
+                row.hue / 65535, row.bri / 255, row.sat / 255
+            ),
+            axis=1,
+        )
 
-    plt.scatter(bri, watt, color=df['color'], marker=".", s=10)
+    plt.scatter(bri, watt, color=df["color"], marker=".", s=10)
 
 
 def mired_to_rgb(mired):
     kelvin = 1000000 / mired
-    xy = colour.CCT_to_xy(kelvin, method='Kang 2002')
+    xy = colour.CCT_to_xy(kelvin, method="Kang 2002")
     XYZ = colour.xy_to_XYZ(xy)
     RGB = colour.XYZ_to_sRGB(XYZ)
     # Note that the colours are overflowing 8-bit, thus a normalisation
@@ -101,15 +106,21 @@ def convert_mired_to_rgb(mired):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='CLI script to output powercalc LUT file as a plot')
-    parser.add_argument('manufacturer')
-    parser.add_argument('model')
-    parser.add_argument('color_mode')
-    parser.add_argument('--output', required=False)
+    parser = argparse.ArgumentParser(
+        description="CLI script to output powercalc LUT file as a plot"
+    )
+    parser.add_argument("manufacturer")
+    parser.add_argument("model")
+    parser.add_argument("color_mode")
+    parser.add_argument("--output", required=False)
     args = parser.parse_args()
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../custom_components/powercalc/data",
-                             args.manufacturer, args.model)
+    data_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "../../custom_components/powercalc/data",
+        args.manufacturer,
+        args.model,
+    )
     file_path = os.path.join(data_path, f"{args.color_mode}.csv.gz")
 
     csv_file = gzip.open(file_path, "rt")
