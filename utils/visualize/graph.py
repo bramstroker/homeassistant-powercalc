@@ -28,7 +28,7 @@ def plot_data(df):
     if color_mode == "color_temp":
         df['color'] = df['mired'].apply(convert_mired_to_rgb)
     else:
-        df['color'] = df.apply(lambda row: colorsys.hls_to_rgb(row.hue / 65535, row.bri / 255, row.sat / 255), axis = 1)
+        df['color'] = df.apply(lambda row: colorsys.hls_to_rgb(row.hue / 65535, row.bri / 255, row.sat / 255), axis=1)
 
     plt.scatter(bri, watt, color=df['color'], marker=".", s=10)
 
