@@ -1,6 +1,7 @@
 import colorsys
 
 import matplotlib.pyplot as plt
+import pandas
 import pandas as pd
 import numpy as np
 import colour
@@ -20,7 +21,7 @@ file = gzip.open(file_path, "rt")
 df1 = pd.read_csv(file)
 
 
-def plot_data(df):
+def create_scatter_plot(df: pandas.DataFrame):
     bri = df['bri']
     watt = df['watt']
     if color_mode == "brightness":
@@ -107,7 +108,7 @@ def convert_mired_to_rgb(mired):
     return list(map(lambda div: div / 255.0, rgb)) + [1]
 
 
-plot_data(df1)
-
-plt.legend(['old', 'new'])
+create_scatter_plot(df1)
+plt.xlabel("brightness")
+plt.ylabel("watt")
 plt.show()
