@@ -258,8 +258,8 @@
 
 |manufacturer |            model id             |                  name                  |        aliases         |standby|
 |-------------|---------------------------------|----------------------------------------|------------------------|------:|
-|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |                        |   0.90|
-|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |                        |   1.75|
+|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |A2U21SRK4QGSE1          |   0.90|
+|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |A32DOYMUN6DTXA          |   1.75|
 |bose         |416776                           |Bose SoundTouch 10                      |                        |   1.50|
 |bose         |767520-2100                      |Bose SoundTouch 300                     |                        |   1.50|
 |denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                  |   3.99|
