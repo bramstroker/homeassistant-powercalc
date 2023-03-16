@@ -1,6 +1,6 @@
 - [Lights](#Lights) (245)
 - [Smart speakers](#Smart-speakers) (16)
-- [Smart switches](#Smart-switches) (24)
+- [Smart switches](#Smart-switches) (25)
 
 ## Lights
 #### 245 total
@@ -228,8 +228,8 @@
 |signify        |LWW001                   |Hue white A60 bulb E27                                                                 |                                                                                                                                                                                                                                                                                                      |  0.300|brightness              |
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                                                                                                                                                                                                                                      |  0.400|color_temp              |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                                                                                                                                                                                                                                      |  0.810|hs,color_temp           |
-|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|brightness,hs,color_temp|
-|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|brightness,hs           |
+|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|hs,color_temp,brightness|
+|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|hs,brightness           |
 |trust          |ZLED-G2705               |Trust ZLED-G2705                                                                       |                                                                                                                                                                                                                                                                                                      |  0.650|brightness              |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                                                                                                                                                                                                                                      |  1.050|hs,color_temp           |
 |tuya           |SL20                     |Treatlife SL20                                                                         |                                                                                                                                                                                                                                                                                                      |  0.100|color_temp              |
@@ -276,7 +276,7 @@
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame |   2.40|
 
 ## Smart switches
-#### 24 total
+#### 25 total
 
 |manufacturer|       model id       |                                       name                                        |                     aliases                      |standby|
 |------------|----------------------|-----------------------------------------------------------------------------------|--------------------------------------------------|------:|
@@ -304,3 +304,4 @@
 |tp-link     |HS110                 |HS110                                                                              |HS110(EU)                                         |  1.540|
 |tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU)                                         |  0.500|
 |tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |                                                  |  0.633|
+|tuya        |TS011F                |Smart plug (with power monitoring)                                                 |TS011F_plug_1<br />TS011F                         |  0.130|
