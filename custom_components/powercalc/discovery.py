@@ -12,6 +12,7 @@ from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_US
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery, discovery_flow
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
 
 from .aliases import MANUFACTURER_ALIASES, MANUFACTURER_WLED
@@ -106,22 +107,11 @@ class DiscoveryManager:
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
-            if entity_entry.disabled:
-                continue
-
-            if entity_entry.domain not in DEVICE_DOMAINS.values():
-                continue
-
-            has_user_config = self._is_user_configured(entity_entry.entity_id)
-            if has_user_config:
-                _LOGGER.debug(
-                    "%s: Entity is manually configured, skipping auto configuration",
-                    entity_entry.entity_id,
-                )
+            if not self.should_process_entity(entity_entry):
                 continue
 
             model_info = await autodiscover_model(self.hass, entity_entry)
-            if not model_info:
+            if not model_info or not model_info.manufacturer or not model_info.model:
                 continue
 
             source_entity = await create_source_entity(
@@ -152,8 +142,6 @@ class DiscoveryManager:
                 power_profile = await get_power_profile(
                     self.hass, {}, model_info=model_info
                 )
-                if not power_profile:
-                    continue
             except ModelNotSupported:
                 _LOGGER.debug(
                     "%s: Model not found in library, skipping discovery",
@@ -167,6 +155,27 @@ class DiscoveryManager:
             self._init_entity_discovery(source_entity, power_profile, {})
 
         _LOGGER.debug("Done auto discovering entities")
+
+    def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
+        """Do some validations on the registry entry to see if it qualifies for discovery"""
+        if entity_entry.disabled:
+            return False
+
+        if entity_entry.domain not in DEVICE_DOMAINS.values():
+            return False
+
+        if entity_entry.entity_category in [EntityCategory.CONFIG, EntityCategory.DIAGNOSTIC]:
+            return False
+
+        has_user_config = self._is_user_configured(entity_entry.entity_id)
+        if has_user_config:
+            _LOGGER.debug(
+                "%s: Entity is manually configured, skipping auto configuration",
+                entity_entry.entity_id,
+            )
+            return False
+
+        return True
 
     @callback
     def _init_entity_discovery(

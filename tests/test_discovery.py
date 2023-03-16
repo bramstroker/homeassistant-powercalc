@@ -6,6 +6,7 @@ from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCO
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import (
     EntityRegistry,
     RegistryEntry,
@@ -253,6 +254,34 @@ async def test_autodiscover_skips_entities_with_empty_manufacturer(
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.test_power")
+
+
+async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> None:
+    """Auto discovery should not consider entities with entity_category diagnostic"""
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="1234",
+                platform="switch",
+                device_id="some-device-id",
+                entity_category=EntityCategory.DIAGNOSTIC
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "some-device-id": DeviceEntry(
+                id="some-device-id", manufacturer="Shelly", model="Shelly Plug S"
+            )
+        },
+    )
+    await async_setup_component(hass, DOMAIN, {})
+    await hass.async_block_till_done()
+
+    assert not hass.states.get("sensor.test_device_power")
 
 
 async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRegistry):
