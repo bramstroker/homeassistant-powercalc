@@ -26,5 +26,10 @@
         "VERSION": "master"
     },
     "name": "Amazon Alexa Echo Dot Gen 3",
-    "standby_power": 1.75
+    "standby_power": 1.75,
+    "aliases": [
+        "A32DOYMUN6DTXA",
+        "A1RABVCI4QCIKC",
+        "C78MP8"
+    ]
 }

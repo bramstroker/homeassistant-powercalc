@@ -256,24 +256,24 @@
 ## Smart speakers
 #### 16 total
 
-|manufacturer |            model id             |                  name                  |        aliases         |standby|
-|-------------|---------------------------------|----------------------------------------|------------------------|------:|
-|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |                        |   0.90|
-|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |                        |   1.75|
-|bose         |416776                           |Bose SoundTouch 10                      |                        |   1.50|
-|bose         |767520-2100                      |Bose SoundTouch 300                     |                        |   1.50|
-|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                  |   3.99|
-|google       |Home                             |Google Home                             |                        |   2.40|
-|google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini        |   1.65|
-|google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini        |   1.65|
-|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                        |   7.58|
-|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|Lenovo Smart Clock      |   2.51|
-|sonos        |connect                          |Sonos Connect                           |                        |   5.00|
-|sonos        |one                              |Sonos One                               |Sonos ONE               |   2.92|
-|sonos        |one sl                           |Sonos One SL                            |                        |   2.83|
-|sonos        |play 3                           |Sonos Play:3                            |Play:3                  |   4.17|
-|sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |IKEA SYMFONISK Bookshelf|   2.56|
-|sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame |   2.40|
+|manufacturer |            model id             |                  name                  |        aliases                         |standby|
+|-------------|---------------------------------|----------------------------------------|----------------------------------------|------:|
+|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |A2U21SRK4QGSE1, B7W644                   |   0.90|
+|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |A32DOYMUN6DTXA, A1RABVCI4QCIKC, C78MP8  |   1.75|
+|bose         |416776                           |Bose SoundTouch 10                      |                                        |   1.50|
+|bose         |767520-2100                      |Bose SoundTouch 300                     |                                        |   1.50|
+|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                  |   3.99|
+|google       |Home                             |Google Home                             |                                        |   2.40|
+|google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini                        |   1.65|
+|google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini                        |   1.65|
+|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                                        |   7.58|
+|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|Lenovo Smart Clock                      |   2.51|
+|sonos        |connect                          |Sonos Connect                           |                                        |   5.00|
+|sonos        |one                              |Sonos One                               |Sonos ONE                               |   2.92|
+|sonos        |one sl                           |Sonos One SL                            |                                        |   2.83|
+|sonos        |play 3                           |Sonos Play:3                            |Play:3                                  |   4.17|
+|sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |IKEA SYMFONISK Bookshelf                |   2.56|
+|sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame                 |   2.40|
 
 ## Smart switches
 #### 25 total

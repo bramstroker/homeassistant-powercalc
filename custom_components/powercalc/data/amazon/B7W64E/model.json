@@ -26,5 +26,9 @@
         "VERSION": "master"
     },
     "name": "Amazon Alexa Echo Dot Gen 4",
-    "standby_power": 0.9
+    "standby_power": 0.9,
+    "aliases": [
+        "A2U21SRK4QGSE1",
+        "B7W644"
+    ]
 }
