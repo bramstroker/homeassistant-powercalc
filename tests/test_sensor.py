@@ -61,7 +61,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.sensor import is_autoconfigurable
+from custom_components.powercalc.sensor import is_auto_configurable
 from custom_components.test.light import MockLight
 
 from .common import (
@@ -692,4 +692,4 @@ async def test_is_autoconfigurable_returns_false(
     await create_mock_light_entity(hass, light_mock)
 
     entity_entry = entity_reg.async_get("light.testa")
-    assert not await is_autoconfigurable(hass, entity_entry)
+    assert not await is_auto_configurable(hass, entity_entry)
