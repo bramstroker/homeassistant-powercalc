@@ -1,10 +1,11 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import os
 import gzip
+import os
 from collections import namedtuple
 
-DataSet = namedtuple('DataSet', ['dataframe', 'color', 'label'])
+import matplotlib.pyplot as plt
+import pandas as pd
+
+DataSet = namedtuple("DataSet", ["dataframe", "color", "label"])
 
 
 def plot_data(df, color):
@@ -17,14 +18,12 @@ def get_library_file(path: str) -> str:
     return os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "../../custom_components/powercalc/data/",
-        path
+        path,
     )
 
 
-def csv_to_dataframe(
-    csv_file: str
-) -> pd.DataFrame:
-    if csv_file.endswith('gz'):
+def csv_to_dataframe(csv_file: str) -> pd.DataFrame:
+    if csv_file.endswith("gz"):
         csv_file = gzip.open(csv_file, "rt")
     return pd.read_csv(csv_file)
 

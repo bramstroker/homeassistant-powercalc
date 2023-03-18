@@ -164,7 +164,10 @@ class DiscoveryManager:
         if entity_entry.domain not in DEVICE_DOMAINS.values():
             return False
 
-        if entity_entry.entity_category in [EntityCategory.CONFIG, EntityCategory.DIAGNOSTIC]:
+        if entity_entry.entity_category in [
+            EntityCategory.CONFIG,
+            EntityCategory.DIAGNOSTIC,
+        ]:
             return False
 
         has_user_config = self._is_user_configured(entity_entry.entity_id)

@@ -266,7 +266,7 @@ async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> N
                 unique_id="1234",
                 platform="switch",
                 device_id="some-device-id",
-                entity_category=EntityCategory.DIAGNOSTIC
+                entity_category=EntityCategory.DIAGNOSTIC,
             ),
         },
     )
