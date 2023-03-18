@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.test.light import MockLight
 
-from .common import (
+from tests.common import (
     create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
@@ -299,7 +299,7 @@ async def test_include_filter_domain(
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom_1",
-                CONF_FILTER: {CONF_DOMAIN: ["light"]}
+                CONF_FILTER: {CONF_DOMAIN: "light"}
             }
         },
     )

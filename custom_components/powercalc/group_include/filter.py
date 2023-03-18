@@ -33,11 +33,16 @@ class IncludeEntityFilter(Protocol):
 
 
 class DomainFilter(IncludeEntityFilter):
-    def __init__(self, config):
-        self.domain: str = config
+    def __init__(self, domain: str):
+        self.domain: str = domain
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.domain == self.domain
+
+
+class NullFilter(IncludeEntityFilter):
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return True
 
 
 class CompositeFilter(IncludeEntityFilter):
