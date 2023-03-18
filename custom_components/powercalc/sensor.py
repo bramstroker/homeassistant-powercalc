@@ -24,9 +24,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import (
-    entity_platform,
-)
+from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.template import Template
@@ -111,6 +109,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
+from .group_include.include import resolve_include_entities
 from .power_profile.factory import get_power_profile
 from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
@@ -129,8 +128,6 @@ from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
-
-from .group_include.include import resolve_include_entities
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -183,7 +180,7 @@ SENSOR_CONFIG = {
                 {
                     vol.Required(CONF_DOMAIN): vol.Any(cv.string, [cv.string]),
                 }
-            )
+            ),
         }
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,

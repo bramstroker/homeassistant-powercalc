@@ -1,11 +1,16 @@
+from unittest.mock import MagicMock
+
 import pytest
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.helpers.entity_registry import RegistryEntry
 
-from custom_components.powercalc.group_include.filter import CompositeFilter, DomainFilter, FilterOperator, NullFilter, \
-    create_filter
-
-from unittest.mock import MagicMock
+from custom_components.powercalc.group_include.filter import (
+    CompositeFilter,
+    DomainFilter,
+    FilterOperator,
+    NullFilter,
+    create_filter,
+)
 
 
 @pytest.mark.parametrize(
@@ -18,7 +23,9 @@ from unittest.mock import MagicMock
         ([False, False], FilterOperator.OR, False),
     ],
 )
-async def test_composite_filter(filter_return_values: list, operator: FilterOperator, expected_result: bool) -> None:
+async def test_composite_filter(
+    filter_return_values: list, operator: FilterOperator, expected_result: bool
+) -> None:
     filter_mocks = []
     for value in filter_return_values:
         entity_filter = NullFilter()
@@ -26,7 +33,10 @@ async def test_composite_filter(filter_return_values: list, operator: FilterOper
         filter_mocks.append(entity_filter)
 
     registry_entry = _create_registry_entry()
-    assert CompositeFilter(filter_mocks, operator).is_valid(registry_entry) == expected_result
+    assert (
+        CompositeFilter(filter_mocks, operator).is_valid(registry_entry)
+        == expected_result
+    )
 
 
 async def test_domain_filter():

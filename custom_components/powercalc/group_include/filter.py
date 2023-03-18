@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from homeassistant.backports.enum import StrEnum
-
 from typing import Protocol
-from homeassistant.helpers.entity_registry import RegistryEntry
 
+from homeassistant.backports.enum import StrEnum
 from homeassistant.const import CONF_DOMAIN
+from homeassistant.helpers.entity_registry import RegistryEntry
 
 
 class FilterOperator(StrEnum):
@@ -19,7 +18,12 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
     if CONF_DOMAIN in filter_config:
         domain_config = filter_config.get(CONF_DOMAIN)
         if type(domain_config) == list:
-            filters.append(CompositeFilter([DomainFilter(domain) for domain in domain_config], FilterOperator.OR))
+            filters.append(
+                CompositeFilter(
+                    [DomainFilter(domain) for domain in domain_config],
+                    FilterOperator.OR,
+                )
+            )
         else:
             filters.append(DomainFilter(domain_config))
 

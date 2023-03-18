@@ -5,9 +5,13 @@ from homeassistant.components import light
 from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
@@ -19,16 +23,11 @@ from custom_components.powercalc.const import (
     CONF_TEMPLATE,
 )
 from custom_components.test.light import MockLight
-
 from tests.common import (
     create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
-)
-from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
-    mock_registry,
 )
 
 
@@ -269,27 +268,33 @@ async def test_include_filter_domain(
                 unique_id="1111",
                 platform="light",
                 device_id="light-device-id",
-                area_id=area.id
+                area_id=area.id,
             ),
             "switch.test_switch": RegistryEntry(
                 entity_id="switch.test_switch",
                 unique_id="2222",
                 platform="switch",
                 device_id="switch-device-id",
-                area_id=area.id
-            )
-        }
+                area_id=area.id,
+            ),
+        },
     )
 
     mock_device_registry(
         hass,
         {
             "light-device-id": DeviceEntry(
-                id="light-device-id", manufacturer="Signify", model="LCT012", area_id=area.id
+                id="light-device-id",
+                manufacturer="Signify",
+                model="LCT012",
+                area_id=area.id,
             ),
             "switch-device-id": DeviceEntry(
-                id="switch-device-id", manufacturer="Shelly", model="Shelly Plug S", area_id=area.id
-            )
+                id="switch-device-id",
+                manufacturer="Shelly",
+                model="Shelly Plug S",
+                area_id=area.id,
+            ),
         },
     )
 
@@ -299,8 +304,8 @@ async def test_include_filter_domain(
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom_1",
-                CONF_FILTER: {CONF_DOMAIN: "light"}
-            }
+                CONF_FILTER: {CONF_DOMAIN: "light"},
+            },
         },
     )
 

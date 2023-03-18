@@ -1,33 +1,17 @@
-
-from typing import cast
 import logging
+from typing import cast
 
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    CONF_DOMAIN,
-)
+from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import (
-    area_registry,
-    device_registry,
-    entity_registry,
-)
+from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import split_entity_id
 from homeassistant.helpers.template import Template
 
-from ..const import (
-    CONF_AREA,
-    CONF_FILTER,
-    CONF_GROUP,
-    CONF_TEMPLATE,
-)
-from ..errors import (
-    SensorConfigurationError,
-)
-
+from ..const import CONF_AREA, CONF_FILTER, CONF_GROUP, CONF_TEMPLATE
+from ..errors import SensorConfigurationError
 from .filter import create_filter
 
 _LOGGER = logging.getLogger(__name__)
@@ -79,7 +63,11 @@ def resolve_include_entities(
 
     if CONF_FILTER in include_config:
         entity_filter = create_filter(include_config.get(CONF_FILTER))
-        entities = {entity_id: entity for entity_id, entity in entities.items() if entity_filter.is_valid(entity)}
+        entities = {
+            entity_id: entity
+            for entity_id, entity in entities.items()
+            if entity_filter.is_valid(entity)
+        }
 
     return list(entities.values())
 
@@ -172,6 +160,4 @@ def resolve_area_entities(
             if entity.area_id is None
         ]
     )
-    return {
-        entity.entity_id: entity for entity in entities
-    }
+    return {entity.entity_id: entity for entity in entities}
