@@ -27,7 +27,6 @@ from .common import (
     run_powercalc_setup,
 )
 from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
     mock_device_registry,
     mock_registry,
 )
