@@ -5,13 +5,15 @@ from homeassistant.components import light
 from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.setup import async_setup_component
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
     CONF_CREATE_GROUP,
+    CONF_FILTER,
     CONF_GROUP,
     CONF_INCLUDE,
     CONF_TEMPLATE,
@@ -23,6 +25,11 @@ from .common import (
     create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
+)
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    mock_device_registry,
+    mock_registry,
 )
 
 
@@ -247,3 +254,57 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         "sensor.light_e_power",
         "sensor.light_f_power",
     }
+
+
+async def test_include_filter_domain(
+    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
+):
+    area = area_reg.async_get_or_create("Bathroom 1")
+    await hass.async_block_till_done()
+
+    mock_registry(
+        hass,
+        {
+            "light.test_light": RegistryEntry(
+                entity_id="light.test_light",
+                unique_id="1111",
+                platform="light",
+                device_id="light-device-id",
+                area_id=area.id
+            ),
+            "switch.test_switch": RegistryEntry(
+                entity_id="switch.test_switch",
+                unique_id="2222",
+                platform="switch",
+                device_id="switch-device-id",
+                area_id=area.id
+            )
+        }
+    )
+
+    mock_device_registry(
+        hass,
+        {
+            "light-device-id": DeviceEntry(
+                id="light-device-id", manufacturer="Signify", model="LCT012", area_id=area.id
+            ),
+            "switch-device-id": DeviceEntry(
+                id="switch-device-id", manufacturer="Shelly", model="Shelly Plug S", area_id=area.id
+            )
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bathroom_1",
+                CONF_FILTER: {CONF_DOMAIN: ["light"]}
+            }
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}
