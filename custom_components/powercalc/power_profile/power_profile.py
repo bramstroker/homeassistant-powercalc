@@ -188,7 +188,7 @@ class PowerProfile:
         return self._json_data.get("config_flow_discovery_remarks")
 
     def get_sub_profiles(self) -> list[str]:
-        """Get listing op possible sub profiles"""
+        """Get listing of possible sub profiles"""
         return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     @property

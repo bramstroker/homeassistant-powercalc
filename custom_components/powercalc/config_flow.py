@@ -499,7 +499,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             )
             self.power_profile = profile
-            errors = await self.validate_strategy_config()
+            if not self.power_profile.has_sub_profiles:
+                errors = await self.validate_strategy_config()
             if not errors:
                 return await self.async_step_post_library()
 
