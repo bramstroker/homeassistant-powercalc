@@ -1,0 +1,28 @@
+{
+    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
+    "measure_method": "manual",
+    "measure_device": "Tuya plug",
+    "name": "Google Nest Hub",
+    "standby_power": 0.41,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 3.10",
+            "10 -> 3.50",
+            "20 -> 3.60",
+            "30 -> 3.70",
+            "40 -> 3.80",
+            "50 -> 3.90",
+            "60 -> 4.00",
+            "70 -> 4.20",
+            "80 -> 4.50",
+            "90 -> 4.80",
+            "100 -> 5.20"
+        ]
+    },
+    "aliases": [
+        "Google Nest Hub"
+    ]
+}
