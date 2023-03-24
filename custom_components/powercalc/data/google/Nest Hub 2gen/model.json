@@ -1,28 +1,30 @@
 {
-    "measure_description": "Streamed 'Radiohead - National Anthem' using spotify, and took average measurements using the measure.py tool on different volume levels",
-    "measure_method": "manual",
-    "measure_device": "Tuya plug",
-    "name": "Google Nest Hub",
-    "standby_power": 0.41,
-    "device_type": "smart_speaker",
-    "calculation_strategy": "linear",
     "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
     "linear_config": {
         "calibrate": [
-            "0 -> 3.10",
-            "10 -> 3.50",
-            "20 -> 3.60",
-            "30 -> 3.70",
-            "40 -> 3.80",
-            "50 -> 3.90",
-            "60 -> 4.00",
-            "70 -> 4.20",
-            "80 -> 4.50",
-            "90 -> 4.80",
-            "100 -> 5.20"
+            "10 -> 2.83",
+            "20 -> 3.1",
+            "30 -> 3.22",
+            "40 -> 3.35",
+            "50 -> 3.51",
+            "60 -> 3.67",
+            "70 -> 3.89",
+            "80 -> 4.13",
+            "90 -> 4.43",
+            "100 -> 4.8",
+            "0 -> 2.11"
         ]
     },
-    "aliases": [
-        "Google Nest Hub"
-    ]
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Tuya",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.12:docker"
+    },
+    "name": "Google Nest Hub (2nd Gen)",
+    "standby_power": 0.39
 }
