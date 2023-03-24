@@ -55,24 +55,24 @@ Resetting sensor
 
 To reset the energy sensor to zero use the `powercalc.reset_energy` service.
 
-```yaml
-service: powercalc.reset_energy
-target:
-  entity_id: sensor.my_energy
-```
+.. code-block:: yaml
+
+    service: powercalc.reset_energy
+    target:
+      entity_id: sensor.my_energy
 
 Increasing sensor
 +++++++++++++++++
 
 To increase the sensor with a given value use the `powercalc.increase_daily_energy` service.
 
-```yaml
-service: powercalc.calibrate_utility_meter
-data:
-  value: 100
-target:
-  entity_id: sensor.my_energy
-```
+.. code-block:: yaml
+
+    service: powercalc.calibrate_utility_meter
+    data:
+      value: 100
+    target:
+      entity_id: sensor.my_energy
 
 This will increase the energy sensor with 100 Kwh or 100 W when you have set ``unit_of_measurement`` to ``W``
 
