@@ -88,8 +88,8 @@ Domain
         create_group: Outdoor lights
         include:
           area: outdoor
-        filter:
-          domain: light
+          filter:
+            domain: light
 
 This will include only light entities from area outdoor.
 
