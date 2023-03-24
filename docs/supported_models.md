@@ -1,5 +1,5 @@
 - [Lights](#Lights) (246)
-- [Smart speakers](#Smart-speakers) (16)
+- [Smart speakers](#Smart-speakers) (17)
 - [Smart switches](#Smart-switches) (25)
 
 ## Lights
@@ -229,8 +229,8 @@
 |signify        |LWW001                   |Hue white A60 bulb E27                                                                 |                                                                                                                                                                                                                                                                                                      |  0.300|brightness              |
 |sonoff         |B02BA60                  |Sonoff B02 Light with dimmer and temperature                                           |                                                                                                                                                                                                                                                                                                      |  0.400|color_temp              |
 |teckin         |SB50                     |Teckin SB50                                                                            |                                                                                                                                                                                                                                                                                                      |  0.810|hs,color_temp           |
-|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|hs,brightness,color_temp|
-|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|hs,brightness           |
+|tp-link        |KL135                    |TP-Link Kasa KL135(US)                                                                 |KL135(US)                                                                                                                                                                                                                                                                                             |  0.200|brightness,hs,color_temp|
+|tp-link        |L900                     |TP-Link Tapo L900-5                                                                    |                                                                                                                                                                                                                                                                                                      |  0.240|brightness,hs           |
 |trust          |ZLED-G2705               |Trust ZLED-G2705                                                                       |                                                                                                                                                                                                                                                                                                      |  0.650|brightness              |
 |tuya           |NO66-ZB                  |Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m                                       |                                                                                                                                                                                                                                                                                                      |  1.050|hs,color_temp           |
 |tuya           |SL20                     |Treatlife SL20                                                                         |                                                                                                                                                                                                                                                                                                      |  0.100|color_temp              |
@@ -255,7 +255,7 @@
 |zipato         |RGBWE2                   |Zipato RGBW Bulb V2                                                                    |                                                                                                                                                                                                                                                                                                      |  0.300|hs,color_temp           |
 
 ## Smart speakers
-#### 16 total
+#### 17 total
 
 |manufacturer |            model id             |                  name                  |                   aliases                    |standby|
 |-------------|---------------------------------|----------------------------------------|----------------------------------------------|------:|
@@ -266,6 +266,7 @@
 |denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                        |   3.99|
 |google       |Home                             |Google Home                             |                                              |   2.40|
 |google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini                              |   1.65|
+|google       |Nest Hub 2gen                    |Google Nest Hub (2nd Gen)               |                                              |   0.39|
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini                              |   1.65|
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                                              |   7.58|
 |lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|Lenovo Smart Clock                            |   2.51|
