@@ -18,4 +18,3 @@ async def evaluate_power(power: Union[Template, Decimal, float]) -> Decimal | No
         return Decimal(power)
     except decimal.DecimalException:
         _LOGGER.error(f"Could not convert power value {power} to decimal")
-
