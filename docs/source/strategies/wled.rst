@@ -8,6 +8,9 @@ You can use WLED strategy for light strips which are controlled by [WLED](https:
 WLED calculates estimated current based on brightness levels and the microcontroller (ESP) used.
 Powercalc asks to input the voltage on which the lightstrip is running and optionally a power factor. Based on these factors the wattage is calculated.
 
+.. important::
+    The brightness limiter must be turned on in WLED for this to work! Otherwise WLED will not provide an estimated current.
+
 You can setup sensors both with YAML or GUI.
 When you use the GUI select :guilabel:`wled` in the calculation_strategy dropdown.
 
