@@ -195,6 +195,8 @@ async def create_utility_meter(
         params["unique_id"] = unique_id
     if "cron_pattern" in signature.parameters:
         params["cron_pattern"] = None
+    if "periodically_resetting" in signature.parameters:
+        params["periodically_resetting"] = True
 
     utility_meter = VirtualUtilityMeter(**params)
     setattr(
