@@ -9,5 +9,5 @@
         "VERSION": "v1.3.13:docker"
     },
     "name": "LTW004",
-    "standby_power": -0.1
+    "standby_power": 0.25
 }
