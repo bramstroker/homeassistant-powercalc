@@ -13,7 +13,9 @@ async def evaluate_power(power: Union[Template, Decimal, float]) -> Decimal | No
 
     try:
         if isinstance(power, Template):
-            return Decimal(power.async_render())
+            power = power.async_render()
+            if power == "unknown":
+                return None
 
         return Decimal(power)
     except decimal.DecimalException:
