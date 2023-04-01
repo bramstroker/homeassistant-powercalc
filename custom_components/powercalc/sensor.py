@@ -651,6 +651,9 @@ async def is_auto_configurable(
         )
         if not power_profile:
             return False
+        source_entity = await create_source_entity(entity_entry.entity_id, hass)
+        if not power_profile.is_entity_domain_supported(source_entity):
+            return False
         if power_profile.has_sub_profiles and power_profile.sub_profile:
             return True
         return not power_profile.is_additional_configuration_required
