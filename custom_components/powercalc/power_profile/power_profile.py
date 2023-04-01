@@ -370,4 +370,3 @@ class EntityIdMatcher(SubProfileMatcher):
 
     def get_tracking_entities(self) -> list[str]:
         return []
-
