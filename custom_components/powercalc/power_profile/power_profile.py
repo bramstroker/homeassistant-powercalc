@@ -294,6 +294,8 @@ class SubProfileSelector:
                 matcher_config["entity_id"],
                 matcher_config["map"],
             )
+        if matcher_type == "entity_id":
+            return EntityIdMatcher(matcher_config["pattern"], matcher_config["profile"])
         raise PowercalcSetupError(f"Unknown sub profile matcher type: {matcher_type}")
 
 
@@ -350,6 +352,21 @@ class AttributeMatcher(SubProfileMatcher):
             return None
 
         return self._mapping.get(val)
+
+    def get_tracking_entities(self) -> list[str]:
+        return []
+
+
+class EntityIdMatcher(SubProfileMatcher):
+    def __init__(self, pattern: str, profile: str):
+        self._pattern = pattern
+        self._profile = profile
+
+    def match(self, entity_state: State) -> str | None:
+        if re.search(self._pattern, entity_state.entity_id):
+            return self._profile
+
+        return None
 
     def get_tracking_entities(self) -> list[str]:
         return []
