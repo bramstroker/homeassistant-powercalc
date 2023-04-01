@@ -120,6 +120,21 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant):
     assert selector.select_sub_profile(state) == "b"
 
 
+async def test_sub_profile_entity_id_match(hass: HomeAssistant):
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("Test", "Test"),
+        get_test_profile_dir("sub_profile_entity_id_match"),
+    )
+    selector = SubProfileSelector(hass, power_profile)
+    assert len(selector.get_tracking_entities()) == 0
+
+    state = State("light.test_nightlight", STATE_ON)
+    assert selector.select_sub_profile(state) == "nightlight"
+
+    state = State("light.test", STATE_ON)
+    assert selector.select_sub_profile(state) == "default"
+
+
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
     hass: HomeAssistant,
 ):
