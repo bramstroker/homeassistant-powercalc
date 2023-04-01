@@ -12,14 +12,14 @@ Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. sign
 model.json
 ----------
 
-Every model MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
-See the [json schema](custom_components/powercalc/data/model_schema.json) how the file must be structured or the examples below.
+Every model MUST contain a ``model.json`` file which defines the supported calculation modes and other configuration.
+See the `json schema <https://github.com/bramstroker/homeassistant-powercalc/blob/master/custom_components/powercalc/data/model_schema.json>`_ how the file must be structured or the examples below.
 
 When the calculation strategy is ``lut`` also [CSV lookup files](#lut-data-files) must be provided, which can be created by running the measure tool.
 
 Example lut mode:
 
-.. code-block::json
+.. code-block:: json
 
     {
         "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
@@ -31,7 +31,7 @@ Example lut mode:
 
 Example linear mode
 
-.. code-block::json
+.. code-block:: json
 
     {
         "name": "Hue Go",
@@ -79,19 +79,19 @@ Expected file structure
 
 **hs.csv**
 
-.. code-block::csv
+.. code-block:: text
 
     bri,hue,sat,watt
 
 **color_temp.csv**
 
-.. code-block::csv
+.. code-block:: text
 
     bri,mired,watt
 
 **brightness.csv**
 
-.. code-block::csv
+.. code-block:: text
 
     bri,watt
 
