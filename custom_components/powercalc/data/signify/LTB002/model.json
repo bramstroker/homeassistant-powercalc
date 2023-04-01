@@ -9,5 +9,5 @@
         "VERSION": "v1.3.13:docker"
     },
     "name": "Signify Philips Hue White Ambiance BR30 (LTB002)",
-    "standby_power": 0
+    "standby_power": 0.25
 }
