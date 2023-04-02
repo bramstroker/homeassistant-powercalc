@@ -68,6 +68,7 @@ class ProfileLibrary:
             for manufacturer in next(os.walk(data_dir))[1]:
                 if (
                     entity_domain
+                    and data_dir == BUILT_IN_DATA_DIRECTORY
                     and len(
                         [
                             device_type
