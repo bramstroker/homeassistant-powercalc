@@ -121,6 +121,15 @@ async def create_virtual_power_sensor(
                 power_profile = await get_power_profile(
                     hass, sensor_config, model_info=model_info
                 )
+                # Check if this power profile supports automatic sub profile selection
+                # If so, trigger an initial selection of the sub profile bases on source entity state
+                if power_profile and power_profile.sub_profile_select:
+                    sub_profile_selector = SubProfileSelector(
+                        hass, power_profile, source_entity
+                    )
+                    power_profile.select_sub_profile(
+                        sub_profile_selector.select_sub_profile(State(source_entity.entity_id, STATE_UNKNOWN))
+                    )
             except ModelNotSupported as err:
                 if not is_fully_configured(sensor_config):
                     _LOGGER.error(
