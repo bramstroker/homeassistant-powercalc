@@ -9,5 +9,8 @@
         "VERSION": "v1.3.13:docker"
     },
     "name": "Hue White and Color Ambiance Surimu (rectangle)",
-    "standby_power": 0.39
+    "standby_power": 0.39,
+    "aliases": [
+        "929002966401"
+    ]
 }
