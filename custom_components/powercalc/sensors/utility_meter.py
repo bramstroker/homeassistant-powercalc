@@ -84,6 +84,7 @@ async def create_utility_meters(
                 unique_id,
                 net_consumption=net_consumption,
             )
+            tariff_sensors.append(utility_meter)
             utility_meters.append(utility_meter)
 
         # Create utility meter for each tariff, and the tariff select entity which allows you to select a tariff.
@@ -108,7 +109,8 @@ async def create_utility_meters(
                 )
                 tariff_sensors.append(utility_meter)
                 utility_meters.append(utility_meter)
-            hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
+
+        hass.data[DATA_UTILITY][entity_id] = {DATA_TARIFF_SENSORS: tariff_sensors}
 
     return utility_meters
 
