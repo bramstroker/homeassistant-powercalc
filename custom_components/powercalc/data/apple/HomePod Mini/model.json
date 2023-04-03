@@ -1,0 +1,26 @@
+{
+    "measure_description": "Streamed white noice for this test",
+    "measure_method": "manual",
+    "measure_device": "Shelly Plug S",
+    "name": "Apple HomePod Mini",
+    "standby_power": 0.65,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 0.99",
+            "10 -> 1.02",
+            "20 -> 1.03",
+            "30 -> 1.04",
+            "40 -> 1.05",
+            "50 -> 1.06",
+            "60 -> 1.33",
+            "70 -> 1.92",
+            "80 -> 2.18",
+            "90 -> 2.77",
+            "100 -> 4.22"
+        ]
+    },
+    "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore."
+}
