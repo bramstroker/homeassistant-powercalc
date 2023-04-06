@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 9.0",
+            "20 -> 9.0",
+            "30 -> 9.0",
+            "40 -> 9.0",
+            "50 -> 16.04",
+            "60 -> 17.14",
+            "70 -> 47.04",
+            "80 -> 49.11",
+            "90 -> 65.2",
+            "100 -> 103.27",
+            "0 -> 23.2"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Fibaro FGWPE/F-101",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.13:docker"
+    },
+    "name": "SONOS Five",
+    "standby_power": 3.1
+}
