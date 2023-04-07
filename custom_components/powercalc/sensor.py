@@ -9,8 +9,8 @@ from datetime import timedelta
 from typing import Any, Final, NamedTuple, Optional
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
 import homeassistant.helpers.device_registry as dr
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -235,7 +235,9 @@ async def async_setup_platform(
 ) -> None:
     """Setup sensors from YAML config sensor entries"""
 
-    await _async_setup_entities(hass, config, async_add_entities, discovery_info=discovery_info)
+    await _async_setup_entities(
+        hass, config, async_add_entities, discovery_info=discovery_info
+    )
 
 
 async def async_setup_entry(
@@ -261,7 +263,9 @@ async def async_setup_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
-    await _async_setup_entities(hass, sensor_config, async_add_entities, config_entry=entry)
+    await _async_setup_entities(
+        hass, sensor_config, async_add_entities, config_entry=entry
+    )
     if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
         await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
@@ -576,8 +580,13 @@ async def create_individual_sensors(  # noqa: C901
                 setattr(entity, "source_device_id", source_entity.device_entry.id)
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
-        if config_entry and config_entry not in source_entity.device_entry.config_entries:
-            device_registry.async_update_device(device_id, add_config_entry_id=config_entry.entry_id)
+        if (
+            config_entry
+            and config_entry not in source_entity.device_entry.config_entries
+        ):
+            device_registry.async_update_device(
+                device_id, add_config_entry_id=config_entry.entry_id
+            )
 
     # Update several registries
     if discovery_info:
