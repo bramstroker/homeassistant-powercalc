@@ -10,6 +10,7 @@ from typing import Any, Final, NamedTuple, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
+import homeassistant.helpers.device_registry as dr
 import voluptuous as vol
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
@@ -234,7 +235,7 @@ async def async_setup_platform(
 ) -> None:
     """Setup sensors from YAML config sensor entries"""
 
-    await _async_setup_entities(hass, config, async_add_entities, discovery_info)
+    await _async_setup_entities(hass, config, async_add_entities, discovery_info=discovery_info)
 
 
 async def async_setup_entry(
@@ -260,7 +261,7 @@ async def async_setup_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
-    await _async_setup_entities(hass, sensor_config, async_add_entities)
+    await _async_setup_entities(hass, sensor_config, async_add_entities, config_entry=entry)
     if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
         await hass.config_entries.async_reload(updated_group_entry.entry_id)
 
@@ -269,6 +270,7 @@ async def _async_setup_entities(
     hass: HomeAssistant,
     config: dict[str, Any],
     async_add_entities: AddEntitiesCallback,
+    config_entry: ConfigEntry | None = None,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Main routine to setup power/energy sensors from provided configuration"""
@@ -276,7 +278,7 @@ async def _async_setup_entities(
     register_entity_services()
 
     try:
-        entities = await create_sensors(hass, config, discovery_info)
+        entities = await create_sensors(hass, config, discovery_info, config_entry)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
@@ -388,6 +390,7 @@ async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
+    config_entry: ConfigEntry | None = None,
     context: Optional[CreationContext] = None,
 ) -> EntitiesBucket:
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
@@ -421,7 +424,7 @@ async def create_sensors(
             config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
         return await create_individual_sensors(
-            hass, merged_sensor_config, context, discovery_info
+            hass, merged_sensor_config, context, config_entry, discovery_info
         )
 
     # Setup power sensors for multiple appliances in one config entry
@@ -460,7 +463,7 @@ async def create_sensors(
                 global_config, config, sensor_config
             )
             new_entities = await create_individual_sensors(
-                hass, merged_sensor_config, context=context
+                hass, merged_sensor_config, config_entry=config_entry, context=context
             )
             new_sensors.extend(new_entities.new)
             existing_sensors.extend(new_entities.existing)
@@ -496,6 +499,7 @@ async def create_individual_sensors(  # noqa: C901
     hass: HomeAssistant,
     sensor_config: dict,
     context: CreationContext,
+    config_entry: ConfigEntry | None = None,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
@@ -563,13 +567,18 @@ async def create_individual_sensors(  # noqa: C901
 
     # Set the entity to same device as the source entity, if any available
     if source_entity.entity_entry and source_entity.device_entry:
+        device_id = source_entity.device_entry.id
+        device_registry = dr.async_get(hass)
         for entity in entities_to_add:
-            if not isinstance(entity, SensorEntity):
+            if not isinstance(entity, BaseEntity):
                 continue
             try:
-                setattr(entity, "device_id", source_entity.device_entry.id)
+                setattr(entity, "source_device_id", source_entity.device_entry.id)
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
+        if config_entry and config_entry not in source_entity.device_entry.config_entries:
+            device_registry.async_update_device(device_id, add_config_entry_id=config_entry.entry_id)
+
 
     # Update several registries
     if discovery_info:

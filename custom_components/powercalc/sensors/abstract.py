@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 from typing import Any
 
 import homeassistant.helpers.device_registry as dr
@@ -27,13 +28,12 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Attach the entity to same device as the source entity"""
-
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
-        if entity_entry is None or not hasattr(self, "device_id"):
+        if entity_entry is None or not hasattr(self, "source_device_id"):
             return
 
-        device_id: str = self.device_id
+        device_id: str = getattr(self, "source_device_id")
         if not device_id:
             return
         device_reg = dr.async_get(self.hass)
@@ -42,6 +42,8 @@ class BaseEntity(Entity):
             return
         _LOGGER.debug(f"Binding {self.entity_id} to device {device_id}")
         entity_reg.async_update_entity(self.entity_id, device_id=device_id)
+
+        self.async_on_remove(lambda: _LOGGER.debug(f"Removing entity {self.entity_id}"))
 
 
 def generate_power_sensor_name(
