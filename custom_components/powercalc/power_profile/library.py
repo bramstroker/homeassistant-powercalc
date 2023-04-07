@@ -100,8 +100,6 @@ class ProfileLibrary:
         self, model_info: ModelInfo, custom_directory: str | None = None
     ) -> PowerProfile | None:
         """Get a power profile for a given manufacturer and model"""
-        if custom_directory:
-            return await self._create_power_profile(model_info, custom_directory)
 
         # Support multiple LUT in subdirectories
         sub_profile = None
@@ -109,14 +107,23 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model)
 
-        profiles = await self.get_profiles_by_manufacturer(model_info.manufacturer)
-        for profile in profiles:
-            if profile.supports(model_info.model):
-                if sub_profile:
-                    profile.select_sub_profile(sub_profile)
-                return profile
+        profile = None
+        if custom_directory:
+            profile = await self._create_power_profile(model_info, custom_directory)
+        else:
+            profiles = await self.get_profiles_by_manufacturer(model_info.manufacturer)
+            for p in profiles:
+                if p.supports(model_info.model):
+                    profile = p
+                    break
 
-        return None
+        if not profile:
+            return None
+
+        if sub_profile:
+            profile.select_sub_profile(sub_profile)
+
+        return profile
 
     async def get_profiles_by_manufacturer(
         self, manufacturer: str
