@@ -43,8 +43,6 @@ class BaseEntity(Entity):
         _LOGGER.debug(f"Binding {self.entity_id} to device {device_id}")
         entity_reg.async_update_entity(self.entity_id, device_id=device_id)
 
-        self.async_on_remove(lambda: _LOGGER.debug(f"Removing entity {self.entity_id}"))
-
 
 def generate_power_sensor_name(
     sensor_config: dict[str, Any],
