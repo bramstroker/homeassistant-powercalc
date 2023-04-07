@@ -27,13 +27,12 @@ _LOGGER = logging.getLogger(__name__)
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Attach the entity to same device as the source entity"""
-
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
-        if entity_entry is None or not hasattr(self, "device_id"):
+        if entity_entry is None or not hasattr(self, "source_device_id"):
             return
 
-        device_id: str = self.device_id
+        device_id: str = getattr(self, "source_device_id")
         if not device_id:
             return
         device_reg = dr.async_get(self.hass)
