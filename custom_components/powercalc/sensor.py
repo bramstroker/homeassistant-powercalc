@@ -579,7 +579,6 @@ async def create_individual_sensors(  # noqa: C901
         if config_entry and config_entry not in source_entity.device_entry.config_entries:
             device_registry.async_update_device(device_id, add_config_entry_id=config_entry.entry_id)
 
-
     # Update several registries
     if discovery_info:
         hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES].update(
