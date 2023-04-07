@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.4.0:docker"
     },
-    "name": "Osram LIGHTIFY LED Classic A60 clear",
+    "name": "LIGHTIFY LED Classic A60 clear",
     "standby_power": 0.4
 }
