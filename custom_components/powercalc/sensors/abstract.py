@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import traceback
 from typing import Any
 
 import homeassistant.helpers.device_registry as dr
