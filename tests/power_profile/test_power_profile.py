@@ -71,7 +71,7 @@ async def test_load_linked_profile(hass: HomeAssistant):
     assert power_profile.name == "Linked profile"
 
 
-async def test_load_sub_lut(hass: HomeAssistant):
+async def test_load_sub_profile(hass: HomeAssistant):
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("yeelight", "YLDL01YL/ambilight")
     )
@@ -81,6 +81,18 @@ async def test_load_sub_lut(hass: HomeAssistant):
     assert power_profile.name == "Yeelight YLDL01YL Downlight"
     assert power_profile.sub_profile == "ambilight"
     assert power_profile.is_additional_configuration_required is False
+
+
+async def test_load_sub_profile_without_model_json(hass: HomeAssistant):
+    """Test if sub profile can be loaded correctly when the sub directories don't have an own model.json"""
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("test", "test/a"), get_test_profile_dir("sub_profile")
+    )
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
+    assert power_profile.manufacturer == "test"
+    assert power_profile.model == "test"
+    assert power_profile.name == "Test"
+    assert power_profile.sub_profile == "a"
 
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant):
