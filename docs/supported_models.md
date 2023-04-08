@@ -1,5 +1,5 @@
 - [Lights](#Lights) (257)
-- [Smart speakers](#Smart-speakers) (22)
+- [Smart speakers](#Smart-speakers) (23)
 - [Smart switches](#Smart-switches) (25)
 
 ## Lights
@@ -266,7 +266,7 @@
 |zipato         |RGBWE2                   |Zipato RGBW Bulb V2                                                                    |                                                                                                                                                                                                                                                                                                      |  0.300|hs,color_temp           |
 
 ## Smart speakers
-#### 22 total
+#### 23 total
 
 |manufacturer |            model id             |                  name                  |                   aliases                    |standby|
 |-------------|---------------------------------|----------------------------------------|----------------------------------------------|------:|
@@ -278,6 +278,7 @@
 |denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                        |   3.99|
 |google       |Home                             |Google Home                             |                                              |   2.40|
 |google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini                              |   1.65|
+|google       |Nest Audio                       |Nest Audio                              |                                              |   1.80|
 |google       |Nest Hub 2gen                    |Google Nest Hub (2nd Gen)               |                                              |   0.39|
 |google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini                              |   1.65|
 |harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                                              |   7.58|
