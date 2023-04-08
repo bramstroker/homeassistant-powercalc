@@ -5,9 +5,9 @@ from __future__ import annotations
 import copy
 import logging
 import uuid
+from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any, Final, NamedTuple, Optional
-from dataclasses import dataclass, field
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
@@ -435,12 +435,10 @@ async def create_sensors(
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
     entities_to_add = EntitiesBucket()
-    for entity_config in (config.get(CONF_ENTITIES) or []):
+    for entity_config in config.get(CONF_ENTITIES) or []:
         # When there are nested entities, combine these with the current entities, recursively
         if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
-            child_entities = await create_sensors(
-                hass, entity_config, context=context
-            )
+            child_entities = await create_sensors(hass, entity_config, context=context)
             entities_to_add.extend_items(child_entities)
             continue
 
@@ -468,7 +466,9 @@ async def create_sensors(
                     hass,
                     merged_sensor_config,
                     config_entry=config_entry,
-                    context=CreationContext(group=context.group, entity_config=sensor_config)
+                    context=CreationContext(
+                        group=context.group, entity_config=sensor_config
+                    ),
                 )
             )
         except SensorConfigurationError as error:
