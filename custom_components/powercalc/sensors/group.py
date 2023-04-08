@@ -65,8 +65,8 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from .energy import EnergySensor, RealEnergySensor
-from .power import PowerSensor, RealPowerSensor
+from .energy import EnergySensor
+from .power import PowerSensor
 from .utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
