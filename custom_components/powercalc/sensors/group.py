@@ -77,7 +77,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_group_sensors(
     group_name: str,
     sensor_config: dict[str, Any],
-    entities: list[SensorEntity, RealPowerSensor, RealEnergySensor],
+    entities: list[BaseEntity],
     hass: HomeAssistant,
     filters: list[Callable, None] = None,
 ) -> list[GroupedSensor]:
