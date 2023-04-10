@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 import uuid
+from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any, Final, NamedTuple, Optional
 
@@ -433,21 +434,16 @@ async def create_sensors(
 
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
-    new_sensors = []
-    existing_sensors = []
-    if CONF_ENTITIES in config:
-        for entity_config in config[CONF_ENTITIES]:
-            # When there are nested entities, combine these with the current entities, recursively
-            if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
-                (child_new_sensors, child_existing_sensors) = await create_sensors(
-                    hass, entity_config, context=context
-                )
-                new_sensors.extend(child_new_sensors)
-                existing_sensors.extend(child_existing_sensors)
-                continue
+    entities_to_add = EntitiesBucket()
+    for entity_config in config.get(CONF_ENTITIES) or []:
+        # When there are nested entities, combine these with the current entities, recursively
+        if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
+            child_entities = await create_sensors(hass, entity_config, context=context)
+            entities_to_add.extend_items(child_entities)
+            continue
 
-            entity_id = entity_config.get(CONF_ENTITY_ID) or str(uuid.uuid4())
-            sensor_configs.update({entity_id: entity_config})
+        entity_id = entity_config.get(CONF_ENTITY_ID) or str(uuid.uuid4())
+        sensor_configs.update({entity_id: entity_config})
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
@@ -461,20 +457,24 @@ async def create_sensors(
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
-        context = CreationContext(group=context.group, entity_config=sensor_config)
         try:
             merged_sensor_config = get_merged_sensor_configuration(
                 global_config, config, sensor_config
             )
-            new_entities = await create_individual_sensors(
-                hass, merged_sensor_config, config_entry=config_entry, context=context
+            entities_to_add.extend_items(
+                await create_individual_sensors(
+                    hass,
+                    merged_sensor_config,
+                    config_entry=config_entry,
+                    context=CreationContext(
+                        group=context.group, entity_config=sensor_config
+                    ),
+                )
             )
-            new_sensors.extend(new_entities.new)
-            existing_sensors.extend(new_entities.existing)
         except SensorConfigurationError as error:
             _LOGGER.error(error)
 
-    if not new_sensors and not existing_sensors:
+    if not entities_to_add.has_entities():
         if CONF_CREATE_GROUP in config:
             raise SensorConfigurationError(
                 f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'"
@@ -486,17 +486,16 @@ async def create_sensors(
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
-        group_entities = new_sensors + existing_sensors
-        group_name = config.get(CONF_CREATE_GROUP)
-        group_sensors = await create_group_sensors(
-            group_name,
-            get_merged_sensor_configuration(global_config, config, validate=False),
-            group_entities,
-            hass=hass,
+        entities_to_add.new.extend(
+            await create_group_sensors(
+                config.get(CONF_CREATE_GROUP),
+                get_merged_sensor_configuration(global_config, config, validate=False),
+                entities_to_add.new + entities_to_add.existing,
+                hass=hass,
+            )
         )
-        new_sensors.extend(group_sensors)
 
-    return EntitiesBucket(new=new_sensors, existing=existing_sensors)
+    return entities_to_add
 
 
 async def create_individual_sensors(  # noqa: C901
@@ -678,9 +677,17 @@ async def is_auto_configurable(
         return False
 
 
-class EntitiesBucket(NamedTuple):
-    new: list[BaseEntity] = []
-    existing: list[BaseEntity] = []
+@dataclass
+class EntitiesBucket:
+    new: list[BaseEntity] = field(default_factory=list)
+    existing: list[BaseEntity] = field(default_factory=list)
+
+    def extend_items(self, bucket: EntitiesBucket):
+        self.new.extend(bucket.new)
+        self.existing.extend(bucket.existing)
+
+    def has_entities(self) -> bool:
+        return bool(self.new) or bool(self.existing)
 
 
 class CreationContext(NamedTuple):

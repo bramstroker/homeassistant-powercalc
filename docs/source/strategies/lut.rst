@@ -7,8 +7,10 @@ Supported domain: ``light``
 This is the most accurate mode.
 For a lot of light models measurements are taken using smart plugs. All this data is saved into CSV files. When you have the LUT mode activated the current brightness/hue/saturation of the light will be checked and closest matching line will be looked up in the CSV.
 
-- `supported models`_ for LUT mode
-- :doc:`LUT file structure </library/protocol>`
+There are two possibilities to add virtual power sensors using LUT mode:
+
+1. Predefined light measurements: The component ships with predefined light measurements for some light models. Also see `supported models`_.
+2. Custom light measurements: It is possible to define your own custom light models. See :doc:`LUT file structure </library/protocol>` for details on file and directory structure.
 
 These LUT files are created using the measurement tool Powercalc provides. When you are interested in taking measurements yourself and contribute to the profile library yourself see :doc:`/contributing/measure`.
 
