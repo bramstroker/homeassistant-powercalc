@@ -172,7 +172,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         self._powercalc_source_domain = powercalc_source_domain
         self._sensor_config = sensor_config
         self.entity_id = entity_id
-        #self._attr_state_class = SensorStateClass.TOTAL_INCREASING
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
 
