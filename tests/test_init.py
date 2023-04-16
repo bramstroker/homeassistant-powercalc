@@ -13,11 +13,14 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_POWER,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
 from custom_components.test.light import MockLight
@@ -118,3 +121,40 @@ async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant
     assert hass.states.get("sensor.all_light_energy")
     assert not hass.states.get("sensor.all_light_energy_2")
     assert hass.states.get("sensor.all_light_energy_daily")
+
+
+async def test_create_config_entry_without_energy_sensor(
+    hass: HomeAssistant,
+) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/1544
+    """
+    template = "{{ 100 * 20 | float}}"
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_FIXED: {CONF_POWER: template, CONF_POWER_TEMPLATE: template},
+        },
+        unique_id="abcd",
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    new_entry = hass.config_entries.async_get_entry(entry.entry_id)
+    assert new_entry.data == {
+        ENTRY_DATA_ENERGY_ENTITY: "sensor.testentry_energy",
+        ENTRY_DATA_POWER_ENTITY: "sensor.testentry_power",
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_NAME: "testentry",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_FIXED: {
+            CONF_POWER_TEMPLATE: template,
+        },
+    }
+    assert new_entry.version == 2
