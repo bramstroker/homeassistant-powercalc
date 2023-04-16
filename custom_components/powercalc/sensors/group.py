@@ -54,6 +54,8 @@ from ..const import (
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DOMAIN,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
     SERVICE_RESET_ENERGY,
     SensorType,
     UnitPrefix,
@@ -259,22 +261,33 @@ def resolve_entity_ids_recursively(
         resolved_ids = []
 
     # Include the power/energy sensors for an existing Virtual Power config entry
-    entity_reg = er.async_get(hass)
     member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-    # Unfortunately device_class is not correctly set at this time in the entity_registry
-    # So we need to match on state_class.
-    state_class = (
-        SensorStateClass.MEASUREMENT
-        if device_class == SensorDeviceClass.POWER
-        else SensorStateClass.TOTAL
-    )
-    entities = [
-        entity_entry.entity_id
-        for entity_entry in entity_reg.entities.values()
-        if entity_entry.config_entry_id in member_entry_ids
-        and entity_entry.capabilities.get(ATTR_STATE_CLASS) == state_class
-    ]
-    resolved_ids.extend(entities)
+    for member_entry_id in member_entry_ids:
+        member_entry = hass.config_entries.async_get_entry(member_entry_id)
+        key = ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
+        if key in member_entry.data:
+            resolved_ids.extend([member_entry.data.get(key)])
+        else:
+            # Below is the old logic for entity resolving.
+            # May be removed in the future when all config entries of users have been migrated
+            # In the new situation we save the power and energy entity id's on the config entry
+            # So we don't have to use a hacky way to get the entities from the entity registry anymore.
+            if device_class == SensorDeviceClass.POWER:
+                _LOGGER.warning("Using legacy resolve_entity_ids_recursively method")
+            entity_reg = er.async_get(hass)
+            state_class = (
+                SensorStateClass.MEASUREMENT
+                if device_class == SensorDeviceClass.POWER
+                else SensorStateClass.TOTAL_INCREASING
+            )
+            entities = [
+                entity_entry.entity_id
+                for entity_entry in entity_reg.entities.values()
+                if entity_entry.config_entry_id == member_entry_id
+                and entity_entry.capabilities.get(ATTR_STATE_CLASS) in state_class
+            ]
+            sorted_entities = sorted(entities)
+            resolved_ids.extend([sorted_entities[0]])
 
     # Include the additional power/energy sensors the user specified
     conf_key = (

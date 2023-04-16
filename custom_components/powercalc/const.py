@@ -23,6 +23,9 @@ DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_PROFILE_LIBRARY = "profile_library"
 
+ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
+ENTRY_DATA_POWER_ENTITY = "_power_entity"
+
 DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_AREA = "area"

@@ -693,3 +693,26 @@ async def test_is_autoconfigurable_returns_false(
 
     entity_entry = entity_reg.async_get("light.testa")
     assert not await is_auto_configurable(hass, entity_entry)
+
+
+async def test_create_config_entry_without_energy_sensor(
+    hass: HomeAssistant,
+) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_CREATE_ENERGY_SENSOR: False,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: "light.test",
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcd",
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testentry_power")
+    assert not hass.states.get("sensor.testentry_energy")

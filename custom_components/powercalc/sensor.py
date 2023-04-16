@@ -95,6 +95,8 @@ from .const import (
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHODS,
+    ENTRY_DATA_POWER_ENTITY,
+    ENTRY_DATA_ENERGY_ENTITY,
     ENTITY_CATEGORIES,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_INCREASE_DAILY_ENERGY,
@@ -229,10 +231,10 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 
 async def async_setup_platform(
-    hass: HomeAssistant,
-    config: ConfigType,
-    async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+        hass: HomeAssistant,
+        config: ConfigType,
+        async_add_entities: AddEntitiesCallback,
+        discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Setup sensors from YAML config sensor entries"""
 
@@ -242,7 +244,7 @@ async def async_setup_platform(
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+        hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Setup sensors from config entry (GUI config flow)"""
     sensor_config = convert_config_entry_to_sensor_config(entry)
@@ -272,11 +274,11 @@ async def async_setup_entry(
 
 
 async def _async_setup_entities(
-    hass: HomeAssistant,
-    config: dict[str, Any],
-    async_add_entities: AddEntitiesCallback,
-    config_entry: ConfigEntry | None = None,
-    discovery_info: DiscoveryInfoType | None = None,
+        hass: HomeAssistant,
+        config: dict[str, Any],
+        async_add_entities: AddEntitiesCallback,
+        config_entry: ConfigEntry | None = None,
+        discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Main routine to setup power/energy sensors from provided configuration"""
 
@@ -284,30 +286,58 @@ async def _async_setup_entities(
 
     try:
         entities = await create_sensors(hass, config, discovery_info, config_entry)
+        if not entities:
+            return
+
+        if config_entry:
+            save_entity_ids_on_config_entry(hass, config_entry, entities)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
 
-    if entities:
-        entities_to_add = [
-            entity for entity in entities.new if isinstance(entity, SensorEntity)
-        ]
+    entities_to_add = [
+        entity for entity in entities.new if isinstance(entity, SensorEntity)
+    ]
 
-        # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
-        # Remove entities which are disabled because of a disabled device from the list of entities to add
-        # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
-        # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
-        # This causes the powercalc entity to never be bound to the device again and be disabled forever.
-        entity_reg = er.async_get(hass)
-        for entity in entities_to_add:
-            existing_entry = entity_reg.async_get(entity.entity_id)
-            if (
+    # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
+    # Remove entities which are disabled because of a disabled device from the list of entities to add
+    # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
+    # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
+    # This causes the powercalc entity to never be bound to the device again and be disabled forever.
+    entity_reg = er.async_get(hass)
+    for entity in entities_to_add:
+        existing_entry = entity_reg.async_get(entity.entity_id)
+        if (
                 existing_entry
                 and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
-            ):
-                entities_to_add.remove(entity)
+        ):
+            entities_to_add.remove(entity)
 
-        async_add_entities(entities_to_add)
+    async_add_entities(entities_to_add)
+
+
+@callback
+def save_entity_ids_on_config_entry(hass, config_entry: ConfigEntry, entities: EntitiesBucket):
+    """
+    Save the power and energy sensor entity_id's on the config entry
+    We need this in group sensor logic to differentiate between energy sensor and utility meters.
+    """
+    power_entities = [e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)]
+    energy_entities = [e.entity_id for e in entities.all() if isinstance(e, EnergySensor)]
+    new_data = config_entry.data.copy()
+    if not power_entities:
+        raise SensorConfigurationError(f"No power sensor created for config_entry {config_entry.entry_id}")
+    new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
+
+    if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(CONF_CREATE_ENERGY_SENSOR):
+        if not energy_entities:
+            raise SensorConfigurationError(f"No energy sensor created for config_entry {config_entry.entry_id}")
+        new_data.update({ENTRY_DATA_ENERGY_ENTITY: energy_entities[0]})
+
+    hass.config_entries.async_update_entry(
+        config_entry,
+        data=new_data,
+    )
 
 
 @callback
@@ -392,11 +422,11 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
 
 
 async def create_sensors(
-    hass: HomeAssistant,
-    config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None,
-    config_entry: ConfigEntry | None = None,
-    context: Optional[CreationContext] = None,
+        hass: HomeAssistant,
+        config: ConfigType,
+        discovery_info: DiscoveryInfoType | None = None,
+        config_entry: ConfigEntry | None = None,
+        context: Optional[CreationContext] = None,
 ) -> EntitiesBucket:
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 
@@ -409,8 +439,8 @@ async def create_sensors(
 
     # Handle setup of domain groups
     if (
-        discovery_info
-        and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP
+            discovery_info
+            and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP
     ):
         domain = discovery_info[CONF_DOMAIN]
         sensor_config = global_config.copy()
@@ -450,10 +480,10 @@ async def create_sensors(
         entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))
         _LOGGER.debug("Found include entities: %s", entities)
         sensor_configs = {
-            entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
-            for entity in entities
-            if await is_auto_configurable(hass, entity)
-        } | sensor_configs
+                             entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
+                             for entity in entities
+                             if await is_auto_configurable(hass, entity)
+                         } | sensor_configs
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
@@ -499,11 +529,11 @@ async def create_sensors(
 
 
 async def create_individual_sensors(  # noqa: C901
-    hass: HomeAssistant,
-    sensor_config: dict,
-    context: CreationContext,
-    config_entry: ConfigEntry | None = None,
-    discovery_info: DiscoveryInfoType | None = None,
+        hass: HomeAssistant,
+        sensor_config: dict,
+        context: CreationContext,
+        config_entry: ConfigEntry | None = None,
+        discovery_info: DiscoveryInfoType | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
@@ -580,8 +610,8 @@ async def create_individual_sensors(  # noqa: C901
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
         if (
-            config_entry
-            and config_entry not in source_entity.device_entry.config_entries
+                config_entry
+                and config_entry not in source_entity.device_entry.config_entries
         ):
             device_registry.async_update_device(
                 device_id, add_config_entry_id=config_entry.entry_id
@@ -613,11 +643,11 @@ async def create_individual_sensors(  # noqa: C901
 
 
 async def check_entity_not_already_configured(
-    sensor_config: dict,
-    source_entity: SourceEntity,
-    hass: HomeAssistant,
-    used_unique_ids: list[str],
-    is_discovered: True,
+        sensor_config: dict,
+        source_entity: SourceEntity,
+        hass: HomeAssistant,
+        used_unique_ids: list[str],
+        is_discovered: True,
 ) -> None:
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -639,9 +669,9 @@ async def check_entity_not_already_configured(
         return
 
     existing_entities = (
-        configured_entities.get(source_entity.entity_id)
-        or discovered_entities.get(source_entity.entity_id)
-        or []
+            configured_entities.get(source_entity.entity_id)
+            or discovered_entities.get(source_entity.entity_id)
+            or []
     )
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
@@ -650,15 +680,15 @@ async def check_entity_not_already_configured(
 
     entity_id = source_entity.entity_id
     if unique_id is None and (
-        entity_id in existing_entities or entity_id in configured_entities
+            entity_id in existing_entities or entity_id in configured_entities
     ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 
 async def is_auto_configurable(
-    hass: HomeAssistant,
-    entity_entry: er.RegistryEntry,
-    sensor_config: ConfigType | None = None,
+        hass: HomeAssistant,
+        entity_entry: er.RegistryEntry,
+        sensor_config: ConfigType | None = None,
 ) -> bool:
     try:
         model_info = await autodiscover_model(hass, entity_entry)
@@ -685,6 +715,9 @@ class EntitiesBucket:
     def extend_items(self, bucket: EntitiesBucket):
         self.new.extend(bucket.new)
         self.existing.extend(bucket.existing)
+
+    def all(self):
+        return self.new + self.existing
 
     def has_entities(self) -> bool:
         return bool(self.new) or bool(self.existing)
