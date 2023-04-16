@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
+from datetime import timedelta
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
@@ -13,6 +14,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.helpers.json import JSONEncoder
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -22,15 +24,17 @@ from homeassistant.const import (
     ENERGY_KILO_WATT_HOUR,
     ENERGY_MEGA_WATT_HOUR,
     ENERGY_WATT_HOUR,
-    POWER_WATT,
+    EVENT_HOMEASSISTANT_STOP, POWER_WATT,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import CoreState, HomeAssistant, State, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
+from homeassistant.helpers.restore_state import RestoreEntity, RestoreStateData
+from homeassistant.helpers.singleton import singleton
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
     from homeassistant.util.unit_conversion import (
@@ -39,6 +43,7 @@ if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
         BaseUnitConverter,
     )
 
+from homeassistant.helpers.storage import Store
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -74,6 +79,10 @@ from .utility_meter import create_utility_meters
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 _LOGGER = logging.getLogger(__name__)
+STORAGE_KEY = "powercalc_group"
+STORAGE_VERSION = 1
+# How long between periodically saving the current states to disk
+STATE_DUMP_INTERVAL = timedelta(minutes=10)
 
 
 async def create_group_sensors(
@@ -397,7 +406,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.unit_converter: BaseUnitConverter | None = None
         if hasattr(self, "get_unit_converter"):
             self.unit_converter = self.get_unit_converter()
-        self.last_states: dict[str, State] = {}
+        self._prev_state_store: PreviousStateStore | None = None
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -405,6 +414,8 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
 
         if (state := await self.async_get_last_state()) is not None:
             self._attr_native_value = state.state
+
+        self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
 
@@ -454,9 +465,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         ]
         if unavailable_entities and isinstance(self, GroupedEnergySensor):
             for entity_id in unavailable_entities:
-                last_state = self.last_states.get(entity_id)
-                if last_state:
-                    available_states.append(last_state)
+                prev_state = self._prev_state_store.get_entity_state(entity_id)
+                if prev_state:
+                    available_states.append(prev_state)
                     unavailable_entities.remove(entity_id)
 
             if unavailable_entities:
@@ -480,37 +491,34 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             self.async_schedule_update_ha_state(True)
             return
 
-        summed = sum(self._get_state_values(available_states, apply_unit_conversions))
-
+        summed = self.calculate_new_state(available_states)
         self._attr_native_value = round(summed, self._rounding_digits)
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
 
-    def _get_state_values(
-        self, states: list[State], apply_unit_conversions: bool
-    ) -> list[Decimal]:
-        """Get the state value from all individual entity state. Apply unit conversions"""
-        values = []
-        for state in states:
-            value = float(state.state)
-            unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            if (
+    def _get_state_value_in_native_unit(self, state) -> Decimal:
+        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
+            "2022.10.0"
+        )
+        if not apply_unit_conversions:
+            return Decimal(state)
+
+        value = float(state.state)
+        unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        if (
                 unit_of_measurement
                 and apply_unit_conversions
                 and self._attr_native_unit_of_measurement != unit_of_measurement
-            ):
-                unit_converter = (
-                    EnergyConverter
-                    if isinstance(self, GroupedEnergySensor)
-                    else PowerConverter
-                )
-                value = unit_converter.convert(
-                    value, unit_of_measurement, self._attr_native_unit_of_measurement
-                )
-            values.append(Decimal(value))
-
-            self.last_states[state.entity_id] = state
-        return values
+        ):
+            unit_converter = (
+                EnergyConverter
+                if isinstance(self, GroupedEnergySensor)
+                else PowerConverter
+            )
+            value = unit_converter.convert(
+                value, unit_of_measurement, self._attr_native_unit_of_measurement
+            )
+        return Decimal(value)
 
     def _remove_incompatible_unit_entities(
         self, states: list[State]
@@ -536,6 +544,13 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
+
+    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+        return sum(
+            [
+                self._get_state_value_in_native_unit(state) for state in member_states
+            ]
+        )
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
@@ -576,5 +591,98 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     {ATTR_ENTITY_ID: entity_id},
                 )
             )
+            self._prev_state_store.set_entity_state(entity_id, State(entity_id, "0.00"))
+        self._attr_native_value = 0
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
+
+    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+        """
+        Calculate the new group energy sensor state
+        For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
+        """
+        if self.state is None:
+            group_sum = Decimal(0)
+        else:
+            group_sum = Decimal(self.state)
+        _LOGGER.debug(f"Current energy group value {self.entity_id}: {group_sum}")
+        for entity_state in member_states:
+            prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
+            prev_state = self._get_state_value_in_native_unit(prev_state) if prev_state is not None else Decimal(0)
+            cur_state = self._get_state_value_in_native_unit(entity_state)
+            delta = cur_state - prev_state
+            _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}")
+            if delta >= 0:
+                _LOGGER.warning(f"skipping state for {entity_state.entity_id}, probably errornous value or sensor was reset")
+                group_sum += delta
+
+            self._prev_state_store.set_entity_state(entity_state.entity_id, entity_state)
+        _LOGGER.debug(f"New energy group value {self.entity_id}: {group_sum}")
+        return group_sum
+
+
+class PreviousStateStore:
+    @staticmethod
+    @singleton("powercalc_group_storage")
+    async def async_get_instance(hass: HomeAssistant) -> PreviousStateStore:
+        """Get the singleton instance of this data helper."""
+        instance = PreviousStateStore(hass)
+
+        try:
+            stored_states = await instance.store.async_load()
+        except HomeAssistantError as exc:
+            _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
+            stored_states = None
+
+        if stored_states is None:
+            _LOGGER.debug("Load previous energy sensor states from store")
+            instance.last_states = {}
+        else:
+            instance.states = stored_states
+
+        instance.async_setup_dump()
+
+        return instance
+
+    def __init__(self, hass: HomeAssistant):
+        self.store: Store = Store(hass, STORAGE_VERSION, STORAGE_KEY, encoder=JSONEncoder)
+        self.states: dict[str, State] = {}
+        self.hass = hass
+
+    def get_entity_state(self, entity_id) -> State | None:
+        """Retrieve the previous state"""
+        return self.states.get(entity_id)
+
+    def set_entity_state(self, entity_id, state: State) -> None:
+        """Set the state for an energy sensor"""
+        self.states[entity_id] = state
+
+    async def persist_states(self) -> None:
+        """Save the current states to storage."""
+        try:
+            await self.store.async_save(self.states)
+        except HomeAssistantError as exc:
+            _LOGGER.error("Error saving current states", exc_info=exc)
+
+    @callback
+    def async_setup_dump(self, *args: Any) -> None:
+        """Set up the listeners for persistence."""
+
+        async def _async_dump_states(*_: Any) -> None:
+            await self.persist_states()
+
+        # Dump states periodically
+        cancel_interval = async_track_time_interval(
+            self.hass,
+            _async_dump_states,
+            STATE_DUMP_INTERVAL,
+        )
+
+        async def _async_dump_states_at_stop(*_: Any) -> None:
+            cancel_interval()
+            await self.persist_states()
+
+        # Dump states when stopping hass
+        self.hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STOP, _async_dump_states_at_stop
+        )
