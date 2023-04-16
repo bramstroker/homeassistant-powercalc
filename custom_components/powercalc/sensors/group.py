@@ -264,7 +264,11 @@ def resolve_entity_ids_recursively(
     member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
     for member_entry_id in member_entry_ids:
         member_entry = hass.config_entries.async_get_entry(member_entry_id)
-        key = ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
+        key = (
+            ENTRY_DATA_POWER_ENTITY
+            if device_class == SensorDeviceClass.POWER
+            else ENTRY_DATA_ENERGY_ENTITY
+        )
         if key in member_entry.data:
             resolved_ids.extend([member_entry.data.get(key)])
         else:
