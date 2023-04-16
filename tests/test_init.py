@@ -13,14 +13,11 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_POWER,
-    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
-    ENTRY_DATA_ENERGY_ENTITY,
-    ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
 from custom_components.test.light import MockLight
