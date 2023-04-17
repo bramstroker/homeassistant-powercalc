@@ -480,12 +480,6 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 self.async_schedule_update_ha_state(True)
                 return
 
-        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
-            "2022.10.0"
-        )
-        if not apply_unit_conversions:  # pragma: no cover
-            self._remove_incompatible_unit_entities(available_states)
-
         if not available_states:
             self._attr_available = False
             self.async_schedule_update_ha_state(True)
@@ -496,18 +490,14 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
 
-    def _get_state_value_in_native_unit(self, state) -> Decimal:
-        apply_unit_conversions = AwesomeVersion(HA_VERSION) >= AwesomeVersion(
-            "2022.10.0"
-        )
-        if not apply_unit_conversions:
-            return Decimal(state)
+    def _get_state_value_in_native_unit(self, state: State) -> Decimal | None:
+        if state is None:
+            return None
 
         value = float(state.state)
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if (
                 unit_of_measurement
-                and apply_unit_conversions
                 and self._attr_native_unit_of_measurement != unit_of_measurement
         ):
             unit_converter = (
@@ -519,23 +509,6 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 value, unit_of_measurement, self._attr_native_unit_of_measurement
             )
         return Decimal(value)
-
-    def _remove_incompatible_unit_entities(
-        self, states: list[State]
-    ) -> None:  # pragma: no cover
-        """Remove members with an incompatible unit of measurements"""
-        for state in states:
-            unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            if (
-                unit_of_measurement is None
-            ):  # No unit of measurement, probably sensor has been reset
-                continue
-            if unit_of_measurement != self._attr_native_unit_of_measurement:
-                _LOGGER.warning(
-                    f"Group member '{state.entity_id}' has another unit of measurement '{unit_of_measurement}' than the group '{self.entity_id}' which has '{self._attr_native_unit_of_measurement}', this is not supported yet. Removing this entity from the total sum."
-                )
-                states.remove(state)
-                self._entities.remove(state.entity_id)
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
@@ -608,15 +581,17 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         _LOGGER.debug(f"Current energy group value {self.entity_id}: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
-            prev_state = self._get_state_value_in_native_unit(prev_state) if prev_state is not None else Decimal(0)
             cur_state = self._get_state_value_in_native_unit(entity_state)
+            prev_state = self._get_state_value_in_native_unit(prev_state) or Decimal(0)
+            self._prev_state_store.set_entity_state(entity_state.entity_id, entity_state)
+
             delta = cur_state - prev_state
             _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}")
             if delta >= 0:
-                _LOGGER.warning(f"skipping state for {entity_state.entity_id}, probably errornous value or sensor was reset")
                 group_sum += delta
+            else:
+                _LOGGER.warning(f"skipping state for {entity_state.entity_id}, probably errornous value or sensor was reset")
 
-            self._prev_state_store.set_entity_state(entity_state.entity_id, entity_state)
         _LOGGER.debug(f"New energy group value {self.entity_id}: {group_sum}")
         return group_sum
 
@@ -665,7 +640,7 @@ class PreviousStateStore:
             _LOGGER.error("Error saving current states", exc_info=exc)
 
     @callback
-    def async_setup_dump(self, *args: Any) -> None:
+    def async_setup_dump(self) -> None:
         """Set up the listeners for persistence."""
 
         async def _async_dump_states(*_: Any) -> None:
