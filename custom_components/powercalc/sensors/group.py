@@ -33,7 +33,7 @@ from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
-from homeassistant.helpers.restore_state import RestoreEntity, RestoreStateData
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
