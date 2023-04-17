@@ -977,3 +977,42 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
+
+
+async def test_energy_sensor_delta_updates(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: [
+                "sensor.a_energy",
+                "sensor.b_energy"
+            ],
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+
+    hass.states.async_set("sensor.a_energy", "2.10")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+
+    # Simulate a reset, this should just be ignored.
+    hass.states.async_set("sensor.a_energy", "0.00")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+
+    hass.states.async_set("sensor.a_energy", "0.20")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
