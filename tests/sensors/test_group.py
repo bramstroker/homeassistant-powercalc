@@ -251,6 +251,15 @@ async def test_reset_service(hass: HomeAssistant):
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
 
+    hass.states.async_set(
+        "sensor.test2_energy",
+        "0.5",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
+
 
 async def test_restore_state(hass: HomeAssistant):
     await create_input_boolean(hass, "test1")

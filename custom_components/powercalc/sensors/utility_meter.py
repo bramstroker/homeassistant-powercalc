@@ -5,17 +5,14 @@ import logging
 from typing import cast
 
 import homeassistant.helpers.entity_registry as er
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
 )
-from homeassistant.components.utility_meter.const import DOMAIN as UTILITY_DOMAIN
 from homeassistant.components.utility_meter.select import TariffSelect
 from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 
@@ -28,7 +25,6 @@ from ..const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DOMAIN,
 )
-from ..errors import SensorConfigurationError
 from .abstract import BaseEntity
 from .energy import EnergySensor, RealEnergySensor
 
@@ -126,30 +122,11 @@ async def create_tariff_select(
     if unique_id:
         select_unique_id = f"{unique_id}_select"
 
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion("2022.9.0"):  # pragma: no cover
-        utility_meter_component = cast(
-            EntityComponent, hass.data["entity_components"].get(UTILITY_DOMAIN)
-        )
-        if utility_meter_component is None:
-            utility_meter_component = (
-                hass.data.get("utility_meter_legacy_component") or None
-            )
-
-        if utility_meter_component is None:
-            raise SensorConfigurationError("Cannot find utility_meter component")
-
-        tariff_select = TariffSelect(
-            name,
-            tariffs,
-            utility_meter_component.async_add_entities,
-            select_unique_id,
-        )
-    else:
-        tariff_select = TariffSelect(
-            name,
-            tariffs,
-            select_unique_id,
-        )
+    tariff_select = TariffSelect(
+        name,
+        tariffs,
+        select_unique_id,
+    )
 
     await select_component.async_add_entities([tariff_select])
 

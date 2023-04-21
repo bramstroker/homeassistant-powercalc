@@ -6,7 +6,6 @@ from datetime import timedelta
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import ATTR_STATE_CLASS
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
@@ -28,22 +27,19 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event, async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
-
-if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.10.0"):
-    from homeassistant.util.unit_conversion import (
+from homeassistant.helpers.storage import Store
+from homeassistant.util.unit_conversion import (
         EnergyConverter,
         PowerConverter,
         BaseUnitConverter,
     )
 
-from homeassistant.helpers.storage import Store
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -587,10 +583,12 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
             delta = cur_state - prev_state
             _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}")
-            if delta >= 0:
-                group_sum += delta
-            else:
-                _LOGGER.warning(f"skipping state for {entity_state.entity_id}, probably errornous value or sensor was reset")
+            if delta < 0:
+                _LOGGER.warning(
+                    f"skipping state for {entity_state.entity_id}, probably erroneous value or sensor was reset")
+                continue
+
+            group_sum += delta
 
         _LOGGER.debug(f"New energy group value {self.entity_id}: {group_sum}")
         return group_sum
@@ -604,13 +602,13 @@ class PreviousStateStore:
         instance = PreviousStateStore(hass)
 
         try:
+            _LOGGER.debug("Load previous energy sensor states from store")
             stored_states = await instance.store.async_load()
         except HomeAssistantError as exc:
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
             stored_states = None
 
         if stored_states is None:
-            _LOGGER.debug("Load previous energy sensor states from store")
             instance.last_states = {}
         else:
             instance.states = stored_states
