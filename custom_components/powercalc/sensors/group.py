@@ -35,10 +35,10 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
 from homeassistant.util.unit_conversion import (
-        EnergyConverter,
-        PowerConverter,
-        BaseUnitConverter,
-    )
+    EnergyConverter,
+    PowerConverter,
+    BaseUnitConverter,
+)
 
 from ..const import (
     ATTR_ENTITIES,
