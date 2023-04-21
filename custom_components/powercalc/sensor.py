@@ -95,6 +95,8 @@ from .const import (
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHODS,
+    ENTRY_DATA_POWER_ENTITY,
+    ENTRY_DATA_ENERGY_ENTITY,
     ENTITY_CATEGORIES,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_INCREASE_DAILY_ENERGY,
@@ -284,30 +286,70 @@ async def _async_setup_entities(
 
     try:
         entities = await create_sensors(hass, config, discovery_info, config_entry)
+        if not entities:
+            return
+
+        if config_entry:
+            save_entity_ids_on_config_entry(hass, config_entry, entities)
     except SensorConfigurationError as err:
         _LOGGER.error(err)
         return
 
-    if entities:
-        entities_to_add = [
-            entity for entity in entities.new if isinstance(entity, SensorEntity)
-        ]
+    entities_to_add = [
+        entity for entity in entities.new if isinstance(entity, SensorEntity)
+    ]
 
-        # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
-        # Remove entities which are disabled because of a disabled device from the list of entities to add
-        # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
-        # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
-        # This causes the powercalc entity to never be bound to the device again and be disabled forever.
-        entity_reg = er.async_get(hass)
-        for entity in entities_to_add:
-            existing_entry = entity_reg.async_get(entity.entity_id)
-            if (
-                existing_entry
-                and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
-            ):
-                entities_to_add.remove(entity)
+    # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
+    # Remove entities which are disabled because of a disabled device from the list of entities to add
+    # When we add nevertheless the entity_platform code will set device_id to None and abort entity addition.
+    # `async_added_to_hass` hook will not be called, which powercalc uses to bind the entity to device again
+    # This causes the powercalc entity to never be bound to the device again and be disabled forever.
+    entity_reg = er.async_get(hass)
+    for entity in entities_to_add:
+        existing_entry = entity_reg.async_get(entity.entity_id)
+        if (
+            existing_entry
+            and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
+        ):
+            entities_to_add.remove(entity)
 
-        async_add_entities(entities_to_add)
+    async_add_entities(entities_to_add)
+
+
+@callback
+def save_entity_ids_on_config_entry(
+    hass, config_entry: ConfigEntry, entities: EntitiesBucket
+):
+    """
+    Save the power and energy sensor entity_id's on the config entry
+    We need this in group sensor logic to differentiate between energy sensor and utility meters.
+    """
+    power_entities = [
+        e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)
+    ]
+    energy_entities = [
+        e.entity_id for e in entities.all() if isinstance(e, EnergySensor)
+    ]
+    new_data = config_entry.data.copy()
+    if not power_entities:
+        raise SensorConfigurationError(
+            f"No power sensor created for config_entry {config_entry.entry_id}"
+        )
+    new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
+
+    if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
+        CONF_CREATE_ENERGY_SENSOR
+    ):
+        if not energy_entities:
+            raise SensorConfigurationError(
+                f"No energy sensor created for config_entry {config_entry.entry_id}"
+            )
+        new_data.update({ENTRY_DATA_ENERGY_ENTITY: energy_entities[0]})
+
+    hass.config_entries.async_update_entry(
+        config_entry,
+        data=new_data,
+    )
 
 
 @callback
@@ -685,6 +727,9 @@ class EntitiesBucket:
     def extend_items(self, bucket: EntitiesBucket):
         self.new.extend(bucket.new)
         self.existing.extend(bucket.existing)
+
+    def all(self):
+        return self.new + self.existing
 
     def has_entities(self) -> bool:
         return bool(self.new) or bool(self.existing)

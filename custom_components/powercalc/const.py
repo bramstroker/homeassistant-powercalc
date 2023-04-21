@@ -11,7 +11,7 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 
-MIN_HA_VERSION = "2022.5"
+MIN_HA_VERSION = "2022.11"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
@@ -22,6 +22,9 @@ DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_PROFILE_LIBRARY = "profile_library"
+
+ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
+ENTRY_DATA_POWER_ENTITY = "_power_entity"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 

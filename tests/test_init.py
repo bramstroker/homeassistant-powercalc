@@ -19,6 +19,8 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
 from custom_components.test.light import MockLight
@@ -121,7 +123,7 @@ async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant
     assert hass.states.get("sensor.all_light_energy_daily")
 
 
-async def test_legacy_power_template_config_is_converted_after_setup(
+async def test_create_config_entry_without_energy_sensor(
     hass: HomeAssistant,
 ) -> None:
     """
@@ -146,6 +148,8 @@ async def test_legacy_power_template_config_is_converted_after_setup(
 
     new_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert new_entry.data == {
+        ENTRY_DATA_ENERGY_ENTITY: "sensor.testentry_energy",
+        ENTRY_DATA_POWER_ENTITY: "sensor.testentry_power",
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_NAME: "testentry",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
