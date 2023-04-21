@@ -1,0 +1,14 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, Plug E (gen1)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.3:docker"
+    },
+    "name": "M\u00fcller Licht GU10 Spot white+color",
+    "name": "404005B",
+    "standby_power": 0.11
+}
