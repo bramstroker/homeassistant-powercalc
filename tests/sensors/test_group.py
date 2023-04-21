@@ -985,10 +985,7 @@ async def test_energy_sensor_delta_updates(hass: HomeAssistant) -> None:
         data={
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
-            CONF_GROUP_ENERGY_ENTITIES: [
-                "sensor.a_energy",
-                "sensor.b_energy"
-            ],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
         },
     )
     config_entry_group.add_to_hass(hass)
