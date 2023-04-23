@@ -125,9 +125,10 @@ from .sensors.daily_energy import (
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
-    create_domain_group_sensor, create_general_standby_sensors, create_group_sensors,
+    create_domain_group_sensor, create_group_sensors,
     create_group_sensors_from_config_entry,
 )
+from .sensors.group_standby import create_general_standby_sensors
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
