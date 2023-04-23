@@ -135,8 +135,6 @@ async def create_group_sensors(
         )
     )
 
-    group_sensors.append(StandbyPowerSensor())
-
     return group_sensors
 
 
@@ -611,7 +609,7 @@ class StandbyPowerSensor(PowerSensor):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
 
-    def __init(self, hass: HomeAssistant):
+    def __init__(self, hass: HomeAssistant):
         self.standby_sensors: set = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
 
     async def async_added_to_hass(self) -> None:

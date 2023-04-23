@@ -123,7 +123,7 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
-    add_to_associated_group,
+    StandbyPowerSensor, add_to_associated_group,
     create_group_sensors,
     create_group_sensors_from_config_entry,
 )
@@ -298,6 +298,7 @@ async def _async_setup_entities(
     entities_to_add = [
         entity for entity in entities.new if isinstance(entity, SensorEntity)
     ]
+    entities_to_add.append(StandbyPowerSensor(hass))
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
