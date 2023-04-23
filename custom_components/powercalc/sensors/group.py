@@ -584,7 +584,10 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
             cur_state = self._get_state_value_in_native_unit(entity_state)
-            prev_state = self._get_state_value_in_native_unit(prev_state) or Decimal(0)
+            if prev_state:
+                prev_state = self._get_state_value_in_native_unit(prev_state)
+            else:
+                prev_state = cur_state if self.state else Decimal(0)
             self._prev_state_store.set_entity_state(
                 entity_state.entity_id, entity_state
             )
@@ -642,9 +645,12 @@ class PreviousStateStore:
             stored_states = None
 
         if stored_states is None:
-            instance.last_states = {}
+            instance.states = {}
         else:
-            instance.states = stored_states
+            instance.states = {
+                entity_id: State.from_dict(json_state)
+                for (entity_id, json_state) in stored_states.items()
+            }
 
         instance.async_setup_dump()
 
