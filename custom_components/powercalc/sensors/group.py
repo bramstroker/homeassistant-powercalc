@@ -69,6 +69,7 @@ from ..const import (
     DUMMY_ENTITY_ID, ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     SERVICE_RESET_ENERGY,
+    SIGNAL_POWER_SENSOR_STATE_CHANGE,
     SensorType,
     UnitPrefix,
 )
@@ -183,7 +184,7 @@ async def create_group_sensors_from_config_entry(
 
 async def create_general_standby_sensors(hass: HomeAssistant, config: ConfigType) -> list[Entity]:
     sensor_config = config.copy()
-    power_sensor = StandbyPowerSensor(hass)
+    power_sensor = StandbyPowerSensor(hass, rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION))
     power_sensor.entity_id = "sensor.all_standby_power"
     sensor_config[CONF_NAME] = "All standby"
     source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
@@ -642,22 +643,22 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
         """Name of the entity."""
         return "All standby power"
 
-    def __init__(self, hass: HomeAssistant):
+    def __init__(self, hass: HomeAssistant, rounding_digits: int = 2):
         self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self._rounding_digits = rounding_digits
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
         await super().async_added_to_hass()
-        async_dispatcher_connect(self.hass, "powercalc_powersensor_changed", self._recalculate)
+        async_dispatcher_connect(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE, self._recalculate)
 
     async def _recalculate(self) -> None:
         """Calculate sum of all power sensors in standby, and update the state of the sensor."""
 
         if self.standby_sensors:
-            self._attr_native_value = round(sum(self.standby_sensors.values()), 2)
+            self._attr_native_value = round(sum(self.standby_sensors.values()), self._rounding_digits)
         else:
             self._attr_native_value = STATE_UNKNOWN
-        _LOGGER.debug("HANDLE POWER STATE UPDATE")
         self.async_schedule_update_ha_state(True)
 
 

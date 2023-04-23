@@ -65,7 +65,7 @@ from ..const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
-    CalculationStrategy,
+    CalculationStrategy, SIGNAL_POWER_SENSOR_STATE_CHANGE,
 )
 from ..discovery import autodiscover_model
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedStrategy
@@ -358,7 +358,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             await self._update_power_sensor(self._source_entity.entity_id, new_state)
             _LOGGER.debug("dispatcher send")
-            async_dispatcher_send(self.hass, "powercalc_powersensor_changed")
+            async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity.entity_id)
