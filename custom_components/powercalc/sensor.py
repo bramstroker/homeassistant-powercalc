@@ -124,7 +124,7 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
-    StandbyPowerSensor, add_to_associated_group,
+    add_to_associated_group,
     create_domain_group_sensor, create_general_standby_sensors, create_group_sensors,
     create_group_sensors_from_config_entry,
 )
