@@ -58,6 +58,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.sensors.group import PreviousStateStore
 
 from ..common import (
     create_input_boolean,
@@ -988,7 +989,7 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
 
 
-async def test_energy_sensor_delta_updates(hass: HomeAssistant) -> None:
+async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
     config_entry_group = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -1022,3 +1023,46 @@ async def test_energy_sensor_delta_updates(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
+
+
+async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.testgroup_energy", "5.00")
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
+
+    hass.states.async_set("sensor.a_energy", "2.50")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
+
+
+async def test_storage(hass: HomeAssistant):
+    state = State("sensor.dummy_power", "20.00")
+
+    store = PreviousStateStore(hass)
+    store.set_entity_state("sensor.dummy", state)
+    await store.persist_states()
+    await hass.async_block_till_done()
+
+    # Retrieving singleton instance should retrieve and decode persisted states
+    store: PreviousStateStore = await PreviousStateStore.async_get_instance(hass)
+    store_state = store.get_entity_state("sensor.dummy")
+
+    assert state == store_state
