@@ -53,6 +53,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
+    DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
@@ -193,6 +194,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
     }
 
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):

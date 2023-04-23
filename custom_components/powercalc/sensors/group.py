@@ -13,6 +13,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -58,6 +59,7 @@ from ..const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
+    DATA_STANDBY_POWER_SENSORS,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -132,6 +134,8 @@ async def create_group_sensors(
             hass, energy_sensor, sensor_config, net_consumption=True
         )
     )
+
+    group_sensors.append(StandbyPowerSensor())
 
     return group_sensors
 
@@ -597,6 +601,30 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
         _LOGGER.debug(f"New energy group value {self.entity_id}: {group_sum}")
         return group_sum
+
+
+class StandbyPowerSensor(PowerSensor):
+    _attr_device_class = SensorDeviceClass.POWER
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = POWER_WATT
+
+    def __init(self, hass: HomeAssistant):
+        self.standby_sensors: set = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+
+    async def async_added_to_hass(self) -> None:
+        """Register state listeners."""
+        await super().async_added_to_hass()
+        async_dispatcher_connect(self.hass, "powercalc_power_changed", self._recalculate)
+
+    async def _recalculate(self) -> None:
+        """Handle sources changed."""
+
+        _LOGGER.debug("HANDLE POWER STATE UPDATE")
+        await self.async_update_ha_state(True)
+
+    def calculate_standby_power(self):
+        for entity_id in self.standby_sensors:
+            _LOGGER.debug(f"standby sensor: {entity_id}")
 
 
 class PreviousStateStore:
