@@ -157,7 +157,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
         msg = (
             "This integration require at least HomeAssistant version "
             f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
@@ -327,7 +327,7 @@ async def create_domain_groups(
 
 def _notify_message(
     hass: HomeAssistant, notification_id: str, title: str, message: str
-) -> None:
+) -> None:  # pragma: no cover
     """Notify user with persistent notification"""
     hass.async_create_task(
         hass.services.async_call(
