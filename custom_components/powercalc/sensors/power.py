@@ -355,20 +355,19 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def appliance_state_listener(event):
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
-
             await self._update_power_sensor(self._source_entity.entity_id, new_state)
-            _LOGGER.debug("dispatcher send")
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity.entity_id)
             await self._update_power_sensor(self._source_entity.entity_id, state)
+            async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(event):
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
-
                 await self._update_power_sensor(entity_id, new_state)
+                async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         """Add listeners and get initial state."""
         entities_to_track = self._power_calculator.get_entities_to_track()

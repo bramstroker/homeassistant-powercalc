@@ -21,7 +21,7 @@ from custom_components.powercalc.common import create_source_entity
 
 from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_PRECISION,
-    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     DATA_STANDBY_POWER_SENSORS,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -37,7 +37,7 @@ async def create_general_standby_sensors(hass: HomeAssistant, config: ConfigType
     sensors = []
     power_sensor = StandbyPowerSensor(hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION))
     sensors.append(power_sensor)
-    if config.get(CONF_CREATE_ENERGY_SENSOR):
+    if config.get(CONF_CREATE_ENERGY_SENSORS):
         power_sensor.entity_id = "sensor.all_standby_power"
         sensor_config = config.copy()
         sensor_config[CONF_NAME] = "All standby"
