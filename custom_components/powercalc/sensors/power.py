@@ -20,6 +20,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers import start
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
     TrackTemplate,
@@ -59,11 +60,12 @@ from ..const import (
     CONF_UNAVAILABLE_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
+    DATA_STANDBY_POWER_SENSORS,
     DISCOVERY_POWER_PROFILE,
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
-    CalculationStrategy,
+    CalculationStrategy, SIGNAL_POWER_SENSOR_STATE_CHANGE,
 )
 from ..discovery import autodiscover_model
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedStrategy
@@ -199,6 +201,7 @@ async def create_virtual_power_sensor(
     )
 
     return VirtualPowerSensor(
+        hass=hass,
         power_calculator=calculation_strategy,
         calculation_strategy=strategy,
         entity_id=entity_id,
@@ -290,6 +293,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         power_calculator: PowerCalculationStrategyInterface,
         calculation_strategy: CalculationStrategy,
         entity_id: str,
@@ -342,6 +346,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None
         ):
             self._ignore_unavailable_state = True
+        self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
 
     async def async_added_to_hass(self):
         """Register callbacks."""
@@ -350,18 +355,19 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def appliance_state_listener(event):
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
-
             await self._update_power_sensor(self._source_entity.entity_id, new_state)
+            async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def template_change_listener(*args):
             state = self.hass.states.get(self._source_entity.entity_id)
             await self._update_power_sensor(self._source_entity.entity_id, state)
+            async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(event):
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
-
                 await self._update_power_sensor(entity_id, new_state)
+                async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         """Add listeners and get initial state."""
         entities_to_track = self._power_calculator.get_entities_to_track()
@@ -410,6 +416,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     ) -> bool:
         """Update power sensor based on new dependant entity state."""
 
+        self._standby_sensors.pop(self.entity_id, None)
         if self._sleep_power_timer:
             self._sleep_power_timer()
             self._sleep_power_timer = None
@@ -475,7 +482,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if entity_state.state in OFF_STATES or not is_calculation_enabled:
-            return await self.calculate_standby_power(entity_state)
+            power = await self.calculate_standby_power(entity_state)
+            self._standby_sensors[self.entity_id] = power
+            return power
 
         power = await self._power_calculator.calculate(entity_state)
         if power is None:

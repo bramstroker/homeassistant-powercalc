@@ -37,8 +37,9 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     """Create object containing all information about the source entity"""
 
     if entity_id == DUMMY_ENTITY_ID:
+        domain, object_id = split_entity_id(DUMMY_ENTITY_ID)
         return SourceEntity(
-            object_id=DUMMY_ENTITY_ID, entity_id=DUMMY_ENTITY_ID, domain=DUMMY_ENTITY_ID
+            object_id=object_id, entity_id=DUMMY_ENTITY_ID, domain=domain
         )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)

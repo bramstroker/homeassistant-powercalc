@@ -22,6 +22,7 @@ DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
 DATA_PROFILE_LIBRARY = "profile_library"
+DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
@@ -151,6 +152,8 @@ SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_CALIBRATE_UTILITY_METER = "calibrate_utility_meter"
 
+SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
+
 MODE_LUT = "lut"
 MODE_LINEAR = "linear"
 MODE_FIXED = "fixed"
@@ -178,4 +181,5 @@ class SensorType(StrEnum):
 
 class PowercalcDiscoveryType(StrEnum):
     DOMAIN_GROUP = "domain_group"
+    STANDBY_GROUP = "standby_group"
     LIBRARY = "library"

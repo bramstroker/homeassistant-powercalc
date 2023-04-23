@@ -1,6 +1,6 @@
 from homeassistant.components import input_boolean, light
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -48,14 +48,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
         hass, get_simple_fixed_config("input_boolean.test", 100), domain_config
     )
 
-    # Triggering start even does not trigger create_domain_groups
-    # Need to further investigate this
-    # For now just call create_domain_groups manually
-    # hass.bus.async_fire(EVENT_HOMEASSISTANT_START)
-
-    await create_domain_groups(
-        hass, hass.data[DOMAIN][DOMAIN_CONFIG], [input_boolean.DOMAIN, light.DOMAIN]
-    )
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
     await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.all_input_boolean_power")

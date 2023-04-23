@@ -53,6 +53,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
+    DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
@@ -156,7 +157,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
         msg = (
             "This integration require at least HomeAssistant version "
             f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
@@ -193,6 +194,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
     }
 
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
@@ -202,6 +204,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
 
         async def _create_domain_groups(event: None):
+            _LOGGER.info('test')
             await create_domain_groups(
                 hass,
                 domain_config,
@@ -212,6 +215,23 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             EVENT_HOMEASSISTANT_STARTED,
             _create_domain_groups,
         )
+
+    async def _create_standby_group(event: None):
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {
+                    DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP
+                },
+                domain_config,
+            )
+        )
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _create_standby_group,
+    )
 
     return True
 
@@ -308,7 +328,7 @@ async def create_domain_groups(
 
 def _notify_message(
     hass: HomeAssistant, notification_id: str, title: str, message: str
-) -> None:
+) -> None:  # pragma: no cover
     """Notify user with persistent notification"""
     hass.async_create_task(
         hass.services.async_call(

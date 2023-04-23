@@ -17,6 +17,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DOMAIN,
+    CONF_ENTITIES,
     CONF_NAME,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
@@ -30,6 +32,7 @@ from homeassistant.const import (
 from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
@@ -38,12 +41,23 @@ from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
     PowerConverter,
 )
 
+from .abstract import (
+    BaseEntity,
+    generate_energy_sensor_entity_id,
+    generate_energy_sensor_name,
+    generate_power_sensor_entity_id,
+    generate_power_sensor_name,
+)
+from .energy import EnergySensor
+from .power import PowerSensor
+from .utility_meter import create_utility_meters
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -65,16 +79,6 @@ from ..const import (
     SensorType,
     UnitPrefix,
 )
-from .abstract import (
-    BaseEntity,
-    generate_energy_sensor_entity_id,
-    generate_energy_sensor_name,
-    generate_power_sensor_entity_id,
-    generate_power_sensor_name,
-)
-from .energy import EnergySensor
-from .power import PowerSensor
-from .utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -88,7 +92,7 @@ STATE_DUMP_INTERVAL = timedelta(minutes=10)
 async def create_group_sensors(
     group_name: str,
     sensor_config: dict[str, Any],
-    entities: list[BaseEntity],
+    entities: list[Entity],
     hass: HomeAssistant,
     filters: list[Callable, None] = None,
 ) -> list[GroupedSensor]:
@@ -172,6 +176,17 @@ async def create_group_sensors_from_config_entry(
         )
 
     return group_sensors
+
+
+async def create_domain_group_sensor(hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType) -> list[Entity]:
+    domain = discovery_info[CONF_DOMAIN]
+    sensor_config = config.copy()
+    sensor_config[
+        CONF_UNIQUE_ID
+    ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+    return await create_group_sensors(
+        f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass
+    )
 
 
 async def remove_power_sensor_from_associated_groups(
