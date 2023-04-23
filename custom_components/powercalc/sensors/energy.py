@@ -92,7 +92,7 @@ async def create_energy_sensor(
     if unit_prefix == UnitPrefix.NONE:
         unit_prefix = None
 
-    _LOGGER.debug("Creating energy sensor: %s, %s", name, entity_id)
+    _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
