@@ -13,7 +13,6 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
-from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
@@ -28,6 +27,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import RegistryEntryDisabler
 from homeassistant.helpers.template import Template
@@ -125,7 +125,8 @@ from .sensors.daily_energy import (
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
-    create_domain_group_sensor, create_group_sensors,
+    create_domain_group_sensor,
+    create_group_sensors,
     create_group_sensors_from_config_entry,
 )
 from .sensors.group_standby import create_general_standby_sensors
@@ -454,9 +455,15 @@ async def create_sensors(
     # Handle setup of domain groups and general standby power group
     if discovery_info:
         if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
-            return EntitiesBucket(new=await create_domain_group_sensor(hass, discovery_info, global_config))
+            return EntitiesBucket(
+                new=await create_domain_group_sensor(
+                    hass, discovery_info, global_config
+                )
+            )
         if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
-            return EntitiesBucket(new=await create_general_standby_sensors(hass, global_config))
+            return EntitiesBucket(
+                new=await create_general_standby_sensors(hass, global_config)
+            )
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
     if CONF_ENTITIES not in config and CONF_INCLUDE not in config:

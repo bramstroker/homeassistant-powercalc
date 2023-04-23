@@ -8,20 +8,16 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.const import (
-    CONF_NAME,
-    POWER_WATT,
-    STATE_UNKNOWN,
-)
+from homeassistant.const import CONF_NAME, POWER_WATT, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
-from custom_components.powercalc.common import create_source_entity
 
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
-    CONF_POWER_SENSOR_PRECISION,
     CONF_CREATE_ENERGY_SENSORS,
+    CONF_POWER_SENSOR_PRECISION,
     DATA_STANDBY_POWER_SENSORS,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -33,16 +29,22 @@ from custom_components.powercalc.sensors.power import PowerSensor
 _LOGGER = logging.getLogger(__name__)
 
 
-async def create_general_standby_sensors(hass: HomeAssistant, config: ConfigType) -> list[Entity]:
+async def create_general_standby_sensors(
+    hass: HomeAssistant, config: ConfigType
+) -> list[Entity]:
     sensors = []
-    power_sensor = StandbyPowerSensor(hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION))
+    power_sensor = StandbyPowerSensor(
+        hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION)
+    )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
         power_sensor.entity_id = "sensor.all_standby_power"
         sensor_config = config.copy()
         sensor_config[CONF_NAME] = "All standby"
         source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
-        energy_sensor = await create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+        energy_sensor = await create_energy_sensor(
+            hass, sensor_config, power_sensor, source_entity
+        )
         sensors.append(energy_sensor)
     return sensors
 
@@ -60,19 +62,25 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
         return "All standby power"
 
     def __init__(self, hass: HomeAssistant, rounding_digits: int = 2):
-        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][
+            DATA_STANDBY_POWER_SENSORS
+        ]
         self._rounding_digits = rounding_digits
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
         await super().async_added_to_hass()
-        async_dispatcher_connect(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE, self._recalculate)
+        async_dispatcher_connect(
+            self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE, self._recalculate
+        )
 
     async def _recalculate(self) -> None:
         """Calculate sum of all power sensors in standby, and update the state of the sensor."""
 
         if self.standby_sensors:
-            self._attr_native_value = round(sum(self.standby_sensors.values()), self._rounding_digits)
+            self._attr_native_value = round(
+                sum(self.standby_sensors.values()), self._rounding_digits
+            )
         else:
             self._attr_native_value = STATE_UNKNOWN
         self.async_schedule_update_ha_state(True)

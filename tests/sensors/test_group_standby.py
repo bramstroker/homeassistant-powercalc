@@ -1,4 +1,11 @@
-from homeassistant.const import (CONF_ENTITIES, CONF_ENTITY_ID, EVENT_HOMEASSISTANT_STARTED, STATE_OFF, STATE_ON, STATE_UNKNOWN)
+from homeassistant.const import (
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    EVENT_HOMEASSISTANT_STARTED,
+    STATE_OFF,
+    STATE_ON,
+    STATE_UNKNOWN,
+)
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
@@ -8,10 +15,8 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CalculationStrategy,
 )
-from ..common import (
-    create_input_booleans,
-    run_powercalc_setup,
-)
+
+from ..common import create_input_booleans, run_powercalc_setup
 
 
 async def test_standby_group(hass: HomeAssistant):
@@ -32,7 +37,7 @@ async def test_standby_group(hass: HomeAssistant):
                     CONF_STANDBY_POWER: 0.3,
                     CONF_MODE: CalculationStrategy.FIXED,
                     CONF_FIXED: {CONF_POWER: 40},
-                }
+                },
             ],
         },
     )

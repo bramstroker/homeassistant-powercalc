@@ -48,16 +48,6 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
-from .abstract import (
-    BaseEntity,
-    generate_energy_sensor_entity_id,
-    generate_energy_sensor_name,
-    generate_power_sensor_entity_id,
-    generate_power_sensor_name,
-)
-from .energy import EnergySensor
-from .power import PowerSensor
-from .utility_meter import create_utility_meters
 from ..const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -79,6 +69,16 @@ from ..const import (
     SensorType,
     UnitPrefix,
 )
+from .abstract import (
+    BaseEntity,
+    generate_energy_sensor_entity_id,
+    generate_energy_sensor_name,
+    generate_power_sensor_entity_id,
+    generate_power_sensor_name,
+)
+from .energy import EnergySensor
+from .power import PowerSensor
+from .utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -178,7 +178,9 @@ async def create_group_sensors_from_config_entry(
     return group_sensors
 
 
-async def create_domain_group_sensor(hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType) -> list[Entity]:
+async def create_domain_group_sensor(
+    hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType
+) -> list[Entity]:
     domain = discovery_info[CONF_DOMAIN]
     sensor_config = config.copy()
     sensor_config[

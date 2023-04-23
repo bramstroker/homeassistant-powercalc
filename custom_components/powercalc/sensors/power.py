@@ -65,7 +65,8 @@ from ..const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
-    CalculationStrategy, SIGNAL_POWER_SENSOR_STATE_CHANGE,
+    SIGNAL_POWER_SENSOR_STATE_CHANGE,
+    CalculationStrategy,
 )
 from ..discovery import autodiscover_model
 from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedStrategy
