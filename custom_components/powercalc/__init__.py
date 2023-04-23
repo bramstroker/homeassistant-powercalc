@@ -215,6 +215,23 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             _create_domain_groups,
         )
 
+    async def _create_standby_group(event: None):
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {
+                    DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP
+                },
+                domain_config,
+            )
+        )
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _create_standby_group,
+    )
+
     return True
 
 

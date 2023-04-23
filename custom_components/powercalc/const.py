@@ -179,4 +179,5 @@ class SensorType(StrEnum):
 
 class PowercalcDiscoveryType(StrEnum):
     DOMAIN_GROUP = "domain_group"
+    STANDBY_GROUP = "standby_group"
     LIBRARY = "library"

@@ -357,6 +357,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             new_state = event.data.get("new_state")
 
             await self._update_power_sensor(self._source_entity.entity_id, new_state)
+            _LOGGER.debug("dispatcher send")
             async_dispatcher_send(self.hass, "powercalc_powersensor_changed")
 
         async def template_change_listener(*args):

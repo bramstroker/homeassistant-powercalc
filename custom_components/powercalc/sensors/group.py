@@ -13,11 +13,14 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DOMAIN,
+    CONF_ENTITIES,
     CONF_NAME,
     CONF_UNIQUE_ID,
     ENERGY_KILO_WATT_HOUR,
@@ -35,6 +38,7 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
@@ -44,6 +48,7 @@ from homeassistant.util.unit_conversion import (
     EnergyConverter,
     PowerConverter,
 )
+from ..common import create_source_entity
 
 from ..const import (
     ATTR_ENTITIES,
@@ -61,7 +66,7 @@ from ..const import (
     CONF_SUB_GROUPS,
     DATA_STANDBY_POWER_SENSORS,
     DOMAIN,
-    ENTRY_DATA_ENERGY_ENTITY,
+    DUMMY_ENTITY_ID, ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
     SERVICE_RESET_ENERGY,
     SensorType,
@@ -74,7 +79,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from .energy import EnergySensor
+from .energy import EnergySensor, create_energy_sensor
 from .power import PowerSensor
 from .utility_meter import create_utility_meters
 
@@ -90,7 +95,7 @@ STATE_DUMP_INTERVAL = timedelta(minutes=10)
 async def create_group_sensors(
     group_name: str,
     sensor_config: dict[str, Any],
-    entities: list[BaseEntity],
+    entities: list[Entity],
     hass: HomeAssistant,
     filters: list[Callable, None] = None,
 ) -> list[GroupedSensor]:
@@ -174,6 +179,27 @@ async def create_group_sensors_from_config_entry(
         )
 
     return group_sensors
+
+
+async def create_general_standby_sensors(hass: HomeAssistant, config: ConfigType) -> list[Entity]:
+    sensor_config = config.copy()
+    power_sensor = StandbyPowerSensor(hass)
+    power_sensor.entity_id = "sensor.all_standby_power"
+    sensor_config[CONF_NAME] = "All standby"
+    source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
+    energy_sensor = await create_energy_sensor(hass, sensor_config, power_sensor, source_entity)
+    return [power_sensor, energy_sensor]
+
+
+async def create_domain_group_sensor(hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType) -> list[Entity]:
+    domain = discovery_info[CONF_DOMAIN]
+    sensor_config = config.copy()
+    sensor_config[
+        CONF_UNIQUE_ID
+    ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+    return await create_group_sensors(
+        f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass
+    )
 
 
 async def remove_power_sensor_from_associated_groups(
@@ -604,28 +630,35 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         return group_sum
 
 
-class StandbyPowerSensor(PowerSensor):
+class StandbyPowerSensor(SensorEntity, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
+    _attr_has_entity_name = True
+    _attr_unique_id = "powercalc_standby_group"
+
+    @property
+    def name(self):
+        """Name of the entity."""
+        return "All standby power"
 
     def __init__(self, hass: HomeAssistant):
-        self.standby_sensors: set = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
         await super().async_added_to_hass()
-        async_dispatcher_connect(self.hass, "powercalc_power_changed", self._recalculate)
+        async_dispatcher_connect(self.hass, "powercalc_powersensor_changed", self._recalculate)
 
     async def _recalculate(self) -> None:
-        """Handle sources changed."""
+        """Calculate sum of all power sensors in standby, and update the state of the sensor."""
 
+        if self.standby_sensors:
+            self._attr_native_value = round(sum(self.standby_sensors.values()), 2)
+        else:
+            self._attr_native_value = STATE_UNKNOWN
         _LOGGER.debug("HANDLE POWER STATE UPDATE")
-        await self.async_update_ha_state(True)
-
-    def calculate_standby_power(self):
-        for entity_id in self.standby_sensors:
-            _LOGGER.debug(f"standby sensor: {entity_id}")
+        self.async_schedule_update_ha_state(True)
 
 
 class PreviousStateStore:

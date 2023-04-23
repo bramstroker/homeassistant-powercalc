@@ -13,6 +13,7 @@ import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
+from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
@@ -124,7 +125,7 @@ from .sensors.daily_energy import (
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     StandbyPowerSensor, add_to_associated_group,
-    create_group_sensors,
+    create_domain_group_sensor, create_general_standby_sensors, create_group_sensors,
     create_group_sensors_from_config_entry,
 )
 from .sensors.power import VirtualPowerSensor, create_power_sensor
@@ -298,7 +299,6 @@ async def _async_setup_entities(
     entities_to_add = [
         entity for entity in entities.new if isinstance(entity, SensorEntity)
     ]
-    entities_to_add.append(StandbyPowerSensor(hass))
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
@@ -450,21 +450,12 @@ async def create_sensors(
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
 
-    # Handle setup of domain groups
-    if (
-        discovery_info
-        and discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP
-    ):
-        domain = discovery_info[CONF_DOMAIN]
-        sensor_config = global_config.copy()
-        sensor_config[
-            CONF_UNIQUE_ID
-        ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
-        return EntitiesBucket(
-            new=await create_group_sensors(
-                f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass
-            )
-        )
+    # Handle setup of domain groups and general standby power group
+    if discovery_info:
+        if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
+            return EntitiesBucket(new=await create_domain_group_sensor(hass, discovery_info, global_config))
+        if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
+            return EntitiesBucket(new=await create_general_standby_sensors(hass, global_config))
 
     # Setup a power sensor for one single appliance. Either by manual configuration or discovery
     if CONF_ENTITIES not in config and CONF_INCLUDE not in config:
@@ -533,7 +524,7 @@ async def create_sensors(
             await create_group_sensors(
                 config.get(CONF_CREATE_GROUP),
                 get_merged_sensor_configuration(global_config, config, validate=False),
-                entities_to_add.new + entities_to_add.existing,
+                entities_to_add.all(),
                 hass=hass,
             )
         )
@@ -722,8 +713,8 @@ async def is_auto_configurable(
 
 @dataclass
 class EntitiesBucket:
-    new: list[BaseEntity] = field(default_factory=list)
-    existing: list[BaseEntity] = field(default_factory=list)
+    new: list[Entity] = field(default_factory=list)
+    existing: list[Entity] = field(default_factory=list)
 
     def extend_items(self, bucket: EntitiesBucket):
         self.new.extend(bucket.new)
