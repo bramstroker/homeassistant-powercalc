@@ -159,7 +159,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
         msg = (
-            "This integration require at least HomeAssistant version "
+            "This integration requires at least HomeAssistant version "
             f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
             " Please upgrade HomeAssistant to continue use this integration."
         )
