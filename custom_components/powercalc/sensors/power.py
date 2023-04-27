@@ -30,7 +30,7 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import DiscoveryInfoType, StateType
+from homeassistant.helpers.typing import DiscoveryInfoType, StateType, ConfigType
 
 from ..common import SourceEntity
 from ..const import (
@@ -102,7 +102,7 @@ async def create_power_sensor(
 
 async def create_virtual_power_sensor(
     hass: HomeAssistant,
-    sensor_config: dict,
+    sensor_config: ConfigType,
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> VirtualPowerSensor:
@@ -118,7 +118,7 @@ async def create_virtual_power_sensor(
             and discovery_info.get(DISCOVERY_POWER_PROFILE)
         ):
             power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
-        else:
+        elif not is_manually_configured(sensor_config):
             try:
                 model_info = await autodiscover_model(hass, source_entity.entity_entry)
                 power_profile = await get_power_profile(
@@ -174,7 +174,7 @@ async def create_virtual_power_sensor(
     standby_power = Decimal(0)
     standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        if sensor_config.get(CONF_STANDBY_POWER):
+        if sensor_config.get(CONF_STANDBY_POWER) is not None:
             standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
         elif power_profile is not None:
             standby_power = Decimal(power_profile.standby_power)
@@ -241,6 +241,20 @@ async def create_real_power_sensor(
     return RealPowerSensor(
         entity_id=power_sensor_id, device_id=device_id, unique_id=unique_id
     )
+
+
+def is_manually_configured(sensor_config: ConfigType) -> bool:
+    """
+    Check if the user manually configured the sensor.
+    We need to skip loading a power profile to make 
+    """
+    if CONF_MODEL in sensor_config:
+        return False
+    if CONF_FIXED in sensor_config:
+        return True
+    if CONF_LINEAR in sensor_config:
+        return True
+    return False
 
 
 def select_calculation_strategy(
