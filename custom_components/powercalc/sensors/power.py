@@ -246,7 +246,7 @@ async def create_real_power_sensor(
 def is_manually_configured(sensor_config: ConfigType) -> bool:
     """
     Check if the user manually configured the sensor.
-    We need to skip loading a power profile to make 
+    We need to skip loading a power profile to make
     """
     if CONF_MODEL in sensor_config:
         return False
