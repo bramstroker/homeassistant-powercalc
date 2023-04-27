@@ -68,6 +68,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
+
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
     await create_input_boolean(hass)
 
@@ -416,7 +417,8 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     assert ATTR_SOURCE_ENTITY not in power_state.attributes
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
 
-async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant):
+
+async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant) -> None:
     """
     Make sure that config settings done by user are not overriden by power profile
     """
