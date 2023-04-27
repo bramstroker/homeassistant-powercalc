@@ -94,7 +94,7 @@ async def create_group_sensors(
     sensor_config: dict[str, Any],
     entities: list[Entity],
     hass: HomeAssistant,
-    filters: list[Callable, None] = None,
+    filters: list[Callable] | None = None,
 ) -> list[GroupedSensor]:
     """Create grouped power and energy sensors."""
 

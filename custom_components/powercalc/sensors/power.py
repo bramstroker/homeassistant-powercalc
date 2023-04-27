@@ -258,7 +258,7 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
 
 
 def select_calculation_strategy(
-    config: dict, power_profile: PowerProfile | None
+    config: ConfigType, power_profile: PowerProfile | None
 ) -> CalculationStrategy:
     """Select the calculation strategy"""
     config_mode = config.get(CONF_MODE)
@@ -282,7 +282,7 @@ def select_calculation_strategy(
     )
 
 
-def is_fully_configured(config) -> bool:
+def is_fully_configured(config: ConfigType) -> bool:
     if config.get(CONF_FIXED):
         return True
     if config.get(CONF_LINEAR):
@@ -331,7 +331,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._calculation_mode = calculation_strategy
         self._source_entity = source_entity
         self._attr_name = name
-        self._power = None
+        self._power: Decimal | None = None
         self._standby_power = standby_power
         self._standby_power_on = standby_power_on
         self._attr_force_update = True
@@ -454,12 +454,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._power is not None:
             self._power = round(self._power, self._rounding_digits)
 
-        _LOGGER.debug(
-            '%s: State changed to "%s". Power:%s',
-            state.entity_id,
-            state.state,
-            self._power,
-        )
+        if state:
+            _LOGGER.debug(
+                '%s: State changed to "%s". Power:%s',
+                state.entity_id,
+                state.state,
+                self._power,
+            )
 
         if self._power is None:
             self.async_write_ha_state()
@@ -533,12 +534,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._power_profile.select_sub_profile(
             self._sub_profile_selector.select_sub_profile(state)
         )
-        self._standby_power = self._power_profile.standby_power
-        self._standby_power_on = self._power_profile.standby_power_on
+        self._standby_power = Decimal(self._power_profile.standby_power)
+        self._standby_power_on = Decimal(self._power_profile.standby_power_on)
 
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state"""
-        sleep_power: dict[str, Any] = self._sensor_config.get(CONF_SLEEP_POWER)
+        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
 
@@ -612,11 +613,11 @@ class RealPowerSensor(PowerSensor):
         return self._entity_id
 
     @property
-    def device_id(self) -> str:
+    def device_id(self) -> str | None:
         """Return the device_id of the sensor."""
         return self._device_id
 
     @property
-    def unique_id(self) -> str:
+    def unique_id(self) -> str | None:
         """Return the unique_id of the sensor."""
         return self._unique_id

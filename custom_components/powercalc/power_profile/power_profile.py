@@ -39,8 +39,8 @@ class PowerProfile:
         hass: HomeAssistant,
         manufacturer: str,
         model: str,
-        directory: str | None,
-        json_data: dict | None = None,
+        directory: str,
+        json_data: dict,
     ):
         self._manufacturer = manufacturer
         self._model = model.replace("#slash#", "/")
@@ -91,7 +91,7 @@ class PowerProfile:
 
     @property
     def name(self) -> str:
-        return self._json_data.get("name")
+        return self._json_data.get("name") or ""
 
     @property
     def standby_power(self) -> float:
@@ -107,13 +107,9 @@ class PowerProfile:
         Get the calculation strategy this profile provides.
         supported modes is here for BC purposes.
         """
-        if "supported_modes" in self._json_data:  # pragma: no cover
-            _LOGGER.warning(
-                "Deprecation: supported_modes detected in model.json file. "
-                "You must rename this to calculation_strategy for this to keep working in the future"
-            )
-            return self._json_data.get("supported_modes")[0]
-        return self._json_data.get("calculation_strategy") or CalculationStrategy.LUT
+        if self._json_data.get("calculation_strategy"):
+            return CalculationStrategy(self._json_data.get("calculation_strategy"))
+        return CalculationStrategy.LUT
 
     @property
     def linked_lut(self) -> str | None:

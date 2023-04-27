@@ -16,6 +16,7 @@ from homeassistant.components.media_player import (
 )
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
@@ -41,7 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: dict,
+        config: ConfigType,
         hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: Optional[float],
@@ -50,7 +51,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration: list[tuple] | None = None
+        self._calibration: list[tuple[int, float]] | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption"""
@@ -87,13 +88,13 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest lower value from calibration table"""
-        return min(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
+        return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
     def get_max_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest higher value from calibration table"""
-        return max(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
+        return max(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
-    def create_calibrate_list(self) -> list[tuple]:
+    def create_calibrate_list(self) -> list[tuple[int, float]]:
         """Build a table of calibration values"""
         calibration_list = []
 
@@ -126,6 +127,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         if self._source_entity.domain == media_player.DOMAIN:
             return 0, 100
+        raise StrategyConfigurationError("Unsupported domain for linear strategy")
 
     def get_current_state_value(self, entity_state: State) -> Optional[int]:
         """Get the current entity state, i.e. selected brightness"""
