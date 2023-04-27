@@ -416,7 +416,6 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     assert ATTR_SOURCE_ENTITY not in power_state.attributes
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
 
-
 async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant):
     """
     Make sure that config settings done by user are not overriden by power profile
