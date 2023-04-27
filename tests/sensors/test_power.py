@@ -14,7 +14,7 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    STATE_OFF,
+    CONF_UNIQUE_ID, STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
@@ -60,6 +60,12 @@ from ..common import (
     create_input_number,
     get_simple_fixed_config,
     run_powercalc_setup,
+)
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
 )
 
 
@@ -410,3 +416,57 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     power_state = hass.states.get("sensor.test_power")
     assert ATTR_SOURCE_ENTITY not in power_state.attributes
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
+
+
+async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant) -> None:
+    """
+    Make sure that config settings done by user are not overriden by power profile
+    """
+    entity_id = "light.test"
+    manufacturer = "sonoff"
+    model = "ZBMINI"
+
+    mock_registry(
+        hass,
+        {
+            entity_id: RegistryEntry(
+                entity_id=entity_id,
+                unique_id="1234",
+                platform="light",
+                device_id="sonoff-device-id",
+            ),
+        },
+    )
+    mock_device_registry(
+        hass,
+        {
+            "sonoff-device-id": DeviceEntry(
+                id="sonoff-device-id", manufacturer=manufacturer, model=model
+            )
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_NAME: "Test 123",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_STANDBY_POWER: 0,
+            CONF_FIXED: {
+                CONF_POWER: 6
+            }
+        },
+    )
+
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_123_power")
+    assert power_state.state == "6.00"
+
+    hass.states.async_set("light.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_123_power")
+    assert power_state.state == "0.00"

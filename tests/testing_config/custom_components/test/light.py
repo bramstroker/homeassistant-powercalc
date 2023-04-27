@@ -69,6 +69,15 @@ class MockLight(MockToggleEntity, LightEntity):
             unique_id = str(uuid.uuid4())[:8]
         self._attr_unique_id = unique_id
 
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {("hue", self.unique_id)},
+            "name": self.name,
+            "manufacturer": self.manufacturer,
+            "model": self.model,
+        }
+
     def turn_on(self, **kwargs):
         """Turn the entity on."""
         super().turn_on(**kwargs)
@@ -86,12 +95,3 @@ class MockLight(MockToggleEntity, LightEntity):
                 setattr(self, key, value)
             if key == "white":
                 setattr(self, "brightness", value)
-
-    @property
-    def device_info(self):
-        return {
-            "identifiers": {("hue", self.unique_id)},
-            "name": self.name,
-            "manufacturer": self.manufacturer,
-            "model": self.model,
-        }
