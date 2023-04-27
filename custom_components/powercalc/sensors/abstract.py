@@ -9,6 +9,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
+from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import (
@@ -44,7 +45,7 @@ class BaseEntity(Entity):
 
 
 def generate_power_sensor_name(
-    sensor_config: dict[str, Any],
+    sensor_config: ConfigType,
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
@@ -59,7 +60,7 @@ def generate_power_sensor_name(
 
 
 def generate_energy_sensor_name(
-    sensor_config: dict[str, Any],
+    sensor_config: ConfigType,
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
@@ -74,7 +75,7 @@ def generate_energy_sensor_name(
 
 
 def _generate_sensor_name(
-    sensor_config: dict[str, Any],
+    sensor_config: ConfigType,
     naming_conf_key: str,
     friendly_naming_conf_key: str,
     name: str | None = None,
@@ -95,7 +96,7 @@ def _generate_sensor_name(
 @callback
 def generate_power_sensor_entity_id(
     hass: HomeAssistant,
-    sensor_config: dict[str, Any],
+    sensor_config: ConfigType,
     source_entity: SourceEntity | None = None,
     name: str | None = None,
     unique_id: str | None = None,
@@ -104,17 +105,18 @@ def generate_power_sensor_entity_id(
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
     name_pattern: str = sensor_config.get(CONF_POWER_SENSOR_NAMING)
-    object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
-    entity_id = async_generate_entity_id(
+    object_id = name or sensor_config.get(CONF_NAME)
+    if object_id is None and source_entity:
+        object_id = source_entity.object_id
+    return async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
-    return entity_id
 
 
 @callback
 def generate_energy_sensor_entity_id(
     hass: HomeAssistant,
-    sensor_config: dict[str, Any],
+    sensor_config: ConfigType,
     source_entity: SourceEntity | None = None,
     name: str | None = None,
     unique_id: str | None = None,
@@ -123,11 +125,12 @@ def generate_energy_sensor_entity_id(
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
     name_pattern: str = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
-    object_id = name or sensor_config.get(CONF_NAME) or source_entity.object_id
-    entity_id = async_generate_entity_id(
+    object_id = name or sensor_config.get(CONF_NAME)
+    if object_id is None and source_entity:
+        object_id = source_entity.object_id
+    return async_generate_entity_id(
         ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass
     )
-    return entity_id
 
 
 def get_entity_id_by_unique_id(

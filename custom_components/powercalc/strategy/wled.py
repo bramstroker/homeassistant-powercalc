@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
-from typing import Optional
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.event import TrackTemplate
+from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import CONF_POWER_FACTOR, CONF_VOLTAGE, OFF_STATES
@@ -29,16 +29,16 @@ _LOGGER = logging.getLogger(__name__)
 class WledStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: dict,
+        config: ConfigType,
         light_entity: SourceEntity,
         hass: HomeAssistant,
-        standby_power: Optional[float],
+        standby_power: float | None = None,
     ) -> None:
         self._hass = hass
         self._voltage = config.get(CONF_VOLTAGE)
         self._power_factor = config.get(CONF_POWER_FACTOR) or 0.9
         self._light_entity = light_entity
-        self._standby_power = standby_power
+        self._standby_power: Decimal = Decimal(standby_power or 0)
         self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
@@ -66,21 +66,22 @@ class WledStrategy(PowerCalculationStrategyInterface):
         if entry:
             return entry.entity_id
 
-        device_id = self._light_entity.entity_entry.device_id
-        estimated_current_entities = [
-            entity_entry.entity_id
-            for entity_entry in entity_registry.async_entries_for_device(
-                entity_reg, device_id
-            )
-            if (entity_entry.device_class or entity_entry.original_device_class)
-            == SensorDeviceClass.CURRENT
-        ]
-        if estimated_current_entities:
-            return estimated_current_entities[0]
+        if self._light_entity.entity_entry:
+            device_id = self._light_entity.entity_entry.device_id
+            estimated_current_entities = [
+                entity_entry.entity_id
+                for entity_entry in entity_registry.async_entries_for_device(
+                    entity_reg, device_id
+                )
+                if (entity_entry.device_class or entity_entry.original_device_class)
+                == SensorDeviceClass.CURRENT
+            ]
+            if estimated_current_entities:
+                return estimated_current_entities[0]
 
         raise StrategyConfigurationError("{No estimated current entity found")
 
-    def get_entities_to_track(self) -> list[str, TrackTemplate]:
+    def get_entities_to_track(self) -> list[str | TrackTemplate]:
         return [self._estimated_current_entity]
 
     def can_calculate_standby(self) -> bool:
