@@ -30,7 +30,7 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import DiscoveryInfoType, StateType, ConfigType
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, StateType
 
 from ..common import SourceEntity
 from ..const import (

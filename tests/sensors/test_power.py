@@ -14,18 +14,23 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_UNIQUE_ID, STATE_OFF,
+    CONF_UNIQUE_ID,
+    STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
+    mock_device_registry,
+    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -60,12 +65,6 @@ from ..common import (
     create_input_number,
     get_simple_fixed_config,
     run_powercalc_setup,
-)
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
-    mock_registry,
 )
 
 
@@ -418,7 +417,9 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
 
 
-async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant) -> None:
+async def test_manually_configured_sensor_overrides_profile(
+    hass: HomeAssistant,
+) -> None:
     """
     Make sure that config settings done by user are not overriden by power profile
     """
@@ -453,9 +454,7 @@ async def test_manually_configured_sensor_overrides_profile(hass: HomeAssistant)
             CONF_NAME: "Test 123",
             CONF_UNIQUE_ID: "1234353",
             CONF_STANDBY_POWER: 0,
-            CONF_FIXED: {
-                CONF_POWER: 6
-            }
+            CONF_FIXED: {CONF_POWER: 6},
         },
     )
 
