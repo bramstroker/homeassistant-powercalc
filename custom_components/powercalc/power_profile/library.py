@@ -138,7 +138,7 @@ class ProfileLibrary:
         """
 
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
+            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
         manufacturer = manufacturer.lower()
 
         if manufacturer in self._profiles:

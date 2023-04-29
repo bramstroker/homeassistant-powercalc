@@ -40,7 +40,7 @@ class PowerProfile:
         manufacturer: str,
         model: str,
         directory: str,
-        json_data: dict,
+        json_data: ConfigType,
     ):
         self._manufacturer = manufacturer
         self._model = model.replace("#slash#", "/")
@@ -249,7 +249,7 @@ class SubProfileSelector:
         self._matchers: list[SubProfileMatcher] = self._build_matchers()
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
-        matchers = []
+        matchers: list[SubProfileMatcher] = []
         select_config = self._power_profile.sub_profile_select
         if not select_config:
             return matchers
@@ -314,7 +314,7 @@ class EntityStateMatcher(SubProfileMatcher):
     def __init__(
         self,
         hass: HomeAssistant,
-        source_entity: SourceEntity,
+        source_entity: SourceEntity | None,
         entity_id: str,
         mapping: dict[str, str],
     ):

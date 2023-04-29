@@ -62,6 +62,8 @@ from ..const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
+    DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -361,7 +363,7 @@ def create_grouped_power_sensor(
         entities=power_sensor_ids,
         unique_id=unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION) or DEFAULT_POWER_SENSOR_PRECISION,
         entity_id=entity_id,
     )
 
@@ -389,7 +391,7 @@ def create_grouped_energy_sensor(
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION) or DEFAULT_ENERGY_SENSOR_PRECISION,
         entity_id=entity_id,
     )
 
@@ -405,8 +407,8 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
+        rounding_digits: int,
         unique_id: str | None = None,
-        rounding_digits: int = 2,
     ):
         self._attr_name = name
         self._entities = entities
@@ -447,7 +449,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             self._async_hide_members(False)
 
     @callback
-    def _async_hide_members(self, hide: True) -> None:
+    def _async_hide_members(self, hide: bool = True) -> None:
         """Hide/unhide group members"""
         registry = er.async_get(self.hass)
         for entity_id in self._entities:
@@ -553,11 +555,11 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
+        rounding_digits: int,
         unique_id: str | None = None,
-        rounding_digits: int = 2,
     ):
         super().__init__(
-            name, entities, entity_id, sensor_config, unique_id, rounding_digits
+            name, entities, entity_id, sensor_config, rounding_digits, unique_id
         )
         unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
         if unit_prefix == UnitPrefix.KILO:
@@ -579,7 +581,8 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     {ATTR_ENTITY_ID: entity_id},
                 )
             )
-            self._prev_state_store.set_entity_state(entity_id, State(entity_id, "0.00"))
+            if self._prev_state_store:
+                self._prev_state_store.set_entity_state(entity_id, State(entity_id, "0.00"))
         self._attr_native_value = 0
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
