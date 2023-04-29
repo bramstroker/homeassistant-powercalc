@@ -21,6 +21,7 @@ from homeassistant.const import (
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.discovery import async_load_platform
+from homeassistant.helpers.typing import ConfigType
 
 from .common import validate_name_pattern
 from .const import (
@@ -156,7 +157,7 @@ CONFIG_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
         msg = (
             "This integration requires at least HomeAssistant version "
@@ -167,7 +168,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.critical(msg)
         return False
 
-    domain_config = config.get(DOMAIN) or {
+    domain_config: ConfigType = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -201,13 +202,13 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
 
-    if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
-
+    domain_groups = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
+    if domain_groups:
         async def _create_domain_groups(event: None):
             await create_domain_groups(
                 hass,
                 domain_config,
-                domain_config.get(CONF_CREATE_DOMAIN_GROUPS),
+                domain_groups,
             )
 
         hass.bus.async_listen_once(
@@ -298,7 +299,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 
 async def create_domain_groups(
-    hass: HomeAssistant, global_config: dict, domains: list[str]
+    hass: HomeAssistant, global_config: ConfigType, domains: list[str]
 ):
     """Create group sensors aggregating all power sensors from given domains"""
     _LOGGER.debug("Setting up domain based group sensors..")
