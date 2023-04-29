@@ -498,9 +498,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         is_calculation_enabled = await self.is_calculation_enabled()
         if entity_state.state in OFF_STATES or not is_calculation_enabled:
-            power = await self.calculate_standby_power(entity_state)
-            self._standby_sensors[self.entity_id] = power
-            return power
+            standby_power = await self.calculate_standby_power(entity_state)
+            self._standby_sensors[self.entity_id] = standby_power
+            return standby_power
 
         power = await self._power_calculator.calculate(entity_state)
         if power is None:
@@ -528,7 +528,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         Dynamically select a different sub profile depending on the entity state or attributes
         Uses SubProfileSelect class which contains all the matching logic
         """
-        if not self._power_profile or not self._power_profile.sub_profile_select:
+        if not self._power_profile or not self._power_profile.sub_profile_select or not self._sub_profile_selector:
             return
 
         self._power_profile.select_sub_profile(
