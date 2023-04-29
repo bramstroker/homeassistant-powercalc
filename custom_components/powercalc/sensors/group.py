@@ -97,7 +97,7 @@ async def create_group_sensors(
     entities: list[Entity],
     hass: HomeAssistant,
     filters: list[Callable] | None = None,
-) -> list[GroupedSensor]:
+) -> list[SensorEntity]:
     """Create grouped power and energy sensors."""
 
     if filters is None:
@@ -117,7 +117,7 @@ async def create_group_sensors(
             )
         ]
 
-    group_sensors = []
+    group_sensors: list[SensorEntity] = []
 
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
     power_sensor = create_grouped_power_sensor(
@@ -144,9 +144,9 @@ async def create_group_sensors(
 
 async def create_group_sensors_from_config_entry(
     hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict
-) -> list[GroupedSensor]:
+) -> list[SensorEntity]:
     """Create group sensors based on a config_entry"""
-    group_sensors = []
+    group_sensors: list[SensorEntity] = []
 
     group_name = entry.data.get(CONF_NAME)
 
@@ -182,7 +182,7 @@ async def create_group_sensors_from_config_entry(
 
 async def create_domain_group_sensor(
     hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType
-) -> list[Entity]:
+) -> list[SensorEntity]:
     domain = discovery_info[CONF_DOMAIN]
     sensor_config = config.copy()
     sensor_config[
@@ -292,6 +292,8 @@ def resolve_entity_ids_recursively(
     member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
     for member_entry_id in member_entry_ids:
         member_entry = hass.config_entries.async_get_entry(member_entry_id)
+        if member_entry is None:
+            continue
         key = (
             ENTRY_DATA_POWER_ENTITY
             if device_class == SensorDeviceClass.POWER
@@ -438,7 +440,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
 
         async_track_state_change_event(self.hass, self._entities, self.on_state_change)
 
-        self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS))
+        self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
 
     async def async_will_remove_from_hass(self) -> None:
         """
@@ -449,7 +451,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             self._async_hide_members(False)
 
     @callback
-    def _async_hide_members(self, hide: bool = True) -> None:
+    def _async_hide_members(self, hide: bool) -> None:
         """Hide/unhide group members"""
         registry = er.async_get(self.hass)
         for entity_id in self._entities:

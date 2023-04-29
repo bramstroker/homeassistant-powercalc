@@ -35,7 +35,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         standby_power: float | None = None,
     ) -> None:
         self._hass = hass
-        self._voltage = config.get(CONF_VOLTAGE)
+        self._voltage = config.get(CONF_VOLTAGE) or 0
         self._power_factor = config.get(CONF_POWER_FACTOR) or 0.9
         self._light_entity = light_entity
         self._standby_power: Decimal = Decimal(standby_power or 0)
@@ -68,21 +68,24 @@ class WledStrategy(PowerCalculationStrategyInterface):
 
         if self._light_entity.entity_entry:
             device_id = self._light_entity.entity_entry.device_id
-            estimated_current_entities = [
-                entity_entry.entity_id
-                for entity_entry in entity_registry.async_entries_for_device(
-                    entity_reg, device_id
-                )
-                if (entity_entry.device_class or entity_entry.original_device_class)
-                == SensorDeviceClass.CURRENT
-            ]
-            if estimated_current_entities:
-                return estimated_current_entities[0]
+            if device_id:
+                estimated_current_entities = [
+                    entity_entry.entity_id
+                    for entity_entry in entity_registry.async_entries_for_device(
+                        entity_reg, device_id
+                    )
+                    if (entity_entry.device_class or entity_entry.original_device_class)
+                    == SensorDeviceClass.CURRENT
+                ]
+                if estimated_current_entities:
+                    return estimated_current_entities[0]
 
         raise StrategyConfigurationError("{No estimated current entity found")
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
-        return [self._estimated_current_entity]
+        if self._estimated_current_entity:
+            return [self._estimated_current_entity]
+        return []
 
     def can_calculate_standby(self) -> bool:
         return True

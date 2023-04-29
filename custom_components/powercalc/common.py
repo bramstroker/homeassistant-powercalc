@@ -54,7 +54,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         device_entry = None
 
     unique_id = None
-    supported_color_modes = []
+    supported_color_modes: list[ColorMode] = []
     if entity_entry:
         source_entity_name = (
             entity_entry.name or entity_entry.original_name or source_object_id
