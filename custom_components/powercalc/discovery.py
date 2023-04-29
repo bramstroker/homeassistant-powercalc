@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Optional
+from typing import Any, Optional
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
@@ -200,7 +200,7 @@ class DiscoveryManager:
             )
             return
 
-        discovery_data = {
+        discovery_data: dict[str, Any] = {
             CONF_ENTITY_ID: source_entity.entity_id,
             DISCOVERY_SOURCE_ENTITY: source_entity,
         }

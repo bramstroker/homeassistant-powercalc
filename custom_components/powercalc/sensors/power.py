@@ -315,7 +315,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         entity_category: str,
         name: str,
         source_entity: SourceEntity,
-        unique_id: str,
+        unique_id: str | None,
         standby_power: Decimal,
         standby_power_on: Decimal,
         update_frequency,
