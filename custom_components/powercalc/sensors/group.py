@@ -425,7 +425,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.unit_converter: BaseUnitConverter | None = None
         if hasattr(self, "get_unit_converter"):
             self.unit_converter = self.get_unit_converter()
-        self._prev_state_store: PreviousStateStore | None = None
+        self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -538,9 +538,10 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_native_unit_of_measurement = POWER_WATT
 
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
-        return sum(
-            [self._get_state_value_in_native_unit(state) for state in member_states]
-        )
+        values = [self._get_state_value_in_native_unit(state) for state in member_states]
+        return Decimal(sum(
+            [value for value in values if value is not None]
+        ))
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
