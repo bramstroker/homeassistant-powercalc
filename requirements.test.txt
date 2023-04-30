@@ -7,4 +7,3 @@ types-croniter
 numpy
 croniter
 aiohue
-voluptuous-stubs
