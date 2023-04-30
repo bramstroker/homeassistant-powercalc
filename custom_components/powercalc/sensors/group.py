@@ -429,7 +429,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.entity_id = entity_id
         self.unit_converter: BaseUnitConverter | None = None
         if hasattr(self, "get_unit_converter"):
-            self.unit_converter = self.get_unit_converter()  # type: ignore
+            self.unit_converter = self.get_unit_converter()
         self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
 
     async def async_added_to_hass(self) -> None:
