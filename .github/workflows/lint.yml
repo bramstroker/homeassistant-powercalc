@@ -37,9 +37,8 @@ jobs:
         uses: actions/checkout@master
       - name: Install mypy
         run: pip install mypy voluptuous-stubs homeassistant-stubs
-      - name: Run mypy
-        uses: sasanquaneuf/mypy-github-action@releases/v1
+      - uses: jpetrucciani/mypy-check@master
         with:
-          checkName: 'mypy'
+          path: 'custom_components/powercalc'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
