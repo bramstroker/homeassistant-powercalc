@@ -7,9 +7,10 @@ from decimal import Decimal, DecimalException
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
-from homeassistant.components.sensor import ATTR_STATE_CLASS, RestoreSensor
+from homeassistant.components.sensor import ATTR_STATE_CLASS
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
+    RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
@@ -440,7 +441,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if last_state := await self.async_get_last_sensor_data():
             try:
                 if last_state.native_value:
-                    self._attr_native_value = round(Decimal(last_state.native_value), self._rounding_digits)
+                    self._attr_native_value = round(
+                        Decimal(last_state.native_value), self._rounding_digits
+                    )
             except DecimalException as err:
                 _LOGGER.warning("Could not restore last state: %s", err)
 

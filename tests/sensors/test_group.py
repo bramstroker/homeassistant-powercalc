@@ -265,10 +265,16 @@ async def test_restore_state(hass: HomeAssistant):
     await create_input_boolean(hass, "test1")
 
     mock_restore_cache_with_extra_data(
-        hass, ((State(
-            "sensor.testgroup_energy",
-            "0.5000",
-        ), {"native_unit_of_measurement": None, "native_value": 0.5}),)
+        hass,
+        (
+            (
+                State(
+                    "sensor.testgroup_energy",
+                    "0.5000",
+                ),
+                {"native_unit_of_measurement": None, "native_value": 0.5},
+            ),
+        ),
     )
 
     await run_powercalc_setup(
