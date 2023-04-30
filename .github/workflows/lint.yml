@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: jpetrucciani/mypy-check@master
         with:
-          path: 'custom_components/powercalc'
+          path: './custom_components/powercalc'
           requirements: voluptuous-stubs homeassistant-stubs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
