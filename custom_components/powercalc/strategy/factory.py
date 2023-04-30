@@ -51,7 +51,10 @@ class PowerCalculatorStrategyFactory:
         raise UnsupportedStrategy("Invalid calculation mode", strategy)
 
     def _create_linear(
-        self, source_entity: SourceEntity, config: dict, power_profile: PowerProfile | None
+        self,
+        source_entity: SourceEntity,
+        config: dict,
+        power_profile: PowerProfile | None,
     ) -> LinearStrategy:
         """Create the linear strategy"""
         linear_config = config.get(CONF_LINEAR)
@@ -67,7 +70,10 @@ class PowerCalculatorStrategyFactory:
         )
 
     def _create_fixed(
-        self, source_entity: SourceEntity, config: dict, power_profile: PowerProfile | None
+        self,
+        source_entity: SourceEntity,
+        config: dict,
+        power_profile: PowerProfile | None,
     ) -> FixedStrategy:
         """Create the fixed strategy"""
         fixed_config = config.get(CONF_FIXED)

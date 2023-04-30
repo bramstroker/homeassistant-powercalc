@@ -8,8 +8,8 @@ from csv import reader
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
-from typing import Union
 from gzip import GzipFile
+from typing import Union
 
 import numpy as np
 from homeassistant.components import light
@@ -166,7 +166,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
         _LOGGER.debug("%s: Calculated power:%s", entity_state.entity_id, power)
         return power
 
-    def lookup_power(self, lookup_table: LookupDictType, light_setting: LightSetting) -> float:
+    def lookup_power(
+        self, lookup_table: LookupDictType, light_setting: LightSetting
+    ) -> float:
         brightness = light_setting.brightness
         brightness_table = lookup_table.get(brightness)
 
@@ -196,7 +198,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return lut_value  # type: ignore
 
         if not isinstance(lut_value, dict):
-            _LOGGER.warning("Cannot calculate power for LutStrategy, expecting a dictionary")
+            _LOGGER.warning(
+                "Cannot calculate power for LutStrategy, expecting a dictionary"
+            )
             return 0
 
         if light_setting.color_mode == ColorMode.COLOR_TEMP:

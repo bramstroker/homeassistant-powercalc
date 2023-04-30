@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
-from typing import cast, Any
+from typing import Any, cast
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN

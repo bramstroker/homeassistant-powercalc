@@ -269,7 +269,9 @@ class SubProfileSelector:
                 return sub_profile
 
         if self._power_profile.sub_profile_select is None:
-            raise PowercalcSetupError("Power profile has no sub profile select configuration")
+            raise PowercalcSetupError(
+                "Power profile has no sub profile select configuration"
+            )
         return self._power_profile.sub_profile_select.default
 
     def get_tracking_entities(self) -> list[str]:

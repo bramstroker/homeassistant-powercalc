@@ -204,6 +204,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     domain_groups = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
     if domain_groups:
+
         async def _create_domain_groups(event: None) -> None:
             await create_domain_groups(
                 hass,

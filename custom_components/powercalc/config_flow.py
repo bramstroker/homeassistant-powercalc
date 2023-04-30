@@ -106,9 +106,7 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
             CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
         ): selector.NumberSelector(
             selector.NumberSelectorConfig(
-                min=10,
-                unit_of_measurement="sec",
-                mode=selector.NumberSelectorMode.BOX
+                min=10, unit_of_measurement="sec", mode=selector.NumberSelectorMode.BOX
             )
         ),
     }
@@ -279,7 +277,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_library()
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Handle the initial step."""
 
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
@@ -359,7 +359,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_group(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_group(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         self.selected_sensor_type = SensorType.GROUP
         errors = _validate_group_input(user_input)
         if user_input is not None:
@@ -382,7 +384,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_fixed(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_FIXED: user_input})
@@ -397,7 +401,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_linear(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_linear(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_LINEAR: user_input})
@@ -412,7 +418,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_wled(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_wled(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_WLED: user_input})
@@ -427,7 +435,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_library(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_library(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """
         Try to autodiscover manufacturer/model first.
         Ask the user to confirm this or forward to manual library selection
@@ -444,7 +454,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_manufacturer()
 
-        if self.source_entity and self.source_entity.entity_entry and self.power_profile is None:
+        if (
+            self.source_entity
+            and self.source_entity.entity_entry
+            and self.power_profile is None
+        ):
             try:
                 self.power_profile = await get_power_profile(
                     self.hass,
@@ -491,7 +505,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_model(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_model(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
@@ -522,7 +538,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_post_library(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_post_library(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered"""
         if (
             self.power_profile
@@ -873,7 +891,9 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     return SCHEMA_POWER_LINEAR.extend(  # type: ignore
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(
-                selector.AttributeSelectorConfig(entity_id=source_entity_id, hide_attributes=[])
+                selector.AttributeSelectorConfig(
+                    entity_id=source_entity_id, hide_attributes=[]
+                )
             )
         }
     )
@@ -975,7 +995,9 @@ def _validate_daily_energy_input(user_input: dict[str, Any]) -> dict:
     return errors
 
 
-def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]) -> vol.Schema:
+def _fill_schema_defaults(
+    data_schema: vol.Schema, options: dict[str, str]
+) -> vol.Schema:
     """Make a copy of the schema with suggested values set to saved options"""
     schema = {}
     for key, val in data_schema.schema.items():

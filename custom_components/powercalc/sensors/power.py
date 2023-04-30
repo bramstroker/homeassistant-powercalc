@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 from decimal import Decimal, DecimalException
-from typing import cast, Any
+from typing import Any, cast
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import (
@@ -530,7 +530,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         Dynamically select a different sub profile depending on the entity state or attributes
         Uses SubProfileSelect class which contains all the matching logic
         """
-        if not self._power_profile or not self._power_profile.sub_profile_select or not self._sub_profile_selector:
+        if (
+            not self._power_profile
+            or not self._power_profile.sub_profile_select
+            or not self._sub_profile_selector
+        ):
             return
 
         self._power_profile.select_sub_profile(
@@ -607,7 +611,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 class RealPowerSensor(PowerSensor):
     """Contains a reference to an existing real power sensor entity"""
 
-    def __init__(self, entity_id: str, device_id: str | None = None, unique_id: str | None = None) -> None:
+    def __init__(
+        self, entity_id: str, device_id: str | None = None, unique_id: str | None = None
+    ) -> None:
         self.entity_id = entity_id
         self._device_id = device_id
         self._unique_id = unique_id

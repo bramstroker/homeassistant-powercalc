@@ -368,7 +368,8 @@ def create_grouped_power_sensor(
         entities=power_sensor_ids,
         unique_id=unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION) or DEFAULT_POWER_SENSOR_PRECISION,
+        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION)
+        or DEFAULT_POWER_SENSOR_PRECISION,
         entity_id=entity_id,
     )
 
@@ -396,7 +397,8 @@ def create_grouped_energy_sensor(
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION) or DEFAULT_ENERGY_SENSOR_PRECISION,
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)
+        or DEFAULT_ENERGY_SENSOR_PRECISION,
         entity_id=entity_id,
     )
 
@@ -544,10 +546,12 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_native_unit_of_measurement = POWER_WATT
 
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
-        values = [self._get_state_value_in_native_unit(state) for state in member_states if state is not None]
-        return Decimal(sum(
-            [value for value in values if value is not None]
-        ))
+        values = [
+            self._get_state_value_in_native_unit(state)
+            for state in member_states
+            if state is not None
+        ]
+        return Decimal(sum([value for value in values if value is not None]))
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
@@ -589,7 +593,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                 )
             )
             if self._prev_state_store:
-                self._prev_state_store.set_entity_state(entity_id, State(entity_id, "0.00"))
+                self._prev_state_store.set_entity_state(
+                    entity_id, State(entity_id, "0.00")
+                )
         self._attr_native_value = 0
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()

@@ -1,6 +1,7 @@
 """The Powercalc constants."""
 
 from datetime import timedelta
+from typing import Literal
 
 from homeassistant.backports.enum import StrEnum
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
@@ -10,7 +11,6 @@ from homeassistant.const import (
     STATE_STANDBY,
     STATE_UNAVAILABLE,
 )
-from typing import Literal
 
 MIN_HA_VERSION = "2022.11"
 
