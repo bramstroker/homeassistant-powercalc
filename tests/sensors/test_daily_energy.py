@@ -341,7 +341,7 @@ async def test_reset_service(hass: HomeAssistant):
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get(entity_id).state == "0"
+    assert hass.states.get(entity_id).state == "0.0000"
 
 
 async def test_increase_service(hass: HomeAssistant) -> None:

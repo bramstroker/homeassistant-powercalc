@@ -706,7 +706,7 @@ class OptionsFlowHandler(OptionsFlow):
         """Build the options schema. depending on the selected sensor type"""
 
         strategy_options: dict[str, Any] = {}
-        data_schema = {}
+        data_schema: vol.Schema = vol.Schema({})
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy:
                 strategy_schema = _get_strategy_schema(
@@ -783,9 +783,9 @@ def _create_virtual_power_schema(
                 ): STRATEGY_SELECTOR
             }
         )
-        return schema.extend(SCHEMA_POWER_OPTIONS.schema)
+        return schema.extend(SCHEMA_POWER_OPTIONS.schema)  # type: ignore
 
-    return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)
+    return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)  # type: ignore
 
 
 def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
@@ -870,7 +870,7 @@ def _validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
 
 def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     """Create the config schema for linear strategy"""
-    return SCHEMA_POWER_LINEAR.extend(
+    return SCHEMA_POWER_LINEAR.extend(  # type: ignore
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(
                 selector.AttributeSelectorConfig(entity_id=source_entity_id, hide_attributes=[])
@@ -986,10 +986,10 @@ def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]) -> v
                 and callable(key.default)
                 and key.default()
             ):
-                new_key = vol.Optional(key.schema, default=options.get(key))
+                new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
             else:
                 new_key = copy.copy(key)
-                new_key.description = {"suggested_value": options.get(key)}
+                new_key.description = {"suggested_value": options.get(key)}  # type: ignore
         schema[new_key] = val
     data_schema = vol.Schema(schema)
     return data_schema

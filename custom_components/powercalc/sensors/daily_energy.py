@@ -251,9 +251,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
     @property
-    def native_value(self) -> int:
+    def native_value(self) -> Decimal:
         """Return the state of the sensor."""
-        return round(self._state, self._rounding_digits)
+        return Decimal(round(self._state, self._rounding_digits))
 
     @callback
     def async_reset(self) -> None:
