@@ -7,7 +7,7 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, Final, NamedTuple, Optional
+from typing import Any, NamedTuple, Optional
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
