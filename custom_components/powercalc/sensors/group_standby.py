@@ -82,5 +82,5 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
                 sum(self.standby_sensors.values()), self._rounding_digits
             )
         else:
-            self._attr_native_value = STATE_UNKNOWN
+            self._attr_native_value = None
         self.async_schedule_update_ha_state(True)
