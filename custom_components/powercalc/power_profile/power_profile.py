@@ -107,8 +107,8 @@ class PowerProfile:
         Get the calculation strategy this profile provides.
         supported modes is here for BC purposes.
         """
-        if self._json_data.get("calculation_strategy"):
-            return CalculationStrategy(self._json_data.get("calculation_strategy"))
+        if "calculation_strategy" in self._json_data:
+            return CalculationStrategy(str(self._json_data.get("calculation_strategy")))
         return CalculationStrategy.LUT
 
     @property
@@ -133,7 +133,7 @@ class PowerProfile:
         return self._json_data.get("linear_config")
 
     @property
-    def fixed_mode_config(self) -> ConfigType:
+    def fixed_mode_config(self) -> ConfigType | None:
         """Get configuration to setup fixed strategy"""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
             raise UnsupportedStrategy(
@@ -268,6 +268,8 @@ class SubProfileSelector:
             if sub_profile:
                 return sub_profile
 
+        if self._power_profile.sub_profile_select is None:
+            raise PowercalcSetupError("Power profile has no sub profile select configuration")
         return self._power_profile.sub_profile_select.default
 
     def get_tracking_entities(self) -> list[str]:

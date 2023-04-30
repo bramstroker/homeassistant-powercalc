@@ -96,7 +96,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def create_calibrate_list(self) -> list[tuple[int, float]]:
         """Build a table of calibration values"""
-        calibration_list = []
+        calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
@@ -106,7 +106,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER)))
+                (max_value, float(self._config.get(CONF_MAX_POWER)))  # type: ignore[arg-type]
             )
             return calibration_list
 
@@ -129,12 +129,12 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return 0, 100
         raise StrategyConfigurationError("Unsupported domain for linear strategy")
 
-    def get_current_state_value(self, entity_state: State) -> Optional[int]:
+    def get_current_state_value(self, entity_state: State) -> int | None:
         """Get the current entity state, i.e. selected brightness"""
 
         attribute = self.get_attribute(entity_state)
         if attribute:
-            value = entity_state.attributes.get(attribute)
+            value: int | None = entity_state.attributes.get(attribute)
             if value is None:
                 _LOGGER.warning(
                     f"No {attribute} attribute for entity: {entity_state.entity_id}"

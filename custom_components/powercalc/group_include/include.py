@@ -21,12 +21,12 @@ _LOGGER = logging.getLogger(__name__)
 def resolve_include_entities(
     hass: HomeAssistant, include_config: dict
 ) -> list[entity_registry.RegistryEntry]:
-    entities = {}
+    entities: dict[str, entity_registry.RegistryEntry] = {}
     entity_reg = entity_registry.async_get(hass)
 
     # Include entities from a certain area
     if CONF_AREA in include_config:
-        area_id = include_config.get(CONF_AREA)
+        area_id = str(include_config.get(CONF_AREA))
         _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | resolve_area_entities(hass, area_id)
 
@@ -42,7 +42,7 @@ def resolve_include_entities(
 
     # Include entities from a certain group
     if CONF_GROUP in include_config:
-        group_id = include_config.get(CONF_GROUP)
+        group_id = str(include_config.get(CONF_GROUP))
         _LOGGER.debug("Including entities from group: %s", group_id)
         entities = entities | resolve_include_groups(hass, group_id)
 

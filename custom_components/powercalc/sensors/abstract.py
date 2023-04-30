@@ -80,17 +80,17 @@ def _generate_sensor_name(
     friendly_naming_conf_key: str,
     name: str | None = None,
     source_entity: SourceEntity | None = None,
-):
+) -> str:
     """Generates the name to use for a sensor"""
-    name_pattern: str = sensor_config.get(naming_conf_key)
     if name is None and source_entity:
         name = source_entity.name
+
     if friendly_naming_conf_key in sensor_config:
-        friendly_name_pattern: str = sensor_config.get(friendly_naming_conf_key)
-        name = friendly_name_pattern.format(name)
-    else:
-        name = name_pattern.format(name)
-    return name
+        friendly_name_pattern = str(sensor_config.get(friendly_naming_conf_key))
+        return friendly_name_pattern.format(name)
+
+    name_pattern = str(sensor_config.get(naming_conf_key))
+    return name_pattern.format(name)
 
 
 @callback
@@ -104,7 +104,7 @@ def generate_power_sensor_entity_id(
     """Generates the entity_id to use for a power sensor"""
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
-    name_pattern: str = sensor_config.get(CONF_POWER_SENSOR_NAMING)
+    name_pattern = str(sensor_config.get(CONF_POWER_SENSOR_NAMING))
     object_id = name or sensor_config.get(CONF_NAME)
     if object_id is None and source_entity:
         object_id = source_entity.object_id
@@ -124,7 +124,7 @@ def generate_energy_sensor_entity_id(
     """Generates the entity_id to use for an energy sensor"""
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
-    name_pattern: str = sensor_config.get(CONF_ENERGY_SENSOR_NAMING)
+    name_pattern = str(sensor_config.get(CONF_ENERGY_SENSOR_NAMING))
     object_id = name or sensor_config.get(CONF_NAME)
     if object_id is None and source_entity:
         object_id = source_entity.object_id
