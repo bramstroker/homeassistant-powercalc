@@ -333,7 +333,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     assert power_state.state == STATE_UNAVAILABLE
 
     energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == STATE_UNKNOWN
+    assert energy_state.state == STATE_UNAVAILABLE
 
     hass.states.async_set("input_boolean.test1", STATE_ON)
     await hass.async_block_till_done()

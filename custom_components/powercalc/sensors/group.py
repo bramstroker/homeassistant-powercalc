@@ -438,8 +438,10 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        if (state := await self.async_get_last_state()) is not None:
-            self._attr_native_value = state.state
+        if (
+            last_state := await self.async_get_last_state()
+        ) and last_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+            self._attr_native_value = last_state.state
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
