@@ -438,21 +438,22 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        last_state = await self.async_get_last_state()
-        last_sensor_state = await self.async_get_last_sensor_data()
-        if last_state or last_sensor_state:
-            try:
-                if last_sensor_state and last_sensor_state.native_value:
-                    self._attr_native_value = round(
-                        Decimal(last_sensor_state.native_value), self._rounding_digits
-                    )
-                else:
-                    self._attr_native_value = round(
-                        Decimal(last_state.state), self._rounding_digits
-                    )
-                _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._attr_native_value}")
-            except DecimalException as err:
-                _LOGGER.warning("Could not restore last state: %s", err)
+        if isinstance(self, GroupedEnergySensor):
+            last_state = await self.async_get_last_state()
+            last_sensor_state = await self.async_get_last_sensor_data()
+            if last_state or last_sensor_state:
+                try:
+                    if last_sensor_state and last_sensor_state.native_value:
+                        self._attr_native_value = round(
+                            Decimal(last_sensor_state.native_value), self._rounding_digits
+                        )
+                    else:
+                        self._attr_native_value = round(
+                            Decimal(last_state.state), self._rounding_digits
+                        )
+                    _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._attr_native_value}")
+                except DecimalException as err:
+                    _LOGGER.warning("Could not restore last state: %s", err)
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
