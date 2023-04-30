@@ -572,7 +572,7 @@ async def create_individual_sensors(  # noqa: C901
             return EntitiesBucket()
         raise error
 
-    entities_to_add: list[BaseEntity] = []
+    entities_to_add: list[Entity] = []
 
     energy_sensor: EnergySensor | None = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
@@ -659,7 +659,7 @@ async def check_entity_not_already_configured(
     source_entity: SourceEntity,
     hass: HomeAssistant,
     used_unique_ids: list[str],
-    is_discovered: True,
+    is_discovered: bool = True,
 ) -> None:
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -674,7 +674,7 @@ async def check_entity_not_already_configured(
     # Prefer configured entity over discovered entity
     if not is_discovered and source_entity.entity_id in discovered_entities:
         entity_reg = er.async_get(hass)
-        for entity in discovered_entities.get(source_entity.entity_id):
+        for entity in discovered_entities.get(source_entity.entity_id) or []:
             entity_reg.async_remove(entity.entity_id)
             hass.states.async_remove(entity.entity_id)
         discovered_entities[source_entity.entity_id] = []
@@ -704,6 +704,8 @@ async def is_auto_configurable(
 ) -> bool:
     try:
         model_info = await autodiscover_model(hass, entity_entry)
+        if not model_info:
+            return False
         power_profile = await get_power_profile(
             hass, sensor_config or {}, model_info=model_info
         )
@@ -724,11 +726,11 @@ class EntitiesBucket:
     new: list[Entity] = field(default_factory=list)
     existing: list[Entity] = field(default_factory=list)
 
-    def extend_items(self, bucket: EntitiesBucket):
+    def extend_items(self, bucket: EntitiesBucket) -> None:
         self.new.extend(bucket.new)
         self.existing.extend(bucket.existing)
 
-    def all(self):
+    def all(self) -> list[Entity]:
         return self.new + self.existing
 
     def has_entities(self) -> bool:

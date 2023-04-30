@@ -204,11 +204,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     domain_groups = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
     if domain_groups:
-        async def _create_domain_groups(event: None):
+        async def _create_domain_groups(event: None) -> None:
             await create_domain_groups(
                 hass,
                 domain_config,
-                domain_groups,
+                domain_groups,  # type: ignore[arg-type]
             )
 
         hass.bus.async_listen_once(
@@ -216,7 +216,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             _create_domain_groups,
         )
 
-    async def _create_standby_group(event: None):
+    async def _create_standby_group(event: None) -> None:
         hass.async_create_task(
             async_load_platform(
                 hass,
@@ -300,7 +300,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 async def create_domain_groups(
     hass: HomeAssistant, global_config: ConfigType, domains: list[str]
-):
+) -> None:
     """Create group sensors aggregating all power sensors from given domains"""
     _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:

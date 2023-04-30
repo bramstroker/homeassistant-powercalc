@@ -275,13 +275,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_library()
 
-    async def async_step_user(self, user_input=None) -> FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the initial step."""
 
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
 
     async def async_step_menu_library(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """
         Handle the Virtual power (library) step.
@@ -291,10 +291,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return await self.async_step_virtual_power(user_input)
 
     async def async_step_virtual_power(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         if user_input is not None:
-            self.source_entity_id = user_input[CONF_ENTITY_ID]
+            self.source_entity_id = str(user_input[CONF_ENTITY_ID])
             self.source_entity = await create_source_entity(
                 self.source_entity_id, self.hass
             )
@@ -333,7 +333,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_daily_energy(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         errors = _validate_daily_energy_input(user_input)
 
@@ -355,7 +355,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_group(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_group(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         self.selected_sensor_type = SensorType.GROUP
         errors = _validate_group_input(user_input)
         if user_input is not None:
@@ -378,7 +378,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_fixed(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_FIXED: user_input})
@@ -393,7 +393,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_linear(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_linear(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_LINEAR: user_input})
@@ -408,7 +408,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_wled(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_wled(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_WLED: user_input})
@@ -423,7 +423,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_library(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_library(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """
         Try to autodiscover manufacturer/model first.
         Ask the user to confirm this or forward to manual library selection
@@ -470,7 +470,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return await self.async_step_manufacturer()
 
     async def async_step_manufacturer(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Ask the user to select the manufacturer"""
         if user_input is not None:
@@ -487,7 +487,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_model(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_model(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
@@ -532,7 +532,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return await self.async_step_power_advanced()
 
     async def async_step_sub_profile(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -553,7 +553,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_power_advanced(
-        self, user_input: dict[str, str] = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         errors: dict[str, str] = {}
         if user_input is not None or self.skip_advanced_step:
@@ -959,7 +959,7 @@ def _build_daily_energy_config(user_input: dict[str, str] = None) -> dict[str, A
     return config
 
 
-def _validate_daily_energy_input(user_input: dict[str, str] = None) -> dict:
+def _validate_daily_energy_input(user_input: dict[str, Any] = None) -> dict:
     """Validates the daily energy form"""
     if not user_input:
         return {}
