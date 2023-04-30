@@ -438,12 +438,19 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        if last_state := await self.async_get_last_sensor_data():
+        if isinstance(self, GroupedEnergySensor):
+            last_state = await self.async_get_last_state()
+            last_sensor_state = await self.async_get_last_sensor_data()
             try:
-                if last_state.native_value:
+                if last_sensor_state and last_sensor_state.native_value:
                     self._attr_native_value = round(
-                        Decimal(last_state.native_value), self._rounding_digits
+                        Decimal(last_sensor_state.native_value), self._rounding_digits
                     )
+                elif last_state:
+                    self._attr_native_value = round(
+                        Decimal(last_state.state), self._rounding_digits
+                    )
+                _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._attr_native_value}")
             except DecimalException as err:
                 _LOGGER.warning("Could not restore last state: %s", err)
 
@@ -616,7 +623,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             group_sum = Decimal(0)
         else:
             group_sum = Decimal(self._attr_native_value)
-        _LOGGER.debug(f"Current energy group value {self.entity_id}: {group_sum}")
+        _LOGGER.debug(f"{self.entity_id}: Recalculate, current value: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
@@ -639,7 +646,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
             group_sum += delta
 
-        _LOGGER.debug(f"New energy group value {self.entity_id}: {group_sum}")
+        _LOGGER.debug(f"{self.entity_id}: New value: {group_sum}")
         return group_sum
 
 
