@@ -8,7 +8,7 @@ from csv import reader
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 from homeassistant.components import light

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er

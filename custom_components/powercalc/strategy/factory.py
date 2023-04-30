@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal, DecimalException
-from typing import Any, cast
+from typing import cast
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import (
