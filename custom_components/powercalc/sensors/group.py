@@ -182,7 +182,7 @@ async def create_group_sensors_from_config_entry(
 
 async def create_domain_group_sensor(
     hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType
-) -> list[SensorEntity]:
+) -> list[Entity]:
     domain = discovery_info[CONF_DOMAIN]
     sensor_config = config.copy()
     sensor_config[
@@ -511,10 +511,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
 
-    def _get_state_value_in_native_unit(self, state: State) -> Decimal | None:
-        if state is None:
-            return None
-
+    def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         value = float(state.state)
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if (
@@ -540,7 +537,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_native_unit_of_measurement = POWER_WATT
 
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
-        values = [self._get_state_value_in_native_unit(state) for state in member_states]
+        values = [self._get_state_value_in_native_unit(state) for state in member_states if state is not None]
         return Decimal(sum(
             [value for value in values if value is not None]
         ))
@@ -603,6 +600,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
             cur_state = self._get_state_value_in_native_unit(entity_state)
+
             if prev_state:
                 prev_state = self._get_state_value_in_native_unit(prev_state)
             else:
@@ -631,21 +629,18 @@ class PreviousStateStore:
     async def async_get_instance(hass: HomeAssistant) -> PreviousStateStore:
         """Get the singleton instance of this data helper."""
         instance = PreviousStateStore(hass)
+        instance.states = {}
 
         try:
             _LOGGER.debug("Load previous energy sensor states from store")
             stored_states = await instance.store.async_load()
+            if stored_states:
+                instance.states = {
+                    entity_id: State.from_dict(json_state)
+                    for (entity_id, json_state) in stored_states.items()
+                }
         except HomeAssistantError as exc:
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
-            stored_states = None
-
-        if stored_states is None:
-            instance.states = {}
-        else:
-            instance.states = {
-                entity_id: State.from_dict(json_state)
-                for (entity_id, json_state) in stored_states.items()
-            }
 
         instance.async_setup_dump()
 
@@ -658,11 +653,11 @@ class PreviousStateStore:
         self.states: dict[str, State] = {}
         self.hass = hass
 
-    def get_entity_state(self, entity_id) -> State | None:
+    def get_entity_state(self, entity_id: str) -> State | None:
         """Retrieve the previous state"""
         return self.states.get(entity_id)
 
-    def set_entity_state(self, entity_id, state: State) -> None:
+    def set_entity_state(self, entity_id: str, state: State) -> None:
         """Set the state for an energy sensor"""
         self.states[entity_id] = state
 
