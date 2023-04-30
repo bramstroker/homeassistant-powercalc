@@ -450,7 +450,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                     self._attr_native_value = round(
                         Decimal(last_state.state), self._rounding_digits
                     )
-                _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._attr_native_value}")
+                _LOGGER.debug(
+                    f"{self.entity_id}: Restoring state: {self._attr_native_value}"
+                )
             except DecimalException as err:
                 _LOGGER.warning("Could not restore last state: %s", err)
 
@@ -561,8 +563,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
         values = [
-            self._get_state_value_in_native_unit(state)
-            for state in member_states
+            self._get_state_value_in_native_unit(state) for state in member_states
         ]
         return Decimal(sum([value for value in values if value is not None]))
 
@@ -631,7 +632,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             if prev_state:
                 prev_state_value = self._get_state_value_in_native_unit(prev_state)
             else:
-                prev_state_value = cur_state_value if self._attr_native_value else Decimal(0)
+                prev_state_value = (
+                    cur_state_value if self._attr_native_value else Decimal(0)
+                )
             self._prev_state_store.set_entity_state(
                 entity_state.entity_id, entity_state
             )
