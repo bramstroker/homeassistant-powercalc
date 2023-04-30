@@ -523,6 +523,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.async_schedule_update_ha_state(True)
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
+        """Convert value of member entity state to match the unit of measurement of the group sensor"""
         value = float(state.state)
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if (
@@ -555,7 +556,6 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         values = [
             self._get_state_value_in_native_unit(state)
             for state in member_states
-            if state is not None
         ]
         return Decimal(sum([value for value in values if value is not None]))
 
@@ -588,6 +588,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     @callback
     def async_reset(self) -> None:
+        """Reset the group sensor and underlying member sensor when supported"""
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")
