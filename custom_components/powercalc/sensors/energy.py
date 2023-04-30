@@ -8,7 +8,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
+from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
@@ -145,19 +145,19 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
     def __init__(
         self,
-        source_entity,
-        unique_id,
-        entity_id,
-        entity_category,
-        name,
-        round_digits,
-        unit_prefix,
-        unit_time,
-        integration_method,
+        source_entity: str,
+        unique_id: str | None,
+        entity_id: str,
+        entity_category: EntityCategory | None,
+        name: str | None,
+        round_digits: int,
+        unit_prefix: str | None,
+        unit_time: UnitOfTime,
+        integration_method: str,
         powercalc_source_entity: str,
         powercalc_source_domain: str,
         sensor_config: ConfigType,
-    ):
+    ) -> None:
         super().__init__(
             source_entity=source_entity,
             name=name,

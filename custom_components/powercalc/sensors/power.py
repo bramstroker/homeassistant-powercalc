@@ -265,7 +265,7 @@ def select_calculation_strategy(
     """Select the calculation strategy"""
     config_mode = config.get(CONF_MODE)
     if config_mode:
-        return config_mode
+        return CalculationStrategy(config_mode)
 
     if config.get(CONF_LINEAR):
         return CalculationStrategy.LINEAR
@@ -422,7 +422,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
         @callback
-        def async_update(event_time: datetime | None = None):
+        def async_update(event_time: datetime | None = None) -> None:
             """Update the entity."""
             self.async_schedule_update_ha_state(True)
 
@@ -541,12 +541,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state"""
-        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)
+        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
 
             @callback
-            def _update_sleep_power(_):
+            def _update_sleep_power(_: Any) -> None:
                 power = Decimal(sleep_power.get(CONF_POWER))
                 if self._multiply_factor_standby and self._multiply_factor:
                     power *= Decimal(self._multiply_factor)
@@ -559,7 +559,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         standby_power = self._standby_power
         if self._power_calculator.can_calculate_standby():
-            standby_power = await self._power_calculator.calculate(state)
+            standby_power = await self._power_calculator.calculate(state) or 0
 
         if self._multiply_factor_standby and self._multiply_factor:
             standby_power *= Decimal(self._multiply_factor)
@@ -573,6 +573,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if isinstance(template, str):
             template = template.replace("[[entity]]", self.source_entity)
             template = Template(template)
+
+        if not isinstance(template, Template):
+            return True
 
         template.hass = self.hass
         return bool(template.async_render())
@@ -592,7 +595,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Return True if entity is available."""
         return self._power is not None
 
-    def set_energy_sensor_attribute(self, entity_id: str):
+    def set_energy_sensor_attribute(self, entity_id: str) -> None:
         """Set the energy sensor on the state attributes"""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return
@@ -602,17 +605,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
 
 class RealPowerSensor(PowerSensor):
-    """Contains a reference to a existing real power sensor entity"""
+    """Contains a reference to an existing real power sensor entity"""
 
-    def __init__(self, entity_id: str, device_id: str = None, unique_id: str = None):
-        self._entity_id = entity_id
+    def __init__(self, entity_id: str, device_id: str | None = None, unique_id: str | None = None) -> None:
+        self.entity_id = entity_id
         self._device_id = device_id
         self._unique_id = unique_id
-
-    @property
-    def entity_id(self) -> str:
-        """Return the name of the sensor."""
-        return self._entity_id
 
     @property
     def device_id(self) -> str | None:

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
 from typing import Union
+from gzip import GzipFile
 
 import numpy as np
 from homeassistant.components import light
@@ -40,7 +41,7 @@ LookupDictType = Union[BrightnessLutType, ColorTempLutType, HsLutType]
 
 class LutRegistry:
     def __init__(self) -> None:
-        self._lookup_dictionaries = {}
+        self._lookup_dictionaries: dict[str, dict] = {}
 
     async def get_lookup_dictionary(
         self, power_profile: PowerProfile, color_mode: ColorMode
@@ -75,13 +76,13 @@ class LutRegistry:
         return lookup_dict
 
     @staticmethod
-    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode):
+    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> GzipFile:
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
-            return gzip.open(gzip_path, "rt")
+            return gzip.open(gzip_path, "rt")  # type: ignore
 
         raise LutFileNotFound("Data file not found: %s")
 
@@ -186,23 +187,23 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 lookup_table[brightness_range[1]], light_setting
             ),
         ]
-        return np.interp(brightness, brightness_range, power_range)
+        return float(np.interp(brightness, brightness_range, power_range))
 
     def lookup_power_for_brightness(
         self, lut_value: Union[LookupDictType, float], light_setting: LightSetting
     ) -> float:
         if light_setting.color_mode == ColorMode.BRIGHTNESS:
-            return lut_value
+            return lut_value  # type: ignore
 
         if not isinstance(lut_value, dict):
             _LOGGER.warning("Cannot calculate power for LutStrategy, expecting a dictionary")
             return 0
 
         if light_setting.color_mode == ColorMode.COLOR_TEMP:
-            return self.get_nearest(lut_value, light_setting.color_temp or 0)
+            return self.get_nearest(lut_value, light_setting.color_temp or 0)  # type: ignore
         else:
             sat_values = self.get_nearest(lut_value, light_setting.hue or 0)
-            return self.get_nearest(sat_values, light_setting.saturation or 0)
+            return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
 
     @staticmethod
     def get_nearest(dict: LookupDictType, search_key: int) -> float | LookupDictType:
@@ -216,7 +217,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         keys = dict.keys()
         last_key = [*keys][-1]
         if last_key < search_key:
-            return last_key
+            return int(last_key)
 
         return max(
             (k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
@@ -227,7 +228,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         keys = dict.keys()
         first_key = [*keys][0]
         if first_key > search_key:
-            return first_key
+            return int(first_key)
 
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
 
