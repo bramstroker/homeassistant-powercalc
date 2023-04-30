@@ -32,7 +32,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_general_standby_sensors(
     hass: HomeAssistant, config: ConfigType
 ) -> list[Entity]:
-    sensors = []
+    sensors: list[Entity] = []
     power_sensor = StandbyPowerSensor(
         hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION)
     )
@@ -57,11 +57,11 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
     _attr_unique_id = "powercalc_standby_group"
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Name of the entity."""
         return "All standby power"
 
-    def __init__(self, hass: HomeAssistant, rounding_digits: int = 2):
+    def __init__(self, hass: HomeAssistant, rounding_digits: int = 2) -> None:
         self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][
             DATA_STANDBY_POWER_SENSORS
         ]

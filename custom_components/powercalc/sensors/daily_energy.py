@@ -74,7 +74,7 @@ async def create_daily_fixed_energy_sensor(
     sensor_config: ConfigType,
     source_entity: SourceEntity | None = None,
 ) -> DailyEnergySensor:
-    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
 
     name = generate_energy_sensor_name(
         sensor_config, sensor_config.get(CONF_NAME), source_entity
@@ -115,7 +115,7 @@ async def create_daily_fixed_energy_sensor(
 async def create_daily_fixed_energy_power_sensor(
     hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity
 ) -> VirtualPowerSensor | None:
-    mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
+    mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
         return None
 
@@ -153,8 +153,8 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         user_unit_of_measurement: str,
         update_frequency: int,
         sensor_config: dict[str, Any],
-        on_time: timedelta = None,
-        start_time: time = None,
+        on_time: timedelta | None = None,
+        start_time: time | None = None,
         rounding_digits: int = 4,
     ):
         self._hass = hass
@@ -227,14 +227,14 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self._last_delta_calculate = self._last_updated
 
         elapsed_seconds = (
-            self._last_delta_calculate - self._last_updated
+            int(self._last_delta_calculate) - int(self._last_updated)
         ) + elapsed_seconds
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
         value = self._value
         if isinstance(value, Template):
             value.hass = self.hass
-            value = value.async_render()
+            value = float(value.async_render())
 
         if self._user_unit_of_measurement == POWER_WATT:
             wh_per_day = value * (self._on_time.total_seconds() / 3600)
@@ -251,18 +251,18 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         return Decimal((energy_per_day / 86400) * elapsed_seconds)
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> int:
         """Return the state of the sensor."""
         return round(self._state, self._rounding_digits)
 
     @callback
     def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
-        self._state = 0
+        self._state = Decimal(0)
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
-    def async_increase(self, value) -> None:
+    def async_increase(self, value: str) -> None:
         _LOGGER.debug(f"{self.entity_id}: Increasing energy sensor with {value}")
         self._state += Decimal(value)
         self.async_write_ha_state()

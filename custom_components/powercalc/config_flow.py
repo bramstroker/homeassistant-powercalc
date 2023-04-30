@@ -109,7 +109,7 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
                 min=10,
                 unit_of_measurement="sec",
                 mode=selector.NumberSelectorMode.BOX
-            )  # type: ignore
+            )
         ),
     }
 )
@@ -252,6 +252,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
         del discovery_info[DISCOVERY_SOURCE_ENTITY]
+        if not self.source_entity:
+            return self.async_abort(reason="No source entity set")
 
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
@@ -442,7 +444,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_manufacturer()
 
-        if self.source_entity.entity_entry and self.power_profile is None:
+        if self.source_entity and self.source_entity.entity_entry and self.power_profile is None:
             try:
                 self.power_profile = await get_power_profile(
                     self.hass,
@@ -481,7 +483,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
             return await self.async_step_model()
 
-        schema = _create_schema_manufacturer(self.hass, self.source_entity.domain)
+        schema = _create_schema_manufacturer(self.hass, self.source_entity.domain)  # type: ignore
         return self.async_show_form(
             step_id="manufacturer",
             data_schema=schema,
@@ -501,7 +503,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             )
             self.power_profile = profile
-            if not self.power_profile.has_sub_profiles:
+            if self.power_profile and not self.power_profile.has_sub_profiles:
                 errors = await self.validate_strategy_config()
             if not errors:
                 return await self.async_step_post_library()
@@ -520,15 +522,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_post_library(self, user_input: dict[str, str] = None) -> FlowResult:
+    async def async_step_post_library(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered"""
         if (
-            self.power_profile.has_sub_profiles
+            self.power_profile
+            and self.power_profile.has_sub_profiles
             and not self.power_profile.sub_profile_select
         ):
             return await self.async_step_sub_profile()
 
-        if self.power_profile.needs_fixed_config:
+        if self.power_profile and self.power_profile.needs_fixed_config:
             return await self.async_step_fixed()
 
         return await self.async_step_power_advanced()
@@ -570,7 +573,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def validate_strategy_config(self) -> dict:
         strategy_name = (
-            self.sensor_config.get(CONF_MODE) or self.power_profile.calculation_strategy
+            self.sensor_config.get(CONF_MODE) or self.power_profile.calculation_strategy  # type: ignore
         )
         strategy = await _create_strategy_object(
             self.hass,
@@ -613,7 +616,7 @@ class OptionsFlowHandler(OptionsFlow):
         self.sensor_type: SensorType = (
             self.current_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         )
-        self.source_entity_id: str | None = self.current_config.get(CONF_ENTITY_ID)
+        self.source_entity_id: str = self.current_config.get(CONF_ENTITY_ID)  # type: ignore
         self.source_entity: SourceEntity | None = None
         self.power_profile: PowerProfile | None = None
         self.strategy: CalculationStrategy | None = self.current_config.get(CONF_MODE)
@@ -670,14 +673,14 @@ class OptionsFlowHandler(OptionsFlow):
             for key, val in generic_option_schema.schema.items():
                 if isinstance(key, vol.Marker):
                     key = key.schema
-                if key in user_input:
+                if user_input and key in user_input:
                     generic_options[key] = user_input.get(key)
 
             self.current_config.update(generic_options)
 
             if self.strategy:
                 strategy_options = _build_strategy_config(
-                    self.strategy, self.source_entity_id, user_input
+                    self.strategy, self.source_entity_id, user_input or {}
                 )
 
                 if self.strategy != CalculationStrategy.LUT:
@@ -702,7 +705,7 @@ class OptionsFlowHandler(OptionsFlow):
     def build_options_schema(self) -> vol.Schema:
         """Build the options schema. depending on the selected sensor type"""
 
-        strategy_options = {}
+        strategy_options: dict[str, Any] = {}
         data_schema = {}
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy:
@@ -848,7 +851,7 @@ def _create_group_selector(
     )
 
 
-def _validate_group_input(user_input: dict[str, str] = None) -> dict:
+def _validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
     """Validate the group form"""
     if not user_input:
         return {}
@@ -937,7 +940,7 @@ async def _create_schema_sub_profile(
 
 
 def _build_strategy_config(
-    strategy: str, source_entity_id: str, user_input: dict[str, str] = None
+    strategy: str, source_entity_id: str, user_input: dict[str, Any]
 ) -> dict[str, Any]:
     """Build the config dict needed for the configured strategy"""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
@@ -949,7 +952,7 @@ def _build_strategy_config(
     return strategy_options
 
 
-def _build_daily_energy_config(user_input: dict[str, str] = None) -> dict[str, Any]:
+def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
     """Build the config under daily_energy: key"""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
     config: dict[str, Any] = {}
@@ -960,7 +963,7 @@ def _build_daily_energy_config(user_input: dict[str, str] = None) -> dict[str, A
     return config
 
 
-def _validate_daily_energy_input(user_input: dict[str, Any] = None) -> dict:
+def _validate_daily_energy_input(user_input: dict[str, Any]) -> dict:
     """Validates the daily energy form"""
     if not user_input:
         return {}
