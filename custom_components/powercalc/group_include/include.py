@@ -21,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 def resolve_include_entities(
     hass: HomeAssistant, include_config: dict
 ) -> list[entity_registry.RegistryEntry]:
-    entities: dict[str, entity_registry.RegistryEntry] = {}
+    entities: dict[str, entity_registry.RegistryEntry | None] = {}
     entity_reg = entity_registry.async_get(hass)
 
     # Include entities from a certain area
@@ -75,7 +75,7 @@ def resolve_include_entities(
 @callback
 def resolve_include_groups(
     hass: HomeAssistant, group_id: str
-) -> dict[str, entity_registry.RegistryEntry]:
+) -> dict[str, entity_registry.RegistryEntry | None]:
     """Get a listing of al entities in a given group"""
     entity_reg = entity_registry.async_get(hass)
 
@@ -93,8 +93,8 @@ def resolve_include_groups(
 def resolve_light_group_entities(
     hass: HomeAssistant,
     group_id: str,
-    resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None,
-) -> dict[str, entity_registry.RegistryEntry]:
+    resolved_entities: dict[str, entity_registry.RegistryEntry | None] | None = None,
+) -> dict[str, entity_registry.RegistryEntry | None]:
     """
     Resolve all registry entries for a given light group.
     When the light group has sub light groups, we will recursively walk these as well
@@ -105,13 +105,13 @@ def resolve_light_group_entities(
     entity_reg = entity_registry.async_get(hass)
     light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
     light_group = next(
-        filter(lambda entity: entity.entity_id == group_id, light_component.entities),
+        filter(lambda entity: entity.entity_id == group_id, light_component.entities),  # type: ignore
         None,
     )
-    if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
+    if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:  # type: ignore
         raise SensorConfigurationError(f"Light group {group_id} not found")
 
-    entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
+    entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
     for entity_id in entity_ids:
         registry_entry = entity_reg.async_get(entity_id)
         if registry_entry is None:
@@ -130,7 +130,7 @@ def resolve_light_group_entities(
 @callback
 def resolve_area_entities(
     hass: HomeAssistant, area_id_or_name: str
-) -> dict[str, entity_registry.RegistryEntry]:
+) -> dict[str, entity_registry.RegistryEntry | None]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
     area = area_reg.async_get_area(area_id_or_name)

@@ -176,7 +176,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             self._attr_entity_category = EntityCategory(entity_category)
 
     @property
-    def extra_state_attributes(self) -> Mapping[str, Any]:
+    def extra_state_attributes(self) -> Mapping[str, Any] | None:
         """Return the state attributes of the energy sensor."""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return super().extra_state_attributes
@@ -189,7 +189,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         return attrs
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         return ENERGY_ICON
 
     @callback
@@ -205,11 +205,7 @@ class RealEnergySensor(EnergySensor):
 
     def __init__(self, entity_entry: er.RegistryEntry):
         self._entity_entry = entity_entry
-
-    @property
-    def entity_id(self) -> str:
-        """Return the entity_id of the sensor."""
-        return self._entity_entry.entity_id
+        self.entity_id = self._entity_entry.entity_id
 
     @property
     def name(self) -> str | None:

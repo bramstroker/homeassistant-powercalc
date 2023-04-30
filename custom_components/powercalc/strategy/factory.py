@@ -83,7 +83,7 @@ class PowerCalculatorStrategyFactory:
         if isinstance(power, Template):
             power.hass = self._hass
 
-        states_power: dict = fixed_config.get(CONF_STATES_POWER)
+        states_power: dict = fixed_config.get(CONF_STATES_POWER)  # type: ignore
         if states_power:
             for p in states_power.values():
                 if isinstance(p, Template):

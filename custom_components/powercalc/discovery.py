@@ -52,6 +52,8 @@ async def autodiscover_model(
 
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
+    if not device_entry:
+        return None
     model_id = device_entry.model
 
     manufacturer = device_entry.manufacturer
@@ -255,7 +257,7 @@ class DiscoveryManager:
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
             platform_entries = [
                 item
-                for item in sensor_config
+                for item in sensor_config or {}
                 if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
             ]
             for entry in platform_entries:
@@ -272,13 +274,13 @@ class DiscoveryManager:
 
         return entities
 
-    def _find_entity_ids_in_yaml_config(self, search_dict: dict):
+    def _find_entity_ids_in_yaml_config(self, search_dict: dict) -> list[str]:
         """
         Takes a dict with nested lists and dicts,
         and searches all dicts for a key of the field
         provided.
         """
-        found_entity_ids = []
+        found_entity_ids: list[str] = []
 
         for key, value in search_dict.items():
             if key == "entity_id":

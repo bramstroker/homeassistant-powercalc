@@ -559,7 +559,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         standby_power = self._standby_power
         if self._power_calculator.can_calculate_standby():
-            standby_power = await self._power_calculator.calculate(state) or 0
+            standby_power = await self._power_calculator.calculate(state) or Decimal(0)
 
         if self._multiply_factor_standby and self._multiply_factor:
             standby_power *= Decimal(self._multiply_factor)

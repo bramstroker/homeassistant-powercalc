@@ -165,13 +165,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if CONF_ATTRIBUTE in self._config:
             return self._config.get(CONF_ATTRIBUTE)
 
-        if entity_state.domain == light.DOMAIN:
+        entity_domain = entity_state.domain  # type: ignore
+        if entity_domain == light.DOMAIN:
             return ATTR_BRIGHTNESS
 
-        if entity_state.domain == fan.DOMAIN:
+        if entity_domain == fan.DOMAIN:
             return ATTR_PERCENTAGE
 
-        if entity_state.domain == media_player.DOMAIN:
+        if entity_domain == media_player.DOMAIN:
             return ATTR_MEDIA_VOLUME_LEVEL
 
         return None

@@ -41,7 +41,7 @@ class ProfileLibrary:
             hass.data[DOMAIN] = {}
 
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
-            return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]
+            return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
         library = ProfileLibrary(hass)
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
