@@ -34,6 +34,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
+    Event,
     async_track_state_change_event,
     async_track_time_interval,
 )
@@ -97,14 +98,14 @@ async def create_group_sensors(
     entities: list[Entity],
     hass: HomeAssistant,
     filters: list[Callable] | None = None,
-) -> list[SensorEntity]:
+) -> list[Entity]:
     """Create grouped power and energy sensors."""
 
     if filters is None:
         filters = []
 
     def _get_filtered_entity_ids_by_class(
-        all_entities: list, default_filters: list[Callable], class_name
+        all_entities: list, default_filters: list[Callable], class_name: Any
     ) -> list[str]:
         filter_list = default_filters.copy()
         filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
@@ -117,7 +118,7 @@ async def create_group_sensors(
             )
         ]
 
-    group_sensors: list[SensorEntity] = []
+    group_sensors: list[Entity] = []
 
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
     power_sensor = create_grouped_power_sensor(
@@ -318,7 +319,8 @@ def resolve_entity_ids_recursively(
                 entity_entry.entity_id
                 for entity_entry in entity_reg.entities.values()
                 if entity_entry.config_entry_id == member_entry_id
-                and entity_entry.capabilities.get(ATTR_STATE_CLASS) in state_class
+                and entity_entry.capabilities
+                and entity_entry.capabilities.get(ATTR_STATE_CLASS) in state_class  # type: ignore
             ]
             sorted_entities = sorted(entities)
             resolved_ids.extend([sorted_entities[0]])
@@ -426,7 +428,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         self.entity_id = entity_id
         self.unit_converter: BaseUnitConverter | None = None
         if hasattr(self, "get_unit_converter"):
-            self.unit_converter = self.get_unit_converter()
+            self.unit_converter = self.get_unit_converter()  # type: ignore
         self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
 
     async def async_added_to_hass(self) -> None:
@@ -467,7 +469,7 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, event) -> None:
+    def on_state_change(self, event: Event) -> None:
         """Triggered when one of the group entities changes state"""
         if self.hass.state != CoreState.running:  # pragma: no cover
             return
@@ -527,6 +529,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
                 value, unit_of_measurement, self._attr_native_unit_of_measurement
             )
         return Decimal(value)
+
+    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+        pass
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
@@ -599,17 +604,17 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         _LOGGER.debug(f"Current energy group value {self.entity_id}: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
-            cur_state = self._get_state_value_in_native_unit(entity_state)
+            cur_state_value = self._get_state_value_in_native_unit(entity_state)
 
             if prev_state:
-                prev_state = self._get_state_value_in_native_unit(prev_state)
+                prev_state_value = self._get_state_value_in_native_unit(prev_state)
             else:
-                prev_state = cur_state if self.state else Decimal(0)
+                prev_state_value = cur_state_value if self.state else Decimal(0)
             self._prev_state_store.set_entity_state(
                 entity_state.entity_id, entity_state
             )
 
-            delta = cur_state - prev_state
+            delta = cur_state_value - prev_state_value
             _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}")
             if delta < 0:
                 _LOGGER.warning(
