@@ -1,9 +1,10 @@
 black
 flake8
 freezegun
-pytest-homeassistant-custom-component==0.12.19
+pytest-homeassistant-custom-component==0.13.3
 types-pytz
 types-croniter
 numpy
 croniter
 aiohue
+voluptuous-stubs
