@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from abc import abstractmethod
 from datetime import timedelta
 from decimal import Decimal
 from typing import Any, Callable
@@ -530,8 +531,9 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
             )
         return Decimal(value)
 
+    @abstractmethod
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
-        pass
+        ...
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
