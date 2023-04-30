@@ -29,7 +29,10 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - uses: jpetrucciani/mypy-check@master
+      - name: Checkout Powercalc
+        uses: actions/checkout@master
+      - name: Run MyPy
+        uses: jpetrucciani/mypy-check@master
         with:
           path: './custom_components/powercalc'
           requirements: voluptuous-stubs homeassistant-stubs
