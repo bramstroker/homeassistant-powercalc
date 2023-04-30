@@ -32,7 +32,7 @@ class ProfileLibrary:
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_device_types: dict[str, list] | None = None
 
-    def factory(hass: HomeAssistant) -> ProfileLibrary:
+    def factory(hass: HomeAssistant) -> ProfileLibrary:  # type: ignore
         """
         Creates and loads the profile library
         Makes sure it is only loaded once and instance is saved in hass data registry

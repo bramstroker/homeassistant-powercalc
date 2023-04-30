@@ -623,7 +623,7 @@ async def create_individual_sensors(  # noqa: C901
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
         if (
             config_entry
-            and config_entry not in source_entity.device_entry.config_entries
+            and config_entry.entry_id not in source_entity.device_entry.config_entries
         ):
             device_registry.async_update_device(
                 device_id, add_config_entry_id=config_entry.entry_id
@@ -692,7 +692,7 @@ async def check_entity_not_already_configured(
 
     entity_id = source_entity.entity_id
     if unique_id is None and (
-        entity_id in existing_entities or entity_id in configured_entities
+        entity_id in existing_entities or entity_id in configured_entities  # type: ignore
     ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 

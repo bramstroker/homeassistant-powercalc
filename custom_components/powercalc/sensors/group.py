@@ -638,9 +638,9 @@ class PreviousStateStore:
 
         try:
             _LOGGER.debug("Load previous energy sensor states from store")
-            stored_states = await instance.store.async_load()
+            stored_states = await instance.store.async_load()  # type: ignore
             if stored_states:
-                instance.states = {
+                instance.states = {  # type: ignore
                     entity_id: State.from_dict(json_state)
                     for (entity_id, json_state) in stored_states.items()
                 }

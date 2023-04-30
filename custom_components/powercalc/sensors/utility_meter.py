@@ -189,7 +189,7 @@ async def create_utility_meter(
     return utility_meter
 
 
-class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
+class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):  # type: ignore
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
 
     @property
