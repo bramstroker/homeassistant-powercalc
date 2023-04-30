@@ -523,6 +523,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.async_schedule_update_ha_state(True)
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
+        """Convert value of member entity state to match the unit of measurement of the group sensor"""
         value = float(state.state)
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if (
@@ -555,7 +556,6 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         values = [
             self._get_state_value_in_native_unit(state)
             for state in member_states
-            if state is not None
         ]
         return Decimal(sum([value for value in values if value is not None]))
 
@@ -588,6 +588,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     @callback
     def async_reset(self) -> None:
+        """Reset the group sensor and underlying member sensor when supported"""
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")
@@ -611,10 +612,10 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         Calculate the new group energy sensor state
         For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
         """
-        if self.state is None:
+        if self._attr_native_value is None:
             group_sum = Decimal(0)
         else:
-            group_sum = Decimal(self.state)
+            group_sum = Decimal(self._attr_native_value)
         _LOGGER.debug(f"Current energy group value {self.entity_id}: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
@@ -623,7 +624,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             if prev_state:
                 prev_state_value = self._get_state_value_in_native_unit(prev_state)
             else:
-                prev_state_value = cur_state_value if self.state else Decimal(0)
+                prev_state_value = cur_state_value if self._attr_native_value else Decimal(0)
             self._prev_state_store.set_entity_state(
                 entity_state.entity_id, entity_state
             )
