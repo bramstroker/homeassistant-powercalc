@@ -1,7 +1,7 @@
 black
 flake8
 freezegun
-pytest-homeassistant-custom-component==0.13.23
+pytest-homeassistant-custom-component==0.13.24
 types-pytz
 types-croniter
 numpy

@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from abc import abstractmethod
 from datetime import timedelta
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from typing import Any, Callable
 
 import homeassistant.util.dt as dt_util
-from homeassistant.components.sensor import ATTR_STATE_CLASS
+from homeassistant.components.sensor import ATTR_STATE_CLASS, RestoreSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -40,7 +40,6 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.json import JSONEncoder
-from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -403,7 +402,7 @@ def create_grouped_energy_sensor(
     )
 
 
-class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
+class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     """Base class for grouped sensors"""
 
     _attr_should_poll = False
@@ -438,8 +437,12 @@ class GroupedSensor(BaseEntity, RestoreEntity, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        if (state := await self.async_get_last_state()) is not None:
-            self._attr_native_value = state.state
+        if last_state := await self.async_get_last_sensor_data():
+            try:
+                if last_state.native_value:
+                    self._attr_native_value = round(Decimal(last_state.native_value), self._rounding_digits)
+            except DecimalException as err:
+                _LOGGER.warning("Could not restore last state: %s", err)
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 

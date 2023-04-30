@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import CONF_NAME, POWER_WATT, STATE_UNKNOWN
+from homeassistant.const import CONF_NAME, POWER_WATT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
@@ -82,5 +82,5 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
                 sum(self.standby_sensors.values()), self._rounding_digits
             )
         else:
-            self._attr_native_value = STATE_UNKNOWN
+            self._attr_native_value = None
         self.async_schedule_update_ha_state(True)

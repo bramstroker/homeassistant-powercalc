@@ -675,7 +675,8 @@ async def check_entity_not_already_configured(
     if not is_discovered and source_entity.entity_id in discovered_entities:
         entity_reg = er.async_get(hass)
         for entity in discovered_entities.get(source_entity.entity_id) or []:
-            entity_reg.async_remove(entity.entity_id)
+            if entity_reg.async_get(entity.entity_id):
+                entity_reg.async_remove(entity.entity_id)
             hass.states.async_remove(entity.entity_id)
         discovered_entities[source_entity.entity_id] = []
         return

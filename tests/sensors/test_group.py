@@ -17,7 +17,6 @@ from homeassistant.const import (
     POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     UnitOfEnergy,
     UnitOfPower,
 )
@@ -26,7 +25,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_restore_cache,
+    mock_restore_cache_with_extra_data,
 )
 
 from custom_components.powercalc.const import (
@@ -265,14 +264,11 @@ async def test_reset_service(hass: HomeAssistant):
 async def test_restore_state(hass: HomeAssistant):
     await create_input_boolean(hass, "test1")
 
-    mock_restore_cache(
-        hass,
-        [
-            State(
-                "sensor.testgroup_energy",
-                "0.5000",
-            ),
-        ],
+    mock_restore_cache_with_extra_data(
+        hass, ((State(
+            "sensor.testgroup_energy",
+            "0.5000",
+        ), {"native_unit_of_measurement": None, "native_value": 0.5}),)
     )
 
     await run_powercalc_setup(
@@ -333,7 +329,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
     assert power_state.state == STATE_UNAVAILABLE
 
     energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == STATE_UNKNOWN
+    assert energy_state.state == STATE_UNAVAILABLE
 
     hass.states.async_set("input_boolean.test1", STATE_ON)
     await hass.async_block_till_done()
