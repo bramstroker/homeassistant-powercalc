@@ -14,7 +14,7 @@ class FilterOperator(StrEnum):
 
 def create_filter(filter_config: dict) -> IncludeEntityFilter:
     """Create filter class"""
-    filters = []
+    filters: list[IncludeEntityFilter] = []
     if CONF_DOMAIN in filter_config:
         domain_config = filter_config.get(CONF_DOMAIN)
         if type(domain_config) == list:
@@ -24,7 +24,7 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
                     FilterOperator.OR,
                 )
             )
-        else:
+        elif type(domain_config) == str:
             filters.append(DomainFilter(domain_config))
 
     return CompositeFilter(filters, FilterOperator.AND)

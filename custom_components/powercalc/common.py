@@ -54,7 +54,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         device_entry = None
 
     unique_id = None
-    supported_color_modes = []
+    supported_color_modes: list[ColorMode] = []
     if entity_entry:
         source_entity_name = (
             entity_entry.name or entity_entry.original_name or source_object_id
@@ -62,7 +62,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
         if entity_entry.capabilities:
-            supported_color_modes = entity_entry.capabilities.get(
+            supported_color_modes = entity_entry.capabilities.get(  # type: ignore[assignment]
                 ATTR_SUPPORTED_COLOR_MODES
             )
     else:
@@ -140,6 +140,6 @@ def validate_name_pattern(value: str) -> str:
 
 def validate_is_number(value: str) -> str:
     """Validate value is a number."""
-    if is_number(value):
+    if is_number(value):  # type: ignore[no-untyped-call]
         return value
     raise vol.Invalid("Value is not a number")

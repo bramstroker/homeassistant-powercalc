@@ -8,7 +8,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS
+from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
@@ -145,19 +145,19 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
     def __init__(
         self,
-        source_entity,
-        unique_id,
-        entity_id,
-        entity_category,
-        name,
-        round_digits,
-        unit_prefix,
-        unit_time,
-        integration_method,
+        source_entity: str,
+        unique_id: str | None,
+        entity_id: str,
+        entity_category: EntityCategory | None,
+        name: str | None,
+        round_digits: int,
+        unit_prefix: str | None,
+        unit_time: UnitOfTime,
+        integration_method: str,
         powercalc_source_entity: str,
         powercalc_source_domain: str,
         sensor_config: ConfigType,
-    ):
+    ) -> None:
         super().__init__(
             source_entity=source_entity,
             name=name,
@@ -176,7 +176,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             self._attr_entity_category = EntityCategory(entity_category)
 
     @property
-    def extra_state_attributes(self) -> Mapping[str, Any]:
+    def extra_state_attributes(self) -> Mapping[str, Any] | None:
         """Return the state attributes of the energy sensor."""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return super().extra_state_attributes
@@ -189,7 +189,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         return attrs
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         return ENERGY_ICON
 
     @callback
@@ -205,11 +205,7 @@ class RealEnergySensor(EnergySensor):
 
     def __init__(self, entity_entry: er.RegistryEntry):
         self._entity_entry = entity_entry
-
-    @property
-    def entity_id(self) -> str:
-        """Return the entity_id of the sensor."""
-        return self._entity_entry.entity_id
+        self.entity_id = self._entity_entry.entity_id
 
     @property
     def name(self) -> str | None:

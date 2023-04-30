@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.components import climate, vacuum
+from homeassistant.components import climate, vacuum  # type: ignore
 from homeassistant.core import State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
@@ -47,7 +47,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             # Lookup by state
             if entity_state.state in self._per_state_power:
                 return await evaluate_power(
-                    self._per_state_power.get(entity_state.state)
+                    self._per_state_power.get(entity_state.state) or 0
                 )
             else:
                 # Lookup by state attribute (attribute|value)
@@ -78,15 +78,15 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 "fixed_states_power_only",
             )
 
-    def get_entities_to_track(self) -> list[Union[str, TrackTemplate]]:
-        track_templates = []
+    def get_entities_to_track(self) -> list[Union[str | TrackTemplate]]:
+        track_templates: list[str | TrackTemplate] = []
 
         if isinstance(self._power, Template):
-            track_templates.append(TrackTemplate(self._power, None))
+            track_templates.append(TrackTemplate(self._power, None, None))
 
         if self._per_state_power:
             for power in list(self._per_state_power.values()):
                 if isinstance(power, Template):
-                    track_templates.append(TrackTemplate(power, None))
+                    track_templates.append(TrackTemplate(power, None, None))
 
         return track_templates

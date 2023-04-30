@@ -17,6 +17,7 @@ async def evaluate_power(power: Union[Template, Decimal, float]) -> Decimal | No
             if power == "unknown":
                 return None
 
-        return Decimal(power)
+        return Decimal(power)  # type: ignore[arg-type]
     except decimal.DecimalException:
         _LOGGER.error(f"Could not convert power value {power} to decimal")
+        return None

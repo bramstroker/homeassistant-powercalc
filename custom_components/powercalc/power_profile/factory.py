@@ -13,7 +13,7 @@ from .power_profile import PowerProfile
 async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
-    model_info: ModelInfo = None,
+    model_info: ModelInfo | None = None,
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)

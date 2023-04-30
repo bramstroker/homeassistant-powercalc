@@ -31,7 +31,7 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
 class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""
 
-    def __init__(self, message: str, config_flow_trans_key: str = None):
+    def __init__(self, message: str, config_flow_trans_key: str | None = None):
         super().__init__(message)
         self._config_flow_trans_key = config_flow_trans_key
 

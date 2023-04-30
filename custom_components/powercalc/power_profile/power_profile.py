@@ -39,8 +39,8 @@ class PowerProfile:
         hass: HomeAssistant,
         manufacturer: str,
         model: str,
-        directory: str | None,
-        json_data: dict | None = None,
+        directory: str,
+        json_data: ConfigType,
     ):
         self._manufacturer = manufacturer
         self._model = model.replace("#slash#", "/")
@@ -91,7 +91,7 @@ class PowerProfile:
 
     @property
     def name(self) -> str:
-        return self._json_data.get("name")
+        return self._json_data.get("name") or ""
 
     @property
     def standby_power(self) -> float:
@@ -107,13 +107,9 @@ class PowerProfile:
         Get the calculation strategy this profile provides.
         supported modes is here for BC purposes.
         """
-        if "supported_modes" in self._json_data:  # pragma: no cover
-            _LOGGER.warning(
-                "Deprecation: supported_modes detected in model.json file. "
-                "You must rename this to calculation_strategy for this to keep working in the future"
-            )
-            return self._json_data.get("supported_modes")[0]
-        return self._json_data.get("calculation_strategy") or CalculationStrategy.LUT
+        if "calculation_strategy" in self._json_data:
+            return CalculationStrategy(str(self._json_data.get("calculation_strategy")))
+        return CalculationStrategy.LUT
 
     @property
     def linked_lut(self) -> str | None:
@@ -137,7 +133,7 @@ class PowerProfile:
         return self._json_data.get("linear_config")
 
     @property
-    def fixed_mode_config(self) -> ConfigType:
+    def fixed_mode_config(self) -> ConfigType | None:
         """Get configuration to setup fixed strategy"""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
             raise UnsupportedStrategy(
@@ -253,7 +249,7 @@ class SubProfileSelector:
         self._matchers: list[SubProfileMatcher] = self._build_matchers()
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
-        matchers = []
+        matchers: list[SubProfileMatcher] = []
         select_config = self._power_profile.sub_profile_select
         if not select_config:
             return matchers
@@ -272,6 +268,8 @@ class SubProfileSelector:
             if sub_profile:
                 return sub_profile
 
+        if self._power_profile.sub_profile_select is None:
+            raise PowercalcSetupError("Power profile has no sub profile select configuration")
         return self._power_profile.sub_profile_select.default
 
     def get_tracking_entities(self) -> list[str]:
@@ -318,7 +316,7 @@ class EntityStateMatcher(SubProfileMatcher):
     def __init__(
         self,
         hass: HomeAssistant,
-        source_entity: SourceEntity,
+        source_entity: SourceEntity | None,
         entity_id: str,
         mapping: dict[str, str],
     ):

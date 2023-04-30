@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import logging
-from typing import cast
+from typing import cast, Any
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
@@ -51,7 +51,7 @@ async def create_utility_meters(
 
     tariffs = sensor_config.get(CONF_UTILITY_METER_TARIFFS)
     meter_types = sensor_config.get(CONF_UTILITY_METER_TYPES)
-    for meter_type in meter_types:
+    for meter_type in meter_types:  # type: ignore
         tariff_sensors = []
 
         name = f"{energy_sensor.name} {meter_type}"
@@ -113,7 +113,7 @@ async def create_utility_meters(
 
 async def create_tariff_select(
     tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None
-):
+) -> TariffSelect:
     """Create tariff selection entity"""
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
 
@@ -139,9 +139,9 @@ async def create_utility_meter(
     name: str,
     sensor_config: dict,
     meter_type: str,
-    unique_id: str = None,
-    tariff: str = None,
-    tariff_entity: str = None,
+    unique_id: str | None = None,
+    tariff: str | None = None,
+    tariff_entity: str | None = None,
     net_consumption: bool = False,
 ) -> VirtualUtilityMeter:
     """Create a utility meter entity, one per tariff"""
@@ -189,16 +189,16 @@ async def create_utility_meter(
     return utility_meter
 
 
-class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
+class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):  # type: ignore
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
 
     @property
-    def unique_id(self):
+    def unique_id(self) -> str | None:
         """Return the unique id."""
         return self._attr_unique_id
 
     @property
-    def native_value(self):
+    def native_value(self) -> Any | None:
         """Return the state of the sensor."""
         if self.rounding_digits and self._state is not None:
             return round(self._state, self.rounding_digits)

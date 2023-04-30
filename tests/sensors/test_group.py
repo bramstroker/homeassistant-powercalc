@@ -1065,4 +1065,6 @@ async def test_storage(hass: HomeAssistant):
     store: PreviousStateStore = await PreviousStateStore.async_get_instance(hass)
     store_state = store.get_entity_state("sensor.dummy")
 
-    assert state == store_state
+    assert state.entity_id == store_state.entity_id
+    assert state.state == store_state.state
+    assert state.last_updated == store_state.last_updated

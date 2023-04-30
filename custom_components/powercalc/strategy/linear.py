@@ -16,6 +16,7 @@ from homeassistant.components.media_player import (
 )
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
@@ -41,7 +42,7 @@ _LOGGER = logging.getLogger(__name__)
 class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: dict,
+        config: ConfigType,
         hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: Optional[float],
@@ -50,7 +51,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._source_entity = source_entity
         self._standby_power = standby_power
-        self._calibration: list[tuple] | None = None
+        self._calibration: list[tuple[int, float]] | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         """Calculate the current power consumption"""
@@ -87,15 +88,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest lower value from calibration table"""
-        return min(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
+        return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
     def get_max_calibrate(self, value: int) -> tuple[int, float]:
         """Get closest higher value from calibration table"""
-        return max(self._calibration, key=lambda v: (v[0] > value, value - v[0]))
+        return max(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
-    def create_calibrate_list(self) -> list[tuple]:
+    def create_calibrate_list(self) -> list[tuple[int, float]]:
         """Build a table of calibration values"""
-        calibration_list = []
+        calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
         if calibrate is None:
@@ -105,7 +106,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER)))
+                (max_value, float(self._config.get(CONF_MAX_POWER)))  # type: ignore[arg-type]
             )
             return calibration_list
 
@@ -126,13 +127,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
 
         if self._source_entity.domain == media_player.DOMAIN:
             return 0, 100
+        raise StrategyConfigurationError("Unsupported domain for linear strategy")
 
-    def get_current_state_value(self, entity_state: State) -> Optional[int]:
+    def get_current_state_value(self, entity_state: State) -> int | None:
         """Get the current entity state, i.e. selected brightness"""
 
         attribute = self.get_attribute(entity_state)
         if attribute:
-            value = entity_state.attributes.get(attribute)
+            value: int | None = entity_state.attributes.get(attribute)
             if value is None:
                 _LOGGER.warning(
                     f"No {attribute} attribute for entity: {entity_state.entity_id}"
@@ -163,13 +165,14 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if CONF_ATTRIBUTE in self._config:
             return self._config.get(CONF_ATTRIBUTE)
 
-        if entity_state.domain == light.DOMAIN:
+        entity_domain = entity_state.domain  # type: ignore
+        if entity_domain == light.DOMAIN:
             return ATTR_BRIGHTNESS
 
-        if entity_state.domain == fan.DOMAIN:
+        if entity_domain == fan.DOMAIN:
             return ATTR_PERCENTAGE
 
-        if entity_state.domain == media_player.DOMAIN:
+        if entity_domain == media_player.DOMAIN:
             return ATTR_MEDIA_VOLUME_LEVEL
 
         return None

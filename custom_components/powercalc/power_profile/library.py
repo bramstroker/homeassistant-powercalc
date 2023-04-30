@@ -32,7 +32,7 @@ class ProfileLibrary:
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_device_types: dict[str, list] | None = None
 
-    def factory(hass: HomeAssistant) -> ProfileLibrary:
+    def factory(hass: HomeAssistant) -> ProfileLibrary:  # type: ignore
         """
         Creates and loads the profile library
         Makes sure it is only loaded once and instance is saved in hass data registry
@@ -41,7 +41,7 @@ class ProfileLibrary:
             hass.data[DOMAIN] = {}
 
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
-            return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]
+            return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
         library = ProfileLibrary(hass)
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
@@ -138,7 +138,7 @@ class ProfileLibrary:
         """
 
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer)
+            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
         manufacturer = manufacturer.lower()
 
         if manufacturer in self._profiles:

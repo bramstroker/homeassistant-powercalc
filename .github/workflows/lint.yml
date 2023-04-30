@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: Checkout Powercalc
@@ -24,5 +24,17 @@ jobs:
         uses: suo/flake8-github-action@releases/v1
         with:
           checkName: 'flake8'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Powercalc
+        uses: actions/checkout@master
+      - name: Run MyPy
+        uses: jpetrucciani/mypy-check@master
+        with:
+          path: './custom_components/powercalc'
+          requirements: voluptuous-stubs homeassistant-stubs numpy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
