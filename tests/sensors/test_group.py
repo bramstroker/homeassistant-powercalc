@@ -17,7 +17,6 @@ from homeassistant.const import (
     POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
-    STATE_UNKNOWN,
     UnitOfEnergy,
     UnitOfPower,
 )
