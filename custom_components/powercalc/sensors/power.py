@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from decimal import Decimal, DecimalException
-from typing import cast
+from typing import cast, Any
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.sensor import (
@@ -23,6 +24,7 @@ from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
+    Event,
     TrackTemplate,
     async_call_later,
     async_track_state_change_event,
@@ -318,14 +320,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         unique_id: str | None,
         standby_power: Decimal,
         standby_power_on: Decimal,
-        update_frequency,
+        update_frequency: int,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
         rounding_digits: int,
         sensor_config: dict,
         power_profile: PowerProfile | None,
-    ):
+    ) -> None:
         """Initialize the sensor."""
         self._power_calculator = power_calculator
         self._calculation_mode = calculation_strategy
@@ -363,22 +365,22 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._ignore_unavailable_state = True
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
 
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Register callbacks."""
         await super().async_added_to_hass()
 
-        async def appliance_state_listener(event):
+        async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
             await self._update_power_sensor(self._source_entity.entity_id, new_state)
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
-        async def template_change_listener(*args):
+        async def template_change_listener(*args: Any) -> None:
             state = self.hass.states.get(self._source_entity.entity_id)
             await self._update_power_sensor(self._source_entity.entity_id, state)
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
-        async def initial_update(event):
+        async def initial_update(event: Event) -> None:
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._update_power_sensor(entity_id, new_state)
@@ -420,7 +422,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
         @callback
-        def async_update(event_time=None):
+        def async_update(event_time: datetime | None = None):
             """Update the entity."""
             self.async_schedule_update_ha_state(True)
 

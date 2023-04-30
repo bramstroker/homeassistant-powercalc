@@ -106,8 +106,10 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
             CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
         ): selector.NumberSelector(
             selector.NumberSelectorConfig(
-                min=10, unit_of_measurement="sec", mode=selector.NumberSelectorMode.BOX
-            )
+                min=10,
+                unit_of_measurement="sec",
+                mode=selector.NumberSelectorMode.BOX
+            )  # type: ignore
         ),
     }
 )
@@ -219,7 +221,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 2
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: dict[str, Any] = {}
         self.selected_sensor_type: str | None = None
@@ -518,7 +520,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_post_library(self, user_input: dict[str, str] = None):
+    async def async_step_post_library(self, user_input: dict[str, str] = None) -> FlowResult:
         """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered"""
         if (
             self.power_profile.has_sub_profiles
@@ -751,8 +753,7 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return _create_linear_schema(source_entity_id)
     if strategy == CalculationStrategy.WLED:
         return SCHEMA_POWER_WLED
-    if strategy == CalculationStrategy.LUT:
-        return vol.Schema({})
+    return vol.Schema({})
 
 
 def _create_virtual_power_schema(
@@ -869,7 +870,7 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     return SCHEMA_POWER_LINEAR.extend(
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(
-                selector.AttributeSelectorConfig(entity_id=source_entity_id)
+                selector.AttributeSelectorConfig(entity_id=source_entity_id, hide_attributes=[])
             )
         }
     )
@@ -922,7 +923,7 @@ async def _create_schema_sub_profile(
     profile = await library.get_profile(model_info)
     sub_profiles = [
         selector.SelectOptionDict(value=sub_profile, label=sub_profile)
-        for sub_profile in profile.get_sub_profiles()
+        for sub_profile in profile.get_sub_profiles()  # type: ignore
     ]
     return vol.Schema(
         {
@@ -971,7 +972,7 @@ def _validate_daily_energy_input(user_input: dict[str, Any] = None) -> dict:
     return errors
 
 
-def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]):
+def _fill_schema_defaults(data_schema: vol.Schema, options: dict[str, str]) -> vol.Schema:
     """Make a copy of the schema with suggested values set to saved options"""
     schema = {}
     for key, val in data_schema.schema.items():
