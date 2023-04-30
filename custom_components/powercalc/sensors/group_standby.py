@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import CONF_NAME, POWER_WATT, STATE_UNKNOWN
+from homeassistant.const import CONF_NAME, POWER_WATT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity

@@ -119,8 +119,8 @@ async def test_grouped_power_sensor(hass: HomeAssistant):
     assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
     assert (
-            energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-            == UnitOfEnergy.KILO_WATT_HOUR
+        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+        == UnitOfEnergy.KILO_WATT_HOUR
     )
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
@@ -342,7 +342,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant):
 
 
 async def test_energy_group_available_when_members_temporarily_unavailable(
-        hass: HomeAssistant,
+    hass: HomeAssistant,
 ) -> None:
     """
     When any of the member sensors of a grouped energy sensor become unavailable,
@@ -405,12 +405,12 @@ async def test_hide_members(hass: HomeAssistant):
     )
 
     assert (
-            entity_reg.async_get("sensor.one_power").hidden_by
-            == er.RegistryEntryHider.INTEGRATION
+        entity_reg.async_get("sensor.one_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
     )
     assert (
-            entity_reg.async_get("sensor.two_power").hidden_by
-            == er.RegistryEntryHider.INTEGRATION
+        entity_reg.async_get("sensor.two_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
     )
 
 
@@ -468,13 +468,13 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
     )
 
     assert (
-            entity_reg.async_get("sensor.test_power").hidden_by
-            is er.RegistryEntryHider.USER
+        entity_reg.async_get("sensor.test_power").hidden_by
+        is er.RegistryEntryHider.USER
     )
 
 
 async def test_members_are_unhiden_after_group_removed(
-        hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry
 ):
     entity_reg.async_get_or_create(
         "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
@@ -497,8 +497,8 @@ async def test_members_are_unhiden_after_group_removed(
 
     assert hass.states.get("sensor.mygroup_power")
     assert (
-            entity_reg.async_get("sensor.test_power").hidden_by
-            == er.RegistryEntryHider.INTEGRATION
+        entity_reg.async_get("sensor.test_power").hidden_by
+        == er.RegistryEntryHider.INTEGRATION
     )
 
     # Remove the config entry
@@ -658,7 +658,7 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
 
 
 async def test_virtual_power_sensor_is_not_added_twice_to_group_after_reload(
-        hass: HomeAssistant,
+    hass: HomeAssistant,
 ):
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1298"""
 
@@ -756,7 +756,7 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
 
 
 async def test_config_entry_is_removed_from_associated_groups_on_removal(
-        hass: HomeAssistant,
+    hass: HomeAssistant,
 ) -> None:
     config_entry_sensor = await create_mocked_virtual_power_sensor_entry(
         hass, "VirtualSensor1", "xyz"
@@ -787,7 +787,7 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
 
 
 async def test_group_is_removed_from_virtual_power_entry_on_removal(
-        hass: HomeAssistant,
+    hass: HomeAssistant,
 ) -> None:
     config_entry_group = MockConfigEntry(
         domain=DOMAIN,
@@ -827,7 +827,7 @@ async def test_group_is_removed_from_virtual_power_entry_on_removal(
 
 
 async def test_error_is_logged_when_config_entry_associated_to_non_existing_group(
-        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
     caplog.set_level(logging.WARNING)
     config_entry = MockConfigEntry(
@@ -846,8 +846,8 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
     await hass.async_block_till_done()
 
     assert (
-            "ConfigEntry Mock Title: Cannot add/remove to group non-existing-config-entry-id. It does not exist"
-            in caplog.text
+        "ConfigEntry Mock Title: Cannot add/remove to group non-existing-config-entry-id. It does not exist"
+        in caplog.text
     )
 
 
@@ -916,7 +916,7 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
 
 
 async def test_gui_discovered_entity_in_yaml_group(
-        hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
     """
     Test if a powercalc entity setup with the GUI (either discovered or manually) can be added to a YAML group
