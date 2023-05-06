@@ -194,7 +194,8 @@ async def create_virtual_power_sensor(
         ] = power_profile.calculation_enabled_condition
 
     _LOGGER.debug(
-        "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
+        "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s "
+        "strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
         source_entity.entity_id,
         entity_category,
         name,

@@ -213,10 +213,12 @@ class PowerProfile:
         _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupported(
-                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})"
+                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
+                f"sub_profile: {sub_profile})"
             )
 
-        # When the sub LUT directory also has a model.json (not required), merge this json into the main model.json data.
+        # When the sub LUT directory also has a model.json (not required),
+        # merge this json into the main model.json data.
         file_path = os.path.join(self._sub_profile_dir, "model.json")
         if os.path.exists(file_path):
             json_file = open(file_path)
