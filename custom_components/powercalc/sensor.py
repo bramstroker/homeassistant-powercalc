@@ -693,7 +693,8 @@ async def check_entity_not_already_configured(
 
     entity_id = source_entity.entity_id
     if unique_id is None and (
-        entity_id in discovered_entities.keys() or entity_id in configured_entities.keys()
+        entity_id in discovered_entities.keys()
+        or entity_id in configured_entities.keys()
     ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 

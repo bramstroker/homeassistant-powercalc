@@ -154,7 +154,9 @@ async def create_virtual_power_sensor(
         entity_id = generate_power_sensor_entity_id(
             hass, sensor_config, source_entity, unique_id=unique_id
         )
-        entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
+        entity_category: str | None = (
+            sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
+        )
 
         strategy = select_calculation_strategy(sensor_config, power_profile)
 
@@ -216,7 +218,8 @@ async def create_virtual_power_sensor(
         standby_power_on=standby_power_on,
         update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
-        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY) or False,
+        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY)
+        or False,
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
         or False,
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
@@ -243,7 +246,7 @@ async def create_real_power_sensor(
     return RealPowerSensor(
         entity_id=power_sensor_id,  # type: ignore
         device_id=device_id,
-        unique_id=unique_id
+        unique_id=unique_id,
     )
 
 
