@@ -34,3 +34,11 @@ ignore_missing_imports = true
 
 [tool.coverage.paths]
 source = ["custom_components/powercalc"]
+
+[tool.ruff]
+select = ["E", "F"]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.mccabe]
+max-complexity = 10
