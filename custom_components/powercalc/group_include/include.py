@@ -21,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 def resolve_include_entities(
     hass: HomeAssistant, include_config: dict
 ) -> list[entity_registry.RegistryEntry]:
-    entities: dict[str, entity_registry.RegistryEntry | None] = {}
+    entities: dict[str, entity_registry.RegistryEntry] = {}
     entity_reg = entity_registry.async_get(hass)
 
     # Include entities from a certain area
@@ -58,15 +58,15 @@ def resolve_include_entities(
         _LOGGER.debug("Including entities from template")
         entity_ids = template.async_render()
         entities = entities | {
-            entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
+            entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids  # type: ignore
         }
 
     if CONF_FILTER in include_config:
-        entity_filter = create_filter(include_config.get(CONF_FILTER))
+        entity_filter = create_filter(include_config.get(CONF_FILTER))  # type: ignore
         entities = {
             entity_id: entity
             for entity_id, entity in entities.items()
-            if entity_filter.is_valid(entity)
+            if entity is not None and entity_filter.is_valid(entity)
         }
 
     return list(entities.values())
@@ -75,7 +75,7 @@ def resolve_include_entities(
 @callback
 def resolve_include_groups(
     hass: HomeAssistant, group_id: str
-) -> dict[str, entity_registry.RegistryEntry | None]:
+) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given group"""
     entity_reg = entity_registry.async_get(hass)
 
@@ -87,14 +87,14 @@ def resolve_include_groups(
     if group_state is None:
         raise SensorConfigurationError(f"Group state {group_id} not found")
     entity_ids = group_state.attributes.get(ATTR_ENTITY_ID)
-    return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}
+    return {entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids}  # type: ignore
 
 
 def resolve_light_group_entities(
     hass: HomeAssistant,
     group_id: str,
-    resolved_entities: dict[str, entity_registry.RegistryEntry | None] | None = None,
-) -> dict[str, entity_registry.RegistryEntry | None]:
+    resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None,
+) -> dict[str, entity_registry.RegistryEntry]:
     """
     Resolve all registry entries for a given light group.
     When the light group has sub light groups, we will recursively walk these as well
@@ -130,14 +130,14 @@ def resolve_light_group_entities(
 @callback
 def resolve_area_entities(
     hass: HomeAssistant, area_id_or_name: str
-) -> dict[str, entity_registry.RegistryEntry | None]:
+) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
     area = area_reg.async_get_area(area_id_or_name)
     if area is None:
         area = area_reg.async_get_area_by_name(str(area_id_or_name))
 
-    if area is None:
+    if area is None or area.id is None:
         raise SensorConfigurationError(
             f"No area with id or name '{area_id_or_name}' found in your HA instance"
         )
