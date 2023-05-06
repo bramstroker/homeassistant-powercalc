@@ -99,9 +99,9 @@ async def create_energy_sensor(
         entity_id=entity_id,
         entity_category=entity_category,
         name=name,
-        round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
+        round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),  # type: ignore
         unit_prefix=unit_prefix,
-        unit_time=TIME_HOURS,
+        unit_time=TIME_HOURS,  # type: ignore
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
         or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
@@ -185,7 +185,9 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             ATTR_SOURCE_ENTITY: self._powercalc_source_entity,
             ATTR_SOURCE_DOMAIN: self._powercalc_source_domain,
         }
-        attrs.update(super().extra_state_attributes)
+        super_attrs = super().extra_state_attributes
+        if super_attrs:
+            attrs.update(super_attrs)
         return attrs
 
     @property

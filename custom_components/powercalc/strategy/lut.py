@@ -53,7 +53,7 @@ class LutRegistry:
             lookup_dict = defaultdict(defaultdict_of_dict)
 
             with self.get_lut_file(power_profile, color_mode) as csv_file:
-                csv_reader = reader(csv_file)
+                csv_reader = reader(csv_file)  # type: ignore
                 next(csv_reader)  # skip header row
 
                 line_count = 0
