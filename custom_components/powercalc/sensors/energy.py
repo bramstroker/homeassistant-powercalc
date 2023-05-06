@@ -56,7 +56,8 @@ async def create_energy_sensor(
         entity_entry = ent_reg.async_get(energy_sensor_id)
         if entity_entry is None:
             raise SensorConfigurationError(
-                f"No energy sensor with id {energy_sensor_id} found in your HA instance. Double check `energy_sensor_id` setting"
+                f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
+                "Double check `energy_sensor_id` setting"
             )
         return RealEnergySensor(entity_entry)
 
@@ -67,7 +68,8 @@ async def create_energy_sensor(
         real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
         if real_energy_sensor:
             _LOGGER.debug(
-                f"Found existing energy sensor '{real_energy_sensor.entity_id}' for the power sensor '{power_sensor.entity_id}'"
+                f"Found existing energy sensor '{real_energy_sensor.entity_id}' "
+                f"for the power sensor '{power_sensor.entity_id}'"
             )
             return real_energy_sensor
 

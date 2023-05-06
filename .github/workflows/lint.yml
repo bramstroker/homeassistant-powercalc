@@ -38,3 +38,10 @@ jobs:
           requirements: voluptuous-stubs homeassistant-stubs numpy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Powercalc
+        uses: actions/checkout@v3
+      - name: Run Ruff
+        uses: chartboost/ruff-action@v1

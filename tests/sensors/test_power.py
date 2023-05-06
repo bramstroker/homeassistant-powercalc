@@ -223,7 +223,8 @@ async def test_strategy_enabled_condition(hass: HomeAssistant):
      - cleaning
      - returning
      - docked
-    When the state is docked the calculation is activated and linear calibration is used to map the consumption while charging
+    When the state is docked the calculation is activated and linear calibration is used to map the consumption
+    while charging
     """
     vacuum_entity_id = "vacuum.my_robot_cleaner"
     power_entity_id = "sensor.my_robot_cleaner_power"

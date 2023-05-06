@@ -499,7 +499,9 @@ class LightRunner(MeasurementRunner):
             self.nudge_and_remeasure(ColorMode.BRIGHTNESS, Variation(0))
         except ZeroReadingError:
             _LOGGER.error(
-                "Measured 0 watt as standby usage, continuing now, but you probably need to have a look into measuring multiple lights at the same time or using a dummy load."
+                "Measured 0 watt as standby usage, continuing now, "
+                "but you probably need to have a look into measuring multiple lights at the same time "
+                "or using a dummy load."
             )
             return 0
 
@@ -517,12 +519,14 @@ class LightRunner(MeasurementRunner):
             ),
             inquirer.Confirm(
                 name="dummy_load",
-                message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                message="Did you connect a dummy load? This can help to be able to measure standby power and low "
+                        "brightness levels correctly",
                 default=False,
             ),
             inquirer.Confirm(
                 name="multiple_lights",
-                message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to be able to measure low currents.",
+                message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to "
+                        "be able to measure low currents.",
                 default=False,
             ),
             inquirer.Text(

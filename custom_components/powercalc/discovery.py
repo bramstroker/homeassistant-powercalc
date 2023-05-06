@@ -63,7 +63,8 @@ async def autodiscover_model(
     if manufacturer in MANUFACTURER_ALIASES:
         manufacturer = MANUFACTURER_ALIASES.get(manufacturer)
 
-    # Make sure we don't have a literal / in model_id, so we don't get issues with sublut directory matching down the road
+    # Make sure we don't have a literal / in model_id,
+    # so we don't get issues with sublut directory matching down the road
     # See github #658
     model_id = str(model_id).replace("/", "#slash#")
 

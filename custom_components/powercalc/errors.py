@@ -21,7 +21,8 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
             existing_entities = []
         self.existing_entities = existing_entities
         super().__init__(
-            f"{source_entity_id}: This entity has already configured a power sensor. When you want to configure it twice make sure to give it a unique_id"
+            f"{source_entity_id}: This entity has already configured a power sensor. "
+            "When you want to configure it twice make sure to give it a unique_id"
         )
 
     def get_existing_entities(self) -> list:
