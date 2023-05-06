@@ -413,7 +413,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="linear",
-            data_schema=_create_linear_schema(self.source_entity_id),
+            data_schema=_create_linear_schema(self.source_entity_id),  # type: ignore
             errors=errors,
             last_step=False,
         )
@@ -514,8 +514,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             library = ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
-                    self.sensor_config.get(CONF_MANUFACTURER),
-                    self.sensor_config.get(CONF_MODEL),
+                    self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
+                    self.sensor_config.get(CONF_MODEL),  # type: ignore
                 )
             )
             self.power_profile = profile
@@ -528,8 +528,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="model",
             data_schema=await _create_schema_model(
                 self.hass,
-                self.sensor_config.get(CONF_MANUFACTURER),
-                self.source_entity,
+                self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
+                self.source_entity,  # type: ignore
             ),
             description_placeholders={
                 "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md"
@@ -565,8 +565,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return await self.async_step_power_advanced()
 
         model_info = ModelInfo(
-            self.sensor_config.get(CONF_MANUFACTURER),
-            self.sensor_config.get(CONF_MODEL),
+            self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
+            self.sensor_config.get(CONF_MODEL),  # type: ignore
         )
         return self.async_show_form(
             step_id="sub_profile",
@@ -597,7 +597,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.hass,
             strategy_name,
             self.sensor_config,
-            self.source_entity,
+            self.source_entity,  # type: ignore
             self.power_profile,
         )
         try:
@@ -616,12 +616,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
 
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
-        if self.name:
-            self.sensor_config.update({CONF_NAME: self.name})
+        self.sensor_config.update({CONF_NAME: self.name})
         if self.source_entity_id:
             self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
 
-        return self.async_create_entry(title=self.name, data=self.sensor_config)
+        return self.async_create_entry(title=self.name, data=self.sensor_config)  # type: ignore
 
 
 class OptionsFlowHandler(OptionsFlow):
@@ -655,8 +654,8 @@ class OptionsFlowHandler(OptionsFlow):
             ):
                 try:
                     model_info = ModelInfo(
-                        self.current_config.get(CONF_MANUFACTURER),
-                        self.current_config.get(CONF_MODEL),
+                        self.current_config.get(CONF_MANUFACTURER),  # type: ignore
+                        self.current_config.get(CONF_MODEL),  # type: ignore
                     )
                     self.power_profile = await get_power_profile(
                         self.hass, {}, model_info
@@ -677,7 +676,7 @@ class OptionsFlowHandler(OptionsFlow):
             errors=errors,
         )
 
-    async def save_options(self, user_input: dict[str, Any] | None = None) -> dict:
+    async def save_options(self, user_input: dict[str, Any]) -> dict:
         """Save options, and return errors when validation fails"""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
@@ -705,7 +704,7 @@ class OptionsFlowHandler(OptionsFlow):
                     self.current_config.update({self.strategy: strategy_options})
 
                 strategy_object = await _create_strategy_object(
-                    self.hass, self.strategy, self.current_config, self.source_entity
+                    self.hass, self.strategy, self.current_config, self.source_entity  # type: ignore
                 )
                 try:
                     await strategy_object.validate_config()
@@ -761,7 +760,7 @@ async def _create_strategy_object(
     factory = PowerCalculatorStrategyFactory(hass)
     if power_profile is None and CONF_MANUFACTURER in config:
         power_profile = await ProfileLibrary.factory(hass).get_profile(
-            ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))
+            ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL))  # type: ignore
         )
     return factory.create(config, strategy, power_profile, source_entity)
 
@@ -983,7 +982,7 @@ def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
     return config
 
 
-def _validate_daily_energy_input(user_input: dict[str, Any]) -> dict:
+def _validate_daily_energy_input(user_input: dict[str, Any] | None) -> dict:
     """Validates the daily energy form"""
     if not user_input:
         return {}

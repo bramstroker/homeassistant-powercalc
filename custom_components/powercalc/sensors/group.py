@@ -444,7 +444,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             try:
                 if last_sensor_state and last_sensor_state.native_value:
                     self._attr_native_value = round(
-                        Decimal(last_sensor_state.native_value), self._rounding_digits
+                        Decimal(last_sensor_state.native_value), self._rounding_digits  # type: ignore
                     )
                 elif last_state:
                     self._attr_native_value = round(
@@ -623,7 +623,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         if self._attr_native_value is None:
             group_sum = Decimal(0)
         else:
-            group_sum = Decimal(self._attr_native_value)
+            group_sum = Decimal(self._attr_native_value)  # type: ignore
         _LOGGER.debug(f"{self.entity_id}: Recalculate, current value: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
