@@ -110,8 +110,12 @@ class PowerCalculatorStrategyFactory:
 
     def _create_wled(self, source_entity: SourceEntity, config: dict) -> WledStrategy:
         """Create the WLED strategy"""
+
+        if CONF_WLED not in config:
+            raise StrategyConfigurationError("No WLED configuration supplied")
+
         return WledStrategy(
-            config=config.get(CONF_WLED),
+            config=config.get(CONF_WLED),  # type: ignore
             light_entity=source_entity,
             hass=self._hass,
             standby_power=config.get(CONF_STANDBY_POWER),
