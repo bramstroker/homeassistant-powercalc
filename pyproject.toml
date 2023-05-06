@@ -31,3 +31,6 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = "homeassistant.components.*"
 ignore_missing_imports = true
+
+[tool.coverage.paths]
+source = ["custom_components/powercalc"]
