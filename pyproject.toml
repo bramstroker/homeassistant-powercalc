@@ -37,7 +37,7 @@ source = ["custom_components/powercalc"]
 
 [tool.ruff]
 select = ["E", "F"]
-line-length = 125
+line-length = 150
 target-version = "py310"
 
 [tool.ruff.mccabe]
