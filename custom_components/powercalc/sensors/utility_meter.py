@@ -61,7 +61,7 @@ async def create_utility_meters(
             unique_id = f"{energy_sensor.unique_id}_{meter_type}"
 
         # Prevent duplicate creation of utility meter. See #1322
-        if isinstance(energy_sensor, RealEnergySensor):
+        if isinstance(energy_sensor, RealEnergySensor) and unique_id:
             entity_registry = er.async_get(hass)
             existing_entity_id = entity_registry.async_get_entity_id(
                 domain=SENSOR_DOMAIN, platform=DOMAIN, unique_id=unique_id

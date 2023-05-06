@@ -34,7 +34,7 @@ async def create_general_standby_sensors(
 ) -> list[Entity]:
     sensors: list[Entity] = []
     power_sensor = StandbyPowerSensor(
-        hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION)
+        hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION)  # type: ignore
     )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
