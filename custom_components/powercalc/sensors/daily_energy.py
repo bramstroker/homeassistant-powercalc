@@ -93,8 +93,8 @@ async def create_daily_fixed_energy_sensor(
 
     if CONF_ON_TIME in mode_config:
         on_time = mode_config.get(CONF_ON_TIME)
-        if not isinstance(on_time, timedelta) and isinstance(on_time, float):
-            on_time = timedelta(seconds=on_time)
+        if not isinstance(on_time, timedelta):
+            on_time = timedelta(seconds=on_time)  # type: ignore
     else:
         on_time = timedelta(days=1)
 
