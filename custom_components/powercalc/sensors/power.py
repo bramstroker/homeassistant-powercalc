@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal, DecimalException
 from typing import Any, cast
 
@@ -154,7 +154,7 @@ async def create_virtual_power_sensor(
         entity_id = generate_power_sensor_entity_id(
             hass, sensor_config, source_entity, unique_id=unique_id
         )
-        entity_category = sensor_config.get(CONF_POWER_SENSOR_CATEGORY)
+        entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
 
         strategy = select_calculation_strategy(sensor_config, power_profile)
 
@@ -177,7 +177,7 @@ async def create_virtual_power_sensor(
     standby_power_on = Decimal(0)
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER) is not None:
-            standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))
+            standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))  # type: ignore
         elif power_profile is not None:
             standby_power = Decimal(power_profile.standby_power)
             standby_power_on = Decimal(power_profile.standby_power_on)
@@ -214,12 +214,12 @@ async def create_virtual_power_sensor(
         unique_id=unique_id,
         standby_power=standby_power,
         standby_power_on=standby_power_on,
-        update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),
+        update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
         multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
-        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY),
+        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY) or False,
         ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
         or False,
-        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),
+        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
         sensor_config=sensor_config,
         power_profile=power_profile,
     )
@@ -234,14 +234,16 @@ async def create_real_power_sensor(
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     device_id = None
     ent_reg = er.async_get(hass)
-    entity_entry = ent_reg.async_get(power_sensor_id)
+    entity_entry = ent_reg.async_get(power_sensor_id)  # type: ignore
     if entity_entry:
         if not unique_id:
             unique_id = entity_entry.unique_id
         device_id = entity_entry.device_id
 
     return RealPowerSensor(
-        entity_id=power_sensor_id, device_id=device_id, unique_id=unique_id
+        entity_id=power_sensor_id,  # type: ignore
+        device_id=device_id,
+        unique_id=unique_id
     )
 
 
@@ -314,13 +316,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         power_calculator: PowerCalculationStrategyInterface,
         calculation_strategy: CalculationStrategy,
         entity_id: str,
-        entity_category: str,
+        entity_category: str | None,
         name: str,
         source_entity: SourceEntity,
         unique_id: str | None,
         standby_power: Decimal,
         standby_power_on: Decimal,
-        update_frequency: int,
+        update_frequency: timedelta,
         multiply_factor: float | None,
         multiply_factor_standby: bool,
         ignore_unavailable_state: bool,
@@ -380,7 +382,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             await self._update_power_sensor(self._source_entity.entity_id, state)
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
-        async def initial_update(event: Event) -> None:
+        async def initial_update(hass: HomeAssistant) -> None:
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._update_power_sensor(entity_id, new_state)
@@ -441,7 +443,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             state = State(self.source_entity, STATE_ON)
 
-        if not self._has_valid_state(state):
+        if not state or not self._has_valid_state(state):
             _LOGGER.debug(
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
@@ -551,14 +553,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             @callback
             def _update_sleep_power(_: Any) -> None:
-                power = Decimal(sleep_power.get(CONF_POWER))
+                power = Decimal(sleep_power.get(CONF_POWER) or 0)
                 if self._multiply_factor_standby and self._multiply_factor:
                     power *= Decimal(self._multiply_factor)
                 self._power = round(power, self._rounding_digits)
                 self.async_write_ha_state()
 
             self._sleep_power_timer = async_call_later(
-                self.hass, delay, _update_sleep_power
+                self.hass, delay, _update_sleep_power  # type: ignore
             )
 
         standby_power = self._standby_power
