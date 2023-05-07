@@ -512,7 +512,8 @@ class LightRunner(MeasurementRunner):
     def gzip_csv(csv_file_path: str):
         """Gzip the CSV file"""
         with open(csv_file_path, "rb") as csv_file, gzip.open(
-            f"{csv_file_path}.gz", "wb",
+            f"{csv_file_path}.gz",
+            "wb",
         ) as gzip_file:
             shutil.copyfileobj(csv_file, gzip_file)
 
@@ -609,7 +610,10 @@ class ColorTempVariation(Variation):
 
 class CsvWriter:
     def __init__(
-        self, csv_file: TextIO, color_mode: ColorMode, add_header: bool,
+        self,
+        csv_file: TextIO,
+        color_mode: ColorMode,
+        add_header: bool,
     ) -> None:
         self.csv_file = csv_file
         self.writer = csv.writer(csv_file)
