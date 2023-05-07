@@ -58,7 +58,6 @@ class ProfileLibrary:
         if self._manufacturer_device_types is None:
             with open(
                 os.path.join(BUILT_IN_DATA_DIRECTORY, "manufacturer_device_types.json"),
-                "r",
             ) as file:
                 self._manufacturer_device_types = json.load(file)
 

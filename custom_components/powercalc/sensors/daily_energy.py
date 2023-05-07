@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import decimal
 import logging
+from collections.abc import Callable
 from datetime import datetime, time, timedelta
 from decimal import Decimal
-from typing import Any, Callable
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.util.dt as dt_util

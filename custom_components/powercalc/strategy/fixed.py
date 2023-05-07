@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Optional, Union
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -35,8 +34,8 @@ class FixedStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
         source_entity: SourceEntity,
-        power: Optional[Union[Template, float]],
-        per_state_power: Optional[dict[str, Union[float, Template]]],
+        power: Template | float | None,
+        per_state_power: dict[str, float | Template] | None,
     ) -> None:
         self._source_entity = source_entity
         self._power = power
@@ -78,7 +77,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 "fixed_states_power_only",
             )
 
-    def get_entities_to_track(self) -> list[Union[str | TrackTemplate]]:
+    def get_entities_to_track(self) -> list[str | TrackTemplate]:
         track_templates: list[str | TrackTemplate] = []
 
         if isinstance(self._power, Template):

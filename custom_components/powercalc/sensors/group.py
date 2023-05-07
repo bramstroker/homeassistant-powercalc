@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import logging
 from abc import abstractmethod
+from collections.abc import Callable
 from datetime import timedelta
 from decimal import Decimal, DecimalException
-from typing import Any, Callable
+from typing import Any
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import (

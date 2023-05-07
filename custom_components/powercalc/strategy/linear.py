@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
-from typing import Optional
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -45,7 +44,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         config: ConfigType,
         hass: HomeAssistant,
         source_entity: SourceEntity,
-        standby_power: Optional[float],
+        standby_power: float | None,
     ) -> None:
         self._config = config
         self._hass = hass

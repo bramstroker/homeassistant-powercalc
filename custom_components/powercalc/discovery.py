@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any, Optional
+from typing import Any
 
 import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
@@ -194,7 +194,7 @@ class DiscoveryManager:
         self,
         source_entity: SourceEntity,
         power_profile: PowerProfile | None,
-        extra_discovery_data: Optional[dict],
+        extra_discovery_data: dict | None,
     ) -> None:
         """Dispatch the discovery flow for a given entity"""
         existing_entries = [

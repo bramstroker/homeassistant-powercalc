@@ -7,7 +7,7 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
@@ -441,7 +441,7 @@ async def create_sensors(
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
     config_entry: ConfigEntry | None = None,
-    context: Optional[CreationContext] = None,
+    context: CreationContext | None = None,
 ) -> EntitiesBucket:
     """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
 

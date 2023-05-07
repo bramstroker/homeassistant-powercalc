@@ -36,7 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 BrightnessLutType = dict[int, float]
 ColorTempLutType = dict[int, dict[int, float]]
 HsLutType = dict[int, dict[int, dict[int, float]]]
-LookupDictType = Union[BrightnessLutType, ColorTempLutType, HsLutType]
+LookupDictType = BrightnessLutType | ColorTempLutType | HsLutType
 
 
 class LutRegistry:
@@ -192,7 +192,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return float(np.interp(brightness, brightness_range, power_range))
 
     def lookup_power_for_brightness(
-        self, lut_value: Union[LookupDictType, float], light_setting: LightSetting
+        self, lut_value: LookupDictType | float, light_setting: LightSetting
     ) -> float:
         if light_setting.color_mode == ColorMode.BRIGHTNESS:
             return lut_value  # type: ignore

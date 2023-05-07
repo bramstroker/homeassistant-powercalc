@@ -36,7 +36,7 @@ ignore_missing_imports = true
 source = ["custom_components/powercalc"]
 
 [tool.ruff]
-select = ["E", "F", "B", "I", "N"]
+select = ["E", "F", "B", "I", "N", "UP"]
 line-length = 150
 target-version = "py310"
 

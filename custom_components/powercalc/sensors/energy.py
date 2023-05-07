@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Mapping, Optional
+from collections.abc import Mapping
+from typing import Any
 
 import homeassistant.helpers.entity_registry as er
 import homeassistant.util.dt as dt_util
@@ -115,7 +116,7 @@ async def create_energy_sensor(
 @callback
 def find_related_real_energy_sensor(
     hass: HomeAssistant, power_sensor: RealPowerSensor
-) -> Optional[RealEnergySensor]:
+) -> RealEnergySensor | None:
     """See if a corresponding energy sensor exists in the HA installation for the power sensor"""
 
     if not power_sensor.device_id:
