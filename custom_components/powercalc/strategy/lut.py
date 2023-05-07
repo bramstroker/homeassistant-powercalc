@@ -204,9 +204,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         if light_setting.color_mode == ColorMode.COLOR_TEMP:
             return self.get_nearest(lut_value, light_setting.color_temp or 0)  # type: ignore
-        else:
-            sat_values = self.get_nearest(lut_value, light_setting.hue or 0)
-            return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
+
+        sat_values = self.get_nearest(lut_value, light_setting.hue or 0)
+        return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
 
     @staticmethod
     def get_nearest(lookup_dict: LookupDictType, search_key: int) -> float | LookupDictType:
@@ -223,7 +223,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return int(last_key)
 
         return max(
-            (k for k in lookup_dict.keys() if int(k) <= int(search_key)), default=[*keys][0],
+            (k for k in lookup_dict if int(k) <= int(search_key)), default=[*keys][0],
         )
 
     @staticmethod

@@ -48,10 +48,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     entity_entry = entity_registry.async_get(entity_id)
 
     dev = dr.async_get(hass)
-    if entity_entry and entity_entry.device_id:
-        device_entry = dev.async_get(entity_entry.device_id)
-    else:
-        device_entry = None
+    device_entry = dev.async_get(entity_entry.device_id) if entity_entry and entity_entry.device_id else None
 
     unique_id = None
     supported_color_modes: list[ColorMode] = []

@@ -42,10 +42,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        if entity_state.entity_id == self._light_entity.entity_id:
-            light_state = entity_state
-        else:
-            light_state = self._hass.states.get(self._light_entity.entity_id)
+        light_state = entity_state if entity_state.entity_id == self._light_entity.entity_id else self._hass.states.get(self._light_entity.entity_id)
 
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power

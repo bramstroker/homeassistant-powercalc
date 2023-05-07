@@ -521,7 +521,7 @@ async def create_sensors(
             raise SensorConfigurationError(
                 f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'",
             )
-        elif not sensor_configs:
+        if not sensor_configs:
             raise SensorConfigurationError(
                 "Could not resolve any entities for non-group sensor",
             )
@@ -672,7 +672,7 @@ async def check_entity_not_already_configured(
     ]
 
     # Prefer configured entity over discovered entity
-    if not is_discovered and source_entity.entity_id in discovered_entities.keys():
+    if not is_discovered and source_entity.entity_id in discovered_entities:
         entity_reg = er.async_get(hass)
         for entity in discovered_entities.get(source_entity.entity_id) or []:
             if entity_reg.async_get(entity.entity_id):
@@ -693,8 +693,8 @@ async def check_entity_not_already_configured(
 
     entity_id = source_entity.entity_id
     if unique_id is None and (
-        entity_id in discovered_entities.keys()
-        or entity_id in configured_entities.keys()
+        entity_id in discovered_entities
+        or entity_id in configured_entities
     ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 

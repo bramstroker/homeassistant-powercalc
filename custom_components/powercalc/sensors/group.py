@@ -621,10 +621,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         Calculate the new group energy sensor state
         For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
         """
-        if self._attr_native_value is None:
-            group_sum = Decimal(0)
-        else:
-            group_sum = Decimal(self._attr_native_value)  # type: ignore
+        group_sum = Decimal(self._attr_native_value) if self._attr_native_value else Decimal(0)  # type: ignore
         _LOGGER.debug(f"{self.entity_id}: Recalculate, current value: {group_sum}")
         for entity_state in member_states:
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)

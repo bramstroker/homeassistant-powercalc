@@ -113,8 +113,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             parts = line.split(" -> ")
             calibration_list.append((int(parts[0]), float(parts[1])))
 
-        sorted_list = sorted(calibration_list, key=lambda tup: tup[0])
-        return sorted_list
+        return sorted(calibration_list, key=lambda tup: tup[0])
 
     def get_entity_value_range(self) -> tuple:
         """Get the min/max range for a given entity domain"""

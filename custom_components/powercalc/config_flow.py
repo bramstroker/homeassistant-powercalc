@@ -687,7 +687,7 @@ class OptionsFlowHandler(OptionsFlow):
                 SCHEMA_POWER_ADVANCED.schema,
             )
             generic_options = {}
-            for key in generic_option_schema.schema.keys():
+            for key in generic_option_schema.schema:
                 if isinstance(key, vol.Marker):
                     key = key.schema
                 if user_input and key in user_input:
@@ -725,12 +725,7 @@ class OptionsFlowHandler(OptionsFlow):
         strategy_options: dict[str, Any] = {}
         data_schema: vol.Schema = vol.Schema({})
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            if self.strategy:
-                strategy_schema = _get_strategy_schema(
-                    self.strategy, self.source_entity_id,
-                )
-            else:
-                strategy_schema = vol.Schema({})
+            strategy_schema = _get_strategy_schema(self.strategy, self.source_entity_id) if self.strategy else vol.Schema({})
             data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
                 SCHEMA_POWER_ADVANCED.schema,
             )
@@ -964,7 +959,7 @@ def _build_strategy_config(
     """Build the config dict needed for the configured strategy"""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
     strategy_options: dict[str, Any] = {}
-    for key in strategy_schema.schema.keys():
+    for key in strategy_schema.schema:
         if user_input.get(key) is None:
             continue
         strategy_options[str(key)] = user_input.get(key)
@@ -975,7 +970,7 @@ def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
     """Build the config under daily_energy: key"""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
     config: dict[str, Any] = {}
-    for key in schema.schema.keys():
+    for key in schema.schema:
         if user_input.get(key) is None:
             continue
         config[str(key)] = user_input.get(key)
@@ -1012,5 +1007,4 @@ def _fill_schema_defaults(
                 new_key = copy.copy(key)
                 new_key.description = {"suggested_value": options.get(key)}  # type: ignore
         schema[new_key] = val
-    data_schema = vol.Schema(schema)
-    return data_schema
+    return vol.Schema(schema)

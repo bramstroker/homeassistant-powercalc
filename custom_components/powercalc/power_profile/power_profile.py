@@ -203,11 +203,11 @@ class PowerProfile:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles"""
 
         if not self.has_sub_profiles:
-            return None
+            return
 
         # Sub profile already selected, no need to load it again
         if self.sub_profile == sub_profile:
-            return None
+            return
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
         _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
@@ -221,8 +221,8 @@ class PowerProfile:
         # merge this json into the main model.json data.
         file_path = os.path.join(self._sub_profile_dir, "model.json")
         if os.path.exists(file_path):
-            json_file = open(file_path)
-            self._json_data = {**self._json_data, **json.load(json_file)}
+            with open(file_path) as json_file:
+                self._json_data = {**self._json_data, **json.load(json_file)}
 
         self.sub_profile = sub_profile
 
@@ -309,11 +309,9 @@ class SubProfileSelectConfig(NamedTuple):
 class SubProfileMatcher(Protocol):
     def match(self, entity_state: State) -> str | None:
         """Returns a sub profile"""
-        pass
 
     def get_tracking_entities(self) -> list[str]:
         """Get extra entities to track for state changes"""
-        pass
 
 
 class EntityStateMatcher(SubProfileMatcher):

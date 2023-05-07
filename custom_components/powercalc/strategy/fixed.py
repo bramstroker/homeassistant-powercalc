@@ -48,13 +48,13 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 return await evaluate_power(
                     self._per_state_power.get(entity_state.state) or 0,
                 )
-            else:
-                # Lookup by state attribute (attribute|value)
-                for state_key, power in self._per_state_power.items():
-                    if "|" in state_key:
-                        attribute, value = state_key.split("|", 2)
-                        if str(entity_state.attributes.get(attribute)) == value:
-                            return await evaluate_power(power)
+
+            # Lookup by state attribute (attribute|value)
+            for state_key, power in self._per_state_power.items():
+                if "|" in state_key:
+                    attribute, value = state_key.split("|", 2)
+                    if str(entity_state.attributes.get(attribute)) == value:
+                        return await evaluate_power(power)
 
         if self._power is None:
             return None

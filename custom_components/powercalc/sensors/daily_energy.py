@@ -237,10 +237,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             value.hass = self.hass
             value = float(value.async_render())
 
-        if self._user_unit_of_measurement == POWER_WATT:
-            wh_per_day = value * (self._on_time.total_seconds() / 3600)
-        else:
-            wh_per_day = value * 1000
+        wh_per_day = value * (self._on_time.total_seconds() / 3600) if self._user_unit_of_measurement == POWER_WATT else value * 1000
 
         # Convert Wh to the native measurement unit
         energy_per_day = wh_per_day

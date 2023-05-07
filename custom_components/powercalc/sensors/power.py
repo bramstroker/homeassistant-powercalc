@@ -303,7 +303,6 @@ def is_fully_configured(config: ConfigType) -> bool:
 class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from"""
 
-    pass
 
 
 class VirtualPowerSensor(SensorEntity, PowerSensor):
