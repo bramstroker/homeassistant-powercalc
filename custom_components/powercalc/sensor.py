@@ -674,7 +674,7 @@ async def create_individual_sensors(
 
 
 async def attach_entities_to_source_device(
-    config_entry: ConfigEntry,
+    config_entry: ConfigEntry | None,
     entities_to_add: list[Entity],
     hass: HomeAssistant,
     source_entity: SourceEntity,
@@ -687,7 +687,7 @@ async def attach_entities_to_source_device(
             if not isinstance(entity, BaseEntity):
                 continue
             try:
-                entity.source_device_id = source_entity.device_entry.id
+                entity.source_device_id = source_entity.device_entry.id  # type: ignore
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
         if (

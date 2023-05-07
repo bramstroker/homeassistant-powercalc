@@ -34,7 +34,7 @@ class ProfileLibrary:
         self._manufacturer_device_types: dict[str, list] | None = None
 
     @staticmethod
-    def factory(hass: HomeAssistant) -> ProfileLibrary:  # type: ignore
+    def factory(hass: HomeAssistant) -> ProfileLibrary:
         """Creates and loads the profile library
         Makes sure it is only loaded once and instance is saved in hass data registry.
         """

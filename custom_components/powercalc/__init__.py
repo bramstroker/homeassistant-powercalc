@@ -221,7 +221,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             await create_domain_groups(
                 hass,
                 domain_config,
-                domain_groups,  # type: ignore[arg-type]
+                domain_groups,
             )
 
         hass.bus.async_listen_once(

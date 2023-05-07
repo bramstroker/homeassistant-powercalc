@@ -475,8 +475,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             try:
                 if last_sensor_state and last_sensor_state.native_value:
                     self._attr_native_value = round(
-                        Decimal(last_sensor_state.native_value),
-                        self._rounding_digits,  # type: ignore
+                        Decimal(last_sensor_state.native_value),  # type: ignore
+                        self._rounding_digits,
                     )
                 elif last_state:
                     self._attr_native_value = round(

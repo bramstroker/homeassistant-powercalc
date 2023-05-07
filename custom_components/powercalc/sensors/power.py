@@ -591,8 +591,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             self._sleep_power_timer = async_call_later(
                 self.hass,
-                delay,
-                _update_sleep_power,  # type: ignore
+                delay,  # type: ignore
+                _update_sleep_power,
             )
 
         standby_power = self._standby_power
