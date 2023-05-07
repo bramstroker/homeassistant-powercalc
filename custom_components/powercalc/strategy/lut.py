@@ -252,7 +252,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                         self._profile, color_mode
                     )
                 except LutFileNotFound:
-                    raise ModelNotSupported(
+                    raise ModelNotSupported(  # noqa: B904
                         f"No lookup file found for mode: {color_mode}",
                         "lut_unsupported_color_mode",
                     )

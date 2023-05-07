@@ -178,12 +178,7 @@ async def create_utility_meter(
         params["periodically_resetting"] = False
 
     utility_meter = VirtualUtilityMeter(**params)
-    setattr(
-        utility_meter,
-        "rounding_digits",
-        sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),
-    )
-
+    utility_meter.rounding_digits = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)
     utility_meter.entity_id = entity_id
 
     return utility_meter

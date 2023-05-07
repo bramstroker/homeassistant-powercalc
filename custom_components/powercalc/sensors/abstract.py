@@ -32,7 +32,7 @@ class BaseEntity(Entity):
         if entity_entry is None or not hasattr(self, "source_device_id"):
             return
 
-        device_id: str = getattr(self, "source_device_id")
+        device_id: str = getattr(self, "source_device_id")  # noqa: B009
         if not device_id:
             return
         device_reg = dr.async_get(self.hass)

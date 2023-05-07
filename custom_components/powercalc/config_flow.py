@@ -687,7 +687,7 @@ class OptionsFlowHandler(OptionsFlow):
                 SCHEMA_POWER_ADVANCED.schema
             )
             generic_options = {}
-            for key, val in generic_option_schema.schema.items():
+            for key in generic_option_schema.schema.keys():
                 if isinstance(key, vol.Marker):
                     key = key.schema
                 if user_input and key in user_input:

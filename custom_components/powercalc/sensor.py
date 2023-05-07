@@ -618,7 +618,7 @@ async def create_individual_sensors(  # noqa: C901
             if not isinstance(entity, BaseEntity):
                 continue
             try:
-                setattr(entity, "source_device_id", source_entity.device_entry.id)
+                entity.source_device_id = source_entity.device_entry.id
             except AttributeError:
                 _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
         if (
