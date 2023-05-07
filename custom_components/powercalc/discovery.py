@@ -28,7 +28,7 @@ from .const import (
     CalculationStrategy,
     PowercalcDiscoveryType,
 )
-from .errors import ModelNotSupported
+from .errors import ModelNotSupportedError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo
 from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
@@ -149,7 +149,7 @@ class DiscoveryManager:
                 power_profile = await get_power_profile(
                     self.hass, {}, model_info=model_info
                 )
-            except ModelNotSupported:
+            except ModelNotSupportedError:
                 _LOGGER.debug(
                     "%s: Model not found in library, skipping discovery",
                     entity_entry.entity_id,

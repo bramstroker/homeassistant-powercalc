@@ -10,9 +10,9 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
-    ModelNotSupported,
+    ModelNotSupportedError,
     PowercalcSetupError,
-    UnsupportedStrategy,
+    UnsupportedStrategyError,
 )
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.power_profile import (
@@ -45,7 +45,7 @@ async def test_load_fixed_profile(hass: HomeAssistant):
     assert power_profile.standby_power == 0.5
     assert power_profile.fixed_mode_config == {CONF_POWER: 50}
 
-    with pytest.raises(UnsupportedStrategy):
+    with pytest.raises(UnsupportedStrategyError):
         power_profile.linear_mode_config
 
 
@@ -57,7 +57,7 @@ async def test_load_linear_profile(hass: HomeAssistant):
     assert power_profile.standby_power == 0.5
     assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
-    with pytest.raises(UnsupportedStrategy):
+    with pytest.raises(UnsupportedStrategyError):
         power_profile.fixed_mode_config
 
 
@@ -96,7 +96,7 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant):
 
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant):
-    with pytest.raises(ModelNotSupported):
+    with pytest.raises(ModelNotSupportedError):
         await ProfileLibrary.factory(hass).get_profile(
             ModelInfo("yeelight", "YLDL01YL/ambilight_boo")
         )

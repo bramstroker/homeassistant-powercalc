@@ -71,7 +71,7 @@ from ..const import (
     CalculationStrategy,
 )
 from ..discovery import autodiscover_model
-from ..errors import ModelNotSupported, StrategyConfigurationError, UnsupportedStrategy
+from ..errors import ModelNotSupportedError, StrategyConfigurationError, UnsupportedStrategyError
 from ..power_profile.factory import get_power_profile
 from ..power_profile.power_profile import PowerProfile, SubProfileSelector
 from ..strategy.factory import PowerCalculatorStrategyFactory
@@ -137,7 +137,7 @@ async def create_virtual_power_sensor(
                             State(source_entity.entity_id, STATE_UNKNOWN)
                         )
                     )
-            except ModelNotSupported as err:
+            except ModelNotSupportedError as err:
                 if not is_fully_configured(sensor_config):
                     _LOGGER.error(
                         "%s: Skipping sensor setup %s", source_entity.entity_id, err
@@ -167,7 +167,7 @@ async def create_virtual_power_sensor(
             sensor_config, strategy, power_profile, source_entity
         )
         await calculation_strategy.validate_config()
-    except (StrategyConfigurationError, UnsupportedStrategy) as err:
+    except (StrategyConfigurationError, UnsupportedStrategyError) as err:
         _LOGGER.error(
             "%s: Skipping sensor setup: %s",
             source_entity.entity_id,
@@ -285,7 +285,7 @@ def select_calculation_strategy(
     if power_profile:
         return power_profile.calculation_strategy
 
-    raise UnsupportedStrategy(
+    raise UnsupportedStrategyError(
         "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme"
     )
 

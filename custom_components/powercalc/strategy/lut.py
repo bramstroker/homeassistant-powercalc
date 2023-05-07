@@ -25,7 +25,7 @@ from homeassistant.components.light import (
 from homeassistant.core import State
 
 from ..common import SourceEntity
-from ..errors import LutFileNotFound, ModelNotSupported, StrategyConfigurationError
+from ..errors import LutFileNotFoundError, ModelNotSupportedError, StrategyConfigurationError
 from ..power_profile.power_profile import PowerProfile
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -84,7 +84,7 @@ class LutRegistry:
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")  # type: ignore
 
-        raise LutFileNotFound("Data file not found: %s")
+        raise LutFileNotFoundError("Data file not found: %s")
 
 
 class LutStrategy(PowerCalculationStrategyInterface):
@@ -126,7 +126,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             lookup_table = await self._lut_registry.get_lookup_dictionary(
                 self._profile, color_mode
             )
-        except LutFileNotFound:
+        except LutFileNotFoundError:
             _LOGGER.error(
                 "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
@@ -251,8 +251,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
                     await self._lut_registry.get_lookup_dictionary(
                         self._profile, color_mode
                     )
-                except LutFileNotFound:
-                    raise ModelNotSupported(  # noqa: B904
+                except LutFileNotFoundError:
+                    raise ModelNotSupportedError(  # noqa: B904
                         f"No lookup file found for mode: {color_mode}",
                         "lut_unsupported_color_mode",
                     )

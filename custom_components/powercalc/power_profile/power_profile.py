@@ -15,7 +15,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from ..common import SourceEntity
 from ..const import CONF_POWER, CalculationStrategy
-from ..errors import ModelNotSupported, PowercalcSetupError, UnsupportedStrategy
+from ..errors import ModelNotSupportedError, PowercalcSetupError, UnsupportedStrategyError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -127,7 +127,7 @@ class PowerProfile:
     def linear_mode_config(self) -> ConfigType | None:
         """Get configuration to setup linear strategy"""
         if not self.is_strategy_supported(CalculationStrategy.LINEAR):
-            raise UnsupportedStrategy(
+            raise UnsupportedStrategyError(
                 f"Strategy linear is not supported by model: {self._model}"
             )
         return self._json_data.get("linear_config")
@@ -136,7 +136,7 @@ class PowerProfile:
     def fixed_mode_config(self) -> ConfigType | None:
         """Get configuration to setup fixed strategy"""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
-            raise UnsupportedStrategy(
+            raise UnsupportedStrategyError(
                 f"Strategy fixed is not supported by model: {self._model}"
             )
         fixed_config = self._json_data.get("fixed_config")
@@ -212,7 +212,7 @@ class PowerProfile:
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
         _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
         if not os.path.exists(self._sub_profile_dir):
-            raise ModelNotSupported(
+            raise ModelNotSupportedError(
                 f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
                 f"sub_profile: {sub_profile})"
             )

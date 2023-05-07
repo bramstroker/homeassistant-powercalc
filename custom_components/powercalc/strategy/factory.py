@@ -14,7 +14,7 @@ from ..const import (
     CONF_WLED,
     CalculationStrategy,
 )
-from ..errors import StrategyConfigurationError, UnsupportedStrategy
+from ..errors import StrategyConfigurationError, UnsupportedStrategyError
 from ..power_profile.power_profile import PowerProfile
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
@@ -48,7 +48,7 @@ class PowerCalculatorStrategyFactory:
         if strategy == CalculationStrategy.WLED:
             return self._create_wled(source_entity, config)
 
-        raise UnsupportedStrategy("Invalid calculation mode", strategy)
+        raise UnsupportedStrategyError("Invalid calculation mode", strategy)
 
     def _create_linear(
         self,

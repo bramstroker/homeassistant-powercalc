@@ -70,7 +70,7 @@ from .const import (
     SensorType,
 )
 from .discovery import autodiscover_model
-from .errors import ModelNotSupported, StrategyConfigurationError
+from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
@@ -467,7 +467,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         self.hass, self.source_entity.entity_entry
                     ),
                 )
-            except ModelNotSupported:
+            except ModelNotSupportedError:
                 self.power_profile = None
         if self.power_profile:
             remarks = self.power_profile.config_flow_discovery_remarks
@@ -662,7 +662,7 @@ class OptionsFlowHandler(OptionsFlow):
                     )
                     if self.power_profile and self.power_profile.needs_fixed_config:
                         self.strategy = CalculationStrategy.FIXED
-                except ModelNotSupported:
+                except ModelNotSupportedError:
                     errors["not_supported"] = "Power profile could not be loaded"
 
         if user_input is not None:

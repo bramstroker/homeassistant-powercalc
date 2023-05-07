@@ -32,6 +32,7 @@ class ProfileLibrary:
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_device_types: dict[str, list] | None = None
 
+    @staticmethod
     def factory(hass: HomeAssistant) -> ProfileLibrary:  # type: ignore
         """
         Creates and loads the profile library
@@ -46,8 +47,6 @@ class ProfileLibrary:
         library = ProfileLibrary(hass)
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
         return library
-
-    factory = staticmethod(factory)
 
     def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
         """

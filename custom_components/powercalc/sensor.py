@@ -109,7 +109,7 @@ from .const import (
 )
 from .discovery import autodiscover_model
 from .errors import (
-    ModelNotSupported,
+    ModelNotSupportedError,
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
@@ -719,7 +719,7 @@ async def is_auto_configurable(
         if power_profile.has_sub_profiles and power_profile.sub_profile:
             return True
         return not power_profile.is_additional_configuration_required
-    except ModelNotSupported:
+    except ModelNotSupportedError:
         return False
 
 

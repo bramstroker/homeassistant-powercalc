@@ -5,7 +5,7 @@ import os
 from homeassistant.core import HomeAssistant
 
 from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
-from ..errors import ModelNotSupported
+from ..errors import ModelNotSupportedError
 from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
 
@@ -35,7 +35,7 @@ async def get_power_profile(
         ModelInfo(manufacturer, model), custom_model_directory
     )
     if profile is None:
-        raise ModelNotSupported(
+        raise ModelNotSupportedError(
             f"Model not found in library (manufacturer: {manufacturer}, model: {model})"
         )
     return profile

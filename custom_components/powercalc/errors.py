@@ -40,13 +40,13 @@ class StrategyConfigurationError(PowercalcSetupError):
         return self._config_flow_trans_key
 
 
-class ModelNotSupported(StrategyConfigurationError):
+class ModelNotSupportedError(StrategyConfigurationError):
     """Raised when model is not supported."""
 
 
-class UnsupportedStrategy(PowercalcSetupError):
+class UnsupportedStrategyError(PowercalcSetupError):
     """Mode not supported."""
 
 
-class LutFileNotFound(PowercalcSetupError):
+class LutFileNotFoundError(PowercalcSetupError):
     """Raised when LUT CSV file does not exist"""

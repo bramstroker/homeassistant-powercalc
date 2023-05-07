@@ -18,7 +18,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
-from homeassistant.const import __version__ as HA_VERSION
+from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.typing import ConfigType
