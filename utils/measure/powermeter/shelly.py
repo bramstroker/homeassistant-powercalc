@@ -36,7 +36,7 @@ class ShellyApiGen2(ShellyApi):
 
 
 class ShellyPowerMeter(PowerMeter):
-    def __init__(self, shelly_ip: str, timeout: int = 5):
+    def __init__(self, shelly_ip: str, timeout: int = 5) -> None:
         self.timeout = timeout
         self.ip_address = shelly_ip
         self.api = self.detect_api_type()
@@ -44,7 +44,7 @@ class ShellyPowerMeter(PowerMeter):
     def get_power(self) -> PowerMeasurementResult:
         try:
             r = requests.get(
-                "http://{}{}".format(self.ip_address, self.api.meter_endpoint),
+                f"http://{self.ip_address}{self.api.meter_endpoint}",
                 timeout=self.timeout,
             )
         except requests.RequestException as e:
@@ -58,7 +58,7 @@ class ShellyPowerMeter(PowerMeter):
     def detect_api_type(self) -> ShellyApi:
         for api in (ShellyApiGen1(), ShellyApiGen2()):
             try:
-                uri = "http://{}{}".format(self.ip_address, api.status_endpoint)
+                uri = f"http://{self.ip_address}{api.status_endpoint}"
                 _LOGGER.debug(f"Checking API connection: {uri}")
                 response = requests.get(uri, timeout=self.timeout)
             except requests.RequestException:

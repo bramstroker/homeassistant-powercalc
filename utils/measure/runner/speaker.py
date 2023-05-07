@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger("measure")
 
 
 class SpeakerRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil):
+    def __init__(self, measure_util: MeasureUtil) -> None:
         self.measure_util = measure_util
         self.media_controller: MediaController = MediaControllerFactory().create()
 
@@ -28,16 +28,16 @@ class SpeakerRunner(MeasurementRunner):
         self.media_controller.process_answers(answers)
 
     def run(
-        self, answers: dict[str, Any], export_directory: str
+        self, answers: dict[str, Any], export_directory: str,
     ) -> RunnerResult | None:
         summary = {}
         duration = DURATION_PER_VOLUME_LEVEL
 
         print(
-            f"Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)"
+            f"Prepare to start measuring the power for {duration} seconds on each volume level starting with 10 until 100 (with steps of 10 between)",
         )
         print(
-            "WARNING: during the measurement session the volume will be increased to the maximum, which can be harmful for your ears"
+            "WARNING: during the measurement session the volume will be increased to the maximum, which can be harmful for your ears",
         )
         input("Hit enter when you are ready to start..")
 
@@ -81,7 +81,7 @@ class SpeakerRunner(MeasurementRunner):
         self.media_controller.turn_off()
         start_time = time.time()
         _LOGGER.info(
-            f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds..."
+            f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds...",
         )
         time.sleep(config.SLEEP_STANDBY)
         try:

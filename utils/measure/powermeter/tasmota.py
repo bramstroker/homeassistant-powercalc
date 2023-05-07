@@ -9,12 +9,12 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 
 
 class TasmotaPowerMeter(PowerMeter):
-    def __init__(self, device_ip: str):
+    def __init__(self, device_ip: str) -> None:
         self._device_ip = device_ip
 
     def get_power(self) -> PowerMeasurementResult:
         r = requests.get(
-            "http://{}/cm?cmnd=STATUS+8".format(self._device_ip), timeout=10
+            f"http://{self._device_ip}/cm?cmnd=STATUS+8", timeout=10,
         )
         json = r.json()
 

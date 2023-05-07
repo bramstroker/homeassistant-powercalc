@@ -13,9 +13,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
 )
 from custom_components.test.light import MockLight
-from tests.common import get_test_profile_dir, run_powercalc_setup
-
-from ...common import create_mock_light_entity
+from tests.common import create_mock_light_entity, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_infrared_light(hass: HomeAssistant):

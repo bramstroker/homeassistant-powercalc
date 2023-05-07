@@ -20,7 +20,7 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-s", "--src", help="SRC video source for video capture", default=0, type=str
+        "-s", "--src", help="SRC video source for video capture", default=0, type=str,
     )
 
     args = parser.parse_args()

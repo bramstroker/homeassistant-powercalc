@@ -1,6 +1,5 @@
 import logging
 from decimal import Decimal
-from typing import Optional
 
 import pytest
 from homeassistant.components.light import (
@@ -8,9 +7,9 @@ from homeassistant.components.light import (
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
+    ColorMode,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.light import ColorMode
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
 
@@ -68,12 +67,12 @@ async def test_brightness_lut(hass: HomeAssistant):
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
-        strategy, state=_create_light_brightness_state(100), expected_power=2.05
+        strategy, state=_create_light_brightness_state(100), expected_power=2.05,
     )
 
     # Out of bounds brightness. Power for bri 255 should be returned and no error
     await _calculate_and_assert_power(
-        strategy, state=_create_light_brightness_state(450), expected_power=9.65
+        strategy, state=_create_light_brightness_state(450), expected_power=9.65,
     )
 
 
@@ -86,32 +85,32 @@ async def test_hs_lut(hass: HomeAssistant):
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
-        strategy, state=_create_light_hs_state(100, 200, 300), expected_power=1.53
+        strategy, state=_create_light_hs_state(100, 200, 300), expected_power=1.53,
     )
 
 
 async def test_sub_lut_loaded(hass: HomeAssistant):
     source_entity = create_source_entity(
-        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS]
+        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS],
     )
 
     strategy = await _create_lut_strategy(
-        hass, "yeelight", "YLDL01YL/ambilight", source_entity
+        hass, "yeelight", "YLDL01YL/ambilight", source_entity,
     )
     await strategy.validate_config()
 
     await _calculate_and_assert_power(
-        strategy, state=_create_light_color_temp_state(255, 588), expected_power=6.31
+        strategy, state=_create_light_color_temp_state(255, 588), expected_power=6.31,
     )
 
 
 async def test_linked_profile_loaded(hass: HomeAssistant):
     source_entity = create_source_entity(
-        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS]
+        LIGHT_DOMAIN, [ColorMode.COLOR_TEMP, ColorMode.HS],
     )
     strategy = await _create_lut_strategy(hass, "signify", "LCA007", source_entity)
     await _calculate_and_assert_power(
-        strategy, state=_create_light_color_temp_state(255, 588), expected_power=5.21
+        strategy, state=_create_light_color_temp_state(255, 588), expected_power=5.21,
     )
 
 
@@ -124,7 +123,7 @@ async def test_no_power_when_no_brightness_available(hass: HomeAssistant):
 
 
 async def test_color_mode_unknown_is_handled_gracefully(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.at_level(logging.ERROR)
     strategy = await _create_lut_strategy(hass, "signify", "LCT010")
@@ -139,7 +138,7 @@ async def test_color_mode_unknown_is_handled_gracefully(
 
 
 async def test_unsupported_color_mode(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.at_level(logging.ERROR)
 
@@ -154,7 +153,7 @@ async def test_unsupported_color_mode(
 async def test_validation_fails_for_non_light_entities(hass: HomeAssistant):
     with pytest.raises(StrategyConfigurationError):
         strategy = await _create_lut_strategy(
-            hass, "signify", "LCT010", source_entity=create_source_entity("sensor")
+            hass, "signify", "LCT010", source_entity=create_source_entity("sensor"),
         )
         await strategy.validate_config()
 
@@ -166,7 +165,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant):
 
         power_profile = await ProfileLibrary.factory(hass).get_profile(
             # This model only supports brightness
-            ModelInfo("signify", "LWA017")
+            ModelInfo("signify", "LWA017"),
         )
         strategy = strategy_factory.create(
             config={},
@@ -181,7 +180,7 @@ async def _create_lut_strategy(
     hass: HomeAssistant,
     manufacturer: str,
     model: str,
-    source_entity: Optional[SourceEntity] = None,
+    source_entity: SourceEntity | None = None,
 ) -> PowerCalculationStrategyInterface:
     if not source_entity:
         source_entity = create_source_entity(LIGHT_DOMAIN)
@@ -233,7 +232,7 @@ def _create_light_hs_state(brightness: int, hue: int, sat: int) -> State:
 
 
 async def _calculate_and_assert_power(
-    strategy: PowerCalculationStrategyInterface, state: State, expected_power: float
+    strategy: PowerCalculationStrategyInterface, state: State, expected_power: float,
 ):
     power = await strategy.calculate(state)
     assert round(Decimal(expected_power), 2) == round(power, 2)

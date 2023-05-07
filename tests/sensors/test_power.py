@@ -59,13 +59,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
-
-from ..common import (
-    create_input_boolean,
-    create_input_number,
-    get_simple_fixed_config,
-    run_powercalc_setup,
-)
+from tests.common import create_input_boolean, create_input_number, get_simple_fixed_config, run_powercalc_setup
 
 
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
@@ -73,7 +67,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
 
     platform = MockEntityPlatform(hass)
     entity = MockEntity(
-        name="existing_power", unique_id="1234", device_class=SensorDeviceClass.POWER
+        name="existing_power", unique_id="1234", device_class=SensorDeviceClass.POWER,
     )
     await platform.async_add_entities([entity])
 
@@ -202,7 +196,7 @@ async def test_multiply_factor(hass: HomeAssistant):
 
 
 async def test_error_when_no_strategy_has_been_configured(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
@@ -320,7 +314,7 @@ async def test_unknown_source_entity_state(hass: HomeAssistant):
 
 
 async def test_error_when_model_not_supported(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
 
@@ -443,8 +437,8 @@ async def test_manually_configured_sensor_overrides_profile(
         hass,
         {
             "sonoff-device-id": DeviceEntry(
-                id="sonoff-device-id", manufacturer=manufacturer, model=model
-            )
+                id="sonoff-device-id", manufacturer=manufacturer, model=model,
+            ),
         },
     )
 

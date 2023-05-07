@@ -43,8 +43,8 @@ async def test_smart_switch(hass: HomeAssistant):
         hass,
         {
             "shelly-device": DeviceEntry(
-                id="shelly-device-id", manufacturer=manufacturer, model=model
-            )
+                id="shelly-device-id", manufacturer=manufacturer, model=model,
+            ),
         },
     )
 
@@ -100,8 +100,8 @@ async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
         hass,
         {
             "ikea-device-id": DeviceEntry(
-                id="ikea-device-id", manufacturer=manufacturer, model=model
-            )
+                id="ikea-device-id", manufacturer=manufacturer, model=model,
+            ),
         },
     )
 
@@ -158,8 +158,8 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
         hass,
         {
             "ikea-device-id": DeviceEntry(
-                id="ikea-device-id", manufacturer=manufacturer, model=model
-            )
+                id="ikea-device-id", manufacturer=manufacturer, model=model,
+            ),
         },
     )
 
@@ -173,13 +173,13 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
 
     assert flow["step_id"] == "library"
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+        flow["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
     assert result["step_id"] == "fixed"
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_POWER: 50}
+        flow["flow_id"], {CONF_POWER: 50},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
 

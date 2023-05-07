@@ -50,7 +50,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
     }
 
     await run_powercalc_setup(
-        hass, get_simple_fixed_config("input_boolean.test", 100), domain_config
+        hass, get_simple_fixed_config("input_boolean.test", 100), domain_config,
     )
 
     hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)

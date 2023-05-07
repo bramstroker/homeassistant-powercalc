@@ -40,7 +40,7 @@ def tesseract_location(root):
         pytesseract.pytesseract.tesseract_cmd = root
     except FileNotFoundError:
         print(
-            "Please double check the Tesseract file directory or ensure it's installed."
+            "Please double check the Tesseract file directory or ensure it's installed.",
         )
         sys.exit(1)
 
@@ -59,7 +59,7 @@ class RateCounter:
         rate(): Returns the iterations/seconds
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.start_time = None
         self.iterations = 0
 
@@ -99,7 +99,7 @@ class RateCounter:
 
         cv2.putText(
             frame,
-            "{} Iterations/Second".format(int(rate)),
+            f"{int(rate)} Iterations/Second",
             (10, 35),
             cv2.FONT_HERSHEY_DUPLEX,
             1.0,
@@ -111,7 +111,7 @@ class RateCounter:
 class VideoStream:
     """Class for grabbing frames from CV2 video capture."""
 
-    def __init__(self, src=0):
+    def __init__(self, src=0) -> None:
         self.stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self.stream.read()
         if self.frame is None:
@@ -220,10 +220,9 @@ class OcrRegionSelection:
                 self.is_selecting = False
                 self.stream.capture_image(self.get_cropped_frame(self.stream.frame))
 
-        if event == cv2.EVENT_MOUSEMOVE:
-            if self.is_selecting and self.drag_start:
-                x_start, y_start = self.drag_start
-                self.selection = (x_start, y_start, x, y)
+        if event == cv2.EVENT_MOUSEMOVE and self.is_selecting and self.drag_start:
+            x_start, y_start = self.drag_start
+            self.selection = (x_start, y_start, x, y)
 
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
         if self.selection:
@@ -238,7 +237,7 @@ class OcrRegionSelection:
             (h, w) = frame.shape[:2]
             y_center = h // 2
             cv2.rectangle(
-                frame, (100, y_center - 40), (1400, y_center + 90), (0, 0, 0), -1
+                frame, (100, y_center - 40), (1400, y_center + 90), (0, 0, 0), -1,
             )
             cv2.putText(
                 frame,
@@ -263,15 +262,15 @@ class OcrRegionSelection:
 
     def get_cropped_frame(self, frame: numpy.ndarray) -> numpy.ndarray:
         return frame[
-            self.selection[1] : self.selection[3],  # noqa E203
-            self.selection[0] : self.selection[2],  # noqa E203
+            self.selection[1] : self.selection[3],  # E203
+            self.selection[0] : self.selection[2],  # E203
         ]
 
 
 class OCR:
     """Class for creating a pytesseract OCR process in a dedicated thread"""
 
-    def __init__(self, video_stream: VideoStream, region_selection: OcrRegionSelection):
+    def __init__(self, video_stream: VideoStream, region_selection: OcrRegionSelection) -> None:
         self.measurement: Decimal = None
         self.stopped: bool = False
         self.region_selection = region_selection
@@ -300,7 +299,7 @@ class OCR:
                     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
                     match = pytesseract.image_to_string(
-                        frame, config="-c tessedit_char_whitelist='0123456789.'"
+                        frame, config="-c tessedit_char_whitelist='0123456789.'",
                     )
                     _LOGGER.debug(f"OCR match: {match.strip()}")
                     if len(match) > 0:
@@ -321,7 +320,7 @@ class OCR:
     def write_result(self, measurement: Decimal):
         if self.file is None:
             file_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "ocr_results.txt"
+                os.path.dirname(os.path.abspath(__file__)), "ocr_results.txt",
             )
             self.file = open(file_path, "a")
 
@@ -361,7 +360,7 @@ class OCR:
             _LOGGER.debug(f"Percentage diff: {diff_percentage}")
             if diff_percentage > 120:
                 _LOGGER.info(
-                    "Difference between measurements is too high, this must be wrong"
+                    "Difference between measurements is too high, this must be wrong",
                 )
                 return False
 
@@ -386,16 +385,16 @@ def ocr_stream(source: str = "0"):
     """
 
     video_stream = VideoStream(
-        source
+        source,
     ).start()  # Starts reading the video stream in dedicated thread
     region_selection = OcrRegionSelection(video_stream).start()
     ocr = OCR(
-        video_stream, region_selection
+        video_stream, region_selection,
     ).start()  # Starts optical character recognition in dedicated thread
     cps1 = RateCounter().start()
 
     print("OCR stream started")
-    print("Active threads: {}".format(threading.activeCount()))
+    print(f"Active threads: {threading.activeCount()}")
 
     # Main display loop
     print("\nPUSH q TO VIEW VIDEO STREAM\n")

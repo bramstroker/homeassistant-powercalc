@@ -14,7 +14,7 @@ TYPE_GROUP = "group"
 
 
 class HueLightController(LightController):
-    def __init__(self, bridge_ip: str):
+    def __init__(self, bridge_ip: str) -> None:
         self.bridge = self.initialize_hue_bridge(bridge_ip)
         self.lights = {light.light_id: light.name for light in self.bridge.lights}
         self.groups = {group.group_id: group.name for group in self.bridge.groups}
@@ -59,14 +59,14 @@ class HueLightController(LightController):
 
         if len(model_ids) > 1:
             raise LightControllerError(
-                "The Hue group contains lights of multiple models, this is not supported"
+                "The Hue group contains lights of multiple models, this is not supported",
             )
 
         return model_ids.pop()
 
     def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(
-            os.path.dirname(__file__), "../.persistent/.python_hue"
+            os.path.dirname(__file__), "../.persistent/.python_hue",
         )
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)

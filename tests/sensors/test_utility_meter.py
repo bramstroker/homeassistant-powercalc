@@ -28,8 +28,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
-
-from ..common import create_input_boolean, run_powercalc_setup
+from tests.common import create_input_boolean, run_powercalc_setup
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant):
@@ -52,8 +51,8 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
                     CONF_CREATE_UTILITY_METERS: True,
                     CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
                     CONF_UTILITY_METER_TYPES: ["daily"],
-                }
-            ]
+                },
+            ],
         },
     )
     await hass.async_block_till_done()
@@ -80,7 +79,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
 
 
 async def test_utility_meter_is_not_created_twice(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
     power_sensor_id = "sensor.test_power"

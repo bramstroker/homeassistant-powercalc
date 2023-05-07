@@ -197,7 +197,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
     (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
 
     await run_powercalc_setup(
-        hass, {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id}
+        hass, {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id},
     )
 
     state = hass.states.get("sensor.test1_power")
@@ -209,7 +209,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 
 
 async def test_error_when_configuring_same_entity_twice(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
@@ -239,7 +239,7 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
                 CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
                 CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
                 CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
-            }
+            },
         },
     )
     await hass.async_block_till_done()
@@ -252,7 +252,7 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
                 "platform": DOMAIN,
                 CONF_ENTITY_ID: "input_boolean.test",
                 CONF_FIXED: {CONF_POWER: 25},
-            }
+            },
         },
     )
     await hass.async_block_till_done()
@@ -293,7 +293,7 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
 
 
 async def test_unsupported_model_is_skipped_from_autodiscovery(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     light = test_light_platform.MockLight("test", STATE_ON)
     light.manufacturer = "lidl"
@@ -308,7 +308,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
 
 
 async def test_can_include_autodiscovered_entity_in_group(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     """Test that models are automatically discovered and power sensors created"""
 
@@ -317,7 +317,7 @@ async def test_can_include_autodiscovered_entity_in_group(
     await create_mock_light_entity(hass, create_discoverable_light("testa"))
 
     hass.states.async_set(
-        "light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS}
+        "light.testa", STATE_ON, {"brightness": 125, "color_mode": ColorMode.BRIGHTNESS},
     )
     await hass.async_block_till_done()
 
@@ -340,17 +340,17 @@ async def test_can_include_autodiscovered_entity_in_group(
 
 
 async def test_user_can_rename_entity_id(
-    hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry,
 ):
     """
     When the power/energy sensors exist already with an unique ID, don't change the entity ID
     This allows the users to change the entity ID's from the GUI
     """
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef", suggested_object_id="my_renamed_power"
+        "sensor", DOMAIN, "abcdef", suggested_object_id="my_renamed_power",
     )
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef_energy", suggested_object_id="my_renamed_energy"
+        "sensor", DOMAIN, "abcdef_energy", suggested_object_id="my_renamed_energy",
     )
     await hass.async_block_till_done()
 
@@ -377,7 +377,7 @@ async def test_user_can_rename_entity_id(
 
 
 async def test_entities_are_bound_to_source_device(
-    hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry, device_reg: DeviceRegistry,
 ):
     """
     Test that all powercalc created sensors are attached to same device as the source entity
@@ -435,7 +435,7 @@ async def test_entities_are_bound_to_source_device(
 
 
 async def test_entities_are_bound_to_source_device2(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     """
     When using the power_sensor_id option the energy sensors and utility meters must be bound to the same device.
@@ -501,7 +501,7 @@ async def test_entities_are_bound_to_disabled_source_device(
                 manufacturer="signify",
                 model="LCA001",
                 disabled_by=DeviceEntryDisabler.USER,
-            )
+            ),
         },
     )
 
@@ -549,7 +549,7 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
                 get_simple_fixed_config("input_boolean.test2"),
                 # Omitting the entity_id should log an error, but still successfully create the other entities
                 {CONF_NAME: "test3", CONF_FIXED: {CONF_POWER: 20}},
-            ]
+            ],
         },
     )
 
@@ -562,7 +562,7 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
 
 
 async def test_change_options_of_renamed_sensor(
-    hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry,
 ):
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -583,7 +583,7 @@ async def test_change_options_of_renamed_sensor(
     assert hass.states.get("sensor.test_energy_daily").name == "test energy daily"
 
     entity_reg.async_update_entity(
-        entity_id="sensor.test_energy_daily", name="Renamed daily utility meter"
+        entity_id="sensor.test_energy_daily", name="Renamed daily utility meter",
     )
     await hass.async_block_till_done()
 
@@ -609,10 +609,10 @@ async def test_change_options_of_renamed_sensor(
 
 
 async def test_renaming_sensor_is_retained_after_startup(
-    hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry,
 ):
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power"
+        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power",
     )
     await hass.async_block_till_done()
     entity_reg.async_update_entity(entity_id="sensor.test_power", name="Renamed power")
@@ -638,7 +638,7 @@ async def test_renaming_sensor_is_retained_after_startup(
 
 
 async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     """
     When creating a group or setting up multiple entities in one platform entry,
@@ -668,9 +668,9 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
                             CONF_MODE: CalculationStrategy.FIXED,
                             CONF_FIXED: {},
                         },
-                    ]
+                    ],
                 },
-            ]
+            ],
         },
     )
     await hass.async_block_till_done()
@@ -680,7 +680,7 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 
 
 async def test_is_autoconfigurable_returns_false(
-    hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry,
 ) -> None:
     """
     is_autoconfigurable should return False when the manufacturer / model is not found in the library

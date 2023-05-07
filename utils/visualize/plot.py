@@ -23,7 +23,7 @@ def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
     else:
         df["color"] = df.apply(
             lambda row: colorsys.hls_to_rgb(
-                row.hue / 65535, row.bri / 255, row.sat / 255
+                row.hue / 65535, row.bri / 255, row.sat / 255,
             ),
             axis=1,
         )
@@ -102,12 +102,12 @@ def convert_mired_to_rgb(mired):
             blue = tmp_blue
 
     rgb = red, green, blue
-    return list(map(lambda div: div / 255.0, rgb)) + [1]
+    return [*[div / 255.0 for div in rgb], 1]
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="CLI script to output powercalc LUT file as a plot"
+        description="CLI script to output powercalc LUT file as a plot",
     )
     parser.add_argument("manufacturer")
     parser.add_argument("model")

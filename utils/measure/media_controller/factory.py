@@ -28,7 +28,7 @@ class MediaControllerFactory:
         factory = factories.get(config.SELECTED_MEDIA_CONTROLLER)
         if factory is None:
             raise Exception(
-                f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}"
+                f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}",
             )
 
         return factory()

@@ -32,7 +32,7 @@ from tests.common import (
 
 
 async def test_include_area(
-    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry,
 ):
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
@@ -62,7 +62,7 @@ async def test_include_area(
 
 
 async def test_include_area_not_found(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
@@ -94,7 +94,7 @@ async def test_include_light_group(hass: HomeAssistant):
                 "platform": "group",
                 "name": "Bathroom",
                 "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
-            }
+            },
         },
     )
     await hass.async_block_till_done()
@@ -182,7 +182,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     light_e = create_discoverable_light("light_e", "6765765756")
     light_f = create_discoverable_light("light_f", "676576575sds6")
     await create_mock_light_entity(
-        hass, [light_a, light_b, light_c, light_d, light_e, light_f]
+        hass, [light_a, light_b, light_c, light_d, light_e, light_f],
     )
 
     # Ugly hack, maybe I can figure out something better in the future.
@@ -218,7 +218,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "unique_id": "groupc",
                     "entities": ["light.light_group_a", "light.light_group_b"],
                 },
-            ]
+            ],
         },
     )
     await hass.async_block_till_done()
@@ -255,7 +255,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
 
 
 async def test_include_filter_domain(
-    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
+    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry,
 ):
     area = area_reg.async_get_or_create("Bathroom 1")
     await hass.async_block_till_done()

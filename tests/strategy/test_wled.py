@@ -19,8 +19,7 @@ from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, D
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 from custom_components.test.light import MockLight
-
-from ..common import create_mock_light_entity, run_powercalc_setup
+from tests.common import create_mock_light_entity, run_powercalc_setup
 
 
 async def test_can_calculate_power(hass: HomeAssistant):
@@ -31,12 +30,12 @@ async def test_can_calculate_power(hass: HomeAssistant):
     platform: test_sensor_platform = getattr(hass.components, "test.sensor")
     platform.init(empty=True)
     estimated_current_entity = platform.MockSensor(
-        name="test_estimated_current", native_value="50.0", unique_id="abc"
+        name="test_estimated_current", native_value="50.0", unique_id="abc",
     )
     platform.ENTITIES[0] = estimated_current_entity
 
     assert await async_setup_component(
-        hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}}
+        hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
     )
     await hass.async_block_till_done()
 
@@ -53,7 +52,7 @@ async def test_can_calculate_power(hass: HomeAssistant):
     assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
 
     state = State("light.test", STATE_OFF)
-    assert 0.1 == await strategy.calculate(state)
+    assert await strategy.calculate(state) == 0.1
 
     state = State("light.test", STATE_ON)
     assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
@@ -106,7 +105,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
                     unique_id="1234",
                     platform="light",
                     device_id="wled-device-id",
-                )
+                ),
             },
         )
 
@@ -124,8 +123,8 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
         hass,
         {
             "wled-device": DeviceEntry(
-                id="wled-device", manufacturer="WLED", model="FOSS"
-            )
+                id="wled-device", manufacturer="WLED", model="FOSS",
+            ),
         },
     )
     mock_registry(
@@ -174,6 +173,6 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
     assert flow["step_id"] == "wled"
 
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_VOLTAGE: 5}
+        flow["flow_id"], {CONF_VOLTAGE: 5},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY

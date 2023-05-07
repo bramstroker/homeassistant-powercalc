@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger("measure")
 
 
 class MeasureUtil:
-    def __init__(self, power_meter: PowerMeter):
+    def __init__(self, power_meter: PowerMeter) -> None:
         self.power_meter = power_meter
 
     def take_average_measurement(self, duration: int) -> float:
@@ -32,7 +32,7 @@ class MeasureUtil:
         return average
 
     def take_measurement(
-        self, start_timestamp: float | None = None, retry_count: int = 0
+        self, start_timestamp: float | None = None, retry_count: int = 0,
     ) -> float:
         """Get a measurement from the powermeter, take multiple samples and calculate the average"""
         measurements = []
@@ -44,7 +44,7 @@ class MeasureUtil:
             try:
                 measurement = self.power_meter.get_power()
                 updated_at = dt.fromtimestamp(measurement.updated).strftime(
-                    "%d-%m-%Y, %H:%M:%S"
+                    "%d-%m-%Y, %H:%M:%S",
                 )
                 _LOGGER.debug(f"Measurement received (update_time={updated_at})")
             except PowerMeterError as err:
@@ -54,7 +54,7 @@ class MeasureUtil:
                 # Check if measurement is not outdated
                 if measurement.updated < start_timestamp:
                     error = OutdatedMeasurementError(
-                        f"Power measurement is outdated. Aborting after {config.MAX_RETRIES} successive retries"
+                        f"Power measurement is outdated. Aborting after {config.MAX_RETRIES} successive retries",
                     )
 
                 # Check if we not have a 0 measurement

@@ -34,7 +34,7 @@ class LightControllerFactory:
         factory = factories.get(config.SELECTED_LIGHT_CONTROLLER)
         if factory is None:
             raise Exception(
-                f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}"
+                f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}",
             )
 
         return factory()

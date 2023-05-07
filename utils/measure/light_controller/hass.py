@@ -11,7 +11,7 @@ from .errors import LightControllerError
 
 
 class HassLightController:
-    def __init__(self, api_url: str, token: str):
+    def __init__(self, api_url: str, token: str) -> None:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
@@ -47,7 +47,7 @@ class HassLightController:
 
         return [
             inquirer.List(
-                name="light_entity_id", message="Select the light", choices=light_list
+                name="light_entity_id", message="Select the light", choices=light_list,
             ),
             inquirer.Text(
                 name="light_model_id",

@@ -25,7 +25,7 @@ class PowerMeterFactory:
     @staticmethod
     def hass():
         return HassPowerMeter(
-            config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE
+            config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE,
         )
 
     @staticmethod
@@ -72,7 +72,7 @@ class PowerMeterFactory:
         factory = factories.get(config.SELECTED_POWER_METER)
         if factory is None:
             raise PowerMeterError(
-                f"Could not find a factory for {config.SELECTED_POWER_METER}"
+                f"Could not find a factory for {config.SELECTED_POWER_METER}",
             )
 
         return factory()

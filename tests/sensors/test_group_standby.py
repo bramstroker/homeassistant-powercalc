@@ -15,8 +15,7 @@ from custom_components.powercalc.const import (
     CONF_STANDBY_POWER,
     CalculationStrategy,
 )
-
-from ..common import create_input_booleans, run_powercalc_setup
+from tests.common import create_input_booleans, run_powercalc_setup
 
 
 async def test_standby_group(hass: HomeAssistant):

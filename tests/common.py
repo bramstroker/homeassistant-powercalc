@@ -46,7 +46,7 @@ async def create_mock_light_entity(
     platform.ENTITIES.extend(entities)
 
     assert await async_setup_component(
-        hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}}
+        hass, light.DOMAIN, {light.DOMAIN: {CONF_PLATFORM: "test"}},
     )
     await hass.async_block_till_done()
 
@@ -62,7 +62,7 @@ async def create_mock_light_entity(
         )
 
         entity_entry = entity_registry.async_get_or_create(
-            "light", "test", entity.unique_id, device_id=device_entry.id
+            "light", "test", entity.unique_id, device_id=device_entry.id,
         )
         await hass.async_block_till_done()
 
@@ -70,7 +70,7 @@ async def create_mock_light_entity(
 
 
 def create_discoverable_light(
-    name: str, unique_id: str = "99f899fefes"
+    name: str, unique_id: str = "99f899fefes",
 ) -> test_light_platform.MockLight:
     light = test_light_platform.MockLight(name, STATE_ON, unique_id)
     light.manufacturer = "lidl"
@@ -106,7 +106,7 @@ async def run_powercalc_setup(
 
 async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
     assert await async_setup_component(
-        hass, input_boolean.DOMAIN, {"input_boolean": {name: None}}
+        hass, input_boolean.DOMAIN, {"input_boolean": {name: None}},
     )
     await hass.async_block_till_done()
 
@@ -134,12 +134,12 @@ def get_simple_fixed_config(entity_id: str, power: float = 50) -> ConfigType:
 
 def get_test_profile_dir(sub_dir: str) -> str:
     return os.path.join(
-        os.path.dirname(__file__), "testing_config/powercalc_profiles", sub_dir
+        os.path.dirname(__file__), "testing_config/powercalc_profiles", sub_dir,
     )
 
 
 async def create_mocked_virtual_power_sensor_entry(
-    hass: HomeAssistant, name: str, unique_id: str | None
+    hass: HomeAssistant, name: str, unique_id: str | None,
 ) -> config_entries.ConfigEntry:
     config_entry = MockConfigEntry(
         domain=DOMAIN,

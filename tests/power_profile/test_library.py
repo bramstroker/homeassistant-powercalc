@@ -62,7 +62,7 @@ async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant):
 async def test_get_profile_with_model_alias(hass: HomeAssistant):
     library = ProfileLibrary(hass)
     profile = await library.get_profile(
-        ModelInfo(MANUFACTURER_IKEA, "TRADFRI bulb E14 WS opal 400lm")
+        ModelInfo(MANUFACTURER_IKEA, "TRADFRI bulb E14 WS opal 400lm"),
     )
     assert profile._directory.endswith("ikea/LED1536G5")
 
@@ -74,12 +74,12 @@ async def test_get_non_existing_profile(hass: HomeAssistant):
 
 
 async def test_hidden_directories_are_skipped_from_model_listing(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     library = ProfileLibrary(hass)
     profiles = await library.get_profiles_by_manufacturer(
-        get_test_profile_dir("hidden-directories")
+        get_test_profile_dir("hidden-directories"),
     )
     assert len(profiles) == 1
     assert len(caplog.records) == 0

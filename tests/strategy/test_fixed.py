@@ -23,15 +23,15 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.fixed import FixedStrategy
+from tests.common import create_input_boolean, create_input_number, run_powercalc_setup
 
-from ..common import create_input_boolean, create_input_number, run_powercalc_setup
 from .common import create_source_entity
 
 
 async def test_simple_power():
     source_entity = create_source_entity("switch")
     strategy = FixedStrategy(source_entity, power=50, per_state_power=None)
-    assert 50 == await strategy.calculate(State(source_entity.entity_id, STATE_ON))
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 50
 
 
 async def test_template_power(hass: HomeAssistant):
@@ -50,7 +50,7 @@ async def test_template_power(hass: HomeAssistant):
         source_entity,
     )
 
-    assert 42 == await strategy.calculate(State(source_entity.entity_id, STATE_ON))
+    assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 42
 
     track_entity = strategy.get_entities_to_track()[0]
     assert isinstance(track_entity, TrackTemplate)
@@ -67,10 +67,10 @@ async def test_states_power(hass: HomeAssistant):
         },
         source_entity,
     )
-    assert 8.3 == await strategy.calculate(State(source_entity.entity_id, "playing"))
-    assert 2.25 == await strategy.calculate(State(source_entity.entity_id, "paused"))
-    assert 1.5 == await strategy.calculate(State(source_entity.entity_id, "idle"))
-    assert 20 == await strategy.calculate(State(source_entity.entity_id, "whatever"))
+    assert await strategy.calculate(State(source_entity.entity_id, "playing")) == 8.3
+    assert await strategy.calculate(State(source_entity.entity_id, "paused")) == 2.25
+    assert await strategy.calculate(State(source_entity.entity_id, "idle")) == 1.5
+    assert await strategy.calculate(State(source_entity.entity_id, "whatever")) == 20
 
 
 async def test_states_power_with_template(hass: HomeAssistant):
@@ -81,7 +81,7 @@ async def test_states_power_with_template(hass: HomeAssistant):
             input_number.DOMAIN: {
                 "test_number42": {"min": "0", "max": "100", "initial": "42"},
                 "test_number60": {"min": "0", "max": "100", "initial": "60"},
-            }
+            },
         },
     )
 
@@ -94,13 +94,13 @@ async def test_states_power_with_template(hass: HomeAssistant):
             CONF_STATES_POWER: {
                 "heat": Template("{{states('input_number.test_number42')}}"),
                 "cool": Template("{{states('input_number.test_number60')}}"),
-            }
+            },
         },
         source_entity,
     )
 
-    assert 42 == await strategy.calculate(State(source_entity.entity_id, "heat"))
-    assert 60 == await strategy.calculate(State(source_entity.entity_id, "cool"))
+    assert await strategy.calculate(State(source_entity.entity_id, "heat")) == 42
+    assert await strategy.calculate(State(source_entity.entity_id, "cool")) == 60
     assert not await strategy.calculate(State(source_entity.entity_id, "not_defined"))
 
     track_entity = strategy.get_entities_to_track()
@@ -129,15 +129,15 @@ async def test_states_power_with_attributes(hass: HomeAssistant):
         source_entity,
     )
 
-    assert 5 == await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Spotify"})
-    )
-    assert 10 == await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Youtube"})
-    )
-    assert 12 == await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"})
-    )
+    assert await strategy.calculate(
+        State(source_entity.entity_id, "playing", {"media_content_id": "Spotify"}),
+    ) == 5
+    assert await strategy.calculate(
+        State(source_entity.entity_id, "playing", {"media_content_id": "Youtube"}),
+    ) == 10
+    assert await strategy.calculate(
+        State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"}),
+    ) == 12
 
 
 async def test_validation_error_when_no_power_supplied():
@@ -201,7 +201,7 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant):
                 CONF_STATES_POWER: {
                     "playing": "{{ states('input_number.test')|float }}",
                     "paused": 1.8,
-                }
+                },
             },
         },
     )
@@ -245,7 +245,7 @@ async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant)
 
 
 def _create_strategy(
-    hass: HomeAssistant, config: ConfigType, source_entity: SourceEntity
+    hass: HomeAssistant, config: ConfigType, source_entity: SourceEntity,
 ) -> FixedStrategy:
     factory = PowerCalculatorStrategyFactory(hass)
     strategy_instance = factory.create(
