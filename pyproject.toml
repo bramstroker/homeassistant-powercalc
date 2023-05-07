@@ -36,10 +36,10 @@ ignore_missing_imports = true
 source = ["custom_components/powercalc"]
 
 [tool.ruff]
-select = ["E", "F", "B", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID"]
+select = ["E", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
 ignore = ["ANN101", "ANN401"]
 line-length = 150
 target-version = "py310"
 
 [tool.ruff.mccabe]
-max-complexity = 10
+max-complexity = 18

@@ -9,23 +9,6 @@ on:
       - '**.py'
 
 jobs:
-  flake8:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Checkout Powercalc
-        uses: actions/checkout@master
-      - name: Install flake8
-        run: pip install flake8 flake8-async flake8-warnings
-      - name: Run flake8
-        uses: suo/flake8-github-action@releases/v1
-        with:
-          checkName: 'flake8'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   mypy:
     runs-on: ubuntu-latest
     steps:

@@ -540,7 +540,7 @@ async def create_sensors(
     return entities_to_add
 
 
-async def create_individual_sensors(  # noqa: C901
+async def create_individual_sensors(
     hass: HomeAssistant,
     sensor_config: dict,
     context: CreationContext,
