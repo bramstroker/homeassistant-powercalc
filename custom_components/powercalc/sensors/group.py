@@ -51,7 +51,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
-from ..const import (
+from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -74,6 +74,7 @@ from ..const import (
     SensorType,
     UnitPrefix,
 )
+
 from .abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,

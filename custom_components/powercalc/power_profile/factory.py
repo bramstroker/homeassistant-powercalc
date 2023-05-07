@@ -4,8 +4,9 @@ import os
 
 from homeassistant.core import HomeAssistant
 
-from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
-from ..errors import ModelNotSupportedError
+from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
+from custom_components.powercalc.errors import ModelNotSupportedError
+
 from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
 

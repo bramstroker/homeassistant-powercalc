@@ -10,8 +10,9 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import split_entity_id
 from homeassistant.helpers.template import Template
 
-from ..const import CONF_AREA, CONF_FILTER, CONF_GROUP, CONF_TEMPLATE
-from ..errors import SensorConfigurationError
+from custom_components.powercalc.const import CONF_AREA, CONF_FILTER, CONF_GROUP, CONF_TEMPLATE
+from custom_components.powercalc.errors import SensorConfigurationError
+
 from .filter import create_filter
 
 _LOGGER = logging.getLogger(__name__)

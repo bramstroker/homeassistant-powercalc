@@ -31,8 +31,8 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
-from ..common import SourceEntity
-from ..const import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
@@ -45,6 +45,7 @@ from ..const import (
     CONF_VALUE,
     UnitPrefix,
 )
+
 from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from .energy import EnergySensor
 from .power import VirtualPowerSensor, create_virtual_power_sensor

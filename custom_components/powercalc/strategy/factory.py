@@ -3,8 +3,8 @@ from __future__ import annotations
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 
-from ..common import SourceEntity
-from ..const import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_LINEAR,
     CONF_POWER,
@@ -14,8 +14,9 @@ from ..const import (
     CONF_WLED,
     CalculationStrategy,
 )
-from ..errors import StrategyConfigurationError, UnsupportedStrategyError
-from ..power_profile.power_profile import PowerProfile
+from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedStrategyError
+from custom_components.powercalc.power_profile.power_profile import PowerProfile
+
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
 from .lut import LutRegistry, LutStrategy

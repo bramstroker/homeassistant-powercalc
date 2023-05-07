@@ -14,8 +14,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
 
-from ..common import SourceEntity
-from ..const import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -28,7 +28,8 @@ from ..const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
 )
-from ..errors import SensorConfigurationError
+from custom_components.powercalc.errors import SensorConfigurationError
+
 from .abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,

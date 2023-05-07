@@ -34,8 +34,8 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, StateType
 
-from ..common import SourceEntity
-from ..const import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENERGY_SENSOR_ENTITY_ID,
     ATTR_INTEGRATION,
@@ -70,12 +70,13 @@ from ..const import (
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
 )
-from ..discovery import autodiscover_model
-from ..errors import ModelNotSupportedError, StrategyConfigurationError, UnsupportedStrategyError
-from ..power_profile.factory import get_power_profile
-from ..power_profile.power_profile import PowerProfile, SubProfileSelector
-from ..strategy.factory import PowerCalculatorStrategyFactory
-from ..strategy.strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.discovery import autodiscover_model
+from custom_components.powercalc.errors import ModelNotSupportedError, StrategyConfigurationError, UnsupportedStrategyError
+from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.power_profile.power_profile import PowerProfile, SubProfileSelector
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
+from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
+
 from .abstract import (
     BaseEntity,
     generate_power_sensor_entity_id,

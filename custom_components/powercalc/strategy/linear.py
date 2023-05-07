@@ -17,9 +17,10 @@ from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
-from ..common import SourceEntity
-from ..const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
-from ..errors import StrategyConfigurationError
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
+from custom_components.powercalc.errors import StrategyConfigurationError
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN]

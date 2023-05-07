@@ -10,8 +10,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
 from homeassistant.helpers.typing import ConfigType
 
-from ..common import SourceEntity
-from ..const import (
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,

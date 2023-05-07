@@ -13,9 +13,9 @@ from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
-from ..common import SourceEntity
-from ..const import CONF_POWER, CalculationStrategy
-from ..errors import ModelNotSupportedError, PowercalcSetupError, UnsupportedStrategyError
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_POWER, CalculationStrategy
+from custom_components.powercalc.errors import ModelNotSupportedError, PowercalcSetupError, UnsupportedStrategyError
 
 _LOGGER = logging.getLogger(__name__)
 

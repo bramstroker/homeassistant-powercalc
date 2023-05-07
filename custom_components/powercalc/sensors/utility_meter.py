@@ -16,7 +16,7 @@ from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 
-from ..const import (
+from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_UTILITY_METER_OFFSET,
@@ -25,6 +25,7 @@ from ..const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DOMAIN,
 )
+
 from .abstract import BaseEntity
 from .energy import EnergySensor, RealEnergySensor
 

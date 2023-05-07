@@ -9,10 +9,11 @@ from homeassistant.core import State
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 
-from ..common import SourceEntity
-from ..const import CONF_POWER, CONF_STATES_POWER
-from ..errors import StrategyConfigurationError
-from ..helpers import evaluate_power
+from custom_components.powercalc.common import SourceEntity
+from custom_components.powercalc.const import CONF_POWER, CONF_STATES_POWER
+from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.helpers import evaluate_power
+
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
