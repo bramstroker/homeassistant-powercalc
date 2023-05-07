@@ -51,7 +51,9 @@ class NullFilter(IncludeEntityFilter):
 
 class CompositeFilter(IncludeEntityFilter):
     def __init__(
-        self, filters: list[IncludeEntityFilter], operator: FilterOperator
+        self,
+        filters: list[IncludeEntityFilter],
+        operator: FilterOperator,
     ) -> None:
         self.filters = filters
         self.operator = operator

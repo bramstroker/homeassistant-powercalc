@@ -224,7 +224,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     @staticmethod
     def get_nearest(
-        lookup_dict: LookupDictType, search_key: int
+        lookup_dict: LookupDictType,
+        search_key: int,
     ) -> float | LookupDictType:
         return (
             lookup_dict.get(search_key)
@@ -235,7 +236,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     @staticmethod
     def get_nearest_lower_brightness(
-        lookup_dict: LookupDictType, search_key: int
+        lookup_dict: LookupDictType,
+        search_key: int,
     ) -> int:
         keys = lookup_dict.keys()
         last_key = [*keys][-1]
@@ -249,7 +251,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     @staticmethod
     def get_nearest_higher_brightness(
-        lookup_dict: LookupDictType, search_key: int
+        lookup_dict: LookupDictType,
+        search_key: int,
     ) -> int:
         keys = lookup_dict.keys()
         first_key = [*keys][0]
