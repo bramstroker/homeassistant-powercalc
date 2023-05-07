@@ -42,4 +42,4 @@ line-length = 150
 target-version = "py310"
 
 [tool.ruff.mccabe]
-max-complexity = 18
+max-complexity = 16
