@@ -18,7 +18,12 @@ from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_CALIBRATE, CONF_GAMMA_CURVE, CONF_MAX_POWER, CONF_MIN_POWER
+from custom_components.powercalc.const import (
+    CONF_CALIBRATE,
+    CONF_GAMMA_CURVE,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -27,7 +32,8 @@ ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
-            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")],
+            cv.ensure_list,
+            [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")],
         ),
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
@@ -197,5 +203,6 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         max_power = self._config.get(CONF_MAX_POWER)
         if min_power and max_power and min_power >= max_power:
             raise StrategyConfigurationError(
-                "Max power cannot be lower than min power", "linear_min_higher_as_max",
+                "Max power cannot be lower than min power",
+                "linear_min_higher_as_max",
             )

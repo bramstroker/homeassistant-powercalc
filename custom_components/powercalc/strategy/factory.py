@@ -14,7 +14,10 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     CalculationStrategy,
 )
-from custom_components.powercalc.errors import StrategyConfigurationError, UnsupportedStrategyError
+from custom_components.powercalc.errors import (
+    StrategyConfigurationError,
+    UnsupportedStrategyError,
+)
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 from .fixed import FixedStrategy
@@ -67,7 +70,10 @@ class PowerCalculatorStrategyFactory:
                 raise StrategyConfigurationError("No linear configuration supplied")
 
         return LinearStrategy(
-            linear_config, self._hass, source_entity, config.get(CONF_STANDBY_POWER),
+            linear_config,
+            self._hass,
+            source_entity,
+            config.get(CONF_STANDBY_POWER),
         )
 
     def _create_fixed(
@@ -99,7 +105,9 @@ class PowerCalculatorStrategyFactory:
         return FixedStrategy(source_entity, power, states_power)
 
     def _create_lut(
-        self, source_entity: SourceEntity, power_profile: PowerProfile | None,
+        self,
+        source_entity: SourceEntity,
+        power_profile: PowerProfile | None,
     ) -> LutStrategy:
         """Create the lut strategy"""
         if power_profile is None:

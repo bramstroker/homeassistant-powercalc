@@ -108,7 +108,9 @@ def generate_power_sensor_entity_id(
     if object_id is None and source_entity:
         object_id = source_entity.object_id
     return async_generate_entity_id(
-        ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass,
+        ENTITY_ID_FORMAT,
+        name_pattern.format(object_id),
+        hass=hass,
     )
 
 
@@ -128,12 +130,15 @@ def generate_energy_sensor_entity_id(
     if object_id is None and source_entity:
         object_id = source_entity.object_id
     return async_generate_entity_id(
-        ENTITY_ID_FORMAT, name_pattern.format(object_id), hass=hass,
+        ENTITY_ID_FORMAT,
+        name_pattern.format(object_id),
+        hass=hass,
     )
 
 
 def get_entity_id_by_unique_id(
-    hass: HomeAssistant, unique_id: str | None,
+    hass: HomeAssistant,
+    unique_id: str | None,
 ) -> str | None:
     if unique_id is None:
         return None

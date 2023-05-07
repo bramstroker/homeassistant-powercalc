@@ -63,7 +63,8 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
         vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
         vol.Optional(CONF_START_TIME): cv.time,
         vol.Optional(
-            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY,
+            CONF_UPDATE_FREQUENCY,
+            default=DEFAULT_DAILY_UPDATE_FREQUENCY,
         ): vol.Coerce(int),
     },
 )
@@ -79,11 +80,16 @@ async def create_daily_fixed_energy_sensor(
     mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
 
     name = generate_energy_sensor_name(
-        sensor_config, sensor_config.get(CONF_NAME), source_entity,
+        sensor_config,
+        sensor_config.get(CONF_NAME),
+        source_entity,
     )
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, unique_id=unique_id, source_entity=source_entity,
+        hass,
+        sensor_config,
+        unique_id=unique_id,
+        source_entity=source_entity,
     )
 
     _LOGGER.debug(
@@ -115,7 +121,9 @@ async def create_daily_fixed_energy_sensor(
 
 
 async def create_daily_fixed_energy_power_sensor(
-    hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity,
+    hass: HomeAssistant,
+    sensor_config: dict,
+    source_entity: SourceEntity,
 ) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
@@ -221,7 +229,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                 self._last_updated = dt_util.now().timestamp()
 
         self._update_timer_removal = async_track_time_interval(
-            self.hass, refresh, timedelta(seconds=self._update_frequency),
+            self.hass,
+            refresh,
+            timedelta(seconds=self._update_frequency),
         )
 
     def calculate_delta(self, elapsed_seconds: int = 0) -> Decimal:
@@ -238,7 +248,11 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             value.hass = self.hass
             value = float(value.async_render())
 
-        wh_per_day = value * (self._on_time.total_seconds() / 3600) if self._user_unit_of_measurement == POWER_WATT else value * 1000
+        wh_per_day = (
+            value * (self._on_time.total_seconds() / 3600)
+            if self._user_unit_of_measurement == POWER_WATT
+            else value * 1000
+        )
 
         # Convert Wh to the native measurement unit
         energy_per_day = wh_per_day
