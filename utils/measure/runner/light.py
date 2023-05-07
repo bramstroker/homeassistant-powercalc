@@ -79,7 +79,9 @@ class LightRunner(MeasurementRunner):
         return f"{self.light_info.model_id}"
 
     def run(
-        self, answers: dict[str, Any], export_directory: str,
+        self,
+        answers: dict[str, Any],
+        export_directory: str,
     ) -> RunnerResult | None:
         """Run the measurement session for lights"""
         csv_file_path = f"{export_directory}/{self.color_mode}.csv"
@@ -105,7 +107,9 @@ class LightRunner(MeasurementRunner):
 
             if resume_at is None:
                 self.light_controller.change_light_state(
-                    ColorMode.BRIGHTNESS, on=True, bri=1,
+                    ColorMode.BRIGHTNESS,
+                    on=True,
+                    bri=1,
                 )
 
             # Initially wait longer so the smartplug can settle
@@ -124,7 +128,9 @@ class LightRunner(MeasurementRunner):
                 _LOGGER.info(f"Changing light to: {variation}")
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
-                    self.color_mode, on=True, **asdict(variation),
+                    self.color_mode,
+                    on=True,
+                    **asdict(variation),
                 )
 
                 if (
@@ -191,7 +197,8 @@ class LightRunner(MeasurementRunner):
         """Get the previously measured dummy load value"""
 
         dummy_load_file = os.path.join(
-            Path(__file__).parent.parent.absolute(), ".persistent/dummy_load",
+            Path(__file__).parent.parent.absolute(),
+            ".persistent/dummy_load",
         )
         if not os.path.exists(dummy_load_file):
             return self.measure_dummy_load(dummy_load_file)
@@ -212,7 +219,9 @@ class LightRunner(MeasurementRunner):
         return average
 
     def get_variations(
-        self, color_mode: ColorMode, resume_at: Variation | None = None,
+        self,
+        color_mode: ColorMode,
+        resume_at: Variation | None = None,
     ) -> Iterator[Variation]:
         """Get all the light settings where the measure script needs to cycle through"""
         if color_mode == ColorMode.HS:
@@ -240,30 +249,42 @@ class LightRunner(MeasurementRunner):
         min_mired = round(self.light_info.min_mired)
         max_mired = round(self.light_info.max_mired)
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.CT_BRI_STEPS,
+            config.MIN_BRIGHTNESS,
+            config.MAX_BRIGHTNESS,
+            config.CT_BRI_STEPS,
         ):
             for mired in self.inclusive_range(
-                min_mired, max_mired, config.CT_MIRED_STEPS,
+                min_mired,
+                max_mired,
+                config.CT_MIRED_STEPS,
             ):
                 yield ColorTempVariation(bri=bri, ct=mired)
 
     def get_hs_variations(self) -> Iterator[HsVariation]:
         """Get hue/sat variations"""
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.HS_BRI_STEPS,
+            config.MIN_BRIGHTNESS,
+            config.MAX_BRIGHTNESS,
+            config.HS_BRI_STEPS,
         ):
             for sat in self.inclusive_range(
-                config.MIN_SAT, config.MAX_SAT, config.HS_SAT_STEPS,
+                config.MIN_SAT,
+                config.MAX_SAT,
+                config.HS_SAT_STEPS,
             ):
                 for hue in self.inclusive_range(
-                    config.MIN_HUE, config.MAX_HUE, config.HS_HUE_STEPS,
+                    config.MIN_HUE,
+                    config.MAX_HUE,
+                    config.HS_HUE_STEPS,
                 ):
                     yield HsVariation(bri=bri, hue=hue, sat=sat)
 
     def get_brightness_variations(self) -> Iterator[Variation]:
         """Get brightness variations"""
         for bri in self.inclusive_range(
-            config.MIN_BRIGHTNESS, config.MAX_BRIGHTNESS, config.BRI_BRI_STEPS,
+            config.MIN_BRIGHTNESS,
+            config.MAX_BRIGHTNESS,
+            config.BRI_BRI_STEPS,
         ):
             yield Variation(bri=bri)
 
@@ -340,12 +361,16 @@ class LightRunner(MeasurementRunner):
                 _LOGGER.warning("Measurement is stuck, Nudging")
                 # If brightness is low, set brightness high. Else, turn light off
                 self.light_controller.change_light_state(
-                    ColorMode.BRIGHTNESS, on=(variation.bri < 128), bri=255,
+                    ColorMode.BRIGHTNESS,
+                    on=(variation.bri < 128),
+                    bri=255,
                 )
                 time.sleep(config.PULSE_TIME_NUDGE)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
-                    color_mode, on=True, **asdict(variation),
+                    color_mode,
+                    on=True,
+                    **asdict(variation),
                 )
                 # Wait a longer amount of time for the PM to settle
                 time.sleep(config.SLEEP_TIME_NUDGE)
@@ -459,13 +484,17 @@ class LightRunner(MeasurementRunner):
 
         if self.color_mode == ColorMode.HS:
             return HsVariation(
-                bri=int(last_row[0]), hue=int(last_row[1]), sat=int(last_row[2]),
+                bri=int(last_row[0]),
+                hue=int(last_row[1]),
+                sat=int(last_row[2]),
             )
 
         raise Exception(f"Color mode {self.color_mode} not supported")
 
     def take_power_measurement(
-        self, start_timestamp: float, retry_count: int = 0,
+        self,
+        start_timestamp: float,
+        retry_count: int = 0,
     ) -> float:
         """Request a power reading from the configured power meter"""
         value = self.measure_util.take_measurement(start_timestamp, retry_count)
@@ -482,7 +511,9 @@ class LightRunner(MeasurementRunner):
     @staticmethod
     def gzip_csv(csv_file_path: str):
         """Gzip the CSV file"""
-        with open(csv_file_path, "rb") as csv_file, gzip.open(f"{csv_file_path}.gz", "wb") as gzip_file:
+        with open(csv_file_path, "rb") as csv_file, gzip.open(
+            f"{csv_file_path}.gz", "wb"
+        ) as gzip_file:
             shutil.copyfileobj(csv_file, gzip_file)
 
     def measure_standby_power(self) -> float:
@@ -515,7 +546,9 @@ class LightRunner(MeasurementRunner):
                 default=ColorMode.HS,
             ),
             inquirer.Confirm(
-                name="gzip", message="Do you want to gzip CSV files?", default=True,
+                name="gzip",
+                message="Do you want to gzip CSV files?",
+                default=True,
             ),
             inquirer.Confirm(
                 name="dummy_load",
@@ -575,7 +608,9 @@ class ColorTempVariation(Variation):
 
 
 class CsvWriter:
-    def __init__(self, csv_file: TextIO, color_mode: ColorMode, add_header: bool) -> None:
+    def __init__(
+        self, csv_file: TextIO, color_mode: ColorMode, add_header: bool
+    ) -> None:
         self.csv_file = csv_file
         self.writer = csv.writer(csv_file)
         self.rows_written = 0

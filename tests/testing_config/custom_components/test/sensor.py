@@ -76,7 +76,10 @@ def init(empty=False):
 
 
 async def async_setup_platform(
-    hass, config, async_add_entities_callback, discovery_info=None,
+    hass,
+    config,
+    async_add_entities_callback,
+    discovery_info=None,
 ):
     """Return mock entities."""
     async_add_entities_callback(list(ENTITIES.values()))

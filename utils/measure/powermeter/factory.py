@@ -25,7 +25,9 @@ class PowerMeterFactory:
     @staticmethod
     def hass():
         return HassPowerMeter(
-            config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE,
+            config.HASS_URL,
+            config.HASS_TOKEN,
+            config.HASS_CALL_UPDATE_ENTITY_SERVICE,
         )
 
     @staticmethod

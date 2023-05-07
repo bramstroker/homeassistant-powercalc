@@ -11,7 +11,9 @@ class MeasurementRunner(Protocol):
         ...
 
     def run(
-        self, answers: dict[str, Any], export_directory: str,
+        self,
+        answers: dict[str, Any],
+        export_directory: str,
     ) -> RunnerResult | None:
         ...
 

@@ -14,7 +14,8 @@ class TasmotaPowerMeter(PowerMeter):
 
     def get_power(self) -> PowerMeasurementResult:
         r = requests.get(
-            f"http://{self._device_ip}/cm?cmnd=STATUS+8", timeout=10,
+            f"http://{self._device_ip}/cm?cmnd=STATUS+8",
+            timeout=10,
         )
         json = r.json()
 

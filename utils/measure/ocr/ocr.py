@@ -237,7 +237,11 @@ class OcrRegionSelection:
             (h, w) = frame.shape[:2]
             y_center = h // 2
             cv2.rectangle(
-                frame, (100, y_center - 40), (1400, y_center + 90), (0, 0, 0), -1,
+                frame,
+                (100, y_center - 40),
+                (1400, y_center + 90),
+                (0, 0, 0),
+                -1,
             )
             cv2.putText(
                 frame,
@@ -270,7 +274,9 @@ class OcrRegionSelection:
 class OCR:
     """Class for creating a pytesseract OCR process in a dedicated thread"""
 
-    def __init__(self, video_stream: VideoStream, region_selection: OcrRegionSelection) -> None:
+    def __init__(
+        self, video_stream: VideoStream, region_selection: OcrRegionSelection
+    ) -> None:
         self.measurement: Decimal = None
         self.stopped: bool = False
         self.region_selection = region_selection
@@ -299,7 +305,8 @@ class OCR:
                     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
                     match = pytesseract.image_to_string(
-                        frame, config="-c tessedit_char_whitelist='0123456789.'",
+                        frame,
+                        config="-c tessedit_char_whitelist='0123456789.'",
                     )
                     _LOGGER.debug(f"OCR match: {match.strip()}")
                     if len(match) > 0:
@@ -320,7 +327,8 @@ class OCR:
     def write_result(self, measurement: Decimal):
         if self.file is None:
             file_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "ocr_results.txt",
+                os.path.dirname(os.path.abspath(__file__)),
+                "ocr_results.txt",
             )
             self.file = open(file_path, "a")
 
@@ -389,7 +397,8 @@ def ocr_stream(source: str = "0"):
     ).start()  # Starts reading the video stream in dedicated thread
     region_selection = OcrRegionSelection(video_stream).start()
     ocr = OCR(
-        video_stream, region_selection,
+        video_stream,
+        region_selection,
     ).start()  # Starts optical character recognition in dedicated thread
     cps1 = RateCounter().start()
 

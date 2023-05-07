@@ -44,7 +44,8 @@ HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
 del HS_SAT_PRECISION
 
 SELECTED_LIGHT_CONTROLLER = config(
-    "LIGHT_CONTROLLER", cast=Choices([t.value for t in LightControllerType]),
+    "LIGHT_CONTROLLER",
+    cast=Choices([t.value for t in LightControllerType]),
 )
 SELECTED_MEDIA_CONTROLLER = config(
     "MEDIA_CONTROLLER",
@@ -52,7 +53,8 @@ SELECTED_MEDIA_CONTROLLER = config(
     default=MediaControllerType.HASS,
 )
 SELECTED_POWER_METER = config(
-    "POWER_METER", cast=Choices([t.value for t in PowerMeterType]),
+    "POWER_METER",
+    cast=Choices([t.value for t in PowerMeterType]),
 )
 
 LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
@@ -80,7 +82,9 @@ HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
 HASS_URL = config("HASS_URL")
 HASS_TOKEN = config("HASS_TOKEN")
 HASS_CALL_UPDATE_ENTITY_SERVICE = config(
-    "HASS_CALL_UPDATE_ENTITY_SERVICE", default=False, cast=bool,
+    "HASS_CALL_UPDATE_ENTITY_SERVICE",
+    default=False,
+    cast=bool,
 )
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")

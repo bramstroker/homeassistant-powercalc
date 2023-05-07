@@ -79,7 +79,8 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
 
 
 async def test_utility_meter_is_not_created_twice(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
     power_sensor_id = "sensor.test_power"

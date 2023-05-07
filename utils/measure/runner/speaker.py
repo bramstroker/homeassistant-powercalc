@@ -28,7 +28,9 @@ class SpeakerRunner(MeasurementRunner):
         self.media_controller.process_answers(answers)
 
     def run(
-        self, answers: dict[str, Any], export_directory: str,
+        self,
+        answers: dict[str, Any],
+        export_directory: str,
     ) -> RunnerResult | None:
         summary = {}
         duration = DURATION_PER_VOLUME_LEVEL

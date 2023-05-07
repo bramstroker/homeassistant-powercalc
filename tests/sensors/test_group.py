@@ -479,10 +479,14 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
 
 
 async def test_members_are_unhiden_after_group_removed(
-    hass: HomeAssistant, entity_reg: EntityRegistry,
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
 ):
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef", suggested_object_id="test_power",
+        "sensor",
+        DOMAIN,
+        "abcdef",
+        suggested_object_id="test_power",
     )
 
     config_entry = MockConfigEntry(
@@ -518,10 +522,16 @@ async def test_members_are_unhiden_after_group_removed(
 
 async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry):
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef", suggested_object_id="testgroup_power",
+        "sensor",
+        DOMAIN,
+        "abcdef",
+        suggested_object_id="testgroup_power",
     )
     entity_reg.async_get_or_create(
-        "sensor", DOMAIN, "abcdef_energy", suggested_object_id="testgroup_energy",
+        "sensor",
+        DOMAIN,
+        "abcdef_energy",
+        suggested_object_id="testgroup_energy",
     )
 
     await create_input_booleans(hass, ["test1", "test2"])
@@ -597,7 +607,9 @@ async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant
     """
 
     config_entry_sensor1 = await create_mocked_virtual_power_sensor_entry(
-        hass, "VirtualSensor1", "xyz",
+        hass,
+        "VirtualSensor1",
+        "xyz",
     )
 
     config_entry_group = MockConfigEntry(
@@ -764,7 +776,9 @@ async def test_config_entry_is_removed_from_associated_groups_on_removal(
     hass: HomeAssistant,
 ) -> None:
     config_entry_sensor = await create_mocked_virtual_power_sensor_entry(
-        hass, "VirtualSensor1", "xyz",
+        hass,
+        "VirtualSensor1",
+        "xyz",
     )
 
     groups: list[str] = ["GroupA", "GroupB", "GroupC"]
@@ -832,7 +846,8 @@ async def test_group_is_removed_from_virtual_power_entry_on_removal(
 
 
 async def test_error_is_logged_when_config_entry_associated_to_non_existing_group(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.WARNING)
     config_entry = MockConfigEntry(
@@ -874,7 +889,9 @@ async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     hass.states.async_set(
-        "sensor.energy_Wh", "200", {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR},
+        "sensor.energy_Wh",
+        "200",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.WATT_HOUR},
     )
     hass.states.async_set(
         "sensor.energy_kWh",
@@ -908,10 +925,14 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     hass.states.async_set(
-        "sensor.power_w", "100", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
+        "sensor.power_w",
+        "100",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.WATT},
     )
     hass.states.async_set(
-        "sensor.power_kw", "0.1", {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT},
+        "sensor.power_kw",
+        "0.1",
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT},
     )
 
     await hass.async_block_till_done()
@@ -921,7 +942,8 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
 
 
 async def test_gui_discovered_entity_in_yaml_group(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     Test if a powercalc entity setup with the GUI (either discovered or manually) can be added to a YAML group

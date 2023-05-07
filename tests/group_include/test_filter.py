@@ -24,7 +24,9 @@ from custom_components.powercalc.group_include.filter import (
     ],
 )
 async def test_composite_filter(
-    filter_return_values: list, operator: FilterOperator, expected_result: bool,
+    filter_return_values: list,
+    operator: FilterOperator,
+    expected_result: bool,
 ) -> None:
     filter_mocks = []
     for value in filter_return_values:

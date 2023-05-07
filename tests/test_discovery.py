@@ -73,7 +73,8 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init) -> None:
 
 
 async def test_discovery_skipped_when_confirmed_by_user(
-    hass: HomeAssistant, mock_flow_init,
+    hass: HomeAssistant,
+    mock_flow_init,
 ) -> None:
     light_entity = MockLight("test")
     light_entity.manufacturer = "lidl"
@@ -109,7 +110,9 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
     await create_mock_light_entity(hass, light_entity)
 
     await async_setup_component(
-        hass, DOMAIN, {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: False}},
+        hass,
+        DOMAIN,
+        {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: False}},
     )
     await hass.async_block_till_done()
 
@@ -118,7 +121,8 @@ async def test_autodiscovery_disabled(hass: HomeAssistant):
 
 
 async def test_autodiscovery_skipped_for_lut_with_subprofiles(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
     Lights which can be autodiscovered and have sub profiles need to de skipped
@@ -134,7 +138,9 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
     await create_mock_light_entity(hass, light_entity)
 
     await async_setup_component(
-        hass, DOMAIN, {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: True}},
+        hass,
+        DOMAIN,
+        {DOMAIN: {CONF_ENABLE_AUTODISCOVERY: True}},
     )
     await hass.async_block_till_done()
 
@@ -143,7 +149,8 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
 
 
 async def test_manually_configured_light_overrides_autodiscovered(
-    hass: HomeAssistant, mock_flow_init,
+    hass: HomeAssistant,
+    mock_flow_init,
 ) -> None:
     light_entity = MockLight("testing")
     light_entity.manufacturer = "signify"
@@ -151,7 +158,9 @@ async def test_manually_configured_light_overrides_autodiscovered(
     await create_mock_light_entity(hass, light_entity)
 
     await run_powercalc_setup(
-        hass, {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}}, {},
+        hass,
+        {CONF_ENTITY_ID: "light.testing", CONF_FIXED: {CONF_POWER: 25}},
+        {},
     )
 
     assert len(mock_flow_init.mock_calls) == 0
@@ -162,7 +171,8 @@ async def test_manually_configured_light_overrides_autodiscovered(
 
 
 async def test_config_entry_overrides_autodiscovered(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
 
@@ -218,7 +228,9 @@ async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant) -> None
         hass,
         {
             "light.test": DeviceEntry(
-                id="some-device-id", manufacturer="signify", model="LCT010",
+                id="some-device-id",
+                manufacturer="signify",
+                model="LCT010",
             ),
         },
     )
@@ -246,7 +258,9 @@ async def test_autodiscover_skips_entities_with_empty_manufacturer(
         hass,
         {
             "light.test": DeviceEntry(
-                id="some-device-id", manufacturer="", model="LCT010",
+                id="some-device-id",
+                manufacturer="",
+                model="LCT010",
             ),
         },
     )
@@ -274,7 +288,9 @@ async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> N
         hass,
         {
             "some-device-id": DeviceEntry(
-                id="some-device-id", manufacturer="Shelly", model="Shelly Plug S",
+                id="some-device-id",
+                manufacturer="Shelly",
+                model="Shelly Plug S",
             ),
         },
     )
@@ -297,7 +313,9 @@ async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRe
     entity_entry = entity_reg.async_get("light.testa")
 
     profile = await get_power_profile(
-        hass, {}, await autodiscover_model(hass, entity_entry),
+        hass,
+        {},
+        await autodiscover_model(hass, entity_entry),
     )
     assert profile
     assert profile.manufacturer == light_mock.manufacturer
@@ -351,7 +369,9 @@ async def test_autodiscover_model_from_entity_entry(
     entity_entry = entity_reg.async_get("light.testa")
 
     power_profile = await get_power_profile(
-        hass, {}, await autodiscover_model(hass, entity_entry),
+        hass,
+        {},
+        await autodiscover_model(hass, entity_entry),
     )
 
     assert power_profile.manufacturer == expected_manufacturer
@@ -359,7 +379,9 @@ async def test_autodiscover_model_from_entity_entry(
 
 
 async def test_get_power_profile_empty_manufacturer(
-    hass: HomeAssistant, entity_reg: EntityRegistry, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     light_mock = MockLight("test")
@@ -371,14 +393,17 @@ async def test_get_power_profile_empty_manufacturer(
     entity_entry = entity_reg.async_get("light.test")
 
     profile = await get_power_profile(
-        hass, {}, await autodiscover_model(hass, entity_entry),
+        hass,
+        {},
+        await autodiscover_model(hass, entity_entry),
     )
     assert not profile
     assert not caplog.records
 
 
 async def test_no_power_sensors_are_created_for_ignored_config_entries(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.DEBUG)
 
@@ -398,7 +423,9 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
         hass,
         {
             "some-device-id": DeviceEntry(
-                id="some-device-id", manufacturer="Signify", model="LCT010",
+                id="some-device-id",
+                manufacturer="Signify",
+                model="LCT010",
             ),
         },
     )

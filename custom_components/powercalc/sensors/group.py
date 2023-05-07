@@ -8,14 +8,14 @@ from decimal import Decimal, DecimalException
 from typing import Any
 
 import homeassistant.util.dt as dt_util
+from homeassistant.components.sensor import ATTR_STATE_CLASS
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
-    ATTR_STATE_CLASS,
     RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,

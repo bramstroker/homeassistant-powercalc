@@ -47,7 +47,9 @@ class HassLightController:
 
         return [
             inquirer.List(
-                name="light_entity_id", message="Select the light", choices=light_list,
+                name="light_entity_id",
+                message="Select the light",
+                choices=light_list,
             ),
             inquirer.Text(
                 name="light_model_id",

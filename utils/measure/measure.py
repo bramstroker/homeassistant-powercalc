@@ -106,7 +106,9 @@ class Measure:
         self.runner.prepare(answers)
 
         export_directory = os.path.join(
-            os.path.dirname(__file__), "export", self.runner.get_export_directory(),
+            os.path.dirname(__file__),
+            "export",
+            self.runner.get_export_directory(),
         )
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
@@ -245,7 +247,8 @@ def validate_required(_, val):
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
         raise ValidationError(
-            "", reason="This question cannot be empty, please put in a value",
+            "",
+            reason="This question cannot be empty, please put in a value",
         )
     return True
 
@@ -260,7 +263,8 @@ def str_to_bool(value: Any) -> bool:
 class RunnerFactory:
     @staticmethod
     def create_runner(
-        device_type: DeviceType, power_meter: PowerMeter,
+        device_type: DeviceType,
+        power_meter: PowerMeter,
     ) -> MeasurementRunner:
         """Creates a runner instance based on selected device type"""
         measure_util = MeasureUtil(power_meter)

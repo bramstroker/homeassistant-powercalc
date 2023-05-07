@@ -129,15 +129,24 @@ async def test_states_power_with_attributes(hass: HomeAssistant):
         source_entity,
     )
 
-    assert await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Spotify"}),
-    ) == 5
-    assert await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Youtube"}),
-    ) == 10
-    assert await strategy.calculate(
-        State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"}),
-    ) == 12
+    assert (
+        await strategy.calculate(
+            State(source_entity.entity_id, "playing", {"media_content_id": "Spotify"}),
+        )
+        == 5
+    )
+    assert (
+        await strategy.calculate(
+            State(source_entity.entity_id, "playing", {"media_content_id": "Youtube"}),
+        )
+        == 10
+    )
+    assert (
+        await strategy.calculate(
+            State(source_entity.entity_id, "playing", {"media_content_id": "Netflix"}),
+        )
+        == 12
+    )
 
 
 async def test_validation_error_when_no_power_supplied():
@@ -245,7 +254,9 @@ async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant)
 
 
 def _create_strategy(
-    hass: HomeAssistant, config: ConfigType, source_entity: SourceEntity,
+    hass: HomeAssistant,
+    config: ConfigType,
+    source_entity: SourceEntity,
 ) -> FixedStrategy:
     factory = PowerCalculatorStrategyFactory(hass)
     strategy_instance = factory.create(

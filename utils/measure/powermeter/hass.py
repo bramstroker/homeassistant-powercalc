@@ -22,7 +22,9 @@ class HassPowerMeter(PowerMeter):
     def get_power(self) -> PowerMeasurementResult:
         if self._call_update_entity:
             self.client.trigger_service(
-                "homeassistant", "update_entity", entity_id=self._entity_id,
+                "homeassistant",
+                "update_entity",
+                entity_id=self._entity_id,
             )
             time.sleep(1)
 

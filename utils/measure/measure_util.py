@@ -32,7 +32,9 @@ class MeasureUtil:
         return average
 
     def take_measurement(
-        self, start_timestamp: float | None = None, retry_count: int = 0,
+        self,
+        start_timestamp: float | None = None,
+        retry_count: int = 0,
     ) -> float:
         """Get a measurement from the powermeter, take multiple samples and calculate the average"""
         measurements = []
