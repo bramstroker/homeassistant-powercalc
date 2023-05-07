@@ -732,7 +732,7 @@ class EntitiesBucket:
         self.new.extend(bucket.new)
         self.existing.extend(bucket.existing)
 
-    def all(self) -> list[Entity]:
+    def all(self) -> list[Entity]:  # noqa: A003
         return self.new + self.existing
 
     def has_entities(self) -> bool:

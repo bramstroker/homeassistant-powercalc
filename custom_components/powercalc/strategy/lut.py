@@ -209,26 +209,26 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
 
     @staticmethod
-    def get_nearest(dict: LookupDictType, search_key: int) -> float | LookupDictType:
+    def get_nearest(lookup_dict: LookupDictType, search_key: int) -> float | LookupDictType:
         return (
-            dict.get(search_key)
-            or dict[min(dict.keys(), key=lambda key: abs(key - search_key))]
+            lookup_dict.get(search_key)
+            or lookup_dict[min(lookup_dict.keys(), key=lambda key: abs(key - search_key))]
         )
 
     @staticmethod
-    def get_nearest_lower_brightness(dict: LookupDictType, search_key: int) -> int:
-        keys = dict.keys()
+    def get_nearest_lower_brightness(lookup_dict: LookupDictType, search_key: int) -> int:
+        keys = lookup_dict.keys()
         last_key = [*keys][-1]
         if last_key < search_key:
             return int(last_key)
 
         return max(
-            (k for k in dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
+            (k for k in lookup_dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
         )
 
     @staticmethod
-    def get_nearest_higher_brightness(dict: LookupDictType, search_key: int) -> int:
-        keys = dict.keys()
+    def get_nearest_higher_brightness(lookup_dict: LookupDictType, search_key: int) -> int:
+        keys = lookup_dict.keys()
         first_key = [*keys][0]
         if first_key > search_key:
             return int(first_key)
