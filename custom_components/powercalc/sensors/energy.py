@@ -58,36 +58,36 @@ async def create_energy_sensor(
         if entity_entry is None:
             raise SensorConfigurationError(
                 f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
-                "Double check `energy_sensor_id` setting"
+                "Double check `energy_sensor_id` setting",
             )
         return RealEnergySensor(entity_entry)
 
     # User specified an existing power sensor with "power_sensor_id" option. Try to find a corresponding energy sensor
     if CONF_POWER_SENSOR_ID in sensor_config and isinstance(
-        power_sensor, RealPowerSensor
+        power_sensor, RealPowerSensor,
     ):
         real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
         if real_energy_sensor:
             _LOGGER.debug(
                 f"Found existing energy sensor '{real_energy_sensor.entity_id}' "
-                f"for the power sensor '{power_sensor.entity_id}'"
+                f"for the power sensor '{power_sensor.entity_id}'",
             )
             return real_energy_sensor
 
         _LOGGER.debug(
-            f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'"
+            f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'",
         )
 
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.
     name = generate_energy_sensor_name(
-        sensor_config, sensor_config.get(CONF_NAME), source_entity
+        sensor_config, sensor_config.get(CONF_NAME), source_entity,
     )
     unique_id = None
     if power_sensor.unique_id:
         unique_id = f"{power_sensor.unique_id}_energy"
 
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, source_entity, unique_id=unique_id
+        hass, sensor_config, source_entity, unique_id=unique_id,
     )
     entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
 
@@ -115,7 +115,7 @@ async def create_energy_sensor(
 
 @callback
 def find_related_real_energy_sensor(
-    hass: HomeAssistant, power_sensor: RealPowerSensor
+    hass: HomeAssistant, power_sensor: RealPowerSensor,
 ) -> RealEnergySensor | None:
     """See if a corresponding energy sensor exists in the HA installation for the power sensor"""
 
@@ -126,7 +126,7 @@ def find_related_real_energy_sensor(
     energy_sensors = [
         entry
         for entry in er.async_entries_for_device(
-            ent_reg, device_id=power_sensor.device_id
+            ent_reg, device_id=power_sensor.device_id,
         )
         if entry.device_class == SensorDeviceClass.ENERGY
         or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR

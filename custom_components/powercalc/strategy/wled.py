@@ -20,7 +20,7 @@ CONFIG_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VOLTAGE): vol.Coerce(float),
         vol.Optional(CONF_POWER_FACTOR, default=0.9): vol.Coerce(float),
-    }
+    },
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
 
         _LOGGER.debug(
             f"{self._light_entity.entity_id}: Estimated current {entity_state.state} "
-            f"(voltage={self._voltage}, power_factor={self._power_factor})"
+            f"(voltage={self._voltage}, power_factor={self._power_factor})",
         )
         power = float(entity_state.state) / 1000 * self._voltage * self._power_factor
         return await evaluate_power(power)
@@ -73,7 +73,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
                 estimated_current_entities = [
                     entity_entry.entity_id
                     for entity_entry in entity_registry.async_entries_for_device(
-                        entity_reg, device_id
+                        entity_reg, device_id,
                     )
                     if (entity_entry.device_class or entity_entry.original_device_class)
                     == SensorDeviceClass.CURRENT

@@ -27,15 +27,15 @@ async def get_power_profile(
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
     if custom_model_directory:
         custom_model_directory = os.path.join(
-            hass.config.config_dir, custom_model_directory
+            hass.config.config_dir, custom_model_directory,
         )
 
     library = ProfileLibrary.factory(hass)
     profile = await library.get_profile(
-        ModelInfo(manufacturer, model), custom_model_directory
+        ModelInfo(manufacturer, model), custom_model_directory,
     )
     if profile is None:
         raise ModelNotSupportedError(
-            f"Model not found in library (manufacturer: {manufacturer}, model: {model})"
+            f"Model not found in library (manufacturer: {manufacturer}, model: {model})",
         )
     return profile

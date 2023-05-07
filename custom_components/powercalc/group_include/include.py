@@ -19,7 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @callback
 def resolve_include_entities(
-    hass: HomeAssistant, include_config: dict
+    hass: HomeAssistant, include_config: dict,
 ) -> list[entity_registry.RegistryEntry]:
     entities: dict[str, entity_registry.RegistryEntry] = {}
     entity_reg = entity_registry.async_get(hass)
@@ -51,7 +51,7 @@ def resolve_include_entities(
         template = include_config.get(CONF_TEMPLATE)
         if not isinstance(template, Template):
             raise SensorConfigurationError(
-                "include->template is not a correct Template"
+                "include->template is not a correct Template",
             )
         template.hass = hass
 
@@ -74,7 +74,7 @@ def resolve_include_entities(
 
 @callback
 def resolve_include_groups(
-    hass: HomeAssistant, group_id: str
+    hass: HomeAssistant, group_id: str,
 ) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given group"""
     entity_reg = entity_registry.async_get(hass)
@@ -119,7 +119,7 @@ def resolve_light_group_entities(
 
         if registry_entry.platform == GROUP_DOMAIN:
             resolve_light_group_entities(
-                hass, registry_entry.entity_id, resolved_entities
+                hass, registry_entry.entity_id, resolved_entities,
             )
 
         resolved_entities[entity_id] = registry_entry
@@ -129,7 +129,7 @@ def resolve_light_group_entities(
 
 @callback
 def resolve_area_entities(
-    hass: HomeAssistant, area_id_or_name: str
+    hass: HomeAssistant, area_id_or_name: str,
 ) -> dict[str, entity_registry.RegistryEntry]:
     """Get a listing of al entities in a given area"""
     area_reg = area_registry.async_get(hass)
@@ -139,7 +139,7 @@ def resolve_area_entities(
 
     if area is None or area.id is None:
         raise SensorConfigurationError(
-            f"No area with id or name '{area_id_or_name}' found in your HA instance"
+            f"No area with id or name '{area_id_or_name}' found in your HA instance",
         )
 
     area_id = area.id
@@ -155,9 +155,9 @@ def resolve_area_entities(
             entity
             for device in device_registry.async_entries_for_area(device_reg, area_id)
             for entity in entity_registry.async_entries_for_device(
-                entity_reg, device.id
+                entity_reg, device.id,
             )
             if entity.area_id is None
-        ]
+        ],
     )
     return {entity.entity_id: entity for entity in entities}

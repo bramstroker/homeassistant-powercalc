@@ -22,7 +22,7 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
                 CompositeFilter(
                     [DomainFilter(domain) for domain in domain_config],
                     FilterOperator.OR,
-                )
+                ),
             )
         elif type(domain_config) == str:
             filters.append(DomainFilter(domain_config))

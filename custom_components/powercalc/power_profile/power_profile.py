@@ -128,7 +128,7 @@ class PowerProfile:
         """Get configuration to setup linear strategy"""
         if not self.is_strategy_supported(CalculationStrategy.LINEAR):
             raise UnsupportedStrategyError(
-                f"Strategy linear is not supported by model: {self._model}"
+                f"Strategy linear is not supported by model: {self._model}",
             )
         return self._json_data.get("linear_config")
 
@@ -137,7 +137,7 @@ class PowerProfile:
         """Get configuration to setup fixed strategy"""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
             raise UnsupportedStrategyError(
-                f"Strategy fixed is not supported by model: {self._model}"
+                f"Strategy fixed is not supported by model: {self._model}",
             )
         fixed_config = self._json_data.get("fixed_config")
         if fixed_config is None and self.standby_power_on:
@@ -169,7 +169,7 @@ class PowerProfile:
         This indicates the user must supply the power values in the config flow
         """
         return self.is_strategy_supported(
-            CalculationStrategy.FIXED
+            CalculationStrategy.FIXED,
         ) and not self._json_data.get("fixed_config")
 
     @property
@@ -214,7 +214,7 @@ class PowerProfile:
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupportedError(
                 f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
-                f"sub_profile: {sub_profile})"
+                f"sub_profile: {sub_profile})",
             )
 
         # When the sub LUT directory also has a model.json (not required),
@@ -272,7 +272,7 @@ class SubProfileSelector:
 
         if self._power_profile.sub_profile_select is None:
             raise PowercalcSetupError(
-                "Power profile has no sub profile select configuration"
+                "Power profile has no sub profile select configuration",
             )
         return self._power_profile.sub_profile_select.default
 
@@ -327,7 +327,7 @@ class EntityStateMatcher(SubProfileMatcher):
         self._hass = hass
         if source_entity:
             entity_id = entity_id.replace(
-                "{{source_object_id}}", source_entity.object_id
+                "{{source_object_id}}", source_entity.object_id,
             )
         self._entity_id = entity_id
         self._mapping = mapping

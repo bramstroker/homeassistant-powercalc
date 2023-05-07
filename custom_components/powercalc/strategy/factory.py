@@ -66,7 +66,7 @@ class PowerCalculatorStrategyFactory:
                 raise StrategyConfigurationError("No linear configuration supplied")
 
         return LinearStrategy(
-            linear_config, self._hass, source_entity, config.get(CONF_STANDBY_POWER)
+            linear_config, self._hass, source_entity, config.get(CONF_STANDBY_POWER),
         )
 
     def _create_fixed(
@@ -98,12 +98,12 @@ class PowerCalculatorStrategyFactory:
         return FixedStrategy(source_entity, power, states_power)
 
     def _create_lut(
-        self, source_entity: SourceEntity, power_profile: PowerProfile | None
+        self, source_entity: SourceEntity, power_profile: PowerProfile | None,
     ) -> LutStrategy:
         """Create the lut strategy"""
         if power_profile is None:
             raise StrategyConfigurationError(
-                "You must supply a valid manufacturer and model to use the LUT mode"
+                "You must supply a valid manufacturer and model to use the LUT mode",
             )
 
         return LutStrategy(source_entity, self._lut_registry, power_profile)

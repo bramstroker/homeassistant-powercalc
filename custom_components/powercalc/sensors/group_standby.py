@@ -30,11 +30,11 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_general_standby_sensors(
-    hass: HomeAssistant, config: ConfigType
+    hass: HomeAssistant, config: ConfigType,
 ) -> list[Entity]:
     sensors: list[Entity] = []
     power_sensor = StandbyPowerSensor(
-        hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION)  # type: ignore
+        hass, rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
     )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
@@ -43,7 +43,7 @@ async def create_general_standby_sensors(
         sensor_config[CONF_NAME] = "All standby"
         source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
         energy_sensor = await create_energy_sensor(
-            hass, sensor_config, power_sensor, source_entity
+            hass, sensor_config, power_sensor, source_entity,
         )
         sensors.append(energy_sensor)
     return sensors
@@ -71,7 +71,7 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
         """Register state listeners."""
         await super().async_added_to_hass()
         async_dispatcher_connect(
-            self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE, self._recalculate
+            self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE, self._recalculate,
         )
 
     async def _recalculate(self) -> None:
@@ -79,7 +79,7 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
 
         if self.standby_sensors:
             self._attr_native_value = round(
-                sum(self.standby_sensors.values()), self._rounding_digits
+                sum(self.standby_sensors.values()), self._rounding_digits,
             )
         else:
             self._attr_native_value = None

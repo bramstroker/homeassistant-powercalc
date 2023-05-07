@@ -26,13 +26,13 @@ ALLOWED_DOMAINS = [fan.DOMAIN, light.DOMAIN, media_player.DOMAIN]
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_CALIBRATE): vol.All(
-            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")]
+            cv.ensure_list, [vol.Match("^[0-9]+ -> ([0-9]*[.])?[0-9]+$")],
         ),
         vol.Optional(CONF_MIN_POWER): vol.Coerce(float),
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
         vol.Optional(CONF_ATTRIBUTE): cv.string,
-    }
+    },
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         max_value = max_calibrate[0]
 
         _LOGGER.debug(
-            f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})"
+            f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})",
         )
 
         min_power = min_calibrate[1]
@@ -105,7 +105,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER)))  # type: ignore[arg-type]
+                (max_value, float(self._config.get(CONF_MAX_POWER))),  # type: ignore[arg-type]
             )
             return calibration_list
 
@@ -136,7 +136,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             value: int | None = entity_state.attributes.get(attribute)
             if value is None:
                 _LOGGER.warning(
-                    f"No {attribute} attribute for entity: {entity_state.entity_id}"
+                    f"No {attribute} attribute for entity: {entity_state.entity_id}",
                 )
                 return None
             if attribute == ATTR_BRIGHTNESS and value > 255:
@@ -154,7 +154,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return int(float(entity_state.state))
         except ValueError:
             _LOGGER.error(
-                f"Expecting state to be a number for entity: {entity_state.entity_id}"
+                f"Expecting state to be a number for entity: {entity_state.entity_id}",
             )
             return None
 
@@ -183,7 +183,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             if self._source_entity.domain not in ALLOWED_DOMAINS:
                 raise StrategyConfigurationError(
                     "Entity domain not supported for linear mode. Must be one of: {}, or use the calibrate option".format(
-                        ",".join(ALLOWED_DOMAINS)
+                        ",".join(ALLOWED_DOMAINS),
                     ),
                     "linear_unsupported_domain",
                 )
@@ -197,5 +197,5 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         max_power = self._config.get(CONF_MAX_POWER)
         if min_power and max_power and min_power >= max_power:
             raise StrategyConfigurationError(
-                "Max power cannot be lower than min power", "linear_min_higher_as_max"
+                "Max power cannot be lower than min power", "linear_min_higher_as_max",
             )

@@ -19,9 +19,9 @@ CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_POWER): vol.Any(vol.Coerce(float), cv.template),
         vol.Optional(CONF_STATES_POWER): vol.Schema(
-            {cv.string: vol.Any(vol.Coerce(float), cv.template)}
+            {cv.string: vol.Any(vol.Coerce(float), cv.template)},
         ),
-    }
+    },
 )
 
 STATE_BASED_ENTITY_DOMAINS = [
@@ -46,7 +46,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             # Lookup by state
             if entity_state.state in self._per_state_power:
                 return await evaluate_power(
-                    self._per_state_power.get(entity_state.state) or 0
+                    self._per_state_power.get(entity_state.state) or 0,
                 )
             else:
                 # Lookup by state attribute (attribute|value)
@@ -65,7 +65,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         """Validate correct setup of the strategy"""
         if self._power is None and self._per_state_power is None:
             raise StrategyConfigurationError(
-                "You must supply one of 'states_power' or 'power'", "fixed_mandatory"
+                "You must supply one of 'states_power' or 'power'", "fixed_mandatory",
             )
 
         if (

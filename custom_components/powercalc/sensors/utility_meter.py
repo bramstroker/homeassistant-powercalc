@@ -64,7 +64,7 @@ async def create_utility_meters(
         if isinstance(energy_sensor, RealEnergySensor) and unique_id:
             entity_registry = er.async_get(hass)
             existing_entity_id = entity_registry.async_get_entity_id(
-                domain=SENSOR_DOMAIN, platform=DOMAIN, unique_id=unique_id
+                domain=SENSOR_DOMAIN, platform=DOMAIN, unique_id=unique_id,
             )
             if existing_entity_id and hass.states.get(existing_entity_id):
                 continue
@@ -89,7 +89,7 @@ async def create_utility_meters(
                 t for t in list(tariffs) if t != GENERAL_TARIFF
             ]
             tariff_select = await create_tariff_select(
-                filtered_tariffs, hass, name, unique_id
+                filtered_tariffs, hass, name, unique_id,
             )
 
             for tariff in filtered_tariffs:
@@ -112,7 +112,7 @@ async def create_utility_meters(
 
 
 async def create_tariff_select(
-    tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None
+    tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None,
 ) -> TariffSelect:
     """Create tariff selection entity"""
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")

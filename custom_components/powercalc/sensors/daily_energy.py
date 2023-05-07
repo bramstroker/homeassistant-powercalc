@@ -57,14 +57,14 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
         vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
-            [ENERGY_KILO_WATT_HOUR, POWER_WATT]
+            [ENERGY_KILO_WATT_HOUR, POWER_WATT],
         ),
         vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
         vol.Optional(CONF_START_TIME): cv.time,
         vol.Optional(
-            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY
+            CONF_UPDATE_FREQUENCY, default=DEFAULT_DAILY_UPDATE_FREQUENCY,
         ): vol.Coerce(int),
-    }
+    },
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -78,11 +78,11 @@ async def create_daily_fixed_energy_sensor(
     mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
 
     name = generate_energy_sensor_name(
-        sensor_config, sensor_config.get(CONF_NAME), source_entity
+        sensor_config, sensor_config.get(CONF_NAME), source_entity,
     )
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or None
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, unique_id=unique_id, source_entity=source_entity
+        hass, sensor_config, unique_id=unique_id, source_entity=source_entity,
     )
 
     _LOGGER.debug(
@@ -114,7 +114,7 @@ async def create_daily_fixed_energy_sensor(
 
 
 async def create_daily_fixed_energy_power_sensor(
-    hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity
+    hass: HomeAssistant, sensor_config: dict, source_entity: SourceEntity,
 ) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
@@ -196,7 +196,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                 self._state = Decimal(state.state)
             except decimal.DecimalException:
                 _LOGGER.warning(
-                    f"{self.entity_id}: Cannot restore state: {state.state}"
+                    f"{self.entity_id}: Cannot restore state: {state.state}",
                 )
                 self._state = Decimal(0)
             self._last_updated = state.last_changed.timestamp()
@@ -214,13 +214,13 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             if delta > 0:
                 self._state = self._state + delta
                 _LOGGER.debug(
-                    f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}"
+                    f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}",
                 )
                 self.async_schedule_update_ha_state()
                 self._last_updated = dt_util.now().timestamp()
 
         self._update_timer_removal = async_track_time_interval(
-            self.hass, refresh, timedelta(seconds=self._update_frequency)
+            self.hass, refresh, timedelta(seconds=self._update_frequency),
         )
 
     def calculate_delta(self, elapsed_seconds: int = 0) -> Decimal:

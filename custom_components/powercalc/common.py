@@ -39,7 +39,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     if entity_id == DUMMY_ENTITY_ID:
         domain, object_id = split_entity_id(DUMMY_ENTITY_ID)
         return SourceEntity(
-            object_id=object_id, entity_id=DUMMY_ENTITY_ID, domain=domain
+            object_id=object_id, entity_id=DUMMY_ENTITY_ID, domain=domain,
         )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
@@ -63,7 +63,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         unique_id = entity_entry.unique_id
         if entity_entry.capabilities:
             supported_color_modes = entity_entry.capabilities.get(  # type: ignore[assignment]
-                ATTR_SUPPORTED_COLOR_MODES
+                ATTR_SUPPORTED_COLOR_MODES,
             )
     else:
         source_entity_name = source_object_id.replace("_", " ")
@@ -109,7 +109,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
 
     if CONF_CREATE_ENERGY_SENSOR not in merged_config:
         merged_config[CONF_CREATE_ENERGY_SENSOR] = merged_config.get(
-            CONF_CREATE_ENERGY_SENSORS
+            CONF_CREATE_ENERGY_SENSORS,
         )
 
     if (
@@ -124,7 +124,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
         and CONF_ENTITY_ID not in merged_config
     ):
         raise SensorConfigurationError(
-            "You must supply an entity_id in the configuration, see the README"
+            "You must supply an entity_id in the configuration, see the README",
         )
 
     return merged_config

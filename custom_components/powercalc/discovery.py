@@ -37,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def autodiscover_model(
-    hass: HomeAssistant, entity_entry: er.RegistryEntry | None
+    hass: HomeAssistant, entity_entry: er.RegistryEntry | None,
 ) -> ModelInfo | None:
     """Try to auto discover manufacturer and model from the known device information"""
     if not entity_entry or not entity_entry.device_id:
@@ -80,7 +80,7 @@ async def autodiscover_model(
 
 
 async def has_manufacturer_and_model_information(
-    hass: HomeAssistant, entity_entry: er.RegistryEntry
+    hass: HomeAssistant, entity_entry: er.RegistryEntry,
 ) -> bool:
     """See if we have enough information in device registry to automatically setup the power sensor"""
     if entity_entry.device_id is None:
@@ -122,7 +122,7 @@ class DiscoveryManager:
                 continue
 
             source_entity = await create_source_entity(
-                entity_entry.entity_id, self.hass
+                entity_entry.entity_id, self.hass,
             )
 
             if (
@@ -147,7 +147,7 @@ class DiscoveryManager:
 
             try:
                 power_profile = await get_power_profile(
-                    self.hass, {}, model_info=model_info
+                    self.hass, {}, model_info=model_info,
                 )
             except ModelNotSupportedError:
                 _LOGGER.debug(
@@ -157,7 +157,7 @@ class DiscoveryManager:
                 continue
 
             if power_profile and not power_profile.is_entity_domain_supported(
-                source_entity
+                source_entity,
             ):
                 continue
 
@@ -205,7 +205,7 @@ class DiscoveryManager:
         ]
         if existing_entries:
             _LOGGER.debug(
-                f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery"
+                f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery",
             )
             return
 
@@ -239,8 +239,8 @@ class DiscoveryManager:
             }
             self.hass.async_create_task(
                 discovery.async_load_platform(
-                    self.hass, SENSOR_DOMAIN, DOMAIN, discovery_info, self.ha_config
-                )
+                    self.hass, SENSOR_DOMAIN, DOMAIN, discovery_info, self.ha_config,
+                ),
             )
 
     def _is_user_configured(self, entity_id: str) -> bool:
@@ -276,7 +276,7 @@ class DiscoveryManager:
                 entry.data.get(CONF_ENTITY_ID)
                 for entry in self.hass.config_entries.async_entries(DOMAIN)
                 if entry.source == SOURCE_USER
-            ]
+            ],
         )
 
         return entities

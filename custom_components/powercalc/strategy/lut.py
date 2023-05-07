@@ -43,7 +43,7 @@ class LutRegistry:
         self._lookup_dictionaries: dict[str, dict] = {}
 
     async def get_lookup_dictionary(
-        self, power_profile: PowerProfile, color_mode: ColorMode
+        self, power_profile: PowerProfile, color_mode: ColorMode,
     ) -> LookupDictType:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}_{power_profile.sub_profile}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
@@ -59,7 +59,7 @@ class LutRegistry:
                 for row in csv_reader:
                     if color_mode == ColorMode.HS:
                         lookup_dict[int(row[0])][int(row[1])][int(row[2])] = float(
-                            row[3]
+                            row[3],
                         )
                     elif color_mode == ColorMode.COLOR_TEMP:
                         lookup_dict[int(row[0])][int(row[1])] = float(row[2])
@@ -123,7 +123,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
-                self._profile, color_mode
+                self._profile, color_mode,
             )
         except LutFileNotFoundError:
             _LOGGER.error(
@@ -166,7 +166,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return power
 
     def lookup_power(
-        self, lookup_table: LookupDictType, light_setting: LightSetting
+        self, lookup_table: LookupDictType, light_setting: LightSetting,
     ) -> float:
         brightness = light_setting.brightness
         brightness_table = lookup_table.get(brightness)
@@ -182,23 +182,23 @@ class LutStrategy(PowerCalculationStrategyInterface):
         ]
         power_range = [
             self.lookup_power_for_brightness(
-                lookup_table[brightness_range[0]], light_setting
+                lookup_table[brightness_range[0]], light_setting,
             ),
             self.lookup_power_for_brightness(
-                lookup_table[brightness_range[1]], light_setting
+                lookup_table[brightness_range[1]], light_setting,
             ),
         ]
         return float(np.interp(brightness, brightness_range, power_range))
 
     def lookup_power_for_brightness(
-        self, lut_value: LookupDictType | float, light_setting: LightSetting
+        self, lut_value: LookupDictType | float, light_setting: LightSetting,
     ) -> float:
         if light_setting.color_mode == ColorMode.BRIGHTNESS:
             return lut_value  # type: ignore
 
         if not isinstance(lut_value, dict):
             _LOGGER.warning(
-                "Cannot calculate power for LutStrategy, expecting a dictionary"
+                "Cannot calculate power for LutStrategy, expecting a dictionary",
             )
             return 0
 
@@ -223,7 +223,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return int(last_key)
 
         return max(
-            (k for k in lookup_dict.keys() if int(k) <= int(search_key)), default=[*keys][0]
+            (k for k in lookup_dict.keys() if int(k) <= int(search_key)), default=[*keys][0],
         )
 
     @staticmethod
@@ -238,7 +238,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
     async def validate_config(self) -> None:
         if self._source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError(
-                "Only light entities can use the LUT mode", "lut_unsupported_color_mode"
+                "Only light entities can use the LUT mode", "lut_unsupported_color_mode",
             )
 
         color_modes = self._source_entity.supported_color_modes
@@ -248,7 +248,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(
-                        self._profile, color_mode
+                        self._profile, color_mode,
                     )
                 except LutFileNotFoundError:
                     raise ModelNotSupportedError(  # noqa: B904
