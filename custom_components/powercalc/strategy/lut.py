@@ -24,7 +24,11 @@ from homeassistant.components.light import (
 from homeassistant.core import State
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.errors import LutFileNotFoundError, ModelNotSupportedError, StrategyConfigurationError
+from custom_components.powercalc.errors import (
+    LutFileNotFoundError,
+    ModelNotSupportedError,
+    StrategyConfigurationError,
+)
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -44,7 +48,9 @@ class LutRegistry:
         self._lookup_dictionaries: dict[str, dict] = {}
 
     async def get_lookup_dictionary(
-        self, power_profile: PowerProfile, color_mode: ColorMode,
+        self,
+        power_profile: PowerProfile,
+        color_mode: ColorMode,
     ) -> LookupDictType:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}_{power_profile.sub_profile}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
@@ -124,7 +130,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
         try:
             lookup_table = await self._lut_registry.get_lookup_dictionary(
-                self._profile, color_mode,
+                self._profile,
+                color_mode,
             )
         except LutFileNotFoundError:
             _LOGGER.error(
@@ -167,7 +174,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return power
 
     def lookup_power(
-        self, lookup_table: LookupDictType, light_setting: LightSetting,
+        self,
+        lookup_table: LookupDictType,
+        light_setting: LightSetting,
     ) -> float:
         brightness = light_setting.brightness
         brightness_table = lookup_table.get(brightness)
@@ -183,16 +192,20 @@ class LutStrategy(PowerCalculationStrategyInterface):
         ]
         power_range = [
             self.lookup_power_for_brightness(
-                lookup_table[brightness_range[0]], light_setting,
+                lookup_table[brightness_range[0]],
+                light_setting,
             ),
             self.lookup_power_for_brightness(
-                lookup_table[brightness_range[1]], light_setting,
+                lookup_table[brightness_range[1]],
+                light_setting,
             ),
         ]
         return float(np.interp(brightness, brightness_range, power_range))
 
     def lookup_power_for_brightness(
-        self, lut_value: LookupDictType | float, light_setting: LightSetting,
+        self,
+        lut_value: LookupDictType | float,
+        light_setting: LightSetting,
     ) -> float:
         if light_setting.color_mode == ColorMode.BRIGHTNESS:
             return lut_value  # type: ignore
@@ -210,25 +223,34 @@ class LutStrategy(PowerCalculationStrategyInterface):
         return self.get_nearest(sat_values, light_setting.saturation or 0)  # type: ignore
 
     @staticmethod
-    def get_nearest(lookup_dict: LookupDictType, search_key: int) -> float | LookupDictType:
+    def get_nearest(
+        lookup_dict: LookupDictType, search_key: int
+    ) -> float | LookupDictType:
         return (
             lookup_dict.get(search_key)
-            or lookup_dict[min(lookup_dict.keys(), key=lambda key: abs(key - search_key))]
+            or lookup_dict[
+                min(lookup_dict.keys(), key=lambda key: abs(key - search_key))
+            ]
         )
 
     @staticmethod
-    def get_nearest_lower_brightness(lookup_dict: LookupDictType, search_key: int) -> int:
+    def get_nearest_lower_brightness(
+        lookup_dict: LookupDictType, search_key: int
+    ) -> int:
         keys = lookup_dict.keys()
         last_key = [*keys][-1]
         if last_key < search_key:
             return int(last_key)
 
         return max(
-            (k for k in lookup_dict if int(k) <= int(search_key)), default=[*keys][0],
+            (k for k in lookup_dict if int(k) <= int(search_key)),
+            default=[*keys][0],
         )
 
     @staticmethod
-    def get_nearest_higher_brightness(lookup_dict: LookupDictType, search_key: int) -> int:
+    def get_nearest_higher_brightness(
+        lookup_dict: LookupDictType, search_key: int
+    ) -> int:
         keys = lookup_dict.keys()
         first_key = [*keys][0]
         if first_key > search_key:
@@ -239,7 +261,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
     async def validate_config(self) -> None:
         if self._source_entity.domain != light.DOMAIN:
             raise StrategyConfigurationError(
-                "Only light entities can use the LUT mode", "lut_unsupported_color_mode",
+                "Only light entities can use the LUT mode",
+                "lut_unsupported_color_mode",
             )
 
         color_modes = self._source_entity.supported_color_modes
@@ -249,7 +272,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(
-                        self._profile, color_mode,
+                        self._profile,
+                        color_mode,
                     )
                 except LutFileNotFoundError:
                     raise ModelNotSupportedError(  # noqa: B904

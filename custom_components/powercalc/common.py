@@ -38,7 +38,9 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     if entity_id == DUMMY_ENTITY_ID:
         domain, object_id = split_entity_id(DUMMY_ENTITY_ID)
         return SourceEntity(
-            object_id=object_id, entity_id=DUMMY_ENTITY_ID, domain=domain,
+            object_id=object_id,
+            entity_id=DUMMY_ENTITY_ID,
+            domain=domain,
         )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
@@ -47,7 +49,11 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     entity_entry = entity_registry.async_get(entity_id)
 
     dev = dr.async_get(hass)
-    device_entry = dev.async_get(entity_entry.device_id) if entity_entry and entity_entry.device_id else None
+    device_entry = (
+        dev.async_get(entity_entry.device_id)
+        if entity_entry and entity_entry.device_id
+        else None
+    )
 
     unique_id = None
     supported_color_modes: list[ColorMode] = []

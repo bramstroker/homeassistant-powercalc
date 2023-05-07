@@ -93,7 +93,9 @@ class ProfileLibrary:
         return sorted(models)
 
     async def get_profile(
-        self, model_info: ModelInfo, custom_directory: str | None = None,
+        self,
+        model_info: ModelInfo,
+        custom_directory: str | None = None,
     ) -> PowerProfile | None:
         """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
@@ -121,7 +123,8 @@ class ProfileLibrary:
         return profile
 
     async def get_profiles_by_manufacturer(
-        self, manufacturer: str,
+        self,
+        manufacturer: str,
     ) -> list[PowerProfile]:
         """Lazy loads a list of power profiles per manufacturer.
 
@@ -158,7 +161,9 @@ class ProfileLibrary:
         return profiles
 
     async def _create_power_profile(
-        self, model_info: ModelInfo, directory: str,
+        self,
+        model_info: ModelInfo,
+        directory: str,
     ) -> PowerProfile | None:
         """Create a power profile object from the model JSON data."""
         model_json_path = os.path.join(directory, "model.json")

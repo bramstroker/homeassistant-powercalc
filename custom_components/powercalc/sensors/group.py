@@ -8,14 +8,14 @@ from decimal import Decimal, DecimalException
 from typing import Any
 
 import homeassistant.util.dt as dt_util
+from homeassistant.components.sensor import ATTR_STATE_CLASS
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
-    ATTR_STATE_CLASS,
     RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -107,7 +107,9 @@ async def create_group_sensors(
         filters = []
 
     def _get_filtered_entity_ids_by_class(
-        all_entities: list, default_filters: list[Callable], class_name: Any,
+        all_entities: list,
+        default_filters: list[Callable],
+        class_name: Any,
     ) -> list[str]:
         filter_list = default_filters.copy()
         filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
@@ -124,21 +126,32 @@ async def create_group_sensors(
 
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
     power_sensor = create_grouped_power_sensor(
-        hass, group_name, sensor_config, set(power_sensor_ids),
+        hass,
+        group_name,
+        sensor_config,
+        set(power_sensor_ids),
     )
     group_sensors.append(power_sensor)
 
     energy_sensor_ids = _get_filtered_entity_ids_by_class(
-        entities, filters, EnergySensor,
+        entities,
+        filters,
+        EnergySensor,
     )
     energy_sensor = create_grouped_energy_sensor(
-        hass, group_name, sensor_config, set(energy_sensor_ids),
+        hass,
+        group_name,
+        sensor_config,
+        set(energy_sensor_ids),
     )
     group_sensors.append(energy_sensor)
 
     group_sensors.extend(
         await create_utility_meters(
-            hass, energy_sensor, sensor_config, net_consumption=True,
+            hass,
+            energy_sensor,
+            sensor_config,
+            net_consumption=True,
         ),
     )
 
@@ -146,7 +159,9 @@ async def create_group_sensors(
 
 
 async def create_group_sensors_from_config_entry(
-    hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict,
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    sensor_config: dict,
 ) -> list[SensorEntity]:
     """Create group sensors based on a config_entry."""
     group_sensors: list[SensorEntity] = []
@@ -161,7 +176,10 @@ async def create_group_sensors_from_config_entry(
     )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
-            hass, group_name, sensor_config, power_sensor_ids,
+            hass,
+            group_name,
+            sensor_config,
+            power_sensor_ids,
         )
         group_sensors.append(power_sensor)
 
@@ -170,13 +188,19 @@ async def create_group_sensors_from_config_entry(
     )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
-            hass, group_name, sensor_config, energy_sensor_ids,
+            hass,
+            group_name,
+            sensor_config,
+            energy_sensor_ids,
         )
         group_sensors.append(energy_sensor)
 
         group_sensors.extend(
             await create_utility_meters(
-                hass, energy_sensor, sensor_config, net_consumption=True,
+                hass,
+                energy_sensor,
+                sensor_config,
+                net_consumption=True,
             ),
         )
 
@@ -184,7 +208,9 @@ async def create_group_sensors_from_config_entry(
 
 
 async def create_domain_group_sensor(
-    hass: HomeAssistant, discovery_info: DiscoveryInfoType, config: ConfigType,
+    hass: HomeAssistant,
+    discovery_info: DiscoveryInfoType,
+    config: ConfigType,
 ) -> list[Entity]:
     domain = discovery_info[CONF_DOMAIN]
     sensor_config = config.copy()
@@ -192,12 +218,16 @@ async def create_domain_group_sensor(
         CONF_UNIQUE_ID
     ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
     return await create_group_sensors(
-        f"All {domain}", sensor_config, discovery_info[CONF_ENTITIES], hass,
+        f"All {domain}",
+        sensor_config,
+        discovery_info[CONF_ENTITIES],
+        hass,
     )
 
 
 async def remove_power_sensor_from_associated_groups(
-    hass: HomeAssistant, config_entry: ConfigEntry,
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
     """When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to."""
     group_entries = [
@@ -220,7 +250,8 @@ async def remove_power_sensor_from_associated_groups(
 
 
 async def remove_group_from_power_sensor_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry,
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
     """When the user removes a group config entry we need to update all the virtual power sensors which reference this group."""
     entries_to_update = [
@@ -240,7 +271,8 @@ async def remove_group_from_power_sensor_entry(
 
 
 async def add_to_associated_group(
-    hass: HomeAssistant, config_entry: ConfigEntry,
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
 ) -> ConfigEntry | None:
     """When the user has set a group on a virtual power config entry,
     we need to add this config entry to the group members sensors and update the group.
@@ -351,7 +383,10 @@ def create_grouped_power_sensor(
     name = generate_power_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or sensor_config.get(group_name)
     entity_id = generate_power_sensor_entity_id(
-        hass, sensor_config, name=group_name, unique_id=unique_id,
+        hass,
+        sensor_config,
+        name=group_name,
+        unique_id=unique_id,
     )
 
     _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
@@ -380,7 +415,10 @@ def create_grouped_energy_sensor(
     if unique_id:
         energy_unique_id = f"{unique_id}_energy"
     entity_id = generate_energy_sensor_entity_id(
-        hass, sensor_config, name=group_name, unique_id=energy_unique_id,
+        hass,
+        sensor_config,
+        name=group_name,
+        unique_id=energy_unique_id,
     )
 
     _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
@@ -437,11 +475,13 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             try:
                 if last_sensor_state and last_sensor_state.native_value:
                     self._attr_native_value = round(
-                        Decimal(last_sensor_state.native_value), self._rounding_digits,  # type: ignore
+                        Decimal(last_sensor_state.native_value),
+                        self._rounding_digits,  # type: ignore
                     )
                 elif last_state:
                     self._attr_native_value = round(
-                        Decimal(last_state.state), self._rounding_digits,
+                        Decimal(last_state.state),
+                        self._rounding_digits,
                     )
                 _LOGGER.debug(
                     f"{self.entity_id}: Restoring state: {self._attr_native_value}",
@@ -537,7 +577,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                 else PowerConverter
             )
             value = unit_converter.convert(
-                value, unit_of_measurement, self._attr_native_unit_of_measurement,
+                value,
+                unit_of_measurement,
+                self._attr_native_unit_of_measurement,
             )
         return Decimal(value)
 
@@ -576,7 +618,12 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         unique_id: str | None = None,
     ) -> None:
         super().__init__(
-            name, entities, entity_id, sensor_config, rounding_digits, unique_id,
+            name,
+            entities,
+            entity_id,
+            sensor_config,
+            rounding_digits,
+            unique_id,
         )
         unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
         if unit_prefix == UnitPrefix.KILO:
@@ -601,7 +648,8 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
             if self._prev_state_store:
                 self._prev_state_store.set_entity_state(
-                    entity_id, State(entity_id, "0.00"),
+                    entity_id,
+                    State(entity_id, "0.00"),
                 )
         self._attr_native_value = 0
         self._attr_last_reset = dt_util.utcnow()
@@ -624,7 +672,8 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     cur_state_value if self._attr_native_value else Decimal(0)
                 )
             self._prev_state_store.set_entity_state(
-                entity_state.entity_id, entity_state,
+                entity_state.entity_id,
+                entity_state,
             )
 
             delta = cur_state_value - prev_state_value
@@ -666,7 +715,10 @@ class PreviousStateStore:
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.store: Store = Store(
-            hass, STORAGE_VERSION, STORAGE_KEY, encoder=JSONEncoder,
+            hass,
+            STORAGE_VERSION,
+            STORAGE_KEY,
+            encoder=JSONEncoder,
         )
         self.states: dict[str, State] = {}
         self.hass = hass
@@ -706,5 +758,6 @@ class PreviousStateStore:
 
         # Dump states when stopping hass
         self.hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STOP, _async_dump_states_at_stop,
+            EVENT_HOMEASSISTANT_STOP,
+            _async_dump_states_at_stop,
         )

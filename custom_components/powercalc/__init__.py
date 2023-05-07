@@ -87,45 +87,55 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
             cv.deprecated(
-                CONF_SCAN_INTERVAL, replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
+                CONF_SCAN_INTERVAL,
+                replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
             ),
             vol.Schema(
                 {
                     vol.Optional(
-                        CONF_FORCE_UPDATE_FREQUENCY, default=DEFAULT_UPDATE_FREQUENCY,
+                        CONF_FORCE_UPDATE_FREQUENCY,
+                        default=DEFAULT_UPDATE_FREQUENCY,
                     ): cv.time_period,
                     vol.Optional(
-                        CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN,
+                        CONF_POWER_SENSOR_NAMING,
+                        default=DEFAULT_POWER_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
                         CONF_POWER_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_POWER_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY,
+                        CONF_POWER_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN,
+                        CONF_ENERGY_SENSOR_NAMING,
+                        default=DEFAULT_ENERGY_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
                         CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY,
+                        CONF_ENERGY_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
-                        CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False,
+                        CONF_DISABLE_EXTENDED_ATTRIBUTES,
+                        default=False,
                     ): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string],
+                        cv.ensure_list,
+                        [cv.string],
                     ),
                     vol.Optional(
-                        CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES,
+                        CONF_UTILITY_METER_TYPES,
+                        default=DEFAULT_UTILITY_METER_TYPES,
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                     vol.Optional(
-                        CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET,
+                        CONF_UTILITY_METER_OFFSET,
+                        default=DEFAULT_OFFSET,
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD,
@@ -140,10 +150,12 @@ CONFIG_SCHEMA = vol.Schema(
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_UNIT_PREFIX, default=UnitPrefix.KILO,
+                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
+                        default=UnitPrefix.KILO,
                     ): vol.In([cls.value for cls in UnitPrefix]),
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string],
+                        cv.ensure_list,
+                        [cv.string],
                     ),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
                     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
@@ -251,7 +263,8 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS,
+        config_entry,
+        PLATFORMS,
     )
 
     if unload_ok:
@@ -271,7 +284,8 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.VIRTUAL_POWER:
         updated_entries = await remove_power_sensor_from_associated_groups(
-            hass, config_entry,
+            hass,
+            config_entry,
         )
     if sensor_type == SensorType.GROUP:
         updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
@@ -299,7 +313,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 
 async def create_domain_groups(
-    hass: HomeAssistant, global_config: ConfigType, domains: list[str],
+    hass: HomeAssistant,
+    global_config: ConfigType,
+    domains: list[str],
 ) -> None:
     """Create group sensors aggregating all power sensors from given domains."""
     _LOGGER.debug("Setting up domain based group sensors..")
@@ -326,7 +342,10 @@ async def create_domain_groups(
 
 
 def _notify_message(
-    hass: HomeAssistant, notification_id: str, title: str, message: str,
+    hass: HomeAssistant,
+    notification_id: str,
+    title: str,
+    message: str,
 ) -> None:  # pragma: no cover
     """Notify user with persistent notification."""
     hass.async_create_task(

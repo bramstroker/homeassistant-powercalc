@@ -71,11 +71,20 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.powercalc.discovery import autodiscover_model
-from custom_components.powercalc.errors import ModelNotSupportedError, StrategyConfigurationError, UnsupportedStrategyError
+from custom_components.powercalc.errors import (
+    ModelNotSupportedError,
+    StrategyConfigurationError,
+    UnsupportedStrategyError,
+)
 from custom_components.powercalc.power_profile.factory import get_power_profile
-from custom_components.powercalc.power_profile.power_profile import PowerProfile, SubProfileSelector
+from custom_components.powercalc.power_profile.power_profile import (
+    PowerProfile,
+    SubProfileSelector,
+)
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.strategy.strategy_interface import (
+    PowerCalculationStrategyInterface,
+)
 
 from .abstract import (
     BaseEntity,
@@ -98,7 +107,10 @@ async def create_power_sensor(
         return await create_real_power_sensor(hass, sensor_config)
 
     return await create_virtual_power_sensor(
-        hass, sensor_config, source_entity, discovery_info,
+        hass,
+        sensor_config,
+        source_entity,
+        discovery_info,
     )
 
 
@@ -123,13 +135,17 @@ async def create_virtual_power_sensor(
             try:
                 model_info = await autodiscover_model(hass, source_entity.entity_entry)
                 power_profile = await get_power_profile(
-                    hass, sensor_config, model_info=model_info,
+                    hass,
+                    sensor_config,
+                    model_info=model_info,
                 )
                 # Check if this power profile supports automatic sub profile selection
                 # If so, trigger an initial selection of the sub profile bases on source entity state
                 if power_profile and power_profile.sub_profile_select:
                     sub_profile_selector = SubProfileSelector(
-                        hass, power_profile, source_entity,
+                        hass,
+                        power_profile,
+                        source_entity,
                     )
                     power_profile.select_sub_profile(
                         sub_profile_selector.select_sub_profile(
@@ -139,7 +155,9 @@ async def create_virtual_power_sensor(
             except ModelNotSupportedError as err:
                 if not is_fully_configured(sensor_config):
                     _LOGGER.error(
-                        "%s: Skipping sensor setup %s", source_entity.entity_id, err,
+                        "%s: Skipping sensor setup %s",
+                        source_entity.entity_id,
+                        err,
                     )
                     raise err
 
@@ -147,11 +165,16 @@ async def create_virtual_power_sensor(
             sensor_config.update(power_profile.sensor_config)
 
         name = generate_power_sensor_name(
-            sensor_config, sensor_config.get(CONF_NAME), source_entity,
+            sensor_config,
+            sensor_config.get(CONF_NAME),
+            source_entity,
         )
         unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
         entity_id = generate_power_sensor_entity_id(
-            hass, sensor_config, source_entity, unique_id=unique_id,
+            hass,
+            sensor_config,
+            source_entity,
+            unique_id=unique_id,
         )
         entity_category: str | None = (
             sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
@@ -163,7 +186,10 @@ async def create_virtual_power_sensor(
             DOMAIN
         ][DATA_CALCULATOR_FACTORY]
         calculation_strategy = calculation_strategy_factory.create(
-            sensor_config, strategy, power_profile, source_entity,
+            sensor_config,
+            strategy,
+            power_profile,
+            source_entity,
         )
         await calculation_strategy.validate_config()
     except (StrategyConfigurationError, UnsupportedStrategyError) as err:
@@ -229,7 +255,8 @@ async def create_virtual_power_sensor(
 
 
 async def create_real_power_sensor(
-    hass: HomeAssistant, sensor_config: dict,
+    hass: HomeAssistant,
+    sensor_config: dict,
 ) -> RealPowerSensor:
     """Create reference to an existing power sensor."""
     power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
@@ -263,7 +290,8 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
 
 
 def select_calculation_strategy(
-    config: ConfigType, power_profile: PowerProfile | None,
+    config: ConfigType,
+    power_profile: PowerProfile | None,
 ) -> CalculationStrategy:
     """Select the calculation strategy."""
     config_mode = config.get(CONF_MODE)
@@ -299,7 +327,6 @@ def is_fully_configured(config: ConfigType) -> bool:
 
 class PowerSensor(BaseEntity):
     """Class which all power sensors should extend from."""
-
 
 
 class VirtualPowerSensor(SensorEntity, PowerSensor):
@@ -399,14 +426,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if self._power_profile:
             self._sub_profile_selector = SubProfileSelector(
-                self.hass, self._power_profile, self._source_entity,
+                self.hass,
+                self._power_profile,
+                self._source_entity,
             )
             track_entities.extend(self._sub_profile_selector.get_tracking_entities())
 
         self._track_entities = track_entities
 
         async_track_state_change_event(
-            self.hass, track_entities, appliance_state_listener,
+            self.hass,
+            track_entities,
+            appliance_state_listener,
         )
 
         track_templates = [
@@ -431,7 +462,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async_track_time_interval(self.hass, async_update, self._update_frequency)
 
     async def _update_power_sensor(
-        self, trigger_entity_id: str, state: State | None,
+        self,
+        trigger_entity_id: str,
+        state: State | None,
     ) -> bool:
         """Update power sensor based on new dependant entity state."""
         self._standby_sensors.pop(self.entity_id, None)
@@ -557,7 +590,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self.async_write_ha_state()
 
             self._sleep_power_timer = async_call_later(
-                self.hass, delay, _update_sleep_power,  # type: ignore
+                self.hass,
+                delay,
+                _update_sleep_power,  # type: ignore
             )
 
         standby_power = self._standby_power
@@ -611,7 +646,10 @@ class RealPowerSensor(PowerSensor):
     """Contains a reference to an existing real power sensor entity."""
 
     def __init__(
-        self, entity_id: str, device_id: str | None = None, unique_id: str | None = None,
+        self,
+        entity_id: str,
+        device_id: str | None = None,
+        unique_id: str | None = None,
     ) -> None:
         self.entity_id = entity_id
         self._device_id = device_id

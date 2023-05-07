@@ -11,7 +11,11 @@ from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, OFF_STATES
+from custom_components.powercalc.const import (
+    CONF_POWER_FACTOR,
+    CONF_VOLTAGE,
+    OFF_STATES,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.helpers import evaluate_power
 
@@ -43,7 +47,11 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._estimated_current_entity: str | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        light_state = entity_state if entity_state.entity_id == self._light_entity.entity_id else self._hass.states.get(self._light_entity.entity_id)
+        light_state = (
+            entity_state
+            if entity_state.entity_id == self._light_entity.entity_id
+            else self._hass.states.get(self._light_entity.entity_id)
+        )
 
         if light_state.state in OFF_STATES and self._standby_power:
             return self._standby_power
@@ -71,7 +79,8 @@ class WledStrategy(PowerCalculationStrategyInterface):
                 estimated_current_entities = [
                     entity_entry.entity_id
                     for entity_entry in entity_registry.async_entries_for_device(
-                        entity_reg, device_id,
+                        entity_reg,
+                        device_id,
                     )
                     if (entity_entry.device_class or entity_entry.original_device_class)
                     == SensorDeviceClass.CURRENT

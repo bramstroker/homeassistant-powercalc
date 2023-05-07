@@ -520,13 +520,13 @@ class LightRunner(MeasurementRunner):
             inquirer.Confirm(
                 name="dummy_load",
                 message="Did you connect a dummy load? This can help to be able to measure standby power and low "
-                        "brightness levels correctly",
+                "brightness levels correctly",
                 default=False,
             ),
             inquirer.Confirm(
                 name="multiple_lights",
                 message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to "
-                        "be able to measure low currents.",
+                "be able to measure low currents.",
                 default=False,
             ),
             inquirer.Text(

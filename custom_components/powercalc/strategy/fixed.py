@@ -66,7 +66,8 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         """Validate correct setup of the strategy."""
         if self._power is None and self._per_state_power is None:
             raise StrategyConfigurationError(
-                "You must supply one of 'states_power' or 'power'", "fixed_mandatory",
+                "You must supply one of 'states_power' or 'power'",
+                "fixed_mandatory",
             )
 
         if (

@@ -15,7 +15,11 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_POWER, CalculationStrategy
-from custom_components.powercalc.errors import ModelNotSupportedError, PowercalcSetupError, UnsupportedStrategyError
+from custom_components.powercalc.errors import (
+    ModelNotSupportedError,
+    PowercalcSetupError,
+    UnsupportedStrategyError,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -320,7 +324,8 @@ class EntityStateMatcher(SubProfileMatcher):
         self._hass = hass
         if source_entity:
             entity_id = entity_id.replace(
-                "{{source_object_id}}", source_entity.object_id,
+                "{{source_object_id}}",
+                source_entity.object_id,
             )
         self._entity_id = entity_id
         self._mapping = mapping
