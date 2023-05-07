@@ -215,7 +215,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         await discovery_manager.start_discovery()
 
     domain_groups = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
-    if domain_groups:
+    if domain_groups and isinstance(domain_groups, list):
 
         async def _create_domain_groups(event: None) -> None:
             await create_domain_groups(
