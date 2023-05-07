@@ -103,7 +103,7 @@ class DiscoveryManager:
     When entities are found it will dispatch a discovery flow, so the user can add them to their HA instance
     """
 
-    def __init__(self, hass: HomeAssistant, ha_config: ConfigType):
+    def __init__(self, hass: HomeAssistant, ha_config: ConfigType) -> None:
         self.hass = hass
         self.ha_config = ha_config
         self.manually_configured_entities: list[str] | None = None

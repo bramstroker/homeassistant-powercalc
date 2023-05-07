@@ -37,7 +37,7 @@ class IncludeEntityFilter(Protocol):
 
 
 class DomainFilter(IncludeEntityFilter):
-    def __init__(self, domain: str):
+    def __init__(self, domain: str) -> None:
         self.domain: str = domain
 
     def is_valid(self, entity: RegistryEntry) -> bool:
@@ -50,7 +50,7 @@ class NullFilter(IncludeEntityFilter):
 
 
 class CompositeFilter(IncludeEntityFilter):
-    def __init__(self, filters: list[IncludeEntityFilter], operator: FilterOperator):
+    def __init__(self, filters: list[IncludeEntityFilter], operator: FilterOperator) -> None:
         self.filters = filters
         self.operator = operator
 

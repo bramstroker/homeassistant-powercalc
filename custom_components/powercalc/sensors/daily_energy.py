@@ -157,7 +157,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         on_time: timedelta | None = None,
         start_time: time | None = None,
         rounding_digits: int = 4,
-    ):
+    ) -> None:
         self._hass = hass
         self._attr_name = name
         self._state: Decimal = Decimal(0)

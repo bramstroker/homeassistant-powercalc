@@ -41,7 +41,7 @@ class PowerProfile:
         model: str,
         directory: str,
         json_data: ConfigType,
-    ):
+    ) -> None:
         self._manufacturer = manufacturer
         self._model = model.replace("#slash#", "/")
         self._hass = hass
@@ -244,7 +244,7 @@ class SubProfileSelector:
         hass: HomeAssistant,
         power_profile: PowerProfile,
         source_entity: SourceEntity | None = None,
-    ):
+    ) -> None:
         self._hass = hass
         self._power_profile = power_profile
         self._source_entity = source_entity
@@ -323,7 +323,7 @@ class EntityStateMatcher(SubProfileMatcher):
         source_entity: SourceEntity | None,
         entity_id: str,
         mapping: dict[str, str],
-    ):
+    ) -> None:
         self._hass = hass
         if source_entity:
             entity_id = entity_id.replace(
@@ -344,7 +344,7 @@ class EntityStateMatcher(SubProfileMatcher):
 
 
 class AttributeMatcher(SubProfileMatcher):
-    def __init__(self, attribute: str, mapping: dict[str, str]):
+    def __init__(self, attribute: str, mapping: dict[str, str]) -> None:
         self._attribute = attribute
         self._mapping = mapping
 
@@ -360,7 +360,7 @@ class AttributeMatcher(SubProfileMatcher):
 
 
 class EntityIdMatcher(SubProfileMatcher):
-    def __init__(self, pattern: str, profile: str):
+    def __init__(self, pattern: str, profile: str) -> None:
         self._pattern = pattern
         self._profile = profile
 

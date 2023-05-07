@@ -417,7 +417,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         sensor_config: dict[str, Any],
         rounding_digits: int,
         unique_id: str | None = None,
-    ):
+    ) -> None:
         self._attr_name = name
         self._entities = entities
         if not sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
@@ -583,7 +583,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         sensor_config: dict[str, Any],
         rounding_digits: int,
         unique_id: str | None = None,
-    ):
+    ) -> None:
         super().__init__(
             name, entities, entity_id, sensor_config, rounding_digits, unique_id
         )
@@ -677,7 +677,7 @@ class PreviousStateStore:
 
         return instance
 
-    def __init__(self, hass: HomeAssistant):
+    def __init__(self, hass: HomeAssistant) -> None:
         self.store: Store = Store(
             hass, STORAGE_VERSION, STORAGE_KEY, encoder=JSONEncoder
         )

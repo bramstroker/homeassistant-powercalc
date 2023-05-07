@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
-    def __init__(self, hass: HomeAssistant):
+    def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
         self._data_directories: list[str] = [
             d

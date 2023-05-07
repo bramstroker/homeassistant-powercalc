@@ -16,7 +16,7 @@ class SensorConfigurationError(PowercalcSetupError):
 class SensorAlreadyConfiguredError(SensorConfigurationError):
     """Raised when power sensors has already been configured before for the entity"""
 
-    def __init__(self, source_entity_id: str, existing_entities: list | None = None):
+    def __init__(self, source_entity_id: str, existing_entities: list | None = None) -> None:
         if existing_entities is None:
             existing_entities = []
         self.existing_entities = existing_entities
@@ -32,7 +32,7 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
 class StrategyConfigurationError(PowercalcSetupError):
     """Raised when strategy is not setup correctly."""
 
-    def __init__(self, message: str, config_flow_trans_key: str | None = None):
+    def __init__(self, message: str, config_flow_trans_key: str | None = None) -> None:
         super().__init__(message)
         self._config_flow_trans_key = config_flow_trans_key
 
