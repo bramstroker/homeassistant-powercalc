@@ -576,7 +576,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_power_on = Decimal(self._power_profile.standby_power_on)
 
     async def calculate_standby_power(self, state: State) -> Decimal:
-        """Calculate the power of the device in OFF state"""
+        """Calculate the power of the device in OFF state."""
         sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
