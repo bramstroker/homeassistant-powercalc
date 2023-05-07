@@ -178,7 +178,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._update_timer_removal: Callable[[], None] | None = None
 
     def set_native_unit_of_measurement(self) -> None:
-        """Set the native unit of measurement"""
+        """Set the native unit of measurement."""
         unit_prefix = (
             self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
         )
@@ -191,7 +191,6 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     async def async_added_to_hass(self) -> None:
         """Handle entity which will be added."""
-
         if state := await self.async_get_last_state():
             try:
                 self._state = Decimal(state.state)

@@ -49,8 +49,7 @@ async def create_energy_sensor(
     power_sensor: PowerSensor,
     source_entity: SourceEntity,
 ) -> EnergySensor:
-    """Create the energy sensor entity"""
-
+    """Create the energy sensor entity."""
     # User specified an existing energy sensor with "energy_sensor_id" option. Just return that one
     if CONF_ENERGY_SENSOR_ID in sensor_config:
         ent_reg = er.async_get(hass)
@@ -118,8 +117,7 @@ async def create_energy_sensor(
 def find_related_real_energy_sensor(
     hass: HomeAssistant, power_sensor: RealPowerSensor,
 ) -> RealEnergySensor | None:
-    """See if a corresponding energy sensor exists in the HA installation for the power sensor"""
-
+    """See if a corresponding energy sensor exists in the HA installation for the power sensor."""
     if not power_sensor.device_id:
         return None
 
@@ -139,11 +137,11 @@ def find_related_real_energy_sensor(
 
 
 class EnergySensor(BaseEntity):
-    """Class which all energy sensors should extend from"""
+    """Class which all energy sensors should extend from."""
 
 
 class VirtualEnergySensor(IntegrationSensor, EnergySensor):
-    """Virtual energy sensor, totalling kWh"""
+    """Virtual energy sensor, totalling kWh."""
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
 
@@ -207,7 +205,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
 
 class RealEnergySensor(EnergySensor):
-    """Contains a reference to an existing energy sensor entity"""
+    """Contains a reference to an existing energy sensor entity."""
 
     def __init__(self, entity_entry: er.RegistryEntry) -> None:
         self._entity_entry = entity_entry

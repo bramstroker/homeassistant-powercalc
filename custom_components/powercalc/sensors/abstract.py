@@ -26,7 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class BaseEntity(Entity):
     async def async_added_to_hass(self) -> None:
-        """Attach the entity to same device as the source entity"""
+        """Attach the entity to same device as the source entity."""
         entity_reg = er.async_get(self.hass)
         entity_entry = entity_reg.async_get(self.entity_id)
         if entity_entry is None or not hasattr(self, "source_device_id"):
@@ -48,7 +48,7 @@ def generate_power_sensor_name(
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
-    """Generates the name to use for a power sensor"""
+    """Generates the name to use for a power sensor."""
     return _generate_sensor_name(
         sensor_config,
         CONF_POWER_SENSOR_NAMING,
@@ -63,7 +63,7 @@ def generate_energy_sensor_name(
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
-    """Generates the name to use for an energy sensor"""
+    """Generates the name to use for an energy sensor."""
     return _generate_sensor_name(
         sensor_config,
         CONF_ENERGY_SENSOR_NAMING,
@@ -80,7 +80,7 @@ def _generate_sensor_name(
     name: str | None = None,
     source_entity: SourceEntity | None = None,
 ) -> str:
-    """Generates the name to use for a sensor"""
+    """Generates the name to use for a sensor."""
     if name is None and source_entity:
         name = source_entity.name
 
@@ -100,7 +100,7 @@ def generate_power_sensor_entity_id(
     name: str | None = None,
     unique_id: str | None = None,
 ) -> str:
-    """Generates the entity_id to use for a power sensor"""
+    """Generates the entity_id to use for a power sensor."""
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
     name_pattern = str(sensor_config.get(CONF_POWER_SENSOR_NAMING))
@@ -120,7 +120,7 @@ def generate_energy_sensor_entity_id(
     name: str | None = None,
     unique_id: str | None = None,
 ) -> str:
-    """Generates the entity_id to use for an energy sensor"""
+    """Generates the entity_id to use for an energy sensor."""
     if entity_id := get_entity_id_by_unique_id(hass, unique_id):
         return entity_id
     name_pattern = str(sensor_config.get(CONF_ENERGY_SENSOR_NAMING))

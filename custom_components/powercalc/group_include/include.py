@@ -77,7 +77,7 @@ def resolve_include_entities(
 def resolve_include_groups(
     hass: HomeAssistant, group_id: str,
 ) -> dict[str, entity_registry.RegistryEntry]:
-    """Get a listing of al entities in a given group"""
+    """Get a listing of al entities in a given group."""
     entity_reg = entity_registry.async_get(hass)
 
     domain = split_entity_id(group_id)[0]
@@ -96,9 +96,8 @@ def resolve_light_group_entities(
     group_id: str,
     resolved_entities: dict[str, entity_registry.RegistryEntry] | None = None,
 ) -> dict[str, entity_registry.RegistryEntry]:
-    """
-    Resolve all registry entries for a given light group.
-    When the light group has sub light groups, we will recursively walk these as well
+    """Resolve all registry entries for a given light group.
+    When the light group has sub light groups, we will recursively walk these as well.
     """
     if resolved_entities is None:
         resolved_entities = {}
@@ -132,7 +131,7 @@ def resolve_light_group_entities(
 def resolve_area_entities(
     hass: HomeAssistant, area_id_or_name: str,
 ) -> dict[str, entity_registry.RegistryEntry]:
-    """Get a listing of al entities in a given area"""
+    """Get a listing of al entities in a given area."""
     area_reg = area_registry.async_get(hass)
     area = area_reg.async_get_area(area_id_or_name)
     if area is None:

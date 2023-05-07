@@ -238,7 +238,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
@@ -302,7 +301,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 async def create_domain_groups(
     hass: HomeAssistant, global_config: ConfigType, domains: list[str],
 ) -> None:
-    """Create group sensors aggregating all power sensors from given domains"""
+    """Create group sensors aggregating all power sensors from given domains."""
     _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
@@ -329,7 +328,7 @@ async def create_domain_groups(
 def _notify_message(
     hass: HomeAssistant, notification_id: str, title: str, message: str,
 ) -> None:  # pragma: no cover
-    """Notify user with persistent notification"""
+    """Notify user with persistent notification."""
     hass.async_create_task(
         hass.services.async_call(
             domain="persistent_notification",

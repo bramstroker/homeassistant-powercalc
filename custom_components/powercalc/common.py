@@ -34,8 +34,7 @@ class SourceEntity(NamedTuple):
 
 
 async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
-    """Create object containing all information about the source entity"""
-
+    """Create object containing all information about the source entity."""
     if entity_id == DUMMY_ENTITY_ID:
         domain, object_id = split_entity_id(DUMMY_ENTITY_ID)
         return SourceEntity(
@@ -83,8 +82,7 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
 
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:
-    """Merges configuration from multiple levels (global, group, sensor) into a single dict"""
-
+    """Merges configuration from multiple levels (global, group, sensor) into a single dict."""
     exclude_from_merging = [
         CONF_NAME,
         CONF_ENTITY_ID,

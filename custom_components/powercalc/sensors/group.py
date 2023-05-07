@@ -103,7 +103,6 @@ async def create_group_sensors(
     filters: list[Callable] | None = None,
 ) -> list[Entity]:
     """Create grouped power and energy sensors."""
-
     if filters is None:
         filters = []
 
@@ -149,7 +148,7 @@ async def create_group_sensors(
 async def create_group_sensors_from_config_entry(
     hass: HomeAssistant, entry: ConfigEntry, sensor_config: dict,
 ) -> list[SensorEntity]:
-    """Create group sensors based on a config_entry"""
+    """Create group sensors based on a config_entry."""
     group_sensors: list[SensorEntity] = []
 
     group_name = entry.data.get(CONF_NAME)
@@ -200,9 +199,7 @@ async def create_domain_group_sensor(
 async def remove_power_sensor_from_associated_groups(
     hass: HomeAssistant, config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
-    """
-    When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to
-    """
+    """When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to."""
     group_entries = [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
@@ -225,9 +222,7 @@ async def remove_power_sensor_from_associated_groups(
 async def remove_group_from_power_sensor_entry(
     hass: HomeAssistant, config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
-    """
-    When the user removes a group config entry we need to update all the virtual power sensors which reference this group
-    """
+    """When the user removes a group config entry we need to update all the virtual power sensors which reference this group."""
     entries_to_update = [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
@@ -247,9 +242,8 @@ async def remove_group_from_power_sensor_entry(
 async def add_to_associated_group(
     hass: HomeAssistant, config_entry: ConfigEntry,
 ) -> ConfigEntry | None:
-    """
-    When the user has set a group on a virtual power config entry,
-    we need to add this config entry to the group members sensors and update the group
+    """When the user has set a group on a virtual power config entry,
+    we need to add this config entry to the group members sensors and update the group.
     """
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type != SensorType.VIRTUAL_POWER:
@@ -285,10 +279,7 @@ def resolve_entity_ids_recursively(
     device_class: SensorDeviceClass,
     resolved_ids: list[str] | None = None,
 ) -> list[str]:
-    """
-    Get all the entity id's for the current group and all the subgroups
-    """
-
+    """Get all the entity id's for the current group and all the subgroups."""
     if resolved_ids is None:
         resolved_ids = []
 
@@ -406,7 +397,7 @@ def create_grouped_energy_sensor(
 
 
 class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
-    """Base class for grouped sensors"""
+    """Base class for grouped sensors."""
 
     _attr_should_poll = False
 
@@ -465,16 +456,15 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
 
     async def async_will_remove_from_hass(self) -> None:
-        """
-        This will trigger when entity is about to be removed from HA
-        Unhide the entities, when they where hidden before
+        """This will trigger when entity is about to be removed from HA
+        Unhide the entities, when they where hidden before.
         """
         if self._sensor_config.get(CONF_HIDE_MEMBERS) is True:
             self._async_hide_members(False)
 
     @callback
     def _async_hide_members(self, hide: bool) -> None:
-        """Hide/unhide group members"""
+        """Hide/unhide group members."""
         registry = er.async_get(self.hass)
         for entity_id in self._entities:
             registry_entry = registry.async_get(entity_id)
@@ -490,7 +480,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     @callback
     def on_state_change(self, event: Event) -> None:
-        """Triggered when one of the group entities changes state"""
+        """Triggered when one of the group entities changes state."""
         if self.hass.state != CoreState.running:  # pragma: no cover
             return
 
@@ -534,7 +524,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.async_schedule_update_ha_state(True)
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
-        """Convert value of member entity state to match the unit of measurement of the group sensor"""
+        """Convert value of member entity state to match the unit of measurement of the group sensor."""
         value = float(state.state)
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if (
@@ -557,7 +547,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
-    """Grouped power sensor. Sums all values of underlying individual power sensors"""
+    """Grouped power sensor. Sums all values of underlying individual power sensors."""
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -571,7 +561,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
-    """Grouped energy sensor. Sums all values of underlying individual energy sensors"""
+    """Grouped energy sensor. Sums all values of underlying individual energy sensors."""
 
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_state_class = SensorStateClass.TOTAL
@@ -598,7 +588,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     @callback
     def async_reset(self) -> None:
-        """Reset the group sensor and underlying member sensor when supported"""
+        """Reset the group sensor and underlying member sensor when supported."""
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")
@@ -618,8 +608,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         self.async_write_ha_state()
 
     def calculate_new_state(self, member_states: list[State]) -> Decimal:
-        """
-        Calculate the new group energy sensor state
+        """Calculate the new group energy sensor state
         For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
         """
         group_sum = Decimal(self._attr_native_value) if self._attr_native_value else Decimal(0)  # type: ignore
@@ -683,11 +672,11 @@ class PreviousStateStore:
         self.hass = hass
 
     def get_entity_state(self, entity_id: str) -> State | None:
-        """Retrieve the previous state"""
+        """Retrieve the previous state."""
         return self.states.get(entity_id)
 
     def set_entity_state(self, entity_id: str, state: State) -> None:
-        """Set the state for an energy sensor"""
+        """Set the state for an energy sensor."""
         self.states[entity_id] = state
 
     async def persist_states(self) -> None:

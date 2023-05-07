@@ -35,9 +35,8 @@ class ProfileLibrary:
 
     @staticmethod
     def factory(hass: HomeAssistant) -> ProfileLibrary:  # type: ignore
-        """
-        Creates and loads the profile library
-        Makes sure it is only loaded once and instance is saved in hass data registry
+        """Creates and loads the profile library
+        Makes sure it is only loaded once and instance is saved in hass data registry.
         """
         if DOMAIN not in hass.data:
             hass.data[DOMAIN] = {}
@@ -50,12 +49,10 @@ class ProfileLibrary:
         return library
 
     def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
-        """
-        Get listing of available manufacturers
+        """Get listing of available manufacturers.
 
         @param entity_domain   Only return manufacturers providing profiles for a given domain
         """
-
         if self._manufacturer_device_types is None:
             with open(
                 os.path.join(BUILT_IN_DATA_DIRECTORY, "manufacturer_device_types.json"),
@@ -86,7 +83,7 @@ class ProfileLibrary:
         return sorted(manufacturers)
 
     def get_model_listing(self, manufacturer: str) -> list[str]:
-        """Get listing of available models for a given manufacturer"""
+        """Get listing of available models for a given manufacturer."""
         models: list[str] = []
         for data_dir in self._data_directories:
             manufacturer_dir = os.path.join(data_dir, manufacturer)
@@ -98,8 +95,7 @@ class ProfileLibrary:
     async def get_profile(
         self, model_info: ModelInfo, custom_directory: str | None = None,
     ) -> PowerProfile | None:
-        """Get a power profile for a given manufacturer and model"""
-
+        """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
         sub_profile = None
         if "/" in model_info.model:
@@ -127,15 +123,13 @@ class ProfileLibrary:
     async def get_profiles_by_manufacturer(
         self, manufacturer: str,
     ) -> list[PowerProfile]:
-        """
-        Lazy loads a list of power profiles per manufacturer
+        """Lazy loads a list of power profiles per manufacturer.
 
         Using the following lookup fallback mechanism:
          - check in user defined directory (config/powercalc-custom-models)
          - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
          - check in built-in directory (config/custom_components/powercalc/data)
         """
-
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
             manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
         manufacturer = manufacturer.lower()
@@ -166,7 +160,7 @@ class ProfileLibrary:
     async def _create_power_profile(
         self, model_info: ModelInfo, directory: str,
     ) -> PowerProfile | None:
-        """Create a power profile object from the model JSON data"""
+        """Create a power profile object from the model JSON data."""
         model_json_path = os.path.join(directory, "model.json")
         try:
             with open(model_json_path) as file:

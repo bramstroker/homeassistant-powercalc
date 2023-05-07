@@ -36,7 +36,7 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
         source_entity: SourceEntity,
     ) -> PowerCalculationStrategyInterface:
-        """Create instance of calculation strategy based on configuration"""
+        """Create instance of calculation strategy based on configuration."""
         if strategy == CalculationStrategy.LINEAR:
             return self._create_linear(source_entity, config, power_profile)
 
@@ -57,7 +57,7 @@ class PowerCalculatorStrategyFactory:
         config: dict,
         power_profile: PowerProfile | None,
     ) -> LinearStrategy:
-        """Create the linear strategy"""
+        """Create the linear strategy."""
         linear_config = config.get(CONF_LINEAR)
 
         if linear_config is None:
@@ -76,7 +76,7 @@ class PowerCalculatorStrategyFactory:
         config: dict,
         power_profile: PowerProfile | None,
     ) -> FixedStrategy:
-        """Create the fixed strategy"""
+        """Create the fixed strategy."""
         fixed_config = config.get(CONF_FIXED)
         if fixed_config is None:
             if power_profile and power_profile.fixed_mode_config:
@@ -101,7 +101,7 @@ class PowerCalculatorStrategyFactory:
     def _create_lut(
         self, source_entity: SourceEntity, power_profile: PowerProfile | None,
     ) -> LutStrategy:
-        """Create the lut strategy"""
+        """Create the lut strategy."""
         if power_profile is None:
             raise StrategyConfigurationError(
                 "You must supply a valid manufacturer and model to use the LUT mode",
@@ -110,8 +110,7 @@ class PowerCalculatorStrategyFactory:
         return LutStrategy(source_entity, self._lut_registry, power_profile)
 
     def _create_wled(self, source_entity: SourceEntity, config: dict) -> WledStrategy:
-        """Create the WLED strategy"""
-
+        """Create the WLED strategy."""
         if CONF_WLED not in config:
             raise StrategyConfigurationError("No WLED configuration supplied")
 

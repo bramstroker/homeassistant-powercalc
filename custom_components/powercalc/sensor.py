@@ -239,8 +239,7 @@ async def async_setup_platform(
         async_add_entities: AddEntitiesCallback,
         discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
-    """Setup sensors from YAML config sensor entries"""
-
+    """Setup sensors from YAML config sensor entries."""
     await _async_setup_entities(
         hass, config, async_add_entities, discovery_info=discovery_info,
     )
@@ -249,7 +248,7 @@ async def async_setup_platform(
 async def async_setup_entry(
         hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Setup sensors from config entry (GUI config flow)"""
+    """Setup sensors from config entry (GUI config flow)."""
     sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.GROUP:
@@ -283,8 +282,7 @@ async def _async_setup_entities(
         config_entry: ConfigEntry | None = None,
         discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
-    """Main routine to setup power/energy sensors from provided configuration"""
-
+    """Main routine to setup power/energy sensors from provided configuration."""
     register_entity_services()
 
     try:
@@ -323,8 +321,7 @@ async def _async_setup_entities(
 def save_entity_ids_on_config_entry(
         hass: HomeAssistant, config_entry: ConfigEntry, entities: EntitiesBucket,
 ) -> None:
-    """
-    Save the power and energy sensor entity_id's on the config entry
+    """Save the power and energy sensor entity_id's on the config entry
     We need this in group sensor logic to differentiate between energy sensor and utility meters.
     """
     power_entities = [
@@ -357,7 +354,7 @@ def save_entity_ids_on_config_entry(
 
 @callback
 def register_entity_services() -> None:
-    """Register the different entity services"""
+    """Register the different entity services."""
     platform = entity_platform.async_get_current_platform()
     platform.async_register_entity_service(
         SERVICE_RESET_ENERGY,
@@ -379,7 +376,7 @@ def register_entity_services() -> None:
 
 
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigType:
-    """Convert the config entry structure to the sensor config which we use to create the entities"""
+    """Convert the config entry structure to the sensor config which we use to create the entities."""
     sensor_config = dict(config_entry.data.copy())
 
     if sensor_config.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
@@ -443,8 +440,7 @@ async def create_sensors(
         config_entry: ConfigEntry | None = None,
         context: CreationContext | None = None,
 ) -> EntitiesBucket:
-    """Main routine to create all sensors (power, energy, utility, group) for a given entity"""
-
+    """Main routine to create all sensors (power, energy, utility, group) for a given entity."""
     if context is None:
         context = CreationContext(
             group=CONF_CREATE_GROUP in config, entity_config=config,
@@ -548,7 +544,6 @@ async def create_individual_sensors(
         discovery_info: DiscoveryInfoType | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
-
     if discovery_info:
         source_entity: SourceEntity = discovery_info.get(DISCOVERY_SOURCE_ENTITY)  # type: ignore
     else:
@@ -639,7 +634,7 @@ async def create_individual_sensors(
 
 async def attach_entities_to_source_device(config_entry: ConfigEntry, entities_to_add: list[Entity],
                                            hass: HomeAssistant, source_entity: SourceEntity) -> None:
-    """Set the entity to same device as the source entity, if any available"""
+    """Set the entity to same device as the source entity, if any available."""
     if source_entity.entity_entry and source_entity.device_entry:
         device_id = source_entity.device_entry.id
         device_registry = dr.async_get(hass)

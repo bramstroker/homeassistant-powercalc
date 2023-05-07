@@ -40,8 +40,7 @@ async def create_utility_meters(
     sensor_config: dict,
     net_consumption: bool = False,
 ) -> list[VirtualUtilityMeter]:
-    """Create the utility meters"""
-
+    """Create the utility meters."""
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
         return []
 
@@ -115,7 +114,7 @@ async def create_utility_meters(
 async def create_tariff_select(
     tariffs: list, hass: HomeAssistant, name: str, unique_id: str | None,
 ) -> TariffSelect:
-    """Create tariff selection entity"""
+    """Create tariff selection entity."""
     _LOGGER.debug(f"Creating utility_meter tariff select: {name}")
 
     select_component = cast(EntityComponent, hass.data[SELECT_DOMAIN])
@@ -145,8 +144,7 @@ async def create_utility_meter(
     tariff_entity: str | None = None,
     net_consumption: bool = False,
 ) -> VirtualUtilityMeter:
-    """Create a utility meter entity, one per tariff"""
-
+    """Create a utility meter entity, one per tariff."""
     parent_meter = entity_id
     if tariff:
         name = f"{name} {tariff}"

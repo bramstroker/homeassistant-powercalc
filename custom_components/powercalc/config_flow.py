@@ -240,7 +240,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, discovery_info: DiscoveryInfoType,
     ) -> FlowResult:
         """Handle integration discovery."""
-
         _LOGGER.debug("Starting discovery flow: %s", discovery_info)
 
         self.skip_advanced_step = (
@@ -281,15 +280,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the initial step."""
-
         return self.async_show_menu(step_id="user", menu_options=SENSOR_TYPE_MENU)
 
     async def async_step_menu_library(
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """
-        Handle the Virtual power (library) step.
-        We forward to the virtual_power step, but without the strategy selector displayed
+        """Handle the Virtual power (library) step.
+        We forward to the virtual_power step, but without the strategy selector displayed.
         """
         self.is_library_flow = True
         return await self.async_step_virtual_power(user_input)
@@ -438,9 +435,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_library(
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """
-        Try to autodiscover manufacturer/model first.
-        Ask the user to confirm this or forward to manual library selection
+        """Try to autodiscover manufacturer/model first.
+        Ask the user to confirm this or forward to manual library selection.
         """
         if user_input is not None:
             if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.power_profile:
@@ -490,7 +486,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_manufacturer(
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Ask the user to select the manufacturer"""
+        """Ask the user to select the manufacturer."""
         if user_input is not None:
             self.sensor_config.update(
                 {CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)},
@@ -541,7 +537,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_post_library(
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered"""
+        """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered."""
         if (
             self.power_profile
             and self.power_profile.has_sub_profiles
@@ -642,7 +638,6 @@ class OptionsFlowHandler(OptionsFlow):
         self, user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle options flow."""
-
         errors = {}
         self.current_config = dict(self.config_entry.data)
         if self.source_entity_id:
@@ -677,7 +672,7 @@ class OptionsFlowHandler(OptionsFlow):
         )
 
     async def save_options(self, user_input: dict[str, Any]) -> dict:
-        """Save options, and return errors when validation fails"""
+        """Save options, and return errors when validation fails."""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
             self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
@@ -720,8 +715,7 @@ class OptionsFlowHandler(OptionsFlow):
         return {}
 
     def build_options_schema(self) -> vol.Schema:
-        """Build the options schema. depending on the selected sensor type"""
-
+        """Build the options schema. depending on the selected sensor type."""
         strategy_options: dict[str, Any] = {}
         data_schema: vol.Schema = vol.Schema({})
         if self.sensor_type == SensorType.VIRTUAL_POWER:
@@ -751,7 +745,7 @@ async def _create_strategy_object(
     source_entity: SourceEntity,
     power_profile: PowerProfile | None = None,
 ) -> PowerCalculationStrategyInterface:
-    """Create the calculation strategy object"""
+    """Create the calculation strategy object."""
     factory = PowerCalculatorStrategyFactory(hass)
     if power_profile is None and CONF_MANUFACTURER in config:
         power_profile = await ProfileLibrary.factory(hass).get_profile(
@@ -761,7 +755,7 @@ async def _create_strategy_object(
 
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
-    """Get the config schema for a given power calculation strategy"""
+    """Get the config schema for a given power calculation strategy."""
     if strategy == CalculationStrategy.FIXED:
         return SCHEMA_POWER_FIXED
     if strategy == CalculationStrategy.LINEAR:
@@ -801,7 +795,7 @@ def _create_virtual_power_schema(
 
 
 def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
-    """Create config schema for groups"""
+    """Create config schema for groups."""
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
         for config_entry in hass.config_entries.async_entries(DOMAIN)
@@ -864,7 +858,7 @@ def _create_group_selector(
 
 
 def _validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
-    """Validate the group form"""
+    """Validate the group form."""
     if not user_input:
         return {}
     errors: dict[str, str] = {}
@@ -881,7 +875,7 @@ def _validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
 
 
 def _create_linear_schema(source_entity_id: str) -> vol.Schema:
-    """Create the config schema for linear strategy"""
+    """Create the config schema for linear strategy."""
     return SCHEMA_POWER_LINEAR.extend(  # type: ignore
         {
             vol.Optional(CONF_ATTRIBUTE): selector.AttributeSelector(
@@ -894,7 +888,7 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
 
 
 def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.Schema:
-    """Create manufacturer schema"""
+    """Create manufacturer schema."""
     library = ProfileLibrary.factory(hass)
     manufacturers = [
         selector.SelectOptionDict(value=manufacturer, label=manufacturer)
@@ -914,7 +908,7 @@ def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.
 async def _create_schema_model(
     hass: HomeAssistant, manufacturer: str, source_entity: SourceEntity,
 ) -> vol.Schema:
-    """Create model schema"""
+    """Create model schema."""
     library = ProfileLibrary.factory(hass)
     models = [
         selector.SelectOptionDict(value=profile.model, label=profile.model)
@@ -935,7 +929,7 @@ async def _create_schema_model(
 async def _create_schema_sub_profile(
     hass: HomeAssistant, model_info: ModelInfo,
 ) -> vol.Schema:
-    """Create sub profile schema"""
+    """Create sub profile schema."""
     library = ProfileLibrary.factory(hass)
     profile = await library.get_profile(model_info)
     sub_profiles = [
@@ -956,7 +950,7 @@ async def _create_schema_sub_profile(
 def _build_strategy_config(
     strategy: str, source_entity_id: str, user_input: dict[str, Any],
 ) -> dict[str, Any]:
-    """Build the config dict needed for the configured strategy"""
+    """Build the config dict needed for the configured strategy."""
     strategy_schema = _get_strategy_schema(strategy, source_entity_id)
     strategy_options: dict[str, Any] = {}
     for key in strategy_schema.schema:
@@ -967,7 +961,7 @@ def _build_strategy_config(
 
 
 def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
-    """Build the config under daily_energy: key"""
+    """Build the config under daily_energy: key."""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
     config: dict[str, Any] = {}
     for key in schema.schema:
@@ -978,7 +972,7 @@ def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
 
 
 def _validate_daily_energy_input(user_input: dict[str, Any] | None) -> dict:
-    """Validates the daily energy form"""
+    """Validates the daily energy form."""
     if not user_input:
         return {}
     errors: dict[str, str] = {}
@@ -992,7 +986,7 @@ def _validate_daily_energy_input(user_input: dict[str, Any] | None) -> dict:
 def _fill_schema_defaults(
     data_schema: vol.Schema, options: dict[str, str],
 ) -> vol.Schema:
-    """Make a copy of the schema with suggested values set to saved options"""
+    """Make a copy of the schema with suggested values set to saved options."""
     schema = {}
     for key, val in data_schema.schema.items():
         new_key = key

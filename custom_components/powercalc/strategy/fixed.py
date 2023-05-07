@@ -63,7 +63,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         return await evaluate_power(self._power)
 
     async def validate_config(self) -> None:
-        """Validate correct setup of the strategy"""
+        """Validate correct setup of the strategy."""
         if self._power is None and self._per_state_power is None:
             raise StrategyConfigurationError(
                 "You must supply one of 'states_power' or 'power'", "fixed_mandatory",

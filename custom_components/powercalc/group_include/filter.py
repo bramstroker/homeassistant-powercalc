@@ -13,7 +13,7 @@ class FilterOperator(StrEnum):
 
 
 def create_filter(filter_config: dict) -> IncludeEntityFilter:
-    """Create filter class"""
+    """Create filter class."""
     filters: list[IncludeEntityFilter] = []
     if CONF_DOMAIN in filter_config:
         domain_config = filter_config.get(CONF_DOMAIN)
@@ -32,7 +32,7 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
 
 class IncludeEntityFilter(Protocol):
     def is_valid(self, entity: RegistryEntry) -> bool:
-        """Return True when the entity should be included, False when it should be discarded"""
+        """Return True when the entity should be included, False when it should be discarded."""
         ...
 
 

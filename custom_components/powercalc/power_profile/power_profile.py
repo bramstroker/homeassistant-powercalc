@@ -51,7 +51,7 @@ class PowerProfile:
         self._sub_profile_dir: str | None = None
 
     def get_model_directory(self, root_only: bool = False) -> str:
-        """Get the model directory containing the data files"""
+        """Get the model directory containing the data files."""
         if self.linked_lut:
             return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
 
@@ -61,9 +61,8 @@ class PowerProfile:
         return self._sub_profile_dir or self._directory
 
     def supports(self, model: str) -> bool:
-        """
-        Check whether this power profile supports a given model ID.
-        Also looks at possible aliases
+        """Check whether this power profile supports a given model ID.
+        Also looks at possible aliases.
         """
         model = model.lower().replace("#slash#", "/")
 
@@ -103,8 +102,7 @@ class PowerProfile:
 
     @property
     def calculation_strategy(self) -> CalculationStrategy:
-        """
-        Get the calculation strategy this profile provides.
+        """Get the calculation strategy this profile provides.
         supported modes is here for BC purposes.
         """
         if "calculation_strategy" in self._json_data:
@@ -125,7 +123,7 @@ class PowerProfile:
 
     @property
     def linear_mode_config(self) -> ConfigType | None:
-        """Get configuration to setup linear strategy"""
+        """Get configuration to setup linear strategy."""
         if not self.is_strategy_supported(CalculationStrategy.LINEAR):
             raise UnsupportedStrategyError(
                 f"Strategy linear is not supported by model: {self._model}",
@@ -134,7 +132,7 @@ class PowerProfile:
 
     @property
     def fixed_mode_config(self) -> ConfigType | None:
-        """Get configuration to setup fixed strategy"""
+        """Get configuration to setup fixed strategy."""
         if not self.is_strategy_supported(CalculationStrategy.FIXED):
             raise UnsupportedStrategyError(
                 f"Strategy fixed is not supported by model: {self._model}",
@@ -146,11 +144,11 @@ class PowerProfile:
 
     @property
     def sensor_config(self) -> ConfigType:
-        """Additional sensor configuration"""
+        """Additional sensor configuration."""
         return self._json_data.get("sensor_config") or {}
 
     def is_strategy_supported(self, mode: CalculationStrategy) -> bool:
-        """Whether a certain calculation strategy is supported by this profile"""
+        """Whether a certain calculation strategy is supported by this profile."""
         return mode == self.calculation_strategy
 
     @property
@@ -164,9 +162,8 @@ class PowerProfile:
 
     @property
     def needs_fixed_config(self) -> bool:
-        """
-        Used for smart switches which only provides standby power values.
-        This indicates the user must supply the power values in the config flow
+        """Used for smart switches which only provides standby power values.
+        This indicates the user must supply the power values in the config flow.
         """
         return self.is_strategy_supported(
             CalculationStrategy.FIXED,
@@ -184,7 +181,7 @@ class PowerProfile:
         return self._json_data.get("config_flow_discovery_remarks")
 
     def get_sub_profiles(self) -> list[str]:
-        """Get listing of possible sub profiles"""
+        """Get listing of possible sub profiles."""
         return sorted(next(os.walk(self.get_model_directory(True)))[1])
 
     @property
@@ -193,15 +190,14 @@ class PowerProfile:
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
-        """Get the configuration for automatic sub profile switching"""
+        """Get the configuration for automatic sub profile switching."""
         select_dict = self._json_data.get("sub_profile_select")
         if not select_dict:
             return None
         return SubProfileSelectConfig(**select_dict)
 
     def select_sub_profile(self, sub_profile: str) -> None:
-        """Select a sub profile. Only applicable when to profile actually supports sub profiles"""
-
+        """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
         if not self.has_sub_profiles:
             return
 
@@ -227,7 +223,7 @@ class PowerProfile:
         self.sub_profile = sub_profile
 
     def is_entity_domain_supported(self, source_entity: SourceEntity) -> bool:
-        """Check whether this power profile supports a given entity domain"""
+        """Check whether this power profile supports a given entity domain."""
         entity_entry = source_entity.entity_entry
         if (
             self.device_type == DeviceType.SMART_SWITCH
@@ -261,9 +257,8 @@ class SubProfileSelector:
         return matchers
 
     def select_sub_profile(self, entity_state: State) -> str:
-        """
-        Dynamically tries to select a sub profile depending on the entity state.
-        This method always need to return a sub profile, when nothing is matched it will return a default
+        """Dynamically tries to select a sub profile depending on the entity state.
+        This method always need to return a sub profile, when nothing is matched it will return a default.
         """
         for matcher in self._matchers:
             sub_profile = matcher.match(entity_state)
@@ -277,7 +272,7 @@ class SubProfileSelector:
         return self._power_profile.sub_profile_select.default
 
     def get_tracking_entities(self) -> list[str]:
-        """Get additional list of entities to track for state changes"""
+        """Get additional list of entities to track for state changes."""
         return [
             entity_id
             for matcher in self._matchers
@@ -285,7 +280,7 @@ class SubProfileSelector:
         ]
 
     def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
-        """Create a matcher from json config. Can be extended for more matchers in the future"""
+        """Create a matcher from json config. Can be extended for more matchers in the future."""
         matcher_type: str = matcher_config["type"]
         if matcher_type == "attribute":
             return AttributeMatcher(matcher_config["attribute"], matcher_config["map"])
@@ -308,10 +303,10 @@ class SubProfileSelectConfig(NamedTuple):
 
 class SubProfileMatcher(Protocol):
     def match(self, entity_state: State) -> str | None:
-        """Returns a sub profile"""
+        """Returns a sub profile."""
 
     def get_tracking_entities(self) -> list[str]:
-        """Get extra entities to track for state changes"""
+        """Get extra entities to track for state changes."""
 
 
 class EntityStateMatcher(SubProfileMatcher):

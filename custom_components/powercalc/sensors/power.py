@@ -92,8 +92,7 @@ async def create_power_sensor(
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> PowerSensor:
-    """Create the power sensor based on powercalc sensor configuration"""
-
+    """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
         return await create_real_power_sensor(hass, sensor_config)
@@ -109,8 +108,7 @@ async def create_virtual_power_sensor(
     source_entity: SourceEntity,
     discovery_info: DiscoveryInfoType | None = None,
 ) -> VirtualPowerSensor:
-    """Create the power sensor entity"""
-
+    """Create the power sensor entity."""
     power_profile = None
     try:
         # When the user did not manually configure a model and a model was auto discovered we can load it.
@@ -233,8 +231,7 @@ async def create_virtual_power_sensor(
 async def create_real_power_sensor(
     hass: HomeAssistant, sensor_config: dict,
 ) -> RealPowerSensor:
-    """Create reference to an existing power sensor"""
-
+    """Create reference to an existing power sensor."""
     power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     device_id = None
@@ -253,9 +250,8 @@ async def create_real_power_sensor(
 
 
 def is_manually_configured(sensor_config: ConfigType) -> bool:
-    """
-    Check if the user manually configured the sensor.
-    We need to skip loading a power profile to make
+    """Check if the user manually configured the sensor.
+    We need to skip loading a power profile to make.
     """
     if CONF_MODEL in sensor_config:
         return False
@@ -269,7 +265,7 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
 def select_calculation_strategy(
     config: ConfigType, power_profile: PowerProfile | None,
 ) -> CalculationStrategy:
-    """Select the calculation strategy"""
+    """Select the calculation strategy."""
     config_mode = config.get(CONF_MODE)
     if config_mode:
         return CalculationStrategy(config_mode)
@@ -302,12 +298,12 @@ def is_fully_configured(config: ConfigType) -> bool:
 
 
 class PowerSensor(BaseEntity):
-    """Class which all power sensors should extend from"""
+    """Class which all power sensors should extend from."""
 
 
 
 class VirtualPowerSensor(SensorEntity, PowerSensor):
-    """Virtual power sensor"""
+    """Virtual power sensor."""
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -438,7 +434,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self, trigger_entity_id: str, state: State | None,
     ) -> bool:
         """Update power sensor based on new dependant entity state."""
-
         self._standby_sensors.pop(self.entity_id, None)
         if self._sleep_power_timer:
             self._sleep_power_timer()
@@ -478,7 +473,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return True
 
     def _has_valid_state(self, state: State | None) -> bool:
-        """Check if the state is valid, we can use it for power calculation"""
+        """Check if the state is valid, we can use it for power calculation."""
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
 
@@ -495,7 +490,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
-
         entity_state = state
         if state.entity_id != self._source_entity.entity_id:
             entity_state = self.hass.states.get(self._source_entity.entity_id)
@@ -532,9 +526,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return None
 
     def _switch_sub_profile_dynamically(self, state: State) -> None:
-        """
-        Dynamically select a different sub profile depending on the entity state or attributes
-        Uses SubProfileSelect class which contains all the matching logic
+        """Dynamically select a different sub profile depending on the entity state or attributes
+        Uses SubProfileSelect class which contains all the matching logic.
         """
         if (
             not self._power_profile
@@ -550,7 +543,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_power_on = Decimal(self._power_profile.standby_power_on)
 
     async def calculate_standby_power(self, state: State) -> Decimal:
-        """Calculate the power of the device in OFF state"""
+        """Calculate the power of the device in OFF state."""
         sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
@@ -606,7 +599,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._power is not None
 
     def set_energy_sensor_attribute(self, entity_id: str) -> None:
-        """Set the energy sensor on the state attributes"""
+        """Set the energy sensor on the state attributes."""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return
         self._attr_extra_state_attributes.update(
@@ -615,7 +608,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
 
 class RealPowerSensor(PowerSensor):
-    """Contains a reference to an existing real power sensor entity"""
+    """Contains a reference to an existing real power sensor entity."""
 
     def __init__(
         self, entity_id: str, device_id: str | None = None, unique_id: str | None = None,

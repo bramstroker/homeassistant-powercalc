@@ -54,8 +54,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._calibration: list[tuple[int, float]] | None = None
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        """Calculate the current power consumption"""
-
+        """Calculate the current power consumption."""
         if self._calibration is None:
             self._calibration = self.create_calibrate_list()
 
@@ -87,15 +86,15 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         return Decimal(power)
 
     def get_min_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest lower value from calibration table"""
+        """Get closest lower value from calibration table."""
         return min(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
     def get_max_calibrate(self, value: int) -> tuple[int, float]:
-        """Get closest higher value from calibration table"""
+        """Get closest higher value from calibration table."""
         return max(self._calibration or (), key=lambda v: (v[0] > value, value - v[0]))
 
     def create_calibrate_list(self) -> list[tuple[int, float]]:
-        """Build a table of calibration values"""
+        """Build a table of calibration values."""
         calibration_list: list[tuple[int, float]] = []
 
         calibrate = self._config.get(CONF_CALIBRATE)
@@ -117,7 +116,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         return sorted(calibration_list, key=lambda tup: tup[0])
 
     def get_entity_value_range(self) -> tuple:
-        """Get the min/max range for a given entity domain"""
+        """Get the min/max range for a given entity domain."""
         if self._source_entity.domain == fan.DOMAIN:
             return 0, 100
 
@@ -129,8 +128,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         raise StrategyConfigurationError("Unsupported domain for linear strategy")
 
     def get_current_state_value(self, entity_state: State) -> int | None:
-        """Get the current entity state, i.e. selected brightness"""
-
+        """Get the current entity state, i.e. selected brightness."""
         attribute = self.get_attribute(entity_state)
         if attribute:
             value: int | None = entity_state.attributes.get(attribute)
@@ -159,8 +157,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return None
 
     def get_attribute(self, entity_state: State) -> str | None:
-        """Returns the attribute which needs to be read for the linear calculation"""
-
+        """Returns the attribute which needs to be read for the linear calculation."""
         if CONF_ATTRIBUTE in self._config:
             return self._config.get(CONF_ATTRIBUTE)
 
@@ -177,8 +174,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         return None
 
     async def validate_config(self) -> None:
-        """Validate correct setup of the strategy"""
-
+        """Validate correct setup of the strategy."""
         if not self._config.get(CONF_CALIBRATE):
             if self._source_entity.domain not in ALLOWED_DOMAINS:
                 raise StrategyConfigurationError(
