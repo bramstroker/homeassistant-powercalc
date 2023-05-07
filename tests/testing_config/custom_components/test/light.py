@@ -28,7 +28,10 @@ def init(empty=False):
 
 
 async def async_setup_platform(
-    hass, config, async_add_entities_callback, discovery_info=None,
+    hass,
+    config,
+    async_add_entities_callback,
+    discovery_info=None,
 ):
     """Return mock entities."""
     async_add_entities_callback(ENTITIES)
@@ -60,7 +63,10 @@ class MockLight(MockToggleEntity, LightEntity):
     model: str | None = None
 
     def __init__(
-        self, name: str, state: str | None = None, unique_id: str | None = None,
+        self,
+        name: str,
+        state: str | None = None,
+        unique_id: str | None = None,
     ) -> None:
         if state is None:
             state = STATE_ON

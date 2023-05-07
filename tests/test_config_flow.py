@@ -83,7 +83,9 @@ async def test_discovery_flow(hass: HomeAssistant):
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profile = await get_power_profile(
-        hass, {}, await autodiscover_model(hass, source_entity.entity_entry),
+        hass,
+        {},
+        await autodiscover_model(hass, source_entity.entity_entry),
     )
 
     result: FlowResult = await hass.config_entries.flow.async_init(
@@ -103,7 +105,8 @@ async def test_discovery_flow(hass: HomeAssistant):
     # Confirm selected manufacturer/model
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -146,7 +149,9 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profile = await get_power_profile(
-        hass, {}, await autodiscover_model(hass, source_entity.entity_entry),
+        hass,
+        {},
+        await autodiscover_model(hass, source_entity.entity_entry),
     )
 
     result: FlowResult = await hass.config_entries.flow.async_init(
@@ -165,13 +170,15 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "sub_profile"
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_SUB_PROFILE: "length_6"},
+        result["flow_id"],
+        {CONF_SUB_PROFILE: "length_6"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -189,7 +196,8 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     """Test a menu is diplayed with sensor type selection"""
 
     result: FlowResult = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER},
+        DOMAIN,
+        context={"source": config_entries.SOURCE_USER},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.MENU
@@ -210,7 +218,9 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant):
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     _assert_default_virtual_power_entry_data(
-        CalculationStrategy.FIXED, result["data"], {CONF_FIXED: {CONF_POWER: 20}},
+        CalculationStrategy.FIXED,
+        result["data"],
+        {CONF_FIXED: {CONF_POWER: 20}},
     )
 
     await hass.async_block_till_done()
@@ -223,7 +233,9 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
 
     template = "{states(input_number.my_number} | float"
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_POWER_TEMPLATE: template},
+        hass,
+        result,
+        {CONF_POWER_TEMPLATE: template},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -241,7 +253,9 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
 async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_STATES_POWER: {"playing": 1.8}},
+        hass,
+        result,
+        {CONF_STATES_POWER: {"playing": 1.8}},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -259,7 +273,9 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
 async def test_create_linear_sensor_entry(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40},
+        hass,
+        result,
+        {CONF_MIN_POWER: 1, CONF_MAX_POWER: 40},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -288,7 +304,9 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant):
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8},
+        hass,
+        result,
+        {CONF_VOLTAGE: 12, CONF_POWER_FACTOR: 0.8},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -317,7 +335,8 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert {"value": "signify", "label": "signify"} in manufacturer_options
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MANUFACTURER: "signify"},
+        result["flow_id"],
+        {CONF_MANUFACTURER: "signify"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -329,7 +348,8 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert {"value": "LWB010", "label": "LWB010"} in model_options
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MODEL: "LCT010"},
+        result["flow_id"],
+        {CONF_MODEL: "LCT010"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -366,7 +386,9 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     }
 
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+        hass,
+        result,
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -418,7 +440,8 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     assert result["step_id"] == "library"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: False},
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -432,10 +455,12 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MANUFACTURER: "yeelight"},
+        result["flow_id"],
+        {CONF_MANUFACTURER: "yeelight"},
     )
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MODEL: "YLDL01YL"},
+        result["flow_id"],
+        {CONF_MODEL: "YLDL01YL"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -447,7 +472,9 @@ async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
     assert {"value": "downlight", "label": "downlight"} in select_options
 
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_SUB_PROFILE: "ambilight"},
+        hass,
+        result,
+        {CONF_SUB_PROFILE: "ambilight"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -465,24 +492,29 @@ async def test_manually_setup_from_library(hass: HomeAssistant) -> None:
     await create_mock_light_entity(hass, light_entity)
 
     result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER},
+        DOMAIN,
+        context={"source": config_entries.SOURCE_USER},
     )
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {"next_step_id": MENU_OPTION_LIBRARY},
+        result["flow_id"],
+        {"next_step_id": MENU_OPTION_LIBRARY},
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "virtual_power"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_ENTITY_ID: "light.test"},
+        result["flow_id"],
+        {CONF_ENTITY_ID: "light.test"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "library"
 
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+        hass,
+        result,
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -534,7 +566,10 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
     }
 
     result = await _set_virtual_power_configuration(
-        hass, result, {CONF_POWER: 20}, advanced_options,
+        hass,
+        result,
+        {CONF_POWER: 20},
+        advanced_options,
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -554,7 +589,8 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):
 
     user_input = {CONF_NAME: "My daily energy sensor"}
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
@@ -571,7 +607,8 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
         CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -598,7 +635,8 @@ async def test_create_group_entry(hass: HomeAssistant):
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
@@ -621,7 +659,8 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant):
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
@@ -644,10 +683,14 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
     """
 
     config_entry_1 = await create_mocked_virtual_power_sensor_entry(
-        hass, "VirtualPower1", "abcdef",
+        hass,
+        "VirtualPower1",
+        "abcdef",
     )
     config_entry_2 = await create_mocked_virtual_power_sensor_entry(
-        hass, "VirtualPower2", None,
+        hass,
+        "VirtualPower2",
+        None,
     )
     config_entry_3 = MockConfigEntry(
         domain=DOMAIN,
@@ -679,7 +722,8 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
     }
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -697,7 +741,8 @@ async def test_group_error_mandatory(hass: HomeAssistant):
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"]
@@ -900,11 +945,13 @@ async def test_strategy_raises_unknown_error(hass: HomeAssistant):
         side_effect=StrategyConfigurationError("test"),
     ):
         result = await _goto_virtual_power_strategy_step(
-            hass, CalculationStrategy.FIXED,
+            hass,
+            CalculationStrategy.FIXED,
         )
 
         result = await hass.config_entries.flow.async_configure(
-            result["flow_id"], {CONF_POWER: 20},
+            result["flow_id"],
+            {CONF_POWER: 20},
         )
 
         assert result["errors"]
@@ -955,7 +1002,8 @@ def _create_mock_entry(
 
 
 async def _initialize_options_flow(
-    hass: HomeAssistant, entry: config_entries.ConfigEntry,
+    hass: HomeAssistant,
+    entry: config_entries.ConfigEntry,
 ) -> FlowResult:
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
@@ -1009,7 +1057,8 @@ async def _goto_virtual_power_strategy_step(
 
     result = await _select_sensor_type(hass, SensorType.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], user_input,
+        result["flow_id"],
+        user_input,
     )
 
     # Lut has alternate flows depending on auto discovery, don't need to assert here
@@ -1029,27 +1078,32 @@ async def _set_virtual_power_configuration(
     if basic_options is None:
         basic_options = {}
     result = await hass.config_entries.flow.async_configure(
-        previous_result["flow_id"], basic_options,
+        previous_result["flow_id"],
+        basic_options,
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     if advanced_options is None:
         advanced_options = {}
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], advanced_options,
+        result["flow_id"],
+        advanced_options,
     )
     return result
 
 
 async def _select_sensor_type(
-    hass: HomeAssistant, sensor_type: SensorType,
+    hass: HomeAssistant,
+    sensor_type: SensorType,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
     result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": config_entries.SOURCE_USER},
+        DOMAIN,
+        context={"source": config_entries.SOURCE_USER},
     )
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {"next_step_id": sensor_type},
+        result["flow_id"],
+        {"next_step_id": sensor_type},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -1065,11 +1119,15 @@ async def _create_wled_entities(hass: HomeAssistant):
     platform: test_sensor_platform = getattr(hass.components, "test.sensor")
     platform.init(empty=True)
     estimated_current_entity = platform.MockSensor(
-        name="test_estimated_current", native_value="5.0", unique_id=DEFAULT_UNIQUE_ID,
+        name="test_estimated_current",
+        native_value="5.0",
+        unique_id=DEFAULT_UNIQUE_ID,
     )
     platform.ENTITIES[0] = estimated_current_entity
 
     assert await async_setup_component(
-        hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
+        hass,
+        sensor.DOMAIN,
+        {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
     )
     await hass.async_block_till_done()

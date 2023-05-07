@@ -22,7 +22,11 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
 )
-from tests.common import create_input_boolean, get_simple_fixed_config, run_powercalc_setup
+from tests.common import (
+    create_input_boolean,
+    get_simple_fixed_config,
+    run_powercalc_setup,
+)
 
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
@@ -34,7 +38,9 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
         hass,
         {
             "shelly-device": DeviceEntry(
-                id="shelly-device-id", manufacturer="Shelly", model="Plug S",
+                id="shelly-device-id",
+                manufacturer="Shelly",
+                model="Plug S",
             ),
         },
     )
@@ -144,7 +150,8 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_real_energy_sensor_error_on_non_existing_entity(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Test that an error is logged when user supplies unknown entity id in energy_sensor_id"""
 

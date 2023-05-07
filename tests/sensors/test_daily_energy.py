@@ -43,7 +43,12 @@ from custom_components.powercalc.sensors.daily_energy import (
     DEFAULT_DAILY_UPDATE_FREQUENCY,
     create_daily_fixed_energy_sensor,
 )
-from tests.common import assert_entity_state, create_input_boolean, create_input_number, run_powercalc_setup
+from tests.common import (
+    assert_entity_state,
+    create_input_boolean,
+    create_input_number,
+    run_powercalc_setup,
+)
 
 
 async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
@@ -70,7 +75,9 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant):
     ],
 )
 async def test_create_daily_energy_sensor_unit_prefix_watt(
-    hass: HomeAssistant, unit_prefix: str, unit_of_measurement: str,
+    hass: HomeAssistant,
+    unit_prefix: str,
+    unit_of_measurement: str,
 ):
     """Test that setting the unit_prefix results in the correct unit_of_measurement"""
     sensor_config = {
@@ -318,7 +325,9 @@ async def test_reset_service(hass: HomeAssistant):
 
     # Set the individual entities to some initial values
     hass.states.async_set(
-        entity_id, "0.8", {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR},
+        entity_id,
+        "0.8",
+        {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR},
     )
     await hass.async_block_till_done()
 
@@ -459,6 +468,7 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
 async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1):
     for _i in range(0, number_of_updates):
         async_fire_time_changed(
-            hass, dt.utcnow() + timedelta(seconds=DEFAULT_DAILY_UPDATE_FREQUENCY),
+            hass,
+            dt.utcnow() + timedelta(seconds=DEFAULT_DAILY_UPDATE_FREQUENCY),
         )
         await hass.async_block_till_done()

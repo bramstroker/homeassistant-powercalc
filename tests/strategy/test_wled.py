@@ -30,12 +30,16 @@ async def test_can_calculate_power(hass: HomeAssistant):
     platform: test_sensor_platform = getattr(hass.components, "test.sensor")
     platform.init(empty=True)
     estimated_current_entity = platform.MockSensor(
-        name="test_estimated_current", native_value="50.0", unique_id="abc",
+        name="test_estimated_current",
+        native_value="50.0",
+        unique_id="abc",
     )
     platform.ENTITIES[0] = estimated_current_entity
 
     assert await async_setup_component(
-        hass, sensor.DOMAIN, {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
+        hass,
+        sensor.DOMAIN,
+        {sensor.DOMAIN: {CONF_PLATFORM: "test"}},
     )
     await hass.async_block_till_done()
 
@@ -123,7 +127,9 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
         hass,
         {
             "wled-device": DeviceEntry(
-                id="wled-device", manufacturer="WLED", model="FOSS",
+                id="wled-device",
+                manufacturer="WLED",
+                model="FOSS",
             ),
         },
     )
@@ -173,6 +179,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant):
     assert flow["step_id"] == "wled"
 
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_VOLTAGE: 5},
+        flow["flow_id"],
+        {CONF_VOLTAGE: 5},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY

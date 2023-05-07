@@ -25,7 +25,10 @@ class TuyaPowerMeter(PowerMeter):
 
     def get_power(self) -> PowerMeasurementResult:
         (on, w, mA, V, err) = tuyapower.deviceInfo(
-            self._device_id, self._device_ip, self._device_key, self._device_version,
+            self._device_id,
+            self._device_ip,
+            self._device_key,
+            self._device_version,
         )
 
         if err != STATUS_OK:

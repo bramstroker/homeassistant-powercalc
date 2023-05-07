@@ -31,7 +31,9 @@ class HassMediaController(MediaController):
 
     def mute_volume(self) -> None:
         self.client.trigger_service(
-            "media_player", "mute_volume", entity_id=self._entity_id,
+            "media_player",
+            "mute_volume",
+            entity_id=self._entity_id,
         )
 
     def play_audio(self, stream_url: str) -> None:
@@ -46,7 +48,9 @@ class HassMediaController(MediaController):
     def turn_off(self) -> None:
         try:
             self.client.trigger_service(
-                "media_player", "turn_off", entity_id=self._entity_id,
+                "media_player",
+                "turn_off",
+                entity_id=self._entity_id,
             )
         except InternalServerError:
             _LOGGER.debug(
@@ -54,7 +58,9 @@ class HassMediaController(MediaController):
                 "probably because not supported by device, Trying media_player.media_stop",
             )
             self.client.trigger_service(
-                "media_player", "media_stop", entity_id=self._entity_id,
+                "media_player",
+                "media_stop",
+                entity_id=self._entity_id,
             )
 
     def get_questions(self) -> list[inquirer.questions.Question]:

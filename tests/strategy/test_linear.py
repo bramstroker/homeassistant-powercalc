@@ -35,7 +35,9 @@ from .common import create_source_entity
 
 async def test_light_max_power_only(hass: HomeAssistant):
     strategy = await _create_strategy_instance(
-        hass, create_source_entity("light"), {CONF_MAX_POWER: 255},
+        hass,
+        create_source_entity("light"),
+        {CONF_MAX_POWER: 255},
     )
 
     state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 100})
@@ -44,7 +46,9 @@ async def test_light_max_power_only(hass: HomeAssistant):
 
 async def test_fan_min_and_max_power(hass: HomeAssistant):
     strategy = await _create_strategy_instance(
-        hass, create_source_entity("fan"), {CONF_MIN_POWER: 10, CONF_MAX_POWER: 100},
+        hass,
+        create_source_entity("fan"),
+        {CONF_MIN_POWER: 10, CONF_MAX_POWER: 100},
     )
 
     state = State("fan.test", STATE_ON, {ATTR_PERCENTAGE: 50})
@@ -67,26 +71,44 @@ async def test_light_calibrate(hass: HomeAssistant):
     )
 
     entity_id = "light.test"
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 1}),
-    ) == 0.3
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 10}),
-    ) == 1.25
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 30}),
-    ) == 2.375
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 75}),
-    ) == 5.15
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255}),
-    ) == 15.3
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 1}),
+        )
+        == 0.3
+    )
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 10}),
+        )
+        == 1.25
+    )
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 30}),
+        )
+        == 2.375
+    )
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 75}),
+        )
+        == 5.15
+    )
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 255}),
+        )
+        == 15.3
+    )
 
     # set to some out of bound brightness.
-    assert await strategy.calculate(
-        State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 350}),
-    ) == 15.3
+    assert (
+        await strategy.calculate(
+            State(entity_id, STATE_ON, {ATTR_BRIGHTNESS: 350}),
+        )
+        == 15.3
+    )
 
 
 async def test_custom_attribute(hass: HomeAssistant):
@@ -102,7 +124,9 @@ async def test_custom_attribute(hass: HomeAssistant):
 
 async def test_power_is_none_when_state_is_none(hass: HomeAssistant):
     strategy = await _create_strategy_instance(
-        hass, create_source_entity("light"), {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
+        hass,
+        create_source_entity("light"),
+        {CONF_MIN_POWER: 20, CONF_MAX_POWER: 100},
     )
 
     state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: None})
@@ -110,7 +134,8 @@ async def test_power_is_none_when_state_is_none(hass: HomeAssistant):
 
 
 async def test_error_on_non_number_state(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ):
     caplog.set_level(logging.ERROR)
     strategy = await _create_strategy_instance(
@@ -161,10 +186,15 @@ async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant):
 
 
 async def _create_strategy_instance(
-    hass: HomeAssistant, source_entity: SourceEntity, linear_config: ConfigType,
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    linear_config: ConfigType,
 ) -> LinearStrategy:
     strategy = LinearStrategy(
-        source_entity=source_entity, config=linear_config, hass=hass, standby_power=None,
+        source_entity=source_entity,
+        config=linear_config,
+        hass=hass,
+        standby_power=None,
     )
 
     await strategy.validate_config()

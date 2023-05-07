@@ -5,7 +5,8 @@ from custom_components.powercalc.diagnostics import async_get_config_entry_diagn
 
 
 async def test_diagnostics(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry,
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
 ) -> None:
     diagnostics_data = await async_get_config_entry_diagnostics(hass, mock_config_entry)
     assert diagnostics_data == {"entry": mock_config_entry.as_dict()}

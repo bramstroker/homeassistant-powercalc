@@ -23,7 +23,9 @@ def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
     else:
         df["color"] = df.apply(
             lambda row: colorsys.hls_to_rgb(
-                row.hue / 65535, row.bri / 255, row.sat / 255,
+                row.hue / 65535,
+                row.bri / 255,
+                row.sat / 255,
             ),
             axis=1,
         )

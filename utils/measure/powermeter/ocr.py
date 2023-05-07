@@ -8,7 +8,8 @@ from .powermeter import PowerMeasurementResult, PowerMeter
 class OcrPowerMeter(PowerMeter):
     def __init__(self) -> None:
         filepath = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "../ocr/ocr_results.txt",
+            os.path.dirname(os.path.abspath(__file__)),
+            "../ocr/ocr_results.txt",
         )
 
         self.file = open(filepath, "rb")
