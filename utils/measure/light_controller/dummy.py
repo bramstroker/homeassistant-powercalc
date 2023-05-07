@@ -4,11 +4,11 @@ from typing import Any
 
 import inquirer.questions
 
-from .controller import LightInfo
+from .controller import LightController, LightInfo
 
 
-class DummyLightController:
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
+class DummyLightController(LightController):
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:
         pass
 
     def get_light_info(self) -> LightInfo:
@@ -17,5 +17,5 @@ class DummyLightController:
     def get_questions(self) -> list[inquirer.questions.Question]:
         return []
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         pass

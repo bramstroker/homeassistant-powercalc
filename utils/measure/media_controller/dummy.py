@@ -2,8 +2,10 @@ from typing import Any
 
 import inquirer
 
+from media_controller.controller import MediaController
 
-class DummyMediaController:
+
+class DummyMediaController(MediaController):
     def set_volume(self, volume: int) -> None:
         pass
 
@@ -19,5 +21,5 @@ class DummyMediaController:
     def get_questions(self) -> list[inquirer.questions.Question]:
         return []
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         pass

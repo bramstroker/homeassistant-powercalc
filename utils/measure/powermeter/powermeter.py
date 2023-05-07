@@ -3,13 +3,15 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, NamedTuple
 
+from inquirer.questions import Question
+
 
 class PowerMeter(ABC):
     @abstractmethod
     def get_power(self) -> PowerMeasurementResult:
         """Get a power measurement from the meter"""
 
-    def get_questions(self) -> list[dict]:
+    def get_questions(self) -> list[Question]:
         """Get questions to ask for the chosen powermeter"""
         return []
 

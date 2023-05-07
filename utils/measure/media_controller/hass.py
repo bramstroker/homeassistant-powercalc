@@ -4,12 +4,14 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
+
+from media_controller.controller import MediaController
 from media_controller.errors import MediaPlayerError
 
 _LOGGER = logging.getLogger("measure")
 
 
-class HassMediaController:
+class HassMediaController(MediaController):
     def __init__(self, api_url: str, token: str) -> None:
         self._entity_id: str | None = None
         self._model_id: str | None = None
@@ -73,6 +75,6 @@ class HassMediaController:
             ),
         ]
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         self._entity_id = answers["media_player_entity_id"]
         self._model_id = answers["media_player_model_id"]

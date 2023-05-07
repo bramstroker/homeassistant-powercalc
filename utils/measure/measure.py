@@ -144,7 +144,7 @@ class Measure:
         name: str,
         measure_device: str,
         extra_json_data: dict | None = None,
-    ):
+    ) -> None:
         """Write model.json manifest file"""
         json_data = {
             "measure_device": measure_device,
@@ -241,7 +241,7 @@ def config_key_exists(key: str) -> bool:
         return False
 
 
-def validate_required(_, val):
+def validate_required(_: Any, val: str) -> bool:
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
         raise ValidationError(
@@ -264,15 +264,14 @@ class RunnerFactory:
     ) -> MeasurementRunner:
         """Creates a runner instance based on selected device type"""
         measure_util = MeasureUtil(power_meter)
-        if device_type == DeviceType.LIGHT:
-            return LightRunner(measure_util)
         if device_type == DeviceType.SPEAKER:
             return SpeakerRunner(measure_util)
-        return None
+
+        return LightRunner(measure_util)
 
 
-def main():
-    print(f"Powercalc measure: {_VERSION}\n")
+def main() -> None:
+    print(f"Powercalc measure: {_VERSION}\n")  # noqa: T201
 
     try:
         power_meter = PowerMeterFactory().create()

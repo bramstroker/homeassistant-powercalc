@@ -19,5 +19,5 @@ class MediaController(Protocol):
     def get_questions(self) -> list[inquirer.questions.Question]:
         ...
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         ...

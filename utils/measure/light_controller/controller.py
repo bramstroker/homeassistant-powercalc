@@ -20,7 +20,7 @@ class LightInfo:
     def get_min_mired(self) -> int:
         return self._min_mired
 
-    def set_min_mired(self, value: int):
+    def set_min_mired(self, value: int) -> None:
         if value < MIN_MIRED:
             value = MIN_MIRED
         self._min_mired = value
@@ -28,7 +28,7 @@ class LightInfo:
     def get_max_mired(self) -> int:
         return self._max_mired
 
-    def set_max_mired(self, value: int):
+    def set_max_mired(self, value: int) -> None:
         if value > MAX_MIRED:
             value = MAX_MIRED
         self._max_mired = value
@@ -38,7 +38,7 @@ class LightInfo:
 
 
 class LightController(Protocol):
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Changes the light to a certain setting"""
         ...
 
@@ -50,6 +50,6 @@ class LightController(Protocol):
         """Get questions to ask for the chosen light controller"""
         ...
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         """Process the answers of the questions"""
         ...

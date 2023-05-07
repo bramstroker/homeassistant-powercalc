@@ -13,15 +13,15 @@ _LOGGER = logging.getLogger("measure")
 
 class LightControllerFactory:
     @staticmethod
-    def hass():
+    def hass() -> HassLightController:
         return HassLightController(config.HASS_URL, config.HASS_TOKEN)
 
     @staticmethod
-    def hue():
+    def hue() -> HueLightController:
         return HueLightController(config.HUE_BRIDGE_IP)
 
     @staticmethod
-    def dummy():
+    def dummy() -> DummyLightController:
         return DummyLightController()
 
     def create(self) -> LightController:

@@ -19,37 +19,37 @@ _LOGGER = logging.getLogger("measure")
 
 class PowerMeterFactory:
     @staticmethod
-    def dummy():
+    def dummy() -> DummyPowerMeter:
         return DummyPowerMeter()
 
     @staticmethod
-    def hass():
+    def hass() -> HassPowerMeter:
         return HassPowerMeter(
             config.HASS_URL, config.HASS_TOKEN, config.HASS_CALL_UPDATE_ENTITY_SERVICE,
         )
 
     @staticmethod
-    def kasa():
+    def kasa() -> KasaPowerMeter:
         return KasaPowerMeter(config.KASA_DEVICE_IP)
 
     @staticmethod
-    def manual():
+    def manual() -> ManualPowerMeter:
         return ManualPowerMeter()
 
     @staticmethod
-    def ocr():
+    def ocr() -> OcrPowerMeter:
         return OcrPowerMeter()
 
     @staticmethod
-    def shelly():
+    def shelly() -> ShellyPowerMeter:
         return ShellyPowerMeter(config.SHELLY_IP, config.SHELLY_TIMEOUT)
 
     @staticmethod
-    def tasmota():
+    def tasmota() -> TasmotaPowerMeter:
         return TasmotaPowerMeter(config.TASMOTA_DEVICE_IP)
 
     @staticmethod
-    def tuya():
+    def tuya() -> TuyaPowerMeter:
         return TuyaPowerMeter(
             config.TUYA_DEVICE_ID,
             config.TUYA_DEVICE_IP,

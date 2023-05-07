@@ -28,7 +28,7 @@ WINDOW_NAME = "Realtime OCR"
 OCR_SLEEP = 0.5
 
 
-def tesseract_location(root):
+def tesseract_location(root) -> None:
     """
     Sets the tesseract cmd root and exits is the root is not set correctly
 
@@ -61,7 +61,7 @@ class RateCounter:
 
     def __init__(self) -> None:
         self.start_time = None
-        self.iterations = 0
+        self.iterations: int = 0
 
     def start(self):
         """
@@ -72,7 +72,7 @@ class RateCounter:
         self.start_time = time.perf_counter()
         return self
 
-    def increment(self):
+    def increment(self) -> None:
         """
         Increases the self.iterations attribute
         """
@@ -146,13 +146,13 @@ class VideoStream:
         height = self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT)
         return int(width), int(height)
 
-    def stop_process(self):
+    def stop_process(self) -> None:
         """
         Sets the self.stopped attribute as True and kills the VideoCapture stream read
         """
         self.stopped = True
 
-    def capture_image(self, frame: numpy.ndarray = None, captures=0):
+    def capture_image(self, frame: numpy.ndarray = None, captures=0) -> int:
         """
         Capture a .jpg during CV2 video stream. Saves to a folder /images in working directory.
 
@@ -201,11 +201,11 @@ class OcrRegionSelection:
         Thread(target=self.register_mouse_callback, args=()).start()
         return self
 
-    def register_mouse_callback(self):
+    def register_mouse_callback(self) -> None:
         cv2.setMouseCallback(WINDOW_NAME, self.draw_rectangle)
 
     # Method to track mouse events
-    def draw_rectangle(self, event, x, y, flags, param):
+    def draw_rectangle(self, event, x, y, flags, param) -> None:
         x, y = numpy.int16([x, y])
 
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -271,7 +271,7 @@ class OCR:
     """Class for creating a pytesseract OCR process in a dedicated thread"""
 
     def __init__(self, video_stream: VideoStream, region_selection: OcrRegionSelection) -> None:
-        self.measurement: Decimal = None
+        self.measurement: Decimal | None = None
         self.stopped: bool = False
         self.region_selection = region_selection
         self.video_stream = video_stream
@@ -285,7 +285,7 @@ class OCR:
         Thread(target=self.do_ocr, args=()).start()
         return self
 
-    def do_ocr(self):
+    def do_ocr(self) -> None:
         """
         Creates a process where frames are continuously grabbed from the exchange and processed by pytesseract OCR.
         """
@@ -317,7 +317,7 @@ class OCR:
                 except Exception as e:
                     _LOGGER.error(f"OCR error: {e}")
 
-    def write_result(self, measurement: Decimal):
+    def write_result(self, measurement: Decimal) -> None:
         if self.file is None:
             file_path = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "ocr_results.txt",
@@ -327,7 +327,7 @@ class OCR:
         self.file.write(f"{time.time()};{str(measurement)}\n")
         self.file.flush()
 
-    def stop_process(self):
+    def stop_process(self) -> None:
         """
         Sets the self.stopped attribute to True and kills the ocr() process
         """
@@ -366,7 +366,8 @@ class OCR:
 
         return True
 
-    def get_percentage_change(self, current: Decimal, previous: Decimal) -> int:
+    @staticmethod
+    def get_percentage_change(current: Decimal, previous: Decimal) -> int:
         try:
             if current == previous:
                 return 0
@@ -394,7 +395,7 @@ def ocr_stream(source: str = "0"):
     cps1 = RateCounter().start()
 
     print("OCR stream started")
-    print(f"Active threads: {threading.activeCount()}")
+    print(f"Active threads: {threading.active_count()}")
 
     # Main display loop
     print("\nPUSH q TO VIEW VIDEO STREAM\n")

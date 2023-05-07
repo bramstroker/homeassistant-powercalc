@@ -12,11 +12,11 @@ _LOGGER = logging.getLogger("measure")
 
 class MediaControllerFactory:
     @staticmethod
-    def hass():
+    def hass() -> HassMediaController:
         return HassMediaController(config.HASS_URL, config.HASS_TOKEN)
 
     @staticmethod
-    def dummy():
+    def dummy() -> DummyMediaController:
         return DummyMediaController()
 
     def create(self) -> MediaController:
