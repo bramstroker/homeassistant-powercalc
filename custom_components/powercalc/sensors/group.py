@@ -531,34 +531,12 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             for state in states
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
-        unavailable_entities = [
-            state.entity_id
-            for state in states
-            if state and state.state == STATE_UNAVAILABLE
-        ]
-        if unavailable_entities and isinstance(self, GroupedEnergySensor):
-            for entity_id in unavailable_entities:
-                prev_state = self._prev_state_store.get_entity_state(entity_id)
-                if prev_state:
-                    available_states.append(prev_state)
-                    unavailable_entities.remove(entity_id)
-
-            if unavailable_entities:
-                _LOGGER.warning(
-                    "%s: One or more members of the group are unavailable, setting group to unavailable (%s)",
-                    self.entity_id,
-                    ",".join(unavailable_entities),
-                )
-                self._attr_available = False
-                self.async_schedule_update_ha_state(True)
-                return
-
         if not available_states:
             self._attr_available = False
             self.async_schedule_update_ha_state(True)
             return
 
-        summed = self.calculate_new_state(available_states)
+        summed = self.calculate_new_state(available_states, states)
         self._attr_native_value = round(summed, self._rounding_digits)
         self._attr_available = True
         self.async_schedule_update_ha_state(True)
@@ -584,7 +562,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         return Decimal(value)
 
     @abstractmethod
-    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+    def calculate_new_state(self, member_available_states: list[State], member_states: list[State]) -> Decimal:
         ...
 
 
@@ -595,9 +573,9 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = POWER_WATT
 
-    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+    def calculate_new_state(self, member_available_states: list[State], member_states: list[State]) -> Decimal:
         values = [
-            self._get_state_value_in_native_unit(state) for state in member_states
+            self._get_state_value_in_native_unit(state) for state in member_available_states
         ]
         return Decimal(sum([value for value in values if value is not None]))
 
@@ -655,13 +633,16 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
-    def calculate_new_state(self, member_states: list[State]) -> Decimal:
+    def calculate_new_state(self, member_available_states: list[State], member_states: list[State]) -> Decimal:
         """Calculate the new group energy sensor state
         For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
         """
         group_sum = Decimal(self._attr_native_value) if self._attr_native_value else Decimal(0)  # type: ignore
         _LOGGER.debug(f"{self.entity_id}: Recalculate, current value: {group_sum}")
         for entity_state in member_states:
+            if entity_state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+                _LOGGER.debug(f"skipping state for {entity_state.entity_id}, sensor unavailable or unknown")
+                continue
             prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
 
@@ -677,7 +658,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
 
             delta = cur_state_value - prev_state_value
-            _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}")
+            _LOGGER.debug(f"delta for entity {entity_state.entity_id}: {delta}, prev={prev_state_value}, cur={cur_state_value}")
             if delta < 0:
                 _LOGGER.warning(
                     f"skipping state for {entity_state.entity_id}, probably erroneous value or sensor was reset",
