@@ -563,7 +563,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     @abstractmethod
     def calculate_new_state(
-        self, member_available_states: list[State], member_states: list[State],
+        self,
+        member_available_states: list[State],
+        member_states: list[State],
     ) -> Decimal:
         ...
 
@@ -576,7 +578,9 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_native_unit_of_measurement = POWER_WATT
 
     def calculate_new_state(
-        self, member_available_states: list[State], member_states: list[State],
+        self,
+        member_available_states: list[State],
+        member_states: list[State],
     ) -> Decimal:
         values = [
             self._get_state_value_in_native_unit(state)
@@ -639,7 +643,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         self.async_write_ha_state()
 
     def calculate_new_state(
-        self, member_available_states: list[State], member_states: list[State],
+        self,
+        member_available_states: list[State],
+        member_states: list[State],
     ) -> Decimal:
         """Calculate the new group energy sensor state
         For each member sensor we calculate the delta by looking at the previous known state and compare it to the current.
