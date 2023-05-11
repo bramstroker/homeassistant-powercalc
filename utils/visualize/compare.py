@@ -8,7 +8,7 @@ import pandas as pd
 DataSet = namedtuple("DataSet", ["dataframe", "color", "label"])
 
 
-def plot_data(df, color):
+def plot_data(df: pd.DataFrame, color: str) -> None:
     x = df["bri"]
     y = df["watt"]
     plt.scatter(x, y, color=color, marker=".", s=10)

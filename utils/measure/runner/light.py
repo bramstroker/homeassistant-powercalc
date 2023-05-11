@@ -353,7 +353,7 @@ class LightRunner(MeasurementRunner):
 
         return formatted_time
 
-    def nudge_and_remeasure(self, color_mode: str, variation: Variation):
+    def nudge_and_remeasure(self, color_mode: str, variation: Variation) -> float | None:
         nudge_count = 0
         for nudge_count in range(config.MAX_NUDGES):
             try:
@@ -509,7 +509,7 @@ class LightRunner(MeasurementRunner):
         return round(value, 2)
 
     @staticmethod
-    def gzip_csv(csv_file_path: str):
+    def gzip_csv(csv_file_path: str) -> None:
         """Gzip the CSV file"""
         with open(csv_file_path, "rb") as csv_file, gzip.open(
             f"{csv_file_path}.gz",
@@ -590,10 +590,10 @@ class HsVariation(Variation):
     def to_csv_row(self) -> list:
         return [self.bri, self.hue, self.sat]
 
-    def is_hue_changed(self, other_variation: HsVariation):
+    def is_hue_changed(self, other_variation: HsVariation) -> bool:
         return self.hue != other_variation.hue
 
-    def is_sat_changed(self, other_variation: HsVariation):
+    def is_sat_changed(self, other_variation: HsVariation) -> bool:
         return self.sat != other_variation.sat
 
 
@@ -604,7 +604,7 @@ class ColorTempVariation(Variation):
     def to_csv_row(self) -> list:
         return [self.bri, self.ct]
 
-    def is_ct_changed(self, other_variation: ColorTempVariation):
+    def is_ct_changed(self, other_variation: ColorTempVariation) -> bool:
         return self.ct != other_variation.ct
 
 
@@ -624,7 +624,7 @@ class CsvWriter:
                 header_row.append("time")
             self.writer.writerow(header_row)
 
-    def write_measurement(self, variation: Variation, power: float):
+    def write_measurement(self, variation: Variation, power: float) -> None:
         """Write row with measurement to the CSV"""
         row = variation.to_csv_row()
         row.append(power)

@@ -13,7 +13,7 @@ import pandas
 import pandas as pd
 
 
-def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
+def create_scatter_plot(df: pandas.DataFrame, color_mode: str) -> None:
     bri = df["bri"]
     watt = df["watt"]
     if color_mode == "brightness":
@@ -36,12 +36,12 @@ def create_scatter_plot(df: pandas.DataFrame, color_mode: str):
 def mired_to_rgb(mired):
     kelvin = 1000000 / mired
     xy = colour.CCT_to_xy(kelvin, method="Kang 2002")
-    XYZ = colour.xy_to_XYZ(xy)
-    RGB = colour.XYZ_to_sRGB(XYZ)
+    xys = colour.xy_to_XYZ(xy)
+    rgb = colour.XYZ_to_sRGB(xys)
     # Note that the colours are overflowing 8-bit, thus a normalisation
     # process must be used.
-    RGB /= np.max(RGB, axis=1)[..., np.newaxis]
-    return RGB
+    rgb /= np.max(rgb, axis=1)[..., np.newaxis]
+    return rgb
 
 
 def convert_mired_to_rgb(mired):
