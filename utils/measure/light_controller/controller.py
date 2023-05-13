@@ -41,7 +41,7 @@ class LightInfo:
 
 
 class LightController(Protocol):
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # type: ignore[no-untyped-def]  # noqa: ANN003
         """Changes the light to a certain setting"""
         ...
 

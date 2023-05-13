@@ -168,9 +168,8 @@ class Measure:
             indent=4,
             sort_keys=True,
         )
-        json_file = open(os.path.join(directory, "model.json"), "w")
-        json_file.write(json_string)
-        json_file.close()
+        with open(os.path.join(directory, "model.json"), "w") as json_file:
+            json_file.write(json_string)
 
     def get_questions(self) -> list[Question]:
         """
@@ -275,7 +274,7 @@ class RunnerFactory:
 
 
 def main() -> None:
-    print(f"Powercalc measure: {_VERSION}\n")  # noqa: T201
+    print(f"Powercalc measure: {_VERSION}\n")
 
     try:
         power_meter = PowerMeterFactory().create()

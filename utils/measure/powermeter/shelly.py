@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 import time
+from typing import Any
 
 import requests
 
-from .errors import ConnectionError
+from .errors import ApiConnectionError
 from .powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
@@ -49,7 +50,7 @@ class ShellyPowerMeter(PowerMeter):
             )
         except requests.RequestException as e:
             _LOGGER.error("Problem connecting to Shelly plug: %s", e)
-            raise ConnectionError("Could not connect to Shelly Plug")
+            raise ApiConnectionError("Could not connect to Shelly Plug") from e
 
         json = r.json()
         power = self.api.parse_json(json)
@@ -72,4 +73,7 @@ class ShellyPowerMeter(PowerMeter):
             _LOGGER.debug(f"Shelly API version {api.api_version} detected")
             return api
 
-        raise ConnectionError("Could not connect to Shelly Plug")
+        raise ApiConnectionError("Could not connect to Shelly Plug")
+
+    def process_answers(self, answers: dict[str, Any]) -> None:
+        pass

@@ -16,8 +16,8 @@ class HassPowerMeter(PowerMeter):
         self._entity_id: str | None = None
         try:
             self.client = Client(api_url, token, cache_session=False)
-        except Exception as e:
-            raise PowerMeterError(f"Failed to connect to HA API: {e}")
+        except Exception as e:  # noqa: BLE001
+            raise PowerMeterError(f"Failed to connect to HA API: {e}") from e
 
     def get_power(self) -> PowerMeasurementResult:
         if self._call_update_entity:
@@ -53,5 +53,5 @@ class HassPowerMeter(PowerMeter):
         ]
         return sorted(power_sensors)
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         self._entity_id = answers["powermeter_entity_id"]

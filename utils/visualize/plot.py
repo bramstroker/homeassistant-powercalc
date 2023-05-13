@@ -107,7 +107,7 @@ def convert_mired_to_rgb(mired):
     return [*[div / 255.0 for div in rgb], 1]
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="CLI script to output powercalc LUT file as a plot",
     )
