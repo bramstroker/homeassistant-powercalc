@@ -41,7 +41,7 @@ async def test_composite_filter(
     )
 
 
-async def test_domain_filter():
+async def test_domain_filter() -> None:
     registry_entry = _create_registry_entry()
     entity_filter = DomainFilter("switch")
     assert entity_filter.is_valid(registry_entry) is True
@@ -50,12 +50,12 @@ async def test_domain_filter():
     assert entity_filter.is_valid(registry_entry) is False
 
 
-async def test_domain_filter_multiple():
+async def test_domain_filter_multiple() -> None:
     entity_filter = create_filter({CONF_DOMAIN: ["switch", "light"]})
     assert entity_filter.is_valid(_create_registry_entry()) is True
 
 
-async def test_null_filter():
+async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
 

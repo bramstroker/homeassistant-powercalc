@@ -424,7 +424,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if not track_entities:
             track_entities = [self._source_entity.entity_id]
 
-        if self._power_profile:
+        if self._power_profile and self._power_profile.sub_profile_select:
             self._sub_profile_selector = SubProfileSelector(
                 self.hass,
                 self._power_profile,

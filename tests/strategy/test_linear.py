@@ -33,7 +33,7 @@ from tests.common import create_mock_light_entity
 from .common import create_source_entity
 
 
-async def test_light_max_power_only(hass: HomeAssistant):
+async def test_light_max_power_only(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("light"),
@@ -44,7 +44,7 @@ async def test_light_max_power_only(hass: HomeAssistant):
     assert await strategy.calculate(state) == 100
 
 
-async def test_fan_min_and_max_power(hass: HomeAssistant):
+async def test_fan_min_and_max_power(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("fan"),
@@ -55,7 +55,7 @@ async def test_fan_min_and_max_power(hass: HomeAssistant):
     assert await strategy.calculate(state) == 55
 
 
-async def test_light_calibrate(hass: HomeAssistant):
+async def test_light_calibrate(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("light"),
@@ -111,7 +111,7 @@ async def test_light_calibrate(hass: HomeAssistant):
     )
 
 
-async def test_custom_attribute(hass: HomeAssistant):
+async def test_custom_attribute(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("fan"),
@@ -122,7 +122,7 @@ async def test_custom_attribute(hass: HomeAssistant):
     assert await strategy.calculate(state) == 52
 
 
-async def test_power_is_none_when_state_is_none(hass: HomeAssistant):
+async def test_power_is_none_when_state_is_none(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("light"),
@@ -136,7 +136,7 @@ async def test_power_is_none_when_state_is_none(hass: HomeAssistant):
 async def test_error_on_non_number_state(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
     strategy = await _create_strategy_instance(
         hass,
@@ -149,7 +149,7 @@ async def test_error_on_non_number_state(
     assert "Expecting state to be a number for entity" in caplog.text
 
 
-async def test_validate_raises_exception_not_allowed_domain(hass: HomeAssistant):
+async def test_validate_raises_exception_not_allowed_domain(hass: HomeAssistant) -> None:
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
@@ -160,7 +160,7 @@ async def test_validate_raises_exception_not_allowed_domain(hass: HomeAssistant)
 
 async def test_validate_raises_exception_when_min_power_higher_than_max(
     hass: HomeAssistant,
-):
+) -> None:
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
@@ -169,7 +169,7 @@ async def test_validate_raises_exception_when_min_power_higher_than_max(
         )
 
 
-async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant):
+async def test_lower_value_than_calibration_table_defines(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("light"),
@@ -202,7 +202,7 @@ async def _create_strategy_instance(
     return strategy
 
 
-async def test_config_entry_with_calibrate_list(hass: HomeAssistant):
+async def test_config_entry_with_calibrate_list(hass: HomeAssistant) -> None:
     light_entity = MockLight("test")
     await create_mock_light_entity(hass, light_entity)
 
@@ -226,7 +226,7 @@ async def test_config_entry_with_calibrate_list(hass: HomeAssistant):
     assert state.state == "1.20"
 
 
-async def test_media_player_volume_level(hass: HomeAssistant):
+async def test_media_player_volume_level(hass: HomeAssistant) -> None:
     strategy = await _create_strategy_instance(
         hass,
         create_source_entity("media_player"),
@@ -238,3 +238,12 @@ async def test_media_player_volume_level(hass: HomeAssistant):
 
     state = State("media_player.test", STATE_IDLE, {ATTR_MEDIA_VOLUME_LEVEL: 0.5})
     assert not await strategy.calculate(state)
+
+
+async def test_error_is_raised_on_unsupported_entity_domain(hass: HomeAssistant) -> None:
+    with pytest.raises(StrategyConfigurationError):
+        await _create_strategy_instance(
+            hass,
+            create_source_entity("input_boolean"),
+            {CONF_MAX_POWER: 255},
+        )
