@@ -20,7 +20,7 @@ from tests.common import (
 )
 
 
-async def test_infrared_light(hass: HomeAssistant):
+async def test_infrared_light(hass: HomeAssistant) -> None:
     """
     Infrared capable light with several sub profiles
     """

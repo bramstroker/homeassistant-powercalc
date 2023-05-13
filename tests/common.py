@@ -90,7 +90,7 @@ async def run_powercalc_setup(
     hass: HomeAssistant,
     sensor_config: list[ConfigType] | ConfigType,
     domain_config: ConfigType | None = None,
-):
+) -> None:
     config = {DOMAIN: domain_config or {}}
     if sensor_config:
         if isinstance(sensor_config, list):
@@ -110,7 +110,7 @@ async def run_powercalc_setup(
     await hass.async_block_till_done()
 
 
-async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
+async def create_input_boolean(hass: HomeAssistant, name: str = "test") -> None:
     assert await async_setup_component(
         hass,
         input_boolean.DOMAIN,
@@ -119,11 +119,11 @@ async def create_input_boolean(hass: HomeAssistant, name: str = "test"):
     await hass.async_block_till_done()
 
 
-async def create_input_booleans(hass: HomeAssistant, names: list[str]):
+async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
     [await create_input_boolean(hass, name) for name in names]
 
 
-async def create_input_number(hass: HomeAssistant, name: str, initial_value: int):
+async def create_input_number(hass: HomeAssistant, name: str, initial_value: int) -> None:
     assert await async_setup_component(
         hass,
         input_number.DOMAIN,
@@ -173,7 +173,7 @@ async def create_mocked_virtual_power_sensor_entry(
     return config_entry
 
 
-def assert_entity_state(hass: HomeAssistant, entity_id: str, expected_state: StateType):
+def assert_entity_state(hass: HomeAssistant, entity_id: str, expected_state: StateType) -> None:
     state = hass.states.get(entity_id)
     assert state
     assert state.state == expected_state

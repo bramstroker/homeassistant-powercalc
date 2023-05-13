@@ -33,7 +33,7 @@ module = "homeassistant.components.*"
 ignore_missing_imports = true
 
 [tool.coverage.paths]
-source = ["custom_components/powercalc"]
+source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]

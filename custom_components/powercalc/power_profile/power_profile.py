@@ -252,11 +252,7 @@ class SubProfileSelector:
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
         matchers: list[SubProfileMatcher] = []
-        select_config = self._power_profile.sub_profile_select
-        if not select_config:
-            return matchers
-
-        for matcher_config in select_config.matchers:
+        for matcher_config in self._power_profile.sub_profile_select.matchers:
             matchers.append(self._create_matcher(matcher_config))
         return matchers
 

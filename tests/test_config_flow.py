@@ -75,7 +75,7 @@ DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 
-async def test_discovery_flow(hass: HomeAssistant):
+async def test_discovery_flow(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     light_entity.manufacturer = "signify"
     light_entity.model = "LCT010"
@@ -141,7 +141,7 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     assert result["description_placeholders"]["remarks"] is not None
 
 
-async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
+async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     light_entity.manufacturer = "lifx"
     light_entity.model = "LIFX Z"
@@ -192,7 +192,7 @@ async def test_discovery_flow_with_subprofile_selection(hass: HomeAssistant):
     }
 
 
-async def test_sensor_type_menu_displayed(hass: HomeAssistant):
+async def test_sensor_type_menu_displayed(hass: HomeAssistant) -> None:
     """Test a menu is diplayed with sensor type selection"""
 
     result: FlowResult = await hass.config_entries.flow.async_init(
@@ -208,11 +208,11 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant):
     "sensor_type",
     [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY, SensorType.GROUP],
 )
-async def test_sensor_type_form_displayed(hass: HomeAssistant, sensor_type: SensorType):
+async def test_sensor_type_form_displayed(hass: HomeAssistant, sensor_type: SensorType) -> None:
     await _select_sensor_type(hass, sensor_type)
 
 
-async def test_create_fixed_sensor_entry(hass: HomeAssistant):
+async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     result = await _set_virtual_power_configuration(hass, result, {CONF_POWER: 20})
 
@@ -228,7 +228,7 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
+async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
 
     template = "{states(input_number.my_number} | float"
@@ -250,7 +250,7 @@ async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
+async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     result = await _set_virtual_power_configuration(
         hass,
@@ -270,7 +270,7 @@ async def test_create_fixed_sensor_entry_with_states_power(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_create_linear_sensor_entry(hass: HomeAssistant):
+async def test_create_linear_sensor_entry(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
     result = await _set_virtual_power_configuration(
         hass,
@@ -290,7 +290,7 @@ async def test_create_linear_sensor_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
+async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
     result = await _set_virtual_power_configuration(hass, result, {CONF_MIN_POWER: 20})
 
@@ -299,7 +299,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant):
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
-async def test_create_wled_sensor_entry(hass: HomeAssistant):
+async def test_create_wled_sensor_entry(hass: HomeAssistant) -> None:
     await _create_wled_entities(hass)
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.WLED)
@@ -321,7 +321,7 @@ async def test_create_wled_sensor_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_lut_manual_flow(hass: HomeAssistant):
+async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 
@@ -370,7 +370,7 @@ async def test_lut_manual_flow(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_lut_autodiscover_flow(hass: HomeAssistant):
+async def test_lut_autodiscover_flow(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     light_entity.manufacturer = "ikea"
     light_entity.model = "LED1545G12"
@@ -403,7 +403,7 @@ async def test_lut_autodiscover_flow(hass: HomeAssistant):
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant):
+async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON)
     light_entity.manufacturer = "ikea"
     # Set to model which is not in library
@@ -415,9 +415,9 @@ async def test_lut_not_autodiscovered_model_unsupported(hass: HomeAssistant):
     assert result["step_id"] == "manufacturer"
 
 
-async def test_lut_not_autodiscovered(hass: HomeAssistant):
+async def test_lut_not_autodiscovered(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON)
-    light_entity._attr_unique_id = None
+    light_entity._attr_unique_id = None  # noqa
     await create_mock_light_entity(hass, light_entity)
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
@@ -425,7 +425,7 @@ async def test_lut_not_autodiscovered(hass: HomeAssistant):
     assert result["step_id"] == "manufacturer"
 
 
-async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
+async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant) -> None:
     """
     When manufacturer and model are auto detected and user chooses to not accept it,
     make sure he/she is forwarded to the manufacturer listing
@@ -448,7 +448,7 @@ async def test_lut_autodiscover_flow_not_confirmed(hass: HomeAssistant):
     assert result["step_id"] == "manufacturer"
 
 
-async def test_lut_flow_with_sub_profiles(hass: HomeAssistant):
+async def test_lut_flow_with_sub_profiles(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 
@@ -559,7 +559,7 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
     assert {"value": "shelly", "label": "shelly"} in manufacturer_options
 
 
-async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
+async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
     advanced_options = {
         CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}",
@@ -584,7 +584,7 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant):
     )
 
 
-async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):
+async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -> None:
     result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
 
     user_input = {CONF_NAME: "My daily energy sensor"}
@@ -597,7 +597,7 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant):
     assert result["errors"] == {"base": "daily_energy_mandatory"}
 
 
-async def test_create_daily_energy_entry(hass: HomeAssistant):
+async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
     result = await _select_sensor_type(hass, SensorType.DAILY_ENERGY)
 
     user_input = {
@@ -627,7 +627,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.my_daily_energy_sensor_energy")
 
 
-async def test_create_group_entry(hass: HomeAssistant):
+async def test_create_group_entry(hass: HomeAssistant) -> None:
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
@@ -652,7 +652,7 @@ async def test_create_group_entry(hass: HomeAssistant):
     assert hass.states.get("sensor.my_group_sensor_power")
 
 
-async def test_create_group_entry_without_unique_id(hass: HomeAssistant):
+async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None:
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
@@ -676,7 +676,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant):
     assert hass.states.get("sensor.my_group_sensor_power")
 
 
-async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAssistant):
+async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAssistant) -> None:
     """
     Test if we can select previously created virtual power config entries as the group member.
     Only entries with a unique ID must be selectable
@@ -737,7 +737,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAss
     }
 
 
-async def test_group_error_mandatory(hass: HomeAssistant):
+async def test_group_error_mandatory(hass: HomeAssistant) -> None:
     result = await _select_sensor_type(hass, SensorType.GROUP)
     user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
     result = await hass.config_entries.flow.async_configure(
@@ -749,7 +749,7 @@ async def test_group_error_mandatory(hass: HomeAssistant):
     assert result["errors"]["base"] == "group_mandatory"
 
 
-async def test_fixed_options_flow(hass: HomeAssistant):
+async def test_fixed_options_flow(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -772,7 +772,7 @@ async def test_fixed_options_flow(hass: HomeAssistant):
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
 
 
-async def test_wled_options_flow(hass: HomeAssistant):
+async def test_wled_options_flow(hass: HomeAssistant) -> None:
     await _create_wled_entities(hass)
 
     entry = _create_mock_entry(
@@ -797,7 +797,7 @@ async def test_wled_options_flow(hass: HomeAssistant):
     assert entry.data[CONF_WLED][CONF_VOLTAGE] == 12
 
 
-async def test_linear_options_flow(hass: HomeAssistant):
+async def test_linear_options_flow(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -820,7 +820,7 @@ async def test_linear_options_flow(hass: HomeAssistant):
     assert entry.data[CONF_LINEAR][CONF_MAX_POWER] == 50
 
 
-async def test_daily_energy_options_flow(hass: HomeAssistant):
+async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -843,7 +843,7 @@ async def test_daily_energy_options_flow(hass: HomeAssistant):
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
 
-async def test_lut_options_flow(hass: HomeAssistant):
+async def test_lut_options_flow(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -888,7 +888,7 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
     assert result["errors"] == {"not_supported": "Power profile could not be loaded"}
 
 
-async def test_group_options_flow(hass: HomeAssistant):
+async def test_group_options_flow(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -915,7 +915,7 @@ async def test_group_options_flow(hass: HomeAssistant):
     # assert hass.states.get("sensor.kitchen_power").attributes.get(ATTR_ENTITIES) == new_entities
 
 
-async def test_linear_options_flow_error(hass: HomeAssistant):
+async def test_linear_options_flow_error(hass: HomeAssistant) -> None:
     entry = _create_mock_entry(
         hass,
         {
@@ -939,7 +939,7 @@ async def test_linear_options_flow_error(hass: HomeAssistant):
     assert result["errors"]["base"] == "linear_min_higher_as_max"
 
 
-async def test_strategy_raises_unknown_error(hass: HomeAssistant):
+async def test_strategy_raises_unknown_error(hass: HomeAssistant) -> None:
     with patch(
         "custom_components.powercalc.strategy.fixed.FixedStrategy.validate_config",
         side_effect=StrategyConfigurationError("test"),
@@ -959,7 +959,7 @@ async def test_strategy_raises_unknown_error(hass: HomeAssistant):
         assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
-async def test_autodiscovered_option_flow(hass: HomeAssistant):
+async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
     """
     Test that we can open an option flow for an auto discovered config entry
     """
@@ -1021,7 +1021,7 @@ def _assert_default_virtual_power_entry_data(
     strategy: CalculationStrategy,
     config_entry_data: Mapping[str, Any],
     expected_strategy_options: dict,
-):
+) -> None:
     assert (
         config_entry_data
         == {
@@ -1112,7 +1112,7 @@ async def _select_sensor_type(
     return result
 
 
-async def _create_wled_entities(hass: HomeAssistant):
+async def _create_wled_entities(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
     await create_mock_light_entity(hass, light_entity)
 

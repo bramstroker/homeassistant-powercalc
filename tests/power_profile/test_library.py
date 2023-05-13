@@ -48,7 +48,7 @@ async def test_get_profile(hass: HomeAssistant) -> None:
     assert profile
     assert profile.manufacturer == "signify"
     assert profile.model == "LCT010"
-    assert profile._directory.endswith("signify/LCT010")
+    assert profile.get_model_directory().endswith("signify/LCT010")
 
 
 async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant) -> None:
@@ -56,7 +56,7 @@ async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant) -> N
     profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCT010"))
     assert profile
     assert profile.manufacturer == "signify"
-    assert profile._directory.endswith("signify/LCT010")
+    assert profile.get_model_directory().endswith("signify/LCT010")
 
 
 async def test_get_profile_with_model_alias(hass: HomeAssistant) -> None:
@@ -64,7 +64,7 @@ async def test_get_profile_with_model_alias(hass: HomeAssistant) -> None:
     profile = await library.get_profile(
         ModelInfo(MANUFACTURER_IKEA, "TRADFRI bulb E14 WS opal 400lm"),
     )
-    assert profile._directory.endswith("ikea/LED1536G5")
+    assert profile.get_model_directory().endswith("ikea/LED1536G5")
 
 
 async def test_get_non_existing_profile(hass: HomeAssistant) -> None:

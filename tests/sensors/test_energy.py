@@ -31,7 +31,7 @@ from tests.common import (
 
 async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     hass: HomeAssistant,
-):
+) -> None:
     await create_input_boolean(hass)
 
     mock_device_registry(

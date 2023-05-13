@@ -47,7 +47,7 @@ async def test_load_fixed_profile(hass: HomeAssistant) -> None:
     assert power_profile.fixed_mode_config == {CONF_POWER: 50}
 
     with pytest.raises(UnsupportedStrategyError):
-        power_profile.linear_mode_config
+        _ = power_profile.linear_mode_config
 
 
 async def test_load_linear_profile(hass: HomeAssistant) -> None:
@@ -60,7 +60,7 @@ async def test_load_linear_profile(hass: HomeAssistant) -> None:
     assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
     with pytest.raises(UnsupportedStrategyError):
-        power_profile.fixed_mode_config
+        _ = power_profile.fixed_mode_config
 
 
 async def test_load_linked_profile(hass: HomeAssistant) -> None:
@@ -97,6 +97,12 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     assert power_profile.model == "test"
     assert power_profile.name == "Test"
     assert power_profile.sub_profile == "a"
+
+
+async def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
+    """By default the calculation strategy must be LUT when no strategy is configured"""
+    power_profile = PowerProfile(hass, "signify", "LCT010", "", {})
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
 
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant) -> None:

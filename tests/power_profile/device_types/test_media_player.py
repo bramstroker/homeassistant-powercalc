@@ -15,7 +15,7 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
-async def test_media_player(hass: HomeAssistant):
+async def test_media_player(hass: HomeAssistant) -> None:
     """
     Test that media player can be setup from profile library
     """
