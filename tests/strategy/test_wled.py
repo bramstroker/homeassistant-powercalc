@@ -22,7 +22,7 @@ from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity, run_powercalc_setup
 
 
-async def test_can_calculate_power(hass: HomeAssistant):
+async def test_can_calculate_power(hass: HomeAssistant) -> None:
     await create_mock_light_entity(hass, MockLight("test", STATE_ON, "abc"))
 
     light_source_entity = await create_source_entity("light.test", hass)
@@ -62,7 +62,7 @@ async def test_can_calculate_power(hass: HomeAssistant):
     assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
 
 
-async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant):
+async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant) -> None:
     """
     By default we will search for estimated_current entity by naming convention _estimated_current
     When none is found we check for entities on the same WLED device with device_class current
@@ -99,7 +99,7 @@ async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant
 
 async def test_exception_is_raised_when_no_estimated_current_entity_found(
     hass: HomeAssistant,
-):
+) -> None:
     with pytest.raises(StrategyConfigurationError):
         mock_registry(
             hass,
@@ -122,7 +122,7 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
         await strategy.find_estimated_current_entity()
 
 
-async def test_wled_autodiscovery_flow(hass: HomeAssistant):
+async def test_wled_autodiscovery_flow(hass: HomeAssistant) -> None:
     mock_device_registry(
         hass,
         {

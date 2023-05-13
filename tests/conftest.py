@@ -1,8 +1,13 @@
+from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.area_registry import AreaRegistry
+from homeassistant.helpers.device_registry import DeviceRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_area_registry,
@@ -20,7 +25,7 @@ from custom_components.powercalc.const import (
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
+def auto_enable_custom_integrations(enable_custom_integrations: bool) -> None:
     yield
 
 
@@ -36,25 +41,25 @@ def expected_lingering_timers() -> bool:
 
 
 @pytest.fixture
-def enable_custom_integrations(hass):
+def enable_custom_integrations(hass: HomeAssistant) -> None:
     """Enable custom integrations defined in the test dir."""
     hass.data.pop(loader.DATA_CUSTOM_COMPONENTS)
 
 
 @pytest.fixture
-def area_reg(hass):
+def area_reg(hass: HomeAssistant) -> AreaRegistry:
     """Return an empty, loaded, registry."""
     return mock_area_registry(hass)
 
 
 @pytest.fixture
-def device_reg(hass):
+def device_reg(hass: HomeAssistant) -> DeviceRegistry:
     """Return an empty, loaded, registry."""
     return mock_device_registry(hass)
 
 
 @pytest.fixture
-def entity_reg(hass):
+def entity_reg(hass: HomeAssistant) -> EntityRegistry:
     """Return an empty, loaded, registry."""
     return mock_registry(hass)
 
@@ -77,7 +82,7 @@ def mock_config_entry() -> MockConfigEntry:
 
 
 @pytest.fixture
-def mock_flow_init(hass):
+def mock_flow_init(hass: HomeAssistant) -> Generator:
     """Mock hass.config_entries.flow.async_init."""
     with patch.object(
         hass.config_entries.flow,

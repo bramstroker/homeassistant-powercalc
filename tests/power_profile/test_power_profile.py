@@ -23,7 +23,7 @@ from custom_components.powercalc.power_profile.power_profile import (
 from tests.common import get_test_profile_dir
 
 
-async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
+async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA001"),
         get_test_profile_dir("signify-LCA001"),
@@ -37,7 +37,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant):
     assert power_profile.name == "Hue White and Color Ambiance A19 E26/E27 (Gen 5)"
 
 
-async def test_load_fixed_profile(hass: HomeAssistant):
+async def test_load_fixed_profile(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("fixed"),
@@ -47,10 +47,10 @@ async def test_load_fixed_profile(hass: HomeAssistant):
     assert power_profile.fixed_mode_config == {CONF_POWER: 50}
 
     with pytest.raises(UnsupportedStrategyError):
-        power_profile.linear_mode_config
+        _ = power_profile.linear_mode_config
 
 
-async def test_load_linear_profile(hass: HomeAssistant):
+async def test_load_linear_profile(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("linear"),
@@ -60,10 +60,10 @@ async def test_load_linear_profile(hass: HomeAssistant):
     assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
     with pytest.raises(UnsupportedStrategyError):
-        power_profile.fixed_mode_config
+        _ = power_profile.fixed_mode_config
 
 
-async def test_load_linked_profile(hass: HomeAssistant):
+async def test_load_linked_profile(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA007"),
         get_test_profile_dir("linked_profile"),
@@ -74,7 +74,7 @@ async def test_load_linked_profile(hass: HomeAssistant):
     assert power_profile.name == "Linked profile"
 
 
-async def test_load_sub_profile(hass: HomeAssistant):
+async def test_load_sub_profile(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("yeelight", "YLDL01YL/ambilight"),
     )
@@ -86,7 +86,7 @@ async def test_load_sub_profile(hass: HomeAssistant):
     assert power_profile.is_additional_configuration_required is False
 
 
-async def test_load_sub_profile_without_model_json(hass: HomeAssistant):
+async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     """Test if sub profile can be loaded correctly when the sub directories don't have an own model.json"""
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("test", "test/a"),
@@ -99,14 +99,20 @@ async def test_load_sub_profile_without_model_json(hass: HomeAssistant):
     assert power_profile.sub_profile == "a"
 
 
-async def test_error_when_sub_profile_not_exists(hass: HomeAssistant):
+async def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
+    """By default the calculation strategy must be LUT when no strategy is configured"""
+    power_profile = PowerProfile(hass, "signify", "LCT010", "", {})
+    assert power_profile.calculation_strategy == CalculationStrategy.LUT
+
+
+async def test_error_when_sub_profile_not_exists(hass: HomeAssistant) -> None:
     with pytest.raises(ModelNotSupportedError):
         await ProfileLibrary.factory(hass).get_profile(
             ModelInfo("yeelight", "YLDL01YL/ambilight_boo"),
         )
 
 
-async def test_unsupported_entity_domain(hass: HomeAssistant):
+async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("signify", "LCA007"),
     )
@@ -118,12 +124,12 @@ async def test_unsupported_entity_domain(hass: HomeAssistant):
     )
 
 
-async def test_sub_profile_attribute_match(hass: HomeAssistant):
+async def test_sub_profile_attribute_match(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_attribute_match"),
     )
-    selector = SubProfileSelector(hass, power_profile)
+    selector = SubProfileSelector(hass, power_profile.sub_profile_select)
     assert len(selector.get_tracking_entities()) == 0
 
     state = State("light.test", STATE_OFF)
@@ -136,12 +142,12 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant):
     assert selector.select_sub_profile(state) == "b"
 
 
-async def test_sub_profile_entity_id_match(hass: HomeAssistant):
+async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_entity_id_match"),
     )
-    selector = SubProfileSelector(hass, power_profile)
+    selector = SubProfileSelector(hass, power_profile.sub_profile_select)
     assert len(selector.get_tracking_entities()) == 0
 
     state = State("light.test_nightlight", STATE_ON)
@@ -153,7 +159,7 @@ async def test_sub_profile_entity_id_match(hass: HomeAssistant):
 
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
     hass: HomeAssistant,
-):
+) -> None:
     with pytest.raises(PowercalcSetupError):
         power_profile = PowerProfile(
             hass,
@@ -167,7 +173,7 @@ async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
                 },
             },
         )
-        SubProfileSelector(hass, power_profile)
+        SubProfileSelector(hass, power_profile.sub_profile_select)
 
 
 async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:

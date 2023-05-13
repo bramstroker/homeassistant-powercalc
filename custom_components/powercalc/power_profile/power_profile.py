@@ -242,21 +242,17 @@ class SubProfileSelector:
     def __init__(
         self,
         hass: HomeAssistant,
-        power_profile: PowerProfile,
+        config: SubProfileSelectConfig,
         source_entity: SourceEntity | None = None,
     ) -> None:
         self._hass = hass
-        self._power_profile = power_profile
+        self._config = config
         self._source_entity = source_entity
         self._matchers: list[SubProfileMatcher] = self._build_matchers()
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
         matchers: list[SubProfileMatcher] = []
-        select_config = self._power_profile.sub_profile_select
-        if not select_config:
-            return matchers
-
-        for matcher_config in select_config.matchers:
+        for matcher_config in self._config.matchers:
             matchers.append(self._create_matcher(matcher_config))
         return matchers
 
@@ -269,11 +265,7 @@ class SubProfileSelector:
             if sub_profile:
                 return sub_profile
 
-        if self._power_profile.sub_profile_select is None:
-            raise PowercalcSetupError(
-                "Power profile has no sub profile select configuration",
-            )
-        return self._power_profile.sub_profile_select.default
+        return self._config.default
 
     def get_tracking_entities(self) -> list[str]:
         """Get additional list of entities to track for state changes."""

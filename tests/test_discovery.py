@@ -1,4 +1,5 @@
 import logging
+from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ColorMode
@@ -36,7 +37,7 @@ from custom_components.test.light import MockLight
 from .common import create_mock_light_entity, run_powercalc_setup
 
 
-async def test_autodiscovery(hass: HomeAssistant, mock_flow_init) -> None:
+async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> None:
     """Test that models are automatically discovered and power sensors created"""
 
     lighta = MockLight("testa")
@@ -74,7 +75,7 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init) -> None:
 
 async def test_discovery_skipped_when_confirmed_by_user(
     hass: HomeAssistant,
-    mock_flow_init,
+    mock_flow_init: AsyncMock,
 ) -> None:
     light_entity = MockLight("test")
     light_entity.manufacturer = "lidl"
@@ -101,7 +102,7 @@ async def test_discovery_skipped_when_confirmed_by_user(
     assert not mock_flow_init.mock_calls
 
 
-async def test_autodiscovery_disabled(hass: HomeAssistant):
+async def test_autodiscovery_disabled(hass: HomeAssistant) -> None:
     """Test that power sensors are not automatically added when auto discovery is disabled"""
 
     light_entity = MockLight("testa")
@@ -150,7 +151,7 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
 
 async def test_manually_configured_light_overrides_autodiscovered(
     hass: HomeAssistant,
-    mock_flow_init,
+    mock_flow_init: AsyncMock,
 ) -> None:
     light_entity = MockLight("testing")
     light_entity.manufacturer = "signify"
@@ -300,7 +301,7 @@ async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> N
     assert not hass.states.get("sensor.test_device_power")
 
 
-async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRegistry):
+async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
     """
     Discovered model with slashes should not be treated as a sub lut profile
     """
@@ -355,7 +356,7 @@ async def test_autodiscover_model_from_entity_entry(
     model: str,
     expected_manufacturer: str,
     expected_model: str,
-):
+) -> None:
     """
     Test the autodiscovery lookup from the library by manufacturer and model information
     A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
@@ -382,7 +383,7 @@ async def test_get_power_profile_empty_manufacturer(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
     light_mock = MockLight("test")
     light_mock.manufacturer = ""
@@ -404,7 +405,7 @@ async def test_get_power_profile_empty_manufacturer(
 async def test_no_power_sensors_are_created_for_ignored_config_entries(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.DEBUG)
 
     unique_id = "abc"

@@ -18,7 +18,7 @@ from custom_components.powercalc.const import (
 from tests.common import create_input_booleans, run_powercalc_setup
 
 
-async def test_standby_group(hass: HomeAssistant):
+async def test_standby_group(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test1", "test2"])
 
     await run_powercalc_setup(

@@ -210,7 +210,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if light_setting.color_mode == ColorMode.BRIGHTNESS:
             return lut_value  # type: ignore
 
-        if not isinstance(lut_value, dict):
+        if not isinstance(lut_value, dict):  # pragma: no cover
             _LOGGER.warning(
                 "Cannot calculate power for LutStrategy, expecting a dictionary",
             )

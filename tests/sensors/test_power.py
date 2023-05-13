@@ -67,7 +67,7 @@ from tests.common import (
 )
 
 
-async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
+async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     platform = MockEntityPlatform(hass)
@@ -108,7 +108,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
     }
 
 
-async def test_rounding_precision(hass: HomeAssistant):
+async def test_rounding_precision(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     config = {CONF_POWER_SENSOR_PRECISION: 4}
@@ -129,7 +129,7 @@ async def test_rounding_precision(hass: HomeAssistant):
     assert power_state.state == "50.0000"
 
 
-async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
+async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) -> None:
     """
     The initial state of the power sensor should be calculated after HA startup completes.
     When we do it already during powercalc setup some entities referred in template could be unknown yet
@@ -153,7 +153,7 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
     assert hass.states.get("sensor.henkie_power").state == "30.00"
 
 
-async def test_standby_power(hass: HomeAssistant):
+async def test_standby_power(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -178,7 +178,7 @@ async def test_standby_power(hass: HomeAssistant):
     assert power_state.state == "15.00"
 
 
-async def test_multiply_factor(hass: HomeAssistant):
+async def test_multiply_factor(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -205,7 +205,7 @@ async def test_multiply_factor(hass: HomeAssistant):
 async def test_error_when_no_strategy_has_been_configured(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
@@ -217,7 +217,7 @@ async def test_error_when_no_strategy_has_been_configured(
     assert "Skipping sensor setup" in caplog.text
 
 
-async def test_strategy_enabled_condition(hass: HomeAssistant):
+async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
     """
     Test calculation_enabled_condition is working correctly.
     This is used for example on robot vacuum cleaners.
@@ -305,7 +305,7 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "15.00"
 
 
-async def test_unknown_source_entity_state(hass: HomeAssistant):
+async def test_unknown_source_entity_state(hass: HomeAssistant) -> None:
     """Power sensor should be unavailable when source entity state is unknown"""
     await create_input_boolean(hass)
     await run_powercalc_setup(
@@ -324,7 +324,7 @@ async def test_unknown_source_entity_state(hass: HomeAssistant):
 async def test_error_when_model_not_supported(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
 
     await create_input_boolean(hass)
@@ -342,7 +342,7 @@ async def test_error_when_model_not_supported(
     assert "Skipping sensor setup" in caplog.text
 
 
-async def test_sleep_power(hass: HomeAssistant):
+async def test_sleep_power(hass: HomeAssistant) -> None:
     """Test sleep power for devices having a sleep mode"""
     entity_id = "media_player.test"
     power_entity_id = "sensor.test_power"
@@ -387,7 +387,7 @@ async def test_sleep_power(hass: HomeAssistant):
     assert hass.states.get(power_entity_id).state == "100.00"
 
 
-async def test_unavailable_power(hass: HomeAssistant):
+async def test_unavailable_power(hass: HomeAssistant) -> None:
     """Test specifying an alternative power value if the source entity is unavailable"""
     await create_input_boolean(hass)
 

@@ -28,13 +28,13 @@ from tests.common import create_input_boolean, create_input_number, run_powercal
 from .common import create_source_entity
 
 
-async def test_simple_power():
+async def test_simple_power() -> None:
     source_entity = create_source_entity("switch")
     strategy = FixedStrategy(source_entity, power=50, per_state_power=None)
     assert await strategy.calculate(State(source_entity.entity_id, STATE_ON)) == 50
 
 
-async def test_template_power(hass: HomeAssistant):
+async def test_template_power(hass: HomeAssistant) -> None:
     await create_input_number(hass, "test", 42)
 
     await hass.async_block_till_done()
@@ -57,7 +57,7 @@ async def test_template_power(hass: HomeAssistant):
     assert track_entity.template.template == template
 
 
-async def test_states_power(hass: HomeAssistant):
+async def test_states_power(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player")
     strategy = _create_strategy(
         hass,
@@ -73,7 +73,7 @@ async def test_states_power(hass: HomeAssistant):
     assert await strategy.calculate(State(source_entity.entity_id, "whatever")) == 20
 
 
-async def test_states_power_with_template(hass: HomeAssistant):
+async def test_states_power_with_template(hass: HomeAssistant) -> None:
     assert await async_setup_component(
         hass,
         input_number.DOMAIN,
@@ -114,7 +114,7 @@ async def test_states_power_with_template(hass: HomeAssistant):
     )
 
 
-async def test_states_power_with_attributes(hass: HomeAssistant):
+async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player")
 
     strategy = _create_strategy(
@@ -149,7 +149,7 @@ async def test_states_power_with_attributes(hass: HomeAssistant):
     )
 
 
-async def test_validation_error_when_no_power_supplied():
+async def test_validation_error_when_no_power_supplied() -> None:
     with pytest.raises(StrategyConfigurationError):
         strategy = FixedStrategy(
             power=None,
@@ -159,7 +159,7 @@ async def test_validation_error_when_no_power_supplied():
         await strategy.validate_config()
 
 
-async def test_validation_error_state_power_only_entity_domain():
+async def test_validation_error_state_power_only_entity_domain() -> None:
     with pytest.raises(StrategyConfigurationError):
         strategy = FixedStrategy(
             power=20,
@@ -169,7 +169,7 @@ async def test_validation_error_state_power_only_entity_domain():
         await strategy.validate_config()
 
 
-async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant):
+async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant) -> None:
     await create_input_boolean(hass, "test")
     await create_input_number(hass, "test", 30)
 
@@ -198,7 +198,7 @@ async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant
     assert state.state == "40.00"
 
 
-async def test_config_entry_with_states_power_template(hass: HomeAssistant):
+async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> None:
     await create_input_number(hass, "test", 30)
 
     config_entry = MockConfigEntry(
@@ -227,7 +227,7 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant):
     assert state.state == "40.00"
 
 
-async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant):
+async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/1369
     """

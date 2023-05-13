@@ -20,7 +20,7 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_profile_dir, run_powercalc_setup
 
 
-async def test_smart_switch(hass: HomeAssistant):
+async def test_smart_switch(hass: HomeAssistant) -> None:
     """
     Test that smart plug can be setup from profile library
     """
@@ -77,7 +77,7 @@ async def test_smart_switch(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
+async def test_smart_switch_power_input_yaml(hass: HomeAssistant) -> None:
     """
     Test a smart switch can be setup with YAML and a fixed power value for the appliance configured by the user
     The values for standby power on and off should be taken from the power profile library.
@@ -137,7 +137,7 @@ async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
+async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant) -> None:
     """
     Test a smart switch can be setup with GUI and a fixed power value for the appliance configured by the user
     The values for standby power on and off should be taken from the power profile library.

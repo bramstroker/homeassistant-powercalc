@@ -6,13 +6,17 @@ Call init before using it in your tests to ensure clean test data.
 import uuid
 
 from homeassistant.components.light import LightEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from pytest_homeassistant_custom_component.common import MockToggleEntity
 
 ENTITIES = []
 
 
-def init(empty=False):
+def init(empty: bool = False) -> None:
     """Initialize the platform with entities."""
     global ENTITIES
 
@@ -22,22 +26,22 @@ def init(empty=False):
         else [
             MockLight("Ceiling", STATE_ON),
             MockLight("Ceiling", STATE_OFF),
-            MockLight(None, STATE_OFF),
+            MockLight("", STATE_OFF),
         ]
     )
 
 
 async def async_setup_platform(
-    hass,
-    config,
-    async_add_entities_callback,
-    discovery_info=None,
-):
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities_callback: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> None:
     """Return mock entities."""
     async_add_entities_callback(ENTITIES)
 
 
-async def async_setup_entry(hass, entry, async_add_entities) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> bool:
     async_add_entities(ENTITIES)
     return True
 
@@ -76,7 +80,7 @@ class MockLight(MockToggleEntity, LightEntity):
         self._attr_unique_id = unique_id
 
     @property
-    def device_info(self):
+    def device_info(self) -> dict:
         return {
             "identifiers": {("hue", self.unique_id)},
             "name": self.name,
@@ -84,7 +88,7 @@ class MockLight(MockToggleEntity, LightEntity):
             "model": self.model,
         }
 
-    def turn_on(self, **kwargs):
+    def turn_on(self, **kwargs) -> None:  # noqa: ANN003
         """Turn the entity on."""
         super().turn_on(**kwargs)
         for key, value in kwargs.items():

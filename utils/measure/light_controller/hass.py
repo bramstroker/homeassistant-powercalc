@@ -21,8 +21,8 @@ class HassLightController(LightController):
             raise LightControllerError(f"Failed to connect to HA API: {e}") from e
 
     def change_light_state(
-        self, color_mode: str, on: bool = True, **kwargs
-    ) -> None:  # noqa: ANN003
+        self, color_mode: str, on: bool = True, **kwargs,  # noqa: ANN003
+    ) -> None:
         if not on:
             self.client.trigger_service("light", "turn_off", entity_id=self._entity_id)
             return

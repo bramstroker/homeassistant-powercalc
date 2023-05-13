@@ -354,7 +354,7 @@ class LightRunner(MeasurementRunner):
         return formatted_time
 
     def nudge_and_remeasure(
-        self, color_mode: str, variation: Variation
+        self, color_mode: str, variation: Variation,
     ) -> float | None:
         nudge_count = 0
         for nudge_count in range(config.MAX_NUDGES):  # noqa: B007

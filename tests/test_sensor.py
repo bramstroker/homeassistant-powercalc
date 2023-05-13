@@ -74,7 +74,7 @@ from .common import (
 )
 
 
-async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
+async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -104,7 +104,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant):
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
 
 
-async def test_utility_meter_is_created(hass: HomeAssistant):
+async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
     """Test that utility meters are succesfully created when `create_utility_meter: true`"""
     await create_input_boolean(hass)
 
@@ -132,7 +132,7 @@ async def test_utility_meter_is_created(hass: HomeAssistant):
     assert not monthly_state
 
 
-async def test_create_nested_group_sensor(hass: HomeAssistant):
+async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test", "test1", "test2"])
 
     await run_powercalc_setup(
@@ -182,7 +182,7 @@ async def test_create_nested_group_sensor(hass: HomeAssistant):
     assert group2.state == "0.00"
 
 
-async def test_light_lut_strategy(hass: HomeAssistant):
+async def test_light_lut_strategy(hass: HomeAssistant) -> None:
     light_entity = test_light_platform.MockLight(
         "test1",
         STATE_ON,
@@ -212,7 +212,7 @@ async def test_light_lut_strategy(hass: HomeAssistant):
 async def test_error_when_configuring_same_entity_twice(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
@@ -229,7 +229,7 @@ async def test_error_when_configuring_same_entity_twice(
     assert hass.states.get("sensor.test_energy")
 
 
-async def test_alternate_naming_strategy(hass: HomeAssistant):
+async def test_alternate_naming_strategy(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     assert await async_setup_component(
@@ -267,7 +267,7 @@ async def test_alternate_naming_strategy(hass: HomeAssistant):
     assert energy_state.attributes.get(ATTR_FRIENDLY_NAME) == "test Energy friendly"
 
 
-async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
+async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -297,7 +297,7 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant):
 async def test_unsupported_model_is_skipped_from_autodiscovery(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     light = test_light_platform.MockLight("test", STATE_ON)
     light.manufacturer = "lidl"
     light.model = "non_existing_model"
@@ -313,7 +313,7 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
 async def test_can_include_autodiscovered_entity_in_group(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     """Test that models are automatically discovered and power sensors created"""
 
     caplog.set_level(logging.ERROR)
@@ -348,7 +348,7 @@ async def test_can_include_autodiscovered_entity_in_group(
 async def test_user_can_rename_entity_id(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
-):
+) -> None:
     """
     When the power/energy sensors exist already with an unique ID, don't change the entity ID
     This allows the users to change the entity ID's from the GUI
@@ -393,7 +393,7 @@ async def test_entities_are_bound_to_source_device(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     device_reg: DeviceRegistry,
-):
+) -> None:
     """
     Test that all powercalc created sensors are attached to same device as the source entity
     """
@@ -452,7 +452,7 @@ async def test_entities_are_bound_to_source_device(
 async def test_entities_are_bound_to_source_device2(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     """
     When using the power_sensor_id option the energy sensors and utility meters must be bound to the same device.
     Also make sure no errors are logged
@@ -554,7 +554,7 @@ async def test_entities_are_bound_to_disabled_source_device(
     assert energy_entity_entry.device_id == device_id
 
 
-async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant):
+async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test1", "test2", "test3"])
 
     await run_powercalc_setup(
@@ -580,7 +580,7 @@ async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssis
 async def test_change_options_of_renamed_sensor(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
-):
+) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={
@@ -629,7 +629,7 @@ async def test_change_options_of_renamed_sensor(
 async def test_renaming_sensor_is_retained_after_startup(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
-):
+) -> None:
     entity_reg.async_get_or_create(
         "sensor",
         DOMAIN,
@@ -662,7 +662,7 @@ async def test_renaming_sensor_is_retained_after_startup(
 async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     """
     When creating a group or setting up multiple entities in one platform entry,
     a sensor with an error should be skipped and not prevent the whole group from being setup.

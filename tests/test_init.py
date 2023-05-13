@@ -38,7 +38,7 @@ from .common import (
 )
 
 
-async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
+async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
     await create_input_boolean(hass)
 
     domain_config = {
@@ -69,7 +69,7 @@ async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry):
     assert entity_entry.platform == "powercalc"
 
 
-async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):
+async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
     unique_id = "98493943242"
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -95,7 +95,7 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry):
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant):
+async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/939
     """

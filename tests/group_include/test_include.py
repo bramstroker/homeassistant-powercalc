@@ -35,7 +35,7 @@ async def test_include_area(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     area_reg: AreaRegistry,
-):
+) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area = area_reg.async_get_or_create("Bathroom 1")
@@ -66,7 +66,7 @@ async def test_include_area(
 async def test_include_area_not_found(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
-):
+) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
         hass,
@@ -78,7 +78,7 @@ async def test_include_area_not_found(
     assert "No area with id or name" in caplog.text
 
 
-async def test_include_light_group(hass: HomeAssistant):
+async def test_include_light_group(hass: HomeAssistant) -> None:
     discoverable_light = create_discoverable_light("bathroom_mirror")
     non_discoverable_light = MockLight("bathroom_spots")
 
@@ -262,7 +262,7 @@ async def test_include_filter_domain(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     area_reg: AreaRegistry,
-):
+) -> None:
     area = area_reg.async_get_or_create("Bathroom 1")
     await hass.async_block_till_done()
 
