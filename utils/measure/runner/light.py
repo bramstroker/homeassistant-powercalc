@@ -355,7 +355,7 @@ class LightRunner(MeasurementRunner):
 
     def nudge_and_remeasure(self, color_mode: str, variation: Variation) -> float | None:
         nudge_count = 0
-        for nudge_count in range(config.MAX_NUDGES):
+        for nudge_count in range(config.MAX_NUDGES):  # noqa: B007
             try:
                 # Likely not significant enough change for PM to detect. Try nudging it
                 _LOGGER.warning("Measurement is stuck, Nudging")

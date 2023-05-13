@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from typing import Any
 
 import requests
 
@@ -21,7 +22,10 @@ class TasmotaPowerMeter(PowerMeter):
 
         try:
             power = json["StatusSNS"]["ENERGY"]["Power"]
-        except KeyError:
-            raise PowerMeterError("Unexpected JSON response format")
+        except KeyError as error:
+            raise PowerMeterError("Unexpected JSON response format") from error
 
         return PowerMeasurementResult(float(power), time.time())
+
+    def process_answers(self, answers: dict[str, Any]) -> None:
+        pass

@@ -18,7 +18,7 @@ class HassMediaController(MediaController):
             self.client = Client(api_url, token, cache_session=False)
             self.client.get_config()
         except HomeassistantAPIError as e:
-            raise MediaPlayerError(f"Failed to connect to HA API: {e}")
+            raise MediaPlayerError(f"Failed to connect to HA API: {e}") from e
 
     def set_volume(self, volume: int) -> None:
         self.client.trigger_service(

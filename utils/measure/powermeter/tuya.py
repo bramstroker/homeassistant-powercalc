@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from typing import Any
 
 import tuyapower
 
@@ -24,7 +25,7 @@ class TuyaPowerMeter(PowerMeter):
         self._device_version = device_version
 
     def get_power(self) -> PowerMeasurementResult:
-        (on, w, mA, V, err) = tuyapower.deviceInfo(
+        (_, w, _, _, err) = tuyapower.deviceInfo(
             self._device_id,
             self._device_ip,
             self._device_key,
@@ -35,3 +36,6 @@ class TuyaPowerMeter(PowerMeter):
             raise PowerMeterError("Could not get a successful power reading")
 
         return PowerMeasurementResult(w, time.time())
+
+    def process_answers(self, answers: dict[str, Any]) -> None:
+        pass

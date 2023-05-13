@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from typing import Any
 
 from .powermeter import PowerMeasurementResult, PowerMeter
 
@@ -12,7 +13,7 @@ class OcrPowerMeter(PowerMeter):
             "../ocr/ocr_results.txt",
         )
 
-        self.file = open(filepath, "rb")
+        self.file = open(filepath, "rb")  # noqa: SIM115
         super().__init__()
 
     def get_power(self) -> PowerMeasurementResult:
@@ -22,7 +23,7 @@ class OcrPowerMeter(PowerMeter):
         timestamp = float(timestamp)
         return PowerMeasurementResult(power, timestamp)
 
-    def read_last_line(self):
+    def read_last_line(self) -> str:
         try:
             self.file.seek(-2, os.SEEK_END)
             while self.file.read(1) != b"\n":
@@ -30,3 +31,6 @@ class OcrPowerMeter(PowerMeter):
         except OSError:
             self.file.seek(0)
         return self.file.readline().decode()
+
+    def process_answers(self, answers: dict[str, Any]) -> None:
+        pass

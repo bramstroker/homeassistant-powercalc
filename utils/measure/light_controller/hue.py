@@ -21,7 +21,7 @@ class HueLightController(LightController):
         self.is_group: bool = False
         self.light_id: int | None = None
 
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:
+    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # noqa: ANN003
         kwargs["on"] = on
         if self.is_group:
             self.bridge.set_group(self.light_id, kwargs)
@@ -73,9 +73,7 @@ class HueLightController(LightController):
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
         except PhueRegistrationException:
-            print(
-                "Please click the link button on the bridge, than hit enter.."
-            )  # noqa: T201
+            print("Please click the link button on the bridge, than hit enter..")
             input()
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
 
