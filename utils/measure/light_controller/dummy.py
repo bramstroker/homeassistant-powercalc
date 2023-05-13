@@ -9,8 +9,8 @@ from .controller import LightController, LightInfo
 
 class DummyLightController(LightController):
     def change_light_state(
-        self, color_mode: str, on: bool = True, **kwargs
-    ) -> None:  # noqa: ANN003
+        self, color_mode: str, on: bool = True, **kwargs,  # noqa: ANN003
+    ) -> None:
         pass
 
     def get_light_info(self) -> LightInfo:

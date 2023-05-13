@@ -144,7 +144,7 @@ async def create_virtual_power_sensor(
                 if power_profile and power_profile.sub_profile_select:
                     sub_profile_selector = SubProfileSelector(
                         hass,
-                        power_profile,
+                        power_profile.sub_profile_select,
                         source_entity,
                     )
                     power_profile.select_sub_profile(
@@ -427,7 +427,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._power_profile and self._power_profile.sub_profile_select:
             self._sub_profile_selector = SubProfileSelector(
                 self.hass,
-                self._power_profile,
+                self._power_profile.sub_profile_select,
                 self._source_entity,
             )
             track_entities.extend(self._sub_profile_selector.get_tracking_entities())
