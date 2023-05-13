@@ -21,7 +21,9 @@ class HueLightController(LightController):
         self.is_group: bool = False
         self.light_id: int | None = None
 
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs) -> None:  # noqa: ANN003
+    def change_light_state(
+        self, color_mode: str, on: bool = True, **kwargs
+    ) -> None:  # noqa: ANN003
         kwargs["on"] = on
         if self.is_group:
             self.bridge.set_group(self.light_id, kwargs)

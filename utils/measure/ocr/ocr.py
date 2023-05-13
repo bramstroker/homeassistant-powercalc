@@ -277,7 +277,9 @@ class OCR:
     """Class for creating a pytesseract OCR process in a dedicated thread"""
 
     def __init__(
-        self, video_stream: VideoStream, region_selection: OcrRegionSelection,
+        self,
+        video_stream: VideoStream,
+        region_selection: OcrRegionSelection,
     ) -> None:
         self.measurement: Decimal | None = None
         self.stopped: bool = False
