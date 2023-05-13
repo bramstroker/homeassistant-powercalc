@@ -208,7 +208,9 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant) -> None:
     "sensor_type",
     [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY, SensorType.GROUP],
 )
-async def test_sensor_type_form_displayed(hass: HomeAssistant, sensor_type: SensorType) -> None:
+async def test_sensor_type_form_displayed(
+    hass: HomeAssistant, sensor_type: SensorType
+) -> None:
     await _select_sensor_type(hass, sensor_type)
 
 
@@ -676,7 +678,9 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
     assert hass.states.get("sensor.my_group_sensor_power")
 
 
-async def test_can_select_existing_powercalc_entry_as_group_member(hass: HomeAssistant) -> None:
+async def test_can_select_existing_powercalc_entry_as_group_member(
+    hass: HomeAssistant,
+) -> None:
     """
     Test if we can select previously created virtual power config entries as the group member.
     Only entries with a unique ID must be selectable

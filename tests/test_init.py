@@ -95,7 +95,9 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> 
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_domain_light_group_with_autodiscovery_enabled(hass: HomeAssistant) -> None:
+async def test_domain_light_group_with_autodiscovery_enabled(
+    hass: HomeAssistant,
+) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/939
     """

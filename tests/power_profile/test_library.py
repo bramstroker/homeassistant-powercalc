@@ -37,7 +37,9 @@ async def test_get_subprofile_listing_empty_list(hass: HomeAssistant) -> None:
     assert sub_profiles == []
 
 
-async def test_non_existing_manufacturer_returns_empty_model_list(hass: HomeAssistant) -> None:
+async def test_non_existing_manufacturer_returns_empty_model_list(
+    hass: HomeAssistant,
+) -> None:
     library = ProfileLibrary(hass)
     assert not library.get_model_listing("foo")
 

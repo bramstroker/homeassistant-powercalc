@@ -169,7 +169,9 @@ async def test_validation_error_state_power_only_entity_domain() -> None:
         await strategy.validate_config()
 
 
-async def test_config_entry_with_template_rendered_correctly(hass: HomeAssistant) -> None:
+async def test_config_entry_with_template_rendered_correctly(
+    hass: HomeAssistant,
+) -> None:
     await create_input_boolean(hass, "test")
     await create_input_number(hass, "test", 30)
 
@@ -227,7 +229,9 @@ async def test_config_entry_with_states_power_template(hass: HomeAssistant) -> N
     assert state.state == "40.00"
 
 
-async def test_template_power_combined_with_multiply_factor(hass: HomeAssistant) -> None:
+async def test_template_power_combined_with_multiply_factor(
+    hass: HomeAssistant,
+) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/1369
     """

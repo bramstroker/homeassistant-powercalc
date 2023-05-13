@@ -22,7 +22,10 @@ class HueLightController(LightController):
         self.light_id: int | None = None
 
     def change_light_state(
-        self, color_mode: str, on: bool = True, **kwargs,  # noqa: ANN003
+        self,
+        color_mode: str,
+        on: bool = True,
+        **kwargs,  # noqa: ANN003
     ) -> None:
         kwargs["on"] = on
         if self.is_group:

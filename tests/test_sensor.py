@@ -554,7 +554,9 @@ async def test_entities_are_bound_to_disabled_source_device(
     assert energy_entity_entry.device_id == device_id
 
 
-async def test_setup_multiple_entities_in_single_platform_config(hass: HomeAssistant) -> None:
+async def test_setup_multiple_entities_in_single_platform_config(
+    hass: HomeAssistant,
+) -> None:
     await create_input_booleans(hass, ["test1", "test2", "test3"])
 
     await run_powercalc_setup(

@@ -62,7 +62,9 @@ async def test_can_calculate_power(hass: HomeAssistant) -> None:
     assert pytest.approx(0.225, 0.01) == float(await strategy.calculate(state))
 
 
-async def test_find_estimated_current_entity_by_device_class(hass: HomeAssistant) -> None:
+async def test_find_estimated_current_entity_by_device_class(
+    hass: HomeAssistant,
+) -> None:
     """
     By default we will search for estimated_current entity by naming convention _estimated_current
     When none is found we check for entities on the same WLED device with device_class current

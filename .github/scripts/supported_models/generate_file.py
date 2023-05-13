@@ -90,7 +90,8 @@ def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
         if device_type not in manufacturer_device_types[manufacturer]:
             manufacturer_device_types[manufacturer].append(device_type)
     with open(
-        os.path.join(DATA_DIR, "manufacturer_device_types.json"), "w",
+        os.path.join(DATA_DIR, "manufacturer_device_types.json"),
+        "w",
     ) as json_file:
         json_file.write(json.dumps(manufacturer_device_types))
 

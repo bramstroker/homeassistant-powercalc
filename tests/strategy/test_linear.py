@@ -149,7 +149,9 @@ async def test_error_on_non_number_state(
     assert "Expecting state to be a number for entity" in caplog.text
 
 
-async def test_validate_raises_exception_not_allowed_domain(hass: HomeAssistant) -> None:
+async def test_validate_raises_exception_not_allowed_domain(
+    hass: HomeAssistant,
+) -> None:
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,
@@ -240,7 +242,9 @@ async def test_media_player_volume_level(hass: HomeAssistant) -> None:
     assert not await strategy.calculate(state)
 
 
-async def test_error_is_raised_on_unsupported_entity_domain(hass: HomeAssistant) -> None:
+async def test_error_is_raised_on_unsupported_entity_domain(
+    hass: HomeAssistant,
+) -> None:
     with pytest.raises(StrategyConfigurationError):
         await _create_strategy_instance(
             hass,

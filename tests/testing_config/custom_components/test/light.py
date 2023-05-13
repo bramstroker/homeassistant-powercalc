@@ -41,7 +41,9 @@ async def async_setup_platform(
     async_add_entities_callback(ENTITIES)
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> bool:
+async def async_setup_entry(
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> bool:
     async_add_entities(ENTITIES)
     return True
 

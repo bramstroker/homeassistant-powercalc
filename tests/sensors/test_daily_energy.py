@@ -127,7 +127,9 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant) -> None:
     assert_entity_state(hass, sensor_entity_id, "12.0000")
 
 
-async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant) -> None:
+async def test_daily_energy_sensor_also_creates_power_sensor(
+    hass: HomeAssistant,
+) -> None:
     """
     When the user configured the value in W and the on_time is always on,
     then a power sensor should also be created
@@ -154,7 +156,9 @@ async def test_daily_energy_sensor_also_creates_power_sensor(hass: HomeAssistant
     assert state.name == "IP camera upstairs power"
 
 
-async def test_power_sensor_not_created_when_not_on_whole_day(hass: HomeAssistant) -> None:
+async def test_power_sensor_not_created_when_not_on_whole_day(
+    hass: HomeAssistant,
+) -> None:
     await run_powercalc_setup(
         hass,
         {
@@ -405,7 +409,9 @@ async def test_restore_state(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.my_daily_energy").state == "0.5000"
 
 
-async def test_restore_state_catches_decimal_conversion_exception(hass: HomeAssistant) -> None:
+async def test_restore_state_catches_decimal_conversion_exception(
+    hass: HomeAssistant,
+) -> None:
     mock_restore_cache(
         hass,
         [
@@ -465,7 +471,9 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
     assert state
 
 
-async def _trigger_periodic_update(hass: HomeAssistant, number_of_updates: int = 1) -> None:
+async def _trigger_periodic_update(
+    hass: HomeAssistant, number_of_updates: int = 1
+) -> None:
     for _i in range(0, number_of_updates):
         async_fire_time_changed(
             hass,

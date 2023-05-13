@@ -520,7 +520,9 @@ async def test_members_are_unhiden_after_group_removed(
     assert not entity_reg.async_get("sensor.mygroup_power")
 
 
-async def test_group_utility_meter(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
+async def test_group_utility_meter(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+) -> None:
     entity_reg.async_get_or_create(
         "sensor",
         DOMAIN,
@@ -600,7 +602,9 @@ async def test_include_config_entries_in_group(hass: HomeAssistant) -> None:
     }
 
 
-async def test_add_virtual_power_sensor_to_group_on_creation(hass: HomeAssistant) -> None:
+async def test_add_virtual_power_sensor_to_group_on_creation(
+    hass: HomeAssistant,
+) -> None:
     """
     When creating a virtual power sensor using the config flow you can define a group you want to add it to
     Test that the new sensors are added to the existing group correctly

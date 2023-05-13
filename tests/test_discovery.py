@@ -301,7 +301,9 @@ async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> N
     assert not hass.states.get("sensor.test_device_power")
 
 
-async def test_load_model_with_slashes(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
+async def test_load_model_with_slashes(
+    hass: HomeAssistant, entity_reg: EntityRegistry
+) -> None:
     """
     Discovered model with slashes should not be treated as a sub lut profile
     """
