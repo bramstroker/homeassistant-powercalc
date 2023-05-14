@@ -93,7 +93,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         if self._estimated_current_entity:
             return [self._estimated_current_entity]
-        return []
+        return []  # pragma: no cover
 
     def can_calculate_standby(self) -> bool:
         return True

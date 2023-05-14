@@ -1,11 +1,5 @@
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
-    mock_registry,
-)
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -13,9 +7,10 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.conftest import MockEntityWithModel
 
 
-async def test_media_player(hass: HomeAssistant) -> None:
+async def test_media_player(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
     """
     Test that media player can be setup from profile library
     """
@@ -23,26 +18,10 @@ async def test_media_player(hass: HomeAssistant) -> None:
     manufacturer = "Google Inc."
     model = "Google Nest Mini"
 
-    mock_registry(
-        hass,
-        {
-            entity_id: RegistryEntry(
-                entity_id=entity_id,
-                unique_id="1234",
-                platform="switch",
-                device_id="nest-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "nest-device": DeviceEntry(
-                id="nest-device-id",
-                manufacturer=manufacturer,
-                model=model,
-            ),
-        },
+    mock_entity_with_model_information(
+        entity_id=entity_id,
+        manufacturer=manufacturer,
+        model=model,
     )
 
     power_sensor_id = "sensor.nest_mini_power"

@@ -259,7 +259,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
         del discovery_info[DISCOVERY_SOURCE_ENTITY]
         if not self.source_entity:
-            return self.async_abort(reason="No source entity set")
+            return self.async_abort(reason="No source entity set")  # pragma: no cover
 
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name

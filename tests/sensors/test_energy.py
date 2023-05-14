@@ -1,13 +1,15 @@
 import logging
+from datetime import timedelta
 
 import pytest
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, EntityCategory, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
+    async_fire_time_changed, mock_device_registry,
     mock_registry,
 )
 
@@ -18,10 +20,11 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_ID,
-    CONF_FIXED,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX, CONF_FIXED,
     CONF_POWER,
-    CONF_POWER_SENSOR_ID,
+    CONF_POWER_SENSOR_ID, UnitPrefix,
 )
+from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (
     create_input_boolean,
     get_simple_fixed_config,
@@ -176,3 +179,43 @@ async def test_real_energy_sensor_error_on_non_existing_entity(
     await hass.async_block_till_done()
 
     assert "No energy sensor with id" in caplog.text
+
+
+async def test_unit_prefix_none(hass: HomeAssistant) -> None:
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+        {CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE},
+    )
+
+    async_fire_time_changed(
+        hass,
+        dt.utcnow() + timedelta(hours=1),
+    )
+
+    hass.states.async_set("sensor.test_power", "50.00")
+
+    await hass.async_block_till_done()
+
+    state_attributes = hass.states.get("sensor.test_energy").attributes
+    assert state_attributes.get("unit_of_measurement") == "Wh"
+
+
+async def test_set_entity_category(hass: HomeAssistant) -> None:
+    energy_sensor = VirtualEnergySensor(
+        source_entity="sensor.test_power",
+        entity_id="sensor.test_energy",
+        name="Test energy",
+        round_digits=2,
+        unit_prefix="k",
+        unit_time=UnitOfTime(UnitOfTime.HOURS),
+        unique_id="1234",
+        entity_category=EntityCategory(EntityCategory.DIAGNOSTIC),
+        integration_method="",
+        powercalc_source_entity="light.test",
+        powercalc_source_domain="light",
+        sensor_config={},
+    )
+    assert energy_sensor.entity_category == EntityCategory.DIAGNOSTIC

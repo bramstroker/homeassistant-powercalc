@@ -1,4 +1,6 @@
+import uuid
 from collections.abc import Generator
+from typing import Protocol
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -6,8 +8,8 @@ from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.device_registry import DeviceRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_area_registry,
@@ -90,3 +92,43 @@ def mock_flow_init(hass: HomeAssistant) -> Generator:
         return_value=AsyncMock(),
     ) as mock_init:
         yield mock_init
+
+
+class MockEntityWithModel(Protocol):
+    def __call__(self, entity_id: str, manufacturer: str, model: str, platform: str = "foo", unique_id: str | None = None) -> None:
+        ...
+
+
+@pytest.fixture
+def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithModel:
+    def _mock_entity_with_model_information(
+        entity_id: str,
+        manufacturer: str,
+        model: str,
+        platform: str = "foo",
+        unique_id: str | None = None
+    ) -> None:
+        device_id = str(uuid.uuid4())
+        mock_registry(
+            hass,
+            {
+                entity_id: RegistryEntry(
+                    entity_id=entity_id,
+                    unique_id=unique_id or str(uuid.uuid4()),
+                    platform=platform,
+                    device_id=device_id,
+                ),
+            },
+        )
+        mock_device_registry(
+            hass,
+            {
+                device_id: DeviceEntry(
+                    id=device_id,
+                    manufacturer=manufacturer,
+                    model=model,
+                ),
+            },
+        )
+
+    return _mock_entity_with_model_information
