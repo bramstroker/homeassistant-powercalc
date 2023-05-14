@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 import pytest
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -23,9 +24,10 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_restore_cache_with_extra_data,
+    async_fire_time_changed, mock_restore_cache_with_extra_data,
 )
 
 from custom_components.powercalc.const import (
@@ -1084,8 +1086,13 @@ async def test_storage(hass: HomeAssistant) -> None:
     state = State("sensor.dummy_power", "20.00")
 
     store = PreviousStateStore(hass)
+    store.async_setup_dump()
     store.set_entity_state("sensor.dummy", state)
-    await store.persist_states()
+    async_fire_time_changed(
+        hass,
+        dt.utcnow() + timedelta(hours=1),
+    )
+
     await hass.async_block_till_done()
 
     # Retrieving singleton instance should retrieve and decode persisted states
