@@ -343,9 +343,6 @@ def save_entity_ids_on_config_entry(
     power_entities = [
         e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)
     ]
-    energy_entities = [
-        e.entity_id for e in entities.all() if isinstance(e, EnergySensor)
-    ]
     new_data = config_entry.data.copy()
     if not power_entities:
         raise SensorConfigurationError(
@@ -356,6 +353,9 @@ def save_entity_ids_on_config_entry(
     if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
         CONF_CREATE_ENERGY_SENSOR,
     ):
+        energy_entities = [
+            e.entity_id for e in entities.all() if isinstance(e, EnergySensor)
+        ]
         if not energy_entities:
             raise SensorConfigurationError(
                 f"No energy sensor created for config_entry {config_entry.entry_id}",
@@ -539,14 +539,10 @@ async def create_sensors(
             _LOGGER.error(error)
 
     if not entities_to_add.has_entities():
+        exception_message = "Could not resolve any entities"
         if CONF_CREATE_GROUP in config:
-            raise SensorConfigurationError(
-                f"Could not resolve any entities in group '{config.get(CONF_CREATE_GROUP)}'",
-            )
-        if not sensor_configs:
-            raise SensorConfigurationError(
-                "Could not resolve any entities for non-group sensor",
-            )
+            exception_message += f" in group '{config.get(CONF_CREATE_GROUP)}'"
+        raise SensorConfigurationError(exception_message)
 
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
