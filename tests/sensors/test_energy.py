@@ -3,13 +3,19 @@ from datetime import timedelta
 
 import pytest
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, EntityCategory, UnitOfTime
+from homeassistant.const import (
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    EntityCategory,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
-    async_fire_time_changed, mock_device_registry,
+    async_fire_time_changed,
+    mock_device_registry,
     mock_registry,
 )
 
@@ -20,9 +26,11 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_ID,
-    CONF_ENERGY_SENSOR_UNIT_PREFIX, CONF_FIXED,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FIXED,
     CONF_POWER,
-    CONF_POWER_SENSOR_ID, UnitPrefix,
+    CONF_POWER_SENSOR_ID,
+    UnitPrefix,
 )
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (

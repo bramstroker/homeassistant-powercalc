@@ -15,7 +15,9 @@ from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
-async def test_smart_switch(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_smart_switch(
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+) -> None:
     """
     Test that smart plug can be setup from profile library
     """
@@ -57,8 +59,7 @@ async def test_smart_switch(hass: HomeAssistant, mock_entity_with_model_informat
 
 
 async def test_smart_switch_power_input_yaml(
-    hass: HomeAssistant,
-        mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
 ) -> None:
     """
     Test a smart switch can be setup with YAML and a fixed power value for the appliance configured by the user
@@ -104,8 +105,7 @@ async def test_smart_switch_power_input_yaml(
 
 
 async def test_smart_switch_power_input_gui_config_flow(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
 ) -> None:
     """
     Test a smart switch can be setup with GUI and a fixed power value for the appliance configured by the user
@@ -182,15 +182,14 @@ async def test_smart_switch_power_input_gui_config_flow(
 
 
 async def test_hue_smart_plug_is_discovered(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
 ) -> None:
     mock_entity_with_model_information(
         entity_id="switch.smartplug",
         manufacturer="signify",
         model="LOM002",
         platform="hue",
-        unique_id="1234"
+        unique_id="1234",
     )
     await run_powercalc_setup(hass, {})
 

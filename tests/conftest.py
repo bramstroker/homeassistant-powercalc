@@ -95,7 +95,14 @@ def mock_flow_init(hass: HomeAssistant) -> Generator:
 
 
 class MockEntityWithModel(Protocol):
-    def __call__(self, entity_id: str, manufacturer: str, model: str, platform: str = "foo", unique_id: str | None = None) -> None:
+    def __call__(
+        self,
+        entity_id: str,
+        manufacturer: str,
+        model: str,
+        platform: str = "foo",
+        unique_id: str | None = None,
+    ) -> None:
         ...
 
 
@@ -106,7 +113,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         manufacturer: str,
         model: str,
         platform: str = "foo",
-        unique_id: str | None = None
+        unique_id: str | None = None,
     ) -> None:
         device_id = str(uuid.uuid4())
         mock_registry(
