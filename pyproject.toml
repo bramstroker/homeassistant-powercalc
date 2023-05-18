@@ -37,7 +37,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
-ignore = ["ANN101", "ANN401", "I001", "COM812"]
+ignore = ["ANN101"]
 line-length = 150
 target-version = "py310"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]

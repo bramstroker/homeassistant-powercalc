@@ -472,7 +472,8 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
 
 
 async def _trigger_periodic_update(
-    hass: HomeAssistant, number_of_updates: int = 1
+    hass: HomeAssistant,
+    number_of_updates: int = 1,
 ) -> None:
     for _i in range(0, number_of_updates):
         async_fire_time_changed(

@@ -242,7 +242,7 @@ def config_key_exists(key: str) -> bool:
         return False
 
 
-def validate_required(_: Any, val: str) -> bool:
+def validate_required(_: Any, val: str) -> bool:  # noqa: ANN401
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
         raise ValidationError(
@@ -252,7 +252,7 @@ def validate_required(_: Any, val: str) -> bool:
     return True
 
 
-def str_to_bool(value: Any) -> bool:
+def str_to_bool(value: Any) -> bool:  # noqa: ANN401
     """Return whether the provided string (or any value really) represents true."""
     if not value:
         return False

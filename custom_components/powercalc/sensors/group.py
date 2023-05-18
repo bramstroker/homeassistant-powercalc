@@ -8,14 +8,14 @@ from decimal import Decimal, DecimalException
 from typing import Any
 
 import homeassistant.util.dt as dt_util
-from homeassistant.components.sensor import ATTR_STATE_CLASS
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import (
+    ATTR_STATE_CLASS,
     RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -109,7 +109,7 @@ async def create_group_sensors(
     def _get_filtered_entity_ids_by_class(
         all_entities: list,
         default_filters: list[Callable],
-        class_name: Any,
+        class_name: Any,  # noqa: ANN401
     ) -> list[str]:
         filter_list = default_filters.copy()
         filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
@@ -740,7 +740,7 @@ class PreviousStateStore:
     def async_setup_dump(self) -> None:
         """Set up the listeners for persistence."""
 
-        async def _async_dump_states(*_: Any) -> None:
+        async def _async_dump_states(*_: Any) -> None:  # noqa: ANN401
             await self.persist_states()
 
         # Dump states periodically
@@ -750,7 +750,7 @@ class PreviousStateStore:
             STATE_DUMP_INTERVAL,
         )
 
-        async def _async_dump_states_at_stop(*_: Any) -> None:
+        async def _async_dump_states_at_stop(*_: Any) -> None:  # noqa: ANN401
             cancel_interval()
             await self.persist_states()
 

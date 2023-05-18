@@ -11,7 +11,8 @@ from tests.conftest import MockEntityWithModel
 
 
 async def test_media_player(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test that media player can be setup from profile library

@@ -132,7 +132,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if self._source_entity.domain == media_player.DOMAIN:
             return 0, 100
         raise StrategyConfigurationError(
-            "Unsupported domain for linear strategy"
+            "Unsupported domain for linear strategy",
         )  # pragma: no cover
 
     def get_current_state_value(self, entity_state: State) -> int | None:

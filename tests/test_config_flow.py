@@ -209,7 +209,8 @@ async def test_sensor_type_menu_displayed(hass: HomeAssistant) -> None:
     [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY, SensorType.GROUP],
 )
 async def test_sensor_type_form_displayed(
-    hass: HomeAssistant, sensor_type: SensorType
+    hass: HomeAssistant,
+    sensor_type: SensorType,
 ) -> None:
     await _select_sensor_type(hass, sensor_type)
 

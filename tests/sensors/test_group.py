@@ -27,7 +27,8 @@ from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    async_fire_time_changed, mock_restore_cache_with_extra_data,
+    async_fire_time_changed,
+    mock_restore_cache_with_extra_data,
 )
 
 from custom_components.powercalc.const import (
@@ -523,7 +524,8 @@ async def test_members_are_unhiden_after_group_removed(
 
 
 async def test_group_utility_meter(
-    hass: HomeAssistant, entity_reg: EntityRegistry
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
 ) -> None:
     entity_reg.async_get_or_create(
         "sensor",

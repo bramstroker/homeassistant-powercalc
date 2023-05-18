@@ -7,9 +7,9 @@ from homeassistant.components.light import (
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
     ATTR_HS_COLOR,
+    ColorMode,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.components.light import ColorMode
 from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, State
 
