@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
       - name: Run MyPy
         uses: jpetrucciani/mypy-check@master
         with:
