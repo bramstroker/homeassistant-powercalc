@@ -84,13 +84,14 @@ async def create_daily_fixed_energy_sensors(
         source_entity,
     )
     entities.append(energy_sensor)
-    daily_fixed_sensor = await create_daily_fixed_energy_power_sensor(
-        hass,
-        sensor_config,
-        source_entity,
-    )
-    if daily_fixed_sensor:
-        entities.append(daily_fixed_sensor)
+    if source_entity:
+        daily_fixed_sensor = await create_daily_fixed_energy_power_sensor(
+            hass,
+            sensor_config,
+            source_entity,
+        )
+        if daily_fixed_sensor:
+            entities.append(daily_fixed_sensor)
     return entities
 
 
@@ -145,7 +146,7 @@ async def create_daily_fixed_energy_sensor(
 async def create_daily_fixed_energy_power_sensor(
     hass: HomeAssistant,
     sensor_config: dict,
-    source_entity: SourceEntity | None = None,
+    source_entity: SourceEntity,
 ) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
     if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
