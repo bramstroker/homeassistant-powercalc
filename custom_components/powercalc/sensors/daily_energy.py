@@ -75,7 +75,7 @@ _LOGGER = logging.getLogger(__name__)
 async def create_daily_fixed_energy_sensors(
     hass: HomeAssistant,
     sensor_config: ConfigType,
-    source_entity: SourceEntity | None = None,
+    source_entity: SourceEntity,
 ) -> list[SensorEntity]:
     entities: list[SensorEntity] = []
     energy_sensor = await create_daily_fixed_energy_sensor(
@@ -97,7 +97,7 @@ async def create_daily_fixed_energy_sensors(
 async def create_daily_fixed_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
-    source_entity: SourceEntity | None = None,
+    source_entity: SourceEntity,
 ) -> DailyEnergySensor:
     mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
 
