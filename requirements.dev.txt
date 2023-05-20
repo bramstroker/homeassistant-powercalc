@@ -1,1 +1,2 @@
 pre-commit
+ruff==0.0.265
