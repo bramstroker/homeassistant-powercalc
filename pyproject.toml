@@ -46,4 +46,4 @@ exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 "utils/measure/**.py" = ["T201"]
 
 [tool.ruff.mccabe]
-max-complexity = 16
+max-complexity = 15

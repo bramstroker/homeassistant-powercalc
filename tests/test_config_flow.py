@@ -234,7 +234,7 @@ async def test_create_fixed_sensor_entry(hass: HomeAssistant) -> None:
 async def test_create_fixed_sensor_entry_with_template(hass: HomeAssistant) -> None:
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED)
 
-    template = "{states(input_number.my_number} | float"
+    template = "{{states(input_number.my_number)}} | float"
     result = await _set_virtual_power_configuration(
         hass,
         result,

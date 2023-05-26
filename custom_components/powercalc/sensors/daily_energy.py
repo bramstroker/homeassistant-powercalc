@@ -72,6 +72,29 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
+async def create_daily_fixed_energy_sensors(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity | None = None,
+) -> list[SensorEntity]:
+    entities: list[SensorEntity] = []
+    energy_sensor = await create_daily_fixed_energy_sensor(
+        hass,
+        sensor_config,
+        source_entity,
+    )
+    entities.append(energy_sensor)
+    if source_entity:
+        daily_fixed_sensor = await create_daily_fixed_energy_power_sensor(
+            hass,
+            sensor_config,
+            source_entity,
+        )
+        if daily_fixed_sensor:
+            entities.append(daily_fixed_sensor)
+    return entities
+
+
 async def create_daily_fixed_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
