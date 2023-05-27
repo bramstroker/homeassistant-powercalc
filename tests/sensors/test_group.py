@@ -1021,17 +1021,7 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
 
 
 async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
-    config_entry_group = MockConfigEntry(
-        domain=DOMAIN,
-        data={
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_NAME: "TestGroup",
-            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
-        },
-    )
-    config_entry_group.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
-    await hass.async_block_till_done()
+    await _create_energy_group(hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"])
 
     hass.states.async_set("sensor.a_energy", "2.00")
     hass.states.async_set("sensor.b_energy", "3.00")
@@ -1057,17 +1047,7 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
 
 
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
-    config_entry_group = MockConfigEntry(
-        domain=DOMAIN,
-        data={
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_NAME: "TestGroup",
-            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
-        },
-    )
-    config_entry_group.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
-    await hass.async_block_till_done()
+    await _create_energy_group(hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"])
 
     hass.states.async_set("sensor.testgroup_energy", "5.00")
     await hass.async_block_till_done()
@@ -1084,12 +1064,37 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
     assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
 
 
+async def test_energy_sensor_in_multiple_groups_calculates_correctly(hass: HomeAssistant) -> None:
+    """
+    Test that group energy sensor is calculated correctly when an energy sensor is part of multiple groups
+    Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1673
+    """
+    await _create_energy_group(hass, "TestGroupA", ["sensor.a_energy", "sensor.b_energy"])
+    await _create_energy_group(hass, "TestGroupB", ["sensor.a_energy", "sensor.c_energy"])
+    await _create_energy_group(hass, "TestGroupC", ["sensor.a_energy", "sensor.d_energy"])
+
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroupa_energy").state == "5.0000"
+    assert hass.states.get("sensor.testgroupb_energy").state == "2.0000"
+    assert hass.states.get("sensor.testgroupc_energy").state == "2.0000"
+
+    hass.states.async_set("sensor.a_energy", "3.21")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroupa_energy").state == "6.2100"
+    assert hass.states.get("sensor.testgroupb_energy").state == "3.2100"
+    assert hass.states.get("sensor.testgroupc_energy").state == "3.2100"
+
+
 async def test_storage(hass: HomeAssistant) -> None:
     state = State("sensor.dummy_power", "20.00")
 
     store = PreviousStateStore(hass)
     store.async_setup_dump()
-    store.set_entity_state("sensor.dummy", state)
+    store.set_entity_state("sensor.group1_energy", "sensor.dummy", state)
     async_fire_time_changed(
         hass,
         dt.utcnow() + timedelta(hours=1),
@@ -1099,8 +1104,23 @@ async def test_storage(hass: HomeAssistant) -> None:
 
     # Retrieving singleton instance should retrieve and decode persisted states
     store: PreviousStateStore = await PreviousStateStore.async_get_instance(hass)
-    store_state = store.get_entity_state("sensor.dummy")
+    store_state = store.get_entity_state("sensor.group1_energy", "sensor.dummy")
 
     assert state.entity_id == store_state.entity_id
     assert state.state == store_state.state
     assert state.last_updated == store_state.last_updated
+
+
+async def _create_energy_group(hass: HomeAssistant, name: str, member_entities: list[str]) -> None:
+    """Create a group energy sensor for testing purposes"""
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: name,
+            CONF_GROUP_ENERGY_ENTITIES: member_entities,
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
