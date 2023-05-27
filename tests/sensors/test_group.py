@@ -1021,7 +1021,9 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
 
 
 async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
-    await _create_energy_group(hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"])
+    await _create_energy_group(
+        hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"]
+    )
 
     hass.states.async_set("sensor.a_energy", "2.00")
     hass.states.async_set("sensor.b_energy", "3.00")
@@ -1047,7 +1049,9 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
 
 
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
-    await _create_energy_group(hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"])
+    await _create_energy_group(
+        hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"]
+    )
 
     hass.states.async_set("sensor.testgroup_energy", "5.00")
     await hass.async_block_till_done()
@@ -1064,14 +1068,22 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
     assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
 
 
-async def test_energy_sensor_in_multiple_groups_calculates_correctly(hass: HomeAssistant) -> None:
+async def test_energy_sensor_in_multiple_groups_calculates_correctly(
+    hass: HomeAssistant,
+) -> None:
     """
     Test that group energy sensor is calculated correctly when an energy sensor is part of multiple groups
     Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1673
     """
-    await _create_energy_group(hass, "TestGroupA", ["sensor.a_energy", "sensor.b_energy"])
-    await _create_energy_group(hass, "TestGroupB", ["sensor.a_energy", "sensor.c_energy"])
-    await _create_energy_group(hass, "TestGroupC", ["sensor.a_energy", "sensor.d_energy"])
+    await _create_energy_group(
+        hass, "TestGroupA", ["sensor.a_energy", "sensor.b_energy"]
+    )
+    await _create_energy_group(
+        hass, "TestGroupB", ["sensor.a_energy", "sensor.c_energy"]
+    )
+    await _create_energy_group(
+        hass, "TestGroupC", ["sensor.a_energy", "sensor.d_energy"]
+    )
 
     hass.states.async_set("sensor.a_energy", "2.00")
     hass.states.async_set("sensor.b_energy", "3.00")
@@ -1127,7 +1139,9 @@ async def test_storage_version_1(hass: HomeAssistant) -> None:
     assert store_state is None
 
 
-async def _create_energy_group(hass: HomeAssistant, name: str, member_entities: list[str]) -> None:
+async def _create_energy_group(
+    hass: HomeAssistant, name: str, member_entities: list[str]
+) -> None:
     """Create a group energy sensor for testing purposes"""
     config_entry_group = MockConfigEntry(
         domain=DOMAIN,

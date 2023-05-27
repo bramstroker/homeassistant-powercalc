@@ -659,7 +659,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     f"skipping state for {entity_state.entity_id}, sensor unavailable or unknown",
                 )
                 continue
-            prev_state = self._prev_state_store.get_entity_state(self.entity_id, entity_state.entity_id)
+            prev_state = self._prev_state_store.get_entity_state(
+                self.entity_id, entity_state.entity_id
+            )
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
 
             if prev_state:
@@ -769,7 +771,7 @@ class PreviousStateStore:
 class PreviousStateStoreStore(Store):
     """Store area registry data."""
 
-    async def _async_migrate_func( # type: ignore
+    async def _async_migrate_func(  # type: ignore
         self,
         old_major_version: int,
         old_minor_version: int,

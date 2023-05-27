@@ -636,7 +636,9 @@ async def create_individual_sensors(
     )
 
     # Update several registries
-    hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES if discovery_info else DATA_CONFIGURED_ENTITIES].update(
+    hass.data[DOMAIN][
+        DATA_DISCOVERED_ENTITIES if discovery_info else DATA_CONFIGURED_ENTITIES
+    ].update(
         {source_entity.entity_id: entities_to_add},
     )
 
