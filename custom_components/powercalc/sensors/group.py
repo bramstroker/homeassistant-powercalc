@@ -700,19 +700,12 @@ class PreviousStateStore:
 
         try:
             _LOGGER.debug("Load previous energy sensor states from store")
-            stored_states = await instance.store.async_load()  # type: ignore
-            if stored_states:
-                if instance.store.version == 1:
-                    instance.states = {  # type: ignore
-                        entity_id: State.from_dict(json_state)
-                        for (entity_id, json_state) in stored_states.items()
-                    }
-                else:
-                    for group, entities in stored_states.items():
-                        instance.states[group] = {  # type: ignore
-                            entity_id: State.from_dict(json_state)
-                            for (entity_id, json_state) in entities.items()
-                        }
+            stored_states = await instance.store.async_load() or {}  # type: ignore
+            for group, entities in stored_states.items():
+                instance.states[group] = {
+                    entity_id: State.from_dict(json_state)
+                    for (entity_id, json_state) in entities.items()
+                }
         except HomeAssistantError as exc:
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
 
@@ -721,13 +714,13 @@ class PreviousStateStore:
         return instance
 
     def __init__(self, hass: HomeAssistant) -> None:
-        self.store: Store = Store(
+        self.store: Store = PreviousStateStoreStore(
             hass,
             STORAGE_VERSION,
             STORAGE_KEY,
             encoder=JSONEncoder,
         )
-        self.states: dict[str, dict[str, State]] = {}
+        self.states: dict[str, dict[str, State | None]] = {}
         self.hass = hass
 
     def get_entity_state(self, group: str, entity_id: str) -> State | None:
@@ -735,7 +728,7 @@ class PreviousStateStore:
         if group in self.states and entity_id in self.states[group]:
             return self.states[group][entity_id]
 
-        return self.states.get(entity_id)
+        return None
 
     def set_entity_state(self, group: str, entity_id: str, state: State) -> None:
         """Set the state for an energy sensor."""
@@ -771,3 +764,18 @@ class PreviousStateStore:
             EVENT_HOMEASSISTANT_STOP,
             _async_dump_states_at_stop,
         )
+
+
+class PreviousStateStoreStore(Store):
+    """Store area registry data."""
+
+    async def _async_migrate_func( # type: ignore
+        self,
+        old_major_version: int,
+        old_minor_version: int,
+        old_data: dict[str, list[dict[str, Any]]],
+    ) -> dict[str, Any]:
+        """Migrate to the new version."""
+        if old_major_version == 1:
+            return {}
+        return old_data

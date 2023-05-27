@@ -1111,6 +1111,22 @@ async def test_storage(hass: HomeAssistant) -> None:
     assert state.last_updated == store_state.last_updated
 
 
+async def test_storage_version_1(hass: HomeAssistant) -> None:
+    store = PreviousStateStore(hass)
+    storage_data = {
+        "sensor.dummy": State("sensor.dummy_power", "20.00"),
+    }
+    store.store.version = 1
+    await store.store.async_save(storage_data)
+    await hass.async_block_till_done()
+
+    # Retrieving singleton instance should retrieve and decode persisted states
+    store: PreviousStateStore = await PreviousStateStore.async_get_instance(hass)
+    store_state = store.get_entity_state("sensor.group1_energy", "sensor.dummy")
+
+    assert store_state is None
+
+
 async def _create_energy_group(hass: HomeAssistant, name: str, member_entities: list[str]) -> None:
     """Create a group energy sensor for testing purposes"""
     config_entry_group = MockConfigEntry(
