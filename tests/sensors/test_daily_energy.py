@@ -471,6 +471,26 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
     assert state
 
 
+async def test_create_daily_energy_sensor_using_config_entry(hass: HomeAssistant) -> None:
+    config_entry_group = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+            CONF_NAME: "Test",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+                CONF_VALUE: 200,
+                CONF_UPDATE_FREQUENCY: 1800.0,
+            },
+        },
+    )
+    config_entry_group.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_group.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy")
+
+
 async def _trigger_periodic_update(
     hass: HomeAssistant,
     number_of_updates: int = 1,

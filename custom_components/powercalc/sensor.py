@@ -343,11 +343,8 @@ def save_entity_ids_on_config_entry(
         e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)
     ]
     new_data = config_entry.data.copy()
-    if not power_entities:
-        raise SensorConfigurationError(
-            f"No power sensor created for config_entry {config_entry.entry_id}",
-        )
-    new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
+    if power_entities:
+        new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
 
     if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
         CONF_CREATE_ENERGY_SENSOR,
