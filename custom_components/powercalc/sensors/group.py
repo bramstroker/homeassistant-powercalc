@@ -90,7 +90,7 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 _LOGGER = logging.getLogger(__name__)
 STORAGE_KEY = "powercalc_group"
-STORAGE_VERSION = 1
+STORAGE_VERSION = 2
 # How long between periodically saving the current states to disk
 STATE_DUMP_INTERVAL = timedelta(minutes=10)
 
@@ -635,6 +635,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
             if self._prev_state_store:
                 self._prev_state_store.set_entity_state(
+                    self.entity_id,
                     entity_id,
                     State(entity_id, "0.00"),
                 )
@@ -658,7 +659,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     f"skipping state for {entity_state.entity_id}, sensor unavailable or unknown",
                 )
                 continue
-            prev_state = self._prev_state_store.get_entity_state(entity_state.entity_id)
+            prev_state = self._prev_state_store.get_entity_state(self.entity_id, entity_state.entity_id)
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
 
             if prev_state:
@@ -668,6 +669,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     cur_state_value if self._attr_native_value else Decimal(0)
                 )
             self._prev_state_store.set_entity_state(
+                self.entity_id,
                 entity_state.entity_id,
                 entity_state,
             )
@@ -698,11 +700,11 @@ class PreviousStateStore:
 
         try:
             _LOGGER.debug("Load previous energy sensor states from store")
-            stored_states = await instance.store.async_load()  # type: ignore
-            if stored_states:
-                instance.states = {  # type: ignore
+            stored_states = await instance.store.async_load() or {}  # type: ignore
+            for group, entities in stored_states.items():
+                instance.states[group] = {
                     entity_id: State.from_dict(json_state)
-                    for (entity_id, json_state) in stored_states.items()
+                    for (entity_id, json_state) in entities.items()
                 }
         except HomeAssistantError as exc:
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
@@ -712,22 +714,25 @@ class PreviousStateStore:
         return instance
 
     def __init__(self, hass: HomeAssistant) -> None:
-        self.store: Store = Store(
+        self.store: Store = PreviousStateStoreStore(
             hass,
             STORAGE_VERSION,
             STORAGE_KEY,
             encoder=JSONEncoder,
         )
-        self.states: dict[str, State] = {}
+        self.states: dict[str, dict[str, State | None]] = {}
         self.hass = hass
 
-    def get_entity_state(self, entity_id: str) -> State | None:
+    def get_entity_state(self, group: str, entity_id: str) -> State | None:
         """Retrieve the previous state."""
-        return self.states.get(entity_id)
+        if group in self.states and entity_id in self.states[group]:
+            return self.states[group][entity_id]
 
-    def set_entity_state(self, entity_id: str, state: State) -> None:
+        return None
+
+    def set_entity_state(self, group: str, entity_id: str, state: State) -> None:
         """Set the state for an energy sensor."""
-        self.states[entity_id] = state
+        self.states.setdefault(group, {})[entity_id] = state
 
     async def persist_states(self) -> None:
         """Save the current states to storage."""
@@ -759,3 +764,18 @@ class PreviousStateStore:
             EVENT_HOMEASSISTANT_STOP,
             _async_dump_states_at_stop,
         )
+
+
+class PreviousStateStoreStore(Store):
+    """Store area registry data."""
+
+    async def _async_migrate_func( # type: ignore
+        self,
+        old_major_version: int,
+        old_minor_version: int,
+        old_data: dict[str, list[dict[str, Any]]],
+    ) -> dict[str, Any]:
+        """Migrate to the new version."""
+        if old_major_version == 1:
+            return {}
+        return old_data
