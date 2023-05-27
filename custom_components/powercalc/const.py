@@ -152,6 +152,7 @@ ATTR_SOURCE_DOMAIN = "source_domain"
 SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_CALIBRATE_UTILITY_METER = "calibrate_utility_meter"
+SERVICE_CALIBRATE_ENERGY = "calibrate_energy"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 

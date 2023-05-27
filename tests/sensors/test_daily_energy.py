@@ -34,6 +34,7 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     DOMAIN,
+    SERVICE_CALIBRATE_ENERGY,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SensorType,
@@ -383,6 +384,32 @@ async def test_increase_service(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get(entity_id).state == "2.7000"
+
+
+async def test_calibrate_service(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Dishwasher",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 0,
+            },
+        },
+    )
+    entity_id = "sensor.dishwasher_energy"
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_CALIBRATE_ENERGY,
+        {
+            ATTR_ENTITY_ID: entity_id,
+            "value": "100",
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(entity_id).state == "100.0000"
 
 
 async def test_restore_state(hass: HomeAssistant) -> None:

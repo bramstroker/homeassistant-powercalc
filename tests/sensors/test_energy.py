@@ -4,6 +4,7 @@ from datetime import timedelta
 import pytest
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     EntityCategory,
@@ -30,6 +31,8 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
+    DOMAIN,
+    SERVICE_CALIBRATE_ENERGY,
     UnitPrefix,
 )
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
@@ -227,3 +230,26 @@ async def test_set_entity_category(hass: HomeAssistant) -> None:
         sensor_config={},
     )
     assert energy_sensor.entity_category == EntityCategory.DIAGNOSTIC
+
+
+async def test_calibrate_service(hass: HomeAssistant) -> None:
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+    )
+    entity_id = "sensor.test_energy"
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_CALIBRATE_ENERGY,
+        {
+            ATTR_ENTITY_ID: entity_id,
+            "value": "100",
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get(entity_id).state == "100.0000"

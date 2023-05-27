@@ -55,6 +55,7 @@ from custom_components.powercalc.const import (
     CONF_UNAVAILABLE_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
+    SERVICE_CALIBRATE_ENERGY,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
@@ -261,6 +262,34 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
+
+
+async def test_calibrate_service(hass: HomeAssistant) -> None:
+    await create_input_booleans(hass, ["test1", "test2"])
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1"),
+                get_simple_fixed_config("input_boolean.test2"),
+            ],
+        },
+    )
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_CALIBRATE_ENERGY,
+        {
+            ATTR_ENTITY_ID: "sensor.testgroup_energy",
+            "value": "100",
+        },
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.testgroup_energy").state == "100"
 
 
 async def test_restore_state(hass: HomeAssistant) -> None:

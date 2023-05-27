@@ -643,6 +643,11 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
+    async def async_calibrate(self, value: str) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Calibrate group energy sensor to: {value}")
+        self._attr_native_value = Decimal(value)
+        self.async_write_ha_state()
+
     def calculate_new_state(
         self,
         member_available_states: list[State],
