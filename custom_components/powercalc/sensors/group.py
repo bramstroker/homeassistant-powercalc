@@ -683,7 +683,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
 
             delta = cur_state_value - prev_state_value
-            if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no-cover
+            if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
                 rounded_delta = round(delta, self._rounding_digits)
                 rounded_prev = round(prev_state_value, self._rounding_digits)
                 rounded_cur = round(cur_state_value, self._rounding_digits)
@@ -790,4 +790,4 @@ class PreviousStateStoreStore(Store):
         """Migrate to the new version."""
         if old_major_version == 1:
             return {}
-        return old_data
+        return old_data  # pragma: no cover
