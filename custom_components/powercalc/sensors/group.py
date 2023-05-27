@@ -678,9 +678,13 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             )
 
             delta = cur_state_value - prev_state_value
-            _LOGGER.debug(
-                f"delta for entity {entity_state.entity_id}: {delta}, prev={prev_state_value}, cur={cur_state_value}",
-            )
+            if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no-cover
+                rounded_delta = round(delta, self._rounding_digits)
+                rounded_prev = round(prev_state_value, self._rounding_digits)
+                rounded_cur = round(cur_state_value, self._rounding_digits)
+                _LOGGER.debug(
+                    f"delta for entity {entity_state.entity_id}: {rounded_delta}, prev={rounded_prev}, cur={rounded_cur}",
+                )
             if delta < 0:
                 _LOGGER.warning(
                     f"skipping state for {entity_state.entity_id}, probably erroneous value or sensor was reset",
@@ -689,7 +693,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
             group_sum += delta
 
-        _LOGGER.debug(f"{self.entity_id}: New value: {group_sum}")
+        _LOGGER.debug(f"{self.entity_id}: New value: {round(group_sum, self._rounding_digits)}")
         return group_sum
 
 
