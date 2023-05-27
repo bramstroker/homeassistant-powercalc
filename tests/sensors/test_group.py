@@ -1022,7 +1022,9 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
 
 async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
     await _create_energy_group(
-        hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"],
+        hass,
+        "TestGroup",
+        ["sensor.a_energy", "sensor.b_energy"],
     )
 
     hass.states.async_set("sensor.a_energy", "2.00")
@@ -1050,7 +1052,9 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
 
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
     await _create_energy_group(
-        hass, "TestGroup", ["sensor.a_energy", "sensor.b_energy"],
+        hass,
+        "TestGroup",
+        ["sensor.a_energy", "sensor.b_energy"],
     )
 
     hass.states.async_set("sensor.testgroup_energy", "5.00")
@@ -1076,13 +1080,19 @@ async def test_energy_sensor_in_multiple_groups_calculates_correctly(
     Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1673
     """
     await _create_energy_group(
-        hass, "TestGroupA", ["sensor.a_energy", "sensor.b_energy"],
+        hass,
+        "TestGroupA",
+        ["sensor.a_energy", "sensor.b_energy"],
     )
     await _create_energy_group(
-        hass, "TestGroupB", ["sensor.a_energy", "sensor.c_energy"],
+        hass,
+        "TestGroupB",
+        ["sensor.a_energy", "sensor.c_energy"],
     )
     await _create_energy_group(
-        hass, "TestGroupC", ["sensor.a_energy", "sensor.d_energy"],
+        hass,
+        "TestGroupC",
+        ["sensor.a_energy", "sensor.d_energy"],
     )
 
     hass.states.async_set("sensor.a_energy", "2.00")
@@ -1140,7 +1150,9 @@ async def test_storage_version_1(hass: HomeAssistant) -> None:
 
 
 async def _create_energy_group(
-    hass: HomeAssistant, name: str, member_entities: list[str],
+    hass: HomeAssistant,
+    name: str,
+    member_entities: list[str],
 ) -> None:
     """Create a group energy sensor for testing purposes"""
     config_entry_group = MockConfigEntry(

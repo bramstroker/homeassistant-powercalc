@@ -471,7 +471,9 @@ async def test_name_and_entity_id_can_be_inherited_from_source_entity(
     assert state
 
 
-async def test_create_daily_energy_sensor_using_config_entry(hass: HomeAssistant) -> None:
+async def test_create_daily_energy_sensor_using_config_entry(
+    hass: HomeAssistant,
+) -> None:
     config_entry_group = MockConfigEntry(
         domain=DOMAIN,
         data={

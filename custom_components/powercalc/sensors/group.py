@@ -660,7 +660,8 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                 )
                 continue
             prev_state = self._prev_state_store.get_entity_state(
-                self.entity_id, entity_state.entity_id,
+                self.entity_id,
+                entity_state.entity_id,
             )
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
 
