@@ -19,3 +19,31 @@ calibrate_utility_meter:
       required: true
       selector:
         text:
+calibrate_energy:
+  name: Calibrate energy sensor
+  description: Sets the energy sensor to a given kWh value.
+  target:
+    entity:
+      domain: sensor
+  fields:
+    value:
+      name: Value
+      description: Value to which set the meter
+      example: "100"
+      required: true
+      selector:
+        text:
+increase_daily_energy:
+  name: Increase daily energy sensor
+  description: Increases the sensor with a given amount
+  target:
+    entity:
+      domain: sensor
+  fields:
+    value:
+      name: Value
+      description: Amount to add to the sensor
+      example: "100"
+      required: true
+      selector:
+        text:

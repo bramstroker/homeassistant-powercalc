@@ -297,7 +297,12 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
-    def async_increase(self, value: str) -> None:
+    async def async_increase(self, value: str) -> None:
         _LOGGER.debug(f"{self.entity_id}: Increasing energy sensor with {value}")
         self._state += Decimal(value)
+        self.async_write_ha_state()
+
+    async def async_calibrate(self, value: str) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Calibrate energy sensor with {value}")
+        self._state = Decimal(value)
         self.async_write_ha_state()

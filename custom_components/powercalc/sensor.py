@@ -99,6 +99,7 @@ from .const import (
     ENTITY_CATEGORIES,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
+    SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
@@ -376,6 +377,12 @@ def register_entity_services() -> None:
 
     platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
+        {vol.Required(CONF_VALUE): validate_is_number},  # type: ignore
+        "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE_ENERGY,
         {vol.Required(CONF_VALUE): validate_is_number},  # type: ignore
         "async_calibrate",
     )

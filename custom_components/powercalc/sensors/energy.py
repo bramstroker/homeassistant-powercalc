@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
+from decimal import Decimal
 from typing import Any
 
 import homeassistant.helpers.entity_registry as er
@@ -209,6 +210,11 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
         self._attr_last_reset = dt_util.utcnow()
+        self.async_write_ha_state()
+
+    async def async_calibrate(self, value: str) -> None:
+        _LOGGER.debug(f"{self.entity_id}: Calibrate energy sensor to: {value}")
+        self._state = Decimal(value)
         self.async_write_ha_state()
 
 
