@@ -1,6 +1,6 @@
 import uuid
 from collections.abc import Generator
-from typing import Protocol
+from typing import Any, Protocol
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -100,8 +100,7 @@ class MockEntityWithModel(Protocol):
         entity_id: str,
         manufacturer: str,
         model: str,
-        platform: str = "foo",
-        unique_id: str | None = None,
+        **entity_reg_kwargs: Any,  # noqa: ANN401
     ) -> None:
         ...
 
@@ -112,18 +111,29 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         entity_id: str,
         manufacturer: str,
         model: str,
-        platform: str = "foo",
-        unique_id: str | None = None,
+        **entity_reg_kwargs: Any,  # noqa: ANN401
     ) -> None:
         device_id = str(uuid.uuid4())
+
+        unique_id = str(uuid.uuid4())
+        if "unique_id" in entity_reg_kwargs:
+            unique_id = entity_reg_kwargs["unique_id"]
+            del entity_reg_kwargs["unique_id"]
+
+        platform = "foo"
+        if "platform" in entity_reg_kwargs:
+            unique_id = entity_reg_kwargs["platform"]
+            del entity_reg_kwargs["platform"]
+
         mock_registry(
             hass,
             {
                 entity_id: RegistryEntry(
                     entity_id=entity_id,
-                    unique_id=unique_id or str(uuid.uuid4()),
+                    unique_id=unique_id,
                     platform=platform,
                     device_id=device_id,
+                    **entity_reg_kwargs,
                 ),
             },
         )

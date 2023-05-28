@@ -6,18 +6,14 @@ from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, Col
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import (
     EntityRegistry,
-    RegistryEntry,
     RegistryEntryDisabler,
 )
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_device_registry,
-    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -35,6 +31,7 @@ from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.test.light import MockLight
 
 from .common import create_mock_light_entity, run_powercalc_setup
+from .conftest import MockEntityWithModel
 
 
 async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> None:
@@ -211,30 +208,13 @@ async def test_config_entry_overrides_autodiscovered(
     assert not caplog.records
 
 
-async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant) -> None:
+async def test_autodiscover_skips_disabled_entities(
+        hass: HomeAssistant,
+        mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """Auto discovery should not consider disabled entities"""
-    mock_registry(
-        hass,
-        {
-            "light.test": RegistryEntry(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="some-device-id",
-                disabled_by=RegistryEntryDisabler.HASS,
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "light.test": DeviceEntry(
-                id="some-device-id",
-                manufacturer="signify",
-                model="LCT010",
-            ),
-        },
-    )
+    mock_entity_with_model_information("light.test", "signify", "LCT010", disabled_by=RegistryEntryDisabler.HASS)
+
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
@@ -243,58 +223,21 @@ async def test_autodiscover_skips_disabled_entities(hass: HomeAssistant) -> None
 
 async def test_autodiscover_skips_entities_with_empty_manufacturer(
     hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    mock_registry(
-        hass,
-        {
-            "light.test": RegistryEntry(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-                device_id="some-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "light.test": DeviceEntry(
-                id="some-device-id",
-                manufacturer="",
-                model="LCT010",
-            ),
-        },
-    )
+    mock_entity_with_model_information("light.test", "", "LCT010")
+
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
     assert not hass.states.get("sensor.test_power")
 
 
-async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant) -> None:
+async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
     """Auto discovery should not consider entities with entity_category diagnostic"""
-    mock_registry(
-        hass,
-        {
-            "switch.test": RegistryEntry(
-                entity_id="switch.test",
-                unique_id="1234",
-                platform="switch",
-                device_id="some-device-id",
-                entity_category=EntityCategory.DIAGNOSTIC,
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "some-device-id": DeviceEntry(
-                id="some-device-id",
-                manufacturer="Shelly",
-                model="Shelly Plug S",
-            ),
-        },
-    )
+
+    mock_entity_with_model_information("switch.test", "Shelly", "Shelly Plug S", entity_category=EntityCategory.DIAGNOSTIC)
+
     await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
@@ -408,31 +351,12 @@ async def test_get_power_profile_empty_manufacturer(
 async def test_no_power_sensors_are_created_for_ignored_config_entries(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     caplog.set_level(logging.DEBUG)
 
     unique_id = "abc"
-    mock_registry(
-        hass,
-        {
-            "light.test": RegistryEntry(
-                entity_id="light.test",
-                unique_id=unique_id,
-                platform="light",
-                device_id="some-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "some-device-id": DeviceEntry(
-                id="some-device-id",
-                manufacturer="Signify",
-                model="LCT010",
-            ),
-        },
-    )
+    mock_entity_with_model_information("light.test", "Signify", "LCT010", unique_id=unique_id)
 
     config_entry_unique_id = f"pc_{unique_id}"
     config_entry = MockConfigEntry(
