@@ -425,7 +425,8 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
 
 
 async def test_manually_configured_sensor_overrides_profile(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Make sure that config settings done by user are not overriden by power profile
