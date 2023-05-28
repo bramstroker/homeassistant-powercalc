@@ -45,6 +45,7 @@ from custom_components.powercalc.const import (
     CONF_DELAY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -69,6 +70,7 @@ from custom_components.powercalc.const import (
     OFF_STATES,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
+    UnitPrefix,
 )
 from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.errors import (
@@ -104,6 +106,7 @@ async def create_power_sensor(
     """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
+        sensor_config.update({CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE})
         return await create_real_power_sensor(hass, sensor_config)
 
     return await create_virtual_power_sensor(

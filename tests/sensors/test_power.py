@@ -1,7 +1,9 @@
 import logging
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
+from homeassistant.components.sensor import SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -10,6 +12,8 @@ from homeassistant.components.vacuum import (
     STATE_RETURNING,
 )
 from homeassistant.const import (
+    ATTR_DEVICE_CLASS,
+    ATTR_UNIT_OF_MEASUREMENT,
     CONF_ATTRIBUTE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -19,18 +23,17 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
+from plugwise.constants import ATTR_STATE_CLASS
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
-    mock_device_registry,
-    mock_registry,
 )
 
 from custom_components.powercalc.const import (
@@ -65,6 +68,7 @@ from tests.common import (
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from tests.conftest import MockEntityWithModel
 
 
 async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
@@ -422,36 +426,14 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
 
 
 async def test_manually_configured_sensor_overrides_profile(
-    hass: HomeAssistant,
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Make sure that config settings done by user are not overriden by power profile
     """
     entity_id = "light.test"
-    manufacturer = "sonoff"
-    model = "ZBMINI"
 
-    mock_registry(
-        hass,
-        {
-            entity_id: RegistryEntry(
-                entity_id=entity_id,
-                unique_id="1234",
-                platform="light",
-                device_id="sonoff-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "sonoff-device-id": DeviceEntry(
-                id="sonoff-device-id",
-                manufacturer=manufacturer,
-                model=model,
-            ),
-        },
-    )
+    mock_entity_with_model_information(entity_id, "sonoff", "ZBMINI")
 
     await run_powercalc_setup(
         hass,
@@ -475,3 +457,50 @@ async def test_manually_configured_sensor_overrides_profile(
 
     power_state = hass.states.get("sensor.test_123_power")
     assert power_state.state == "0.00"
+
+
+async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
+    """
+    Test that the riemann integral sensor is correclty created and updated for a kW power sensor
+    Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
+    """
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_POWER_SENSOR_ID: "sensor.test_power",
+        },
+    )
+
+    hass.states.async_set(
+        "sensor.test_power",
+        "100",
+        {
+            ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
+            ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
+            ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        },
+    )
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+
+    now = dt.utcnow() + timedelta(minutes=60)
+    with patch("homeassistant.util.dt.utcnow", return_value=now):
+        hass.states.async_set(
+            "sensor.test_power",
+            "200",
+            {
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
+                ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
+                ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
+            },
+        )
+        await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
+    assert state.state == "100.0000"
