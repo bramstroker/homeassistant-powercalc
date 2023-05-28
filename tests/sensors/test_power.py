@@ -3,7 +3,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
-from homeassistant.components.sensor import SensorStateClass
+from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -29,7 +29,6 @@ from homeassistant.const import (
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
-from plugwise.constants import ATTR_STATE_CLASS
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
     MockEntityPlatform,
