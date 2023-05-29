@@ -62,6 +62,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from tests.common import (
+    assert_entity_state,
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
@@ -448,14 +449,12 @@ async def test_manually_configured_sensor_overrides_profile(
     hass.states.async_set("light.test", STATE_ON)
     await hass.async_block_till_done()
 
-    power_state = hass.states.get("sensor.test_123_power")
-    assert power_state.state == "6.00"
+    assert_entity_state(hass, "sensor.test_123_power", "6.00")
 
     hass.states.async_set("light.test", STATE_OFF)
     await hass.async_block_till_done()
 
-    power_state = hass.states.get("sensor.test_123_power")
-    assert power_state.state == "0.00"
+    assert_entity_state(hass, "sensor.test_123_power", "0.00")
 
 
 async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:

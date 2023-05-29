@@ -2,6 +2,7 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP,
+    ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
@@ -12,35 +13,36 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
 )
-from custom_components.test.light import MockLight
 from tests.common import (
-    create_mock_light_entity,
     get_test_profile_dir,
     run_powercalc_setup,
 )
+from tests.conftest import MockEntityWithModel
 
 
-async def test_infrared_light(hass: HomeAssistant) -> None:
+async def test_infrared_light(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
     """
     Infrared capable light with several sub profiles
     """
     power_sensor_id = "sensor.test_power"
     light_id = "light.test"
     infrared_brightness_select_id = "select.test_infrared_brightness"
+    manufacturer = "LIFX"
+    model = "LIFX A19 Night Vision"
 
-    light_mock = MockLight("test")
-    light_mock.manufacturer = "LIFX"
-    light_mock.model = "LIFX A19 Night Vision"
-    light_mock.supported_color_modes = [ColorMode.HS, ColorMode.COLOR_TEMP]
-
-    await create_mock_light_entity(hass, light_mock)
+    mock_entity_with_model_information(
+        light_id,
+        manufacturer,
+        model,
+        capabilities={ATTR_SUPPORTED_COLOR_MODES: [ColorMode.HS, ColorMode.COLOR_TEMP]},
+    )
 
     await run_powercalc_setup(
         hass,
         {
             CONF_ENTITY_ID: light_id,
-            CONF_MANUFACTURER: light_mock.manufacturer,
-            CONF_MODEL: light_mock.model,
+            CONF_MANUFACTURER: manufacturer,
+            CONF_MODEL: model,
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("infrared_light"),
         },
     )

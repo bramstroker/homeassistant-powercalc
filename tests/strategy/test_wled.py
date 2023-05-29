@@ -18,12 +18,14 @@ from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, DOMAIN
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
-from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity, run_powercalc_setup
+from tests.common import run_powercalc_setup
+from tests.conftest import MockEntityWithModel
 
 
-async def test_can_calculate_power(hass: HomeAssistant) -> None:
-    await create_mock_light_entity(hass, MockLight("test", STATE_ON, "abc"))
+async def test_can_calculate_power(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    mock_entity_with_model_information("light.test")
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
 
     light_source_entity = await create_source_entity("light.test", hass)
 

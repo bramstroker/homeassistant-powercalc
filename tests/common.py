@@ -33,7 +33,7 @@ from custom_components.powercalc.const import (
 async def create_mock_light_entity(
     hass: HomeAssistant,
     entities: test_light_platform.MockLight | list[test_light_platform.MockLight],
-) -> tuple[str, str]:
+) -> None:
     """Create a mocked light entity, and bind it to a device having a manufacturer/model"""
     entity_registry = er.async_get(hass)
     device_registry = dr.async_get(hass)
@@ -63,15 +63,13 @@ async def create_mock_light_entity(
             model=entity.model,
         )
 
-        entity_entry = entity_registry.async_get_or_create(
+        entity_registry.async_get_or_create(
             "light",
             "test",
             entity.unique_id,
             device_id=device_entry.id,
         )
         await hass.async_block_till_done()
-
-    return (entity_entry.entity_id, device_entry.id)
 
 
 def create_discoverable_light(
