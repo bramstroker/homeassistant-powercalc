@@ -189,11 +189,13 @@ async def test_config_entry_overrides_autodiscovered(
 
 
 async def test_autodiscover_skips_disabled_entities(
-        hass: HomeAssistant,
-        mock_entity_with_model_information: MockEntityWithModel,
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Auto discovery should not consider disabled entities"""
-    mock_entity_with_model_information("light.test", "signify", "LCT010", disabled_by=er.RegistryEntryDisabler.HASS)
+    mock_entity_with_model_information(
+        "light.test", "signify", "LCT010", disabled_by=er.RegistryEntryDisabler.HASS,
+    )
 
     await run_powercalc_setup(hass, {})
 
@@ -211,10 +213,17 @@ async def test_autodiscover_skips_entities_with_empty_manufacturer(
     assert not hass.states.get("sensor.test_power")
 
 
-async def test_autodiscover_skips_diagnostics_entities(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_autodiscover_skips_diagnostics_entities(
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """Auto discovery should not consider entities with entity_category diagnostic"""
 
-    mock_entity_with_model_information("switch.test", "Shelly", "Shelly Plug S", entity_category=EntityCategory.DIAGNOSTIC)
+    mock_entity_with_model_information(
+        "switch.test",
+        "Shelly",
+        "Shelly Plug S",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
 
     await run_powercalc_setup(hass, {})
 
@@ -324,7 +333,9 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     caplog.set_level(logging.DEBUG)
 
     unique_id = "abc"
-    mock_entity_with_model_information("light.test", "Signify", "LCT010", unique_id=unique_id)
+    mock_entity_with_model_information(
+        "light.test", "Signify", "LCT010", unique_id=unique_id,
+    )
 
     config_entry_unique_id = f"pc_{unique_id}"
     config_entry = MockConfigEntry(
