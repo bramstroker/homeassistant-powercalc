@@ -98,8 +98,8 @@ class MockEntityWithModel(Protocol):
     def __call__(
         self,
         entity_id: str,
-        manufacturer: str,
-        model: str,
+        manufacturer: str = "signify",
+        model: str = "LCT010",
         **entity_reg_kwargs: Any,  # noqa: ANN401
     ) -> None:
         ...
@@ -109,8 +109,8 @@ class MockEntityWithModel(Protocol):
 def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithModel:
     def _mock_entity_with_model_information(
         entity_id: str,
-        manufacturer: str,
-        model: str,
+        manufacturer: str = "signify",
+        model: str = "LCT010",
         **entity_reg_kwargs: Any,  # noqa: ANN401
     ) -> None:
         device_id = str(uuid.uuid4())

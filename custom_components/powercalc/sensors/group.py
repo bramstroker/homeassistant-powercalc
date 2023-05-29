@@ -699,7 +699,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             group_sum += delta
 
         _LOGGER.debug(
-            f"{self.entity_id}: New value: {round(group_sum, self._rounding_digits)}"
+            f"{self.entity_id}: New value: {round(group_sum, self._rounding_digits)}",
         )
         return group_sum
 

@@ -27,8 +27,7 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.linear import LinearStrategy
-from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity
+from tests.conftest import MockEntityWithModel
 
 from .common import create_source_entity
 
@@ -204,9 +203,8 @@ async def _create_strategy_instance(
     return strategy
 
 
-async def test_config_entry_with_calibrate_list(hass: HomeAssistant) -> None:
-    light_entity = MockLight("test")
-    await create_mock_light_entity(hass, light_entity)
+async def test_config_entry_with_calibrate_list(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    mock_entity_with_model_information("light.test")
 
     config_entry = MockConfigEntry(
         domain=DOMAIN,

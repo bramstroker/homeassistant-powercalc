@@ -28,14 +28,13 @@ from custom_components.powercalc.const import (
     ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
-from custom_components.test.light import MockLight
 
 from .common import (
     create_input_boolean,
-    create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from .conftest import MockEntityWithModel
 
 
 async def test_domain_groups(hass: HomeAssistant, entity_reg: EntityRegistry) -> None:
@@ -97,15 +96,12 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> 
 
 async def test_domain_light_group_with_autodiscovery_enabled(
     hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     See https://github.com/bramstroker/homeassistant-powercalc/issues/939
     """
-    light_entity = MockLight("testb")
-    light_entity.manufacturer = "signify"
-    light_entity.model = "LCA001"
-
-    await create_mock_light_entity(hass, light_entity)
+    mock_entity_with_model_information("light.testb", "signify", "LCA001")
 
     domain_config = {
         CONF_ENABLE_AUTODISCOVERY: True,

@@ -1,9 +1,10 @@
 import logging
 
+import homeassistant.helpers.entity_registry as er
 import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
-from homeassistant.components.light import ColorMode
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_SUPPORTED_COLOR_MODES, ColorMode
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
@@ -26,11 +27,6 @@ from homeassistant.helpers.device_registry import (
     DeviceEntryDisabler,
     DeviceRegistry,
 )
-from homeassistant.helpers.entity_registry import (
-    EntityRegistry,
-    RegistryEntry,
-    RegistryEntryDisabler,
-)
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -38,7 +34,6 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENTITIES,
@@ -62,16 +57,14 @@ from custom_components.powercalc.const import (
     SensorType,
 )
 from custom_components.powercalc.sensor import is_auto_configurable
-from custom_components.test.light import MockLight
 
 from .common import (
-    create_discoverable_light,
     create_input_boolean,
     create_input_booleans,
-    create_mock_light_entity,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from .conftest import MockEntityWithModel
 
 
 async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
@@ -182,19 +175,15 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     assert group2.state == "0.00"
 
 
-async def test_light_lut_strategy(hass: HomeAssistant) -> None:
-    light_entity = test_light_platform.MockLight(
-        "test1",
-        STATE_ON,
-        unique_id="dsafbwq",
+async def test_light_lut_strategy(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    light_entity_id = "light.test1"
+    mock_entity_with_model_information(
+        light_entity_id,
+        "signify",
+        "LWB010",
+        capabilities={ATTR_SUPPORTED_COLOR_MODES: [light.ColorMode.BRIGHTNESS]},
     )
-    light_entity.supported_color_modes = {light.ColorMode.BRIGHTNESS}
-    light_entity.color_mode = light.ColorMode.BRIGHTNESS
-    light_entity.brightness = 125
-    light_entity.manufacturer = "signify"
-    light_entity.model = "LWB010"
-
-    (light_entity_id, __) = await create_mock_light_entity(hass, light_entity)
+    hass.states.async_set(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 125, ATTR_COLOR_MODE: light.ColorMode.BRIGHTNESS})
 
     await run_powercalc_setup(
         hass,
@@ -297,12 +286,9 @@ async def test_can_create_same_entity_twice_with_unique_id(hass: HomeAssistant) 
 async def test_unsupported_model_is_skipped_from_autodiscovery(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    light = test_light_platform.MockLight("test", STATE_ON)
-    light.manufacturer = "lidl"
-    light.model = "non_existing_model"
-
-    await create_mock_light_entity(hass, light)
+    mock_entity_with_model_information("light.test", "lidl", "non_existing_model")
 
     # Run powercalc setup with autodiscovery
     await run_powercalc_setup(hass, {}, {})
@@ -313,12 +299,13 @@ async def test_unsupported_model_is_skipped_from_autodiscovery(
 async def test_can_include_autodiscovered_entity_in_group(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Test that models are automatically discovered and power sensors created"""
 
     caplog.set_level(logging.ERROR)
 
-    await create_mock_light_entity(hass, create_discoverable_light("testa"))
+    mock_entity_with_model_information("light.testa", "lidl", "HG06462A")
 
     hass.states.async_set(
         "light.testa",
@@ -347,7 +334,7 @@ async def test_can_include_autodiscovered_entity_in_group(
 
 async def test_user_can_rename_entity_id(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_reg: er.EntityRegistry,
 ) -> None:
     """
     When the power/energy sensors exist already with an unique ID, don't change the entity ID
@@ -391,7 +378,7 @@ async def test_user_can_rename_entity_id(
 
 async def test_entities_are_bound_to_source_device(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_reg: er.EntityRegistry,
     device_reg: DeviceRegistry,
 ) -> None:
     """
@@ -472,13 +459,13 @@ async def test_entities_are_bound_to_source_device2(
     entity_reg = mock_registry(
         hass,
         {
-            switch_id: RegistryEntry(
+            switch_id: er.RegistryEntry(
                 entity_id=switch_id,
                 unique_id="1234",
                 platform="switch",
                 device_id=device_id,
             ),
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: er.RegistryEntry(
                 entity_id=power_sensor_id,
                 unique_id="12345",
                 platform="sensor",
@@ -524,16 +511,16 @@ async def test_entities_are_bound_to_disabled_source_device(
     entity_reg = mock_registry(
         hass,
         {
-            light_id: RegistryEntry(
+            light_id: er.RegistryEntry(
                 entity_id=light_id,
-                disabled_by=RegistryEntryDisabler.DEVICE,
+                disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
                 platform="light",
                 device_id=device_id,
             ),
-            power_sensor_id: RegistryEntry(
+            power_sensor_id: er.RegistryEntry(
                 entity_id=power_sensor_id,
-                disabled_by=RegistryEntryDisabler.DEVICE,
+                disabled_by=er.RegistryEntryDisabler.DEVICE,
                 unique_id="1234",
                 platform="powercalc",
                 device_id=device_id,
@@ -581,7 +568,7 @@ async def test_setup_multiple_entities_in_single_platform_config(
 
 async def test_change_options_of_renamed_sensor(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_reg: er.EntityRegistry,
 ) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -630,7 +617,7 @@ async def test_change_options_of_renamed_sensor(
 
 async def test_renaming_sensor_is_retained_after_startup(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    entity_reg: er.EntityRegistry,
 ) -> None:
     entity_reg.async_get_or_create(
         "sensor",
@@ -706,17 +693,14 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 
 async def test_is_autoconfigurable_returns_false(
     hass: HomeAssistant,
-    entity_reg: EntityRegistry,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     is_autoconfigurable should return False when the manufacturer / model is not found in the library
     """
-    light_mock = MockLight("testa")
-    light_mock.manufacturer = "Foo"
-    light_mock.model = "Bar"
+    mock_entity_with_model_information("light.testa", "Foo", "Bar")
 
-    await create_mock_light_entity(hass, light_mock)
-
+    entity_reg = er.async_get(hass)
     entity_entry = entity_reg.async_get("light.testa")
     assert not await is_auto_configurable(hass, entity_entry)
 
