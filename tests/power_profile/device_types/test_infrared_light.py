@@ -20,7 +20,9 @@ from tests.common import (
 from tests.conftest import MockEntityWithModel
 
 
-async def test_infrared_light(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_infrared_light(
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+) -> None:
     """
     Infrared capable light with several sub profiles
     """

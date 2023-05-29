@@ -22,7 +22,9 @@ from tests.common import run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
 
-async def test_can_calculate_power(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_can_calculate_power(
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+) -> None:
     mock_entity_with_model_information("light.test")
     hass.states.async_set("light.test", STATE_ON)
     await hass.async_block_till_done()

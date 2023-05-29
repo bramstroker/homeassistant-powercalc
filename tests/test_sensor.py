@@ -4,7 +4,12 @@ import homeassistant.helpers.entity_registry as er
 import pytest
 from homeassistant.components import light
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
-from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_SUPPORTED_COLOR_MODES, ColorMode
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_MODE,
+    ATTR_SUPPORTED_COLOR_MODES,
+    ColorMode,
+)
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
@@ -175,7 +180,9 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     assert group2.state == "0.00"
 
 
-async def test_light_lut_strategy(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_light_lut_strategy(
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+) -> None:
     light_entity_id = "light.test1"
     mock_entity_with_model_information(
         light_entity_id,
@@ -183,7 +190,11 @@ async def test_light_lut_strategy(hass: HomeAssistant, mock_entity_with_model_in
         "LWB010",
         capabilities={ATTR_SUPPORTED_COLOR_MODES: [light.ColorMode.BRIGHTNESS]},
     )
-    hass.states.async_set(light_entity_id, STATE_ON, {ATTR_BRIGHTNESS: 125, ATTR_COLOR_MODE: light.ColorMode.BRIGHTNESS})
+    hass.states.async_set(
+        light_entity_id,
+        STATE_ON,
+        {ATTR_BRIGHTNESS: 125, ATTR_COLOR_MODE: light.ColorMode.BRIGHTNESS},
+    )
 
     await run_powercalc_setup(
         hass,
