@@ -604,13 +604,13 @@ async def create_individual_sensors(
         entities_to_add.append(energy_sensor)
 
         if source_entity:
-            power_sensor = await create_daily_fixed_energy_power_sensor(
+            daily_fixed_power_sensor = await create_daily_fixed_energy_power_sensor(
                 hass,
                 sensor_config,
                 source_entity,
             )
-            if power_sensor:
-                entities_to_add.append(power_sensor)
+            if daily_fixed_power_sensor:
+                entities_to_add.append(daily_fixed_power_sensor)
     else:
         try:
             power_sensor = await create_power_sensor(
