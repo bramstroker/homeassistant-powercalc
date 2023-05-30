@@ -68,7 +68,7 @@ To increase the sensor with a given value use the `powercalc.increase_daily_ener
 
 .. code-block:: yaml
 
-    service: powercalc.calibrate_utility_meter
+    service: powercalc.increase_daily_energy
     data:
       value: 100
     target:
