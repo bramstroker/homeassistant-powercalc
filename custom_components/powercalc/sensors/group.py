@@ -348,6 +348,9 @@ def resolve_entity_ids_recursively(
                 and entity_entry.capabilities
                 and entity_entry.capabilities.get(ATTR_STATE_CLASS) in state_class  # type: ignore
             ]
+            if not entities:
+                _LOGGER.error(f"No power or energy sensor found for config entry: {member_entry.title}, skipping these from the group")
+                continue
             sorted_entities = sorted(entities)
             resolved_ids.extend([sorted_entities[0]])
 
