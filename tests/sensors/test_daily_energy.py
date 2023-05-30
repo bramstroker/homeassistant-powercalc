@@ -25,6 +25,7 @@ from pytest_homeassistant_custom_component.common import (
 )
 
 from custom_components.powercalc.const import (
+    CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
@@ -126,6 +127,22 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant) -> None:
     # So 48 - 4 = 44 updates makes for a full day
     await _trigger_periodic_update(hass, 44)
     assert_entity_state(hass, sensor_entity_id, "12.0000")
+
+
+async def test_utility_meters_are_created(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_PLATFORM: DOMAIN,
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 12,
+            },
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+    )
+
+    assert hass.states.get("sensor.ip_camera_upstairs_energy_daily")
 
 
 async def test_daily_energy_sensor_also_creates_power_sensor(
