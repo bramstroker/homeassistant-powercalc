@@ -120,7 +120,8 @@ from .power_profile.factory import get_power_profile
 from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
-    create_daily_fixed_energy_sensors,
+    create_daily_fixed_energy_power_sensor,
+    create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
@@ -595,13 +596,21 @@ async def create_individual_sensors(
     entities_to_add: list[Entity] = []
     energy_sensor: EnergySensor | None = None
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        entities_to_add.extend(
-            await create_daily_fixed_energy_sensors(
+        energy_sensor = await create_daily_fixed_energy_sensor(
+            hass,
+            sensor_config,
+            source_entity,
+        )
+        entities_to_add.append(energy_sensor)
+
+        if source_entity:
+            daily_fixed_power_sensor = await create_daily_fixed_energy_power_sensor(
                 hass,
                 sensor_config,
                 source_entity,
-            ),
-        )
+            )
+            if daily_fixed_power_sensor:
+                entities_to_add.append(daily_fixed_power_sensor)
     else:
         try:
             power_sensor = await create_power_sensor(
