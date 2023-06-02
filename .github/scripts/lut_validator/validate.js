@@ -20,6 +20,7 @@ const validColorModeCombinations = [
     //The entries below are not really valid combinations according to HA docs, but some core integrations in HA supply this (for example TP-Link)
     'brightness,hs',
     'brightness,color_temp,hs',
+    'brightness,color_temp'
 ]
 
 const main = async () => {

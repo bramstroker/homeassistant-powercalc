@@ -5,20 +5,25 @@ from homeassistant.components import light
 from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
     CONF_CREATE_GROUP,
+    CONF_FILTER,
     CONF_GROUP,
     CONF_INCLUDE,
     CONF_TEMPLATE,
 )
 from custom_components.test.light import MockLight
-
-from .common import (
+from tests.common import (
     create_discoverable_light,
     create_mock_light_entity,
     get_simple_fixed_config,
@@ -27,8 +32,10 @@ from .common import (
 
 
 async def test_include_area(
-    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
-):
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    area_reg: AreaRegistry,
+) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area = area_reg.async_get_or_create("Bathroom 1")
@@ -57,8 +64,9 @@ async def test_include_area(
 
 
 async def test_include_area_not_found(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
         hass,
@@ -70,7 +78,7 @@ async def test_include_area_not_found(
     assert "No area with id or name" in caplog.text
 
 
-async def test_include_light_group(hass: HomeAssistant):
+async def test_include_light_group(hass: HomeAssistant) -> None:
     discoverable_light = create_discoverable_light("bathroom_mirror")
     non_discoverable_light = MockLight("bathroom_spots")
 
@@ -89,7 +97,7 @@ async def test_include_light_group(hass: HomeAssistant):
                 "platform": "group",
                 "name": "Bathroom",
                 "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
-            }
+            },
         },
     )
     await hass.async_block_till_done()
@@ -177,7 +185,8 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
     light_e = create_discoverable_light("light_e", "6765765756")
     light_f = create_discoverable_light("light_f", "676576575sds6")
     await create_mock_light_entity(
-        hass, [light_a, light_b, light_c, light_d, light_e, light_f]
+        hass,
+        [light_a, light_b, light_c, light_d, light_e, light_f],
     )
 
     # Ugly hack, maybe I can figure out something better in the future.
@@ -213,7 +222,7 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
                     "unique_id": "groupc",
                     "entities": ["light.light_group_a", "light.light_group_b"],
                 },
-            ]
+            ],
         },
     )
     await hass.async_block_till_done()
@@ -247,3 +256,65 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         "sensor.light_e_power",
         "sensor.light_f_power",
     }
+
+
+async def test_include_filter_domain(
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    area_reg: AreaRegistry,
+) -> None:
+    area = area_reg.async_get_or_create("Bathroom 1")
+    await hass.async_block_till_done()
+
+    mock_registry(
+        hass,
+        {
+            "light.test_light": RegistryEntry(
+                entity_id="light.test_light",
+                unique_id="1111",
+                platform="light",
+                device_id="light-device-id",
+                area_id=area.id,
+            ),
+            "switch.test_switch": RegistryEntry(
+                entity_id="switch.test_switch",
+                unique_id="2222",
+                platform="switch",
+                device_id="switch-device-id",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    mock_device_registry(
+        hass,
+        {
+            "light-device-id": DeviceEntry(
+                id="light-device-id",
+                manufacturer="Signify",
+                model="LCT012",
+                area_id=area.id,
+            ),
+            "switch-device-id": DeviceEntry(
+                id="switch-device-id",
+                manufacturer="Shelly",
+                model="Shelly Plug S",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bathroom_1",
+                CONF_FILTER: {CONF_DOMAIN: "light"},
+            },
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}

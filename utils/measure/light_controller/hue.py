@@ -14,14 +14,19 @@ TYPE_GROUP = "group"
 
 
 class HueLightController(LightController):
-    def __init__(self, bridge_ip: str):
+    def __init__(self, bridge_ip: str) -> None:
         self.bridge = self.initialize_hue_bridge(bridge_ip)
         self.lights = {light.light_id: light.name for light in self.bridge.lights}
         self.groups = {group.group_id: group.name for group in self.bridge.groups}
         self.is_group: bool = False
         self.light_id: int | None = None
 
-    def change_light_state(self, color_mode: str, on: bool = True, **kwargs):
+    def change_light_state(
+        self,
+        color_mode: str,
+        on: bool = True,
+        **kwargs,  # noqa: ANN003
+    ) -> None:
         kwargs["on"] = on
         if self.is_group:
             self.bridge.set_group(self.light_id, kwargs)
@@ -37,15 +42,15 @@ class HueLightController(LightController):
 
         # Individual light information
         light = self.bridge.get_light(self.light_id)
-        lightinfo = LightInfo(
+        light_info = LightInfo(
             model_id=light["modelid"],
         )
 
         if "ct" in light["capabilities"]["control"]:
-            lightinfo.min_mired = light["capabilities"]["control"]["ct"]["min"]
-            lightinfo.max_mired = light["capabilities"]["control"]["ct"]["max"]
+            light_info.min_mired = light["capabilities"]["control"]["ct"]["min"]
+            light_info.max_mired = light["capabilities"]["control"]["ct"]["max"]
 
-        return lightinfo
+        return light_info
 
     def find_group_model(self, group_id: int) -> str:
         model_ids = set()
@@ -59,14 +64,16 @@ class HueLightController(LightController):
 
         if len(model_ids) > 1:
             raise LightControllerError(
-                "The Hue group contains lights of multiple models, this is not supported"
+                "The Hue group contains lights of multiple models, this is not supported",
             )
 
         return model_ids.pop()
 
-    def initialize_hue_bridge(self, bridge_ip: str) -> Bridge:
+    @staticmethod
+    def initialize_hue_bridge(bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(
-            os.path.dirname(__file__), "../.persistent/.python_hue"
+            os.path.dirname(__file__),
+            "../.persistent/.python_hue",
         )
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)
@@ -77,24 +84,28 @@ class HueLightController(LightController):
 
         return bridge
 
-    def get_questions(self) -> list[dict]:
-        def get_message(answers) -> str:
+    def get_questions(self) -> list[inquirer.questions.Question]:
+        def get_message(answers: dict[str, Any]) -> str:
             if answers.get("multiple_lights"):
                 return "Select the lightgroup"
             return "Select the light"
 
-        def get_light_list(answers) -> list:
+        def get_light_list(answers: dict[str, Any]) -> list:
             if answers.get("multiple_lights"):
                 return [
-                    (name, f"{TYPE_GROUP}:{id}") for id, name in self.groups.items()
+                    (name, f"{TYPE_GROUP}:{group_id}")
+                    for group_id, name in self.groups.items()
                 ]
-            return [(name, f"{TYPE_LIGHT}:{id}") for id, name in self.lights.items()]
+            return [
+                (name, f"{TYPE_LIGHT}:{light_id}")
+                for light_id, name in self.lights.items()
+            ]
 
         return [
             inquirer.List(name="light", message=get_message, choices=get_light_list),
         ]
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         light_type, light_id = answers["light"].split(":")
         self.is_group = light_type == TYPE_GROUP
         self.light_id = int(light_id)

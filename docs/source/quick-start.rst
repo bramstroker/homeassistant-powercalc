@@ -52,7 +52,7 @@ When your appliance is not supported out of the box (or you want to have more co
     .. code-block:: yaml
 
         powercalc:
-            enable_autodisovery: false
+            enable_autodiscovery: false
 
 Energy dashboard
 ----------------

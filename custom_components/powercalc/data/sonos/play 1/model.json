@@ -1,0 +1,28 @@
+{
+    "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using HAOS; manual mute/zero volume measurement.",
+    "measure_method": "script",
+    "measure_device": "ZOOZ Z-WAVE PLUS S2 POWER STRIP ZEN20 VER. 3.0",
+    "name": "Sonos Play:1",
+    "standby_power": 2.10,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 3.40",
+            "10 -> 3.60",
+            "20 -> 3.70",
+            "30 -> 3.70",
+            "40 -> 3.80",
+            "50 -> 3.90",
+            "60 -> 4.40",
+            "70 -> 6.00",
+            "80 -> 6.40",
+            "90 -> 11.10",
+            "100 -> 11.40"
+        ]
+    },
+    "aliases": [
+        "Play:1"
+    ]
+}

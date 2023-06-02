@@ -4,8 +4,13 @@ import os
 
 from homeassistant.core import HomeAssistant
 
-from ..const import CONF_CUSTOM_MODEL_DIRECTORY, CONF_MANUFACTURER, CONF_MODEL
-from ..errors import ModelNotSupported
+from custom_components.powercalc.const import (
+    CONF_CUSTOM_MODEL_DIRECTORY,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
+)
+from custom_components.powercalc.errors import ModelNotSupportedError
+
 from .library import ModelInfo, ProfileLibrary
 from .power_profile import PowerProfile
 
@@ -13,7 +18,7 @@ from .power_profile import PowerProfile
 async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
-    model_info: ModelInfo = None,
+    model_info: ModelInfo | None = None,
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
@@ -27,15 +32,17 @@ async def get_power_profile(
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
     if custom_model_directory:
         custom_model_directory = os.path.join(
-            hass.config.config_dir, custom_model_directory
+            hass.config.config_dir,
+            custom_model_directory,
         )
 
     library = ProfileLibrary.factory(hass)
     profile = await library.get_profile(
-        ModelInfo(manufacturer, model), custom_model_directory
+        ModelInfo(manufacturer, model),
+        custom_model_directory,
     )
     if profile is None:
-        raise ModelNotSupported(
-            f"Model not found in library (manufacturer: {manufacturer}, model: {model})"
+        raise ModelNotSupportedError(
+            f"Model not found in library (manufacturer: {manufacturer}, model: {model})",
         )
     return profile

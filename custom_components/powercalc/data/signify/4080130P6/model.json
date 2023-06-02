@@ -1,0 +1,8 @@
+{
+    "measure_device": "See linked profile",
+    "measure_method": "script",
+    "name": "Hue Devote",
+    "standby_power": 0.29,
+    "calculation_strategy": "lut",
+    "linked_lut": "signify/LTA001"
+}

@@ -1,0 +1,21 @@
+{
+	"measure_description": "Measured manually",
+	"measure_method": "manual",
+	"measure_device": "PeakTech P 4250 (1 mV/10 mA) with VOLTCRAFT VC270",
+	"name": "Smart plug (with power monitoring)",
+	"standby_power": 0.13,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 0.39
+	},
+	"aliases": [
+		"TS011F_plug_1",
+		"TS011F_plug_3",
+		"TS011F"
+	]
+}

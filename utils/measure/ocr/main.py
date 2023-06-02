@@ -3,7 +3,7 @@ import argparse
 import ocr
 
 
-def main():
+def main() -> None:
     """
     Handles command line arguments and begins the real-time OCR by calling ocr_stream().
     A path to the Tesseract cmd root is required.
@@ -20,7 +20,11 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-s", "--src", help="SRC video source for video capture", default=0, type=str
+        "-s",
+        "--src",
+        help="SRC video source for video capture",
+        default=0,
+        type=str,
     )
 
     args = parser.parse_args()

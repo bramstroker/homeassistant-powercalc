@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 2.83",
+            "20 -> 3.1",
+            "30 -> 3.22",
+            "40 -> 3.35",
+            "50 -> 3.51",
+            "60 -> 3.67",
+            "70 -> 3.89",
+            "80 -> 4.13",
+            "90 -> 4.43",
+            "100 -> 4.8",
+            "0 -> 2.11"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Tuya",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.12:docker"
+    },
+    "name": "Google Nest Hub (2nd Gen)",
+    "standby_power": 0.39
+}

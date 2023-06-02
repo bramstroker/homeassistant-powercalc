@@ -14,6 +14,7 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
+    CONF_UNIQUE_ID,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
@@ -54,21 +55,24 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
-
-from ..common import (
+from tests.common import (
+    assert_entity_state,
     create_input_boolean,
     create_input_number,
     get_simple_fixed_config,
     run_powercalc_setup,
 )
+from tests.conftest import MockEntityWithModel
 
 
-async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
+async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     platform = MockEntityPlatform(hass)
     entity = MockEntity(
-        name="existing_power", unique_id="1234", device_class=SensorDeviceClass.POWER
+        name="existing_power",
+        unique_id="1234",
+        device_class=SensorDeviceClass.POWER,
     )
     await platform.async_add_entities([entity])
 
@@ -102,7 +106,7 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant):
     }
 
 
-async def test_rounding_precision(hass: HomeAssistant):
+async def test_rounding_precision(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     config = {CONF_POWER_SENSOR_PRECISION: 4}
@@ -123,7 +127,7 @@ async def test_rounding_precision(hass: HomeAssistant):
     assert power_state.state == "50.0000"
 
 
-async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
+async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant) -> None:
     """
     The initial state of the power sensor should be calculated after HA startup completes.
     When we do it already during powercalc setup some entities referred in template could be unknown yet
@@ -147,7 +151,7 @@ async def test_initial_state_is_calculated_after_startup(hass: HomeAssistant):
     assert hass.states.get("sensor.henkie_power").state == "30.00"
 
 
-async def test_standby_power(hass: HomeAssistant):
+async def test_standby_power(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -172,7 +176,7 @@ async def test_standby_power(hass: HomeAssistant):
     assert power_state.state == "15.00"
 
 
-async def test_multiply_factor(hass: HomeAssistant):
+async def test_multiply_factor(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     await run_powercalc_setup(
@@ -197,8 +201,9 @@ async def test_multiply_factor(hass: HomeAssistant):
 
 
 async def test_error_when_no_strategy_has_been_configured(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     caplog.set_level(logging.ERROR)
     await create_input_boolean(hass)
 
@@ -210,7 +215,7 @@ async def test_error_when_no_strategy_has_been_configured(
     assert "Skipping sensor setup" in caplog.text
 
 
-async def test_strategy_enabled_condition(hass: HomeAssistant):
+async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
     """
     Test calculation_enabled_condition is working correctly.
     This is used for example on robot vacuum cleaners.
@@ -218,7 +223,8 @@ async def test_strategy_enabled_condition(hass: HomeAssistant):
      - cleaning
      - returning
      - docked
-    When the state is docked the calculation is activated and linear calibration is used to map the consumption while charging
+    When the state is docked the calculation is activated and linear calibration is used to map the consumption
+    while charging
     """
     vacuum_entity_id = "vacuum.my_robot_cleaner"
     power_entity_id = "sensor.my_robot_cleaner_power"
@@ -297,7 +303,7 @@ async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "15.00"
 
 
-async def test_unknown_source_entity_state(hass: HomeAssistant):
+async def test_unknown_source_entity_state(hass: HomeAssistant) -> None:
     """Power sensor should be unavailable when source entity state is unknown"""
     await create_input_boolean(hass)
     await run_powercalc_setup(
@@ -314,8 +320,9 @@ async def test_unknown_source_entity_state(hass: HomeAssistant):
 
 
 async def test_error_when_model_not_supported(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
-):
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     caplog.set_level(logging.ERROR)
 
     await create_input_boolean(hass)
@@ -333,7 +340,7 @@ async def test_error_when_model_not_supported(
     assert "Skipping sensor setup" in caplog.text
 
 
-async def test_sleep_power(hass: HomeAssistant):
+async def test_sleep_power(hass: HomeAssistant) -> None:
     """Test sleep power for devices having a sleep mode"""
     entity_id = "media_player.test"
     power_entity_id = "sensor.test_power"
@@ -378,7 +385,7 @@ async def test_sleep_power(hass: HomeAssistant):
     assert hass.states.get(power_entity_id).state == "100.00"
 
 
-async def test_unavailable_power(hass: HomeAssistant):
+async def test_unavailable_power(hass: HomeAssistant) -> None:
     """Test specifying an alternative power value if the source entity is unavailable"""
     await create_input_boolean(hass)
 
@@ -410,3 +417,36 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
     power_state = hass.states.get("sensor.test_power")
     assert ATTR_SOURCE_ENTITY not in power_state.attributes
     assert ATTR_SOURCE_DOMAIN not in power_state.attributes
+
+
+async def test_manually_configured_sensor_overrides_profile(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """
+    Make sure that config settings done by user are not overriden by power profile
+    """
+    entity_id = "light.test"
+
+    mock_entity_with_model_information(entity_id, "sonoff", "ZBMINI")
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: entity_id,
+            CONF_NAME: "Test 123",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_STANDBY_POWER: 0,
+            CONF_FIXED: {CONF_POWER: 6},
+        },
+    )
+
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert_entity_state(hass, "sensor.test_123_power", "6.00")
+
+    hass.states.async_set("light.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert_entity_state(hass, "sensor.test_123_power", "0.00")

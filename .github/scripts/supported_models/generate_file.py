@@ -11,7 +11,7 @@ from pytablewriter import MarkdownTableWriter
 sys.path.insert(
     1,
     os.path.abspath(
-        os.path.join(Path(__file__), "../../../../custom_components/powercalc")
+        os.path.join(Path(__file__), "../../../../custom_components/powercalc"),
     ),
 )
 
@@ -90,7 +90,8 @@ def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
         if device_type not in manufacturer_device_types[manufacturer]:
             manufacturer_device_types[manufacturer].append(device_type)
     with open(
-        os.path.join(DATA_DIR, "manufacturer_device_types.json"), "w"
+        os.path.join(DATA_DIR, "manufacturer_device_types.json"),
+        "w",
     ) as json_file:
         json_file.write(json.dumps(manufacturer_device_types))
 
@@ -113,7 +114,7 @@ def get_model_list() -> list[dict]:
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "color_modes": color_modes,
-                }
+                },
             )
             models.append(model_data)
 

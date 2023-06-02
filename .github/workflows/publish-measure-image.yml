@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Get version
         id: version
         uses: home-assistant/actions/helpers/version@master
@@ -54,6 +54,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./utils/measure
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

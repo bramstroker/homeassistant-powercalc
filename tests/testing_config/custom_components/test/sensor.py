@@ -3,6 +3,9 @@ Provide a mock sensor platform.
 
 Call init before using it in your tests to ensure clean test data.
 """
+from datetime import datetime
+from typing import Any
+
 from homeassistant.components.sensor import (
     DEVICE_CLASSES,
     RestoreSensor,
@@ -20,6 +23,9 @@ from homeassistant.const import (
     SIGNAL_STRENGTH_DECIBELS,
     VOLUME_CUBIC_METERS,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from pytest_homeassistant_custom_component.common import MockEntity
 
 DEVICE_CLASSES.append("none")
@@ -56,7 +62,7 @@ UNITS_OF_MEASUREMENT = {
 ENTITIES = {}
 
 
-def init(empty=False):
+def init(empty: bool = False) -> None:
     """Initialize the platform with entities."""
     global ENTITIES
 
@@ -76,8 +82,11 @@ def init(empty=False):
 
 
 async def async_setup_platform(
-    hass, config, async_add_entities_callback, discovery_info=None
-):
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities_callback: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> None:
     """Return mock entities."""
     async_add_entities_callback(list(ENTITIES.values()))
 
@@ -86,27 +95,27 @@ class MockSensor(MockEntity, SensorEntity):
     """Mock Sensor class."""
 
     @property
-    def device_class(self):
+    def device_class(self) -> str:
         """Return the class of this sensor."""
         return self._handle("device_class")
 
     @property
-    def last_reset(self):
+    def last_reset(self) -> datetime | None:
         """Return the last_reset of this sensor."""
         return self._handle("last_reset")
 
     @property
-    def native_unit_of_measurement(self):
+    def native_unit_of_measurement(self) -> str | None:
         """Return the native unit_of_measurement of this sensor."""
         return self._handle("native_unit_of_measurement")
 
     @property
-    def native_value(self):
+    def native_value(self) -> Any | None:
         """Return the native value of this sensor."""
         return self._handle("native_value")
 
     @property
-    def state_class(self):
+    def state_class(self) -> str:
         """Return the state class of this sensor."""
         return self._handle("state_class")
 

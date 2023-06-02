@@ -1,14 +1,6 @@
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import (
-    mock_device_registry,
-    mock_registry,
-)
 
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
 from custom_components.powercalc.const import (
@@ -20,9 +12,13 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.conftest import MockEntityWithModel
 
 
-async def test_smart_switch(hass: HomeAssistant):
+async def test_smart_switch(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """
     Test that smart plug can be setup from profile library
     """
@@ -30,24 +26,10 @@ async def test_smart_switch(hass: HomeAssistant):
     manufacturer = "Shelly"
     model = "Shelly Plug S"
 
-    mock_registry(
-        hass,
-        {
-            switch_id: RegistryEntry(
-                entity_id=switch_id,
-                unique_id="1234",
-                platform="switch",
-                device_id="shelly-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "shelly-device": DeviceEntry(
-                id="shelly-device-id", manufacturer=manufacturer, model=model
-            )
-        },
+    mock_entity_with_model_information(
+        entity_id=switch_id,
+        manufacturer=manufacturer,
+        model=model,
     )
 
     power_sensor_id = "sensor.oven_device_power"
@@ -77,7 +59,10 @@ async def test_smart_switch(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
+async def test_smart_switch_power_input_yaml(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """
     Test a smart switch can be setup with YAML and a fixed power value for the appliance configured by the user
     The values for standby power on and off should be taken from the power profile library.
@@ -87,24 +72,10 @@ async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
     manufacturer = "IKEA"
     model = "Smart Control Outlet"
 
-    mock_registry(
-        hass,
-        {
-            switch_id: RegistryEntry(
-                entity_id=switch_id,
-                unique_id="1234",
-                platform="switch",
-                device_id="ikea-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "ikea-device-id": DeviceEntry(
-                id="ikea-device-id", manufacturer=manufacturer, model=model
-            )
-        },
+    mock_entity_with_model_information(
+        entity_id=switch_id,
+        manufacturer=manufacturer,
+        model=model,
     )
 
     power_sensor_id = "sensor.heater_device_power"
@@ -135,7 +106,10 @@ async def test_smart_switch_power_input_yaml(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "0.52"
 
 
-async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
+async def test_smart_switch_power_input_gui_config_flow(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
     """
     Test a smart switch can be setup with GUI and a fixed power value for the appliance configured by the user
     The values for standby power on and off should be taken from the power profile library.
@@ -145,24 +119,10 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     manufacturer = "IKEA"
     model = "TRADFRI control outlet"
 
-    mock_registry(
-        hass,
-        {
-            switch_id: RegistryEntry(
-                entity_id=switch_id,
-                unique_id="1234",
-                platform="switch",
-                device_id="ikea-device-id",
-            ),
-        },
-    )
-    mock_device_registry(
-        hass,
-        {
-            "ikea-device-id": DeviceEntry(
-                id="ikea-device-id", manufacturer=manufacturer, model=model
-            )
-        },
+    mock_entity_with_model_information(
+        entity_id=switch_id,
+        manufacturer=manufacturer,
+        model=model,
     )
 
     power_sensor_id = "sensor.heater_device_power"
@@ -175,13 +135,15 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
 
     assert flow["step_id"] == "library"
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_CONFIRM_AUTODISCOVERED_MODEL: True}
+        flow["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
     assert result["step_id"] == "fixed"
     result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"], {CONF_POWER: 50}
+        flow["flow_id"],
+        {CONF_POWER: 50},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
@@ -222,39 +184,17 @@ async def test_smart_switch_power_input_gui_config_flow(hass: HomeAssistant):
     assert hass.states.get(power_sensor_id).state == "100.80"
 
 
-async def test_switch_as_x_added_through_discovery(
-    hass: HomeAssistant, mock_flow_init
+async def test_hue_smart_plug_is_discovered(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
-    """
-    Test that smart plug can be setup from profile library
-    """
-    entity_id = "light.foo"
-    manufacturer = "Signify"
-    model = "LOM007"
-    device_id = "mydevice"
-
-    mock_registry(
-        hass,
-        {
-            entity_id: RegistryEntry(
-                entity_id=entity_id,
-                unique_id="1234",
-                platform="switch_as_x",
-                device_id=device_id,
-            ),
-        },
+    mock_entity_with_model_information(
+        entity_id="switch.smartplug",
+        manufacturer="signify",
+        model="LOM002",
+        platform="hue",
+        unique_id="1234",
     )
-    mock_device_registry(
-        hass,
-        {device_id: DeviceEntry(id=device_id, manufacturer=manufacturer, model=model)},
-    )
+    await run_powercalc_setup(hass, {})
 
-    await async_setup_component(hass, DOMAIN, {})
-    await hass.async_block_till_done()
-
-    # Check that two discovery flows have been initialized
-    # LightA and LightB should be discovered, LightC not
-    mock_calls = mock_flow_init.mock_calls
-    assert len(mock_calls) == 1
-    assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
-    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == entity_id
+    assert hass.states.get("sensor.smartplug_device_power")

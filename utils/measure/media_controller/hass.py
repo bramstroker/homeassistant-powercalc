@@ -4,20 +4,21 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
+from media_controller.controller import MediaController
 from media_controller.errors import MediaPlayerError
 
 _LOGGER = logging.getLogger("measure")
 
 
-class HassMediaController:
-    def __init__(self, api_url: str, token: str):
+class HassMediaController(MediaController):
+    def __init__(self, api_url: str, token: str) -> None:
         self._entity_id: str | None = None
         self._model_id: str | None = None
         try:
             self.client = Client(api_url, token, cache_session=False)
             self.client.get_config()
         except HomeassistantAPIError as e:
-            raise MediaPlayerError(f"Failed to connect to HA API: {e}")
+            raise MediaPlayerError(f"Failed to connect to HA API: {e}") from e
 
     def set_volume(self, volume: int) -> None:
         self.client.trigger_service(
@@ -29,7 +30,9 @@ class HassMediaController:
 
     def mute_volume(self) -> None:
         self.client.trigger_service(
-            "media_player", "mute_volume", entity_id=self._entity_id
+            "media_player",
+            "mute_volume",
+            entity_id=self._entity_id,
         )
 
     def play_audio(self, stream_url: str) -> None:
@@ -44,14 +47,19 @@ class HassMediaController:
     def turn_off(self) -> None:
         try:
             self.client.trigger_service(
-                "media_player", "turn_off", entity_id=self._entity_id
+                "media_player",
+                "turn_off",
+                entity_id=self._entity_id,
             )
         except InternalServerError:
             _LOGGER.debug(
-                "Internal server error on media_player.turn_off service, probably because not supported by device, Trying media_player.media_stop"
+                "Internal server error on media_player.turn_off service, "
+                "probably because not supported by device, Trying media_player.media_stop",
             )
             self.client.trigger_service(
-                "media_player", "media_stop", entity_id=self._entity_id
+                "media_player",
+                "media_stop",
+                entity_id=self._entity_id,
             )
 
     def get_questions(self) -> list[inquirer.questions.Question]:
@@ -72,6 +80,6 @@ class HassMediaController:
             ),
         ]
 
-    def process_answers(self, answers: dict[str, Any]):
+    def process_answers(self, answers: dict[str, Any]) -> None:
         self._entity_id = answers["media_player_entity_id"]
         self._model_id = answers["media_player_model_id"]

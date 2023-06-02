@@ -12,11 +12,11 @@ _LOGGER = logging.getLogger("measure")
 
 class MediaControllerFactory:
     @staticmethod
-    def hass():
+    def hass() -> HassMediaController:
         return HassMediaController(config.HASS_URL, config.HASS_TOKEN)
 
     @staticmethod
-    def dummy():
+    def dummy() -> DummyMediaController:
         return DummyMediaController()
 
     def create(self) -> MediaController:
@@ -28,7 +28,7 @@ class MediaControllerFactory:
         factory = factories.get(config.SELECTED_MEDIA_CONTROLLER)
         if factory is None:
             raise Exception(
-                f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}"
+                f"Could not find a factory for {config.SELECTED_MEDIA_CONTROLLER}",
             )
 
         return factory()

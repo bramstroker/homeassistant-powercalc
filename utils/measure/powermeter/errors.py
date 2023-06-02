@@ -10,5 +10,5 @@ class ZeroReadingError(PowerMeterError):
     pass
 
 
-class ConnectionError(PowerMeterError):
+class ApiConnectionError(PowerMeterError):
     pass

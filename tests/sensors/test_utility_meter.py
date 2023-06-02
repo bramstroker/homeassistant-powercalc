@@ -28,11 +28,10 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
+from tests.common import create_input_boolean, run_powercalc_setup
 
-from ..common import create_input_boolean, run_powercalc_setup
 
-
-async def test_tariff_sensors_are_created(hass: HomeAssistant):
+async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
     assert await async_setup_component(hass, utility_meter.DOMAIN, {})
@@ -50,10 +49,10 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
                     CONF_MODE: CalculationStrategy.FIXED,
                     CONF_FIXED: {CONF_POWER: 50},
                     CONF_CREATE_UTILITY_METERS: True,
-                    CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+                    CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
                     CONF_UTILITY_METER_TYPES: ["daily"],
-                }
-            ]
+                },
+            ],
         },
     )
     await hass.async_block_till_done()
@@ -74,9 +73,14 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant):
     assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
 
+    general_sensor = hass.states.get("sensor.test_energy_daily")
+    assert general_sensor
+    assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
+
 
 async def test_utility_meter_is_not_created_twice(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
     power_sensor_id = "sensor.test_power"

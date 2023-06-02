@@ -43,7 +43,7 @@ class DeviceType(str, Enum):
 
 _LOGGER = logging.getLogger("measure")
 
-with open(os.path.join(sys.path[0], ".VERSION"), "r") as f:
+with open(os.path.join(sys.path[0], ".VERSION")) as f:
     _VERSION = f.read().strip()
 
 
@@ -88,7 +88,7 @@ class Measure:
         _LOGGER.info(f"Selected powermeter: {config.SELECTED_POWER_METER}")
         if DeviceType.LIGHT:
             _LOGGER.info(
-                f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}"
+                f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}",
             )
 
         if config.SELECTED_DEVICE_TYPE:
@@ -106,7 +106,9 @@ class Measure:
         self.runner.prepare(answers)
 
         export_directory = os.path.join(
-            os.path.dirname(__file__), "export", self.runner.get_export_directory()
+            os.path.dirname(__file__),
+            "export",
+            self.runner.get_export_directory(),
         )
         if not os.path.exists(export_directory):
             os.makedirs(export_directory)
@@ -134,7 +136,7 @@ class Measure:
 
         if generate_model_json or isinstance(self.runner, LightRunner):
             _LOGGER.info(
-                f"Measurement session finished. Files exported to {export_directory}"
+                f"Measurement session finished. Files exported to {export_directory}",
             )
 
     @staticmethod
@@ -144,7 +146,7 @@ class Measure:
         name: str,
         measure_device: str,
         extra_json_data: dict | None = None,
-    ):
+    ) -> None:
         """Write model.json manifest file"""
         json_data = {
             "measure_device": measure_device,
@@ -166,9 +168,8 @@ class Measure:
             indent=4,
             sort_keys=True,
         )
-        json_file = open(os.path.join(directory, "model.json"), "w")
-        json_file.write(json_string)
-        json_file.close()
+        with open(os.path.join(directory, "model.json"), "w") as json_file:
+            json_file.write(json_string)
 
     def get_questions(self) -> list[Question]:
         """
@@ -241,16 +242,17 @@ def config_key_exists(key: str) -> bool:
         return False
 
 
-def validate_required(_, val):
+def validate_required(_: Any, val: str) -> bool:  # noqa: ANN401
     """Validation function for the inquirer question, checks if the input has a not empty value"""
     if len(val) == 0:
         raise ValidationError(
-            "", reason="This question cannot be empty, please put in a value"
+            "",
+            reason="This question cannot be empty, please put in a value",
         )
     return True
 
 
-def str_to_bool(value: Any) -> bool:
+def str_to_bool(value: Any) -> bool:  # noqa: ANN401
     """Return whether the provided string (or any value really) represents true."""
     if not value:
         return False
@@ -260,17 +262,18 @@ def str_to_bool(value: Any) -> bool:
 class RunnerFactory:
     @staticmethod
     def create_runner(
-        device_type: DeviceType, power_meter: PowerMeter
+        device_type: DeviceType,
+        power_meter: PowerMeter,
     ) -> MeasurementRunner:
         """Creates a runner instance based on selected device type"""
         measure_util = MeasureUtil(power_meter)
-        if device_type == DeviceType.LIGHT:
-            return LightRunner(measure_util)
         if device_type == DeviceType.SPEAKER:
             return SpeakerRunner(measure_util)
 
+        return LightRunner(measure_util)
 
-def main():
+
+def main() -> None:
     print(f"Powercalc measure: {_VERSION}\n")
 
     try:
@@ -280,18 +283,17 @@ def main():
         measure_util = MeasureUtil(power_meter)
 
         args = sys.argv[1:]
-        if len(args) > 0:
-            if args[0] == "average":
-                try:
-                    duration = int(args[1])
-                except IndexError:
-                    duration = 60
-                questions = power_meter.get_questions()
-                if questions:
-                    answers = measure.ask_questions(questions)
-                    power_meter.process_answers(answers)
-                measure_util.take_average_measurement(duration)
-                exit(0)
+        if len(args) > 0 and args[0] == "average":
+            try:
+                duration = int(args[1])
+            except IndexError:
+                duration = 60
+            questions = power_meter.get_questions()
+            if questions:
+                answers = measure.ask_questions(questions)
+                power_meter.process_answers(answers)
+            measure_util.take_average_measurement(duration)
+            exit(0)
 
         measure.start()
         exit(0)

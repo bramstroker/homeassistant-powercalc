@@ -3,7 +3,8 @@ from homeassistant.core import HomeAssistant
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant,
+    entry: ConfigEntry,
 ) -> dict:
     """Return diagnostics for a config entry."""
     return {

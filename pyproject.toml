@@ -1,3 +1,49 @@
+[tool.pytest.ini_options]
+testpaths = "tests"
+norecursedirs = ".git"
+asyncio_mode = "auto"
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.10"
+show_error_codes = true
+follow_imports = "silent"
+local_partial_types = true
+strict_equality = true
+no_implicit_optional = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+disable_error_code = "typeddict-item" #see https://github.com/python/mypy/issues/15195
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "homeassistant.components.*"
+ignore_missing_imports = true
+
+[tool.coverage.paths]
+source = ["custom_components/powercalc", "utils", "tests"]
+
+[tool.ruff]
+select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
+ignore = ["ANN101"]
+line-length = 150
+target-version = "py310"
+exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
+
+[tool.ruff.per-file-ignores]
+"utils/measure/**.py" = ["T201"]
+
+[tool.ruff.mccabe]
+max-complexity = 15

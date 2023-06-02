@@ -18,9 +18,10 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
-from homeassistant.const import __version__ as HA_VERSION
+from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.discovery import async_load_platform
+from homeassistant.helpers.typing import ConfigType
 
 from .common import validate_name_pattern
 from .const import (
@@ -35,13 +36,17 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -49,6 +54,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
+    DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
@@ -81,45 +87,55 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
             cv.deprecated(
-                CONF_SCAN_INTERVAL, replacement_key=CONF_FORCE_UPDATE_FREQUENCY
+                CONF_SCAN_INTERVAL,
+                replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
             ),
             vol.Schema(
                 {
                     vol.Optional(
-                        CONF_FORCE_UPDATE_FREQUENCY, default=DEFAULT_UPDATE_FREQUENCY
+                        CONF_FORCE_UPDATE_FREQUENCY,
+                        default=DEFAULT_UPDATE_FREQUENCY,
                     ): cv.time_period,
                     vol.Optional(
-                        CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
+                        CONF_POWER_SENSOR_NAMING,
+                        default=DEFAULT_POWER_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_POWER_SENSOR_FRIENDLY_NAMING
+                        CONF_POWER_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_POWER_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                        CONF_POWER_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
+                        CONF_ENERGY_SENSOR_NAMING,
+                        default=DEFAULT_ENERGY_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING
+                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                        CONF_ENERGY_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
-                        CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False
+                        CONF_DISABLE_EXTENDED_ATTRIBUTES,
+                        default=False,
                     ): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string]
+                        cv.ensure_list,
+                        [cv.string],
                     ),
                     vol.Optional(
-                        CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES
+                        CONF_UTILITY_METER_TYPES,
+                        default=DEFAULT_UTILITY_METER_TYPES,
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                     vol.Optional(
-                        CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
+                        CONF_UTILITY_METER_OFFSET,
+                        default=DEFAULT_OFFSET,
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD,
@@ -134,15 +150,18 @@ CONFIG_SCHEMA = vol.Schema(
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_UNIT_PREFIX, default=UnitPrefix.KILO
+                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
+                        default=UnitPrefix.KILO,
                     ): vol.In([cls.value for cls in UnitPrefix]),
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string]
+                        cv.ensure_list,
+                        [cv.string],
                     ),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
-                }
+                    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
+                },
             ),
-        )
+        ),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -150,10 +169,10 @@ CONFIG_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
         msg = (
-            "This integration require at least HomeAssistant version "
+            "This integration requires at least HomeAssistant version "
             f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
             " Please upgrade HomeAssistant to continue use this integration."
         )
@@ -161,7 +180,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         _LOGGER.critical(msg)
         return False
 
-    domain_config = config.get(DOMAIN) or {
+    domain_config: ConfigType = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -188,19 +207,21 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
     }
 
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
         discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
 
-    if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
+    domain_groups: list[str] | None = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
+    if domain_groups:
 
-        async def _create_domain_groups(event: None):
+        async def _create_domain_groups(event: None) -> None:
             await create_domain_groups(
                 hass,
                 domain_config,
-                domain_config.get(CONF_CREATE_DOMAIN_GROUPS),
+                domain_groups,  # type: ignore
             )
 
         hass.bus.async_listen_once(
@@ -208,12 +229,27 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             _create_domain_groups,
         )
 
+    async def _create_standby_group(event: None) -> None:
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
+                domain_config,
+            ),
+        )
+
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _create_standby_group,
+    )
+
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
@@ -227,7 +263,8 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
+        config_entry,
+        PLATFORMS,
     )
 
     if unload_ok:
@@ -247,7 +284,8 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
     if sensor_type == SensorType.VIRTUAL_POWER:
         updated_entries = await remove_power_sensor_from_associated_groups(
-            hass, config_entry
+            hass,
+            config_entry,
         )
     if sensor_type == SensorType.GROUP:
         updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
@@ -257,10 +295,29 @@ async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
             await hass.config_entries.async_reload(entry.entry_id)
 
 
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    version = config_entry.version
+    if version == 1:
+        data = {**config_entry.data}
+        if (
+            CONF_FIXED in data
+            and CONF_POWER in data[CONF_FIXED]
+            and CONF_POWER_TEMPLATE in data[CONF_FIXED]
+        ):
+            data[CONF_FIXED].pop(CONF_POWER, None)
+        config_entry.version = 2
+        hass.config_entries.async_update_entry(config_entry, data=data)
+
+    return True
+
+
 async def create_domain_groups(
-    hass: HomeAssistant, global_config: dict, domains: list[str]
-):
-    """Create group sensors aggregating all power sensors from given domains"""
+    hass: HomeAssistant,
+    global_config: ConfigType,
+    domains: list[str],
+) -> None:
+    """Create group sensors aggregating all power sensors from given domains."""
     _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
@@ -280,14 +337,17 @@ async def create_domain_groups(
                     CONF_DOMAIN: domain,
                 },
                 global_config,
-            )
+            ),
         )
 
 
 def _notify_message(
-    hass: HomeAssistant, notification_id: str, title: str, message: str
-) -> None:
-    """Notify user with persistent notification"""
+    hass: HomeAssistant,
+    notification_id: str,
+    title: str,
+    message: str,
+) -> None:  # pragma: no cover
+    """Notify user with persistent notification."""
     hass.async_create_task(
         hass.services.async_call(
             domain="persistent_notification",
@@ -297,5 +357,5 @@ def _notify_message(
                 "message": message,
                 "notification_id": f"{DOMAIN}.{notification_id}",
             },
-        )
+        ),
     )
