@@ -10,7 +10,14 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS, UnitOfPower, UnitOfTime
+from homeassistant.const import (
+    ATTR_UNIT_OF_MEASUREMENT,
+    CONF_NAME,
+    ENERGY_KILO_WATT_HOUR,
+    TIME_HOURS,
+    UnitOfPower,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
@@ -118,7 +125,9 @@ async def create_energy_sensor(
     )
 
 
-def get_unit_prefix(hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor) -> str | None:
+def get_unit_prefix(
+    hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor
+) -> str | None:
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
     power_unit = power_sensor.unit_of_measurement
