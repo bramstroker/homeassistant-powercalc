@@ -1,9 +1,7 @@
 import logging
 from datetime import timedelta
-from unittest.mock import patch
 
 import pytest
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -12,8 +10,6 @@ from homeassistant.components.vacuum import (
     STATE_RETURNING,
 )
 from homeassistant.const import (
-    ATTR_DEVICE_CLASS,
-    ATTR_UNIT_OF_MEASUREMENT,
     CONF_ATTRIBUTE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -23,7 +19,6 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
-    UnitOfPower,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
 from homeassistant.setup import async_setup_component
@@ -455,51 +450,3 @@ async def test_manually_configured_sensor_overrides_profile(
     await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.test_123_power", "0.00")
-
-
-async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
-    """
-    Test that the riemann integral sensor is correclty created and updated for a kW power sensor
-    Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
-    """
-    await run_powercalc_setup(
-        hass,
-        {
-            CONF_NAME: "Test",
-            CONF_UNIQUE_ID: "1234353",
-            CONF_POWER_SENSOR_ID: "sensor.test_power",
-        },
-    )
-
-    hass.states.async_set(
-        "sensor.test_power",
-        "100",
-        {
-            ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
-            ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
-            ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
-        },
-    )
-    await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.test_energy")
-    assert state
-
-    now = dt.utcnow() + timedelta(minutes=60)
-    with patch("homeassistant.util.dt.utcnow", return_value=now):
-        hass.states.async_set(
-            "sensor.test_power",
-            "200",
-            {
-                ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
-                ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
-                ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
-            },
-        )
-        await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.test_energy")
-    assert state
-    # Re-enable assertion after issue is fixed
-    # assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
-    # assert state.state == "100.0000"

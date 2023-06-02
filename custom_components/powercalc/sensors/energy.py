@@ -10,7 +10,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.const import CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS, UnitOfTime
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_NAME, ENERGY_KILO_WATT_HOUR, TIME_HOURS, UnitOfPower, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
@@ -98,9 +98,7 @@ async def create_energy_sensor(
     )
     entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
 
-    unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
-    if unit_prefix == UnitPrefix.NONE:
-        unit_prefix = None
+    unit_prefix = get_unit_prefix(hass, sensor_config, power_sensor)
 
     _LOGGER.debug("Creating energy sensor: %s", name)
     return VirtualEnergySensor(
@@ -118,6 +116,24 @@ async def create_energy_sensor(
         powercalc_source_domain=source_entity.domain,
         sensor_config=sensor_config,
     )
+
+
+def get_unit_prefix(hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor) -> str | None:
+    unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
+
+    power_unit = power_sensor.unit_of_measurement
+    power_state = hass.states.get(power_sensor.entity_id)
+    if power_unit is None and power_state:
+        power_unit = power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+
+    # When the power sensor is in kW, we don't want to add an extra k prefix.
+    # As this would result in an energy sensor having kkWh unit, which is obviously invalid
+    if power_unit == UnitOfPower.KILO_WATT and unit_prefix == UnitPrefix.KILO:
+        unit_prefix = UnitPrefix.NONE
+
+    if unit_prefix == UnitPrefix.NONE:
+        unit_prefix = None
+    return unit_prefix
 
 
 @callback

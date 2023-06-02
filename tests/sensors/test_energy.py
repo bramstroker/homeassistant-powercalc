@@ -1,13 +1,21 @@
 import logging
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
+from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
+    ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
+    ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_UNIQUE_ID,
     EntityCategory,
+    UnitOfEnergy,
+    UnitOfPower,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
@@ -211,7 +219,29 @@ async def test_unit_prefix_none(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     state_attributes = hass.states.get("sensor.test_energy").attributes
-    assert state_attributes.get("unit_of_measurement") == "Wh"
+    assert state_attributes.get("unit_of_measurement") == UnitOfEnergy.WATT_HOUR
+
+
+async def test_unit_prefix_kwh_default(hass: HomeAssistant) -> None:
+    """By default, unit prefix should be k, resulting in kWh energy sensor created for a W power sensor"""
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("input_boolean.test"),
+    )
+
+    async_fire_time_changed(
+        hass,
+        dt.utcnow() + timedelta(hours=1),
+    )
+
+    hass.states.async_set("sensor.test_power", "50.00")
+
+    await hass.async_block_till_done()
+
+    state_attributes = hass.states.get("sensor.test_energy").attributes
+    assert state_attributes.get("unit_of_measurement") == UnitOfEnergy.KILO_WATT_HOUR
 
 
 async def test_set_entity_category(hass: HomeAssistant) -> None:
@@ -253,3 +283,50 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get(entity_id).state == "100.0000"
+
+
+async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
+    """
+    Test that the riemann integral sensor is correclty created and updated for a kW power sensor
+    Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
+    """
+
+    hass.states.async_set(
+        "sensor.test_power",
+        "100",
+        {
+            ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
+            ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
+            ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
+        },
+    )
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_POWER_SENSOR_ID: "sensor.test_power",
+        },
+    )
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+
+    now = dt.utcnow() + timedelta(minutes=60)
+    with patch("homeassistant.util.dt.utcnow", return_value=now):
+        hass.states.async_set(
+            "sensor.test_power",
+            "200",
+            {
+                ATTR_UNIT_OF_MEASUREMENT: UnitOfPower.KILO_WATT,
+                ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
+                ATTR_STATE_CLASS: SensorStateClass.MEASUREMENT,
+            },
+        )
+        await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
