@@ -7,7 +7,6 @@ from datetime import timedelta
 from decimal import Decimal, DecimalException
 from typing import Any
 
-import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import (
     ATTR_STATE_CLASS,
     RestoreSensor,
@@ -350,7 +349,7 @@ def resolve_entity_ids_recursively(
             ]
             if not entities:
                 _LOGGER.error(
-                    f"No power or energy sensor found for config entry: {member_entry.title}, skipping these from the group"
+                    f"No power or energy sensor found for config entry: {member_entry.title}, skipping these from the group",
                 )
                 continue
             sorted_entities = sorted(entities)
@@ -625,18 +624,19 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         elif unit_prefix == UnitPrefix.MEGA:
             self._attr_native_unit_of_measurement = ENERGY_MEGA_WATT_HOUR
 
-    @callback
-    def async_reset(self) -> None:
+    async def async_reset(self) -> None:
         """Reset the group sensor and underlying member sensor when supported."""
         _LOGGER.debug(f"{self.entity_id}: Reset grouped energy sensor")
+        self._attr_native_value = 0
+        self.async_write_ha_state()
+
         for entity_id in self._entities:
             _LOGGER.debug(f"Resetting {entity_id}")
-            self.hass.async_create_task(
-                self.hass.services.async_call(
-                    DOMAIN,
-                    SERVICE_RESET_ENERGY,
-                    {ATTR_ENTITY_ID: entity_id},
-                ),
+            await self.hass.services.async_call(
+                DOMAIN,
+                SERVICE_RESET_ENERGY,
+                {ATTR_ENTITY_ID: entity_id},
+                blocking=True,
             )
             if self._prev_state_store:
                 self._prev_state_store.set_entity_state(
@@ -644,9 +644,6 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                     entity_id,
                     State(entity_id, "0.00"),
                 )
-        self._attr_native_value = 0
-        self._attr_last_reset = dt_util.utcnow()
-        self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
         _LOGGER.debug(f"{self.entity_id}: Calibrate group energy sensor to: {value}")

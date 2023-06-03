@@ -118,7 +118,13 @@ async def create_input_boolean(hass: HomeAssistant, name: str = "test") -> None:
 
 
 async def create_input_booleans(hass: HomeAssistant, names: list[str]) -> None:
-    [await create_input_boolean(hass, name) for name in names]
+    config = {"input_boolean": {name: None for name in names}}
+    assert await async_setup_component(
+        hass,
+        input_boolean.DOMAIN,
+        config,
+    )
+    await hass.async_block_till_done()
 
 
 async def create_input_number(

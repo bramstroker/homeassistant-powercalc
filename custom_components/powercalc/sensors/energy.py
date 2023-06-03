@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import Any
 
 import homeassistant.helpers.entity_registry as er
-import homeassistant.util.dt as dt_util
 from homeassistant.components.integration.sensor import IntegrationSensor
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -126,7 +125,7 @@ async def create_energy_sensor(
 
 
 def get_unit_prefix(
-    hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor
+    hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor,
 ) -> str | None:
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
@@ -234,7 +233,6 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     def async_reset(self) -> None:
         _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
         self._state = 0
-        self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
