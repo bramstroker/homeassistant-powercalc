@@ -78,7 +78,10 @@ async def test_discovery_skipped_when_confirmed_by_user(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information(
-        "light.test", "lidl", "HG06106C", unique_id=DEFAULT_UNIQUE_ID,
+        "light.test",
+        "lidl",
+        "HG06106C",
+        unique_id=DEFAULT_UNIQUE_ID,
     )
 
     config_entry = MockConfigEntry(
@@ -101,7 +104,8 @@ async def test_discovery_skipped_when_confirmed_by_user(
 
 
 async def test_autodiscovery_disabled(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """Test that power sensors are not automatically added when auto discovery is disabled"""
 
@@ -168,7 +172,10 @@ async def test_config_entry_overrides_autodiscovered(
     caplog.set_level(logging.ERROR)
 
     mock_entity_with_model_information(
-        "light.testing", "signify", "LWA017", unique_id="abcdef",
+        "light.testing",
+        "signify",
+        "LWA017",
+        unique_id="abcdef",
     )
 
     hass.states.async_set(
@@ -253,7 +260,9 @@ async def test_load_model_with_slashes(
     Discovered model with slashes should not be treated as a sub lut profile
     """
     mock_entity_with_model_information(
-        "light.testa", "ikea", "TRADFRI bulb E14 W op/ch 400lm",
+        "light.testa",
+        "ikea",
+        "TRADFRI bulb E14 W op/ch 400lm",
     )
     entity_reg = er.async_get(hass)
     entity_entry = entity_reg.async_get("light.testa")

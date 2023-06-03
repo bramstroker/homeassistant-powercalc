@@ -181,7 +181,8 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
 
 
 async def test_light_lut_strategy(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     light_entity_id = "light.test1"
     mock_entity_with_model_information(

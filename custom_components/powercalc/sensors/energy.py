@@ -125,7 +125,9 @@ async def create_energy_sensor(
 
 
 def get_unit_prefix(
-    hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor,
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    power_sensor: PowerSensor,
 ) -> str | None:
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
