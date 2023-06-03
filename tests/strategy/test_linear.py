@@ -204,7 +204,7 @@ async def _create_strategy_instance(
 
 
 async def test_config_entry_with_calibrate_list(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.test")
 

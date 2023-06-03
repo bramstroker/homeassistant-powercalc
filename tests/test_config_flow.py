@@ -77,10 +77,10 @@ DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 
 async def test_discovery_flow(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information(
-        "light.test", "signify", "LCT010", unique_id=DEFAULT_UNIQUE_ID
+        "light.test", "signify", "LCT010", unique_id=DEFAULT_UNIQUE_ID,
     )
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
@@ -144,10 +144,10 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
 
 
 async def test_discovery_flow_with_subprofile_selection(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information(
-        "light.test", "lifx", "LIFX Z", unique_id=DEFAULT_UNIQUE_ID
+        "light.test", "lifx", "LIFX Z", unique_id=DEFAULT_UNIQUE_ID,
     )
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
@@ -377,12 +377,12 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
 
 
 async def test_lut_autodiscover_flow(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     manufacturer = "ikea"
     model = "LED1545G12"
     mock_entity_with_model_information(
-        "light.test", manufacturer, model, unique_id=DEFAULT_UNIQUE_ID
+        "light.test", manufacturer, model, unique_id=DEFAULT_UNIQUE_ID,
     )
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
@@ -413,7 +413,7 @@ async def test_lut_autodiscover_flow(
 
 
 async def test_lut_not_autodiscovered_model_unsupported(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.test", "ikea", "unknown_model")
 
@@ -433,14 +433,14 @@ async def test_lut_not_autodiscovered(hass: HomeAssistant) -> None:
 
 
 async def test_lut_autodiscover_flow_not_confirmed(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     When manufacturer and model are auto detected and user chooses to not accept it,
     make sure he/she is forwarded to the manufacturer listing
     """
     mock_entity_with_model_information(
-        "light.test", "ikea", "LED1545G12", unique_id="234438"
+        "light.test", "ikea", "LED1545G12", unique_id="234438",
     )
 
     result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
@@ -457,7 +457,7 @@ async def test_lut_autodiscover_flow_not_confirmed(
 
 
 async def test_lut_flow_with_sub_profiles(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information("light.test", "", "")
 
@@ -495,10 +495,10 @@ async def test_lut_flow_with_sub_profiles(
 
 
 async def test_manually_setup_from_library(
-    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel
+    hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information(
-        "light.test", "ikea", "LED1545G12", unique_id=DEFAULT_UNIQUE_ID
+        "light.test", "ikea", "LED1545G12", unique_id=DEFAULT_UNIQUE_ID,
     )
 
     result = await hass.config_entries.flow.async_init(
