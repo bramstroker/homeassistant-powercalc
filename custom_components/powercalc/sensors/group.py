@@ -44,6 +44,7 @@ from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.util import Throttle
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
@@ -523,6 +524,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
+    @Throttle(timedelta(seconds=30))
     def on_state_change(self, event: Event) -> None:
         """Triggered when one of the group entities changes state."""
         if self.hass.state != CoreState.running:  # pragma: no cover

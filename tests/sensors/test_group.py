@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from unittest.mock import patch
 
 import pytest
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -240,26 +241,28 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.testgroup_energy").state == "2.0000"
 
     # Reset the group sensor and underlying group members
-    await hass.services.async_call(
-        DOMAIN,
-        SERVICE_RESET_ENERGY,
-        {
-            ATTR_ENTITY_ID: "sensor.testgroup_energy",
-        },
-        blocking=True,
-    )
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_RESET_ENERGY,
+            {
+                ATTR_ENTITY_ID: "sensor.testgroup_energy",
+            },
+            blocking=True,
+        )
+        await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
 
-    hass.states.async_set(
-        "sensor.test2_energy",
-        "0.5",
-        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
-    )
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=120)):
+        hass.states.async_set(
+            "sensor.test2_energy",
+            "0.5",
+            {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+        )
+        await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "0.5000"
 
@@ -368,14 +371,15 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state.state == STATE_UNAVAILABLE
 
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("input_boolean.test1", STATE_ON)
+        await hass.async_block_till_done()
 
-    power_state = hass.states.get("sensor.testgroup_power")
-    assert power_state.state != STATE_UNAVAILABLE
+        power_state = hass.states.get("sensor.testgroup_power")
+        assert power_state.state != STATE_UNAVAILABLE
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == STATE_UNAVAILABLE
+        energy_state = hass.states.get("sensor.testgroup_energy")
+        assert energy_state.state == STATE_UNAVAILABLE
 
 
 async def test_energy_group_available_when_members_temporarily_unavailable(
@@ -404,17 +408,19 @@ async def test_energy_group_available_when_members_temporarily_unavailable(
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state.state == "3.0000"
 
-    hass.states.async_set("sensor.test1_energy", STATE_UNAVAILABLE)
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("sensor.test1_energy", STATE_UNAVAILABLE)
+        await hass.async_block_till_done()
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == "3.0000"
+        energy_state = hass.states.get("sensor.testgroup_energy")
+        assert energy_state.state == "3.0000"
 
-    hass.states.async_set("sensor.test2_energy", "2.2")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=120)):
+        hass.states.async_set("sensor.test2_energy", "2.2")
+        await hass.async_block_till_done()
 
-    energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.state == "3.2000"
+        energy_state = hass.states.get("sensor.testgroup_energy")
+        assert energy_state.state == "3.2000"
 
 
 async def test_hide_members(hass: HomeAssistant) -> None:
@@ -1062,21 +1068,24 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
 
     assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
 
-    hass.states.async_set("sensor.a_energy", "2.10")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("sensor.a_energy", "2.10")
+        await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+        assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
 
     # Simulate a reset, this should just be ignored.
-    hass.states.async_set("sensor.a_energy", "0.00")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=120)):
+        hass.states.async_set("sensor.a_energy", "0.00")
+        await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
+        assert hass.states.get("sensor.testgroup_energy").state == "5.1000"
 
-    hass.states.async_set("sensor.a_energy", "0.20")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=180)):
+        hass.states.async_set("sensor.a_energy", "0.20")
+        await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
+        assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
 
 
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
@@ -1095,10 +1104,11 @@ async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) 
 
     assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
 
-    hass.states.async_set("sensor.a_energy", "2.50")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("sensor.a_energy", "2.50")
+        await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
+        assert hass.states.get("sensor.testgroup_energy").state == "5.5000"
 
 
 async def test_energy_sensor_in_multiple_groups_calculates_correctly(
@@ -1132,12 +1142,13 @@ async def test_energy_sensor_in_multiple_groups_calculates_correctly(
     assert hass.states.get("sensor.testgroupb_energy").state == "2.0000"
     assert hass.states.get("sensor.testgroupc_energy").state == "2.0000"
 
-    hass.states.async_set("sensor.a_energy", "3.21")
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("sensor.a_energy", "3.21")
+        await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroupa_energy").state == "6.2100"
-    assert hass.states.get("sensor.testgroupb_energy").state == "3.2100"
-    assert hass.states.get("sensor.testgroupc_energy").state == "3.2100"
+        assert hass.states.get("sensor.testgroupa_energy").state == "6.2100"
+        assert hass.states.get("sensor.testgroupb_energy").state == "3.2100"
+        assert hass.states.get("sensor.testgroupc_energy").state == "3.2100"
 
 
 async def test_storage(hass: HomeAssistant) -> None:
