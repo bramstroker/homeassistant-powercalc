@@ -539,13 +539,13 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         ]
         if not available_states:
             self._attr_available = False
-            self.async_schedule_update_ha_state(True)
+            self.async_write_ha_state()
             return
 
         summed = self.calculate_new_state(available_states, states)
         self._attr_native_value = round(summed, self._rounding_digits)
         self._attr_available = True
-        self.async_schedule_update_ha_state(True)
+        self.async_write_ha_state()
 
     def _get_state_value_in_native_unit(self, state: State) -> Decimal:
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
