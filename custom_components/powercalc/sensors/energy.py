@@ -31,9 +31,9 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
-    CONF_FORCE_ENERGY_SENSOR_CREATION,
     UnitPrefix,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
