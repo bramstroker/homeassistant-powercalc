@@ -126,14 +126,16 @@ async def create_daily_fixed_energy_power_sensor(
     source_entity: SourceEntity,
 ) -> VirtualPowerSensor | None:
     mode_config: dict = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
-    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) != POWER_WATT:
-        return None
 
     if mode_config.get(CONF_ON_TIME) != timedelta(days=1):
         return None
 
+    power_value = mode_config.get(CONF_VALUE)
+    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR:
+        power_value = power_value * 1000 / 24
+
     power_sensor_config = sensor_config.copy()
-    power_sensor_config[CONF_FIXED] = {CONF_POWER: mode_config.get(CONF_VALUE)}
+    power_sensor_config[CONF_FIXED] = {CONF_POWER: power_value}
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if unique_id:

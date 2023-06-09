@@ -174,6 +174,35 @@ async def test_daily_energy_sensor_also_creates_power_sensor(
     assert state.name == "IP camera upstairs power"
 
 
+async def test_daily_energy_sensor_kwh_also_creates_power_sensor(
+    hass: HomeAssistant,
+) -> None:
+    """
+    When the user configured the value in kWh and the on_time is always on,
+    then a power sensor should also be created
+    """
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "IP camera upstairs",
+            CONF_DAILY_FIXED_ENERGY: {
+                CONF_VALUE: 12,
+                CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+            },
+        },
+    )
+
+    state = hass.states.get("sensor.ip_camera_upstairs_energy")
+    assert state
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+
+    state = hass.states.get("sensor.ip_camera_upstairs_power")
+    assert state
+    assert state.state == "500.00"
+    assert state.name == "IP camera upstairs power"
+
+
 async def test_power_sensor_not_created_when_not_on_whole_day(
     hass: HomeAssistant,
 ) -> None:
