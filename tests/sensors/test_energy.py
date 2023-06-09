@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
+    CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     DOMAIN,
@@ -114,6 +115,77 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
     assert energy_state
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.existing_energy",
+    }
+
+
+async def test_force_create_energy_sensor_for_existing_power_sensor(
+    hass: HomeAssistant,
+) -> None:
+    """
+    When the user uses `power_sensor_id` option and a related energy sensor already exists in the system,
+    creation can be forced with `force_energy_sensor_creation`
+    """
+    await create_input_boolean(hass)
+
+    mock_device_registry(
+        hass,
+        {
+            "shelly-device": DeviceEntry(
+                id="shelly-device-id",
+                manufacturer="Shelly",
+                model="Plug S",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.existing_power",
+                unique_id="1234",
+                platform="sensor",
+                device_id="shelly-device-id",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.existing_energy": RegistryEntry(
+                entity_id="sensor.existing_energy",
+                unique_id="12345",
+                platform="sensor",
+                device_id="shelly-device-id",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                {
+                    CONF_NAME: "MySensor",
+                    CONF_POWER_SENSOR_ID: "sensor.existing_power",
+                    CONF_FORCE_ENERGY_SENSOR_CREATION: True,
+                },
+            ],
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state
+    assert power_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.existing_power",
+    }
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state
+    assert energy_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.mysensor_energy",
     }
 
 
