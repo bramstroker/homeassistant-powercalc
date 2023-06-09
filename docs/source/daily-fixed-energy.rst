@@ -48,8 +48,7 @@ Or define in watts, with an optional on time (which is 24 hour a day by default)
 This will simulate the device using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
 
 .. note::
-    When selecting `kWh` as the unit no power sensor (W) will be created, but only an energy sensor (kWh) will be available.
-    If you choose `W`, than both a power and energy sensor will be available.
+    When you use `on_time` no power sensor (W) will be created, but only an energy sensor (kWh) will be available.
 
 Services
 --------
