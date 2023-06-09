@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
@@ -74,17 +75,23 @@ async def create_energy_sensor(
         power_sensor,
         RealPowerSensor,
     ):
-        real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
-        if real_energy_sensor:
+        # User can force the energy sensor creation with "force_energy_sensor_creation" option.
+        # If they did, don't look for an energy sensor
+        if CONF_FORCE_ENERGY_SENSOR_CREATION not in sensor_config or not sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) :
+            real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
+            if real_energy_sensor:
+                _LOGGER.debug(
+                    f"Found existing energy sensor '{real_energy_sensor.entity_id}' "
+                    f"for the power sensor '{power_sensor.entity_id}'",
+                )
+                return real_energy_sensor
             _LOGGER.debug(
-                f"Found existing energy sensor '{real_energy_sensor.entity_id}' "
-                f"for the power sensor '{power_sensor.entity_id}'",
+                f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'",
             )
-            return real_energy_sensor
-
-        _LOGGER.debug(
-            f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'",
-        )
+        else:
+            _LOGGER.debug(
+                f"Forced energy sensor generation for the power sensor '{power_sensor.entity_id}'",
+            )
 
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.
     name = generate_energy_sensor_name(

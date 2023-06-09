@@ -16,6 +16,7 @@ from .const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_POWER_SENSOR_ID,
     DUMMY_ENTITY_ID,
 )
@@ -94,6 +95,7 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
         CONF_ENTITY_ID,
         CONF_UNIQUE_ID,
         CONF_POWER_SENSOR_ID,
+        CONF_FORCE_ENERGY_SENSOR_CREATION,
     ]
     num_configs = len(configs)
 
