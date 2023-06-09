@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping
 from decimal import Decimal
-from typing import Any
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.integration.sensor import IntegrationSensor
@@ -220,7 +218,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             self._attr_entity_category = EntityCategory(entity_category)
 
     @property
-    def extra_state_attributes(self) -> Mapping[str, Any] | None:
+    def extra_state_attributes(self) -> dict[str, str] | None:
         """Return the state attributes of the energy sensor."""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return super().extra_state_attributes

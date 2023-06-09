@@ -1,4 +1,6 @@
 import logging
+from datetime import timedelta
+from unittest.mock import patch
 
 import homeassistant.helpers.entity_registry as er
 import pytest
@@ -33,6 +35,7 @@ from homeassistant.helpers.device_registry import (
     DeviceRegistry,
 )
 from homeassistant.setup import async_setup_component
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -170,8 +173,9 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     }
     assert group2.state == "50.00"
 
-    hass.states.async_set("input_boolean.test2", STATE_OFF)
-    await hass.async_block_till_done()
+    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+        hass.states.async_set("input_boolean.test2", STATE_OFF)
+        await hass.async_block_till_done()
 
     group1 = hass.states.get("sensor.testgroup1_power")
     assert group1.state == "100.00"
