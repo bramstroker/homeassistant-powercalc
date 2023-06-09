@@ -75,7 +75,10 @@ async def create_energy_sensor(
     ):
         # User can force the energy sensor creation with "force_energy_sensor_creation" option.
         # If they did, don't look for an energy sensor
-        if CONF_FORCE_ENERGY_SENSOR_CREATION not in sensor_config or not sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) :
+        if (
+            CONF_FORCE_ENERGY_SENSOR_CREATION not in sensor_config
+            or not sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
+        ):
             real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
             if real_energy_sensor:
                 _LOGGER.debug(

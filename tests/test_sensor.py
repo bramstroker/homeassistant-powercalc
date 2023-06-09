@@ -173,7 +173,9 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     }
     assert group2.state == "50.00"
 
-    with patch("homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)):
+    with patch(
+        "homeassistant.util.utcnow", return_value=dt.utcnow() + timedelta(seconds=60)
+    ):
         hass.states.async_set("input_boolean.test2", STATE_OFF)
         await hass.async_block_till_done()
 
