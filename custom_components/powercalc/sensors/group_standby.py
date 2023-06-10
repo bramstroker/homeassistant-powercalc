@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import CONF_NAME, POWER_WATT
+from homeassistant.const import CONF_NAME, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
@@ -57,7 +57,7 @@ async def create_general_standby_sensors(
 class StandbyPowerSensor(SensorEntity, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_has_entity_name = True
     _attr_unique_id = "powercalc_standby_group"
 

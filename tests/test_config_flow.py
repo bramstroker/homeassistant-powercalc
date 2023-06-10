@@ -12,8 +12,8 @@ from homeassistant.const import (
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
-    POWER_WATT,
     STATE_ON,
+    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
@@ -636,7 +636,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
         CONF_NAME: "My daily energy sensor",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_VALUE: 0.5,
-        CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
     }
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -650,7 +650,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
         CONF_DAILY_FIXED_ENERGY: {
             CONF_UPDATE_FREQUENCY: 1800,
             CONF_VALUE: 0.5,
-            CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+            CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
         },
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
     }
@@ -866,14 +866,14 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
 
     result = await _initialize_options_flow(hass, entry)
 
-    user_input = {CONF_VALUE: 75, CONF_UNIT_OF_MEASUREMENT: POWER_WATT}
+    user_input = {CONF_VALUE: 75, CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == POWER_WATT
+    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == UnitOfPower.WATT
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
 

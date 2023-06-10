@@ -10,8 +10,8 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    ENERGY_KILO_WATT_HOUR,
     TIME_HOURS,
+    UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
@@ -171,7 +171,7 @@ def find_related_real_energy_sensor(
             device_id=power_sensor.device_id,
         )
         if entry.device_class == SensorDeviceClass.ENERGY
-        or entry.unit_of_measurement == ENERGY_KILO_WATT_HOUR
+        or entry.unit_of_measurement == UnitOfEnergy.KILO_WATT_HOUR
     ]
     if not energy_sensors:
         return None
