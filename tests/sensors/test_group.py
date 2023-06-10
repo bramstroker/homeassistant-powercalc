@@ -16,7 +16,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
     UnitOfEnergy,
@@ -107,7 +106,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     assert power_state
     assert power_state.attributes.get("state_class") == SensorStateClass.MEASUREMENT
     assert power_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
-    assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == POWER_WATT
+    assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
     assert power_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_power",
         "sensor.test2_power",

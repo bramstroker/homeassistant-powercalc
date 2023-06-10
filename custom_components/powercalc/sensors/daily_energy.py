@@ -20,10 +20,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-    POWER_WATT,
+    UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.event import async_track_time_interval
@@ -57,8 +55,8 @@ DEFAULT_DAILY_UPDATE_FREQUENCY = 1800
 DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=ENERGY_KILO_WATT_HOUR): vol.In(
-            [ENERGY_KILO_WATT_HOUR, POWER_WATT],
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=UnitOfEnergy.KILO_WATT_HOUR): vol.In(
+            [UnitOfEnergy.KILO_WATT_HOUR, UnitOfPower.WATT],
         ),
         vol.Optional(CONF_ON_TIME, default=timedelta(days=1)): cv.time_period,
         vol.Optional(CONF_START_TIME): cv.time,
@@ -131,7 +129,7 @@ async def create_daily_fixed_energy_power_sensor(
         return None
 
     power_value: float = mode_config.get(CONF_VALUE)  # type: ignore
-    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR:
+    if mode_config.get(CONF_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR:
         power_value = power_value * 1000 / 24
 
     power_sensor_config = sensor_config.copy()
@@ -193,11 +191,11 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
         )
         if unit_prefix == UnitPrefix.KILO:
-            self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         elif unit_prefix == UnitPrefix.NONE:
-            self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.WATT_HOUR
         elif unit_prefix == UnitPrefix.MEGA:
-            self._attr_native_unit_of_measurement = ENERGY_MEGA_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.MEGA_WATT_HOUR
 
     async def async_added_to_hass(self) -> None:
         """Handle entity which will be added."""
@@ -251,15 +249,15 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
         wh_per_day = (
             value * (self._on_time.total_seconds() / 3600)
-            if self._user_unit_of_measurement == POWER_WATT
+            if self._user_unit_of_measurement == UnitOfPower.WATT
             else value * 1000
         )
 
         # Convert Wh to the native measurement unit
         energy_per_day = wh_per_day
-        if self._attr_native_unit_of_measurement == ENERGY_KILO_WATT_HOUR:
+        if self._attr_native_unit_of_measurement == UnitOfEnergy.KILO_WATT_HOUR:
             energy_per_day = wh_per_day / 1000
-        elif self._attr_native_unit_of_measurement == ENERGY_MEGA_WATT_HOUR:
+        elif self._attr_native_unit_of_measurement == UnitOfEnergy.MEGA_WATT_HOUR:
             energy_per_day = wh_per_day / 1000000
 
         return Decimal((energy_per_day / 86400) * elapsed_seconds)

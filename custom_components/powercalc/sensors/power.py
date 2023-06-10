@@ -14,10 +14,10 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
-    POWER_WATT,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    UnitOfPower,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers import start
@@ -334,7 +334,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_should_poll: bool = False
 
     def __init__(

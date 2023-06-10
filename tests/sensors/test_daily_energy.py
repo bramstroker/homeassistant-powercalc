@@ -10,10 +10,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIT_OF_MEASUREMENT,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
-    ENERGY_WATT_HOUR,
-    POWER_WATT,
+    UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
@@ -63,7 +61,7 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -
     assert sensor
     assert sensor.name == "My sensor Energy"
     assert sensor.entity_id == "sensor.my_sensor_energy"
-    assert sensor.native_unit_of_measurement == ENERGY_KILO_WATT_HOUR
+    assert sensor.native_unit_of_measurement == UnitOfEnergy.KILO_WATT_HOUR
     assert sensor.device_class == SensorDeviceClass.ENERGY
     assert sensor.state_class == SensorStateClass.TOTAL
 
@@ -71,9 +69,9 @@ async def test_create_daily_energy_sensor_default_options(hass: HomeAssistant) -
 @pytest.mark.parametrize(
     "unit_prefix,unit_of_measurement",
     [
-        (UnitPrefix.NONE, ENERGY_WATT_HOUR),
-        (UnitPrefix.KILO, ENERGY_KILO_WATT_HOUR),
-        (UnitPrefix.MEGA, ENERGY_MEGA_WATT_HOUR),
+        (UnitPrefix.NONE, UnitOfEnergy.WATT_HOUR),
+        (UnitPrefix.KILO, UnitOfEnergy.KILO_WATT_HOUR),
+        (UnitPrefix.MEGA, UnitOfEnergy.MEGA_WATT_HOUR),
     ],
 )
 async def test_create_daily_energy_sensor_unit_prefix_watt(
@@ -111,7 +109,7 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant) -> None:
     assert state
     assert state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
     await _trigger_periodic_update(hass)
     assert_entity_state(hass, sensor_entity_id, "0.2500")
@@ -158,7 +156,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 15,
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
             },
         },
     )
@@ -166,7 +164,7 @@ async def test_daily_energy_sensor_also_creates_power_sensor(
     state = hass.states.get("sensor.ip_camera_upstairs_energy")
     assert state
     assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == ENERGY_KILO_WATT_HOUR
+    assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
     state = hass.states.get("sensor.ip_camera_upstairs_power")
     assert state
@@ -187,7 +185,7 @@ async def test_daily_energy_sensor_kwh_also_creates_power_sensor(
             CONF_NAME: "Heater",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 12,
-                CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
             },
         },
     )
@@ -207,7 +205,7 @@ async def test_power_sensor_not_created_when_not_on_whole_day(
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 15,
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_ON_TIME: timedelta(hours=4),
             },
         },
@@ -222,7 +220,7 @@ async def test_power_sensor_not_created_when_not_on_whole_day(
     [
         (
             {
-                CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
                 CONF_ON_TIME: timedelta(days=1),
                 CONF_VALUE: 12,
             },
@@ -232,7 +230,7 @@ async def test_power_sensor_not_created_when_not_on_whole_day(
         (
             # Consume 1500 x 2 hour = 3 kWh a day
             {
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_ON_TIME: timedelta(hours=2),
                 CONF_VALUE: 2000,
             },
@@ -241,7 +239,7 @@ async def test_power_sensor_not_created_when_not_on_whole_day(
         ),
         (
             {
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_ON_TIME: 3600,  # Test that on time can be passed as seconds
                 CONF_VALUE: 2400,
             },
@@ -273,7 +271,7 @@ async def test_calculate_delta_mega_watt_hour(hass: HomeAssistant) -> None:
         CONF_NAME: "My sensor",
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.MEGA,
         CONF_DAILY_FIXED_ENERGY: {
-            CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+            CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
             CONF_ON_TIME: timedelta(days=1),
             CONF_VALUE: 12,
         },
@@ -295,7 +293,7 @@ async def test_template_value(hass: HomeAssistant) -> None:
             CONF_NAME: "Router",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: "{{states('input_number.test')}}",
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_UPDATE_FREQUENCY: update_frequency,
             },
         },
@@ -320,7 +318,7 @@ async def test_config_flow_template_value(hass: HomeAssistant) -> None:
             CONF_NAME: "My daily",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_VALUE_TEMPLATE: "{{ 5*0.5 }}",
             },
         },
@@ -341,7 +339,7 @@ async def test_config_flow_decimal_value(hass: HomeAssistant) -> None:
             CONF_NAME: "My daily",
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
                 CONF_VALUE: 0.3,
             },
         },
@@ -362,7 +360,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 15,
-                CONF_UNIT_OF_MEASUREMENT: POWER_WATT,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
             },
         },
     )
@@ -373,7 +371,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     hass.states.async_set(
         entity_id,
         "0.8",
-        {ATTR_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR},
+        {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
     )
     await hass.async_block_till_done()
 
@@ -548,7 +546,7 @@ async def test_create_daily_energy_sensor_using_config_entry(
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_NAME: "Test",
             CONF_DAILY_FIXED_ENERGY: {
-                CONF_UNIT_OF_MEASUREMENT: ENERGY_KILO_WATT_HOUR,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
                 CONF_VALUE: 200,
                 CONF_UPDATE_FREQUENCY: 1800.0,
             },

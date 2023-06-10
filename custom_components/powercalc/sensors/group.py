@@ -23,13 +23,11 @@ from homeassistant.const import (
     CONF_ENTITIES,
     CONF_NAME,
     CONF_UNIQUE_ID,
-    ENERGY_KILO_WATT_HOUR,
-    ENERGY_MEGA_WATT_HOUR,
-    ENERGY_WATT_HOUR,
     EVENT_HOMEASSISTANT_STOP,
-    POWER_WATT,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    UnitOfEnergy,
+    UnitOfPower,
 )
 from homeassistant.core import CoreState, HomeAssistant, State, callback
 from homeassistant.exceptions import HomeAssistantError
@@ -581,7 +579,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = POWER_WATT
+    _attr_native_unit_of_measurement = UnitOfPower.WATT
 
     def calculate_new_state(
         self,
@@ -620,11 +618,11 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         )
         unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
         if unit_prefix == UnitPrefix.KILO:
-            self._attr_native_unit_of_measurement = ENERGY_KILO_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         elif unit_prefix == UnitPrefix.NONE:
-            self._attr_native_unit_of_measurement = ENERGY_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.WATT_HOUR
         elif unit_prefix == UnitPrefix.MEGA:
-            self._attr_native_unit_of_measurement = ENERGY_MEGA_WATT_HOUR
+            self._attr_native_unit_of_measurement = UnitOfEnergy.MEGA_WATT_HOUR
 
     async def async_reset(self) -> None:
         """Reset the group sensor and underlying member sensor when supported."""
