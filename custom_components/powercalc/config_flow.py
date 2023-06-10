@@ -96,7 +96,9 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
     {
         vol.Optional(CONF_VALUE): vol.Coerce(float),
         vol.Optional(CONF_VALUE_TEMPLATE): selector.TemplateSelector(),
-        vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=UnitOfEnergy.KILO_WATT_HOUR): vol.In(
+        vol.Optional(
+            CONF_UNIT_OF_MEASUREMENT, default=UnitOfEnergy.KILO_WATT_HOUR
+        ): vol.In(
             [UnitOfEnergy.KILO_WATT_HOUR, UnitOfPower.WATT],
         ),
         vol.Optional(CONF_ON_TIME): selector.DurationSelector(

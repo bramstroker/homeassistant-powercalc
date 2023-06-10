@@ -873,7 +873,10 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT] == UnitOfPower.WATT
+    assert (
+        entry.data[CONF_DAILY_FIXED_ENERGY][CONF_UNIT_OF_MEASUREMENT]
+        == UnitOfPower.WATT
+    )
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
 
 
