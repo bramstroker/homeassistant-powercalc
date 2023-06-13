@@ -162,6 +162,7 @@ async def create_group_sensors_from_config_entry(
     sensor_config: dict,
 ) -> list[SensorEntity]:
     """Create group sensors based on a config_entry."""
+    _LOGGER.info(f"Setup group config entry={entry.entry_id}, title={entry.title}")
     group_sensors: list[SensorEntity] = []
 
     group_name = entry.data.get(CONF_NAME)
@@ -237,6 +238,8 @@ async def remove_power_sensor_from_associated_groups(
 
     for group_entry in group_entries:
         member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
+        if config_entry.entry_id not in member_sensors:
+            continue
         member_sensors.remove(config_entry.entry_id)
 
         hass.config_entries.async_update_entry(
@@ -292,9 +295,12 @@ async def add_to_associated_group(
         return None
 
     member_sensors = set(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
-    if config_entry.entry_id not in member_sensors:
-        member_sensors.add(config_entry.entry_id)
 
+    # Config entry has already been added to associated group. just skip adding it again
+    if config_entry.entry_id in member_sensors:
+        return None
+
+    member_sensors.add(config_entry.entry_id)
     hass.config_entries.async_update_entry(
         group_entry,
         data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: list(member_sensors)},
@@ -494,7 +500,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
-        async_track_state_change_event(self.hass, self._entities, self.on_state_change)
+        self.async_on_remove(
+            async_track_state_change_event(self.hass, self._entities, self.on_state_change),
+        )
 
         self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
 
