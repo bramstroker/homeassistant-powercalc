@@ -162,7 +162,6 @@ async def create_group_sensors_from_config_entry(
     sensor_config: dict,
 ) -> list[SensorEntity]:
     """Create group sensors based on a config_entry."""
-    _LOGGER.info(f"Setup group config entry={entry.entry_id}, title={entry.title}")
     group_sensors: list[SensorEntity] = []
 
     group_name = entry.data.get(CONF_NAME)
