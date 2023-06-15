@@ -1,0 +1,16 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plus1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "aliases": [
+        "4080248P9"
+    ],
+    "name": "Hue color floor",
+    "standby_power": 0.5
+}
