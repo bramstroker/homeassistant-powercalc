@@ -17,7 +17,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry, ConfigEntryState
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
@@ -276,9 +276,6 @@ async def async_setup_entry(
         async_add_entities(entities)
         return
 
-    # Add entry to an existing group
-    updated_group_entry = await add_to_associated_group(hass, entry)
-
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
@@ -288,8 +285,9 @@ async def async_setup_entry(
         async_add_entities,
         config_entry=entry,
     )
-    if updated_group_entry and updated_group_entry.state == ConfigEntryState.LOADED:
-        await hass.config_entries.async_reload(updated_group_entry.entry_id)
+
+    # Add entry to an existing group
+    await add_to_associated_group(hass, entry)
 
 
 async def _async_setup_entities(
