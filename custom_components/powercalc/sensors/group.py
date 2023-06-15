@@ -500,7 +500,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         self.async_on_remove(
-            async_track_state_change_event(self.hass, self._entities, self.on_state_change),
+            async_track_state_change_event(
+                self.hass, self._entities, self.on_state_change
+            ),
         )
 
         self._async_hide_members(self._sensor_config.get(CONF_HIDE_MEMBERS) or False)
