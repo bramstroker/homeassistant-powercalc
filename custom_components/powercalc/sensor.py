@@ -280,7 +280,7 @@ async def async_setup_entry(
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
     if CONF_ENTITY_ID in sensor_config:
-        _register_entity_id_change_listener(hass, entry, sensor_config.get(CONF_ENTITY_ID))
+        _register_entity_id_change_listener(hass, entry, str(sensor_config.get(CONF_ENTITY_ID)))
 
     await _async_setup_entities(
         hass,
@@ -352,12 +352,12 @@ def _register_entity_id_change_listener(hass: HomeAssistant, entry: ConfigEntry,
         hass.config_entries.async_update_entry(entry, data={**entry.data, CONF_ENTITY_ID: new_entity_id})
 
     @callback
-    def _filter_entity_id(event: Event) -> None:
+    def _filter_entity_id(event: Event) -> bool:
         """Only dispatch the listener for update events concerning the source entity"""
         return (
-                event.data["action"] == "update" and
-                "old_entity_id" in event.data
-                and event.data["old_entity_id"] == source_entity_id
+            event.data["action"] == "update" and
+            "old_entity_id" in event.data
+            and event.data["old_entity_id"] == source_entity_id
         )
 
     hass.bus.async_listen(
