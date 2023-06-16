@@ -25,11 +25,11 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
+from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED, RegistryEntryDisabler
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
@@ -279,6 +279,24 @@ async def async_setup_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
+    @callback
+    async def _entity_rename_listener(event: Event) -> None:
+        await handle_entity_id_rename(hass, entry, event)
+
+    @callback
+    def _filter_entity_id(event: Event) -> None:
+        return (
+            event.data["action"] == "update" and
+            "old_entity_id" in event.data
+            and event.data["old_entity_id"] == sensor_config.get(CONF_ENTITY_ID)
+        )
+
+    hass.bus.async_listen(
+        EVENT_ENTITY_REGISTRY_UPDATED,
+        _entity_rename_listener,
+        event_filter=_filter_entity_id,
+    )
+
     await _async_setup_entities(
         hass,
         sensor_config,
@@ -288,6 +306,14 @@ async def async_setup_entry(
 
     # Add entry to an existing group
     await add_to_associated_group(hass, entry)
+
+
+async def handle_entity_id_rename(hass: HomeAssistant, config_entry: ConfigEntry, event: Event) -> None:
+    """Handle entity registry updated."""
+    old_entity_id = event.data["old_entity_id"]
+    new_entity_id = event.data[CONF_ENTITY_ID]
+    _LOGGER.debug(f"Entity id has been changed, updating powercalc config. old_id={old_entity_id}, new_id={new_entity_id}")
+    hass.config_entries.async_update_entry(config_entry, data={**config_entry.data, CONF_ENTITY_ID: new_entity_id})
 
 
 async def _async_setup_entities(
