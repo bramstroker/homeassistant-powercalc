@@ -501,7 +501,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         self.async_on_remove(
             async_track_state_change_event(
-                self.hass, self._entities, self.on_state_change
+                self.hass, self._entities, self.on_state_change,
             ),
         )
 
