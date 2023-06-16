@@ -74,7 +74,9 @@ class ShellyPowerMeter(PowerMeter):
             raise ApiConnectionError("Could not connect to Shelly Plug") from ex
 
         if response.status_code != 200:
-            raise ApiConnectionError("Could not connect to Shelly Plug, invalid statusCode")
+            raise ApiConnectionError(
+                "Could not connect to Shelly Plug, invalid statusCode"
+            )
 
         json = response.json()
         gen = json["gen"] if "gen" in json else 1
