@@ -25,11 +25,11 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.entity_registry import RegistryEntryDisabler
+from homeassistant.helpers.entity_registry import EVENT_ENTITY_REGISTRY_UPDATED, RegistryEntryDisabler
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
@@ -279,6 +279,9 @@ async def async_setup_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.unique_id
 
+    if CONF_ENTITY_ID in sensor_config:
+        _register_entity_id_change_listener(hass, entry, str(sensor_config.get(CONF_ENTITY_ID)))
+
     await _async_setup_entities(
         hass,
         sensor_config,
@@ -330,6 +333,38 @@ async def _async_setup_entities(
             entities_to_add.remove(entity)
 
     async_add_entities(entities_to_add)
+
+
+def _register_entity_id_change_listener(hass: HomeAssistant, entry: ConfigEntry, source_entity_id: str) -> None:
+    """
+    When the user changes the entity id of the source entity,
+    we also need to change the powercalc config entry to reflect these changes
+    This method adds the necessary listener and handler to facilitate this
+    """
+    @callback
+    async def _entity_rename_listener(event: Event) -> None:
+        """Handle renaming of the entity"""
+        old_entity_id = event.data["old_entity_id"]
+        new_entity_id = event.data[CONF_ENTITY_ID]
+        _LOGGER.debug(
+            f"Entity id has been changed, updating powercalc config. old_id={old_entity_id}, new_id={new_entity_id}",
+        )
+        hass.config_entries.async_update_entry(entry, data={**entry.data, CONF_ENTITY_ID: new_entity_id})
+
+    @callback
+    def _filter_entity_id(event: Event) -> bool:
+        """Only dispatch the listener for update events concerning the source entity"""
+        return (
+            event.data["action"] == "update" and
+            "old_entity_id" in event.data
+            and event.data["old_entity_id"] == source_entity_id
+        )
+
+    hass.bus.async_listen(
+        EVENT_ENTITY_REGISTRY_UPDATED,
+        _entity_rename_listener,
+        event_filter=_filter_entity_id,
+    )
 
 
 @callback
