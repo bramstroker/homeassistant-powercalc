@@ -175,7 +175,8 @@
                                 "enum": [
                                     "attribute",
                                     "entity_id",
-                                    "entity_state"
+                                    "entity_state",
+                                    "integration"
                                 ]
                             },
                             "attribute": {
@@ -188,6 +189,9 @@
                                 "type": "string"
                             },
                             "profile": {
+                                "type": "string"
+                            },
+                            "integration": {
                                 "type": "string"
                             }
                         },
