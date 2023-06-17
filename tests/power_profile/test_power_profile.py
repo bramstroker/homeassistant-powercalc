@@ -166,20 +166,33 @@ async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
     assert selector.select_sub_profile(state) == "default"
 
 
-async def test_sub_profile_match_integration(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize(
+    "registry_entry,expected_profile",
+    [
+        (RegistryEntry(
+            entity_id="switch.test",
+            platform="tasmota",
+            unique_id="111",
+        ), "tasmota"),
+        (RegistryEntry(
+            entity_id="switch.test",
+            platform="shelly",
+            unique_id="111",
+        ), "default"),
+        (None, "default"),
+    ],
+)
+async def test_sub_profile_match_integration(hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_integration"),
     )
+
     source_entity = SourceEntity(
         entity_id="switch.test",
         domain="switch",
         object_id="test",
-        entity_entry=RegistryEntry(
-            entity_id="switch.test",
-            platform="tasmota",
-            unique_id="111",
-        ),
+        entity_entry=registry_entry,
     )
 
     selector = SubProfileSelector(
@@ -190,7 +203,7 @@ async def test_sub_profile_match_integration(hass: HomeAssistant) -> None:
     assert len(selector.get_tracking_entities()) == 0
 
     state = State("switch.test", STATE_ON)
-    assert selector.select_sub_profile(state) == "tasmota"
+    assert selector.select_sub_profile(state) == expected_profile
 
 
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
