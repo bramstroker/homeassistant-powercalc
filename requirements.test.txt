@@ -1,8 +1,0 @@
-black
-freezegun
-pytest-homeassistant-custom-component==0.13.38
-types-pytz
-types-croniter
-numpy
-croniter
-aiohue
