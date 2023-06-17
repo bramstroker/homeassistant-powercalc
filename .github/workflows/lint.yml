@@ -14,11 +14,13 @@ jobs:
     steps:
       - name: Checkout Powercalc
         uses: actions/checkout@v3
+      - run: pip install --upgrade pip poetry
+      - run: poetry install
       - name: Run MyPy
         uses: jpetrucciani/mypy-check@master
         with:
           path: './custom_components/powercalc'
-          requirements_file: requirements.dev.txt
+          #requirements_file: requirements.dev.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ruff:
