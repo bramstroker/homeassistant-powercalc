@@ -14,8 +14,14 @@ jobs:
     steps:
       - name: Checkout Powercalc
         uses: actions/checkout@v3
-      - run: pip install --upgrade pip poetry
-      - run: poetry install
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      - name: Install project
+        run: poetry install --no-interaction
       - name: Run MyPy
         uses: jpetrucciani/mypy-check@master
         with:
