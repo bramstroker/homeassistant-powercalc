@@ -23,6 +23,7 @@ jobs:
         run: bash tests/setup.sh
       - name: Run tests
         run: |
+          source .venv/bin/activate
           pytest \
             -qq \
             --timeout=9 \
