@@ -125,10 +125,10 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
     )
 
 
-async def test_sub_profile_attribute_match(hass: HomeAssistant) -> None:
+async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_attribute_match"),
+        get_test_profile_dir("sub_profile_match_attribute"),
     )
     selector = SubProfileSelector(
         hass,
@@ -147,10 +147,10 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant) -> None:
     assert selector.select_sub_profile(state) == "b"
 
 
-async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
+async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_entity_id_match"),
+        get_test_profile_dir("sub_profile_match_entity_id"),
     )
     selector = SubProfileSelector(
         hass,
@@ -182,7 +182,7 @@ async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
         (None, "default"),
     ],
 )
-async def test_sub_profile_match_integration(hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None) -> None:
+async def test_sub_profile_matcher_integration(hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_integration"),
