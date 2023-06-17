@@ -19,8 +19,8 @@ jobs:
         run: bash tests/setup.sh
       - name: Run tests
         run: |
-          pip install pytest-cov
-          pip install coverage
+          poetry add pytest-cov
+          poetry add coverage
           pytest \
             -qq \
             --timeout=9 \
