@@ -22,11 +22,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: poetry-$POETRY_VERSION
+          key: "poetry-$POETRY_VERSION"
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
-          version: $POETRY_VERSION
+          version: ${{ env.POETRY_VERSION }}
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
