@@ -14,13 +14,13 @@ from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from light_controller.errors import LightControllerError
-from measure_util import MeasureUtil
 from powermeter.errors import PowerMeterError
 from powermeter.factory import PowerMeterFactory
 from powermeter.powermeter import PowerMeter
 from runner.light import LightRunner
 from runner.runner import MeasurementRunner
 from runner.speaker import SpeakerRunner
+from util.measure_util import MeasureUtil
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 

@@ -18,12 +18,12 @@ import inquirer
 from light_controller.const import ColorMode
 from light_controller.controller import LightInfo
 from light_controller.factory import LightControllerFactory
-from measure_util import MeasureUtil
 from powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
+from util.measure_util import MeasureUtil
 
 from .runner import MeasurementRunner, RunnerResult
 

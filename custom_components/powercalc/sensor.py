@@ -284,7 +284,7 @@ async def async_setup_entry(
 
     if CONF_ENTITY_ID in sensor_config:
         _register_entity_id_change_listener(
-            hass, entry, str(sensor_config.get(CONF_ENTITY_ID))
+            hass, entry, str(sensor_config.get(CONF_ENTITY_ID)),
         )
 
     await _async_setup_entities(
@@ -341,7 +341,7 @@ async def _async_setup_entities(
 
 
 def _register_entity_id_change_listener(
-    hass: HomeAssistant, entry: ConfigEntry, source_entity_id: str
+    hass: HomeAssistant, entry: ConfigEntry, source_entity_id: str,
 ) -> None:
     """
     When the user changes the entity id of the source entity,
@@ -358,7 +358,7 @@ def _register_entity_id_change_listener(
             f"Entity id has been changed, updating powercalc config. old_id={old_entity_id}, new_id={new_entity_id}",
         )
         hass.config_entries.async_update_entry(
-            entry, data={**entry.data, CONF_ENTITY_ID: new_entity_id}
+            entry, data={**entry.data, CONF_ENTITY_ID: new_entity_id},
         )
 
     @callback

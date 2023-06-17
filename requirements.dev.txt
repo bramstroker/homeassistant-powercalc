@@ -1,5 +1,0 @@
-pre-commit
-ruff==0.0.265
-voluptuous-stubs
-homeassistant-stubs==2023.6.1
-numpy
