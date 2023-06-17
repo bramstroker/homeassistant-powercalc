@@ -1,6 +1,7 @@
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.entity_registry import RegistryEntry
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -124,12 +125,16 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
     )
 
 
-async def test_sub_profile_attribute_match(hass: HomeAssistant) -> None:
+async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_attribute_match"),
+        get_test_profile_dir("sub_profile_match_attribute"),
     )
-    selector = SubProfileSelector(hass, power_profile.sub_profile_select)
+    selector = SubProfileSelector(
+        hass,
+        power_profile.sub_profile_select,
+        SourceEntity(entity_id="light.test", domain="light", object_id="test"),
+    )
     assert len(selector.get_tracking_entities()) == 0
 
     state = State("light.test", STATE_OFF)
@@ -142,12 +147,16 @@ async def test_sub_profile_attribute_match(hass: HomeAssistant) -> None:
     assert selector.select_sub_profile(state) == "b"
 
 
-async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
+async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
-        get_test_profile_dir("sub_profile_entity_id_match"),
+        get_test_profile_dir("sub_profile_match_entity_id"),
     )
-    selector = SubProfileSelector(hass, power_profile.sub_profile_select)
+    selector = SubProfileSelector(
+        hass,
+        power_profile.sub_profile_select,
+        SourceEntity(entity_id="light.test", domain="light", object_id="test"),
+    )
     assert len(selector.get_tracking_entities()) == 0
 
     state = State("light.test_nightlight", STATE_ON)
@@ -155,6 +164,46 @@ async def test_sub_profile_entity_id_match(hass: HomeAssistant) -> None:
 
     state = State("light.test", STATE_ON)
     assert selector.select_sub_profile(state) == "default"
+
+
+@pytest.mark.parametrize(
+    "registry_entry,expected_profile",
+    [
+        (RegistryEntry(
+            entity_id="switch.test",
+            platform="tasmota",
+            unique_id="111",
+        ), "tasmota"),
+        (RegistryEntry(
+            entity_id="switch.test",
+            platform="shelly",
+            unique_id="111",
+        ), "default"),
+        (None, "default"),
+    ],
+)
+async def test_sub_profile_matcher_integration(hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None) -> None:
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("Test", "Test"),
+        get_test_profile_dir("sub_profile_match_integration"),
+    )
+
+    source_entity = SourceEntity(
+        entity_id="switch.test",
+        domain="switch",
+        object_id="test",
+        entity_entry=registry_entry,
+    )
+
+    selector = SubProfileSelector(
+        hass,
+        power_profile.sub_profile_select,
+        source_entity,
+    )
+    assert len(selector.get_tracking_entities()) == 0
+
+    state = State("switch.test", STATE_ON)
+    assert selector.select_sub_profile(state) == expected_profile
 
 
 async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
@@ -165,7 +214,7 @@ async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
             hass,
             manufacturer="Foo",
             model="Bar",
-            directory=None,
+            directory="",
             json_data={
                 "sub_profile_select": {
                     "matchers": [{"type": "invalid_type"}],
@@ -173,7 +222,11 @@ async def test_exception_is_raised_when_invalid_sub_profile_matcher_supplied(
                 },
             },
         )
-        SubProfileSelector(hass, power_profile.sub_profile_select)
+        SubProfileSelector(
+            hass,
+            power_profile.sub_profile_select,
+            SourceEntity(entity_id="light.test", domain="light", object_id="test"),
+        )
 
 
 async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
