@@ -14,7 +14,7 @@ homeassistant-api = "^4.1"
 inquirer = "^3.1"
 numpy = "^1.22"
 opencv-python = "^4.7"
-phue = "^1.1"
+phue = {git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d"}
 pytesseract = "^0.3"
 python-decouple = "^3.4"
 python-kasa = "^0.5"
