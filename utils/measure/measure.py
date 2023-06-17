@@ -297,7 +297,7 @@ def main() -> None:
 
         measure.start()
         exit(0)
-    except (PowerMeterError, LightControllerError) as e:
+    except (PowerMeterError, LightControllerError, KeyboardInterrupt) as e:
         _LOGGER.error(f"Aborting: {e}")
         exit(1)
 
