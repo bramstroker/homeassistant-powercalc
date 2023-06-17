@@ -316,7 +316,7 @@ class OCR:
                     if len(match) > 0:
                         try:
                             measurement = Decimal(match)
-                            _LOGGER.info(f"Measurement: {str(measurement)}")
+                            _LOGGER.info(f"Measurement: {measurement!s}")
                         except DecimalException:
                             _LOGGER.error("Cannot convert OCR match to decimal")
                             continue
@@ -336,7 +336,7 @@ class OCR:
             )
             self.file = open(file_path, "a")  # noqa: SIM115
 
-        self.file.write(f"{time.time()};{str(measurement)}\n")
+        self.file.write(f"{time.time()};{measurement!s}\n")
         self.file.flush()
 
     def stop_process(self) -> None:
