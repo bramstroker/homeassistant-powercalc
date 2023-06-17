@@ -169,20 +169,28 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "registry_entry,expected_profile",
     [
-        (RegistryEntry(
-            entity_id="switch.test",
-            platform="tasmota",
-            unique_id="111",
-        ), "tasmota"),
-        (RegistryEntry(
-            entity_id="switch.test",
-            platform="shelly",
-            unique_id="111",
-        ), "default"),
+        (
+            RegistryEntry(
+                entity_id="switch.test",
+                platform="tasmota",
+                unique_id="111",
+            ),
+            "tasmota",
+        ),
+        (
+            RegistryEntry(
+                entity_id="switch.test",
+                platform="shelly",
+                unique_id="111",
+            ),
+            "default",
+        ),
         (None, "default"),
     ],
 )
-async def test_sub_profile_matcher_integration(hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None) -> None:
+async def test_sub_profile_matcher_integration(
+    hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None
+) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_integration"),
