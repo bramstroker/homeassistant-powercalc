@@ -47,3 +47,18 @@ increase_daily_energy:
       required: true
       selector:
         text:
+activate_playbook:
+  name: Activate playbook
+  description: Activate playbook
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+  fields:
+    playbook:
+      name: Playbook
+      description: Playbook identifier
+      required: true
+      example: Bedroom
+      selector:
+        text:

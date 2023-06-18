@@ -91,6 +91,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
+from ..strategy.playbook import PlaybookStrategy
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -407,18 +408,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
-            await self._update_power_sensor(self._source_entity.entity_id, new_state)
+            await self._handle_source_entity_state_change(self._source_entity.entity_id, new_state)
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def template_change_listener(*_: Any) -> None:  # noqa: ANN401
             state = self.hass.states.get(self._source_entity.entity_id)
-            await self._update_power_sensor(self._source_entity.entity_id, state)
+            await self._handle_source_entity_state_change(self._source_entity.entity_id, state)
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(hass: HomeAssistant) -> None:
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
-                await self._update_power_sensor(entity_id, new_state)
+                await self._handle_source_entity_state_change(entity_id, new_state)
                 async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         """Add listeners and get initial state."""
@@ -462,6 +463,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
+        if isinstance(self._strategy_instance, PlaybookStrategy):
+            self._strategy_instance.set_update_callback(self._update_power_sensor)
+
         @callback
         def async_update(event_time: datetime | None = None) -> None:
             """Update the entity."""
@@ -469,7 +473,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         async_track_time_interval(self.hass, async_update, self._update_frequency)
 
-    async def _update_power_sensor(
+    async def _handle_source_entity_state_change(
         self,
         trigger_entity_id: str,
         state: State | None,
@@ -512,6 +516,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self.async_write_ha_state()
         return True
+
+    @callback
+    def _update_power_sensor(self, power: Decimal):
+        self._power = round(power, self._rounding_digits)
+        self.async_write_ha_state()
 
     def _has_valid_state(self, state: State | None) -> bool:
         """Check if the state is valid, we can use it for power calculation."""
@@ -648,6 +657,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._attr_extra_state_attributes.update(
             {ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id},
         )
+
+    async def async_activate_playbook(self, playbook: str) -> None:
+        _LOGGER.info("activate playbook called")
+        if self._calculation_strategy != CalculationStrategy.PLAYBOOK:
+            #todo correct exception
+            return
+
+        await self._strategy_instance.activate_playbook(playbook)
 
 
 class RealPowerSensor(PowerSensor):
