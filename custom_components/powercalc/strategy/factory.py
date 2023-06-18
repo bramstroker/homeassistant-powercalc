@@ -23,6 +23,7 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
 from .lut import LutRegistry, LutStrategy
+from .playbook import PlaybookStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .wled import WledStrategy
 
@@ -48,6 +49,9 @@ class PowerCalculatorStrategyFactory:
 
         if strategy == CalculationStrategy.LUT:
             return self._create_lut(source_entity, power_profile)
+
+        if strategy == CalculationStrategy.PLAYBOOK:
+            return self._create_playbook()
 
         if strategy == CalculationStrategy.WLED:
             return self._create_wled(source_entity, config)
@@ -128,3 +132,6 @@ class PowerCalculatorStrategyFactory:
             hass=self._hass,
             standby_power=config.get(CONF_STANDBY_POWER),
         )
+
+    def _create_playbook(self):
+        return PlaybookStrategy(self._hass)

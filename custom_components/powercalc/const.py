@@ -171,6 +171,7 @@ class CalculationStrategy(StrEnum):
     LUT = "lut"
     LINEAR = "linear"
     FIXED = "fixed"
+    PLAYBOOK = "playbook"
     WLED = "wled"
 
 

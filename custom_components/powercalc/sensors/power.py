@@ -185,13 +185,61 @@ async def create_virtual_power_sensor(
         calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[
             DOMAIN
         ][DATA_CALCULATOR_FACTORY]
-        calculation_strategy = calculation_strategy_factory.create(
-            sensor_config,
+
+        standby_power = Decimal(0)
+        standby_power_on = Decimal(0)
+        if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
+            if sensor_config.get(CONF_STANDBY_POWER) is not None:
+                standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))  # type: ignore
+            elif power_profile is not None:
+                standby_power = Decimal(power_profile.standby_power)
+                standby_power_on = Decimal(power_profile.standby_power_on)
+
+        if (
+            CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
+            and power_profile is not None
+            and power_profile.calculation_enabled_condition
+        ):
+            sensor_config[
+                CONF_CALCULATION_ENABLED_CONDITION
+            ] = power_profile.calculation_enabled_condition
+
+        _LOGGER.debug(
+            "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s "
+            "strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
+            source_entity.entity_id,
+            entity_category,
+            name,
             strategy,
-            power_profile,
-            source_entity,
+            power_profile.manufacturer if power_profile else "",
+            power_profile.model if power_profile else "",
+            round(standby_power, 2),
+            unique_id,
         )
-        await calculation_strategy.validate_config()
+
+        power_sensor = VirtualPowerSensor(
+            hass=hass,
+            calculation_strategy_factory=calculation_strategy_factory,
+            calculation_strategy=strategy,
+            entity_id=entity_id,
+            entity_category=entity_category,
+            name=name,
+            source_entity=source_entity,
+            unique_id=unique_id,
+            standby_power=standby_power,
+            standby_power_on=standby_power_on,
+            update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
+            multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
+            multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY)
+            or False,
+            ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
+            or False,
+            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
+            sensor_config=sensor_config,
+            power_profile=power_profile,
+        )
+        await power_sensor.validate()
+        return power_sensor
     except (StrategyConfigurationError, UnsupportedStrategyError) as err:
         _LOGGER.error(
             "%s: Skipping sensor setup: %s",
@@ -199,59 +247,6 @@ async def create_virtual_power_sensor(
             err,
         )
         raise err
-
-    standby_power = Decimal(0)
-    standby_power_on = Decimal(0)
-    if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-        if sensor_config.get(CONF_STANDBY_POWER) is not None:
-            standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))  # type: ignore
-        elif power_profile is not None:
-            standby_power = Decimal(power_profile.standby_power)
-            standby_power_on = Decimal(power_profile.standby_power_on)
-
-    if (
-        CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
-        and power_profile is not None
-        and power_profile.calculation_enabled_condition
-    ):
-        sensor_config[
-            CONF_CALCULATION_ENABLED_CONDITION
-        ] = power_profile.calculation_enabled_condition
-
-    _LOGGER.debug(
-        "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s "
-        "strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
-        source_entity.entity_id,
-        entity_category,
-        name,
-        calculation_strategy.__class__.__name__,
-        power_profile.manufacturer if power_profile else "",
-        power_profile.model if power_profile else "",
-        round(standby_power, 2),
-        unique_id,
-    )
-
-    return VirtualPowerSensor(
-        hass=hass,
-        power_calculator=calculation_strategy,
-        calculation_strategy=strategy,
-        entity_id=entity_id,
-        entity_category=entity_category,
-        name=name,
-        source_entity=source_entity,
-        unique_id=unique_id,
-        standby_power=standby_power,
-        standby_power_on=standby_power_on,
-        update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
-        multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
-        multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY)
-        or False,
-        ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
-        or False,
-        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
-        sensor_config=sensor_config,
-        power_profile=power_profile,
-    )
 
 
 async def create_real_power_sensor(
@@ -340,7 +335,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def __init__(
         self,
         hass: HomeAssistant,
-        power_calculator: PowerCalculationStrategyInterface,
+        calculation_strategy_factory: PowerCalculatorStrategyFactory,
         calculation_strategy: CalculationStrategy,
         entity_id: str,
         entity_category: str | None,
@@ -358,8 +353,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         power_profile: PowerProfile | None,
     ) -> None:
         """Initialize the sensor."""
-        self._power_calculator = power_calculator
-        self._calculation_mode = calculation_strategy
+        self._calculation_strategy = calculation_strategy
         self._source_entity = source_entity
         self._attr_name = name
         self._power: Decimal | None = None
@@ -393,6 +387,18 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         ):
             self._ignore_unavailable_state = True
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
+        self._init_calculation_strategy(factory=calculation_strategy_factory)
+
+    def _init_calculation_strategy(self, factory: PowerCalculatorStrategyFactory):
+        self._strategy_instance = factory.create(
+            self._sensor_config,
+            self._calculation_strategy,
+            self._power_profile,
+            self._source_entity,
+        )
+
+    async def validate(self):
+        await self._strategy_instance.validate_config()
 
     async def async_added_to_hass(self) -> None:
         """Register callbacks."""
@@ -416,7 +422,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         """Add listeners and get initial state."""
-        entities_to_track = self._power_calculator.get_entities_to_track()
+        entities_to_track = self._strategy_instance.get_entities_to_track()
 
         track_entities = [
             entity for entity in entities_to_track if isinstance(entity, str)
@@ -539,7 +545,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._standby_sensors[self.entity_id] = standby_power
             return standby_power
 
-        power = await self._power_calculator.calculate(entity_state)
+        power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
 
@@ -598,8 +604,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             )
 
         standby_power = self._standby_power
-        if self._power_calculator.can_calculate_standby():
-            standby_power = await self._power_calculator.calculate(state) or Decimal(0)
+        if self._strategy_instance.can_calculate_standby():
+            standby_power = await self._strategy_instance.calculate(state) or Decimal(0)
 
         if self._multiply_factor_standby and self._multiply_factor:
             standby_power *= Decimal(self._multiply_factor)
