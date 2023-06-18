@@ -1,23 +1,22 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
-
-import voluptuous as vol
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers import ConfigType
 from homeassistant.helpers.event import async_track_point_in_time
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util import dt
 
+from custom_components.powercalc.const import CONF_PLAYBOOKS
+
 from .strategy_interface import PowerCalculationStrategyInterface
-from ..const import CONF_PLAYBOOKS
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -34,7 +33,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
         hass: HomeAssistant,
-        config: ConfigType
+        config: ConfigType,
     ) -> None:
         self._hass = hass
         self._active_playbook: Playbook | None = None
@@ -90,10 +89,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             return self._loaded_playbooks[playbook_id]
 
         playbooks = self._config.get(CONF_PLAYBOOKS)
-        if not playbook_id in playbooks:
+        if playbook_id not in playbooks:
             raise RuntimeError() #todo correct exception
 
-        playbook_file = playbooks[playbook_id]
+        playbooks[playbook_id]
 
 
         # todo actual loading of playbooks

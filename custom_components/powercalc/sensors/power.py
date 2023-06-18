@@ -53,6 +53,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
@@ -89,7 +90,6 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from ..const import CONF_PLAYBOOK
 
 _LOGGER = logging.getLogger(__name__)
 

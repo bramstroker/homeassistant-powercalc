@@ -8,6 +8,7 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
@@ -27,7 +28,6 @@ from .lut import LutRegistry, LutStrategy
 from .playbook import PlaybookStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .wled import WledStrategy
-from ..const import CONF_PLAYBOOK
 
 
 class PowerCalculatorStrategyFactory:

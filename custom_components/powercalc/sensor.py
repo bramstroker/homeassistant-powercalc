@@ -73,7 +73,8 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
-    CONF_PLAYBOOK, CONF_POWER,
+    CONF_PLAYBOOK,
+    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
@@ -139,8 +140,8 @@ from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
-from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 from .strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
+from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
