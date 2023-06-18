@@ -7,15 +7,11 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import homeassistant.helpers.config_validation as cv
-import voluptuous as vol
-from homeassistant.components import climate, vacuum  # type: ignore
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.util import dt
 
 from .strategy_interface import PowerCalculationStrategyInterface
-from ..const import CONF_PLAYBOOKS
 
 # CONFIG_SCHEMA = vol.Schema(
 #     {
@@ -79,7 +75,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._cancel_timer = async_track_point_in_time(
             self._hass,
             _update_power,
-            self._start_time + timedelta(seconds=entry[0])
+            self._start_time + timedelta(seconds=entry[0]),
         )
 
     async def _load_playbook(self, playbook_id: str) -> Playbook:
@@ -102,7 +98,7 @@ class Playbook:
 
 
 class PlaybookQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         self._elements = deque()
 
     def enqueue(self, element):
@@ -111,5 +107,5 @@ class PlaybookQueue:
     def dequeue(self):
         return self._elements.popleft()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._elements)

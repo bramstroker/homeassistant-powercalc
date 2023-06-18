@@ -82,16 +82,13 @@ from custom_components.powercalc.power_profile.power_profile import (
     SubProfileSelector,
 )
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
-from custom_components.powercalc.strategy.strategy_interface import (
-    PowerCalculationStrategyInterface,
-)
+from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 
 from .abstract import (
     BaseEntity,
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from ..strategy.playbook import PlaybookStrategy
 
 _LOGGER = logging.getLogger(__name__)
 
