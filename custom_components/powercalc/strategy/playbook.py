@@ -11,7 +11,7 @@ from decimal import Decimal
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant.core import Event, HomeAssistant, State, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
@@ -41,18 +41,23 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._hass = hass
         self._active_playbook: Playbook | None = None
         self._loaded_playbooks: dict[str, Playbook] = {}
-        self._update_callback: Callable | None = None
-        self._start_time: datetime | None = None
-        self._cancel_timer = None
+        self._update_callback: Callable[[Decimal], None] = lambda power: None
+        self._start_time: datetime = dt.utcnow()
+        self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
 
-    def set_update_callback(self, update_callback: Callable) -> None:
+    def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
+        """
+        Register update callback which allows to give the strategy instance access to the power sensor
+        and manipulate the state
+        """
         self._update_callback = update_callback
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         return Decimal(0)
 
     async def activate_playbook(self, playbook_id: str) -> None:
+        """Activate and execute a given playbook"""
         _LOGGER.debug(f"Activating playbook {playbook_id}")
         playbook = await self._load_playbook(playbook_id=playbook_id)
         self._active_playbook = playbook
@@ -62,19 +67,25 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
     @callback
     def _execute_playbook_entry(self) -> None:
+        """Execute one step of the playbook"""
         if self._cancel_timer is not None:
             self._cancel_timer()
             self._cancel_timer = None
 
+        if not self._active_playbook:
+            _LOGGER.error("Could not execute next playbook entry. No active playbook")
+            return
+
         queue = self._active_playbook.queue
         if len(queue) == 0:
             _LOGGER.debug(f"Playbook {self._active_playbook.key} completed")
+            self._active_playbook = None
             return
 
         entry = queue.dequeue()
 
         @callback
-        def _update_power(event: Event) -> None:
+        def _update_power(date_time: datetime) -> None:
             _LOGGER.debug(f"playbook {self._active_playbook.key}: Update power {entry.power}")
             self._update_callback(entry.power)
             # Schedule next update
@@ -88,10 +99,11 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         )
 
     async def _load_playbook(self, playbook_id: str) -> Playbook:
+        """Lazy load a playbook from a CSV file"""
         if playbook_id in self._loaded_playbooks:
             return self._loaded_playbooks[playbook_id]
 
-        playbooks = self._config.get(CONF_PLAYBOOKS)
+        playbooks = dict(self._config.get(CONF_PLAYBOOKS))
         if playbook_id not in playbooks:
             raise StrategyConfigurationError(f"Playbook with id {playbook_id} not defined in playbooks config")
 

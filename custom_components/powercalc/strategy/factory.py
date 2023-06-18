@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
+from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -134,6 +135,6 @@ class PowerCalculatorStrategyFactory:
             standby_power=config.get(CONF_STANDBY_POWER),
         )
 
-    def _create_playbook(self, config: dict) -> PlaybookStrategy:
+    def _create_playbook(self, config: ConfigType) -> PlaybookStrategy:
         playbook_config = config.get(CONF_PLAYBOOK)
         return PlaybookStrategy(self._hass, playbook_config)

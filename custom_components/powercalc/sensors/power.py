@@ -661,7 +661,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
         _LOGGER.info("activate playbook called")
-        if self._calculation_strategy != CalculationStrategy.PLAYBOOK:
+        if not isinstance(self._strategy_instance, PlaybookStrategy):
             #todo correct exception
             return
 
