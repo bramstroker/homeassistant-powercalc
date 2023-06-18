@@ -391,7 +391,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
         self._init_calculation_strategy(factory=calculation_strategy_factory)
 
-    def _init_calculation_strategy(self, factory: PowerCalculatorStrategyFactory):
+    def _init_calculation_strategy(self, factory: PowerCalculatorStrategyFactory) -> None:
         self._strategy_instance = factory.create(
             self._sensor_config,
             self._calculation_strategy,
@@ -399,7 +399,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._source_entity,
         )
 
-    async def validate(self):
+    async def validate(self) -> None:
         await self._strategy_instance.validate_config()
 
     async def async_added_to_hass(self) -> None:
@@ -519,7 +519,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return True
 
     @callback
-    def _update_power_sensor(self, power: Decimal):
+    def _update_power_sensor(self, power: Decimal) -> None:
         self._power = round(power, self._rounding_digits)
         self.async_write_ha_state()
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import csv
 import logging
+import os
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -10,11 +12,12 @@ from decimal import Decimal
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.core import Event, HomeAssistant, State, callback
-from homeassistant.helpers import ConfigType
 from homeassistant.helpers.event import async_track_point_in_time
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 
 from custom_components.powercalc.const import CONF_PLAYBOOKS
+from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -43,7 +46,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._cancel_timer = None
         self._config = config
 
-    def set_update_callback(self, update_callback: Callable):
+    def set_update_callback(self, update_callback: Callable) -> None:
         self._update_callback = update_callback
 
     async def calculate(self, entity_state: State) -> Decimal | None:
@@ -65,14 +68,14 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         queue = self._active_playbook.queue
         if len(queue) == 0:
-            _LOGGER.debug(f"Playbook {self._active_playbook.id} completed")
+            _LOGGER.debug(f"Playbook {self._active_playbook.key} completed")
             return
 
         entry = queue.dequeue()
 
         @callback
         def _update_power(event: Event) -> None:
-            _LOGGER.debug(f"playbook {self._active_playbook.id}: Update power {entry.power}")
+            _LOGGER.debug(f"playbook {self._active_playbook.key}: Update power {entry.power}")
             self._update_callback(entry.power)
             # Schedule next update
             self._execute_playbook_entry()
@@ -90,21 +93,27 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         playbooks = self._config.get(CONF_PLAYBOOKS)
         if playbook_id not in playbooks:
-            raise RuntimeError() #todo correct exception
+            raise StrategyConfigurationError(f"Playbook with id {playbook_id} not defined in playbooks config")
 
-        playbooks[playbook_id]
+        file_path = os.path.join(self._hass.config.config_dir, playbooks[playbook_id])
+        if not os.path.exists(file_path):
+            raise StrategyConfigurationError(f"Playbook file '{file_path}' does not exist")
 
+        with open(file_path) as csv_file:
+            queue = PlaybookQueue()
 
-        # todo actual loading of playbooks
-        queue = PlaybookQueue()
-        queue.enqueue(PlaybookEntry(time=5, power=Decimal(40)))
-        self._loaded_playbooks = Playbook(id=playbook_id, queue=queue)
-        return self._loaded_playbooks
+            csv_reader = csv.reader(csv_file)
+            for row in csv_reader:
+                queue.enqueue(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
+
+            self._loaded_playbooks[playbook_id] = Playbook(key=playbook_id, queue=queue)
+
+        return self._loaded_playbooks[playbook_id]
 
 
 @dataclass
 class Playbook:
-    id: str
+    key: str
     queue: PlaybookQueue
 
 
