@@ -578,6 +578,8 @@ class LightRunner(MeasurementRunner):
         return questions
 
 
+
+
 @dataclass(frozen=True)
 class Variation:
     bri: int

@@ -92,9 +92,9 @@ KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
 
 try:
-    SELECTED_DEVICE_TYPE = config("SELECTED_DEVICE_TYPE")
+    SELECTED_MEASURE_TYPE = config("SELECTED_DEVICE_TYPE")
 except UndefinedValueError:
-    SELECTED_DEVICE_TYPE = None
+    SELECTED_MEASURE_TYPE = None
 
 try:
     RESUME = config("RESUME", cast=bool)
