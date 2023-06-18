@@ -298,7 +298,7 @@ class SubProfileSelector:
             return EntityIdMatcher(matcher_config["pattern"], matcher_config["profile"])
         if matcher_type == SubProfileMatcherType.INTEGRATION:
             return IntegrationMatcher(
-                matcher_config["integration"], matcher_config["profile"]
+                matcher_config["integration"], matcher_config["profile"],
             )
         raise PowercalcSetupError(f"Unknown sub profile matcher type: {matcher_type}")
 
