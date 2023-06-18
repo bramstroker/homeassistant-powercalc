@@ -189,7 +189,9 @@ async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
     ],
 )
 async def test_sub_profile_matcher_integration(
-    hass: HomeAssistant, registry_entry: RegistryEntry, expected_profile: str | None,
+    hass: HomeAssistant,
+    registry_entry: RegistryEntry,
+    expected_profile: str | None,
 ) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),
