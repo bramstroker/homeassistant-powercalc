@@ -137,4 +137,4 @@ class PowerCalculatorStrategyFactory:
 
     def _create_playbook(self, config: ConfigType) -> PlaybookStrategy:
         playbook_config = config.get(CONF_PLAYBOOK)
-        return PlaybookStrategy(self._hass, playbook_config)
+        return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
