@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import ConfigType
 from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
@@ -26,6 +27,7 @@ from .lut import LutRegistry, LutStrategy
 from .playbook import PlaybookStrategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .wled import WledStrategy
+from ..const import CONF_PLAYBOOK
 
 
 class PowerCalculatorStrategyFactory:
@@ -133,5 +135,6 @@ class PowerCalculatorStrategyFactory:
             standby_power=config.get(CONF_STANDBY_POWER),
         )
 
-    def _create_playbook(self):
-        return PlaybookStrategy(self._hass)
+    def _create_playbook(self, config: ConfigType):
+        playbook_config = config.get(CONF_PLAYBOOK)
+        return PlaybookStrategy(self._hass, playbook_config)

@@ -73,7 +73,7 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
-    CONF_POWER,
+    CONF_PLAYBOOK, CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_NAMING,
@@ -140,6 +140,7 @@ from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
+from .strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -160,6 +161,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
+    vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
@@ -447,7 +449,7 @@ def register_entity_services() -> None:
 
     platform.async_register_entity_service(
         "activate_playbook",
-        {},  # type: ignore
+        {vol.Required("playbook_id"): cv.string},  # type: ignore
         "async_activate_playbook",
     )
 

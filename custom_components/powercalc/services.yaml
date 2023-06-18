@@ -55,7 +55,7 @@ activate_playbook:
       domain: sensor
       integration: powercalc
   fields:
-    playbook:
+    playbook_id:
       name: Playbook
       description: Playbook identifier
       required: true

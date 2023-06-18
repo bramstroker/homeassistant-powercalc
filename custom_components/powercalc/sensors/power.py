@@ -89,6 +89,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
+from ..const import CONF_PLAYBOOK
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -296,6 +297,9 @@ def select_calculation_strategy(
 
     if config.get(CONF_FIXED):
         return CalculationStrategy.FIXED
+
+    if config.get(CONF_PLAYBOOK):
+        return CalculationStrategy.PLAYBOOK
 
     if config.get(CONF_WLED):
         return CalculationStrategy.WLED
@@ -655,13 +659,13 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             {ATTR_ENERGY_SENSOR_ENTITY_ID: entity_id},
         )
 
-    async def async_activate_playbook(self, playbook: str) -> None:
+    async def async_activate_playbook(self, playbook_id: str) -> None:
         _LOGGER.info("activate playbook called")
         if self._calculation_strategy != CalculationStrategy.PLAYBOOK:
             #todo correct exception
             return
 
-        await self._strategy_instance.activate_playbook(playbook)
+        await self._strategy_instance.activate_playbook(playbook_id)
 
 
 class RealPowerSensor(PowerSensor):
