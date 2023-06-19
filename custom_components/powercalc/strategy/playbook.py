@@ -84,7 +84,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             self._cancel_timer()
             self._cancel_timer = None
 
-        if not self._active_playbook:
+        if not self._active_playbook:  # pragma: no cover
             _LOGGER.error("Could not execute next playbook entry. No active playbook")
             return
 

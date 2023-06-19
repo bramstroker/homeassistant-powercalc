@@ -16,6 +16,8 @@ from custom_components.powercalc.const import (
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_STOP_PLAYBOOK,
 )
+from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from tests.common import get_simple_fixed_config, get_test_config_dir, run_powercalc_setup
 
 
@@ -172,3 +174,25 @@ async def test_services_raises_error_on_non_playbook_sensor(hass: HomeAssistant)
             blocking=True,
         )
         await hass.async_block_till_done()
+
+
+async def test_exception_when_providing_unknown_playbook(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/test.csv"}})
+    with pytest.raises(StrategyConfigurationError):
+        await strategy.activate_playbook("program2")
+
+
+async def test_exception_when_providing_unknown_playbook_file(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/unknown.csv"}})
+    with pytest.raises(StrategyConfigurationError):
+        await strategy.activate_playbook("program1")
+
+
+async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/test.csv"}})
+    await strategy.activate_playbook("program1")
+    await strategy.activate_playbook("program1")
+
