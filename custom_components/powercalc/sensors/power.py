@@ -434,10 +434,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self._track_entities = track_entities
 
-        async_track_state_change_event(
-            self.hass,
-            track_entities,
-            appliance_state_listener,
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass,
+                track_entities,
+                appliance_state_listener,
+            ),
         )
 
         track_templates = [

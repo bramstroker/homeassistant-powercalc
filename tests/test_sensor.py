@@ -746,3 +746,50 @@ async def test_create_config_entry_without_energy_sensor(
 
     assert hass.states.get("sensor.testentry_power")
     assert not hass.states.get("sensor.testentry_energy")
+
+
+async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
+    light_id = "sensor.my_light"
+    entity_reg = mock_registry(
+        hass,
+        {
+            light_id: er.RegistryEntry(
+                entity_id=light_id,
+                disabled_by=er.RegistryEntryDisabler.DEVICE,
+                unique_id="1234",
+                platform="light",
+            ),
+        },
+    )
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_CREATE_ENERGY_SENSOR: False,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: light_id,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id="abcd",
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(
+        hass,
+        {},
+    )
+
+    new_light_id = "sensor.my_light_new"
+    entity_reg.async_update_entity(entity_id=light_id, new_entity_id=new_light_id)
+    await hass.async_block_till_done()
+
+    changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
+    assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id
+
+    hass.states.async_set(new_light_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.testentry_power")
+    assert power_state.state == "50.00"
+    assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id

@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "measure"
+version = "0.1.0"
+description = "Powwercalc measurement tool"
+authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiohttp = "^3.8"
+chardet = "^5.1"
+charset-normalizer = "^3.1"
+homeassistant-api = "^4.1"
+inquirer = "^3.1"
+numpy = "^1.22"
+opencv-python = "^4.7"
+phue = {git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d"}
+pytesseract = "^0.3"
+python-decouple = "^3.4"
+python-kasa = "^0.5"
+readchar = "^4.0"
+requests = "^2.28"
+tuyapower = "^0.2"
+typing-extensions = "^4.6"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.272"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

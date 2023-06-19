@@ -56,7 +56,8 @@ DAILY_FIXED_ENERGY_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_VALUE): vol.Any(vol.Coerce(float), cv.template),
         vol.Optional(
-            CONF_UNIT_OF_MEASUREMENT, default=UnitOfEnergy.KILO_WATT_HOUR
+            CONF_UNIT_OF_MEASUREMENT,
+            default=UnitOfEnergy.KILO_WATT_HOUR,
         ): vol.In(
             [UnitOfEnergy.KILO_WATT_HOUR, UnitOfPower.WATT],
         ),

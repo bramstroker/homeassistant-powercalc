@@ -4,10 +4,10 @@ from typing import Any
 
 import config
 import inquirer
-from measure_util import MeasureUtil
 from media_controller.controller import MediaController
 from media_controller.factory import MediaControllerFactory
 from powermeter.errors import ZeroReadingError
+from util.measure_util import MeasureUtil
 
 from .runner import MeasurementRunner, RunnerResult
 
@@ -92,5 +92,5 @@ class SpeakerRunner(MeasurementRunner):
             _LOGGER.error("Measured 0 watt as standby power.")
             return 0
 
-    def get_export_directory(self) -> str:
+    def get_export_directory(self) -> str | None:
         return "speaker"
