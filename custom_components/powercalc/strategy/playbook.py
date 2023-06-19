@@ -136,12 +136,6 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         return self._loaded_playbooks[playbook_id]
 
 
-@dataclass
-class Playbook:
-    key: str
-    queue: PlaybookQueue
-
-
 class PlaybookQueue:
     def __init__(self) -> None:
         self._entries: deque[PlaybookEntry] = deque()
@@ -154,6 +148,12 @@ class PlaybookQueue:
 
     def __len__(self) -> int:
         return len(self._entries)
+
+
+@dataclass
+class Playbook:
+    key: str
+    queue: PlaybookQueue
 
 
 @dataclass
