@@ -59,7 +59,7 @@ activate_playbook:
       name: Playbook
       description: Playbook identifier
       required: true
-      example: Bedroom
+      example: program1
       selector:
         text:
 stop_playbook:
