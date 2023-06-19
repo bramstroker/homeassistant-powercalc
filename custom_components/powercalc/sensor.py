@@ -104,10 +104,12 @@ from .const import (
     ENTITY_CATEGORIES,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
+    SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
+    SERVICE_STOP_PLAYBOOK,
     CalculationStrategy,
     PowercalcDiscoveryType,
     SensorType,
@@ -448,9 +450,15 @@ def register_entity_services() -> None:
     )
 
     platform.async_register_entity_service(
-        "activate_playbook",
+        SERVICE_ACTIVATE_PLAYBOOK,
         {vol.Required("playbook_id"): cv.string},  # type: ignore
         "async_activate_playbook",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_STOP_PLAYBOOK,
+        {},
+        "async_stop_playbook",
     )
 
 

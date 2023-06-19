@@ -667,6 +667,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         await self._strategy_instance.activate_playbook(playbook_id)
 
+    async def async_stop_playbook(self) -> None:
+        _LOGGER.info("activate playbook called")
+        if not isinstance(self._strategy_instance, PlaybookStrategy):
+            #todo correct exception
+            return
+
+        await self._strategy_instance.stop_playbook()
+
 
 class RealPowerSensor(PowerSensor):
     """Contains a reference to an existing real power sensor entity."""

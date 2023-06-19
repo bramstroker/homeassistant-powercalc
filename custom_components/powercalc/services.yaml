@@ -62,3 +62,10 @@ activate_playbook:
       example: Bedroom
       selector:
         text:
+stop_playbook:
+  name: Stop playbook
+  description: Stop active playbook
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc

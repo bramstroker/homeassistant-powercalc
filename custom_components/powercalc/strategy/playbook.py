@@ -58,12 +58,23 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
     async def activate_playbook(self, playbook_id: str) -> None:
         """Activate and execute a given playbook"""
+        if self._active_playbook:
+            await self.stop_playbook()
+
         _LOGGER.debug(f"Activating playbook {playbook_id}")
         playbook = await self._load_playbook(playbook_id=playbook_id)
         self._active_playbook = playbook
         self._start_time = dt.utcnow()
 
         self._execute_playbook_entry()
+
+    async def stop_playbook(self) -> None:
+        """Activate and execute a given playbook"""
+        _LOGGER.debug("Stopping playbook")
+        self._active_playbook = None
+        if self._cancel_timer is not None:
+            self._cancel_timer()
+            self._cancel_timer = None
 
     @callback
     def _execute_playbook_entry(self) -> None:
