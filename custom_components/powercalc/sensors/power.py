@@ -20,6 +20,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
@@ -657,18 +658,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         )
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
-        _LOGGER.info("activate playbook called")
         if not isinstance(self._strategy_instance, PlaybookStrategy):
-            #todo correct exception
-            return
+            raise HomeAssistantError("supported only playbook enabled sensors")
 
         await self._strategy_instance.activate_playbook(playbook_id)
 
     async def async_stop_playbook(self) -> None:
-        _LOGGER.info("activate playbook called")
         if not isinstance(self._strategy_instance, PlaybookStrategy):
-            #todo correct exception
-            return
+            raise HomeAssistantError("supported only playbook enabled sensors")
 
         await self._strategy_instance.stop_playbook()
 

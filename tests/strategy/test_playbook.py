@@ -1,7 +1,9 @@
 from datetime import timedelta
 
+import pytest
 from homeassistant.const import ATTR_ENTITY_ID, CONF_ENTITY_ID, CONF_NAME, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
@@ -14,7 +16,7 @@ from custom_components.powercalc.const import (
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_STOP_PLAYBOOK,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import get_simple_fixed_config, get_test_config_dir, run_powercalc_setup
 
 
 async def test_activate_playbook_service(hass: HomeAssistant) -> None:
@@ -144,3 +146,29 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.washing_machine_power").state == "0.50"
+
+
+async def test_services_raises_error_on_non_playbook_sensor(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("switch.test"),
+    )
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_ACTIVATE_PLAYBOOK,
+            {ATTR_ENTITY_ID: "sensor.test_power", "playbook_id": "playbook1"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
+
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_STOP_PLAYBOOK,
+            {ATTR_ENTITY_ID: "sensor.test_power"},
+            blocking=True,
+        )
+        await hass.async_block_till_done()
