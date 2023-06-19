@@ -45,6 +45,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._start_time: datetime = dt.utcnow()
         self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
+        self._power = Decimal(0)
 
     def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
         """
@@ -54,7 +55,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._update_callback = update_callback
 
     async def calculate(self, entity_state: State) -> Decimal | None:
-        return Decimal(0)
+        return self._power
 
     async def activate_playbook(self, playbook_id: str) -> None:
         """Activate and execute a given playbook"""
@@ -97,8 +98,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         @callback
         def _update_power(date_time: datetime) -> None:
-            _LOGGER.debug(f"playbook {self._active_playbook.key}: Update power {entry.power}")  # type: ignore
-            self._update_callback(entry.power)
+            self._power = entry.power
+            _LOGGER.debug(f"playbook {self._active_playbook.key}: Update power {self._power}")  # type: ignore
+            self._update_callback(self._power)
             # Schedule next update
             self._execute_playbook_entry()
 
