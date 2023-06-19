@@ -66,3 +66,20 @@ For example to start the playbook when your washing machine enters a specific pr
         target:
           entity_id: sensor.waching_machine_power
 
+Playbook structure
+------------------
+
+A playbook file must be a CSV file with 2 columns.
+- elapsed time in seconds
+- power value in W
+
+```
+0.5,70
+2,90
+4,25.5
+```
+
+When running this playbook the power sensor state will go to 70W after 0.5 seconds, 90W after 2 seconds and 25.5W after 4 seconds.
+All these timing are related to the start of the playbook. So when the playbook starts at 18:00:00 the final step will be executed at 18:00:04
+
+
