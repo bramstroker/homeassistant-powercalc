@@ -478,7 +478,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self,
         trigger_entity_id: str,
         state: State | None,
-    ) -> bool:
+    ) -> None:
         """Update power sensor based on new dependant entity state."""
         self._standby_sensors.pop(self.entity_id, None)
         if self._sleep_power_timer:
@@ -495,7 +495,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             )
             self._power = None
             self.async_write_ha_state()
-            return False
+            return
 
         self._switch_sub_profile_dynamically(state)
         self._power = await self.calculate_power(state)
@@ -511,12 +511,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._power,
             )
 
-        if self._power is None:
-            self.async_write_ha_state()
-            return False
-
         self.async_write_ha_state()
-        return True
 
     @callback
     def _update_power_sensor(self, power: Decimal) -> None:
