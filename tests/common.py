@@ -156,6 +156,13 @@ def get_test_profile_dir(sub_dir: str) -> str:
     )
 
 
+def get_test_config_dir() -> str:
+    return os.path.join(
+        os.path.dirname(__file__),
+        "testing_config",
+    )
+
+
 async def create_mocked_virtual_power_sensor_entry(
     hass: HomeAssistant,
     name: str,
