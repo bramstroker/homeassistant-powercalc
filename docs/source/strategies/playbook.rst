@@ -17,20 +17,8 @@ Configuration options
 | playbooks     | dict  | **Required** |          | Mapping of playbook id's and file paths |
 +---------------+-------+--------------+----------+-----------------------------------------+
 
-Setup a power sensor with playbook support
-
-.. code-block:: yaml
-
-    sensor:
-      - platform: powercalc
-        entity_id: sensor.dummy
-        name: Washing machine
-        playbook:
-          playbooks:
-            program1: playbooks/program1.csv
-            program2: playbooks/program2.csv
-
-Or reference your washing machine entity, this will also add the powercalc sensor to your washing machine device.
+Setup a power sensor with playbook support.
+The examples below will both create a `sensor.washing_machine_power`
 
 .. code-block:: yaml
 
@@ -42,11 +30,26 @@ Or reference your washing machine entity, this will also add the powercalc senso
             program1: playbooks/program1.csv
             program2: playbooks/program2.csv
 
+this will also add the powercalc sensor to your washing machine device.
+
+or when you don't have an entity to bind to, just use dummy and define a name.
+
+.. code-block:: yaml
+
+    sensor:
+      - platform: powercalc
+        entity_id: sensor.dummy
+        name: Washing machine
+        playbook:
+          playbooks:
+            ...
+
+
 Executing the playbook
 ----------------------
 
+To start executing a playbook you'll have to utilize HA automations.
 Powercalc provides two services which let's you control the playbook execution. `activate_playbook` and `stop_playbook`.
-You can use this service in an automation to start the playbook.
 For example to start the playbook when your washing machine enters a specific program use an automation similar as below.
 
 .. code-block:: yaml
