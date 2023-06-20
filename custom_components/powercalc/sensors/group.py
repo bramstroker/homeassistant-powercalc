@@ -446,6 +446,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     """Base class for grouped sensors."""
 
     _attr_should_poll = False
+    _throttle_interval = 30
 
     def __init__(
         self,
@@ -533,7 +534,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    @Throttle(timedelta(seconds=30))
+    @Throttle(timedelta(seconds=_throttle_interval))
     def on_state_change(self, event: Event) -> None:
         """Triggered when one of the group entities changes state."""
         if self.hass.state != CoreState.running:  # pragma: no cover
@@ -591,6 +592,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
+    _throttle_interval = 1
 
     def calculate_new_state(
         self,
