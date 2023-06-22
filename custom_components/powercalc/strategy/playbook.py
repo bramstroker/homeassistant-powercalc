@@ -37,6 +37,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self,
         hass: HomeAssistant,
         config: ConfigType,
+        playbook_directory: str | None = None,
     ) -> None:
         self._hass = hass
         self._active_playbook: Playbook | None = None
@@ -46,6 +47,8 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
         self._power = Decimal(0)
+        if not playbook_directory:
+            self._playbook_directory: str = os.path.join(hass.config.config_dir, "powercalc/playbooks")
 
     def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
         """
@@ -123,7 +126,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if playbook_id not in playbooks:
             raise StrategyConfigurationError(f"Playbook with id {playbook_id} not defined in playbooks config")
 
-        file_path = os.path.join(self._hass.config.config_dir, playbooks[playbook_id])
+        file_path = os.path.join(self._playbook_directory, playbooks[playbook_id])
         if not os.path.exists(file_path):
             raise StrategyConfigurationError(f"Playbook file '{file_path}' does not exist")
 

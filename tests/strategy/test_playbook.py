@@ -22,6 +22,7 @@ from tests.common import get_simple_fixed_config, get_test_config_dir, run_power
 
 
 async def test_activate_playbook_service(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {
@@ -29,12 +30,11 @@ async def test_activate_playbook_service(hass: HomeAssistant) -> None:
             CONF_NAME: "Test",
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
-                    "playbook1": "playbooks/test.csv",
+                    "playbook1": "test.csv",
                 },
             },
         },
     )
-    hass.config.config_dir = get_test_config_dir()
 
     await hass.services.async_call(
         DOMAIN,
@@ -68,6 +68,7 @@ async def test_activate_playbook_service(hass: HomeAssistant) -> None:
 
 
 async def test_stop_playbook_service(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {
@@ -75,12 +76,11 @@ async def test_stop_playbook_service(hass: HomeAssistant) -> None:
             CONF_NAME: "Test",
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
-                    "playbook1": "playbooks/test.csv",
+                    "playbook1": "test.csv",
                 },
             },
         },
     )
-    hass.config.config_dir = get_test_config_dir()
 
     await hass.services.async_call(
         DOMAIN,
@@ -115,6 +115,7 @@ async def test_stop_playbook_service(hass: HomeAssistant) -> None:
 
 
 async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
         hass,
         {
@@ -122,13 +123,11 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
             CONF_STANDBY_POWER: 0.5,
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
-                    "playbook1": "playbooks/test.csv",
+                    "playbook1": "test.csv",
                 },
             },
         },
     )
-
-    hass.config.config_dir = get_test_config_dir()
 
     hass.states.async_set("switch.washing_machine", STATE_ON)
     await hass.async_block_till_done()
@@ -178,21 +177,21 @@ async def test_services_raises_error_on_non_playbook_sensor(hass: HomeAssistant)
 
 async def test_exception_when_providing_unknown_playbook(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
-    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/test.csv"}})
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     with pytest.raises(StrategyConfigurationError):
         await strategy.activate_playbook("program2")
 
 
 async def test_exception_when_providing_unknown_playbook_file(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
-    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/unknown.csv"}})
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "unknown.csv"}})
     with pytest.raises(StrategyConfigurationError):
         await strategy.activate_playbook("program1")
 
 
 async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
-    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "playbooks/test.csv"}})
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     await strategy.activate_playbook("program1")
     await strategy.activate_playbook("program1")
 

@@ -8,6 +8,17 @@ You can generate a playbook with the powercalc measure tool (todo link).
 
 Currently only YAML is supported.
 
+You must put your playbook in HA config directory and create a subdirectory `powercalc/playbooks` there.
+So it could look like this:
+
+::
+
+    config
+    ├── powercalc
+    │   └── playbooks
+    │       ├── playbook1.csv
+    │       └── playbook2.csv
+
 Configuration options
 ---------------------
 
@@ -27,8 +38,8 @@ The examples below will both create a `sensor.washing_machine_power`
         entity_id: switch.washing_machine
         playbook:
           playbooks:
-            program1: playbooks/program1.csv
-            program2: playbooks/program2.csv
+            program1: program1.csv
+            program2: program2.csv
 
 this will also add the powercalc sensor to your washing machine device.
 
@@ -76,13 +87,13 @@ A playbook file must be a CSV file with 2 columns.
 - elapsed time in seconds
 - power value in W
 
-```
-0.5,70
-2,90
-4,25.5
-```
+::
+
+    0.5,70
+    2,90
+    4,25.5
 
 When running this playbook the power sensor state will go to 70W after 0.5 seconds, 90W after 2 seconds and 25.5W after 4 seconds.
-All these timing are related to the start of the playbook. So when the playbook starts at 18:00:00 the final step will be executed at 18:00:04
+All these timing are relative to the start of the playbook. So when the playbook starts at 18:00:00 the final step will be executed at 18:00:04
 
 
