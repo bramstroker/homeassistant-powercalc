@@ -71,6 +71,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
     async def stop_playbook(self) -> None:
         """Activate and execute a given playbook"""
+        if not self._active_playbook:
+            return
+
         _LOGGER.debug("Stopping playbook")
         self._active_playbook = None
         if self._cancel_timer is not None:

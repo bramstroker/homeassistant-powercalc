@@ -658,12 +658,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         )
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
+        """Active a playbook"""
         if not isinstance(self._strategy_instance, PlaybookStrategy):
             raise HomeAssistantError("supported only playbook enabled sensors")
 
         await self._strategy_instance.activate_playbook(playbook_id)
 
     async def async_stop_playbook(self) -> None:
+        """Stop an active playbook"""
         if not isinstance(self._strategy_instance, PlaybookStrategy):
             raise HomeAssistantError("supported only playbook enabled sensors")
 
