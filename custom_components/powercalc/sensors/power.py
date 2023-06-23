@@ -393,7 +393,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._init_calculation_strategy(factory=calculation_strategy_factory)
 
     def _init_calculation_strategy(
-        self, factory: PowerCalculatorStrategyFactory,
+        self,
+        factory: PowerCalculatorStrategyFactory,
     ) -> None:
         self._strategy_instance = factory.create(
             self._sensor_config,
@@ -413,14 +414,16 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
             await self._handle_source_entity_state_change(
-                self._source_entity.entity_id, new_state,
+                self._source_entity.entity_id,
+                new_state,
             )
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def template_change_listener(*_: Any) -> None:  # noqa: ANN401
             state = self.hass.states.get(self._source_entity.entity_id)
             await self._handle_source_entity_state_change(
-                self._source_entity.entity_id, state,
+                self._source_entity.entity_id,
+                state,
             )
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 

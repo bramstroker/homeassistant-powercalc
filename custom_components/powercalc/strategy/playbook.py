@@ -49,7 +49,8 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._power = Decimal(0)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
-                hass.config.config_dir, "powercalc/playbooks",
+                hass.config.config_dir,
+                "powercalc/playbooks",
             )
 
     def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
