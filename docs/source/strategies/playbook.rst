@@ -4,7 +4,7 @@ Playbook
 
 The playbook strategy makes it possible to record power consumption over time and replay that in Home Assistant.
 This is useful to implement power sensors for program based devices. For example Washing machines, dishwashers.
-You can generate a playbook with the powercalc :doc:`measure tool </measure>`.
+You can generate a playbook with the powercalc :doc:`measure tool </contributing/measure>`.
 
 Currently only YAML is supported.
 
