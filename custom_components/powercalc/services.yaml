@@ -25,6 +25,7 @@ calibrate_energy:
   target:
     entity:
       domain: sensor
+      device_class: energy
   fields:
     value:
       name: Value
@@ -39,6 +40,8 @@ increase_daily_energy:
   target:
     entity:
       domain: sensor
+      integration: powercalc
+      device_class: energy
   fields:
     value:
       name: Value
@@ -54,6 +57,7 @@ activate_playbook:
     entity:
       domain: sensor
       integration: powercalc
+      device_class: power
   fields:
     playbook_id:
       name: Playbook
@@ -69,3 +73,4 @@ stop_playbook:
     entity:
       domain: sensor
       integration: powercalc
+      device_class: power
