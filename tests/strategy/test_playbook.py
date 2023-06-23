@@ -1,7 +1,13 @@
 from datetime import timedelta
 
 import pytest
-from homeassistant.const import ATTR_ENTITY_ID, CONF_ENTITY_ID, CONF_NAME, STATE_OFF, STATE_ON
+from homeassistant.const import (
+    ATTR_ENTITY_ID,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    STATE_OFF,
+    STATE_ON,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util import dt
@@ -18,7 +24,11 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
-from tests.common import get_simple_fixed_config, get_test_config_dir, run_powercalc_setup
+from tests.common import (
+    get_simple_fixed_config,
+    get_test_config_dir,
+    run_powercalc_setup,
+)
 
 
 async def test_activate_playbook_service(hass: HomeAssistant) -> None:
@@ -149,7 +159,9 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.washing_machine_power").state == "0.50"
 
 
-async def test_services_raises_error_on_non_playbook_sensor(hass: HomeAssistant) -> None:
+async def test_services_raises_error_on_non_playbook_sensor(
+    hass: HomeAssistant,
+) -> None:
     await run_powercalc_setup(
         hass,
         get_simple_fixed_config("switch.test"),
@@ -182,7 +194,9 @@ async def test_exception_when_providing_unknown_playbook(hass: HomeAssistant) ->
         await strategy.activate_playbook("program2")
 
 
-async def test_exception_when_providing_unknown_playbook_file(hass: HomeAssistant) -> None:
+async def test_exception_when_providing_unknown_playbook_file(
+    hass: HomeAssistant,
+) -> None:
     hass.config.config_dir = get_test_config_dir()
     strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "unknown.csv"}})
     with pytest.raises(StrategyConfigurationError):
@@ -194,4 +208,3 @@ async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     await strategy.activate_playbook("program1")
     await strategy.activate_playbook("program1")
-
