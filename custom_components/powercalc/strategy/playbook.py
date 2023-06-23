@@ -49,7 +49,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._power = Decimal(0)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
-                hass.config.config_dir, "powercalc/playbooks"
+                hass.config.config_dir, "powercalc/playbooks",
             )
 
     def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
@@ -127,13 +127,13 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         playbooks: dict[str, str] = self._config.get(CONF_PLAYBOOKS)  # type: ignore
         if playbook_id not in playbooks:
             raise StrategyConfigurationError(
-                f"Playbook with id {playbook_id} not defined in playbooks config"
+                f"Playbook with id {playbook_id} not defined in playbooks config",
             )
 
         file_path = os.path.join(self._playbook_directory, playbooks[playbook_id])
         if not os.path.exists(file_path):
             raise StrategyConfigurationError(
-                f"Playbook file '{file_path}' does not exist"
+                f"Playbook file '{file_path}' does not exist",
             )
 
         with open(file_path) as csv_file:
