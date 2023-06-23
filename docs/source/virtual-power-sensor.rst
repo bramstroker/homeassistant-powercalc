@@ -11,6 +11,7 @@ Powercalc offers various calculation methods that can be used to establish a new
    strategies/fixed
    strategies/linear
    strategies/lut
+   strategies/playbook
    strategies/wled
 
 GUI

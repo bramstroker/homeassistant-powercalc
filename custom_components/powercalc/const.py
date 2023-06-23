@@ -74,6 +74,8 @@ CONF_POWER_SENSOR_PRECISION = "power_sensor_precision"
 CONF_POWER = "power"
 CONF_POWER_SENSOR_ID = "power_sensor_id"
 CONF_POWER_TEMPLATE = "power_template"
+CONF_PLAYBOOK = "playbook"
+CONF_PLAYBOOKS = "playbooks"
 CONF_MIN_POWER = "min_power"
 CONF_MAX_POWER = "max_power"
 CONF_ON_TIME = "on_time"
@@ -150,17 +152,14 @@ ATTR_IS_GROUP = "is_group"
 ATTR_SOURCE_ENTITY = "source_entity"
 ATTR_SOURCE_DOMAIN = "source_domain"
 
+SERVICE_ACTIVATE_PLAYBOOK = "activate_playbook"
+SERVICE_STOP_PLAYBOOK = "stop_playbook"
 SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_CALIBRATE_UTILITY_METER = "calibrate_utility_meter"
 SERVICE_CALIBRATE_ENERGY = "calibrate_energy"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
-
-MODE_LUT = "lut"
-MODE_LINEAR = "linear"
-MODE_FIXED = "fixed"
-MODE_WLED = "wled"
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
 
@@ -171,6 +170,7 @@ class CalculationStrategy(StrEnum):
     LUT = "lut"
     LINEAR = "linear"
     FIXED = "fixed"
+    PLAYBOOK = "playbook"
     WLED = "wled"
 
 
