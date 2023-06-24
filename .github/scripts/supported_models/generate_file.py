@@ -21,7 +21,7 @@ DEVICE_TYPES = [
     ("light", "Lights"),
     ("smart_speaker", "Smart speakers"),
     ("smart_switch", "Smart switches / plugs"),
-    ("network", "Networking")
+    ("network", "Networking"),
 ]
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))

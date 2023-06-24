@@ -39,4 +39,3 @@ async def test_network_device(
     await hass.async_block_till_done()
 
     assert hass.states.get(power_sensor_id).state == "0.00"
-
