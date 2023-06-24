@@ -63,7 +63,7 @@ def generate_supported_model_list(model_listing: list[dict]):
                 model["model"],
                 model["name"],
                 "<br />".join(model.get("aliases") or []),
-                model["standby_power"],
+                model.get("standby_power") or 0,
             ]
             if device_type[0] == "light":
                 row.append(",".join(model.get("color_modes") or []))
