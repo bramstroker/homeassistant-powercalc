@@ -16,7 +16,6 @@
         },
         "standby_power": {
             "type": "number",
-            "minimum": 0.05,
             "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
         },
         "standby_power_on": {
