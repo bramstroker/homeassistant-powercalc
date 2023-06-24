@@ -300,7 +300,7 @@ class LightRunner(MeasurementRunner):
     @staticmethod
     def calculate_time_left(
         variations: list[Variation],
-        current_variation: Variation = None,
+        current_variation: Variation | None = None,
         progress: int = 0,
     ) -> str:
         """Try to guess the remaining time left. This will not account for measuring errors / retries obviously"""
@@ -378,8 +378,7 @@ class LightRunner(MeasurementRunner):
                 )
                 # Wait a longer amount of time for the PM to settle
                 time.sleep(config.SLEEP_TIME_NUDGE)
-                power = self.take_power_measurement(variation_start_time)
-                return power
+                return self.take_power_measurement(variation_start_time)
             except OutdatedMeasurementError:
                 continue
             except ZeroReadingError as error:

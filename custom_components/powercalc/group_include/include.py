@@ -112,13 +112,13 @@ def resolve_light_group_entities(
     entity_reg = entity_registry.async_get(hass)
     light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
     light_group = next(
-        filter(lambda entity: entity.entity_id == group_id, light_component.entities),  # type: ignore
+        filter(lambda entity: entity.entity_id == group_id, light_component.entities),
         None,
     )
-    if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:  # type: ignore
+    if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
         raise SensorConfigurationError(f"Light group {group_id} not found")
 
-    entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
+    entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
     for entity_id in entity_ids:
         registry_entry = entity_reg.async_get(entity_id)
         if registry_entry is None:

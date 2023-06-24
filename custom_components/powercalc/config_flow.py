@@ -774,11 +774,10 @@ class OptionsFlowHandler(OptionsFlow):
         if self.sensor_type == SensorType.GROUP:
             data_schema = _create_group_options_schema(self.hass)
 
-        data_schema = _fill_schema_defaults(
+        return _fill_schema_defaults(
             data_schema,
             self.current_config | strategy_options,
         )
-        return data_schema
 
 
 async def _create_strategy_object(
