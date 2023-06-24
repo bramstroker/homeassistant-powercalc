@@ -7,7 +7,7 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, NamedTuple
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
@@ -853,6 +853,7 @@ class EntitiesBucket:
         return bool(self.new) or bool(self.existing)
 
 
-class CreationContext(NamedTuple):
-    group: bool = False
-    entity_config: ConfigType = {}
+@dataclass
+class CreationContext:
+    group: bool = field(default=False)
+    entity_config: ConfigType = field(default_factory=dict)

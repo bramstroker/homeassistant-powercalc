@@ -154,7 +154,7 @@ class VideoStream:
         """
         self.stopped = True
 
-    def capture_image(self, frame: numpy.ndarray = None, captures: int = 0) -> int:
+    def capture_image(self, frame: numpy.ndarray | None = None, captures: int = 0) -> int:
         """
         Capture a .jpg during CV2 video stream. Saves to a folder /images in working directory.
 
@@ -349,7 +349,7 @@ class OCR:
     def render(self, frame: numpy.ndarray) -> numpy.ndarray:
         if self.measurement is None:
             return frame
-        frame = cv2.putText(
+        return cv2.putText(
             frame,
             str(self.measurement),
             (100, 100),
@@ -357,7 +357,6 @@ class OCR:
             1.5,
             (0, 255, 0),
         )
-        return frame
 
     def validate_measurement(self, measurement: Decimal) -> bool:
         if measurement > 100:

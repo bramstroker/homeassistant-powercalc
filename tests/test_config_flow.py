@@ -1121,11 +1121,10 @@ async def _set_virtual_power_configuration(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     if advanced_options is None:
         advanced_options = {}
-    result = await hass.config_entries.flow.async_configure(
+    return await hass.config_entries.flow.async_configure(
         result["flow_id"],
         advanced_options,
     )
-    return result
 
 
 async def _select_sensor_type(
