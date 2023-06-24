@@ -3,7 +3,6 @@
 	"measure_method": "manual",
 	"measure_device": "NOUS A1Z",
 	"name": "FRITZ!Repeater 1200 AX",
-	"standby_power": 0,
 	"sensor_config": {
 		"power_sensor_naming": "{} Device Power",
 		"energy_sensor_naming": "{} Device Energy"
