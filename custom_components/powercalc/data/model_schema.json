@@ -4,7 +4,6 @@
     "type": "object",
     "required": [
         "name",
-        "standby_power",
         "measure_method",
         "measure_device",
         "calculation_strategy"
@@ -16,6 +15,7 @@
         },
         "standby_power": {
             "type": "number",
+            "minimum": 0.05,
             "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
         },
         "standby_power_on": {
