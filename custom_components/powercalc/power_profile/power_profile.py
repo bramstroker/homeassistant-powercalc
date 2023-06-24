@@ -7,6 +7,7 @@ import re
 from typing import NamedTuple, Protocol
 
 from homeassistant.backports.enum import StrEnum
+from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -28,6 +29,7 @@ class DeviceType(StrEnum):
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
+    NETWORK = "network"
 
 
 class SubProfileMatcherType(StrEnum):
@@ -41,6 +43,7 @@ DEVICE_DOMAINS = {
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
+    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
 }
 
 

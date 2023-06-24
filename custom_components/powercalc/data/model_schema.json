@@ -62,7 +62,8 @@
             "enum": [
                 "light",
                 "smart_switch",
-                "smart_speaker"
+                "smart_speaker",
+                "network"
             ],
             "description": "Type of device"
         },
