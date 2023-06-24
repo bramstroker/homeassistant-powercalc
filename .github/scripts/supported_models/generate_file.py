@@ -20,7 +20,8 @@ from aliases import MANUFACTURER_DIRECTORY_MAPPING  # noqa: E402
 DEVICE_TYPES = [
     ("light", "Lights"),
     ("smart_speaker", "Smart speakers"),
-    ("smart_switch", "Smart switches"),
+    ("smart_switch", "Smart switches / plugs"),
+    ("network", "Networking")
 ]
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
