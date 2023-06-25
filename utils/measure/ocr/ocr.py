@@ -155,7 +155,9 @@ class VideoStream:
         self.stopped = True
 
     def capture_image(
-        self, frame: numpy.ndarray | None = None, captures: int = 0,
+        self,
+        frame: numpy.ndarray | None = None,
+        captures: int = 0,
     ) -> int:
         """
         Capture a .jpg during CV2 video stream. Saves to a folder /images in working directory.

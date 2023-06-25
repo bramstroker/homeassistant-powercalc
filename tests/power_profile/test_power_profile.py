@@ -134,7 +134,9 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
             "light.test",
             "test",
             "light",
-            entity_entry=RegistryEntry(entity_id="light.test", unique_id="1234", platform="hue"),
+            entity_entry=RegistryEntry(
+                entity_id="light.test", unique_id="1234", platform="hue"
+            ),
         ),
     )
 
