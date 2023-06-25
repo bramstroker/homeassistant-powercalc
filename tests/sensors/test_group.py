@@ -1161,7 +1161,9 @@ async def test_storage_version_1(hass: HomeAssistant) -> None:
     assert store_state is None
 
 
-async def test_unknown_member_config_entry_is_skipped_from_group(hass: HomeAssistant) -> None:
+async def test_unknown_member_config_entry_is_skipped_from_group(
+    hass: HomeAssistant,
+) -> None:
     member_entry = await setup_config_entry(
         hass,
         {
@@ -1181,7 +1183,9 @@ async def test_unknown_member_config_entry_is_skipped_from_group(hass: HomeAssis
         },
     )
 
-    assert hass.states.get("sensor.group_power").attributes.get("entities") == {"sensor.test_power"}
+    assert hass.states.get("sensor.group_power").attributes.get("entities") == {
+        "sensor.test_power"
+    }
 
 
 async def _create_energy_group(
