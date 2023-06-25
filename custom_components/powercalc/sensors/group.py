@@ -237,8 +237,6 @@ async def remove_power_sensor_from_associated_groups(
 
     for group_entry in group_entries:
         member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-        if config_entry.entry_id not in member_sensors:
-            continue
         member_sensors.remove(config_entry.entry_id)
 
         hass.config_entries.async_update_entry(
