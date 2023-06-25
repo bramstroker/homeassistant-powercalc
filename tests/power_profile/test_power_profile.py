@@ -125,6 +125,20 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
     )
 
 
+async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
+    power_profile = await ProfileLibrary.factory(hass).get_profile(
+        ModelInfo("signify", "LOM001"),
+    )
+    assert power_profile.is_entity_domain_supported(
+        SourceEntity(
+            "light.test",
+            "test",
+            "light",
+            entity_entry=RegistryEntry(entity_id="light.test", unique_id="1234", platform="hue"),
+        ),
+    )
+
+
 async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo("Test", "Test"),

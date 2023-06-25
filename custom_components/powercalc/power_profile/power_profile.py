@@ -243,7 +243,7 @@ class PowerProfile:
             self.device_type == DeviceType.SMART_SWITCH
             and entity_entry
             and entity_entry.platform in ["hue"]
-        ):
+        ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
         return DEVICE_DOMAINS[self.device_type] == source_entity.domain
 

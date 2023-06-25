@@ -92,6 +92,15 @@ async def test_stop_playbook_service(hass: HomeAssistant) -> None:
         },
     )
 
+    # Calling stop on a non running playbook should not raise an error.
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_STOP_PLAYBOOK,
+        {ATTR_ENTITY_ID: "sensor.test_power"},
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
     await hass.services.async_call(
         DOMAIN,
         SERVICE_ACTIVATE_PLAYBOOK,
