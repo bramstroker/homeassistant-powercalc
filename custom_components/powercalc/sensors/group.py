@@ -418,7 +418,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     """Base class for grouped sensors."""
 
     _attr_should_poll = False
-    _throttle_interval = 30
 
     def __init__(
         self,
@@ -450,6 +449,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
+        state_listener = self.on_state_change
         if isinstance(self, GroupedEnergySensor):
             last_state = await self.async_get_last_state()
             last_sensor_state = await self.async_get_last_sensor_data()
@@ -470,13 +470,16 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             except DecimalException as err:
                 _LOGGER.warning("Could not restore last state: %s", err)
 
+            # throttle group energy updates to only once each 30 seconds
+            state_listener = Throttle(timedelta(seconds=30))(state_listener)
+
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
                 self._entities,
-                self.on_state_change,
+                state_listener,
             ),
         )
 
@@ -506,7 +509,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    @Throttle(timedelta(seconds=_throttle_interval))
     def on_state_change(self, event: Event) -> None:
         """Triggered when one of the group entities changes state."""
         if self.hass.state != CoreState.running:  # pragma: no cover
@@ -564,7 +566,6 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
-    _throttle_interval = 1
 
     def calculate_new_state(
         self,
