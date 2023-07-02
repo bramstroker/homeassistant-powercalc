@@ -28,6 +28,7 @@ from homeassistant.const import (
     UnitOfEnergy,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.device_registry import (
     DeviceEntry,
     DeviceEntryDisabler,
@@ -105,7 +106,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
 
 
-async def test_legacy_yaml_platform_configuration(hass: HomeAssistant) -> None:
+async def test_legacy_yaml_platform_configuration(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
     assert await async_setup_component(
         hass,
         sensor.DOMAIN,
@@ -120,6 +121,7 @@ async def test_legacy_yaml_platform_configuration(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power")
+    assert issue_registry.async_get_issue(DOMAIN, "powercalc_deprecated_yaml")
 
 
 async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
