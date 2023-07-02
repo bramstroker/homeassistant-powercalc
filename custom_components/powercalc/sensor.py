@@ -33,6 +33,7 @@ from homeassistant.helpers.entity_registry import (
     EVENT_ENTITY_REGISTRY_UPDATED,
     RegistryEntryDisabler,
 )
+from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
@@ -254,6 +255,26 @@ async def async_setup_platform(
     discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Setup sensors from YAML config sensor entries."""
+
+    # Legacy sensor platform config is used. Raise an issue.
+    if not discovery_info and config:
+        async_create_issue(
+            hass,
+            DOMAIN,
+            "powercalc_deprecated_yaml",
+            breaks_in_ha_version=None,
+            is_fixable=False,
+            severity=IssueSeverity.WARNING,
+            learn_more_url="https://homeassistant-powercalc.readthedocs.io/en/latest/configuration/new-yaml-configuration.yaml",
+            translation_key="deprecated_platform_yaml",
+            translation_placeholders={"platform": SENSOR_DOMAIN},
+        )
+
+    # Support new YAML configuration structure. powercalc -> sensors.
+    if discovery_info and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML:
+        config = discovery_info
+        discovery_info = None
+
     await _async_setup_entities(
         hass,
         config,

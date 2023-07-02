@@ -1,7 +1,7 @@
 import logging
 
 import pytest
-from homeassistant.components import sensor, utility_meter
+from homeassistant.components import utility_meter
 from homeassistant.components.utility_meter.sensor import (
     ATTR_SOURCE_ID,
     ATTR_STATUS,
@@ -10,7 +10,7 @@ from homeassistant.components.utility_meter.sensor import (
     CONF_UNIQUE_ID,
     PAUSED,
 )
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
@@ -25,7 +25,6 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_ID,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
-    DOMAIN,
     CalculationStrategy,
 )
 from tests.common import create_input_boolean, run_powercalc_setup
@@ -38,24 +37,17 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    await async_setup_component(
+    await run_powercalc_setup(
         hass,
-        sensor.DOMAIN,
         {
-            sensor.DOMAIN: [
-                {
-                    CONF_PLATFORM: DOMAIN,
-                    CONF_ENTITY_ID: "input_boolean.test",
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: {CONF_POWER: 50},
-                    CONF_CREATE_UTILITY_METERS: True,
-                    CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
-                    CONF_UTILITY_METER_TYPES: ["daily"],
-                },
-            ],
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: ["daily"],
         },
     )
-    await hass.async_block_till_done()
 
     tariff_select = hass.states.get("select.test_energy_daily")
     assert tariff_select

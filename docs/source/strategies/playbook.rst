@@ -33,13 +33,13 @@ The examples below will both create a ``sensor.washing_machine_power``
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: switch.washing_machine
-        playbook:
-          playbooks:
-            program1: program1.csv
-            program2: program2.csv
+    powercalc:
+      sensors:
+        - entity_id: switch.washing_machine
+          playbook:
+            playbooks:
+              program1: program1.csv
+              program2: program2.csv
 
 this will also add the powercalc sensor to your washing machine device.
 
@@ -47,13 +47,13 @@ or when you don't have an entity to bind to, just use dummy and define a name.
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: sensor.dummy
-        name: Washing machine
-        playbook:
-          playbooks:
-            ...
+    powercalc:
+      sensors:
+        - entity_id: sensor.dummy
+          name: Washing machine
+          playbook:
+            playbooks:
+              ...
 
 
 Executing the playbook

@@ -21,6 +21,7 @@ from .const import (
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_SENSORS,
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
     DISCOVERY_TYPE,
@@ -265,7 +266,7 @@ class DiscoveryManager:
         """Looks at the YAML and GUI config entries for all the configured entity_id's."""
         entities = []
 
-        # Find entity ids in yaml config
+        # Find entity ids in yaml config (Legacy)
         if SENSOR_DOMAIN in self.ha_config:
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
             platform_entries = [
@@ -275,6 +276,13 @@ class DiscoveryManager:
             ]
             for entry in platform_entries:
                 entities.extend(self._find_entity_ids_in_yaml_config(entry))
+
+        # Find entity ids in yaml config (New)
+        domain_config: ConfigType = self.ha_config.get(DOMAIN, {})
+        if CONF_SENSORS in domain_config:
+            sensors = domain_config[CONF_SENSORS]
+            for sensor_config in sensors:
+                entities.extend(self._find_entity_ids_in_yaml_config(sensor_config))
 
         # Add entities from existing config entries
         entities.extend(

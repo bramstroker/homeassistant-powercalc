@@ -21,7 +21,6 @@ from homeassistant.const import (
     STATE_UNKNOWN,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
-from homeassistant.setup import async_setup_component
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
@@ -51,7 +50,6 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    DOMAIN,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
 )
@@ -109,12 +107,10 @@ async def test_use_real_power_sensor_in_group(hass: HomeAssistant) -> None:
 async def test_rounding_precision(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    config = {CONF_POWER_SENSOR_PRECISION: 4}
-    await async_setup_component(hass, DOMAIN, {DOMAIN: config})
-
     await run_powercalc_setup(
         hass,
         get_simple_fixed_config("input_boolean.test", 50),
+        {CONF_POWER_SENSOR_PRECISION: 4},
     )
 
     state = hass.states.get("sensor.test_power")

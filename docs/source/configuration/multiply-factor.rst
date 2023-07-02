@@ -12,9 +12,10 @@ Let's assume you have a combination of 4 GU10 spots in your ceiling in a light g
 
 .. code-block:: yaml
 
-    - platform: powercalc
-      entity_id: light.livingroom_spots
-      multiply_factor: 4
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_spots
+          multiply_factor: 4
 
 This will add the power sensor `sensor.livingroom_spots_power` and the measured power will be multiplied by 4, as the original measurements are for 1 spot.
 
@@ -22,10 +23,11 @@ By default the multiply factor will **NOT** be applied to the standby power, you
 
 .. code-block:: yaml
 
-    - platform: powercalc
-      entity_id: light.livingroom_spots
-      multiply_factor: 4
-      multiply_factor_standby: true
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_spots
+          multiply_factor: 4
+          multiply_factor_standby: true
 
 .. tip::
     a multiply_factor lower than 1 will decrease the power. For example 0.5 will half the power.

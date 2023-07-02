@@ -50,10 +50,10 @@ You can also change the base sensor name with the ``name`` option
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.patio
-        name: Patio Light
+    powercalc:
+      sensors:
+        - entity_id: light.patio
+          name: Patio Light
 
 will create:
 

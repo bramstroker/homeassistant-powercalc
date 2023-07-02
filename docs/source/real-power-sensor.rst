@@ -7,11 +7,11 @@ to use an existing power sensor and let powercalc create the energy sensors and 
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.toilet
-        power_sensor_id: sensor.toilet_light_power
-        force_energy_sensor_creation: true # optional
+    powercalc:
+      sensors:
+        - entity_id: light.toilet
+          power_sensor_id: sensor.toilet_light_power
+          force_energy_sensor_creation: true # optional
 
 This also enables you to combine virtual power sensors (created with powercalc) and existing power sensors in your HA installation into
 a group. Without this configuration option power_sensor_id that would not be possible.

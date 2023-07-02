@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import homeassistant.helpers.entity_registry as er
 import pytest
-from homeassistant.components import light
+from homeassistant.components import light, sensor
 from homeassistant.components.integration.sensor import ATTR_SOURCE_ID
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -12,7 +12,6 @@ from homeassistant.components.light import (
     ATTR_SUPPORTED_COLOR_MODES,
     ColorMode,
 )
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
 from homeassistant.const import (
@@ -104,6 +103,23 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
     )
     assert energy_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_power"
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
+
+
+async def test_legacy_yaml_platform_configuration(hass: HomeAssistant) -> None:
+    assert await async_setup_component(
+        hass,
+        sensor.DOMAIN,
+        {
+            sensor.DOMAIN: {
+                CONF_PLATFORM: DOMAIN,
+                CONF_ENTITY_ID: "input_boolean.test",
+                CONF_FIXED: {CONF_POWER: 50},
+            },
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power")
 
 
 async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
@@ -207,7 +223,7 @@ async def test_light_lut_strategy(
 
     await run_powercalc_setup(
         hass,
-        {CONF_PLATFORM: DOMAIN, CONF_ENTITY_ID: light_entity_id},
+        {CONF_ENTITY_ID: light_entity_id},
     )
 
     state = hass.states.get("sensor.test1_power")
@@ -241,29 +257,17 @@ async def test_error_when_configuring_same_entity_twice(
 async def test_alternate_naming_strategy(hass: HomeAssistant) -> None:
     await create_input_boolean(hass)
 
-    assert await async_setup_component(
+    await run_powercalc_setup(
         hass,
-        DOMAIN,
         {
-            DOMAIN: {
-                CONF_POWER_SENSOR_NAMING: "{} Power consumption",
-                CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
-                CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
-                CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
-            },
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_FIXED: {CONF_POWER: 25},
         },
-    )
-    await hass.async_block_till_done()
-
-    assert await async_setup_component(
-        hass,
-        SENSOR_DOMAIN,
         {
-            SENSOR_DOMAIN: {
-                "platform": DOMAIN,
-                CONF_ENTITY_ID: "input_boolean.test",
-                CONF_FIXED: {CONF_POWER: 25},
-            },
+            CONF_POWER_SENSOR_NAMING: "{} Power consumption",
+            CONF_POWER_SENSOR_FRIENDLY_NAMING: "{} Power friendly",
+            CONF_ENERGY_SENSOR_NAMING: "{} Energy kwh",
+            CONF_ENERGY_SENSOR_FRIENDLY_NAMING: "{} Energy friendly",
         },
     )
     await hass.async_block_till_done()
