@@ -223,5 +223,11 @@
                 }
             }
         }
+    },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "title": "Powercalc YAML configuration has moved",
+            "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`"
+        }
     }
 }

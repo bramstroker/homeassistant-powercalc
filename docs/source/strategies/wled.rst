@@ -29,8 +29,8 @@ Configuration options
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.wled_lightstrip
-        wled:
-          voltage: 5
+    powercalc:
+      sensors:
+        - entity_id: light.wled_lightstrip
+          wled:
+            voltage: 5

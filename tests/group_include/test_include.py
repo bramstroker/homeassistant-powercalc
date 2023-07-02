@@ -31,10 +31,18 @@ from tests.common import (
 )
 
 
+@pytest.mark.parametrize(
+    "area_input",
+    [
+        pytest.param("bathroom_1", id="by id"),
+        pytest.param("Bathroom 1", id="by name"),
+    ],
+)
 async def test_include_area(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     area_reg: AreaRegistry,
+    area_input: str,
 ) -> None:
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
@@ -45,22 +53,12 @@ async def test_include_area(
 
     await run_powercalc_setup(
         hass,
-        {CONF_CREATE_GROUP: "Test include", CONF_INCLUDE: {CONF_AREA: "bathroom_1"}},
+        {CONF_CREATE_GROUP: "Test include", CONF_INCLUDE: {CONF_AREA: area_input}},
     )
 
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
-
-    await run_powercalc_setup(
-        hass,
-        {
-            CONF_CREATE_GROUP: "Test include area by name",
-            CONF_INCLUDE: {CONF_AREA: "Bathroom 1"},
-        },
-    )
-
-    assert hass.states.get("sensor.test_include_area_by_name_power")
 
 
 async def test_include_area_not_found(

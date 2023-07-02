@@ -8,7 +8,6 @@ from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_PLATFORM,
     CONF_UNIT_OF_MEASUREMENT,
     UnitOfEnergy,
     UnitOfPower,
@@ -96,7 +95,6 @@ async def test_daily_energy_sensor_from_kwh_value(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 12,
@@ -131,7 +129,6 @@ async def test_utility_meters_are_created(hass: HomeAssistant) -> None:
     await run_powercalc_setup(
         hass,
         {
-            CONF_PLATFORM: DOMAIN,
             CONF_NAME: "IP camera upstairs",
             CONF_DAILY_FIXED_ENERGY: {
                 CONF_VALUE: 12,

@@ -32,12 +32,12 @@ Configuration options
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.livingroom_floorlamp
-        linear:
-          min_power: 0.5
-          max_power: 8
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_floorlamp
+          linear:
+            min_power: 0.5
+            max_power: 8
 
 .. note::
 
@@ -53,16 +53,16 @@ Also you can use this calibration table for other entities than lights and fans,
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.livingroom_floorlamp
-        linear:
-          calibrate:
-            - 1 -> 0.3
-            - 10 -> 1.25
-            - 50 -> 3.50
-            - 100 -> 6.8
-            - 255 -> 15.3
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_floorlamp
+          linear:
+            calibrate:
+              - 1 -> 0.3
+              - 10 -> 1.25
+              - 50 -> 3.50
+              - 100 -> 6.8
+              - 255 -> 15.3
 
 .. note::
     For lights the supplied values must be in brightness range 1-255, when you select 1 in lovelace UI slider this is actually brightness level 3.
@@ -72,28 +72,28 @@ Configuration with a sensor (`sensor.heater_modulation`) which supplies a percen
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: sensor.heater_modulation
-        name: Heater
-        linear:
-          calibrate:
-            - 1 -> 200
-            - 100 -> 1650
+    powercalc:
+      sensors:
+        - entity_id: sensor.heater_modulation
+          name: Heater
+          linear:
+            calibrate:
+              - 1 -> 200
+              - 100 -> 1650
 
 You could also use this to setup a power profile for your robot vacuum cleaner, which only consumes power when it is docked into the charching port. You need to use this in conjunction with the ``calculation_enabled_condition`` to only activate the power calculation when the device is docked.
 
 .. code-block:: yaml
 
-    sensor:
-        - platform: powercalc
-          entity_id: vacuum.my_robot_cleaner
+    powercalc:
+      sensors:
+        - entity_id: vacuum.my_robot_cleaner
           calculation_enabled_condition: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}"
           linear:
             attribute: battery_level
             calibrate:
-                - 1 -> 20
-                - 79 -> 20
-                - 80 -> 15
-                - 99 -> 8
-                - 100 -> 1.5
+              - 1 -> 20
+              - 79 -> 20
+              - 80 -> 15
+              - 99 -> 8
+              - 100 -> 1.5

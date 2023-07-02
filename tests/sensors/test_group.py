@@ -1184,7 +1184,7 @@ async def test_unknown_member_config_entry_is_skipped_from_group(
     )
 
     assert hass.states.get("sensor.group_power").attributes.get("entities") == {
-        "sensor.test_power"
+        "sensor.test_power",
     }
 
 

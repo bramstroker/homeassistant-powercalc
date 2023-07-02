@@ -27,23 +27,23 @@ This will add 0.05 kWh per day to the energy sensor called "IP camera upstairs"
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        name: IP camera upstairs
-        daily_fixed_energy:
-          value: 0.05
+    powercalc:
+      sensors:
+        - name: IP camera upstairs
+          daily_fixed_energy:
+            value: 0.05
 
 Or define in watts, with an optional on time (which is 24 hour a day by default).
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        name: Intercom
-        daily_fixed_energy:
-          value: 21
-          unit_of_measurement: W
-          on_time: 12:00:00
+    powercalc:
+      sensors:
+        - name: Intercom
+          daily_fixed_energy:
+            value: 21
+            unit_of_measurement: W
+            on_time: 12:00:00
 
 This will simulate the device using 21 watts for 12 hours a day. The energy sensor will increase by 0.252 kWh a day.
 

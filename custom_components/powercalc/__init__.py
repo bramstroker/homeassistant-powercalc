@@ -46,6 +46,7 @@ from .const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
@@ -75,6 +76,7 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
+from .sensor import SENSOR_CONFIG
 from .sensors.group import (
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
@@ -159,6 +161,10 @@ CONFIG_SCHEMA = vol.Schema(
                     ),
                     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
                     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
+                    vol.Optional(CONF_SENSORS): vol.All(
+                        cv.ensure_list,
+                        [SENSOR_CONFIG],
+                    ),
                 },
             ),
         ),
@@ -213,6 +219,19 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
         discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
+
+    if CONF_SENSORS in domain_config:
+        for sensor_config in domain_config.get(CONF_SENSORS):
+            sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
+            hass.async_create_task(
+                async_load_platform(
+                    hass,
+                    Platform.SENSOR,
+                    DOMAIN,
+                    sensor_config,
+                    config,
+                ),
+            )
 
     domain_groups: list[str] | None = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
     if domain_groups:

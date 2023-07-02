@@ -29,28 +29,28 @@ For most lights the device information in HA will detect the manufacturer and mo
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.livingroom_floorlamp
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_floorlamp
 
 When the correct manufacturer and model could somehow not be discovered from HA, you can supply these manually.
 You can also use this option to force using a certain LUT.
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.livingroom_floorlamp
-        manufacturer: signify
-        model: LCT010
+    powercalc:
+      sensors:
+        - entity_id: light.livingroom_floorlamp
+          manufacturer: signify
+          model: LCT010
 
 Some light models (currently LIFX brand) require you to refer a so called "sub profile" directory, because they have different power charasteristics based on some information not known to HA. For example LIFX BR30 Night Vision light has some infrared mode which can be set in the LIFX app. To load the LUT file for a infrared setting of 25 you can use the following configuration.
 You will need to lookup the available sub LUT's in the powercalc data directory.
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.lifx_nighvision
-        manufacturer: lifx
-        model: LIFX BR30 Night Vision/infrared_25
+    powercalc:
+      sensors:
+        - entity_id: light.lifx_nighvision
+          manufacturer: lifx
+          model: LIFX BR30 Night Vision/infrared_25

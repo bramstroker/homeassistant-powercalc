@@ -23,31 +23,31 @@ Configuration options
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.nondimmabled_bulb
-        fixed:
-          power: 20
+    powercalc:
+      sensors:
+        - entity_id: light.nondimmabled_bulb
+          fixed:
+            power: 20
 
 **Using a template for the power value**
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: light.bathroom
-        fixed:
-          power: "{{states('input_number.bathroom_watts')}}"
+    powercalc:
+      sensors:
+        - entity_id: light.bathroom
+          fixed:
+            power: "{{states('input_number.bathroom_watts')}}"
 
 When you don't have a source entity or helper (ex. `input_boolean`) to bind on and you just want the power sensor to reflect the template value you can use `sensor.dummy` as the entity_id
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: sensor.dummy
-        fixed:
-          power: "{{states('input_number.bathroom_watts')}}"
+    powercalc:
+      sensors:
+        - entity_id: sensor.dummy
+          fixed:
+            power: "{{states('input_number.bathroom_watts')}}"
 
 Power per state
 ---------------
@@ -55,14 +55,14 @@ The `states_power` setting allows you to specify a power per entity state. This 
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: media_player.sonos_living
-        fixed:
-          states_power:
-            playing: 8.3
-            paused: 2.25
-            idle: 1.5
+    powercalc:
+      sensors:
+        - entity_id: media_player.sonos_living
+          fixed:
+            states_power:
+              playing: 8.3
+              paused: 2.25
+              idle: 1.5
 
 > Remark: You cannot use `off` in states_power as this is handled separately by powercalc. You'll need to use `standby_power` to indicate the power when the device is off.
 
@@ -70,14 +70,14 @@ You can also use state attributes. Use the `|` delimiter to seperate the attribu
 
 .. code-block:: yaml
 
-    sensor:
-      - platform: powercalc
-        entity_id: media_player.sonos_living
-        fixed:
-          power: 12
-          states_power:
-            media_content_id|Spotify: 5
-            media_content_id|Youtube: 10
+    powercalc:
+      sensors:
+        - entity_id: media_player.sonos_living
+          fixed:
+            power: 12
+            states_power:
+              media_content_id|Spotify: 5
+              media_content_id|Youtube: 10
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
 

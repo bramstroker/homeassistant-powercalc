@@ -223,5 +223,11 @@
       "group_mandatory": "[%key:component::powercalc::config::error::group_mandatory%]",
       "unknown": "[%key:component::powercalc::config::error::unknown%]"
     }
+  },
+  "issues": {
+    "deprecated_platform_yaml": {
+      "title": "Powercalc YAML configuration has moved",
+      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`"
+    }
   }
 }
