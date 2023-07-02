@@ -34,4 +34,5 @@ New configuration. Everything should move under the `powercalc->sensors` key, an
             power: 80
 
 .. note::
-    You probably already have a `powercalc:` entry in your configuration for global powercalc configuration. You'll need
+    You probably already have a `powercalc:` entry in your configuration for global powercalc configuration. You'll need to add `sensors` under that to prevent duplicating the `powercalc:` key.
+    When you use https://www.home-assistant.io/docs/configuration/packages/ you can of course have powercalc sensor definitions scattered accross multiple files.
