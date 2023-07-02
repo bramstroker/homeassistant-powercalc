@@ -278,8 +278,9 @@ class DiscoveryManager:
                 entities.extend(self._find_entity_ids_in_yaml_config(entry))
 
         # Find entity ids in yaml config (New)
-        if CONF_SENSORS in self.ha_config.get(DOMAIN, {}):
-            sensors = self.ha_config.get(DOMAIN)[CONF_SENSORS]
+        domain_config: ConfigType = self.ha_config.get(DOMAIN, {})
+        if CONF_SENSORS in domain_config:
+            sensors = domain_config[CONF_SENSORS]
             for sensor_config in sensors:
                 entities.extend(self._find_entity_ids_in_yaml_config(sensor_config))
 

@@ -220,18 +220,18 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
 
-    if CONF_SENSORS in domain_config:
-        for sensor_config in domain_config.get(CONF_SENSORS):
-            sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
-            hass.async_create_task(
-                async_load_platform(
-                    hass,
-                    Platform.SENSOR,
-                    DOMAIN,
-                    sensor_config,
-                    config,
-                ),
-            )
+    sensors: list = domain_config.get(CONF_SENSORS, [])
+    for sensor_config in sensors:
+        sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                Platform.SENSOR,
+                DOMAIN,
+                sensor_config,
+                config,
+            ),
+        )
 
     domain_groups: list[str] | None = domain_config.get(CONF_CREATE_DOMAIN_GROUPS)
     if domain_groups:
