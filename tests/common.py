@@ -92,18 +92,6 @@ async def run_powercalc_setup(
 ) -> None:
     config = {DOMAIN: domain_config or {}}
     if sensor_config:
-        # if isinstance(sensor_config, list):
-        #     for entry in sensor_config:
-        #         if CONF_PLATFORM not in entry:
-        #             entry[CONF_PLATFORM] = DOMAIN
-        # elif CONF_PLATFORM not in sensor_config:
-        #     sensor_config[CONF_PLATFORM] = DOMAIN
-        #
-        # config.update({sensor.DOMAIN: sensor_config})
-        # if "sensor" in hass.config.components:
-        #     hass.config.components.remove("sensor")
-        # assert await async_setup_component(hass, sensor.DOMAIN, config)
-        # await hass.async_block_till_done()
         if not isinstance(sensor_config, list):
             sensor_config = [sensor_config]
         config[DOMAIN][CONF_SENSORS] = sensor_config
