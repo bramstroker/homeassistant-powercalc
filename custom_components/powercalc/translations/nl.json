@@ -223,5 +223,11 @@
                 }
             }
         }
+    },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "title": "Powercalc YAML configuratie is verplaatst",
+            "description": "Configuratie middels `sensor->platform` is verouderd. Verander je configratie naar `powercalc->sensors`. Klik op 'Meer informatie' voor verder uitleg."
+        }
     }
 }
