@@ -271,7 +271,10 @@ async def async_setup_platform(
         )
 
     # Support new YAML configuration structure. powercalc -> sensors.
-    if discovery_info and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML:
+    if (
+        discovery_info
+        and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML
+    ):
         config = discovery_info
         discovery_info = None
 
