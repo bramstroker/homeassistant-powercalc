@@ -1,6 +1,6 @@
 - [Lights](#Lights) (267)
 - [Smart speakers](#Smart-speakers) (25)
-- [Smart switches / plugs](#Smart-switches-/-plugs) (28)
+- [Smart switches / plugs](#Smart-switches-/-plugs) (29)
 - [Networking](#Networking) (1)
 
 ## Lights
@@ -308,38 +308,39 @@
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame                       |   2.40|
 
 ## Smart switches / plugs
-#### 28 total
+#### 29 total
 
-|manufacturer|       model id       |                                       name                                        |                     aliases                      |standby|
-|------------|----------------------|-----------------------------------------------------------------------------------|--------------------------------------------------|------:|
-|arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |                                                  |  0.267|
-|arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |                                                  |  0.660|
-|arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|                                                  |  0.290|
-|avm         |FRITZ!DECT 200        |AVM Fritz!DECT 200                                                                 |                                                  |  0.450|
-|blitzwolf   |SHP6                  |Blitzwolf BW-SHP6 version 10A                                                      |                                                  |  0.500|
-|blitzwolf   |SHP6-15A              |Blitzwolf BW-SHP6 version 15A                                                      |                                                  |  0.400|
-|bosch       |PLUG_COMPACT          |Bosch PLUG_COMPACT                                                                 |                                                  |  0.240|
-|everspring  |AN158                 |Everspring AN158                                                                   |                                                  |  0.300|
-|fibaro      |FGWP102               |Fibaro FGWP102                                                                     |                                                  |  0.300|
-|greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |                                                  |  0.300|
-|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                  |  0.400|
-|innr        |SP 120                |Innr Zigbee Smart Plug                                                             |                                                  |  0.410|
-|innr        |SP 224                |Innr Zigbee Smart Plug                                                             |                                                  |  0.180|
-|neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |                                                  |  0.310|
-|nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |MSP-3-1-X1                                        |  0.670|
-|nous        |A1T                   |NOUS A1T                                                                           |                                                  |  0.290|
-|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |                                                  |  0.440|
-|qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |                                                  |  0.300|
-|shelly      |shelly plug s         |Shelly Plug S                                                                      |                                                  |  0.520|
-|signify     |LOM001                |Hue smart plug LOM001                                                              |                                                  |  0.230|
-|signify     |LOM002                |Hue smart plug LOM002                                                              |                                                  |  0.230|
-|signify     |LOM007                |Hue smart plug LOM007                                                              |                                                  |  0.150|
-|sonoff      |ZBMINI                |ZBMINI                                                                             |Zigbee two way smart switch (ZBMINI)<br />01MINIZB|  0.330|
-|tp-link     |HS100                 |HS100                                                                              |HS100(EU)                                         |  0.890|
-|tp-link     |HS110                 |HS110                                                                              |HS110(EU)                                         |  1.540|
-|tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU)                                         |  0.500|
-|tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |                                                  |  0.633|
-|tuya        |TS011F                |Smart plug (with power monitoring)                                                 |TS011F_plug_1<br />TS011F_plug_3<br />TS011F      |  0.130|
+|manufacturer|       model id       |                                       name                                        |                        aliases                        |standby|
+|------------|----------------------|-----------------------------------------------------------------------------------|-------------------------------------------------------|------:|
+|arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |                                                       |  0.267|
+|arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |                                                       |  0.660|
+|arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|                                                       |  0.290|
+|avm         |FRITZ!DECT 200        |AVM Fritz!DECT 200                                                                 |                                                       |  0.450|
+|blitzwolf   |SHP6                  |Blitzwolf BW-SHP6 version 10A                                                      |                                                       |  0.500|
+|blitzwolf   |SHP6-15A              |Blitzwolf BW-SHP6 version 15A                                                      |                                                       |  0.400|
+|bosch       |PLUG_COMPACT          |Bosch PLUG_COMPACT                                                                 |                                                       |  0.240|
+|everspring  |AN158                 |Everspring AN158                                                                   |                                                       |  0.300|
+|fibaro      |FGWP102               |Fibaro FGWP102                                                                     |                                                       |  0.300|
+|greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |                                                       |  0.300|
+|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                       |  0.400|
+|innr        |SP 120                |Innr Zigbee Smart Plug                                                             |                                                       |  0.410|
+|innr        |SP 224                |Innr Zigbee Smart Plug                                                             |                                                       |  0.180|
+|neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |                                                       |  0.310|
+|nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |MSP-3-1-X1                                             |  0.670|
+|nous        |A1T                   |NOUS A1T                                                                           |                                                       |  0.290|
+|nous        |A1Z                   |Smart plug (with power monitoring)                                                 |A1Z                                                    |  0.100|
+|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |                                                       |  0.440|
+|qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |                                                       |  0.300|
+|shelly      |shelly plug s         |Shelly Plug S                                                                      |                                                       |  0.520|
+|signify     |LOM001                |Hue smart plug LOM001                                                              |                                                       |  0.230|
+|signify     |LOM002                |Hue smart plug LOM002                                                              |                                                       |  0.230|
+|signify     |LOM007                |Hue smart plug LOM007                                                              |                                                       |  0.150|
+|sonoff      |ZBMINI                |ZBMINI                                                                             |Zigbee two way smart switch (ZBMINI)<br />01MINIZB     |  0.330|
+|tp-link     |HS100                 |HS100                                                                              |HS100(EU)                                              |  0.890|
+|tp-link     |HS110                 |HS110                                                                              |HS110(EU)                                              |  1.540|
+|tp-link     |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU)                                              |  0.500|
+|tp-link     |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |                                                       |  0.633|
+|tuya        |TS011F                |Smart plug (with power monitoring)                                                 |TS011F_plug_1<br />TS011F_plug_3<br />TS011F<br />BSD29|  0.130|
 
 ## Networking
 #### 1 total
