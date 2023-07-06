@@ -64,13 +64,6 @@ async def test_autodiscovery(hass: HomeAssistant, mock_flow_init: AsyncMock) -> 
     assert mock_calls[1][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[1][2]["data"][CONF_ENTITY_ID] == "light.testb"
 
-    # Also check if power sensors are created.
-    # Currently, we also create them directly, even without the user finishing the discovery flow
-    # In the future this behaviour may change.
-    assert hass.states.get("sensor.testa_power")
-    assert hass.states.get("sensor.testb_power")
-    assert not hass.states.get("sensor.testc_power")
-
 
 async def test_discovery_skipped_when_confirmed_by_user(
     hass: HomeAssistant,

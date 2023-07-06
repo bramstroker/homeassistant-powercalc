@@ -1,3 +1,6 @@
+from unittest.mock import AsyncMock
+
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
@@ -187,6 +190,7 @@ async def test_smart_switch_power_input_gui_config_flow(
 async def test_hue_smart_plug_is_discovered(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
 ) -> None:
     mock_entity_with_model_information(
         entity_id="switch.smartplug",
@@ -197,4 +201,6 @@ async def test_hue_smart_plug_is_discovered(
     )
     await run_powercalc_setup(hass, {})
 
-    assert hass.states.get("sensor.smartplug_device_power")
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
+    assert mock_calls[0][2]["context"] == {"source": SOURCE_INTEGRATION_DISCOVERY}
