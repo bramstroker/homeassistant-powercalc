@@ -603,13 +603,13 @@ async def create_sensors(
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-        entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))  # type: ignore
-        _LOGGER.debug("Found include entities: %s", entities)
-        sensor_configs = {
-            entity.entity_id: {CONF_ENTITY_ID: entity.entity_id}
-            for entity in entities
-            if await is_auto_configurable(hass, entity)
-        } | sensor_configs
+        include_entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))  # type: ignore
+        _LOGGER.debug("Found include entities: %s", include_entities)
+        for source_entity in include_entities:
+            if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+                entities_to_add.existing.extend(hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id])
+            elif await is_auto_configurable(hass, source_entity):
+                sensor_configs.update({source_entity.entity_id: {CONF_ENTITY_ID: source_entity.entity_id}})
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
