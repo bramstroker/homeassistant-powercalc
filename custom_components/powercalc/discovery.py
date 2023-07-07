@@ -11,7 +11,7 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import discovery, discovery_flow
+from homeassistant.helpers import discovery_flow
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
 
@@ -24,10 +24,8 @@ from .const import (
     CONF_SENSORS,
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
-    DISCOVERY_TYPE,
     DOMAIN,
     CalculationStrategy,
-    PowercalcDiscoveryType,
 )
 from .errors import ModelNotSupportedError
 from .power_profile.factory import get_power_profile
@@ -232,24 +230,6 @@ class DiscoveryManager:
             context={"source": SOURCE_INTEGRATION_DISCOVERY},
             data=discovery_data,
         )
-
-        # Code below if for legacy discovery routine, will be removed somewhere in the future
-        if power_profile and not power_profile.is_additional_configuration_required:
-            discovery_info = {
-                CONF_ENTITY_ID: source_entity.entity_id,
-                DISCOVERY_SOURCE_ENTITY: source_entity,
-                DISCOVERY_POWER_PROFILE: power_profile,
-                DISCOVERY_TYPE: PowercalcDiscoveryType.LIBRARY,
-            }
-            self.hass.async_create_task(
-                discovery.async_load_platform(
-                    self.hass,
-                    SENSOR_DOMAIN,
-                    DOMAIN,
-                    discovery_info,
-                    self.ha_config,
-                ),
-            )
 
     def _is_user_configured(self, entity_id: str) -> bool:
         """Check if user have setup powercalc sensors for a given entity_id.

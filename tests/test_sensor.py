@@ -107,7 +107,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
 
 
 async def test_legacy_yaml_platform_configuration(
-    hass: HomeAssistant, issue_registry: ir.IssueRegistry
+    hass: HomeAssistant, issue_registry: ir.IssueRegistry,
 ) -> None:
     assert await async_setup_component(
         hass,
