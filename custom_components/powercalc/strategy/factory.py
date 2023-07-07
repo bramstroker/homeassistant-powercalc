@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from homeassistant.const import CONF_CONDITION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
+    CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_PLAYBOOK,
@@ -13,6 +15,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
+    CONF_STRATEGIES,
     CONF_WLED,
     CalculationStrategy,
 )
@@ -145,13 +148,13 @@ class PowerCalculatorStrategyFactory:
         return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
 
     def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
-        composite_config = config.get("composite")
-        sub_strategies = composite_config.get("strategies")
+        composite_config = config.get(CONF_COMPOSITE)
+        sub_strategies = composite_config.get(CONF_STRATEGIES)
 
         def _resolve_strategy_instance(strategy_config: ConfigType) -> PowerCalculationStrategyInterface:
             strategy = detect_calculation_strategy(strategy_config, power_profile)
             return self.create(strategy_config, strategy, power_profile, source_entity)
 
-        strategies = [SubStrategy(config["condition"], _resolve_strategy_instance(config)) for config in sub_strategies]
+        strategies = [SubStrategy(config[CONF_CONDITION], _resolve_strategy_instance(config)) for config in sub_strategies]
 
         return CompositeStrategy(self._hass, strategies)

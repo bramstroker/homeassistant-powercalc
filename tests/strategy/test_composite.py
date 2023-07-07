@@ -1,16 +1,19 @@
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import (
+    CONF_CONDITION,
     CONF_ENTITY_ID,
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
+    CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_POWER,
+    CONF_STRATEGIES,
 )
 from tests.common import (
     run_powercalc_setup,
@@ -20,10 +23,10 @@ from tests.common import (
 async def test_composite(hass: HomeAssistant) -> None:
     sensor_config = {
         CONF_ENTITY_ID: "light.test",
-        "composite": {
-            "strategies": [
+        CONF_COMPOSITE: {
+            CONF_STRATEGIES: [
                 {
-                    "condition":
+                    CONF_CONDITION:
                         {
                             "condition": "numeric_state",
                             "entity_id": "sensor.temperature",
@@ -36,7 +39,7 @@ async def test_composite(hass: HomeAssistant) -> None:
                     },
                 },
                 {
-                    "condition":
+                    CONF_CONDITION:
                         {
                             "condition": "state",
                             "entity_id": "light.test",
