@@ -116,15 +116,12 @@ from .const import (
     SensorType,
     UnitPrefix,
 )
-from .discovery import autodiscover_model
 from .errors import (
-    ModelNotSupportedError,
     PowercalcSetupError,
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
 from .group_include.include import resolve_include_entities
-from .power_profile.factory import get_power_profile
 from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
@@ -608,8 +605,6 @@ async def create_sensors(
         for source_entity in include_entities:
             if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
                 entities_to_add.existing.extend(hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id])
-            elif await is_auto_configurable(hass, source_entity):
-                sensor_configs.update({source_entity.entity_id: {CONF_ENTITY_ID: source_entity.entity_id}})
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
@@ -830,32 +825,6 @@ async def check_entity_not_already_configured(
         entity_id in discovered_entities or entity_id in configured_entities
     ):
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
-
-
-async def is_auto_configurable(
-    hass: HomeAssistant,
-    entity_entry: er.RegistryEntry,
-    sensor_config: ConfigType | None = None,
-) -> bool:
-    try:
-        model_info = await autodiscover_model(hass, entity_entry)
-        if not model_info:
-            return False
-        power_profile = await get_power_profile(
-            hass,
-            sensor_config or {},
-            model_info=model_info,
-        )
-        if not power_profile:
-            return False
-        source_entity = await create_source_entity(entity_entry.entity_id, hass)
-        if not power_profile.is_entity_domain_supported(source_entity):
-            return False
-        if power_profile.has_sub_profiles and power_profile.sub_profile:
-            return True
-        return not power_profile.is_additional_configuration_required
-    except ModelNotSupportedError:
-        return False
 
 
 @dataclass

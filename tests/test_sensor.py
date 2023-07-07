@@ -64,7 +64,6 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from custom_components.powercalc.sensor import is_auto_configurable
 
 from .common import (
     create_input_boolean,
@@ -718,20 +717,6 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
 
     assert len(caplog.records) == 2
     assert "Skipping sensor setup" in caplog.text
-
-
-async def test_is_autoconfigurable_returns_false(
-    hass: HomeAssistant,
-    mock_entity_with_model_information: MockEntityWithModel,
-) -> None:
-    """
-    is_autoconfigurable should return False when the manufacturer / model is not found in the library
-    """
-    mock_entity_with_model_information("light.testa", "Foo", "Bar")
-
-    entity_reg = er.async_get(hass)
-    entity_entry = entity_reg.async_get("light.testa")
-    assert not await is_auto_configurable(hass, entity_entry)
 
 
 async def test_create_config_entry_without_energy_sensor(

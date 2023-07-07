@@ -1,14 +1,16 @@
 import logging
+import uuid
 
 import pytest
 from homeassistant.components import light
-from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID, STATE_OFF
+from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID, CONF_UNIQUE_ID, STATE_OFF
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     mock_device_registry,
     mock_registry,
 )
@@ -18,9 +20,14 @@ from custom_components.powercalc.const import (
     CONF_AREA,
     CONF_CREATE_GROUP,
     CONF_FILTER,
+    CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
+    CONF_POWER,
+    CONF_SENSOR_TYPE,
     CONF_TEMPLATE,
+    DOMAIN,
+    SensorType,
 )
 from custom_components.test.light import MockLight
 from tests.common import (
@@ -47,9 +54,9 @@ async def test_include_area(
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area = area_reg.async_get_or_create("Bathroom 1")
-    await hass.async_block_till_done()
     entity_reg.async_update_entity("light.bathroom_mirror", area_id=area.id)
-    await hass.async_block_till_done()
+
+    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
 
     await run_powercalc_setup(
         hass,
@@ -78,6 +85,8 @@ async def test_include_area_not_found(
 
 async def test_include_light_group(hass: HomeAssistant) -> None:
     discoverable_light = create_discoverable_light("bathroom_mirror")
+    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+
     non_discoverable_light = MockLight("bathroom_spots")
 
     await create_mock_light_entity(hass, [discoverable_light, non_discoverable_light])
@@ -126,6 +135,9 @@ async def test_include_domain(hass: HomeAssistant) -> None:
         ],
     )
 
+    _create_powercalc_config_entry(hass, "light.bathroom_spots")
+    _create_powercalc_config_entry(hass, "light.kitchen")
+
     await run_powercalc_setup(
         hass,
         [
@@ -155,6 +167,9 @@ async def test_include_template(hass: HomeAssistant) -> None:
             create_discoverable_light("kitchen", "2222"),
         ],
     )
+
+    _create_powercalc_config_entry(hass, "light.bathroom_spots")
+    _create_powercalc_config_entry(hass, "light.kitchen")
 
     template = "{{ states|selectattr('entity_id', 'eq', 'light.bathroom_spots')|map(attribute='entity_id')|list}}"
     await run_powercalc_setup(
@@ -186,6 +201,10 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         hass,
         [light_a, light_b, light_c, light_d, light_e, light_f],
     )
+
+    _create_powercalc_config_entry(hass, "light.light_a")
+    _create_powercalc_config_entry(hass, "light.light_e")
+    _create_powercalc_config_entry(hass, "light.light_f")
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -302,6 +321,9 @@ async def test_include_filter_domain(
         },
     )
 
+    _create_powercalc_config_entry(hass, "light.test_light")
+    _create_powercalc_config_entry(hass, "switch.test_switch")
+
     await run_powercalc_setup(
         hass,
         {
@@ -319,3 +341,19 @@ async def test_include_filter_domain(
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}
+
+
+def _create_powercalc_config_entry(hass: HomeAssistant, source_entity_id: str) -> MockConfigEntry:
+    unique_id = str(uuid.uuid4())
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_ENTITY_ID: source_entity_id,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+    return entry
