@@ -1,4 +1,4 @@
-
+from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import (
     CONF_ENTITY_ID,
     STATE_ON,
@@ -23,13 +23,26 @@ async def test_composite(hass: HomeAssistant) -> None:
         "composite": {
             "strategies": [
                 {
-                    "condition": "test",
+                    "condition":
+                        {
+                            "condition": "numeric_state",
+                            "entity_id": "sensor.temperature",
+                            "above": 17,
+                            "below": 25,
+                        }
+                    ,
                     CONF_FIXED: {
                         CONF_POWER: 50,
                     },
                 },
                 {
-                    "condition": "test",
+                    "condition":
+                        {
+                            "condition": "state",
+                            "entity_id": "light.test",
+                            "state": "on",
+                        }
+                    ,
                     CONF_LINEAR: {
                         CONF_MIN_POWER: 10,
                         CONF_MAX_POWER: 20,
@@ -41,7 +54,9 @@ async def test_composite(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass, sensor_config, {})
 
-    hass.states.async_set("light.test", STATE_ON)
+    hass.states.async_set("sensor.temperature", "12")
+    await hass.async_block_till_done()
+    hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_power").state == "50.00"
+    assert hass.states.get("sensor.test_power").state == "17.84"

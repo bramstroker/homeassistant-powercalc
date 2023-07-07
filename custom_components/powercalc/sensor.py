@@ -218,7 +218,7 @@ SENSOR_CONFIG = {
         vol.Required("strategies"): vol.All(
             cv.ensure_list,
             [vol.Schema({
-                vol.Required("condition"): cv.string,
+                vol.Required("condition"): cv.CONDITION_SCHEMA,
                 vol.Optional(CONF_FIXED): FIXED_SCHEMA,
                 vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
                 vol.Optional(CONF_WLED): WLED_SCHEMA,

@@ -154,4 +154,4 @@ class PowerCalculatorStrategyFactory:
 
         strategies = [SubStrategy(config["condition"], _resolve_strategy_instance(config)) for config in sub_strategies]
 
-        return CompositeStrategy(strategies)
+        return CompositeStrategy(self._hass, strategies)
