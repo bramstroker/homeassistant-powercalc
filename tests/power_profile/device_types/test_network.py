@@ -19,11 +19,14 @@ async def test_network_device(
 
     power_sensor_id = "sensor.wifi_repeater_device_power"
 
-    await run_powercalc_setup(hass, {
-        CONF_ENTITY_ID: binary_sensor_id,
-        CONF_MANUFACTURER: manufacturer,
-        CONF_MODEL:  model,
-    })
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: binary_sensor_id,
+            CONF_MANUFACTURER: manufacturer,
+            CONF_MODEL: model,
+        },
+    )
 
     power_state = hass.states.get(power_sensor_id)
     assert power_state
