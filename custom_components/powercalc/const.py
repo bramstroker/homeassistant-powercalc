@@ -168,6 +168,7 @@ OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
 class CalculationStrategy(StrEnum):
     """Possible virtual power calculation strategies."""
 
+    COMPOSITE = "composite"
     LUT = "lut"
     LINEAR = "linear"
     FIXED = "fixed"

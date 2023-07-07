@@ -50,11 +50,9 @@ from custom_components.powercalc.const import (
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_LINEAR,
-    CONF_MODE,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
-    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
@@ -85,6 +83,7 @@ from custom_components.powercalc.power_profile.power_profile import (
 )
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
+from custom_components.powercalc.strategy.selector import detect_calculation_strategy
 
 from .abstract import (
     BaseEntity,
@@ -180,7 +179,7 @@ async def create_virtual_power_sensor(
             sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
         )
 
-        strategy = select_calculation_strategy(sensor_config, power_profile)
+        strategy = detect_calculation_strategy(sensor_config, power_profile)
 
         calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[
             DOMAIN
@@ -282,35 +281,6 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
     if CONF_LINEAR in sensor_config:
         return True
     return False
-
-
-def select_calculation_strategy(
-    config: ConfigType,
-    power_profile: PowerProfile | None,
-) -> CalculationStrategy:
-    """Select the calculation strategy."""
-    config_mode = config.get(CONF_MODE)
-    if config_mode:
-        return CalculationStrategy(config_mode)
-
-    if config.get(CONF_LINEAR):
-        return CalculationStrategy.LINEAR
-
-    if config.get(CONF_FIXED):
-        return CalculationStrategy.FIXED
-
-    if config.get(CONF_PLAYBOOK):
-        return CalculationStrategy.PLAYBOOK
-
-    if config.get(CONF_WLED):
-        return CalculationStrategy.WLED
-
-    if power_profile:
-        return power_profile.calculation_strategy
-
-    raise UnsupportedStrategyError(
-        "Cannot select a strategy (LINEAR, FIXED or LUT, WLED), supply it in the config. See the readme",
-    )
 
 
 def is_fully_configured(config: ConfigType) -> bool:

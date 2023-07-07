@@ -22,10 +22,12 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
+from .composite import CompositeStrategy, SubStrategy
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
 from .lut import LutRegistry, LutStrategy
 from .playbook import PlaybookStrategy
+from .selector import detect_calculation_strategy
 from .strategy_interface import PowerCalculationStrategyInterface
 from .wled import WledStrategy
 
@@ -57,6 +59,9 @@ class PowerCalculatorStrategyFactory:
 
         if strategy == CalculationStrategy.WLED:
             return self._create_wled(source_entity, config)
+
+        if strategy == CalculationStrategy.COMPOSITE:
+            return self._create_composite(config, power_profile, source_entity)
 
         raise UnsupportedStrategyError("Invalid calculation mode", strategy)
 
@@ -138,3 +143,15 @@ class PowerCalculatorStrategyFactory:
     def _create_playbook(self, config: ConfigType) -> PlaybookStrategy:
         playbook_config = config.get(CONF_PLAYBOOK)
         return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
+
+    def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
+        composite_config = config.get("composite")
+        sub_strategies = composite_config.get("strategies")
+
+        def _resolve_strategy_instance(strategy_config: ConfigType) -> PowerCalculationStrategyInterface:
+            strategy = detect_calculation_strategy(strategy_config, power_profile)
+            return self.create(strategy_config, strategy, power_profile, source_entity)
+
+        strategies = [SubStrategy(config["condition"], _resolve_strategy_instance(config)) for config in sub_strategies]
+
+        return CompositeStrategy(strategies)

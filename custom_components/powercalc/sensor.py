@@ -214,6 +214,18 @@ SENSOR_CONFIG = {
         },
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
+    vol.Optional("composite"): vol.Schema({
+        vol.Required("strategies"): vol.All(
+            cv.ensure_list,
+            [vol.Schema({
+                vol.Required("condition"): cv.string,
+                vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+                vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+                vol.Optional(CONF_WLED): WLED_SCHEMA,
+                vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+            })],
+        ),
+    }),
 }
 
 
