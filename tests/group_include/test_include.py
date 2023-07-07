@@ -2,7 +2,7 @@ import logging
 
 import pytest
 from homeassistant.components import light
-from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID
+from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -312,6 +312,9 @@ async def test_include_filter_domain(
             },
         },
     )
+
+    hass.states.async_set("light.test_light", STATE_OFF)
+    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state

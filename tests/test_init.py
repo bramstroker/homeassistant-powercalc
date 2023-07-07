@@ -10,19 +10,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import create_domain_groups
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
+    CONF_MANUFACTURER,
+    CONF_MODEL,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
-    DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -94,7 +94,7 @@ async def test_unload_entry(hass: HomeAssistant, entity_reg: EntityRegistry) -> 
     assert entry.state is ConfigEntryState.NOT_LOADED
 
 
-async def test_domain_light_group_with_autodiscovery_enabled(
+async def test_domain_group_with_utility_meter(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
@@ -102,6 +102,19 @@ async def test_domain_light_group_with_autodiscovery_enabled(
     See https://github.com/bramstroker/homeassistant-powercalc/issues/939
     """
     mock_entity_with_model_information("light.testb", "signify", "LCA001")
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCA001",
+            CONF_UNIQUE_ID: "1234",
+            CONF_ENTITY_ID: "light.testb",
+        },
+        unique_id="1234",
+    )
+    entry.add_to_hass(hass)
 
     domain_config = {
         CONF_ENABLE_AUTODISCOVERY: True,
@@ -112,7 +125,7 @@ async def test_domain_light_group_with_autodiscovery_enabled(
 
     await run_powercalc_setup(hass, {}, domain_config)
 
-    await create_domain_groups(hass, hass.data[DOMAIN][DOMAIN_CONFIG], [light.DOMAIN])
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.all_light_power")
