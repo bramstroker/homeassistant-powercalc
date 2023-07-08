@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 from decimal import Decimal
 
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.condition import ConditionCheckerType
 from homeassistant.helpers.event import TrackTemplate
@@ -36,11 +37,17 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         return track_templates
 
     def resolve_track_templates_from_condition(self, condition_config: dict, templates: list[str | TrackTemplate]) -> None:
-        for value in condition_config.values():
+        for key, value in condition_config.items():
+            if key == CONF_ENTITY_ID and isinstance(value, list):
+                templates.extend(value)
             if isinstance(value, Template):
                 templates.append(TrackTemplate(value, None, None))
             if isinstance(value, dict):
                 self.resolve_track_templates_from_condition(value, templates)
+            if isinstance(value, list):
+                for item in value:
+                    if isinstance(item, dict):
+                        self.resolve_track_templates_from_condition(item, templates)
 
 
 @dataclass

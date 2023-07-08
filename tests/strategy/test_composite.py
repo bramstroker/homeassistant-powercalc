@@ -2,7 +2,9 @@ from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import (
     CONF_CONDITION,
     CONF_ENTITY_ID,
+    STATE_OFF,
     STATE_ON,
+    STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
 
@@ -102,3 +104,94 @@ async def test_template_condition(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "20.00"
+
+
+async def test_power_sensor_unavailable_when_no_condition_matches(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_COMPOSITE: {
+            CONF_STRATEGIES: [
+                {
+                    CONF_CONDITION: {
+                        "condition": "state",
+                        "entity_id": "light.test",
+                        "state": STATE_OFF,
+                    },
+                    CONF_FIXED: {
+                        CONF_POWER: 10,
+                    },
+                },
+            ],
+        },
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+
+async def test_nested_conditions(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_COMPOSITE: {
+            CONF_STRATEGIES: [
+                {
+                    CONF_CONDITION: {
+                        "condition": "and",
+                        "conditions": [
+                            {
+                                "condition": "state",
+                                "entity_id": "binary_sensor.test1",
+                                "state": STATE_OFF,
+                            },
+                            {
+                                "condition": "or",
+                                "conditions": [
+                                    {
+                                        "condition": "state",
+                                        "entity_id": "binary_sensor.test2",
+                                        "state": STATE_ON,
+                                    },
+                                    {
+                                        "condition": "template",
+                                        "value_template": "{{ is_state('binary_sensor.test3', 'on')  }}",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    CONF_FIXED: {
+                        CONF_POWER: 10,
+                    },
+                },
+            ],
+        },
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("light.test", STATE_ON)
+
+    hass.states.async_set("binary_sensor.test1", STATE_OFF)
+    hass.states.async_set("binary_sensor.test2", STATE_ON)
+    hass.states.async_set("binary_sensor.test3", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+    hass.states.async_set("binary_sensor.test1", STATE_OFF)
+    hass.states.async_set("binary_sensor.test2", STATE_OFF)
+    hass.states.async_set("binary_sensor.test3", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+    hass.states.async_set("binary_sensor.test1", STATE_ON)
+    hass.states.async_set("binary_sensor.test2", STATE_OFF)
+    hass.states.async_set("binary_sensor.test3", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
