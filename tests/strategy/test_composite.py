@@ -98,7 +98,7 @@ async def test_template_condition(hass: HomeAssistant) -> None:
 
 
 async def test_power_sensor_unavailable_when_no_condition_matches(
-        hass: HomeAssistant,
+    hass: HomeAssistant,
 ) -> None:
     sensor_config = {
         CONF_ENTITY_ID: "light.test",

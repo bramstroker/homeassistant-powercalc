@@ -160,12 +160,16 @@ class PowerCalculatorStrategyFactory:
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
                 condition_instance = await condition.async_from_config(
-                    self._hass, condition_config,
+                    self._hass,
+                    condition_config,
                 )
 
             strategy = detect_calculation_strategy(strategy_config, power_profile)
             strategy_instance = await self.create(
-                strategy_config, strategy, power_profile, source_entity,
+                strategy_config,
+                strategy,
+                power_profile,
+                source_entity,
             )
             return SubStrategy(condition_config, condition_instance, strategy_instance)
 

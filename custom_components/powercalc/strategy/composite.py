@@ -23,7 +23,8 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
     async def calculate(self, entity_state: State) -> Decimal | None:
         for sub_strategy in self.strategies:
             if sub_strategy.condition and not sub_strategy.condition(
-                self.hass, {"state": entity_state},
+                self.hass,
+                {"state": entity_state},
             ):
                 continue
 
@@ -36,12 +37,15 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         for sub_strategy in self.strategies:
             if sub_strategy.condition_config:
                 self.resolve_track_templates_from_condition(
-                    sub_strategy.condition_config, track_templates,
+                    sub_strategy.condition_config,
+                    track_templates,
                 )
         return track_templates
 
     def resolve_track_templates_from_condition(
-        self, condition_config: dict, templates: list[str | TrackTemplate],
+        self,
+        condition_config: dict,
+        templates: list[str | TrackTemplate],
     ) -> None:
         for key, value in condition_config.items():
             if key == CONF_ENTITY_ID and isinstance(value, list):
