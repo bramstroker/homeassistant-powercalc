@@ -9,15 +9,6 @@ For the conditions the same engine is used as in HA automations and scripts. See
 
 Currently this is a YAML only feature
 
-Configuration options
----------------------
-
-+---------------+-------+--------------+----------+------------------------------------+
-| Name          | Type  | Requirement  | Default  | Description                        |
-+===============+=======+==============+==========+====================================+
-| strategies    | list  | **Required** |          | List of objects with strategy configuration and condition |         |
-+---------------+-------+--------------+----------+------------------------------------+
-
 Usage
 -----
 
