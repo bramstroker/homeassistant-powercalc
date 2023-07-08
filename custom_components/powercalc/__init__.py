@@ -39,6 +39,7 @@ from .const import (
     CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_INCLUDE,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
@@ -221,7 +222,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         await discovery_manager.start_discovery()
 
     sensors: list = domain_config.get(CONF_SENSORS, [])
-    for sensor_config in sensors:
+    sorted_sensors = sorted(
+        sensors, key=lambda x: (CONF_INCLUDE in x, x.get(CONF_INCLUDE, False))
+    )
+    for sensor_config in sorted_sensors:
         sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
         hass.async_create_task(
             async_load_platform(
