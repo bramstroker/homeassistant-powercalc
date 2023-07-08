@@ -27,7 +27,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
     powercalc_entities = []
-    source_entities = resolve_include_entities(hass, include_config)  # type: ignore
+    source_entities = resolve_include_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
         if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
