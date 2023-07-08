@@ -343,6 +343,56 @@ async def test_include_filter_domain(
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}
 
 
+async def test_include_yaml_configured_entity(hass: HomeAssistant, entity_reg: EntityRegistry,
+    area_reg: AreaRegistry) -> None:
+    """Test that include also includes entities that the user configured with YAML"""
+
+    light_a = MockLight("light_a")
+    light_b = MockLight("light_b")
+    light_c = create_discoverable_light("light_c")
+    light_d = MockLight("light_d")
+    await create_mock_light_entity(
+        hass,
+        [light_a, light_b, light_c, light_d],
+    )
+
+    area = area_reg.async_get_or_create("My area")
+    entity_reg.async_update_entity(light_a.entity_id, area_id=area.id)
+    entity_reg.async_update_entity(light_b.entity_id, area_id=area.id)
+    entity_reg.async_update_entity(light_c.entity_id, area_id=area.id)
+
+    _create_powercalc_config_entry(hass, light_a.entity_id)
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Test include",
+                CONF_INCLUDE: {
+                    CONF_AREA: "my_area",
+                },
+            },
+            {
+                CONF_ENTITY_ID: light_b.entity_id,
+                CONF_FIXED: {
+                    CONF_POWER: 50,
+                },
+            },
+            {
+                CONF_ENTITY_ID: light_c.entity_id,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.light_a_power",
+        "sensor.light_b_power",
+        "sensor.light_c_power",
+    }
+
+
 def _create_powercalc_config_entry(hass: HomeAssistant, source_entity_id: str) -> MockConfigEntry:
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
