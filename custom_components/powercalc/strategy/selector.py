@@ -1,6 +1,13 @@
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_FIXED, CONF_LINEAR, CONF_MODE, CONF_PLAYBOOK, CONF_WLED, CalculationStrategy
+from custom_components.powercalc.const import (
+    CONF_FIXED,
+    CONF_LINEAR,
+    CONF_MODE,
+    CONF_PLAYBOOK,
+    CONF_WLED,
+    CalculationStrategy,
+)
 from custom_components.powercalc.errors import UnsupportedStrategyError
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 

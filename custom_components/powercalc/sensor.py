@@ -214,18 +214,24 @@ SENSOR_CONFIG = {
         },
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-    vol.Optional(CONF_COMPOSITE): vol.Schema({
-        vol.Required(CONF_STRATEGIES): vol.All(
-            cv.ensure_list,
-            [vol.Schema({
-                vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
-                vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-                vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-                vol.Optional(CONF_WLED): WLED_SCHEMA,
-                vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-            })],
-        ),
-    }),
+    vol.Optional(CONF_COMPOSITE): vol.Schema(
+        {
+            vol.Required(CONF_STRATEGIES): vol.All(
+                cv.ensure_list,
+                [
+                    vol.Schema(
+                        {
+                            vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
+                            vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+                            vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+                            vol.Optional(CONF_WLED): WLED_SCHEMA,
+                            vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+                        }
+                    )
+                ],
+            ),
+        }
+    ),
 }
 
 
@@ -620,7 +626,9 @@ async def create_sensors(  # noqa: C901
         for source_entity in include_entities:
             if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
                 entities_to_add.existing.extend(
-                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
+                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][
+                        source_entity.entity_id
+                    ],
                 )
 
     # Create sensors for each entity

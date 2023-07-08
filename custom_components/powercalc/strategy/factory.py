@@ -148,7 +148,12 @@ class PowerCalculatorStrategyFactory:
         playbook_config = config.get(CONF_PLAYBOOK)
         return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
 
-    async def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
+    async def _create_composite(
+        self,
+        config: ConfigType,
+        power_profile: PowerProfile | None,
+        source_entity: SourceEntity,
+    ) -> CompositeStrategy:
         composite_config = config.get(CONF_COMPOSITE)
         sub_strategies = composite_config.get(CONF_STRATEGIES)  # type: ignore
 
@@ -156,10 +161,14 @@ class PowerCalculatorStrategyFactory:
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
-                condition_instance = await condition.async_from_config(self._hass, condition_config)
+                condition_instance = await condition.async_from_config(
+                    self._hass, condition_config
+                )
 
             strategy = detect_calculation_strategy(strategy_config, power_profile)
-            strategy_instance = await self.create(strategy_config, strategy, power_profile, source_entity)
+            strategy_instance = await self.create(
+                strategy_config, strategy, power_profile, source_entity
+            )
             return SubStrategy(condition_config, condition_instance, strategy_instance)
 
         strategies = [await _create_sub_strategy(config) for config in sub_strategies]

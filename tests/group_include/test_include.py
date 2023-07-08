@@ -350,7 +350,9 @@ async def test_include_filter_domain(
 
 
 async def test_include_yaml_configured_entity(
-    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry,
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    area_reg: AreaRegistry,
 ) -> None:
     """Test that include also includes entities that the user configured with YAML"""
 
@@ -401,7 +403,8 @@ async def test_include_yaml_configured_entity(
 
 
 def _create_powercalc_config_entry(
-    hass: HomeAssistant, source_entity_id: str,
+    hass: HomeAssistant,
+    source_entity_id: str,
 ) -> MockConfigEntry:
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
