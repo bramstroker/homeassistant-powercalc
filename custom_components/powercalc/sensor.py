@@ -604,7 +604,7 @@ async def create_sensors(
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
     entities_to_add = EntitiesBucket()
-    for entity_config in config.get(CONF_ENTITIES) or []:
+    for entity_config in config.get(CONF_ENTITIES, []):
         # When there are nested entities, combine these with the current entities, recursively
         if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
             child_entities = await create_sensors(hass, entity_config, context=context)
