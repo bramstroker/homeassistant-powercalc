@@ -56,6 +56,7 @@
                     "group_power_entities": "Additionele vermogen entiteiten",
                     "name": "Naam",
                     "sub_groups": "Sub groepen",
+                    "area": "Ruimte",
                     "hide_members": "Verberg onderliggende sensoren",
                     "unique_id": "Uniek id"
                 },
@@ -63,7 +64,8 @@
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele vermogen entiteiten (W)",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
-                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+                    "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe"
                 },
                 "title": "Creëer een groep sensor"
             },
@@ -179,6 +181,7 @@
         "step": {
             "init": {
                 "data": {
+                    "area": "Ruimte",
                     "attribute": "Attribuut",
                     "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
                     "calibrate": "Kalibratie waardes",
@@ -208,6 +211,7 @@
                     "value_template": "Waarde template"
                 },
                 "data_description": {
+                    "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
                     "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
                     "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
                     "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",

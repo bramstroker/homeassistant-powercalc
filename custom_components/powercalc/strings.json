@@ -37,6 +37,7 @@
           "group_power_entities": "Additional power entities",
           "group_energy_entities": "Additional energy entities",
           "sub_groups": "Sub groups",
+          "area": "Area",
           "hide_members": "Hide members",
           "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]"
         },
@@ -44,7 +45,8 @@
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+          "area": "Adds all powercalc sensors from the specified area"
         }
       },
       "virtual_power": {
