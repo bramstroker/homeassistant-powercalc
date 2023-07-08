@@ -732,6 +732,7 @@ async def test_group_include_area(hass: HomeAssistant, entity_reg: EntityRegistr
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_AREA: area.id,
+        CONF_CREATE_UTILITY_METERS: True,
     }
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -744,13 +745,19 @@ async def test_group_include_area(hass: HomeAssistant, entity_reg: EntityRegistr
         CONF_HIDE_MEMBERS: False,
         CONF_AREA: area.id,
         CONF_UNIQUE_ID: "My group sensor",
-        CONF_CREATE_UTILITY_METERS: False,
+        CONF_CREATE_UTILITY_METERS: True,
     }
-
     await hass.async_block_till_done()
-    group_state = hass.states.get("sensor.my_group_sensor_power")
-    assert group_state
-    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy", "sensor.test_power"}
+
+    power_state = hass.states.get("sensor.my_group_sensor_power")
+    assert power_state
+    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+
+    energy_state = hass.states.get("sensor.my_group_sensor_energy")
+    assert energy_state
+    assert energy_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
+
+    assert hass.states.get("sensor.my_group_sensor_energy_daily")
 
 
 async def test_can_select_existing_powercalc_entry_as_group_member(

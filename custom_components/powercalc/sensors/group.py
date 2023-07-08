@@ -170,8 +170,13 @@ async def create_group_sensors_from_config_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.entry_id
 
+    area_entities: list[Entity] = []
+    if CONF_AREA in entry.data:
+        area_entities = resolve_include_entities(hass, {CONF_AREA: entry.data[CONF_AREA]})
+
     power_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER),
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER) +
+        [entity.entity_id for entity in area_entities if isinstance(entity, PowerSensor)],
     )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
@@ -183,7 +188,8 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(power_sensor)
 
     energy_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY),
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY) +
+        [entity.entity_id for entity in area_entities if isinstance(entity, EnergySensor)],
     )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
@@ -340,10 +346,6 @@ def resolve_entity_ids_recursively(
         else CONF_GROUP_ENERGY_ENTITIES
     )
     resolved_ids.extend(entry.data.get(conf_key) or [])
-
-    if CONF_AREA in entry.data:
-        include_entities = resolve_include_entities(hass, {CONF_AREA: entry.data[CONF_AREA]})
-        resolved_ids.extend([entity.entity_id for entity in include_entities])
 
     # Include the entities from sub groups
     subgroups = entry.data.get(CONF_SUB_GROUPS)
