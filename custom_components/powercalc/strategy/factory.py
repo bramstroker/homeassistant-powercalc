@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from homeassistant.const import CONF_CONDITION
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import condition
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -40,7 +41,7 @@ class PowerCalculatorStrategyFactory:
         self._hass = hass
         self._lut_registry = LutRegistry()
 
-    def create(
+    async def create(
         self,
         config: dict,
         strategy: str,
@@ -64,7 +65,7 @@ class PowerCalculatorStrategyFactory:
             return self._create_wled(source_entity, config)
 
         if strategy == CalculationStrategy.COMPOSITE:
-            return self._create_composite(config, power_profile, source_entity)
+            return await self._create_composite(config, power_profile, source_entity)
 
         raise UnsupportedStrategyError("Invalid calculation mode", strategy)
 
@@ -147,14 +148,19 @@ class PowerCalculatorStrategyFactory:
         playbook_config = config.get(CONF_PLAYBOOK)
         return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
 
-    def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
+    async def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
         composite_config = config.get(CONF_COMPOSITE)
         sub_strategies = composite_config.get(CONF_STRATEGIES)
 
-        def _resolve_strategy_instance(strategy_config: ConfigType) -> PowerCalculationStrategyInterface:
+        async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy
+            condition_instance = None
+            condition_config = config.get(CONF_CONDITION)
+            if condition_config:
+                condition_instance = await condition.async_from_config(self._hass, condition_config)
+
             strategy = detect_calculation_strategy(strategy_config, power_profile)
-            return self.create(strategy_config, strategy, power_profile, source_entity)
+            strategy_instance = await self.create(strategy_config, strategy, power_profile, source_entity)
+            return SubStrategy(condition_instance, strategy_instance)
 
-        strategies = [SubStrategy(config[CONF_CONDITION], _resolve_strategy_instance(config)) for config in sub_strategies]
-
+        strategies = [await _create_sub_strategy(config) for config in sub_strategies]
         return CompositeStrategy(self._hass, strategies)

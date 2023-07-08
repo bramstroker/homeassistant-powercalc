@@ -63,3 +63,44 @@ async def test_composite(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "17.84"
+
+
+async def test_template_condition(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_COMPOSITE: {
+            CONF_STRATEGIES: [
+                {
+                    CONF_CONDITION:
+                        {
+                            "condition": "template",
+                            "value_template": "{{ (state_attr('device_tracker.iphone', 'battery_level')|int) > 50 }}"
+                        }
+                    ,
+                    CONF_FIXED: {
+                        CONF_POWER: 10,
+                    },
+                },
+                {
+                    CONF_FIXED: {
+                        CONF_POWER: 20
+                    },
+                },
+            ],
+        },
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("device_tracker.iphone", STATE_ON, {"battery_level": "60"})
+    await hass.async_block_till_done()
+
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+    hass.states.async_set("device_tracker.iphone", "40")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "20.00"

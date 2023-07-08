@@ -90,6 +90,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
+from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -360,18 +361,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         ):
             self._ignore_unavailable_state = True
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
-        self._init_calculation_strategy(factory=calculation_strategy_factory)
-
-    def _init_calculation_strategy(
-        self,
-        factory: PowerCalculatorStrategyFactory,
-    ) -> None:
-        self._strategy_instance = factory.create(
-            self._sensor_config,
-            self._calculation_strategy,
-            self._power_profile,
-            self._source_entity,
-        )
+        self.calculation_strategy_factory = calculation_strategy_factory
+        self._strategy_instance: PowerCalculationStrategyInterface | None = None
 
     async def validate(self) -> None:
         await self._strategy_instance.validate_config()
@@ -379,6 +370,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def async_added_to_hass(self) -> None:
         """Register callbacks."""
         await super().async_added_to_hass()
+        self._strategy_instance = await self.calculation_strategy_factory.create(
+            self._sensor_config,
+            self._calculation_strategy,
+            self._power_profile,
+            self._source_entity,
+        )
 
         async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
