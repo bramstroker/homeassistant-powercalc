@@ -523,6 +523,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         entity_state = state
         if state.entity_id != self._source_entity.entity_id:
             entity_state = self.hass.states.get(self._source_entity.entity_id)
+            if entity_state is None:
+                return None
 
         unavailable_power = self._sensor_config.get(CONF_UNAVAILABLE_POWER)
         if entity_state.state == STATE_UNAVAILABLE and unavailable_power is not None:
