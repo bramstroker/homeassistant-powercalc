@@ -51,6 +51,7 @@ from homeassistant.util.unit_conversion import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_AREA,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
@@ -71,6 +72,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.group_include.include import scan_include
 
 from .abstract import (
     BaseEntity,
@@ -339,6 +341,10 @@ def resolve_entity_ids_recursively(
     )
     resolved_ids.extend(entry.data.get(conf_key) or [])
 
+    if CONF_AREA in entry.data:
+        include_entities = scan_include(hass, {CONF_AREA: entry.data[CONF_AREA]})
+        resolved_ids.extend([entity.entity_id for entity in include_entities])
+
     # Include the entities from sub groups
     subgroups = entry.data.get(CONF_SUB_GROUPS)
     if not subgroups:
@@ -350,6 +356,7 @@ def resolve_entity_ids_recursively(
             _LOGGER.error(f"Subgroup config entry not found: {subgroup_entry_id}")
             continue
         resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
+
     return resolved_ids
 
 
