@@ -19,6 +19,7 @@ from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_CONDITION,
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -48,6 +49,7 @@ from .const import (
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
+    CONF_COMPOSITE,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
@@ -84,6 +86,7 @@ from .const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
+    CONF_STRATEGIES,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
@@ -211,6 +214,18 @@ SENSOR_CONFIG = {
         },
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
+    vol.Optional(CONF_COMPOSITE): vol.Schema({
+        vol.Required(CONF_STRATEGIES): vol.All(
+            cv.ensure_list,
+            [vol.Schema({
+                vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
+                vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+                vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+                vol.Optional(CONF_WLED): WLED_SCHEMA,
+                vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+            })],
+        ),
+    }),
 }
 
 
@@ -605,7 +620,7 @@ async def create_sensors(  # noqa: C901
         for source_entity in include_entities:
             if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
                 entities_to_add.existing.extend(
-                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id]
+                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
                 )
 
     # Create sensors for each entity

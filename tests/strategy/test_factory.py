@@ -14,7 +14,7 @@ from .common import create_source_entity
 async def test_exception_raised_on_not_supported_strategy(hass: HomeAssistant) -> None:
     with pytest.raises(UnsupportedStrategyError):
         factory = PowerCalculatorStrategyFactory(hass)
-        factory.create(
+        await factory.create(
             {},
             "NonExistingStrategy",
             power_profile=None,
@@ -27,7 +27,7 @@ async def test_exception_raised_when_no_power_profile_passed_lut_strategy(
 ) -> None:
     with pytest.raises(StrategyConfigurationError):
         factory = PowerCalculatorStrategyFactory(hass)
-        factory.create(
+        await factory.create(
             {},
             CalculationStrategy.LUT,
             power_profile=None,

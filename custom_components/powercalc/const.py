@@ -32,6 +32,7 @@ DUMMY_ENTITY_ID = "sensor.dummy"
 
 CONF_AREA = "area"
 CONF_CALIBRATE = "calibrate"
+CONF_COMPOSITE = "composite"
 CONF_CREATE_GROUP = "create_group"
 CONF_CREATE_DOMAIN_GROUPS = "create_domain_groups"
 CONF_CREATE_ENERGY_SENSOR = "create_energy_sensor"
@@ -93,6 +94,7 @@ CONF_WLED = "wled"
 CONF_STATES_POWER = "states_power"
 CONF_START_TIME = "start_time"
 CONF_STANDBY_POWER = "standby_power"
+CONF_STRATEGIES = "strategies"
 CONF_SUB_GROUPS = "sub_groups"
 CONF_CALCULATION_ENABLED_CONDITION = "calculation_enabled_condition"
 CONF_DISABLE_STANDBY_POWER = "disable_standby_power"
@@ -168,6 +170,7 @@ OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
 class CalculationStrategy(StrEnum):
     """Possible virtual power calculation strategies."""
 
+    COMPOSITE = "composite"
     LUT = "lut"
     LINEAR = "linear"
     FIXED = "fixed"

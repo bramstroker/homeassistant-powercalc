@@ -793,7 +793,7 @@ async def _create_strategy_object(
         power_profile = await ProfileLibrary.factory(hass).get_profile(
             ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL)),  # type: ignore
         )
-    return factory.create(config, strategy, power_profile, source_entity)
+    return await factory.create(config, strategy, power_profile, source_entity)
 
 
 def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
