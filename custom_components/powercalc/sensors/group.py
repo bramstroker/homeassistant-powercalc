@@ -72,7 +72,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from custom_components.powercalc.group_include.include import scan_include
+from custom_components.powercalc.group_include.include import resolve_include_entities
 
 from .abstract import (
     BaseEntity,
@@ -342,7 +342,7 @@ def resolve_entity_ids_recursively(
     resolved_ids.extend(entry.data.get(conf_key) or [])
 
     if CONF_AREA in entry.data:
-        include_entities = scan_include(hass, {CONF_AREA: entry.data[CONF_AREA]})
+        include_entities = resolve_include_entities(hass, {CONF_AREA: entry.data[CONF_AREA]})
         resolved_ids.extend([entity.entity_id for entity in include_entities])
 
     # Include the entities from sub groups

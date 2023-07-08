@@ -123,7 +123,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .group_include.include import scan_include
+from .group_include.include import resolve_include_entities
 from .sensors.abstract import BaseEntity
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
@@ -616,7 +616,7 @@ async def create_sensors(
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-        entities_to_add.existing.extend(scan_include(hass, config.get(CONF_INCLUDE)))
+        entities_to_add.existing.extend(resolve_include_entities(hass, config.get(CONF_INCLUDE)))
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():

@@ -25,7 +25,7 @@ from .filter import create_filter
 _LOGGER = logging.getLogger(__name__)
 
 
-def scan_include(hass: HomeAssistant, include_config: dict) -> list:
+def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
     powercalc_entities = []
     source_entities = resolve_include_entities(hass, include_config)  # type: ignore
     _LOGGER.debug("Found include entities: %s", source_entities)
@@ -40,7 +40,7 @@ def scan_include(hass: HomeAssistant, include_config: dict) -> list:
 
 
 @callback
-def resolve_include_entities(
+def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> list[entity_registry.RegistryEntry]:
