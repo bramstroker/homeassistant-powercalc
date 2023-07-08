@@ -557,7 +557,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     return sensor_config
 
 
-async def create_sensors(  # noqa: C901
+async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
@@ -604,7 +604,7 @@ async def create_sensors(  # noqa: C901
     # Setup power sensors for multiple appliances in one config entry
     sensor_configs = {}
     entities_to_add = EntitiesBucket()
-    for entity_config in config.get(CONF_ENTITIES) or []:
+    for entity_config in config.get(CONF_ENTITIES, []):
         # When there are nested entities, combine these with the current entities, recursively
         if CONF_ENTITIES in entity_config or CONF_CREATE_GROUP in entity_config:
             child_entities = await create_sensors(hass, entity_config, context=context)
@@ -616,15 +616,7 @@ async def create_sensors(  # noqa: C901
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-        include_entities = resolve_include_entities(hass, config.get(CONF_INCLUDE))  # type: ignore
-        _LOGGER.debug("Found include entities: %s", include_entities)
-        for source_entity in include_entities:
-            if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-                entities_to_add.existing.extend(
-                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][
-                        source_entity.entity_id
-                    ],
-                )
+        entities_to_add.existing.extend(resolve_include_entities(hass, config.get(CONF_INCLUDE)))  # type: ignore
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():

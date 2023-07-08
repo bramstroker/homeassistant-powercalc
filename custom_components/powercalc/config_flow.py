@@ -27,6 +27,7 @@ from homeassistant.helpers.typing import DiscoveryInfoType
 
 from .common import SourceEntity, create_source_entity
 from .const import (
+    CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
@@ -873,6 +874,7 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
                 ),
             ),
             vol.Optional(CONF_SUB_GROUPS): _create_group_selector(hass, multiple=True),
+            vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
                 default=False,
@@ -915,6 +917,7 @@ def _validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
         and CONF_GROUP_POWER_ENTITIES not in user_input
         and CONF_GROUP_ENERGY_ENTITIES not in user_input
         and CONF_GROUP_MEMBER_SENSORS not in user_input
+        and CONF_AREA not in user_input
     ):
         errors["base"] = "group_mandatory"
 

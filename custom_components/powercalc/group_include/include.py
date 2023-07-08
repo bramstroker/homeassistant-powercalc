@@ -15,6 +15,8 @@ from custom_components.powercalc.const import (
     CONF_FILTER,
     CONF_GROUP,
     CONF_TEMPLATE,
+    DATA_CONFIGURED_ENTITIES,
+    DOMAIN,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
 
@@ -23,8 +25,22 @@ from .filter import create_filter
 _LOGGER = logging.getLogger(__name__)
 
 
+def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
+    powercalc_entities = []
+    source_entities = resolve_include_source_entities(hass, include_config)
+    _LOGGER.debug("Found include entities: %s", source_entities)
+    for source_entity in source_entities:
+        if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+            powercalc_entities.extend(
+                hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][
+                    source_entity.entity_id
+                ],
+            )
+    return powercalc_entities
+
+
 @callback
-def resolve_include_entities(
+def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> list[entity_registry.RegistryEntry]:

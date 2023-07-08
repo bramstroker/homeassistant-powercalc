@@ -37,6 +37,7 @@
           "group_power_entities": "Additional power entities",
           "group_energy_entities": "Additional energy entities",
           "sub_groups": "Sub groups",
+          "area": "Area",
           "hide_members": "Hide members",
           "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]"
         },
@@ -44,7 +45,8 @@
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+          "area": "Adds all powercalc sensors from the specified area"
         }
       },
       "virtual_power": {
@@ -191,6 +193,7 @@
           "group_member_sensors": "[%key:component::powercalc::config::step::group::data::group_member_sensors%]",
           "group_power_entities": "[%key:component::powercalc::config::step::group::data::group_power_entities%]",
           "group_energy_entities": "[%key:component::powercalc::config::step::group::data::group_energy_entities%]",
+          "area": "[%key:component::powercalc::config::step::group::data::area%]",
           "sub_groups": "[%key:component::powercalc::config::step::group::data::sub_groups%]",
           "hide_members": "[%key:component::powercalc::config::step::group::data::hide_members%]",
           "energy_integration_method": "[%key:component::powercalc::config::step::power_advanced::data::energy_integration_method%]",
@@ -204,6 +207,7 @@
           "attribute": "[%key:component::powercalc::config::step::linear::data_description::attribute%]",
           "power_template": "[%key:component::powercalc::config::step::fixed::data_description::power_template%]",
           "states_power": "[%key:component::powercalc::config::step::fixed::data_description::states_power%]",
+          "area": "[%key:component::powercalc::config::step::group::data_description::area%]",
           "sub_groups": "[%key:component::powercalc::config::step::group::data_description::sub_groups%]",
           "group_member_sensors": "[%key:component::powercalc::config::step::group::data_description::group_member_sensors%]",
           "group_power_entities": "[%key:component::powercalc::config::step::group::data_description::group_power_entities%]",

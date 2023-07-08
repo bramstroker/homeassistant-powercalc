@@ -7,6 +7,7 @@ import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.components import sensor
 from homeassistant.const import (
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_PLATFORM,
@@ -17,6 +18,8 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.area_registry import AreaRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry
 from homeassistant.helpers.selector import SelectSelector
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.setup import async_setup_component
@@ -29,6 +32,7 @@ from custom_components.powercalc.config_flow import (
     MENU_OPTION_LIBRARY,
 )
 from custom_components.powercalc.const import (
+    CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -706,6 +710,54 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
+
+
+async def test_group_include_area(hass: HomeAssistant, entity_reg: EntityRegistry,
+    area_reg: AreaRegistry) -> None:
+
+    # Create light entity and add to group My area
+    light = MockLight("test")
+    await create_mock_light_entity(hass, light)
+    area = area_reg.async_get_or_create("My area")
+    entity_reg.async_update_entity(light.entity_id, area_id=area.id)
+
+    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED, {CONF_ENTITY_ID: "light.test"})
+    await _set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_STATES_POWER: {"playing": 1.8}},
+    )
+
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_AREA: area.id,
+        CONF_CREATE_UTILITY_METERS: True,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
+        CONF_AREA: area.id,
+        CONF_UNIQUE_ID: "My group sensor",
+        CONF_CREATE_UTILITY_METERS: True,
+    }
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.my_group_sensor_power")
+    assert power_state
+    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+
+    energy_state = hass.states.get("sensor.my_group_sensor_energy")
+    assert energy_state
+    assert energy_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
+
+    assert hass.states.get("sensor.my_group_sensor_energy_daily")
 
 
 async def test_can_select_existing_powercalc_entry_as_group_member(
