@@ -150,7 +150,7 @@ class PowerCalculatorStrategyFactory:
 
     async def _create_composite(self, config: ConfigType, power_profile: PowerProfile | None, source_entity: SourceEntity) -> CompositeStrategy:
         composite_config = config.get(CONF_COMPOSITE)
-        sub_strategies = composite_config.get(CONF_STRATEGIES)
+        sub_strategies = composite_config.get(CONF_STRATEGIES)  # type: ignore
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
