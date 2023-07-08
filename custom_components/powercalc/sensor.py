@@ -604,7 +604,9 @@ async def create_sensors(  # noqa: C901
         _LOGGER.debug("Found include entities: %s", include_entities)
         for source_entity in include_entities:
             if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-                entities_to_add.existing.extend(hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id])
+                entities_to_add.existing.extend(
+                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id]
+                )
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():

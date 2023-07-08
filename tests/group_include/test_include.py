@@ -3,7 +3,13 @@ import uuid
 
 import pytest
 from homeassistant.components import light
-from homeassistant.const import CONF_DOMAIN, CONF_ENTITIES, CONF_ENTITY_ID, CONF_UNIQUE_ID, STATE_OFF
+from homeassistant.const import (
+    CONF_DOMAIN,
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    CONF_UNIQUE_ID,
+    STATE_OFF,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -343,8 +349,9 @@ async def test_include_filter_domain(
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_light_power"}
 
 
-async def test_include_yaml_configured_entity(hass: HomeAssistant, entity_reg: EntityRegistry,
-    area_reg: AreaRegistry) -> None:
+async def test_include_yaml_configured_entity(
+    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
+) -> None:
     """Test that include also includes entities that the user configured with YAML"""
 
     light_a = MockLight("light_a")
@@ -393,7 +400,9 @@ async def test_include_yaml_configured_entity(hass: HomeAssistant, entity_reg: E
     }
 
 
-def _create_powercalc_config_entry(hass: HomeAssistant, source_entity_id: str) -> MockConfigEntry:
+def _create_powercalc_config_entry(
+    hass: HomeAssistant, source_entity_id: str
+) -> MockConfigEntry:
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
         domain=DOMAIN,
