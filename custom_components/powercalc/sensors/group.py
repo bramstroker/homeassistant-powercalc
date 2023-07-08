@@ -173,7 +173,7 @@ async def create_group_sensors_from_config_entry(
     area_entities: list[Entity] = []
     if CONF_AREA in entry.data:
         area_entities = resolve_include_entities(
-            hass, {CONF_AREA: entry.data[CONF_AREA]}
+            hass, {CONF_AREA: entry.data[CONF_AREA]},
         )
 
     power_sensor_ids: set[str] = set(
