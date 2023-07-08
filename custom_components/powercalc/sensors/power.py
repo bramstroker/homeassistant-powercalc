@@ -366,6 +366,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def validate(self) -> None:
         await self.ensure_strategy_instance()
+        assert self._strategy_instance is not None
         await self._strategy_instance.validate_config()
 
     async def ensure_strategy_instance(self) -> None:
@@ -381,6 +382,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Register callbacks."""
         await super().async_added_to_hass()
         await self.ensure_strategy_instance()
+        assert self._strategy_instance is not None
 
         async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
@@ -534,6 +536,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._standby_sensors[self.entity_id] = standby_power
             return standby_power
 
+        assert self._strategy_instance is not None
         power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
@@ -574,6 +577,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state."""
+        assert self._strategy_instance is not None
         sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
@@ -640,6 +644,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
         """Active a playbook"""
+        assert self._strategy_instance is not None
         if not isinstance(self._strategy_instance, PlaybookStrategy):
             raise HomeAssistantError("supported only playbook enabled sensors")
 
@@ -647,6 +652,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_stop_playbook(self) -> None:
         """Stop an active playbook"""
+        assert self._strategy_instance is not None
         if not isinstance(self._strategy_instance, PlaybookStrategy):
             raise HomeAssistantError("supported only playbook enabled sensors")
 
