@@ -29,15 +29,14 @@ Let's start with a simple example:
       sensors:
         - entity_id: switch.heater
           composite:  # This indicates the composite strategy is used
-            strategies:
-              - condition:
-                  condition: state
-                  entity_id: select.heater_mode
-                  state: high
-                fixed:
-                  power: 1000
-              - fixed:
-                  power: 500
+            - condition:
+                condition: state
+                entity_id: select.heater_mode
+                state: high
+              fixed:
+                power: 1000
+            - fixed:
+                power: 500
 
 This will create a power sensor `sensor.heater_power`. Whenever the `select.heater_mode` is high the power sensor will be 1000 and in all other cases 500.
 
@@ -54,32 +53,31 @@ For example:
       sensors:
         - entity_id: light.test
           composite:
-            strategies:
-              # First strategy (fixed) using nested AND and OR conditions
-              - condition:
-                  condition: and
-                  conditions:
-                    - condition: state
-                      entity_id: binary_sensor.test
-                      state: on
-                    - condition: or
-                      conditions:
-                        - condition: numeric_state
-                          entity_id: sensor.test
-                          above: 20
-                          below: 40
-                        - condition: template
-                          value_template: "{{ is_state('sensor.test2', 'test') }}"
-                fixed:
-                  power: 10
-              # Second strategy (linear)
-              - condition:
-                  condition: state
-                  entity_id: binary_sensor.test
-                  state: off
-                linear:
-                  min_power: 20
-                  max_power: 40
+            # First strategy (fixed) using nested AND and OR conditions
+            - condition:
+                condition: and
+                conditions:
+                  - condition: state
+                    entity_id: binary_sensor.test
+                    state: on
+                  - condition: or
+                    conditions:
+                      - condition: numeric_state
+                        entity_id: sensor.test
+                        above: 20
+                        below: 40
+                      - condition: template
+                        value_template: "{{ is_state('sensor.test2', 'test') }}"
+              fixed:
+                power: 10
+            # Second strategy (linear)
+            - condition:
+                condition: state
+                entity_id: binary_sensor.test
+                state: off
+              linear:
+                min_power: 20
+                max_power: 40
 
 
 When no condition matches for any strategy the power sensor will become ``unavailable`` or when the ``light.test`` is OFF powercalc will look at the ``standby_power``

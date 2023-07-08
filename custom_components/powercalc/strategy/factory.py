@@ -16,7 +16,6 @@ from custom_components.powercalc.const import (
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
-    CONF_STRATEGIES,
     CONF_WLED,
     CalculationStrategy,
 )
@@ -154,20 +153,19 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
         source_entity: SourceEntity,
     ) -> CompositeStrategy:
-        composite_config = config.get(CONF_COMPOSITE)
-        sub_strategies = composite_config.get(CONF_STRATEGIES)  # type: ignore
+        sub_strategies = config.get(CONF_COMPOSITE)  # type: ignore
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
                 condition_instance = await condition.async_from_config(
-                    self._hass, condition_config
+                    self._hass, condition_config,
                 )
 
             strategy = detect_calculation_strategy(strategy_config, power_profile)
             strategy_instance = await self.create(
-                strategy_config, strategy, power_profile, source_entity
+                strategy_config, strategy, power_profile, source_entity,
             )
             return SubStrategy(condition_config, condition_instance, strategy_instance)
 

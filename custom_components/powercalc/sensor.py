@@ -86,7 +86,6 @@ from .const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
-    CONF_STRATEGIES,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
@@ -214,23 +213,19 @@ SENSOR_CONFIG = {
         },
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-    vol.Optional(CONF_COMPOSITE): vol.Schema(
-        {
-            vol.Required(CONF_STRATEGIES): vol.All(
-                cv.ensure_list,
-                [
-                    vol.Schema(
-                        {
-                            vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
-                            vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-                            vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-                            vol.Optional(CONF_WLED): WLED_SCHEMA,
-                            vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-                        }
-                    )
-                ],
+    vol.Optional(CONF_COMPOSITE): vol.All(
+        cv.ensure_list,
+        [
+            vol.Schema(
+                {
+                    vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
+                    vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+                    vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+                    vol.Optional(CONF_WLED): WLED_SCHEMA,
+                    vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+                },
             ),
-        }
+        ],
     ),
 }
 
