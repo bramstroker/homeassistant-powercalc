@@ -7,6 +7,7 @@ from decimal import Decimal
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.condition import ConditionCheckerType
 from homeassistant.helpers.event import TrackTemplate
+from homeassistant.helpers.template import Template
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -28,11 +29,22 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         return None
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
-        return []
+        track_templates: list[TrackTemplate] = []
+        for sub_strategy in self.strategies:
+            if sub_strategy.condition_config:
+                self.resolve_track_templates_from_condition(sub_strategy.condition_config, track_templates)
+        return track_templates
+
+    def resolve_track_templates_from_condition(self, condition_config: dict, templates: list[TrackTemplate]) -> None:
+        for value in condition_config.values():
+            if isinstance(value, Template):
+                templates.append(TrackTemplate(value, None, None))
+            if isinstance(value, dict):
+                self.resolve_track_templates_from_condition(value, templates)
 
 
 @dataclass
 class SubStrategy:
-    condition_config = dict | None
+    condition_config: dict | None
     condition: ConditionCheckerType | None
     strategy: PowerCalculationStrategyInterface

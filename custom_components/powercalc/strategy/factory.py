@@ -160,7 +160,7 @@ class PowerCalculatorStrategyFactory:
 
             strategy = detect_calculation_strategy(strategy_config, power_profile)
             strategy_instance = await self.create(strategy_config, strategy, power_profile, source_entity)
-            return SubStrategy(condition_instance, strategy_instance)
+            return SubStrategy(condition_config, condition_instance, strategy_instance)
 
         strategies = [await _create_sub_strategy(config) for config in sub_strategies]
         return CompositeStrategy(self._hass, strategies)

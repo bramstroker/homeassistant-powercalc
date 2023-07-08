@@ -98,7 +98,7 @@ async def test_template_condition(hass: HomeAssistant) -> None:
 
     assert hass.states.get("sensor.test_power").state == "10.00"
 
-    hass.states.async_set("device_tracker.iphone", "40")
+    hass.states.async_set("device_tracker.iphone", STATE_ON, {"battery_level": "40"})
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "20.00"
