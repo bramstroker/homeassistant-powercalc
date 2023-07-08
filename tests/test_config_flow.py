@@ -712,16 +712,18 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
     assert hass.states.get("sensor.my_group_sensor_power")
 
 
-async def test_group_include_area(hass: HomeAssistant, entity_reg: EntityRegistry,
-    area_reg: AreaRegistry) -> None:
-
+async def test_group_include_area(
+    hass: HomeAssistant, entity_reg: EntityRegistry, area_reg: AreaRegistry
+) -> None:
     # Create light entity and add to group My area
     light = MockLight("test")
     await create_mock_light_entity(hass, light)
     area = area_reg.async_get_or_create("My area")
     entity_reg.async_update_entity(light.entity_id, area_id=area.id)
 
-    result = await _goto_virtual_power_strategy_step(hass, CalculationStrategy.FIXED, {CONF_ENTITY_ID: "light.test"})
+    result = await _goto_virtual_power_strategy_step(
+        hass, CalculationStrategy.FIXED, {CONF_ENTITY_ID: "light.test"}
+    )
     await _set_virtual_power_configuration(
         hass,
         result,

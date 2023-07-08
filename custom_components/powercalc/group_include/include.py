@@ -32,9 +32,7 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
     for source_entity in source_entities:
         if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
             powercalc_entities.extend(
-                hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][
-                    source_entity.entity_id
-                ],
+                hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
             )
     return powercalc_entities
 

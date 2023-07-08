@@ -172,11 +172,17 @@ async def create_group_sensors_from_config_entry(
 
     area_entities: list[Entity] = []
     if CONF_AREA in entry.data:
-        area_entities = resolve_include_entities(hass, {CONF_AREA: entry.data[CONF_AREA]})
+        area_entities = resolve_include_entities(
+            hass, {CONF_AREA: entry.data[CONF_AREA]}
+        )
 
     power_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER) +
-        [entity.entity_id for entity in area_entities if isinstance(entity, PowerSensor)],
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
+        + [
+            entity.entity_id
+            for entity in area_entities
+            if isinstance(entity, PowerSensor)
+        ],
     )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
@@ -188,8 +194,12 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(power_sensor)
 
     energy_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY) +
-        [entity.entity_id for entity in area_entities if isinstance(entity, EnergySensor)],
+        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
+        + [
+            entity.entity_id
+            for entity in area_entities
+            if isinstance(entity, EnergySensor)
+        ],
     )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
