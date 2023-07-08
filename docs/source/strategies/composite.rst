@@ -5,7 +5,7 @@ Composite
 The composite strategy allows you to create power sensor which contains of multiple strategies.
 For each strategy you can setup conditions which indicate when the strategy should be applied.
 So for example you could use the ``fixed`` strategy when a certain condition applies, and the ``linear`` when another condition applies.
-For the conditions the same engine is used as in HA automations and scripts.
+For the conditions the same engine is used as in HA automations and scripts. See https://www.home-assistant.io/docs/scripts/conditions/
 
 Currently this is a YAML only feature
 
