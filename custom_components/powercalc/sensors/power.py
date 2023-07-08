@@ -84,7 +84,9 @@ from custom_components.powercalc.power_profile.power_profile import (
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from custom_components.powercalc.strategy.selector import detect_calculation_strategy
-from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.strategy.strategy_interface import (
+    PowerCalculationStrategyInterface,
+)
 
 from .abstract import (
     BaseEntity,
@@ -521,7 +523,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
         entity_state = state
-        if state.entity_id != self._source_entity.entity_id and (entity_state := self.hass.states.get(self._source_entity.entity_id)) is None:
+        if (
+            state.entity_id != self._source_entity.entity_id
+            and (entity_state := self.hass.states.get(self._source_entity.entity_id))
+            is None
+        ):
             return None
 
         unavailable_power = self._sensor_config.get(CONF_UNAVAILABLE_POWER)
