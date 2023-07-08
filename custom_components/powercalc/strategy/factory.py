@@ -152,9 +152,9 @@ class PowerCalculatorStrategyFactory:
         composite_config = config.get(CONF_COMPOSITE)
         sub_strategies = composite_config.get(CONF_STRATEGIES)
 
-        async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy
+        async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
-            condition_config = config.get(CONF_CONDITION)
+            condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
                 condition_instance = await condition.async_from_config(self._hass, condition_config)
 

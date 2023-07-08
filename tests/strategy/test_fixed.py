@@ -42,7 +42,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
     template = "{{states('input_number.test')}}"
 
     source_entity = create_source_entity("switch")
-    strategy = _create_strategy(
+    strategy = await _create_strategy(
         hass,
         {
             CONF_POWER: Template(template),
@@ -59,7 +59,7 @@ async def test_template_power(hass: HomeAssistant) -> None:
 
 async def test_states_power(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player")
-    strategy = _create_strategy(
+    strategy = await _create_strategy(
         hass,
         {
             CONF_POWER: 20,
@@ -88,7 +88,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     source_entity = create_source_entity("climate")
-    strategy = _create_strategy(
+    strategy = await _create_strategy(
         hass,
         {
             CONF_STATES_POWER: {
@@ -117,7 +117,7 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
 async def test_states_power_with_attributes(hass: HomeAssistant) -> None:
     source_entity = create_source_entity("media_player")
 
-    strategy = _create_strategy(
+    strategy = await _create_strategy(
         hass,
         {
             CONF_POWER: 12,
@@ -257,13 +257,13 @@ async def test_template_power_combined_with_multiply_factor(
     assert state.state == "2050.00"
 
 
-def _create_strategy(
+async def _create_strategy(
     hass: HomeAssistant,
     config: ConfigType,
     source_entity: SourceEntity,
 ) -> FixedStrategy:
     factory = PowerCalculatorStrategyFactory(hass)
-    strategy_instance = factory.create(
+    strategy_instance = await factory.create(
         {CONF_FIXED: config},
         CalculationStrategy.FIXED,
         None,

@@ -71,19 +71,17 @@ async def test_template_condition(hass: HomeAssistant) -> None:
         CONF_COMPOSITE: {
             CONF_STRATEGIES: [
                 {
-                    CONF_CONDITION:
-                        {
-                            "condition": "template",
-                            "value_template": "{{ (state_attr('device_tracker.iphone', 'battery_level')|int) > 50 }}"
-                        }
-                    ,
+                    CONF_CONDITION: {
+                        "condition": "template",
+                        "value_template": "{{ (state_attr('device_tracker.iphone', 'battery_level')|int) > 50 }}",
+                    },
                     CONF_FIXED: {
                         CONF_POWER: 10,
                     },
                 },
                 {
                     CONF_FIXED: {
-                        CONF_POWER: 20
+                        CONF_POWER: 20,
                     },
                 },
             ],

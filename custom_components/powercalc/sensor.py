@@ -620,7 +620,7 @@ async def create_sensors(  # noqa: C901
         for source_entity in include_entities:
             if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
                 entities_to_add.existing.extend(
-                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id]
+                    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
                 )
 
     # Create sensors for each entity

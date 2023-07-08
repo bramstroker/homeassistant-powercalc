@@ -187,7 +187,7 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant) -> N
             # This model only supports brightness
             ModelInfo("signify", "LWA017"),
         )
-        strategy = strategy_factory.create(
+        strategy = await strategy_factory.create(
             config={},
             strategy=CalculationStrategy.LUT,
             power_profile=power_profile,
@@ -208,7 +208,7 @@ async def _create_lut_strategy(
     power_profile = await ProfileLibrary.factory(hass).get_profile(
         ModelInfo(manufacturer, model),
     )
-    return strategy_factory.create(
+    return await strategy_factory.create(
         config={},
         strategy=CalculationStrategy.LUT,
         power_profile=power_profile,

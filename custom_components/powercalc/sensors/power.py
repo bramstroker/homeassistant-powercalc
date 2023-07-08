@@ -84,13 +84,13 @@ from custom_components.powercalc.power_profile.power_profile import (
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from custom_components.powercalc.strategy.selector import detect_calculation_strategy
+from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
 
 from .abstract import (
     BaseEntity,
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from ..strategy.strategy_interface import PowerCalculationStrategyInterface
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -365,17 +365,22 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._strategy_instance: PowerCalculationStrategyInterface | None = None
 
     async def validate(self) -> None:
+        await self.ensure_strategy_instance()
         await self._strategy_instance.validate_config()
+
+    async def ensure_strategy_instance(self) -> None:
+        if self._strategy_instance is None:
+            self._strategy_instance = await self.calculation_strategy_factory.create(
+                self._sensor_config,
+                self._calculation_strategy,
+                self._power_profile,
+                self._source_entity,
+            )
 
     async def async_added_to_hass(self) -> None:
         """Register callbacks."""
         await super().async_added_to_hass()
-        self._strategy_instance = await self.calculation_strategy_factory.create(
-            self._sensor_config,
-            self._calculation_strategy,
-            self._power_profile,
-            self._source_entity,
-        )
+        await self.ensure_strategy_instance()
 
         async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
