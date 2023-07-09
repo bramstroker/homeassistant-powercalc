@@ -71,7 +71,7 @@ async def create_utility_meters(
             if existing_entity_id and hass.states.get(existing_entity_id):
                 continue
 
-        # Create generic utility meter (no specific tarrifs)
+        # Create generic utility meter (no specific tariffs)
         if not tariffs or GENERAL_TARIFF in tariffs:
             utility_meter = await create_utility_meter(
                 energy_sensor.entity_id,
