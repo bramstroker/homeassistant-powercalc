@@ -33,11 +33,9 @@ class BaseEntity(Entity):
             return
 
         device_id: str = getattr(self, "source_device_id")  # noqa: B009
-        if not device_id:
-            return
         device_reg = dr.async_get(self.hass)
         device_entry = device_reg.async_get(device_id)
-        if not device_entry or device_entry.id == entity_entry.device_id:
+        if not device_entry or device_entry.id == entity_entry.device_id:  # pragma: no cover
             return
         _LOGGER.debug(f"Binding {self.entity_id} to device {device_id}")
         entity_reg.async_update_entity(self.entity_id, device_id=device_id)
