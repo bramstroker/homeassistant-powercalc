@@ -924,6 +924,7 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
             CONF_GROUP_POWER_ENTITIES: ["sensor.power_w", "sensor.power_kw"],
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.energy_w", "sensor.energy_kw"],
             CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.NONE,
         },
     )
@@ -941,8 +942,12 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
 
     await hass.async_block_till_done()
 
-    energy_state = hass.states.get("sensor.testgroup_power")
-    assert energy_state.state == "200.00"
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state.state == "200.00"
+    assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
 
 
 async def test_gui_discovered_entity_in_yaml_group(
