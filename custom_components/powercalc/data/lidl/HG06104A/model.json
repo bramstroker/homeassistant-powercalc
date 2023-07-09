@@ -9,5 +9,8 @@
         "VERSION": "v1.3.1:docker"
     },
     "name": "Livarno Lux smart LED light strip 2.5m",
-    "standby_power": 0.34
+    "standby_power": 0.34,
+    "aliases": [
+        "TS0505A"
+    ]
 }
