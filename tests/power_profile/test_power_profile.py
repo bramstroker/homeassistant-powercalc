@@ -84,7 +84,6 @@ async def test_load_sub_profile(hass: HomeAssistant) -> None:
     assert power_profile.model == "YLDL01YL"
     assert power_profile.name == "Yeelight YLDL01YL Downlight"
     assert power_profile.sub_profile == "ambilight"
-    assert power_profile.is_additional_configuration_required is False
 
 
 async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:

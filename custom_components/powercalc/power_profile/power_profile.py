@@ -166,15 +166,6 @@ class PowerProfile:
         return mode == self.calculation_strategy
 
     @property
-    def is_additional_configuration_required(self) -> bool:
-        """Checks if the power profile can be setup without any additional user configuration."""
-        if self.has_sub_profiles and self.sub_profile is None:
-            return True
-        if self.needs_fixed_config:
-            return True
-        return False
-
-    @property
     def needs_fixed_config(self) -> bool:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
