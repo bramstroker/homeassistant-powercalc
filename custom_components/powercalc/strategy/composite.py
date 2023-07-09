@@ -52,8 +52,6 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                 templates.extend(value)
             if isinstance(value, Template):
                 templates.append(TrackTemplate(value, None, None))
-            if isinstance(value, dict):
-                self.resolve_track_templates_from_condition(value, templates)
             if isinstance(value, list):
                 for item in value:
                     if isinstance(item, dict):
