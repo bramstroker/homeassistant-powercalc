@@ -23,7 +23,7 @@ Configuration options
 Examples
 --------
 
-This will add 0.05 kWh per day to the energy sensor called "IP camera upstairs"
+This will add 0.05 kWh per day to the energy sensor called "IP camera upstairs". You'll have to add a new entry under ``sensor:`` in `configuration.yaml`:
 
 .. code-block:: yaml
 
