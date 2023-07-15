@@ -46,26 +46,24 @@ Most basic example:
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - entity_id: light.my_light
-          fixed:
-            power: 20
+  - platform: powercalc
+    entity_id: light.my_light
+    fixed:
+      power: 20
 
 Tip: You can also setup multiple sensors in one go using the ``entities`` option.
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - entities:
-            - entity_id: light.my_light
-              fixed:
-                power: 20
-            - entity_id: light.my_light2
-              linear:
-                min_power: 2
-                max_power: 9
+  - platform: powercalc
+    entities:
+      - entity_id: light.my_light
+        fixed:
+          power: 20
+      - entity_id: light.my_light2
+        linear:
+          min_power: 2
+          max_power: 9
 
 For all the possible options see the strategy sections as linked above, :doc:`configuration/sensor-configuration` and the rest of the Powercalc documentation.
 
