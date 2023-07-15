@@ -46,14 +46,13 @@ will create following sensors:
 
 Change full name
 ----------------
-You can also change the base sensor name with the ``name`` option
+You can also change the base sensor name with the ``name`` option in ``sensor:``
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - entity_id: light.patio
-          name: Patio Light
+  - platform: powercalc
+    entity_id: light.patio
+    name: Patio Light
 
 will create:
 
