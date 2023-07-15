@@ -3,7 +3,7 @@ Real power sensor
 =================
 
 To use an existing power sensor and let powercalc create the energy sensors and utility meters for it, 
-you'll have to add a new entry under the ``sensor:`` line in `configuration.yaml` (functionality not available through the webUI).
+you'll have to add a new entry under ``sensor:`` in `configuration.yaml` (functionality not available through the webUI).
 
 .. code-block:: yaml
 
