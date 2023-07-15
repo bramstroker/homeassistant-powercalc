@@ -787,3 +787,77 @@ async def test_rename_source_entity_id(hass: HomeAssistant) -> None:
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state.state == "50.00"
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id
+
+
+async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
+    """Test that changing the source entity of an existing config entry works correctly"""
+
+    original_light_id = "light.original"
+    original_unique_id = "aaaa"
+    new_light_id = "light.new"
+    new_unique_id = "bbbb"
+    mock_registry(
+        hass,
+        {
+            original_light_id: er.RegistryEntry(
+                entity_id=original_light_id,
+                unique_id=original_unique_id,
+                platform="light",
+            ),
+            new_light_id: er.RegistryEntry(
+                entity_id=original_light_id,
+                unique_id=new_unique_id,
+                platform="light",
+            ),
+        },
+    )
+
+    # Create an existing config entry referencing the original source entity
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: original_light_id,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_UNIQUE_ID: original_unique_id,
+        },
+        unique_id=original_unique_id,
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(
+        hass,
+        {},
+    )
+
+    hass.states.async_set(original_light_id, STATE_ON)
+    hass.states.async_set(new_light_id, STATE_ON)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.testentry_power")
+    assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == original_light_id
+    assert power_state.state == "50.00"
+
+    # Change the entity_id using the options flow
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+    user_input = {CONF_ENTITY_ID: new_light_id, CONF_POWER: 100}
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+    await hass.async_block_till_done()
+
+    changed_entry = hass.config_entries.async_get_entry(entry.entry_id)
+    assert changed_entry.data.get(CONF_ENTITY_ID) == new_light_id
+    assert changed_entry.unique_id == original_unique_id
+
+    power_state = hass.states.get("sensor.testentry_power")
+    assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id
+    assert power_state.state == "100.00"

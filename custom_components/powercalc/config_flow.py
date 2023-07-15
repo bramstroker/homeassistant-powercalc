@@ -721,6 +721,8 @@ class OptionsFlowHandler(OptionsFlow):
                 if user_input and key in user_input:
                     generic_options[key] = user_input.get(key)
 
+            if CONF_ENTITY_ID in user_input:
+                generic_options[CONF_ENTITY_ID] = user_input[CONF_ENTITY_ID]
             self.current_config.update(generic_options)
 
             if self.strategy:
@@ -763,9 +765,20 @@ class OptionsFlowHandler(OptionsFlow):
                 if self.strategy
                 else vol.Schema({})
             )
-            data_schema = SCHEMA_POWER_OPTIONS.extend(strategy_schema.schema).extend(
-                SCHEMA_POWER_ADVANCED.schema,
+
+            data_schema = (
+                vol.Schema(
+                    {
+                        vol.Optional(CONF_ENTITY_ID): _create_source_entity_selector(
+                            False,
+                        ),
+                    },
+                )
+                .extend(SCHEMA_POWER_OPTIONS.schema)
+                .extend(strategy_schema.schema)
+                .extend(SCHEMA_POWER_ADVANCED.schema)
             )
+
             strategy_options = self.current_config.get(self.strategy) or {}
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
@@ -808,20 +821,23 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     return vol.Schema({})
 
 
+def _create_source_entity_selector(is_library_flow: bool = True) -> selector.EntitySelector:
+    if is_library_flow:
+        return selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=list(DEVICE_DOMAINS.values())),
+        )
+    return selector.EntitySelector()
+
+
 def _create_virtual_power_schema(
     hass: HomeAssistant,
     is_library_flow: bool = True,
 ) -> vol.Schema:
-    if is_library_flow:
-        entity_selector = selector.EntitySelector(
-            selector.EntitySelectorConfig(domain=list(DEVICE_DOMAINS.values())),
-        )
-    else:
-        entity_selector = selector.EntitySelector()
-
     schema = vol.Schema(
         {
-            vol.Required(CONF_ENTITY_ID): entity_selector,
+            vol.Required(CONF_ENTITY_ID): _create_source_entity_selector(
+                is_library_flow,
+            ),
         },
     ).extend(SCHEMA_POWER_BASE.schema)
     schema = schema.extend({vol.Optional(CONF_GROUP): _create_group_selector(hass)})
