@@ -3,6 +3,7 @@ from typing import cast
 
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
@@ -19,6 +20,8 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.sensors.energy import RealEnergySensor
+from custom_components.powercalc.sensors.power import RealPowerSensor
 
 from .filter import create_filter
 
@@ -26,15 +29,24 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
-    powercalc_entities = []
+    resolved_entities = []
     source_entities = resolve_include_source_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
         if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-            powercalc_entities.extend(
+            resolved_entities.extend(
                 hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
             )
-    return powercalc_entities
+            continue
+
+        if source_entity.domain is not DOMAIN and source_entity.device_class in [SensorDeviceClass.POWER, SensorDeviceClass.ENERGY]:
+            if source_entity.device_class == SensorDeviceClass.POWER:
+                entity = RealPowerSensor(source_entity.entity_id, source_entity.device_id, source_entity.unique_id)
+            else:
+                entity = RealEnergySensor(source_entity)
+            resolved_entities.append(entity)
+
+    return resolved_entities
 
 
 @callback
