@@ -29,16 +29,22 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
+    """"
+    For a given include configuration fetch all power and energy sensors from the HA instance
+    """
     resolved_entities = []
     source_entities = resolve_include_source_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
+        # Check if we have powercalc sensors for giving source entity
         if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
             resolved_entities.extend(
                 hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
             )
             continue
 
+        # When we are dealing with a non powercalc sensor and it's an power or energy sensor,
+        # we can include that in the group
         if source_entity.domain is not DOMAIN and source_entity.device_class in [SensorDeviceClass.POWER, SensorDeviceClass.ENERGY]:
             if source_entity.device_class == SensorDeviceClass.POWER:
                 entity = RealPowerSensor(source_entity.entity_id, source_entity.device_id, source_entity.unique_id)
