@@ -27,19 +27,18 @@ Select :guilabel:`Group` and follow the instructions.
 Create group with YAML
 ----------------------
 
-You can combine the ``entities`` option and ``create_group`` to group individual power sensors into a group.
+You can combine the ``entities`` option and ``create_group`` to group individual power sensors into a group. You'll have to add a new entry under ``sensor:`` in `configuration.yaml`:
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - create_group: All hallway lights
-          entities:
-            - entity_id: light.hallway
-            - entity_id: light.living_room
-              linear:
-                min_power: 0.5
-                max_power: 8
+  - platform: powercalc
+    create_group: All hallway lights
+    entities:
+      - entity_id: light.hallway
+      - entity_id: light.living_room
+        linear:
+          min_power: 0.5
+          max_power: 8
 
 This will create the following entities:
 
@@ -57,18 +56,17 @@ You can also nest groups, this makes it possible to add an entity to multiple gr
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - create_group: All lights
-          entities:
-            - entity_id: light.a
-            - entity_id: light.b
-            - create_group: Upstairs lights
-              entities:
-                - entity_id: light.c
-                - create_group: Bedroom Bob lights
-                  entities:
-                    - entity_id: light.d
+  - platform: powercalc
+    create_group: All lights
+    entities:
+      - entity_id: light.a
+      - entity_id: light.b
+      - create_group: Upstairs lights
+        entities:
+          - entity_id: light.c
+          - create_group: Bedroom Bob lights
+            entities:
+              - entity_id: light.d
 
 Each group will have power sensors created for the following lights:
 
@@ -98,13 +96,12 @@ You can use the following configuration:
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - create_group: Living Room
-          entities:
-            - power_sensor_id: sensor.heater_power
-              energy_sensor_id: sensor.heater_kwh
-            - entity_id: light.hallway #Powercalc sensor
+  - platform: powercalc
+    create_group: Living Room
+    entities:
+      - power_sensor_id: sensor.heater_power
+        energy_sensor_id: sensor.heater_kwh
+      - entity_id: light.hallway #Powercalc sensor
 
 .. note::
     When you don't supply ``energy_sensor_id``, but only ``power_sensor_id`` powercalc tries to find a related energy sensor on the same device.
