@@ -2,16 +2,15 @@
 Real power sensor
 =================
 
-In the yaml configuration (functionality not available through the webUI) you can add the following configuration
-to use an existing power sensor and let powercalc create the energy sensors and utility meters for it:
+To use an existing power sensor and let powercalc create the energy sensors and utility meters for it, 
+you'll have to add a new entry under the ``sensor:`` line in `configuration.yaml` (functionality not available through the webUI).
 
 .. code-block:: yaml
 
-    powercalc:
-      sensors:
-        - entity_id: light.toilet
-          power_sensor_id: sensor.toilet_light_power
-          force_energy_sensor_creation: true # optional
+  - platform: powercalc
+    entity_id: light.toilet
+    power_sensor_id: sensor.toilet_light_power
+    force_energy_sensor_creation: true # optional
 
 This also enables you to combine virtual power sensors (created with powercalc) and existing power sensors in your HA installation into
 a group. Without this configuration option power_sensor_id that would not be possible.
