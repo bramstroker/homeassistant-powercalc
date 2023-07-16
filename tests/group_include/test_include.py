@@ -464,11 +464,14 @@ async def test_include_non_powercalc_entities_in_group(
     }
 
 
-async def test_include_area2(
+async def test_group_setup_continues_when_subgroup_has_no_include_entities(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
     area_reg: AreaRegistry,
 ) -> None:
+    """
+    When one of the subgroups has no include entities resolved the other nested groups should just be setup
+    """
     await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
 
     area_bathroom = area_reg.async_get_or_create("Bathroom")
