@@ -61,10 +61,10 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
 def find_powercalc_entities_by_source_entity(hass: HomeAssistant, source_entity_id: str) -> list[Entity]:
     # Check if we have powercalc sensors setup with YAML
     if source_entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-        return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]
+        return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]  # type: ignore
 
     # Check if we have powercalc sensors setup with GUI
-    entities = []
+    entities: list[Entity] = []
     for entry in hass.config_entries.async_entries(DOMAIN):
         if entry.data.get(CONF_ENTITY_ID) != source_entity_id:
             continue
