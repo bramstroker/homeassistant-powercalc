@@ -66,7 +66,11 @@ async def create_energy_sensor(
                 f"No energy sensor with id {energy_sensor_id} found in your HA instance. "
                 "Double check `energy_sensor_id` setting",
             )
-        return RealEnergySensor(entity_entry)
+        return RealEnergySensor(
+            entity_entry.entity_id,
+            entity_entry.name or entity_entry.original_name,
+            entity_entry.unique_id,
+        )
 
     # User specified an existing power sensor with "power_sensor_id" option. Try to find a corresponding energy sensor
     if CONF_POWER_SENSOR_ID in sensor_config and isinstance(
@@ -176,7 +180,12 @@ def find_related_real_energy_sensor(
     if not energy_sensors:
         return None
 
-    return RealEnergySensor(energy_sensors[0])
+    entity_entry = energy_sensors[0]
+    return RealEnergySensor(
+        entity_entry.entity_id,
+        entity_entry.name or entity_entry.original_name,
+        entity_entry.unique_id,
+    )
 
 
 class EnergySensor(BaseEntity):
@@ -254,16 +263,17 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 class RealEnergySensor(EnergySensor):
     """Contains a reference to an existing energy sensor entity."""
 
-    def __init__(self, entity_entry: er.RegistryEntry) -> None:
-        self._entity_entry = entity_entry
-        self.entity_id = self._entity_entry.entity_id
+    def __init__(self, entity_id: str, name: str | None = None, unique_id: str | None = None) -> None:
+        self.entity_id = entity_id
+        self._name = name
+        self._unique_id = unique_id
 
     @property
     def name(self) -> str | None:
         """Return the name of the sensor."""
-        return self._entity_entry.name or self._entity_entry.original_name
+        return self._name
 
     @property
     def unique_id(self) -> str | None:
         """Return the unique_id of the sensor."""
-        return self._entity_entry.unique_id
+        return self._unique_id

@@ -4,7 +4,7 @@ from typing import cast
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
+from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.entity import Entity
@@ -19,6 +19,8 @@ from custom_components.powercalc.const import (
     CONF_TEMPLATE,
     DATA_CONFIGURED_ENTITIES,
     DOMAIN,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.energy import RealEnergySensor
@@ -37,14 +39,9 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
     source_entities = resolve_include_source_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
-        # Check if we have powercalc sensors for giving source entity
-        if source_entity.entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-            resolved_entities.extend(
-                hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity.entity_id],
-            )
-            continue
+        resolved_entities.extend(find_powercalc_entities_by_source_entity(hass, source_entity.entity_id))
 
-        # When we are dealing with a non powercalc sensor and it's an power or energy sensor,
+        # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
         if source_entity.domain is not DOMAIN:
             if source_entity.device_class == SensorDeviceClass.POWER:
@@ -56,9 +53,26 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
                     ),
                 )
             elif source_entity.device_class == SensorDeviceClass.ENERGY:
-                resolved_entities.append(RealEnergySensor(source_entity))
+                resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
     return resolved_entities
+
+
+def find_powercalc_entities_by_source_entity(hass: HomeAssistant, source_entity_id: str) -> list[Entity]:
+    # Check if we have powercalc sensors setup with YAML
+    if source_entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
+        return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]
+
+    # Check if we have powercalc sensors setup with GUI
+    entities = []
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if entry.data.get(CONF_ENTITY_ID) != source_entity_id:
+            continue
+        if entry.data.get(ENTRY_DATA_POWER_ENTITY):
+            entities.append(RealPowerSensor(entry.data.get(ENTRY_DATA_POWER_ENTITY)))
+        if entry.data.get(ENTRY_DATA_ENERGY_ENTITY):
+            entities.append(RealEnergySensor(entry.data.get(ENTRY_DATA_ENERGY_ENTITY)))
+    return entities
 
 
 @callback
