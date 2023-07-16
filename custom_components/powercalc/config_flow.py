@@ -821,7 +821,9 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
     return vol.Schema({})
 
 
-def _create_source_entity_selector(is_library_flow: bool = True) -> selector.EntitySelector:
+def _create_source_entity_selector(
+    is_library_flow: bool = True,
+) -> selector.EntitySelector:
     if is_library_flow:
         return selector.EntitySelector(
             selector.EntitySelectorConfig(domain=list(DEVICE_DOMAINS.values())),

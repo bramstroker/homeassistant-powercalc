@@ -947,7 +947,9 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
     assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
     energy_state = hass.states.get("sensor.testgroup_energy")
-    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
+    assert (
+        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
+    )
 
 
 async def test_gui_discovered_entity_in_yaml_group(
