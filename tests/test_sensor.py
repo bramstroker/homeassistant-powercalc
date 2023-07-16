@@ -715,7 +715,7 @@ async def test_sensors_with_errors_are_skipped_for_multiple_entity_setup(
     )
     await hass.async_block_till_done()
 
-    assert len(caplog.records) == 2
+    assert len(caplog.records) == 3
     assert "Skipping sensor setup" in caplog.text
 
 

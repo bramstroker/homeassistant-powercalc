@@ -464,6 +464,41 @@ async def test_include_non_powercalc_entities_in_group(
     }
 
 
+async def test_include_area2(
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    area_reg: AreaRegistry,
+) -> None:
+    await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
+
+    area_bathroom = area_reg.async_get_or_create("Bathroom")
+    area_reg.async_get_or_create("Bedroom")
+    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+
+    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "GroupA",
+            CONF_ENTITIES: [
+                {
+                    CONF_CREATE_GROUP: "GroupB",
+                    CONF_INCLUDE: {CONF_AREA: "bedroom"},
+                },
+                {
+                    CONF_CREATE_GROUP: "GroupC",
+                    CONF_INCLUDE: {CONF_AREA: "bathroom"},
+                },
+            ],
+        },
+    )
+
+    assert hass.states.get("sensor.groupa_power")
+    assert not hass.states.get("sensor.groupb_power")
+    assert hass.states.get("sensor.groupc_power")
+
+
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
