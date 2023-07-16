@@ -464,9 +464,6 @@ async def test_include_non_powercalc_entities_in_group(
     }
 
 
-# async def test_include_powercalc_gui_entry_in_yaml_include(hass: HomeAssistant):
-
-
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
