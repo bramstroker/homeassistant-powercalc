@@ -3,6 +3,7 @@ import uuid
 
 import pytest
 from homeassistant.components import light
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
@@ -400,6 +401,58 @@ async def test_include_yaml_configured_entity(
         "sensor.light_b_power",
         "sensor.light_c_power",
     }
+
+
+async def test_include_non_powercalc_entities_in_group(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    """Test that both powercalc and non powercalc entities can be included"""
+    area = area_reg.async_get_or_create("bedroom")
+    await hass.async_block_till_done()
+
+    _create_powercalc_config_entry(hass, "light.test")
+
+    shelly_power_sensor = "sensor.shelly_power"
+    shelly_energy_sensor = "sensor.shelly_energy"
+    mock_registry(
+        hass,
+        {
+            shelly_power_sensor: RegistryEntry(
+                entity_id=shelly_power_sensor,
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            shelly_energy_sensor: RegistryEntry(
+                entity_id=shelly_energy_sensor,
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="3333",
+                platform="light",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bedroom",
+            },
+        },
+    )
+
+    power_state = hass.states.get("sensor.test_include_power")
+    assert power_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power", shelly_power_sensor}
+
+    energy_state = hass.states.get("sensor.test_include_energy")
+    assert energy_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_energy", shelly_energy_sensor}
 
 
 def _create_powercalc_config_entry(
