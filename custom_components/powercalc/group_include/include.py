@@ -39,7 +39,9 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
     source_entities = resolve_include_source_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
-        resolved_entities.extend(find_powercalc_entities_by_source_entity(hass, source_entity.entity_id))
+        resolved_entities.extend(
+            find_powercalc_entities_by_source_entity(hass, source_entity.entity_id)
+        )
 
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
@@ -58,7 +60,9 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
     return resolved_entities
 
 
-def find_powercalc_entities_by_source_entity(hass: HomeAssistant, source_entity_id: str) -> list[Entity]:
+def find_powercalc_entities_by_source_entity(
+    hass: HomeAssistant, source_entity_id: str
+) -> list[Entity]:
     # Check if we have powercalc sensors setup with YAML
     if source_entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
         return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]  # type: ignore

@@ -263,7 +263,9 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 class RealEnergySensor(EnergySensor):
     """Contains a reference to an existing energy sensor entity."""
 
-    def __init__(self, entity_id: str, name: str | None = None, unique_id: str | None = None) -> None:
+    def __init__(
+        self, entity_id: str, name: str | None = None, unique_id: str | None = None
+    ) -> None:
         self.entity_id = entity_id
         self._name = name
         self._unique_id = unique_id

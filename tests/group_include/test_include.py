@@ -404,7 +404,8 @@ async def test_include_yaml_configured_entity(
 
 
 async def test_include_non_powercalc_entities_in_group(
-    hass: HomeAssistant, area_reg: AreaRegistry,
+    hass: HomeAssistant,
+    area_reg: AreaRegistry,
 ) -> None:
     """Test that both powercalc and non powercalc entities can be included"""
     area = area_reg.async_get_or_create("bedroom")
@@ -463,8 +464,7 @@ async def test_include_non_powercalc_entities_in_group(
     }
 
 
-#async def test_include_powercalc_gui_entry_in_yaml_include(hass: HomeAssistant):
-
+# async def test_include_powercalc_gui_entry_in_yaml_include(hass: HomeAssistant):
 
 
 def _create_powercalc_config_entry(
