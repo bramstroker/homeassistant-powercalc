@@ -7,6 +7,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import area_registry, device_registry, entity_registry
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import split_entity_id
 from homeassistant.helpers.template import Template
@@ -28,11 +29,11 @@ from .filter import create_filter
 _LOGGER = logging.getLogger(__name__)
 
 
-def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
+def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[Entity]:
     """"
     For a given include configuration fetch all power and energy sensors from the HA instance
     """
-    resolved_entities = []
+    resolved_entities: list[Entity] = []
     source_entities = resolve_include_source_entities(hass, include_config)
     _LOGGER.debug("Found include entities: %s", source_entities)
     for source_entity in source_entities:
@@ -45,12 +46,13 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list:
 
         # When we are dealing with a non powercalc sensor and it's an power or energy sensor,
         # we can include that in the group
-        if source_entity.domain is not DOMAIN and source_entity.device_class in [SensorDeviceClass.POWER, SensorDeviceClass.ENERGY]:
+        if source_entity.domain is not DOMAIN:
             if source_entity.device_class == SensorDeviceClass.POWER:
-                entity = RealPowerSensor(source_entity.entity_id, source_entity.device_id, source_entity.unique_id)
-            else:
-                entity = RealEnergySensor(source_entity)
-            resolved_entities.append(entity)
+                resolved_entities.append(
+                    RealPowerSensor(source_entity.entity_id, source_entity.device_id, source_entity.unique_id),
+                )
+            elif source_entity.device_class == SensorDeviceClass.ENERGY:
+                resolved_entities.append(RealEnergySensor(source_entity))
 
     return resolved_entities
 
