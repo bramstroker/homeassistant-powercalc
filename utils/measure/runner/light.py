@@ -106,11 +106,7 @@ class LightRunner(MeasurementRunner):
             csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
 
             if resume_at is None:
-                self.light_controller.change_light_state(
-                    ColorMode.BRIGHTNESS,
-                    on=True,
-                    bri=1,
-                )
+                self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
