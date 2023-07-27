@@ -21,9 +21,9 @@ from homeassistant.const import (
 )
 from homeassistant.core import (
     CALLBACK_TYPE,
+    Event,
     HomeAssistant,
     State,
-    Event,
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
