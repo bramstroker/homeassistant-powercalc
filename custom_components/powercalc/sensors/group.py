@@ -29,11 +29,11 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
-    callback,
     CoreState,
     Event,
     HomeAssistant,
     State,
+    callback,
 )
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
