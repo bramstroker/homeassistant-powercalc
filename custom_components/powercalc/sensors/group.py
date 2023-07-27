@@ -28,12 +28,17 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfPower,
 )
-from homeassistant.core import CoreState, HomeAssistant, State, callback
+from homeassistant.core import (
+    CoreState,
+    Event,
+    HomeAssistant,
+    State,
+    callback,
+)
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
-    Event,
     async_track_state_change_event,
     async_track_time_interval,
 )

@@ -19,13 +19,18 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     UnitOfPower,
 )
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
+from homeassistant.core import (
+    CALLBACK_TYPE,
+    Event,
+    HomeAssistant,
+    State,
+    callback,
+)
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
-    Event,
     TrackTemplate,
     async_call_later,
     async_track_state_change_event,
