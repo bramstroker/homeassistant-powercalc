@@ -31,8 +31,8 @@ from homeassistant.const import (
 from homeassistant.core import (
     callback,
     CoreState,
-    HomeAssistant,
     Event,
+    HomeAssistant,
     State,
 )
 from homeassistant.exceptions import HomeAssistantError
