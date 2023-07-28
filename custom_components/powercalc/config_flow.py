@@ -693,18 +693,19 @@ class OptionsFlowHandler(OptionsFlow):
                 except ModelNotSupportedError:
                     errors["not_supported"] = "Power profile could not be loaded"
 
+        schema = self.build_options_schema()
         if user_input is not None:
-            errors = await self.save_options(user_input)
+            errors = await self.save_options(user_input, schema)
             if not errors:
                 return self.async_create_entry(title="", data={})
 
         return self.async_show_form(
             step_id="init",
-            data_schema=self.build_options_schema(),
+            data_schema=schema,
             errors=errors,
         )
 
-    async def save_options(self, user_input: dict[str, Any]) -> dict:
+    async def save_options(self, user_input: dict[str, Any], schema: vol.Schema) -> dict:
         """Save options, and return errors when validation fails."""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
@@ -714,16 +715,10 @@ class OptionsFlowHandler(OptionsFlow):
             generic_option_schema = SCHEMA_POWER_OPTIONS.extend(
                 SCHEMA_POWER_ADVANCED.schema,
             )
-            generic_options = {}
-            for key in generic_option_schema.schema:
-                if isinstance(key, vol.Marker):
-                    key = key.schema
-                if user_input and key in user_input:
-                    generic_options[key] = user_input.get(key)
+            self._process_user_input(user_input, generic_option_schema)
 
             if CONF_ENTITY_ID in user_input:
-                generic_options[CONF_ENTITY_ID] = user_input[CONF_ENTITY_ID]
-            self.current_config.update(generic_options)
+                self.current_config[CONF_ENTITY_ID] = user_input[CONF_ENTITY_ID]
 
             if self.strategy:
                 strategy_options = _build_strategy_config(
@@ -747,13 +742,26 @@ class OptionsFlowHandler(OptionsFlow):
                     return {"base": error.get_config_flow_translate_key()}
 
         if self.sensor_type == SensorType.GROUP:
-            self.current_config.update(user_input)
+            self._process_user_input(user_input, schema)
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data=self.current_config,
         )
         return {}
+
+    def _process_user_input(self, user_input: dict[str, Any], schema: vol.Schema) -> None:
+        """
+        Process the provided user input against the schema.
+        Update the current_config dictionary with the new options. We use that to save the data to config entry later on.
+        """
+        for key in schema.schema:
+            if isinstance(key, vol.Marker):
+                key = key.schema
+            if key in user_input:
+                self.current_config[key] = user_input.get(key)
+            elif key in self.current_config:
+                self.current_config.pop(key)
 
     def build_options_schema(self) -> vol.Schema:
         """Build the options schema. depending on the selected sensor type."""
@@ -786,7 +794,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
 
         if self.sensor_type == SensorType.GROUP:
-            data_schema = _create_group_options_schema(self.hass)
+            data_schema = _create_group_options_schema(self.hass, self.config_entry)
 
         return _fill_schema_defaults(
             data_schema,
@@ -857,7 +865,7 @@ def _create_virtual_power_schema(
     return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)  # type: ignore
 
 
-def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
+def _create_group_options_schema(hass: HomeAssistant, config_entry: ConfigEntry | None = None) -> vol.Schema:
     """Create config schema for groups."""
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
@@ -891,7 +899,7 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
                     multiple=True,
                 ),
             ),
-            vol.Optional(CONF_SUB_GROUPS): _create_group_selector(hass, multiple=True),
+            vol.Optional(CONF_SUB_GROUPS): _create_group_selector(hass, current_entry=config_entry, multiple=True),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
@@ -904,6 +912,7 @@ def _create_group_options_schema(hass: HomeAssistant) -> vol.Schema:
 
 def _create_group_selector(
     hass: HomeAssistant,
+    current_entry: ConfigEntry | None = None,
     multiple: bool = False,
 ) -> selector.SelectSelector:
     options = [
@@ -913,6 +922,7 @@ def _create_group_selector(
         )
         for config_entry in hass.config_entries.async_entries(DOMAIN)
         if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+        and (current_entry and config_entry.entry_id != current_entry.entry_id)
     ]
 
     return selector.SelectSelector(

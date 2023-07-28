@@ -766,6 +766,37 @@ async def test_group_include_area(
     assert hass.states.get("sensor.my_group_sensor_energy_daily")
 
 
+async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    area_reg.async_get_or_create("My area")
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_AREA: "My area",
+        },
+        title="TestArea",
+    )
+    config_entry.add_to_hass(hass)
+
+    updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
+    assert updated_entry.data == {CONF_SENSOR_TYPE: SensorType.GROUP, CONF_AREA: "My area"}
+
+    result = await _initialize_options_flow(hass, config_entry)
+
+    user_input = {}
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+    updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
+    assert updated_entry.data == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_CREATE_UTILITY_METERS: False,
+        CONF_HIDE_MEMBERS: False,
+    }
+
+
 async def test_can_select_existing_powercalc_entry_as_group_member(
     hass: HomeAssistant,
 ) -> None:
