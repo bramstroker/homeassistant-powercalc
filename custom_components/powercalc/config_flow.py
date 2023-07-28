@@ -705,7 +705,9 @@ class OptionsFlowHandler(OptionsFlow):
             errors=errors,
         )
 
-    async def save_options(self, user_input: dict[str, Any], schema: vol.Schema) -> dict:
+    async def save_options(
+        self, user_input: dict[str, Any], schema: vol.Schema
+    ) -> dict:
         """Save options, and return errors when validation fails."""
         if self.sensor_type == SensorType.DAILY_ENERGY:
             daily_energy_config = _build_daily_energy_config(user_input)
@@ -750,7 +752,9 @@ class OptionsFlowHandler(OptionsFlow):
         )
         return {}
 
-    def _process_user_input(self, user_input: dict[str, Any], schema: vol.Schema) -> None:
+    def _process_user_input(
+        self, user_input: dict[str, Any], schema: vol.Schema
+    ) -> None:
         """
         Process the provided user input against the schema.
         Update the current_config dictionary with the new options. We use that to save the data to config entry later on.
@@ -865,7 +869,9 @@ def _create_virtual_power_schema(
     return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)  # type: ignore
 
 
-def _create_group_options_schema(hass: HomeAssistant, config_entry: ConfigEntry | None = None) -> vol.Schema:
+def _create_group_options_schema(
+    hass: HomeAssistant, config_entry: ConfigEntry | None = None
+) -> vol.Schema:
     """Create config schema for groups."""
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
@@ -899,7 +905,9 @@ def _create_group_options_schema(hass: HomeAssistant, config_entry: ConfigEntry 
                     multiple=True,
                 ),
             ),
-            vol.Optional(CONF_SUB_GROUPS): _create_group_selector(hass, current_entry=config_entry, multiple=True),
+            vol.Optional(CONF_SUB_GROUPS): _create_group_selector(
+                hass, current_entry=config_entry, multiple=True
+            ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,

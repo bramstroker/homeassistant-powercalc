@@ -780,7 +780,10 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
     config_entry.add_to_hass(hass)
 
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
-    assert updated_entry.data == {CONF_SENSOR_TYPE: SensorType.GROUP, CONF_AREA: "My area"}
+    assert updated_entry.data == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_AREA: "My area",
+    }
 
     result = await _initialize_options_flow(hass, config_entry)
 

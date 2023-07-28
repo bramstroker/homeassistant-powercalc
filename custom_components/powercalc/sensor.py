@@ -608,7 +608,9 @@ async def create_sensors(  # noqa: C901
         # When there are nested entities, combine these with the current entities, recursively
         if CONF_ENTITIES in entity_config or context.group:
             try:
-                child_entities = await create_sensors(hass, entity_config, context=context)
+                child_entities = await create_sensors(
+                    hass, entity_config, context=context
+                )
                 entities_to_add.extend_items(child_entities)
             except SensorConfigurationError as exception:
                 _LOGGER.error(
