@@ -6,6 +6,7 @@ import pytest
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.components import sensor
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -53,6 +54,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
     CONF_STATES_POWER,
+    CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
@@ -1116,6 +1118,61 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
+
+
+async def test_subgroup_selector(hass: HomeAssistant) -> None:
+    # Create two existing group config entries
+    group1_entry = _create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Group1",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+        },
+    )
+    group2_entry = _create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "Group2",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+        },
+    )
+
+    # Initialize a new config flow
+    result = await _select_sensor_type(hass, SensorType.GROUP)
+
+    # Assert the two existing groups can be selected as subgroup
+    data_schema: vol.Schema = result["data_schema"]
+    sub_group_selector: SelectSelector = data_schema.schema[CONF_SUB_GROUPS]
+    options = sub_group_selector.config["options"]
+    assert options == [
+        {"label": "Group1", "value": group1_entry.entry_id},
+        {"label": "Group2", "value": group2_entry.entry_id},
+    ]
+
+    # Create the new group
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_NAME: "Group3",
+            CONF_SUB_GROUPS: [group1_entry.entry_id, group2_entry.entry_id],
+        },
+    )
+
+    # Initialize the options flow for the newly created group
+    new_entry: ConfigEntry = result["result"]
+    result = await hass.config_entries.options.async_init(
+        new_entry.entry_id,
+        data=None,
+    )
+
+    # Assert that the group itself is not selectable as subgroup
+    data_schema: vol.Schema = result["data_schema"]
+    sub_group_selector: SelectSelector = data_schema.schema[CONF_SUB_GROUPS]
+    options = sub_group_selector.config["options"]
+    assert options == [
+        {"label": "Group1", "value": group1_entry.entry_id},
+        {"label": "Group2", "value": group2_entry.entry_id},
+    ]
 
 
 def _create_mock_entry(

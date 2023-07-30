@@ -609,7 +609,7 @@ async def create_sensors(  # noqa: C901
         if CONF_ENTITIES in entity_config or context.group:
             try:
                 child_entities = await create_sensors(
-                    hass, entity_config, context=context
+                    hass, entity_config, context=context,
                 )
                 entities_to_add.extend_items(child_entities)
             except SensorConfigurationError as exception:
