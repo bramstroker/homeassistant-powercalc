@@ -8,6 +8,7 @@ from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
     CONF_UNIQUE_ID,
     STATE_OFF,
 )
@@ -32,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_INCLUDE,
     CONF_POWER,
     CONF_SENSOR_TYPE,
+    CONF_SUB_GROUPS,
     CONF_TEMPLATE,
     DOMAIN,
     SensorType,
@@ -500,6 +502,52 @@ async def test_group_setup_continues_when_subgroup_has_no_include_entities(
     assert hass.states.get("sensor.groupa_power")
     assert not hass.states.get("sensor.groupb_power")
     assert hass.states.get("sensor.groupc_power")
+
+
+async def test_area_groups_as_subgroups(
+    hass: HomeAssistant,
+    entity_reg: EntityRegistry,
+    area_reg: AreaRegistry,
+) -> None:
+    await create_mock_light_entity(hass, create_discoverable_light("bathroom_mirror"))
+
+    area_bathroom = area_reg.async_get_or_create("Bathroom")
+    area_reg.async_get_or_create("Bedroom")
+    entity_reg.async_update_entity("light.bathroom_mirror", area_id=area_bathroom.id)
+
+    _create_powercalc_config_entry(hass, "light.bathroom_mirror")
+
+    group_a_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_NAME: "GroupA",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_AREA: area_bathroom.name,
+        },
+        unique_id="groupA",
+    )
+    group_a_entry.add_to_hass(hass)
+
+    group_b_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_NAME: "GroupB",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_SUB_GROUPS: [group_a_entry.entry_id],
+        },
+        unique_id="groupB",
+    )
+    group_b_entry.add_to_hass(hass)
+
+    await run_powercalc_setup(hass, {})
+
+    group_a_power = hass.states.get("sensor.groupa_power")
+    assert group_a_power
+    assert group_a_power.attributes.get(CONF_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+    group_b_power = hass.states.get("sensor.groupb_power")
+    assert group_b_power
+    assert group_b_power.attributes.get(CONF_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
 
 def _create_powercalc_config_entry(
