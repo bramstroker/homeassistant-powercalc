@@ -224,7 +224,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     sensors: list = domain_config.get(CONF_SENSORS, [])
     sorted_sensors = sorted(
         sensors,
-        key=lambda x: (CONF_INCLUDE in x, x.get(CONF_INCLUDE, False)),
+        key=lambda item: 1 if CONF_INCLUDE in item else 0,
     )
     for sensor_config in sorted_sensors:
         sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
