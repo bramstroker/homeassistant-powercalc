@@ -706,7 +706,9 @@ class OptionsFlowHandler(OptionsFlow):
         )
 
     async def save_options(
-        self, user_input: dict[str, Any], schema: vol.Schema,
+        self,
+        user_input: dict[str, Any],
+        schema: vol.Schema,
     ) -> dict:
         """Save options, and return errors when validation fails."""
         if self.sensor_type == SensorType.DAILY_ENERGY:
@@ -753,7 +755,9 @@ class OptionsFlowHandler(OptionsFlow):
         return {}
 
     def _process_user_input(
-        self, user_input: dict[str, Any], schema: vol.Schema,
+        self,
+        user_input: dict[str, Any],
+        schema: vol.Schema,
     ) -> None:
         """
         Process the provided user input against the schema.
@@ -870,7 +874,8 @@ def _create_virtual_power_schema(
 
 
 def _create_group_options_schema(
-    hass: HomeAssistant, config_entry: ConfigEntry | None = None,
+    hass: HomeAssistant,
+    config_entry: ConfigEntry | None = None,
 ) -> vol.Schema:
     """Create config schema for groups."""
     member_sensors = [
@@ -906,7 +911,9 @@ def _create_group_options_schema(
                 ),
             ),
             vol.Optional(CONF_SUB_GROUPS): _create_group_selector(
-                hass, current_entry=config_entry, multiple=True,
+                hass,
+                current_entry=config_entry,
+                multiple=True,
             ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(
