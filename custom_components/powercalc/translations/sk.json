@@ -65,6 +65,7 @@
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+                    "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti"
                 },
                 "title": "Vytvoriť skupinu snímača"
             },
@@ -180,6 +181,7 @@
         "step": {
             "init": {
                 "data": {
+                    "area": "Oblasť",                    
                     "attribute": "Attribút",
                     "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
                     "calibrate": "Kalibračné hodnoty",
@@ -209,6 +211,7 @@
                     "value_template": "Šablóna hodnoty"
                 },
                 "data_description": {
+                    "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",                    
                     "attribute": "Zadajte atribút. Keď zostane prázdne, bude jas pre svetlá a percento pre ventilátory",
                     "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
                     "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20",
@@ -223,6 +226,12 @@
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
                 }
             }
+        }
+    },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "title": "Konfigurácia Powercalc YAML bola presunutá",
+            "description": "Konfigurácia senzorov pomocou `sensor->platform` bola zastaraná. Musíte zmeniť konfiguráciu na `powercalc->sensors`. Kliknite na 'Viac informácií' pre ďalšie pokyny."
         }
     }
 }
