@@ -64,7 +64,7 @@
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
-                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti"
                 },
                 "title": "Vytvoriť skupinu snímača"
