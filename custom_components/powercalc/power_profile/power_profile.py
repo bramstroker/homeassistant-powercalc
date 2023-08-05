@@ -6,7 +6,14 @@ import os
 import re
 from typing import NamedTuple, Protocol
 
-from homeassistant.backports.enum import StrEnum
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION  # noqa
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.8.0"):
+    from enum import StrEnum
+else:
+    from homeassistant.backports.enum import StrEnum
+
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN

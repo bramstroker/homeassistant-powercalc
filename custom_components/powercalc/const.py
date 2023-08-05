@@ -3,7 +3,14 @@
 from datetime import timedelta
 from typing import Literal
 
-from homeassistant.backports.enum import StrEnum
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION  # noqa
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.8.0"):
+    from enum import StrEnum
+else:
+    from homeassistant.backports.enum import StrEnum
+
 from homeassistant.components.utility_meter.const import DAILY, MONTHLY, WEEKLY
 from homeassistant.const import (
     STATE_NOT_HOME,
