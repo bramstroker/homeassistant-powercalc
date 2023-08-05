@@ -129,7 +129,9 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
 SCHEMA_REAL_POWER = vol.Schema(
     {
         vol.Required(CONF_NAME): selector.TextSelector(),
-        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
+        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(
+            selector.EntitySelectorConfig(device_class=SensorDeviceClass.POWER),
+        ),
         vol.Optional(
             CONF_CREATE_UTILITY_METERS,
             default=False,

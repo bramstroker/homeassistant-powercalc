@@ -49,6 +49,19 @@
           "area": "Adds all powercalc sensors from the specified area"
         }
       },
+      "real_power": {
+        "title": "Create an energy sensor for an existing power sensor",
+        "description": "Currently specific settings can only be configured globally",
+        "data": {
+          "name": "[%key:common::config_flow::data::name%]",
+          "entity_id": "Power sensor id",
+          "create_utility_meters": "[%key:component::powercalc::config::step::virtual_power::data::create_utility_meters%]"
+        },
+        "data_description": {
+          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        }
+      },
       "virtual_power": {
         "title": "Create a virtual power sensor",
         "description": "See the readme for more information about the possible strategies and configuration options",
