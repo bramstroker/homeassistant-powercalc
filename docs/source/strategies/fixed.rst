@@ -76,7 +76,10 @@ The `states_power` setting allows you to specify a power per entity state. This 
               paused: 2.25
               idle: 1.5
 
-> Remark: You cannot use `off` in states_power as this is handled separately by powercalc. You'll need to use `standby_power` to indicate the power when the device is off.
+.. warning::
+
+    Some states you cannot use as they are considered "off" for powercalc. In this case you'll need to use `standby_power`.
+    The states which this applies to are `off`, `not_home`, `standby` and `unavailable`.
 
 You can also use state attributes. Use the `|` delimiter to seperate the attribute and value. Here is en example:
 
@@ -92,10 +95,5 @@ You can also use state attributes. Use the `|` delimiter to seperate the attribu
               media_content_id|Youtube: 10
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
-
-.. warning::
-
-    Some states you cannot use as they are considered "off" for powercalc. In this case you'll need to use `standby_power`.
-    The states which this applies to are `off`, `not_home`, `standby` and `unavailable`.
 
 .. _template: https://www.home-assistant.io/docs/configuration/templating/
