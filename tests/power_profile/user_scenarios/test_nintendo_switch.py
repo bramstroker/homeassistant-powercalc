@@ -5,7 +5,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
-from custom_components.powercalc.const import CONF_DELAY, CONF_FIXED, CONF_POWER, CONF_SLEEP_POWER, CONF_STANDBY_POWER
+from custom_components.powercalc.const import (
+    CONF_DELAY,
+    CONF_FIXED,
+    CONF_POWER,
+    CONF_SLEEP_POWER,
+    CONF_STANDBY_POWER,
+)
 from tests.common import run_powercalc_setup
 from tests.conftest import MockEntityWithModel
 
