@@ -91,6 +91,7 @@ SENSOR_TYPE_MENU = {
     SensorType.GROUP: "Group",
     SensorType.VIRTUAL_POWER: "Virtual power (manual)",
     MENU_OPTION_LIBRARY: "Virtual power (library)",
+    SensorType.REAL_POWER: "Energy from real power sensor",
 }
 
 SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
@@ -124,6 +125,17 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     },
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
+
+SCHEMA_REAL_POWER = vol.Schema(
+    {
+        vol.Required(CONF_NAME): selector.TextSelector(),
+        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
+        vol.Optional(
+            CONF_CREATE_UTILITY_METERS,
+            default=False,
+        ): selector.BooleanSelector(),
+    },
+)
 
 SCHEMA_POWER_LIBRARY = vol.Schema(
     {
@@ -506,6 +518,22 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         return await self.async_step_manufacturer()
+
+    async def async_step_real_power(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for real power sensor"""
+
+        self.selected_sensor_type = SensorType.REAL_POWER
+        if user_input is not None:
+            self.name = user_input.get(CONF_NAME)
+            self.sensor_config.update(user_input)
+            return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="real_power",
+            data_schema=SCHEMA_REAL_POWER,
+            errors={},
+            last_step=False,
+        )
 
     async def async_step_manufacturer(
         self,

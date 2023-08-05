@@ -1175,6 +1175,26 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
     ]
 
 
+async def test_real_power(hass: HomeAssistant) -> None:
+
+    result = await _select_sensor_type(hass, SensorType.REAL_POWER)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_NAME: "Foo",
+            CONF_ENTITY_ID: "sensor.my_power",
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.foo_energy")
+    assert hass.states.get("sensor.foo_energy_daily")
+
+
 def _create_mock_entry(
     hass: HomeAssistant,
     entry_data: ConfigType,
