@@ -4,7 +4,6 @@ Provide a mock sensor platform.
 Call init before using it in your tests to ensure clean test data.
 """
 from datetime import datetime
-from typing import Any
 
 from homeassistant.components.sensor import (
     DEVICE_CLASSES,
@@ -25,7 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, StateType
 from pytest_homeassistant_custom_component.common import MockEntity
 
 DEVICE_CLASSES.append("none")
@@ -110,7 +109,7 @@ class MockSensor(MockEntity, SensorEntity):
         return self._handle("native_unit_of_measurement")
 
     @property
-    def native_value(self) -> Any | None:
+    def native_value(self) -> StateType:
         """Return the native value of this sensor."""
         return self._handle("native_value")
 

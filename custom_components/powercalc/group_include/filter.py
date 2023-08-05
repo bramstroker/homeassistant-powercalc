@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from homeassistant.backports.enum import StrEnum
+from awesomeversion.awesomeversion import AwesomeVersion
+from homeassistant.const import __version__ as HA_VERSION  # noqa
+
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.8.0"):
+    from enum import StrEnum
+else:
+    from homeassistant.backports.enum import StrEnum
+
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.helpers.entity_registry import RegistryEntry
 
