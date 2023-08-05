@@ -46,6 +46,7 @@ When you don't have a source entity or helper (ex. `input_boolean`) to bind on a
     powercalc:
       sensors:
         - entity_id: sensor.dummy
+          name: Bathroom lights
           fixed:
             power: "{{states('input_number.bathroom_watts')}}"
 
