@@ -544,13 +544,13 @@ async def test_area_groups_as_subgroups(
     group_a_power = hass.states.get("sensor.groupa_power")
     assert group_a_power
     assert group_a_power.attributes.get(CONF_ENTITIES) == {
-        "sensor.bathroom_mirror_power"
+        "sensor.bathroom_mirror_power",
     }
 
     group_b_power = hass.states.get("sensor.groupb_power")
     assert group_b_power
     assert group_b_power.attributes.get(CONF_ENTITIES) == {
-        "sensor.bathroom_mirror_power"
+        "sensor.bathroom_mirror_power",
     }
 
 
