@@ -104,8 +104,21 @@
                 "data": {
                     "model": "Model ID"
                 },
-                "description": "Select het model. Zie de [lijst]({supported_models_link}) van ondersteunde verlichting voor meer informatie",
+                "description": "Selecteer het model. Zie de [lijst]({supported_models_link}) van ondersteunde apparaten voor meer informatie",
                 "title": "Model configuratie"
+            },
+            "real_power": {
+                "data": {
+                    "name": "Naam",
+                    "entity_id": "Vermogensensor id",
+                    "create_utility_meters": "Creëer utiliteit meters"
+                },
+                "data_description": {
+                    "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
+                    "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc."
+                },
+                "description": "Currently specific settings can only be configured globally",
+                "title": "Create an energy sensor for an existing power sensor"
             },
             "sub_profile": {
                 "data": {
