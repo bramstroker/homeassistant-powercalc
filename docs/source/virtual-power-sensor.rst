@@ -8,12 +8,12 @@ Powercalc offers various calculation methods that can be used to establish a new
 .. toctree::
    :maxdepth: 1
 
-   strategies/composite
    strategies/fixed
    strategies/linear
    strategies/lut
    strategies/playbook
    strategies/wled
+   strategies/composite
 
 GUI
 ---

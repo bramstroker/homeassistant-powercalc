@@ -9,7 +9,7 @@ from typing import NamedTuple, Protocol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 
-if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2022.8.0"):
+if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
     from enum import StrEnum
 else:
     from homeassistant.backports.enum import StrEnum

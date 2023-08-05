@@ -350,7 +350,8 @@ def resolve_entity_ids_recursively(
         area_entities = [
             entity.entity_id
             for entity in resolve_include_entities(
-                hass, {CONF_AREA: entry.data[CONF_AREA]},
+                hass,
+                {CONF_AREA: entry.data[CONF_AREA]},
             )
             if isinstance(
                 entity,
