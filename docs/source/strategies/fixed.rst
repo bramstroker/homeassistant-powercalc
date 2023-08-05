@@ -81,4 +81,9 @@ You can also use state attributes. Use the `|` delimiter to seperate the attribu
 
 When no match is found in `states_power` lookup than the configured `power` will be considered.
 
+.. warning::
+
+    Some states you cannot use as they are considered "off" for powercalc. In this case you'll need to use `standby_power`.
+    The states which this applies to are `off`, `not_home`, `standby` and `unavailable`.
+
 .. _template: https://www.home-assistant.io/docs/configuration/templating/
