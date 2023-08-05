@@ -50,6 +50,17 @@ When you don't have a source entity or helper (ex. `input_boolean`) to bind on a
           fixed:
             power: "{{states('input_number.bathroom_watts')}}"
 
+**Example with standby power**
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - entity_id: switch.test
+          fixed:
+            power: 5
+          standby_power: 0.5
+
 Power per state
 ---------------
 The `states_power` setting allows you to specify a power per entity state. This can be useful for example on Sonos devices which have a different power consumption in different states.
