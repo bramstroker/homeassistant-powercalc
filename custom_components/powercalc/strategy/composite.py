@@ -21,7 +21,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         self.strategies = strategies
 
     async def calculate(
-        self, entity_state: State, is_initial_update: bool = False
+        self, entity_state: State, is_initial_update: bool = False,
     ) -> Decimal | None:
         for sub_strategy in self.strategies:
             if sub_strategy.condition and not sub_strategy.condition(
@@ -31,7 +31,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                 continue
 
             return await sub_strategy.strategy.calculate(
-                entity_state, is_initial_update
+                entity_state, is_initial_update,
             )
 
         return None

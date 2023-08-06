@@ -510,7 +510,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     if sensor_type == SensorType.REAL_POWER:
         sensor_config[CONF_POWER_SENSOR_ID] = sensor_config.get(CONF_ENTITY_ID)
         sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
-        sensor_config.pop(CONF_ENTITY_ID)
 
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         daily_fixed_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))  # type: ignore

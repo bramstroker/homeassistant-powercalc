@@ -414,7 +414,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._handle_source_entity_state_change(
-                    entity_id, new_state, is_initial_update=True
+                    entity_id, new_state, is_initial_update=True,
                 )
                 async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
@@ -534,7 +534,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return True
 
     async def calculate_power(
-        self, state: State, is_initial_update: bool = False
+        self, state: State, is_initial_update: bool = False,
     ) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
         entity_state = state
