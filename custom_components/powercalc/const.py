@@ -191,6 +191,7 @@ class SensorType(StrEnum):
     DAILY_ENERGY = "daily_energy"
     VIRTUAL_POWER = "virtual_power"
     GROUP = "group"
+    REAL_POWER = "real_power"
 
 
 class PowercalcDiscoveryType(StrEnum):

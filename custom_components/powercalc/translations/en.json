@@ -107,6 +107,19 @@
                 "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
                 "title": "Model config"
             },
+            "real_power": {
+                "data": {
+                    "name": "Name",
+                    "entity_id": "Power sensor id",
+                    "create_utility_meters": "Create utility meters"
+                },
+                "data_description": {
+                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
+                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+                },
+                "description": "Currently specific settings can only be configured globally",
+                "title": "Create an energy sensor for an existing power sensor"
+            },
             "sub_profile": {
                 "data": {
                     "sub_profile": "Sub profile"
