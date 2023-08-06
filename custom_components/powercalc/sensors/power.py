@@ -199,7 +199,7 @@ async def create_virtual_power_sensor(
         if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
             if sensor_config.get(CONF_STANDBY_POWER) is not None:
                 standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
-                if isinstance(standby_power, float):
+                if not isinstance(standby_power, Template):
                     standby_power = Decimal(standby_power)
             elif power_profile is not None:
                 standby_power = Decimal(power_profile.standby_power)
@@ -616,12 +616,15 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._strategy_instance.can_calculate_standby():
             standby_power = await self._strategy_instance.calculate(state) or Decimal(0)
 
-        if self._multiply_factor_standby and self._multiply_factor:
-            standby_power *= Decimal(self._multiply_factor)
         evaluated = await evaluate_power(standby_power)
         if evaluated is None:
             evaluated = Decimal(0)
-        return evaluated
+        standby_power = evaluated
+
+        if self._multiply_factor_standby and self._multiply_factor:
+            standby_power *= Decimal(self._multiply_factor)
+
+        return standby_power
 
     async def is_calculation_enabled(self) -> bool:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
