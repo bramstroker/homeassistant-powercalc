@@ -46,7 +46,9 @@ class WledStrategy(PowerCalculationStrategyInterface):
         self._standby_power: Decimal = Decimal(standby_power or 0)
         self._estimated_current_entity: str | None = None
 
-    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+    async def calculate(
+        self, entity_state: State, is_initial_update: bool = False
+    ) -> Decimal | None:
         light_state = (
             entity_state
             if entity_state.entity_id == self._light_entity.entity_id

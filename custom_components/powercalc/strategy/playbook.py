@@ -16,7 +16,11 @@ from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 
-from custom_components.powercalc.const import CONF_AUTOSTART, CONF_PLAYBOOKS, CONF_REPEAT
+from custom_components.powercalc.const import (
+    CONF_AUTOSTART,
+    CONF_PLAYBOOKS,
+    CONF_REPEAT,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -64,7 +68,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         """
         self._update_callback = update_callback
 
-    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+    async def calculate(
+        self, entity_state: State, is_initial_update: bool = False
+    ) -> Decimal | None:
         if is_initial_update and self._autostart:
             await self.activate_playbook(self._autostart)
 

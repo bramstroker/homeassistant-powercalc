@@ -104,7 +104,9 @@ class LutStrategy(PowerCalculationStrategyInterface):
         self._lut_registry = lut_registry
         self._profile = profile
 
-    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+    async def calculate(
+        self, entity_state: State, is_initial_update: bool = False
+    ) -> Decimal | None:
         """Calculate the power consumption based on brightness, mired, hsl values."""
         attrs = entity_state.attributes
         color_mode = attrs.get(ATTR_COLOR_MODE)

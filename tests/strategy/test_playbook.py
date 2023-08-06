@@ -204,7 +204,9 @@ async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     await strategy.activate_playbook("program1")
 
 
-async def elapse_and_assert_power(hass: HomeAssistant, seconds: float, expected_power: str) -> None:
+async def elapse_and_assert_power(
+    hass: HomeAssistant, seconds: float, expected_power: str
+) -> None:
     async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=seconds))
     await hass.async_block_till_done()
 

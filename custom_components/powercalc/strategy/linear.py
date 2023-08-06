@@ -59,7 +59,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         self._standby_power = standby_power
         self._calibration: list[tuple[int, float]] | None = None
 
-    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+    async def calculate(
+        self, entity_state: State, is_initial_update: bool = False
+    ) -> Decimal | None:
         """Calculate the current power consumption."""
         if self._calibration is None:
             self._calibration = self.create_calibrate_list()
