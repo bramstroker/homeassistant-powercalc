@@ -23,6 +23,8 @@ Given the following example:
 
 When the light is `ON` power will be 2, when the light is `OFF` power will be 50.
 
+Passing templates as the `standby_power` value is also supported for entities created with YAML.
+
 Sleep power
 -----------
 
