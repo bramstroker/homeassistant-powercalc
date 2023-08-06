@@ -22,11 +22,15 @@ So it could look like this:
 Configuration options
 ---------------------
 
-+---------------+-------+--------------+----------+-----------------------------------------+
-| Name          | Type  | Requirement  | Default  | Description                             |
-+===============+=======+==============+==========+=========================================+
-| playbooks     | dict  | **Required** |          | Mapping of playbook id's and file paths |
-+---------------+-------+--------------+----------+-----------------------------------------+
++---------------+--------+--------------+----------+--------------------------------------------------------------------------+
+| Name          | Type   | Requirement  | Default  | Description                                                              |
++===============+========+==============+==========+==========================================================================+
+| playbooks     | dict   | **Required** |          | Mapping of playbook id's and file paths                                  |
++---------------+--------+--------------+----------+--------------------------------------------------------------------------+
+| autostart     | string | **Optional** |          | key of the playbook which you want to start when HA starts.              |
++---------------+--------+--------------+----------+--------------------------------------------------------------------------+
+| repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes |                   |
++---------------+--------+--------------+----------+--------------------------------------------------------------------------+
 
 Setup a power sensor with playbook support.
 The examples below will both create a ``sensor.washing_machine_power``
@@ -55,9 +59,22 @@ or when you don't have an entity to bind to, just use dummy and define a name.
             playbooks:
               ...
 
+Example using ``autostart`` and ``repeat`` options:
 
-Executing the playbook
-----------------------
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - entity_id: sensor.dummy
+          name: Refrigerator
+          playbook:
+            playbooks:
+              playbook: refrigerator.csv
+          autostart: playbook
+          repeat: true
+
+Manually executing the playbook
+-------------------------------
 
 To start executing a playbook you'll have to utilize HA automations.
 Powercalc provides two services which let's you control the playbook execution. ``activate_playbook`` and ``stop_playbook``.
