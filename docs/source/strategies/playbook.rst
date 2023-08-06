@@ -29,7 +29,7 @@ Configuration options
 +---------------+--------+--------------+----------+--------------------------------------------------------------------------+
 | autostart     | string | **Optional** |          | key of the playbook which you want to start when HA starts.              |
 +---------------+--------+--------------+----------+--------------------------------------------------------------------------+
-| repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes |                   |
+| repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes |
 +---------------+--------+--------------+----------+--------------------------------------------------------------------------+
 
 Setup a power sensor with playbook support.
