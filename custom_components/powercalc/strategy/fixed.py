@@ -42,7 +42,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         self._power = power
         self._per_state_power = per_state_power
 
-    async def calculate(self, entity_state: State) -> Decimal | None:
+    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
         if self._per_state_power is not None:
             # Lookup by state
             if entity_state.state in self._per_state_power:

@@ -16,7 +16,7 @@ from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 
-from custom_components.powercalc.const import CONF_PLAYBOOKS
+from custom_components.powercalc.const import CONF_AUTOSTART, CONF_PLAYBOOKS, CONF_REPEAT
 from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -26,6 +26,8 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_PLAYBOOKS): vol.Schema(
             {cv.string: cv.string},
         ),
+        vol.Optional(CONF_AUTOSTART): cv.string,
+        vol.Optional(CONF_REPEAT, default=False): cv.boolean,
     },
 )
 
@@ -46,6 +48,8 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._start_time: datetime = dt.utcnow()
         self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
+        self._repeat: bool = bool(config.get(CONF_REPEAT))
+        self._autostart: str | None = config.get(CONF_AUTOSTART)
         self._power = Decimal(0)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
@@ -60,7 +64,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         """
         self._update_callback = update_callback
 
-    async def calculate(self, entity_state: State) -> Decimal | None:
+    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+        if is_initial_update and self._autostart:
+            await self.activate_playbook(self._autostart)
+
         return self._power
 
     async def activate_playbook(self, playbook_id: str) -> None:
@@ -138,7 +145,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         with open(file_path) as csv_file:
-            queue = PlaybookQueue()
+            queue = PlaybookQueue(repeat=self._repeat)
 
             csv_reader = csv.reader(csv_file)
             for row in csv_reader:
@@ -150,14 +157,18 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
 
 class PlaybookQueue:
-    def __init__(self) -> None:
+    def __init__(self, repeat: bool = False) -> None:
         self._entries: deque[PlaybookEntry] = deque()
+        self._repeat = repeat
 
     def enqueue(self, entry: PlaybookEntry) -> None:
         self._entries.append(entry)
 
     def dequeue(self) -> PlaybookEntry:
-        return self._entries.popleft()
+        entry = self._entries.popleft()
+        if self._repeat:
+            self.enqueue(entry)
+        return entry
 
     def __len__(self) -> int:
         return len(self._entries)
