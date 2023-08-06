@@ -48,6 +48,7 @@ async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant) 
     assert result["errors"]["base"] == "linear_mandatory"
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
+
 async def test_linear_options_flow(hass: HomeAssistant) -> None:
     entry = create_mock_entry(
         hass,

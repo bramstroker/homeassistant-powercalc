@@ -1,7 +1,13 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE, CONF_UNIQUE_ID
+from homeassistant.const import (
+    CONF_ENTITIES,
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_SENSOR_TYPE,
+    CONF_UNIQUE_ID,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry
@@ -24,7 +30,10 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
 )
 from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity, create_mocked_virtual_power_sensor_entry
+from tests.common import (
+    create_mock_light_entity,
+    create_mocked_virtual_power_sensor_entry,
+)
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,

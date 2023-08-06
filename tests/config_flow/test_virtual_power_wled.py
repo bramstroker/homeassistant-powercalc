@@ -5,7 +5,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 
 import custom_components.test.sensor as test_sensor_platform
-from custom_components.powercalc.const import CONF_MODE, CONF_POWER_FACTOR, CONF_SENSOR_TYPE, CONF_VOLTAGE, CONF_WLED, CalculationStrategy, SensorType
+from custom_components.powercalc.const import (
+    CONF_MODE,
+    CONF_POWER_FACTOR,
+    CONF_SENSOR_TYPE,
+    CONF_VOLTAGE,
+    CONF_WLED,
+    CalculationStrategy,
+    SensorType,
+)
 from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (

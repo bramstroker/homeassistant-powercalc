@@ -19,7 +19,12 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
-from tests.config_flow.common import DEFAULT_ENTITY_ID, DEFAULT_UNIQUE_ID, create_mock_entry, initialize_options_flow
+from tests.config_flow.common import (
+    DEFAULT_ENTITY_ID,
+    DEFAULT_UNIQUE_ID,
+    create_mock_entry,
+    initialize_options_flow,
+)
 from tests.conftest import MockEntityWithModel
 
 
@@ -148,6 +153,7 @@ async def test_discovery_flow_with_subprofile_selection(
         CONF_NAME: "test",
         CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
+
 
 async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
     """

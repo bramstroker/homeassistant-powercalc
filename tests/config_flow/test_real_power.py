@@ -3,7 +3,11 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, SensorType
-from tests.config_flow.common import create_mock_entry, initialize_options_flow, select_sensor_type
+from tests.config_flow.common import (
+    create_mock_entry,
+    initialize_options_flow,
+    select_sensor_type,
+)
 
 
 async def test_real_power(hass: HomeAssistant) -> None:

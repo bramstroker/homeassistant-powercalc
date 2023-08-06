@@ -526,7 +526,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_manufacturer()
 
-    async def async_step_real_power(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_real_power(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Handle the flow for real power sensor"""
 
         self.selected_sensor_type = SensorType.REAL_POWER

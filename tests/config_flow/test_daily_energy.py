@@ -1,10 +1,25 @@
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_NAME, CONF_UNIQUE_ID, CONF_UNIT_OF_MEASUREMENT, UnitOfPower
+from homeassistant.const import (
+    CONF_NAME,
+    CONF_UNIQUE_ID,
+    CONF_UNIT_OF_MEASUREMENT,
+    UnitOfPower,
+)
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.const import CONF_DAILY_FIXED_ENERGY, CONF_SENSOR_TYPE, CONF_UPDATE_FREQUENCY, CONF_VALUE
-from tests.config_flow.common import DEFAULT_UNIQUE_ID, create_mock_entry, initialize_options_flow, select_sensor_type
+from custom_components.powercalc.const import (
+    CONF_DAILY_FIXED_ENERGY,
+    CONF_SENSOR_TYPE,
+    CONF_UPDATE_FREQUENCY,
+    CONF_VALUE,
+)
+from tests.config_flow.common import (
+    DEFAULT_UNIQUE_ID,
+    create_mock_entry,
+    initialize_options_flow,
+    select_sensor_type,
+)
 
 
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -> None:

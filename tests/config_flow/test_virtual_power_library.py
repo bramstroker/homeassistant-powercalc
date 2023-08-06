@@ -5,8 +5,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
 
 from custom_components.powercalc import DOMAIN
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, MENU_OPTION_LIBRARY
-from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODE, CONF_MODEL, CONF_SENSOR_TYPE, CalculationStrategy, SensorType
+from custom_components.powercalc.config_flow import (
+    CONF_CONFIRM_AUTODISCOVERED_MODEL,
+    MENU_OPTION_LIBRARY,
+)
+from custom_components.powercalc.const import (
+    CONF_MANUFACTURER,
+    CONF_MODE,
+    CONF_MODEL,
+    CONF_SENSOR_TYPE,
+    CalculationStrategy,
+    SensorType,
+)
 from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
