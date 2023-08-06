@@ -3,7 +3,10 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, SensorType
 from tests.config_flow.common import (
