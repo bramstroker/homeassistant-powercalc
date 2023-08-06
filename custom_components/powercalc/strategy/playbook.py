@@ -142,7 +142,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         with open(file_path) as csv_file:
-            queue = PlaybookQueue()
+            queue = PlaybookQueue(repeat=self._repeat)
 
             csv_reader = csv.reader(csv_file)
             for row in csv_reader:
@@ -154,14 +154,18 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
 
 class PlaybookQueue:
-    def __init__(self) -> None:
+    def __init__(self, repeat: bool = False) -> None:
         self._entries: deque[PlaybookEntry] = deque()
+        self._repeat = repeat
 
     def enqueue(self, entry: PlaybookEntry) -> None:
         self._entries.append(entry)
 
     def dequeue(self) -> PlaybookEntry:
-        return self._entries.popleft()
+        entry = self._entries.popleft()
+        if self._repeat:
+            self.enqueue(entry)
+        return entry
 
     def __len__(self) -> int:
         return len(self._entries)
