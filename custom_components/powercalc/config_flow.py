@@ -827,6 +827,9 @@ class OptionsFlowHandler(OptionsFlow):
 
             strategy_options = self.current_config.get(self.strategy) or {}
 
+        if self.sensor_type == SensorType.REAL_POWER:
+            data_schema = SCHEMA_REAL_POWER
+
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
             strategy_options = self.current_config[CONF_DAILY_FIXED_ENERGY]
