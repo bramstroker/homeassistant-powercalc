@@ -126,9 +126,8 @@ SCHEMA_DAILY_ENERGY = vol.Schema(
     },
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
 
-SCHEMA_REAL_POWER = vol.Schema(
+SCHEMA_REAL_POWER_OPTIONS = vol.Schema(
     {
-        vol.Required(CONF_NAME): selector.TextSelector(),
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(
             selector.EntitySelectorConfig(device_class=SensorDeviceClass.POWER),
         ),
@@ -138,6 +137,12 @@ SCHEMA_REAL_POWER = vol.Schema(
         ): selector.BooleanSelector(),
     },
 )
+
+SCHEMA_REAL_POWER = vol.Schema(
+    {
+        vol.Required(CONF_NAME): selector.TextSelector(),
+    },
+).extend(SCHEMA_REAL_POWER_OPTIONS.schema)
 
 SCHEMA_POWER_LIBRARY = vol.Schema(
     {
@@ -775,7 +780,7 @@ class OptionsFlowHandler(OptionsFlow):
                 except StrategyConfigurationError as error:
                     return {"base": error.get_config_flow_translate_key()}
 
-        if self.sensor_type == SensorType.GROUP:
+        if self.sensor_type in [SensorType.GROUP, SensorType.REAL_POWER]:
             self._process_user_input(user_input, schema)
 
         self.hass.config_entries.async_update_entry(
@@ -828,7 +833,7 @@ class OptionsFlowHandler(OptionsFlow):
             strategy_options = self.current_config.get(self.strategy) or {}
 
         if self.sensor_type == SensorType.REAL_POWER:
-            data_schema = SCHEMA_REAL_POWER
+            data_schema = SCHEMA_REAL_POWER_OPTIONS
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
             data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
