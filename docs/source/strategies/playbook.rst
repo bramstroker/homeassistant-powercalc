@@ -33,7 +33,7 @@ Configuration options
 +---------------+--------+--------------+----------+--------------------------------------------------------------------------+
 
 Setup a power sensor with playbook support.
-The examples below will both create a ``sensor.washing_machine_power``
+The example below will create entity ``sensor.washing_machine_power``
 
 .. code-block:: yaml
 
