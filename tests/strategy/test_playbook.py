@@ -14,6 +14,7 @@ from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.powercalc.const import (
+    CONF_AUTOSTART,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_REPEAT,
@@ -152,6 +153,32 @@ async def test_repeat(hass: HomeAssistant) -> None:
     await elapse_and_assert_power(hass, 4, "40.00")
     await elapse_and_assert_power(hass, 6, "20.00")
     await elapse_and_assert_power(hass, 8, "40.00")
+    await elapse_and_assert_power(hass, 10, "20.00")
+
+    await _stop_playbook(hass)
+
+    await elapse_and_assert_power(hass, 12, "20.00")
+    await elapse_and_assert_power(hass, 14, "20.00")
+
+
+async def test_autostart(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "playbook": "test2.csv",
+                },
+                CONF_AUTOSTART: "playbook",
+            },
+        },
+    )
+
+    await elapse_and_assert_power(hass, 2, "20.00")
+    await elapse_and_assert_power(hass, 4, "40.00")
 
 
 async def test_exception_when_providing_unknown_playbook(hass: HomeAssistant) -> None:

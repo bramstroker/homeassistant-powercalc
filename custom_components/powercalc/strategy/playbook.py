@@ -26,7 +26,7 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_PLAYBOOKS): vol.Schema(
             {cv.string: cv.string},
         ),
-        vol.Optional(CONF_AUTOSTART, default=False): cv.boolean,
+        vol.Optional(CONF_AUTOSTART): cv.string,
         vol.Optional(CONF_REPEAT, default=False): cv.boolean,
     },
 )
@@ -49,7 +49,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
         self._repeat: bool = bool(config.get(CONF_REPEAT))
-        self._autostart: bool = bool(config.get(CONF_AUTOSTART))
+        self._autostart: str | None = config.get(CONF_AUTOSTART)
         self._power = Decimal(0)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
@@ -64,7 +64,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         """
         self._update_callback = update_callback
 
-    async def calculate(self, entity_state: State) -> Decimal | None:
+    async def calculate(self, entity_state: State, is_initial_update: bool = False) -> Decimal | None:
+        if is_initial_update and self._autostart:
+            await self.activate_playbook(self._autostart)
+
         return self._power
 
     async def activate_playbook(self, playbook_id: str) -> None:
