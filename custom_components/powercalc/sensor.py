@@ -156,7 +156,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
     vol.Optional(CONF_MODE): vol.In([cls.value for cls in CalculationStrategy]),
-    vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float),
+    vol.Optional(CONF_STANDBY_POWER): vol.Any(vol.Coerce(float), cv.template),
     vol.Optional(CONF_DISABLE_STANDBY_POWER): cv.boolean,
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,

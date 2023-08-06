@@ -81,6 +81,7 @@ from custom_components.powercalc.errors import (
     StrategyConfigurationError,
     UnsupportedStrategyError,
 )
+from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
@@ -197,7 +198,9 @@ async def create_virtual_power_sensor(
         standby_power_on = Decimal(0)
         if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
             if sensor_config.get(CONF_STANDBY_POWER) is not None:
-                standby_power = Decimal(sensor_config.get(CONF_STANDBY_POWER))  # type: ignore
+                standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
+                if isinstance(standby_power, float):
+                    standby_power = Decimal(standby_power)
             elif power_profile is not None:
                 standby_power = Decimal(power_profile.standby_power)
                 standby_power_on = Decimal(power_profile.standby_power_on)
@@ -213,14 +216,13 @@ async def create_virtual_power_sensor(
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s "
-            "strategy=%s manufacturer=%s model=%s standby_power=%s unique_id=%s)",
+            "strategy=%s manufacturer=%s model=%s unique_id=%s)",
             source_entity.entity_id,
             entity_category,
             name,
             strategy,
             power_profile.manufacturer if power_profile else "",
             power_profile.model if power_profile else "",
-            round(standby_power, 2),
             unique_id,
         )
 
@@ -323,7 +325,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         name: str,
         source_entity: SourceEntity,
         unique_id: str | None,
-        standby_power: Decimal,
+        standby_power: Decimal | Template,
         standby_power_on: Decimal,
         update_frequency: timedelta,
         multiply_factor: float | None,
@@ -446,6 +448,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             for template in entities_to_track
             if isinstance(template, TrackTemplate)
         ]
+        if isinstance(self._standby_power, Template):
+            self._standby_power.hass = self.hass
+            track_templates.append(TrackTemplate(self._standby_power, None, None))
         if track_templates:
             async_track_template_result(
                 self.hass,
@@ -613,7 +618,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if self._multiply_factor_standby and self._multiply_factor:
             standby_power *= Decimal(self._multiply_factor)
-        return Decimal(standby_power)
+        evaluated = await evaluate_power(standby_power)
+        if evaluated is None:
+            evaluated = Decimal(0)
+        return evaluated
 
     async def is_calculation_enabled(self) -> bool:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:

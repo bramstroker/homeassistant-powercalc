@@ -446,3 +446,28 @@ async def test_manually_configured_sensor_overrides_profile(
     await hass.async_block_till_done()
 
     assert_entity_state(hass, "sensor.test_123_power", "0.00")
+
+
+async def test_standby_power_template(hass: HomeAssistant) -> None:
+    await create_input_number(hass, "test", 0)
+    await create_input_boolean(hass)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "input_boolean.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_STANDBY_POWER: "{{ states('input_number.test') }}",
+            CONF_FIXED: {CONF_POWER: 40},
+        },
+    )
+
+    hass.states.async_set("input_number.test", 20)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "20.00"
+
+    hass.states.async_set("input_number.test", 60)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "60.00"
