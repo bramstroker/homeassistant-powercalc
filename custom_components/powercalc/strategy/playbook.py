@@ -16,7 +16,7 @@ from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt
 
-from custom_components.powercalc.const import CONF_PLAYBOOKS
+from custom_components.powercalc.const import CONF_AUTOSTART, CONF_PLAYBOOKS, CONF_REPEAT
 from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -26,6 +26,8 @@ CONFIG_SCHEMA = vol.Schema(
         vol.Optional(CONF_PLAYBOOKS): vol.Schema(
             {cv.string: cv.string},
         ),
+        vol.Optional(CONF_AUTOSTART, default=False): cv.boolean,
+        vol.Optional(CONF_REPEAT, default=False): cv.boolean,
     },
 )
 
@@ -46,6 +48,8 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._start_time: datetime = dt.utcnow()
         self._cancel_timer: CALLBACK_TYPE | None = None
         self._config = config
+        self._repeat: bool = bool(config.get(CONF_REPEAT))
+        self._autostart: bool = bool(config.get(CONF_AUTOSTART))
         self._power = Decimal(0)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
