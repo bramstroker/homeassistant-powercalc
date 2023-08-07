@@ -1,3 +1,2 @@
 - Foutmelding indien niet playbooks gevuld
-- Selectie entiteiten, alleen entiteiten die playbook strategy hebben.
 - Entity_id dummy of optioneel

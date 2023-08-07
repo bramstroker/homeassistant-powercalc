@@ -69,6 +69,7 @@ from .const import (
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
+    DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
     CalculationStrategy,
@@ -342,48 +343,55 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
+        errors: dict[str, str] = {}
+
         if user_input is not None:
-            self.source_entity_id = str(user_input[CONF_ENTITY_ID])
-            self.source_entity = await create_source_entity(
-                self.source_entity_id,
-                self.hass,
-            )
-            unique_id = user_input.get(CONF_UNIQUE_ID)
-            if not unique_id:
-                source_unique_id = self.source_entity.unique_id or self.source_entity_id
-                unique_id = f"pc_{source_unique_id}"
+            selected_strategy = CalculationStrategy(user_input.get(CONF_MODE))
+            entity_id = user_input.get(CONF_ENTITY_ID)
+            if selected_strategy is not CalculationStrategy.PLAYBOOK and entity_id is None:
+                errors[CONF_ENTITY_ID] = "entity_mandatory"
 
-            await self.async_set_unique_id(unique_id)
-            self._abort_if_unique_id_configured()
+            if not errors:
+                self.source_entity_id = str(entity_id or DUMMY_ENTITY_ID)
+                self.source_entity = await create_source_entity(
+                    self.source_entity_id,
+                    self.hass,
+                )
+                unique_id = user_input.get(CONF_UNIQUE_ID)
+                if not unique_id:
+                    source_unique_id = self.source_entity.unique_id or self.source_entity_id
+                    unique_id = f"pc_{source_unique_id}"
 
-            self.name = user_input.get(CONF_NAME) or self.source_entity.name
-            self.selected_sensor_type = SensorType.VIRTUAL_POWER
-            self.sensor_config.update(user_input)
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
 
-            if (
-                user_input.get(CONF_MODE) == CalculationStrategy.LUT
-                or self.is_library_flow
-            ):
-                return await self.async_step_library()
+                self.name = user_input.get(CONF_NAME) or self.source_entity.name
+                self.selected_sensor_type = SensorType.VIRTUAL_POWER
+                self.sensor_config.update(user_input)
 
-            if user_input.get(CONF_MODE) == CalculationStrategy.FIXED:
-                return await self.async_step_fixed()
-
-            if user_input.get(CONF_MODE) == CalculationStrategy.LINEAR:
-                return await self.async_step_linear()
-
-            if user_input.get(CONF_MODE) == CalculationStrategy.PLAYBOOK:
-                return await self.async_step_playbook()
-
-            if user_input.get(CONF_MODE) == CalculationStrategy.WLED:
-                return await self.async_step_wled()
+                return await self.forward_to_strategy_step(selected_strategy)
 
         return self.async_show_form(
             step_id="virtual_power",
             data_schema=_create_virtual_power_schema(self.hass, self.is_library_flow),
-            errors={},
+            errors=errors,
             last_step=False,
         )
+
+    async def forward_to_strategy_step(self, strategy: CalculationStrategy) -> FlowResult:
+        if strategy == CalculationStrategy.FIXED:
+            return await self.async_step_fixed()
+
+        if strategy == CalculationStrategy.LINEAR:
+            return await self.async_step_linear()
+
+        if strategy == CalculationStrategy.PLAYBOOK:
+            return await self.async_step_playbook()
+
+        if strategy == CalculationStrategy.WLED:
+            return await self.async_step_wled()
+
+        return await self.async_step_library()
 
     async def async_step_daily_energy(
         self,
@@ -481,7 +489,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             playbooks = user_input.get(CONF_PLAYBOOKS)
             if playbooks is None or len(playbooks) == 0:
-                errors["not_supported"] = "gaat niet goed man"
+                errors["base"] = "playbook_mandatory"
 
             if not errors:
                 return await self.async_step_power_advanced()
@@ -657,7 +665,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        errors: dict[str, str] = {}
         if user_input is not None:
             # Append the sub profile to the model
             model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
@@ -671,7 +678,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="sub_profile",
             data_schema=await _create_schema_sub_profile(self.hass, model_info),
-            errors=errors,
+            errors={},
             last_step=False,
         )
 
@@ -679,7 +686,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        errors: dict[str, str] = {}
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
             return self.create_config_entry()
@@ -687,7 +693,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="power_advanced",
             data_schema=SCHEMA_POWER_ADVANCED,
-            errors=errors,
+            errors={},
         )
 
     async def validate_strategy_config(self) -> dict:
@@ -767,7 +773,7 @@ class OptionsFlowHandler(OptionsFlow):
                     if self.power_profile and self.power_profile.needs_fixed_config:
                         self.strategy = CalculationStrategy.FIXED
                 except ModelNotSupportedError:
-                    errors["not_supported"] = "Power profile could not be loaded"
+                    errors["base"] = "not_supported"
 
         schema = self.build_options_schema()
         if user_input is not None:
@@ -934,7 +940,7 @@ def _create_virtual_power_schema(
 ) -> vol.Schema:
     schema = vol.Schema(
         {
-            vol.Required(CONF_ENTITY_ID): _create_source_entity_selector(
+            vol.Optional(CONF_ENTITY_ID): _create_source_entity_selector(
                 is_library_flow,
             ),
         },

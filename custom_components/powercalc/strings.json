@@ -191,7 +191,9 @@
             "group_mandatory": "You must define at least subgroups or power and energy-entities",
             "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
             "lut_wrong_domain": "Only light entities can use the LUT mode",
-            "unknown": "Unknown error occured, please see the logs for additional information"
+            "unknown": "Unknown error occured, please see the logs for additional information",
+            "playbook_mandatory": "You need to specify at least one playbook",
+            "entity_mandatory": "Selecting an entity is required for any strategy other than playbook"
         }
     },
     "options": {
