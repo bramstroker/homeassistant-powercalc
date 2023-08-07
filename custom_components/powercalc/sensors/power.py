@@ -411,7 +411,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(hass: HomeAssistant) -> None:
-            await self._strategy_instance.on_start(hass)
+            if self._strategy_instance:
+                await self._strategy_instance.on_start(hass)
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._handle_source_entity_state_change(
