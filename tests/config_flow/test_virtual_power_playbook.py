@@ -12,6 +12,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -22,14 +23,15 @@ from tests.config_flow.common import (
 
 
 async def test_create_entry(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.PLAYBOOK)
     result = await set_virtual_power_configuration(
         hass,
         result,
         {
             CONF_PLAYBOOKS: {
-                "playbook1": "playbook1.csv",
-                "playbook2": "playbook1.csv",
+                "playbook1": "test.csv",
+                "playbook2": "test2.csv",
             },
             CONF_REPEAT: True,
             CONF_AUTOSTART: "playbook1",
@@ -43,8 +45,8 @@ async def test_create_entry(hass: HomeAssistant) -> None:
         {
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
-                    "playbook1": "playbook1.csv",
-                    "playbook2": "playbook1.csv",
+                    "playbook1": "test.csv",
+                    "playbook2": "test2.csv",
                 },
                 CONF_REPEAT: True,
                 CONF_AUTOSTART: "playbook1",
@@ -58,6 +60,7 @@ async def test_create_entry(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -66,8 +69,8 @@ async def test_options_flow(hass: HomeAssistant) -> None:
             CONF_MODE: CalculationStrategy.PLAYBOOK,
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
-                    "playbook1": "playbook1.csv",
-                    "playbook2": "playbook1.csv",
+                    "playbook1": "test.csv",
+                    "playbook2": "test2.csv",
                 },
                 CONF_REPEAT: False,
                 CONF_AUTOSTART: "playbook1",
@@ -79,8 +82,8 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_PLAYBOOKS: {
-            "playbook1": "playbook1.csv",
-            "playbook2": "playbook1.csv",
+            "playbook1": "test.csv",
+            "playbook2": "test2.csv",
         },
         CONF_REPEAT: True,
         CONF_AUTOSTART: "playbook2",
