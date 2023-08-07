@@ -346,9 +346,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            selected_strategy = CalculationStrategy(user_input.get(CONF_MODE) or CalculationStrategy.LUT)
+            selected_strategy = CalculationStrategy(
+                user_input.get(CONF_MODE) or CalculationStrategy.LUT
+            )
             entity_id = user_input.get(CONF_ENTITY_ID)
-            if selected_strategy is not CalculationStrategy.PLAYBOOK and entity_id is None:
+            if (
+                selected_strategy is not CalculationStrategy.PLAYBOOK
+                and entity_id is None
+            ):
                 errors[CONF_ENTITY_ID] = "entity_mandatory"
 
             if not errors:
@@ -359,7 +364,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 unique_id = user_input.get(CONF_UNIQUE_ID)
                 if not unique_id:
-                    source_unique_id = self.source_entity.unique_id or self.source_entity_id
+                    source_unique_id = (
+                        self.source_entity.unique_id or self.source_entity_id
+                    )
                     unique_id = f"pc_{source_unique_id}"
 
                 await self.async_set_unique_id(unique_id)
@@ -378,7 +385,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def forward_to_strategy_step(self, strategy: CalculationStrategy) -> FlowResult:
+    async def forward_to_strategy_step(
+        self, strategy: CalculationStrategy
+    ) -> FlowResult:
         if strategy == CalculationStrategy.FIXED:
             return await self.async_step_fixed()
 

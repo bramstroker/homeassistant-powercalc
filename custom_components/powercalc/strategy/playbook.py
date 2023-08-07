@@ -166,7 +166,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
                     )
                 entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
 
-            self._loaded_playbooks[playbook_id] = Playbook(key=playbook_id, queue=PlaybookQueue(entries))
+            self._loaded_playbooks[playbook_id] = Playbook(
+                key=playbook_id, queue=PlaybookQueue(entries)
+            )
 
         return self._loaded_playbooks[playbook_id]
 
