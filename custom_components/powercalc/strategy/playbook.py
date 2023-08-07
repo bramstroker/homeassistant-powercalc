@@ -160,6 +160,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             csv_reader = csv.reader(csv_file)
             entries = []
             for row in csv_reader:
+                if len(row) != 2:
+                    raise StrategyConfigurationError(
+                        f"Playbook file '{file_path}' has invalid structure, please see the documentation.",
+                    )
                 entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
 
             self._loaded_playbooks[playbook_id] = Playbook(key=playbook_id, queue=PlaybookQueue(entries))

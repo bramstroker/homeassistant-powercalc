@@ -198,11 +198,40 @@ async def test_exception_when_providing_unknown_playbook_file(
         await strategy.activate_playbook("program1")
 
 
+async def test_exception_on_invalid_csv(
+    hass: HomeAssistant,
+) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "invalid.csv"}})
+    with pytest.raises(StrategyConfigurationError):
+        await strategy.activate_playbook("program1")
+
+
 async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
     strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     await strategy.activate_playbook("program1")
     await strategy.activate_playbook("program1")
+
+
+async def test_load_csv_from_subdirectory(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "playbook1": "subdir/test.csv",
+                },
+            },
+        },
+    )
+
+    await _activate_playbook(hass, "playbook1")
+
+    await elapse_and_assert_power(hass, 2, "20.00")
 
 
 async def test_multiply_factor(hass: HomeAssistant) -> None:
