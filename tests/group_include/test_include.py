@@ -554,7 +554,9 @@ async def test_area_groups_as_subgroups(
     }
 
 
-async def test_power_group_does_not_include_binary_sensors(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+async def test_power_group_does_not_include_binary_sensors(
+    hass: HomeAssistant, area_reg: AreaRegistry
+) -> None:
     area = area_reg.async_get_or_create("Bathroom")
     await hass.async_block_till_done()
 
