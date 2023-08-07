@@ -6,7 +6,8 @@ The playbook strategy makes it possible to record power consumption over time an
 This is useful to implement power sensors for program based devices. For example Washing machines, dishwashers.
 You can generate a playbook with the powercalc :doc:`measure tool </contributing/measure>`.
 
-Currently this is a YAML only feature.
+You can setup sensors both with YAML or GUI.
+When you use the GUI select :guilabel:`playbook` in the calculation_strategy dropdown.
 
 You must put your playbook in HA config directory and create a subdirectory ``powercalc/playbooks`` there.
 So it could look like this:
