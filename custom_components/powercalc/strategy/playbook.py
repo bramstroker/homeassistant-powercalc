@@ -68,15 +68,12 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         """
         self._update_callback = update_callback
 
-    async def calculate(
-        self,
-        entity_state: State,
-        is_initial_update: bool = False,
-    ) -> Decimal | None:
-        if is_initial_update and self._autostart:
-            await self.activate_playbook(self._autostart)
-
+    async def calculate(self, entity_state: State) -> Decimal | None:
         return self._power
+
+    async def on_start(self, hass: HomeAssistant) -> None:
+        if self._autostart:
+            await self.activate_playbook(self._autostart)
 
     async def activate_playbook(self, playbook_id: str) -> None:
         """Activate and execute a given playbook"""
@@ -114,6 +111,13 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         queue = self._active_playbook.queue
         if len(queue) == 0:
+            if self._repeat:
+                _LOGGER.debug(f"Playbook {self._active_playbook.key} repeating")
+                self._start_time = dt.utcnow()
+                queue.reset()
+                self._execute_playbook_entry()
+                return
+
             _LOGGER.debug(f"Playbook {self._active_playbook.key} completed")
             self._active_playbook = None
             return
@@ -153,33 +157,33 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         with open(file_path) as csv_file:
-            queue = PlaybookQueue(repeat=self._repeat)
-
             csv_reader = csv.reader(csv_file)
+            entries = []
             for row in csv_reader:
-                queue.enqueue(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
+                if len(row) != 2:
+                    raise StrategyConfigurationError(
+                        f"Playbook file '{file_path}' has invalid structure, please see the documentation.",
+                    )
+                entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
 
-            self._loaded_playbooks[playbook_id] = Playbook(key=playbook_id, queue=queue)
+            self._loaded_playbooks[playbook_id] = Playbook(key=playbook_id, queue=PlaybookQueue(entries))
 
         return self._loaded_playbooks[playbook_id]
 
 
 class PlaybookQueue:
-    def __init__(self, repeat: bool = False) -> None:
-        self._entries: deque[PlaybookEntry] = deque()
-        self._repeat = repeat
-
-    def enqueue(self, entry: PlaybookEntry) -> None:
-        self._entries.append(entry)
+    def __init__(self, items: list[PlaybookEntry]) -> None:
+        self._items = items
+        self._queue: deque[PlaybookEntry] = deque(items)
 
     def dequeue(self) -> PlaybookEntry:
-        entry = self._entries.popleft()
-        if self._repeat:
-            self.enqueue(entry)
-        return entry
+        return self._queue.popleft()
+
+    def reset(self) -> None:
+        self._queue = deque(self._items)
 
     def __len__(self) -> int:
-        return len(self._entries)
+        return len(self._queue)
 
 
 @dataclass

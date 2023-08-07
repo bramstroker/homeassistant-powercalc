@@ -15,6 +15,7 @@ from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
+    CONF_MULTIPLY_FACTOR,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_REPEAT,
@@ -197,11 +198,62 @@ async def test_exception_when_providing_unknown_playbook_file(
         await strategy.activate_playbook("program1")
 
 
+async def test_exception_on_invalid_csv(
+    hass: HomeAssistant,
+) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "invalid.csv"}})
+    with pytest.raises(StrategyConfigurationError):
+        await strategy.activate_playbook("program1")
+
+
 async def test_lazy_load_playbook(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
     strategy = PlaybookStrategy(hass, {CONF_PLAYBOOKS: {"program1": "test.csv"}})
     await strategy.activate_playbook("program1")
     await strategy.activate_playbook("program1")
+
+
+async def test_load_csv_from_subdirectory(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "playbook1": "subdir/test.csv",
+                },
+            },
+        },
+    )
+
+    await _activate_playbook(hass, "playbook1")
+
+    await elapse_and_assert_power(hass, 2, "20.00")
+
+
+async def test_multiply_factor(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "playbook": "test2.csv",
+                },
+            },
+            CONF_MULTIPLY_FACTOR: 3,
+        },
+    )
+
+    await _activate_playbook(hass, "playbook")
+
+    await elapse_and_assert_power(hass, 2, "60.00")
 
 
 async def elapse_and_assert_power(

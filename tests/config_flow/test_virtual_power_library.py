@@ -124,4 +124,4 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
     result = await initialize_options_flow(hass, entry)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["errors"] == {"not_supported": "Power profile could not be loaded"}
+    assert result["errors"] == {"base": "not_supported"}
