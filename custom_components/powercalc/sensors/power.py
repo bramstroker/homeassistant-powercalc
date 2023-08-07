@@ -411,12 +411,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         async def initial_update(hass: HomeAssistant) -> None:
+            await self._strategy_instance.on_start(hass)
             for entity_id in self._track_entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._handle_source_entity_state_change(
                     entity_id,
                     new_state,
-                    is_initial_update=True,
                 )
                 async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
@@ -478,7 +478,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self,
         trigger_entity_id: str,
         state: State | None,
-        is_initial_update: bool = False,
     ) -> None:
         """Update power sensor based on new dependant entity state."""
         self._standby_sensors.pop(self.entity_id, None)
@@ -499,7 +498,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return
 
         self._switch_sub_profile_dynamically(state)
-        self._power = await self.calculate_power(state, is_initial_update)
+        self._power = await self.calculate_power(state)
 
         if self._power is not None:
             self._power = round(self._power, self._rounding_digits)
@@ -535,11 +534,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         return True
 
-    async def calculate_power(
-        self,
-        state: State,
-        is_initial_update: bool = False,
-    ) -> Decimal | None:
+    async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
         entity_state = state
         if (
@@ -562,7 +557,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             return standby_power
 
         assert self._strategy_instance is not None
-        power = await self._strategy_instance.calculate(entity_state, is_initial_update)
+        power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
 

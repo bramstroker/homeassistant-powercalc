@@ -68,15 +68,12 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         """
         self._update_callback = update_callback
 
-    async def calculate(
-        self,
-        entity_state: State,
-        is_initial_update: bool = False,
-    ) -> Decimal | None:
-        if is_initial_update and self._autostart:
-            await self.activate_playbook(self._autostart)
-
+    async def calculate(self, entity_state: State) -> Decimal | None:
         return self._power
+
+    async def on_start(self, hass: HomeAssistant) -> None:
+        if self._autostart:
+            await self.activate_playbook(self._autostart)
 
     async def activate_playbook(self, playbook_id: str) -> None:
         """Activate and execute a given playbook"""
