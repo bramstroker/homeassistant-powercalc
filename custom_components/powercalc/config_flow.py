@@ -346,7 +346,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            selected_strategy = CalculationStrategy(user_input.get(CONF_MODE))
+            selected_strategy = CalculationStrategy(user_input.get(CONF_MODE) or CalculationStrategy.LUT)
             entity_id = user_input.get(CONF_ENTITY_ID)
             if selected_strategy is not CalculationStrategy.PLAYBOOK and entity_id is None:
                 errors[CONF_ENTITY_ID] = "entity_mandatory"
