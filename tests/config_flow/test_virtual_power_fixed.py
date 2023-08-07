@@ -20,6 +20,7 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
+    select_sensor_type,
     set_virtual_power_configuration,
 )
 
@@ -148,3 +149,15 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant) -> N
             CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('vacuum.my_robot_cleaner', 'docked') }}",
         },
     )
+
+
+async def test_entity_selection_mandatory(hass: HomeAssistant) -> None:
+    result = await select_sensor_type(hass, SensorType.VIRTUAL_POWER)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_MODE: CalculationStrategy.FIXED,
+        },
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["errors"] == {"entity_id": "entity_mandatory"}
