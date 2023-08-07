@@ -176,9 +176,6 @@ class PlaybookQueue:
         self._items = items
         self._queue: deque[PlaybookEntry] = deque(items)
 
-    def enqueue(self, entry: PlaybookEntry) -> None:
-        self._queue.append(entry)
-
     def dequeue(self) -> PlaybookEntry:
         return self._queue.popleft()
 
