@@ -7,7 +7,7 @@ from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
-    from enum import IntFlag, StrEnum
+    from enum import StrEnum
 else:
     from homeassistant.backports.enum import StrEnum
 
@@ -174,12 +174,6 @@ SERVICE_CALIBRATE_ENERGY = "calibrate_energy"
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 
 OFF_STATES = (STATE_OFF, STATE_NOT_HOME, STATE_STANDBY, STATE_UNAVAILABLE)
-
-
-class PowerCalcEntityFeature(IntFlag):
-    """Supported features of a powercalc entity."""
-
-    PLAYBOOK = 1
 
 
 class CalculationStrategy(StrEnum):
