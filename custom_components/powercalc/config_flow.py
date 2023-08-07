@@ -28,6 +28,7 @@ from homeassistant.helpers.typing import DiscoveryInfoType
 from .common import SourceEntity, create_source_entity
 from .const import (
     CONF_AREA,
+    CONF_AUTOSTART,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
@@ -50,8 +51,11 @@ from .const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_ON_TIME,
+    CONF_PLAYBOOK,
+    CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
+    CONF_REPEAT,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
@@ -191,6 +195,7 @@ STRATEGY_SELECTOR = selector.SelectSelector(
         options=[
             CalculationStrategy.FIXED,
             CalculationStrategy.LINEAR,
+            CalculationStrategy.PLAYBOOK,
             CalculationStrategy.WLED,
             CalculationStrategy.LUT,
         ],
@@ -212,6 +217,14 @@ SCHEMA_POWER_LINEAR = vol.Schema(
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
         vol.Optional(CONF_CALIBRATE): selector.ObjectSelector(),
+    },
+)
+
+SCHEMA_POWER_PLAYBOOK = vol.Schema(
+    {
+        vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(),
+        vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
+        vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
     },
 )
 
@@ -359,6 +372,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if user_input.get(CONF_MODE) == CalculationStrategy.LINEAR:
                 return await self.async_step_linear()
 
+            if user_input.get(CONF_MODE) == CalculationStrategy.PLAYBOOK:
+                return await self.async_step_playbook()
+
             if user_input.get(CONF_MODE) == CalculationStrategy.WLED:
                 return await self.async_step_wled()
 
@@ -452,6 +468,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="linear",
             data_schema=_create_linear_schema(self.source_entity_id),  # type: ignore
             errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_playbook(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        if user_input is not None:
+            self.sensor_config.update({CONF_PLAYBOOK: user_input})
+            return await self.async_step_power_advanced()
+
+        return self.async_show_form(
+            step_id="playbook",
+            data_schema=SCHEMA_POWER_PLAYBOOK,
+            errors={},
             last_step=False,
         )
 
@@ -873,6 +904,8 @@ def _get_strategy_schema(strategy: str, source_entity_id: str) -> vol.Schema:
         return SCHEMA_POWER_FIXED
     if strategy == CalculationStrategy.LINEAR:
         return _create_linear_schema(source_entity_id)
+    if strategy == CalculationStrategy.PLAYBOOK:
+        return SCHEMA_POWER_PLAYBOOK
     if strategy == CalculationStrategy.WLED:
         return SCHEMA_POWER_WLED
     return vol.Schema({})
