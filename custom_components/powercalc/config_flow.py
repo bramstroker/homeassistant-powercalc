@@ -347,7 +347,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             selected_strategy = CalculationStrategy(
-                user_input.get(CONF_MODE) or CalculationStrategy.LUT
+                user_input.get(CONF_MODE) or CalculationStrategy.LUT,
             )
             entity_id = user_input.get(CONF_ENTITY_ID)
             if (
@@ -386,7 +386,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def forward_to_strategy_step(
-        self, strategy: CalculationStrategy
+        self, strategy: CalculationStrategy,
     ) -> FlowResult:
         if strategy == CalculationStrategy.FIXED:
             return await self.async_step_fixed()
