@@ -74,6 +74,7 @@ from custom_components.powercalc.const import (
     OFF_STATES,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
+    PowerCalcEntityFeature,
 )
 from custom_components.powercalc.discovery import autodiscover_model
 from custom_components.powercalc.errors import (
@@ -516,7 +517,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     @callback
     def _update_power_sensor(self, power: Decimal) -> None:
-        self._power = round(power, self._rounding_digits)
+        self._power = power
+        if self._multiply_factor:
+            self._power *= Decimal(self._multiply_factor)
+        self._power = round(self._power, self._rounding_digits)
         self.async_write_ha_state()
 
     def _has_valid_state(self, state: State | None) -> bool:
@@ -660,6 +664,14 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     def available(self) -> bool:
         """Return True if entity is available."""
         return self._power is not None
+
+    @property
+    def supported_features(self) -> PowerCalcEntityFeature:
+        """Flag supported features."""
+        supported_features = PowerCalcEntityFeature(0)
+        if self._calculation_strategy == CalculationStrategy.PLAYBOOK:
+            supported_features |= PowerCalcEntityFeature.PLAYBOOK
+        return supported_features
 
     def set_energy_sensor_attribute(self, entity_id: str) -> None:
         """Set the energy sensor on the state attributes."""

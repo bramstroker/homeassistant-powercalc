@@ -475,14 +475,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
+        errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_PLAYBOOK: user_input})
-            return await self.async_step_power_advanced()
+
+            playbooks = user_input.get(CONF_PLAYBOOKS)
+            if playbooks is None or len(playbooks) == 0:
+                errors["not_supported"] = "gaat niet goed man"
+
+            if not errors:
+                return await self.async_step_power_advanced()
 
         return self.async_show_form(
             step_id="playbook",
             data_schema=SCHEMA_POWER_PLAYBOOK,
-            errors={},
+            errors=errors,
             last_step=False,
         )
 
