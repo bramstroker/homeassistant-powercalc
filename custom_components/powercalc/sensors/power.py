@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta
-from decimal import Decimal, DecimalException
+from decimal import Decimal
 from typing import Any, cast
 
 import homeassistant.helpers.entity_registry as er
@@ -58,6 +58,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
+    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
@@ -68,7 +69,6 @@ from custom_components.powercalc.const import (
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DATA_STANDBY_POWER_SENSORS,
-    DISCOVERY_POWER_PROFILE,
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
@@ -131,15 +131,7 @@ async def create_virtual_power_sensor(
     """Create the power sensor entity."""
     power_profile = None
     try:
-        # When the user did not manually configure a model and a model was auto discovered we can load it.
-
-        if (
-            discovery_info
-            and sensor_config.get(CONF_MODEL) is None
-            and discovery_info.get(DISCOVERY_POWER_PROFILE)
-        ):
-            power_profile = discovery_info.get(DISCOVERY_POWER_PROFILE)
-        elif not is_manually_configured(sensor_config):
+        if not is_manually_configured(sensor_config):
             try:
                 model_info = await autodiscover_model(hass, source_entity.entity_entry)
                 power_profile = await get_power_profile(
@@ -286,21 +278,11 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
     """
     if CONF_MODEL in sensor_config:
         return False
-    if CONF_FIXED in sensor_config:
-        return True
-    if CONF_LINEAR in sensor_config:
-        return True
-    return False
+    return any(key in sensor_config for key in [CONF_LINEAR, CONF_FIXED, CONF_PLAYBOOK])
 
 
 def is_fully_configured(config: ConfigType) -> bool:
-    if config.get(CONF_FIXED):
-        return True
-    if config.get(CONF_LINEAR):
-        return True
-    if config.get(CONF_WLED):
-        return True
-    return False
+    return any(key in config for key in [CONF_LINEAR, CONF_WLED, CONF_FIXED, CONF_PLAYBOOK])
 
 
 class PowerSensor(BaseEntity):
@@ -489,7 +471,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             state = State(self.source_entity, STATE_ON)
 
-        if not state or not self._has_valid_state(state):
+        if not self._has_valid_state(state):
             _LOGGER.debug(
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
@@ -574,13 +556,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 standby_power *= Decimal(self._multiply_factor)
             power += standby_power
 
-        try:
-            return Decimal(power)
-        except DecimalException:
-            _LOGGER.error(
-                f"{state.entity_id}: Could not convert value '{power}' to decimal",
-            )
-            return None
+        return Decimal(power)
 
     def _switch_sub_profile_dynamically(self, state: State) -> None:
         """Dynamically select a different sub profile depending on the entity state or attributes

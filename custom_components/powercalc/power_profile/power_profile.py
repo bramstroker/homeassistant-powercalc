@@ -12,7 +12,7 @@ from homeassistant.const import __version__ as HA_VERSION  # noqa
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
     from enum import StrEnum
 else:
-    from homeassistant.backports.enum import StrEnum
+    from homeassistant.backports.enum import StrEnum  # pragma: no cover
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN

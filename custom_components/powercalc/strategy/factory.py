@@ -144,6 +144,9 @@ class PowerCalculatorStrategyFactory:
         )
 
     def _create_playbook(self, config: ConfigType) -> PlaybookStrategy:
+        if CONF_PLAYBOOK not in config:
+            raise StrategyConfigurationError("No Playbook configuration supplied")
+
         playbook_config = config.get(CONF_PLAYBOOK)
         return PlaybookStrategy(self._hass, playbook_config)  # type: ignore
 

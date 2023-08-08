@@ -71,7 +71,7 @@ async def create_utility_meters(
                 unique_id=unique_id,
             )
             if existing_entity_id and hass.states.get(existing_entity_id):
-                continue
+                continue  # pragma: no cover
 
         # Create generic utility meter (no specific tariffs)
         if not tariffs or GENERAL_TARIFF in tariffs:

@@ -33,3 +33,18 @@ async def test_exception_raised_when_no_power_profile_passed_lut_strategy(
             power_profile=None,
             source_entity=create_source_entity("light"),
         )
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    [CalculationStrategy.FIXED, CalculationStrategy.LINEAR, CalculationStrategy.WLED, CalculationStrategy.PLAYBOOK],
+)
+async def test_exception_raised_when_strategy_config_not_provided(hass: HomeAssistant, strategy: CalculationStrategy) -> None:
+    with pytest.raises(StrategyConfigurationError):
+        factory = PowerCalculatorStrategyFactory(hass)
+        await factory.create(
+            {},
+            strategy,
+            power_profile=None,
+            source_entity=create_source_entity("light"),
+        )
