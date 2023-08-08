@@ -471,7 +471,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             state = State(self.source_entity, STATE_ON)
 
-        if not self._has_valid_state(state):
+        if not state or not self._has_valid_state(state):
             _LOGGER.debug(
                 "%s: Source entity has an invalid state, setting power sensor to unavailable",
                 trigger_entity_id,
@@ -504,13 +504,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._power = round(self._power, self._rounding_digits)
         self.async_write_ha_state()
 
-    def _has_valid_state(self, state: State | None) -> bool:
+    def _has_valid_state(self, state: State) -> bool:
         """Check if the state is valid, we can use it for power calculation."""
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
-
-        if state is None:
-            return False
 
         if state.state == STATE_UNKNOWN:
             return False
