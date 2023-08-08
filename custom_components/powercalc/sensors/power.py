@@ -620,7 +620,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             template = Template(template)
 
         if not isinstance(template, Template):
-            return True
+            return True  # pragma: no cover
 
         template.hass = self.hass
         return bool(template.async_render())
