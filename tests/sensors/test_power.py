@@ -19,8 +19,10 @@ from homeassistant.const import (
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
+    EntityCategory,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockEntity,
@@ -46,6 +48,7 @@ from custom_components.powercalc.const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_POWER,
+    CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SLEEP_POWER,
@@ -527,3 +530,73 @@ async def test_multiply_factor_standby_power_on(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_device_power").state == "1.64"
+
+
+async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 10},
+            CONF_SLEEP_POWER: {
+                CONF_POWER: 2,
+                CONF_DELAY: 20,
+            },
+            CONF_MULTIPLY_FACTOR: 2,
+            CONF_MULTIPLY_FACTOR_STANDBY: True,
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=25))
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "4.00"
+
+
+async def test_standby_power_invalid_template(hass: HomeAssistant) -> None:
+    """Test when the template does not return a decimal it does not break the powercalc sensor"""
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 10},
+            CONF_STANDBY_POWER: "{{ states('sensor.foo') }}",
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    hass.states.async_set("sensor.foo", "bla")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "0.00"
+
+    hass.states.async_set("sensor.foo", "20")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "20.00"
+
+
+async def test_entity_category(hass: HomeAssistant) -> None:
+    """Test setting an entity_category on the power sensor"""
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 10},
+            CONF_UNIQUE_ID: "123",
+            CONF_POWER_SENSOR_CATEGORY: EntityCategory.DIAGNOSTIC,
+        },
+    )
+
+    entity_registry = er.async_get(hass)
+    power_entry = entity_registry.async_get("sensor.test_power")
+    assert power_entry
+    assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
