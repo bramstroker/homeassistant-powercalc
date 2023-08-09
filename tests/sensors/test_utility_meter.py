@@ -2,6 +2,7 @@ import logging
 
 import pytest
 from homeassistant.components import utility_meter
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import (
     ATTR_SOURCE_ID,
     ATTR_STATUS,
@@ -10,11 +11,12 @@ from homeassistant.components.utility_meter.sensor import (
     CONF_UNIQUE_ID,
     PAUSED,
 )
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import mock_registry
+from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -127,3 +129,73 @@ async def test_utility_meter_is_not_created_twice(
     assert entity_registry.async_get(utility_meter_id)
     assert hass.states.get(utility_meter_id)
     assert len(caplog.records) == 0
+
+
+async def test_regression(hass: HomeAssistant) -> None:
+    #- entity_id: switch.gerateschranke_licht_servodrive
+  #name: Geräteschrank
+  #power_sensor_id: sensor.gerateschranke_licht_servodrive_power
+#- entity_id: switch.gerateschranke_frei
+#  name: Geräteschrank unbenutzt
+#  power_sensor_id: sensor.gerateschranke_frei_power
+    power_sensor_id = "sensor.test_power"
+    power_sensor2_id = "sensor.test2_power"
+    energy_sensor_id = "sensor.test_energy"
+    device_id = "some_device"
+    mock_registry(
+        hass,
+        {
+            power_sensor_id: RegistryEntry(
+                entity_id=power_sensor_id,
+                unique_id="29742725-6F34-49F2-91DE-589951306E9F",
+                name="Test power",
+                platform="sensor",
+                device_id=device_id,
+            ),
+            power_sensor2_id: RegistryEntry(
+                entity_id=power_sensor_id,
+                unique_id="A1CBB81F-A958-482B-A10E-1DAA0652796A",
+                name="Test power2",
+                platform="sensor",
+                device_id=device_id,
+            ),
+            energy_sensor_id: RegistryEntry(
+                entity_id=energy_sensor_id,
+                unique_id="4FA9B62F-E957-4366-B7DA-832C1D5F742D",
+                name="Test energy",
+                platform="sensor",
+                device_id=device_id,
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    mock_device_registry(
+        hass,
+        {
+            device_id: DeviceEntry(
+                id=device_id,
+                manufacturer="foo",
+                model="bar",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_POWER_SENSOR_ID: power_sensor_id,
+                CONF_NAME: "Test1",
+            },
+            {
+                CONF_POWER_SENSOR_ID: power_sensor2_id,
+                CONF_NAME: "Test2",
+            },
+        ],
+        {
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+    )
+
+

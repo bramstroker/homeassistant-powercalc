@@ -2,7 +2,7 @@ import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_PLATFORM, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -15,7 +15,7 @@ from pytest_homeassistant_custom_component.common import (
 
 import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, DOMAIN
+from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, CONF_WLED, DOMAIN
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 from tests.common import run_powercalc_setup
@@ -190,3 +190,62 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant) -> None:
         {CONF_VOLTAGE: 5},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
+
+
+async def test_yaml_configuration(hass: HomeAssistant) -> None:
+    """
+    Full functional test for YAML configuration setup.
+    Also check standby power can be calculated by the WLED strategy
+    """
+    mock_device_registry(
+        hass,
+        {
+            "wled-device": DeviceEntry(
+                id="wled-device",
+                manufacturer="WLED",
+                model="FOSS",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="wled-device",
+            ),
+            "sensor.test_current": RegistryEntry(
+                entity_id="sensor.test_current",
+                unique_id="1234",
+                platform="sensor",
+                device_id="wled-device",
+                unit_of_measurement="mA",
+                original_device_class=SensorDeviceClass.CURRENT,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_WLED: {
+                CONF_VOLTAGE: 5,
+                CONF_POWER_FACTOR: 1,
+            },
+        },
+    )
+
+    hass.states.async_set("light.test", STATE_ON)
+    hass.states.async_set("sensor.test_current", 500)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "2.50"
+
+    hass.states.async_set("light.test", STATE_OFF)
+    hass.states.async_set("sensor.test_current", 50)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "0.25"

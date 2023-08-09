@@ -86,3 +86,10 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     )
     assert len(profiles) == 1
     assert len(caplog.records) == 0
+
+
+async def test_exception_is_raised_when_no_model_json_present(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    library = ProfileLibrary(hass)
+    await library.create_power_profile(ModelInfo("foo", "bar"), get_test_profile_dir("no-model-json"))
+    assert "model.json file not found in directory" in caplog.text

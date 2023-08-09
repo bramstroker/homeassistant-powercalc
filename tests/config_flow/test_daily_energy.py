@@ -1,8 +1,10 @@
+
 from homeassistant import data_entry_flow
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
+    UnitOfEnergy,
     UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
@@ -10,6 +12,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.const import (
     CONF_DAILY_FIXED_ENERGY,
+    CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
     CONF_VALUE,
@@ -89,3 +92,30 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
         == UnitOfPower.WATT
     )
     assert entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 75
+
+
+async def test_on_time_option(hass: HomeAssistant) -> None:
+    result = await select_sensor_type(hass, SensorType.DAILY_ENERGY)
+
+    user_input = {
+        CONF_NAME: "My daily energy sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_VALUE: 10,
+        CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+        CONF_ON_TIME: {
+            "hours": 10,
+            "minutes": 20,
+            "seconds": 30,
+        },
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_DAILY_FIXED_ENERGY][CONF_ON_TIME] == {
+        "hours": 10,
+        "minutes": 20,
+        "seconds": 30,
+    }
