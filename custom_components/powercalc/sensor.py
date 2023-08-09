@@ -694,7 +694,7 @@ async def create_individual_sensors(
     except SensorAlreadyConfiguredError as error:
         # Include previously discovered/configured entities in group when no specific configuration
         if context.group and list(context.entity_config.keys()) == [CONF_ENTITY_ID]:
-            return EntitiesBucket([], error.existing_entities)
+            return EntitiesBucket([], error.get_existing_entities())
         raise error
 
     entities_to_add: list[Entity] = []

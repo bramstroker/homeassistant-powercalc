@@ -19,10 +19,8 @@ class SensorAlreadyConfiguredError(SensorConfigurationError):
     def __init__(
         self,
         source_entity_id: str,
-        existing_entities: list | None = None,
+        existing_entities: list,
     ) -> None:
-        if existing_entities is None:
-            existing_entities = []
         self.existing_entities = existing_entities
         super().__init__(
             f"{source_entity_id}: This entity has already configured a power sensor. "
