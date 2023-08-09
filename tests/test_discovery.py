@@ -32,8 +32,9 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
-from custom_components.powercalc.discovery import autodiscover_model, has_manufacturer_and_model_information
+from custom_components.powercalc.discovery import autodiscover_model, get_model_information
 from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
 from .common import create_mock_light_entity, run_powercalc_setup
@@ -386,32 +387,32 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
 
 
 @pytest.mark.parametrize(
-    "entity_entry,device_entry,expected_return",
+    "entity_entry,device_entry,model_info",
     [
         (
             RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch"),
             None,
-            False,
+            None,
         ),
         (
             RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch", device_id="a"),
             DeviceEntry(id="a", manufacturer="foo", model="bar"),
-            True,
+            ModelInfo("foo", "bar"),
         ),
         (
             RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch", device_id="a"),
             DeviceEntry(id="b", manufacturer="foo", model="bar"),
-            False,
+            None,
         ),
     ],
 )
-async def test_has_model_information(
+async def test_get_model_information(
     hass: HomeAssistant,
     entity_entry: RegistryEntry,
     device_entry: DeviceEntry | None,
-    expected_return: bool,
+    model_info: ModelInfo | None,
 ) -> None:
     if device_entry:
         mock_device_registry(hass, {str(device_entry.id): device_entry})
     mock_registry(hass, {str(entity_entry.id): entity_entry})
-    assert await has_manufacturer_and_model_information(hass, entity_entry) == expected_return
+    assert await get_model_information(hass, entity_entry) == model_info

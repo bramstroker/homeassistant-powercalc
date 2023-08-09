@@ -43,32 +43,28 @@ async def autodiscover_model(
     if not entity_entry or not entity_entry.device_id:
         return None
 
-    if not await has_manufacturer_and_model_information(hass, entity_entry):
+    model_info = await get_model_information(hass, entity_entry)
+    if not model_info:
         _LOGGER.debug(
             "%s: Cannot autodiscover model, manufacturer or model unknown from device registry",
             entity_entry.entity_id,
         )
         return None
 
-    device_registry = dr.async_get(hass)
-    device_entry = device_registry.async_get(entity_entry.device_id)
-    if not device_entry:
-        return None
-
-    model_id = device_entry.model
-    manufacturer = device_entry.manufacturer
-    if manufacturer is None or model_id is None:
-        return None
-
-    if manufacturer in MANUFACTURER_ALIASES:
-        manufacturer = MANUFACTURER_ALIASES.get(manufacturer)
+    if model_info.manufacturer in MANUFACTURER_ALIASES:
+        model_info = ModelInfo(
+            str(MANUFACTURER_ALIASES.get(model_info.manufacturer)),
+            model_info.model,
+        )
 
     # Make sure we don't have a literal / in model_id,
     # so we don't get issues with sublut directory matching down the road
     # See github #658
-    model_id = str(model_id).replace("/", "#slash#")
-
-    model_info = ModelInfo(str(manufacturer), str(model_id))
+    if "/" in model_info.model:
+        model_info = ModelInfo(
+            model_info.manufacturer,
+            model_info.model.replace("/", "#slash#"),
+        )
 
     _LOGGER.debug(
         "%s: Auto discovered model (manufacturer=%s, model=%s)",
@@ -79,22 +75,25 @@ async def autodiscover_model(
     return model_info
 
 
-async def has_manufacturer_and_model_information(
+async def get_model_information(
     hass: HomeAssistant,
     entity_entry: er.RegistryEntry,
-) -> bool:
+) -> ModelInfo | None:
     """See if we have enough information in device registry to automatically setup the power sensor."""
     if entity_entry.device_id is None:
-        return False
+        return None
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
-    if device_entry is None:
-        return False
+    if device_entry is None or device_entry.manufacturer is None or device_entry.model is None:
+        return None
 
-    if len(str(device_entry.manufacturer)) == 0 or len(str(device_entry.model)) == 0:
-        return False
+    manufacturer = str(device_entry.manufacturer)
+    model = str(device_entry.model)
 
-    return True
+    if len(manufacturer) == 0 or len(model) == 0:
+        return None
+
+    return ModelInfo(manufacturer, model)
 
 
 class DiscoveryManager:
