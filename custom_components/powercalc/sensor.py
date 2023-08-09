@@ -687,7 +687,6 @@ async def create_individual_sensors(
             source_entity,
             hass,
             used_unique_ids,
-            discovery_info is not None,
         )
     except SensorAlreadyConfiguredError as error:
         # Include previously discovered/configured entities in group when no specific configuration
@@ -804,7 +803,6 @@ async def check_entity_not_already_configured(
     source_entity: SourceEntity,
     hass: HomeAssistant,
     used_unique_ids: list[str],
-    is_discovered: bool = True,
 ) -> None:
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
@@ -812,34 +810,15 @@ async def check_entity_not_already_configured(
     configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
         DATA_CONFIGURED_ENTITIES
     ]
-    discovered_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
-        DATA_DISCOVERED_ENTITIES
-    ]
 
-    # Prefer configured entity over discovered entity
-    if not is_discovered and source_entity.entity_id in discovered_entities:
-        entity_reg = er.async_get(hass)
-        for entity in discovered_entities.get(source_entity.entity_id) or []:
-            if entity_reg.async_get(entity.entity_id):
-                entity_reg.async_remove(entity.entity_id)
-            hass.states.async_remove(entity.entity_id)
-        discovered_entities[source_entity.entity_id] = []
-        return
-
-    existing_entities = (
-        configured_entities.get(source_entity.entity_id)
-        or discovered_entities.get(source_entity.entity_id)
-        or []
-    )
+    existing_entities = configured_entities.get(source_entity.entity_id) or []
 
     unique_id = sensor_config.get(CONF_UNIQUE_ID) or source_entity.unique_id
     if unique_id in used_unique_ids:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
     entity_id = source_entity.entity_id
-    if unique_id is None and (
-        entity_id in discovered_entities or entity_id in configured_entities
-    ):
+    if unique_id is None and entity_id in configured_entities:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
 
 
