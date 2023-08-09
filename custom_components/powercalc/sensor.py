@@ -786,8 +786,8 @@ async def attach_entities_to_source_device(
                 continue
             try:
                 entity.source_device_id = source_entity.device_entry.id  # type: ignore
-            except AttributeError:
-                _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")  # pragma: no cover
+            except AttributeError:  # pragma: no cover
+                _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
         if (
             config_entry
             and config_entry.entry_id not in source_entity.device_entry.config_entries
