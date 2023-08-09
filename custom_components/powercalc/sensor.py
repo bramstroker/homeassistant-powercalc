@@ -784,9 +784,7 @@ async def attach_entities_to_source_device(
     if source_entity.entity_entry and source_entity.device_entry:
         device_id = source_entity.device_entry.id
         device_registry = dr.async_get(hass)
-        for entity in entities_to_add:
-            if not isinstance(entity, BaseEntity):
-                continue
+        for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
             try:
                 entity.source_device_id = source_entity.device_entry.id  # type: ignore
             except AttributeError:  # pragma: no cover
