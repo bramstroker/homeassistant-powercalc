@@ -282,13 +282,13 @@ class DiscoveryManager:
         found_entity_ids: list[str] = []
 
         for key, value in search_dict.items():
-            if key == "entity_id":
+            if key == CONF_ENTITY_ID:
                 found_entity_ids.append(value)
 
             elif isinstance(value, dict):
                 results = self._find_entity_ids_in_yaml_config(value)
                 for result in results:
-                    found_entity_ids.append(result)
+                    found_entity_ids.append(result)  # pragma: no cover
 
             elif isinstance(value, list):
                 for item in value:
