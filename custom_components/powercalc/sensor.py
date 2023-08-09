@@ -610,7 +610,10 @@ async def create_sensors(
                 child_entities = await create_sensors(
                     hass,
                     entity_config,
-                    context=context,
+                    context=CreationContext(
+                        group=context.group,
+                        entity_config=entity_config,
+                    ),
                 )
                 entities_to_add.extend_items(child_entities)
             except SensorConfigurationError as exception:
