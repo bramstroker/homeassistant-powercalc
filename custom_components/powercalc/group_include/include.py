@@ -70,8 +70,9 @@ def find_powercalc_entities_by_source_entity(
         return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]  # type: ignore
 
     # Check if we have powercalc sensors setup with GUI
+    # todo: Seems the code below can be removed as powercalc config entries also are in the DATA_CONFIGURED_ENTITIES,
     entities: list[Entity] = []
-    for entry in hass.config_entries.async_entries(DOMAIN):
+    for entry in hass.config_entries.async_entries(DOMAIN):  # pragma: no cover
         if entry.data.get(CONF_ENTITY_ID) != source_entity_id:
             continue
         if entry.data.get(ENTRY_DATA_POWER_ENTITY):
@@ -86,7 +87,7 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    entities: dict[str, entity_registry.RegistryEntry] = {}
+    entities: dict[str, entity_registry.RegistryEntry | None] = {}
     entity_reg = entity_registry.async_get(hass)
 
     # Include entities from a certain area
@@ -113,17 +114,13 @@ def resolve_include_source_entities(
 
     # Include entities by evaluating a template
     if CONF_TEMPLATE in include_config:
-        template = include_config.get(CONF_TEMPLATE)
-        if not isinstance(template, Template):
-            raise SensorConfigurationError(
-                "include->template is not a correct Template",
-            )
+        template: Template = include_config.get(CONF_TEMPLATE)  # type: ignore
         template.hass = hass
 
         _LOGGER.debug("Including entities from template")
         entity_ids = template.async_render()
         entities = entities | {
-            entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids  # type: ignore
+            entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
         }
 
     if CONF_FILTER in include_config:

@@ -14,7 +14,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
     STATE_OFF,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
@@ -38,6 +38,8 @@ from custom_components.powercalc.const import (
     CONF_SUB_GROUPS,
     CONF_TEMPLATE,
     DOMAIN,
+    ENTRY_DATA_ENERGY_ENTITY,
+    ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
 from custom_components.test.light import MockLight
@@ -114,7 +116,7 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
             light.DOMAIN: {
                 "platform": "group",
                 "name": "Bathroom",
-                "entities": ["light.bathroom_mirror", "light.bathroom_spots"],
+                "entities": ["light.bathroom_mirror", "light.bathroom_spots", "light.whatever"],
             },
         },
     )
@@ -134,6 +136,20 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
     group_state = hass.states.get("sensor.test_include_lightgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
+
+
+async def test_error_is_logged_when_light_group_not_exists(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Powercalc group",
+                CONF_INCLUDE: {CONF_GROUP: "light.some_group"},
+            },
+        ],
+    )
+    assert "Light group light.some_group not found" in caplog.text
 
 
 async def test_include_domain(hass: HomeAssistant) -> None:
@@ -235,6 +251,20 @@ async def test_include_group(hass: HomeAssistant) -> None:
     group_state = hass.states.get("sensor.powercalc_group_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.tv_power", "sensor.soundbar_power"}
+
+
+async def test_error_is_logged_when_group_not_exists(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Powercalc group",
+                CONF_INCLUDE: {CONF_GROUP: "switch.some_group"},
+            },
+        ],
+    )
+    assert "Group state switch.some_group not found" in caplog.text
 
 
 async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
@@ -596,6 +626,8 @@ def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
 ) -> MockConfigEntry:
+    __, object_id = split_entity_id(source_entity_id)
+
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -604,6 +636,8 @@ def _create_powercalc_config_entry(
             CONF_UNIQUE_ID: unique_id,
             CONF_ENTITY_ID: source_entity_id,
             CONF_FIXED: {CONF_POWER: 50},
+            ENTRY_DATA_POWER_ENTITY: f"sensor.{object_id}_power",
+            ENTRY_DATA_ENERGY_ENTITY: f"sensor.{object_id}_energy",
         },
         unique_id=unique_id,
     )
