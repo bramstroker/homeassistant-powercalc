@@ -251,6 +251,21 @@ async def test_autodiscover_skips_diagnostics_entities(
     assert not hass.states.get("sensor.test_device_power")
 
 
+async def test_autodiscover_skips_unsupported_domains(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    mock_entity_with_model_information(
+        "media_player.test",
+        "signify",
+        "LCT010",
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    assert not hass.states.get("sensor.test_power")
+
+
 async def test_load_model_with_slashes(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
