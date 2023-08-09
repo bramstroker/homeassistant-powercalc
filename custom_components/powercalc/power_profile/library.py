@@ -106,7 +106,7 @@ class ProfileLibrary:
 
         profile = None
         if custom_directory:
-            profile = await self._create_power_profile(model_info, custom_directory)
+            profile = await self.create_power_profile(model_info, custom_directory)
         else:
             profiles = await self.get_profiles_by_manufacturer(model_info.manufacturer)
             for p in profiles:
@@ -148,7 +148,7 @@ class ProfileLibrary:
             for model in next(os.walk(manufacturer_dir))[1]:
                 if model[0] in [".", "@"]:
                     continue
-                power_profile = await self._create_power_profile(
+                power_profile = await self.create_power_profile(
                     ModelInfo(manufacturer, model),
                     os.path.join(manufacturer_dir, model),
                 )
@@ -160,7 +160,7 @@ class ProfileLibrary:
         self._profiles[manufacturer] = profiles
         return profiles
 
-    async def _create_power_profile(
+    async def create_power_profile(
         self,
         model_info: ModelInfo,
         directory: str,
