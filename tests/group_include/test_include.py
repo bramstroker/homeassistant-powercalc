@@ -3,7 +3,9 @@ import uuid
 
 import pytest
 from homeassistant.components import light
+from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import (
     CONF_DOMAIN,
     CONF_ENTITIES,
@@ -197,6 +199,42 @@ async def test_include_template(hass: HomeAssistant) -> None:
     group_state = hass.states.get("sensor.lights_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_spots_power"}
+
+
+async def test_include_group(hass: HomeAssistant) -> None:
+    hass.states.async_set("switch.tv", "on")
+    await async_setup_component(
+        hass,
+        SWITCH_DOMAIN,
+        {
+            SWITCH_DOMAIN: {
+                "platform": GROUP_DOMAIN,
+                "entities": ["switch.tv", "switch.soundbar"],
+                "name": "Multimedia Group",
+                "unique_id": "unique_identifier",
+                "all": "false",
+            },
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.tv"),
+            get_simple_fixed_config("switch.soundbar"),
+            {
+                CONF_CREATE_GROUP: "Powercalc group",
+                CONF_INCLUDE: {CONF_GROUP: "switch.multimedia_group"},
+            },
+        ],
+    )
+
+    await hass.async_start()
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.powercalc_group_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.tv_power", "sensor.soundbar_power"}
 
 
 async def test_combine_include_with_entities(hass: HomeAssistant) -> None:

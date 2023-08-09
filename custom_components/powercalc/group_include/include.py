@@ -40,16 +40,16 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug(
             "Found possible include entities: %s",
-            [entity.entity_id for entity in source_entities],
+            list(source_entities.keys()),
         )
-    for source_entity in source_entities:
+    for entity_id, source_entity in source_entities.items():
         resolved_entities.extend(
-            find_powercalc_entities_by_source_entity(hass, source_entity.entity_id),
+            find_powercalc_entities_by_source_entity(hass, entity_id),
         )
 
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
-        if source_entity.domain is not DOMAIN:
+        if source_entity and source_entity.domain is not DOMAIN:
             device_class = (
                 source_entity.device_class or source_entity.original_device_class
             )
@@ -85,7 +85,7 @@ def find_powercalc_entities_by_source_entity(
 def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
-) -> list[entity_registry.RegistryEntry]:
+) -> dict[str, entity_registry.RegistryEntry | None]:
     entities: dict[str, entity_registry.RegistryEntry] = {}
     entity_reg = entity_registry.async_get(hass)
 
@@ -134,7 +134,7 @@ def resolve_include_source_entities(
             if entity is not None and entity_filter.is_valid(entity)
         }
 
-    return list(entities.values())
+    return entities
 
 
 @callback
@@ -149,6 +149,7 @@ def resolve_include_groups(
     if domain == LIGHT_DOMAIN:
         return resolve_light_group_entities(hass, group_id)
 
+    entity_reg.async_get(group_id)
     group_state = hass.states.get(group_id)
     if group_state is None:
         raise SensorConfigurationError(f"Group state {group_id} not found")
