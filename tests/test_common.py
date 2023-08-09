@@ -2,7 +2,10 @@ import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSORS, CONF_CREATE_UTILITY_METERS
+from custom_components.powercalc import (
+    CONF_CREATE_ENERGY_SENSORS,
+    CONF_CREATE_UTILITY_METERS,
+)
 from custom_components.powercalc.common import get_merged_sensor_configuration
 from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
 
@@ -45,8 +48,8 @@ from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
     ],
 )
 async def test_merge_configuration(
-        hass: HomeAssistant,
-        configs: list[dict],
-        output_config: dict,
+    hass: HomeAssistant,
+    configs: list[dict],
+    output_config: dict,
 ) -> None:
     assert get_merged_sensor_configuration(*configs) == output_config

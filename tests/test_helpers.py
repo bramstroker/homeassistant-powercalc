@@ -17,7 +17,9 @@ from custom_components.powercalc.helpers import evaluate_power
         (Decimal(40.65), Decimal(40.65)),
     ],
 )
-async def test_evaluate_power(hass: HomeAssistant, power: Template | Decimal | float, output: Decimal | None) -> None:
+async def test_evaluate_power(
+    hass: HomeAssistant, power: Template | Decimal | float, output: Decimal | None
+) -> None:
     if isinstance(power, Template):
         power.hass = hass
     assert await evaluate_power(power) == output

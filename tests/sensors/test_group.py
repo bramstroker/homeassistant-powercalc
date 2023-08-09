@@ -1194,18 +1194,22 @@ async def test_unknown_member_config_entry_is_skipped_from_group(
         "sensor.test_power",
     }
 
+
 async def test_reference_existing_sensor_in_group(hass: HomeAssistant) -> None:
-    await run_powercalc_setup(hass, [
-        get_simple_fixed_config("switch.test"),
-        {
-            CONF_CREATE_GROUP: "TestGroup",
-            CONF_ENTITIES: [
-                {
-                    CONF_ENTITY_ID: "switch.test",
-                },
-            ],
-        },
-    ])
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.test"),
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_ENTITIES: [
+                    {
+                        CONF_ENTITY_ID: "switch.test",
+                    },
+                ],
+            },
+        ],
+    )
 
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state

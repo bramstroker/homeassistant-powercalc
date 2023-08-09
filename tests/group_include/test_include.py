@@ -116,7 +116,11 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
             light.DOMAIN: {
                 "platform": "group",
                 "name": "Bathroom",
-                "entities": ["light.bathroom_mirror", "light.bathroom_spots", "light.whatever"],
+                "entities": [
+                    "light.bathroom_mirror",
+                    "light.bathroom_spots",
+                    "light.whatever",
+                ],
             },
         },
     )
@@ -138,7 +142,9 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.bathroom_mirror_power"}
 
 
-async def test_error_is_logged_when_light_group_not_exists(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_error_is_logged_when_light_group_not_exists(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
         hass,
@@ -250,10 +256,15 @@ async def test_include_group(hass: HomeAssistant) -> None:
 
     group_state = hass.states.get("sensor.powercalc_group_power")
     assert group_state
-    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.tv_power", "sensor.soundbar_power"}
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.tv_power",
+        "sensor.soundbar_power",
+    }
 
 
-async def test_error_is_logged_when_group_not_exists(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_error_is_logged_when_group_not_exists(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
         hass,
@@ -623,7 +634,8 @@ async def test_area_groups_as_subgroups(
 
 
 async def test_power_group_does_not_include_binary_sensors(
-    hass: HomeAssistant, area_reg: AreaRegistry,
+    hass: HomeAssistant,
+    area_reg: AreaRegistry,
 ) -> None:
     area = area_reg.async_get_or_create("Bathroom")
     await hass.async_block_till_done()

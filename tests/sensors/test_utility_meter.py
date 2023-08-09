@@ -16,7 +16,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from pytest_homeassistant_custom_component.common import (
+    mock_device_registry,
+    mock_registry,
+)
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -132,12 +135,12 @@ async def test_utility_meter_is_not_created_twice(
 
 
 async def test_regression(hass: HomeAssistant) -> None:
-    #- entity_id: switch.gerateschranke_licht_servodrive
-  #name: Geräteschrank
-  #power_sensor_id: sensor.gerateschranke_licht_servodrive_power
-#- entity_id: switch.gerateschranke_frei
-#  name: Geräteschrank unbenutzt
-#  power_sensor_id: sensor.gerateschranke_frei_power
+    # - entity_id: switch.gerateschranke_licht_servodrive
+    # name: Geräteschrank
+    # power_sensor_id: sensor.gerateschranke_licht_servodrive_power
+    # - entity_id: switch.gerateschranke_frei
+    #  name: Geräteschrank unbenutzt
+    #  power_sensor_id: sensor.gerateschranke_frei_power
     power_sensor_id = "sensor.test_power"
     power_sensor2_id = "sensor.test2_power"
     energy_sensor_id = "sensor.test_energy"
@@ -197,5 +200,3 @@ async def test_regression(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
-
-

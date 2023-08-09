@@ -32,7 +32,10 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
-from custom_components.powercalc.discovery import autodiscover_model, get_model_information
+from custom_components.powercalc.discovery import (
+    autodiscover_model,
+    get_model_information,
+)
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
@@ -405,17 +408,29 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     "entity_entry,device_entry,model_info",
     [
         (
-            RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch"),
+            RegistryEntry(
+                entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch"
+            ),
             None,
             None,
         ),
         (
-            RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch", device_id="a"),
+            RegistryEntry(
+                entity_id="switch.test",
+                unique_id=uuid.uuid4(),
+                platform="switch",
+                device_id="a",
+            ),
             DeviceEntry(id="a", manufacturer="foo", model="bar"),
             ModelInfo("foo", "bar"),
         ),
         (
-            RegistryEntry(entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch", device_id="a"),
+            RegistryEntry(
+                entity_id="switch.test",
+                unique_id=uuid.uuid4(),
+                platform="switch",
+                device_id="a",
+            ),
             DeviceEntry(id="b", manufacturer="foo", model="bar"),
             None,
         ),

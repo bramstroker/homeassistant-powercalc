@@ -478,7 +478,9 @@ async def test_standby_power_template(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "60.00"
 
 
-async def test_power_state_unavailable_when_source_entity_has_no_state(hass: HomeAssistant) -> None:
+async def test_power_state_unavailable_when_source_entity_has_no_state(
+    hass: HomeAssistant,
+) -> None:
     await run_powercalc_setup(
         hass,
         {

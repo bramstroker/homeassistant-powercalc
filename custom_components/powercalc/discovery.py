@@ -84,7 +84,11 @@ async def get_model_information(
         return None
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
-    if device_entry is None or device_entry.manufacturer is None or device_entry.model is None:
+    if (
+        device_entry is None
+        or device_entry.manufacturer is None
+        or device_entry.model is None
+    ):
         return None
 
     manufacturer = str(device_entry.manufacturer)

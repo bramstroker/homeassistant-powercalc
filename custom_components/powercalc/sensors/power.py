@@ -282,7 +282,9 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
 
 
 def is_fully_configured(config: ConfigType) -> bool:
-    return any(key in config for key in [CONF_LINEAR, CONF_WLED, CONF_FIXED, CONF_PLAYBOOK])
+    return any(
+        key in config for key in [CONF_LINEAR, CONF_WLED, CONF_FIXED, CONF_PLAYBOOK]
+    )
 
 
 class PowerSensor(BaseEntity):

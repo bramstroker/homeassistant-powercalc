@@ -683,7 +683,9 @@ async def create_individual_sensors(
     source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
-        used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
+        used_unique_ids = hass.data[DOMAIN][
+            DATA_USED_UNIQUE_IDS
+        ] = []  # pragma: no cover
     try:
         await check_entity_not_already_configured(
             sensor_config,
@@ -784,7 +786,9 @@ async def attach_entities_to_source_device(
     if source_entity.entity_entry and source_entity.device_entry:
         device_id = source_entity.device_entry.id
         device_registry = dr.async_get(hass)
-        for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
+        for entity in (
+            entity for entity in entities_to_add if isinstance(entity, BaseEntity)
+        ):
             try:
                 entity.source_device_id = source_entity.device_entry.id  # type: ignore
             except AttributeError:  # pragma: no cover

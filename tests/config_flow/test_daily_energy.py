@@ -1,4 +1,3 @@
-
 from homeassistant import data_entry_flow
 from homeassistant.const import (
     CONF_NAME,

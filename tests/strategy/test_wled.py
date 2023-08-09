@@ -15,7 +15,12 @@ from pytest_homeassistant_custom_component.common import (
 
 import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.const import CONF_POWER_FACTOR, CONF_VOLTAGE, CONF_WLED, DOMAIN
+from custom_components.powercalc.const import (
+    CONF_POWER_FACTOR,
+    CONF_VOLTAGE,
+    CONF_WLED,
+    DOMAIN,
+)
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.wled import WledStrategy
 from tests.common import run_powercalc_setup
