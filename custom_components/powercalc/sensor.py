@@ -98,7 +98,6 @@ from .const import (
     DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_USED_UNIQUE_IDS,
-    DISCOVERY_SOURCE_ENTITY,
     DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -562,7 +561,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     return sensor_config
 
 
-async def create_sensors(  # noqa: C901
+async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
@@ -593,10 +592,8 @@ async def create_sensors(  # noqa: C901
                 new=await create_general_standby_sensors(hass, global_config),
             )
 
-    # Setup a power sensor for one single appliance. Either by manual configuration or discovery
+    # Set up a power sensor for one single appliance. Either by manual configuration or discovery
     if CONF_ENTITIES not in config and CONF_INCLUDE not in config:
-        if discovery_info:
-            config[CONF_ENTITY_ID] = discovery_info[CONF_ENTITY_ID]
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
         return await create_individual_sensors(
             hass,
@@ -682,10 +679,8 @@ async def create_individual_sensors(
     discovery_info: DiscoveryInfoType | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
-    if discovery_info:
-        source_entity: SourceEntity = discovery_info.get(DISCOVERY_SOURCE_ENTITY)  # type: ignore
-    else:
-        source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
+
+    source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
         used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []
@@ -701,8 +696,6 @@ async def create_individual_sensors(
         # Include previously discovered/configured entities in group when no specific configuration
         if context.group and list(context.entity_config.keys()) == [CONF_ENTITY_ID]:
             return EntitiesBucket([], error.existing_entities)
-        if discovery_info:
-            return EntitiesBucket()
         raise error
 
     entities_to_add: list[Entity] = []
