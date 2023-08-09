@@ -353,9 +353,6 @@ async def _async_setup_entities(
 
     try:
         entities = await create_sensors(hass, config, discovery_info, config_entry)
-        if not entities:
-            return
-
         if config_entry:
             save_entity_ids_on_config_entry(hass, config_entry, entities)
     except SensorConfigurationError as err:
