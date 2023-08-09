@@ -8,7 +8,7 @@ from homeassistant.const import __version__ as HA_VERSION  # noqa
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
     from enum import StrEnum
 else:
-    from homeassistant.backports.enum import StrEnum
+    from homeassistant.backports.enum import StrEnum  # pragma: no cover
 
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -40,7 +40,6 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
 class IncludeEntityFilter(Protocol):
     def is_valid(self, entity: RegistryEntry) -> bool:
         """Return True when the entity should be included, False when it should be discarded."""
-        ...
 
 
 class DomainFilter(IncludeEntityFilter):
