@@ -386,7 +386,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def forward_to_strategy_step(
-        self, strategy: CalculationStrategy,
+        self,
+        strategy: CalculationStrategy,
     ) -> FlowResult:
         if strategy == CalculationStrategy.FIXED:
             return await self.async_step_fixed()

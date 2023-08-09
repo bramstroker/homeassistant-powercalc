@@ -622,6 +622,47 @@ async def test_area_groups_as_subgroups(
     }
 
 
+async def test_power_group_does_not_include_binary_sensors(
+    hass: HomeAssistant, area_reg: AreaRegistry,
+) -> None:
+    area = area_reg.async_get_or_create("Bathroom")
+    await hass.async_block_till_done()
+
+    mock_registry(
+        hass,
+        {
+            "binary_sensor.test": RegistryEntry(
+                entity_id="binary_sensor.test",
+                unique_id="1111",
+                platform="binary_sensor",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            "sensor.test": RegistryEntry(
+                entity_id="sensor.test",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bathroom",
+            },
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
+
+
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,

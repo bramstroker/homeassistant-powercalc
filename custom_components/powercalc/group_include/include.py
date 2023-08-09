@@ -1,6 +1,7 @@
 import logging
 from typing import cast
 
+from homeassistant.components import sensor
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
@@ -49,7 +50,7 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
 
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
-        if source_entity and source_entity.domain is not DOMAIN:
+        if source_entity.domain == sensor.DOMAIN:
             device_class = (
                 source_entity.device_class or source_entity.original_device_class
             )
