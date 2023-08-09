@@ -246,7 +246,7 @@ class DiscoveryManager:
         entities = []
 
         # Find entity ids in yaml config (Legacy)
-        if SENSOR_DOMAIN in self.ha_config:
+        if SENSOR_DOMAIN in self.ha_config:  # pragma: no cover
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
             platform_entries = [
                 item
