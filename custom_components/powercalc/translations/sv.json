@@ -10,7 +10,7 @@
             "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
             "group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
             "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
-            "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt"
+            "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt",
             "linear_unsupported_domain": "Entitetsområde stöds inte för linjärläge. Måste vara en av följande: fläkt, ljus eller mediaplayer. Du kan dock använda kalibreringsalternativet.",
             "lut_unsupported_color_mode": "LUT profilen stöder inte ett av färglägena på din lampa. Se loggen för mer information",
             "lut_wrong_domain": "Enbart lampentiteter kan använda LUT läge",
