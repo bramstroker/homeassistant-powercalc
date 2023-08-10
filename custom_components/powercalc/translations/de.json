@@ -177,7 +177,7 @@
                     "create_energy_sensor": "Energiesensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "entity_id": "Quell-Entität",
-                    "group": "Zur Gruppe hinzufügen,
+                    "group": "Zur Gruppe hinzufügen",
                     "mode": "Berechnungsstrategie",
                     "name": "Name",
                     "standby_power": "Standby-Leistung",
@@ -269,7 +269,7 @@
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
-                    "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
+                    "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
                     "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist"
                 }
             }
