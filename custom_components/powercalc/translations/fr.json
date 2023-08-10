@@ -1,6 +1,5 @@
 {
     "config": {
-        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Le capteur est déjà configuré, spécifiez un unique_id"
         },
@@ -10,12 +9,13 @@
             "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec 'states_power' et non 'power'",
             "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
             "linear_mandatory": "Vous devez spécifier au moins la puissance minimale ou la valeur d'étalonnage",
-            "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
             "linear_min_higher_as_max": "La puissance maximale ne peut pas être inférieure à la puissance minimale",
+            "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
             "lut_unsupported_color_mode": "Le profil LUT ne prend pas en charge l'un des modes de couleur de votre lumière. Voir les journaux pour plus d'informations",
             "lut_wrong_domain": "Seules les entités lumineuses peuvent utiliser le mode LUT",
             "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations"
         },
+        "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
@@ -51,21 +51,31 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Créer des compteurs d'électricité",
+                    "group_energy_entities": "Entités énergétiques supplémentaires",
                     "group_member_sensors": "Membres des capteurs powercalc",
                     "group_power_entities": "Entités de puissance supplémentaires",
-                    "group_energy_entities": "Entités énergétiques supplémentaires",
+                    "hide_members": "Masquer les membres",
                     "name": "Nom",
                     "sub_groups": "Sous-groupes",
-                    "hide_members": "Masquer les membres",
                     "unique_id": "Identifiant unique"
                 },
                 "data_description": {
+                    "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-                    "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe"
                 },
                 "title": "Créer un capteur de groupe"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirmer le modèle"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Si vous choisissez de ne pas confirmer, vous pouvez entrer vous-même le fabricant et le modèle"
+                },
+                "description": "Le fabricant \"{manufacturer}\" et le modèle \"{model}\" ont été automatiquement détectés pour votre appareil.{remarks}",
+                "title": "Bibliothèque"
             },
             "linear": {
                 "data": {
@@ -81,16 +91,6 @@
                 },
                 "title": "Configuration linéaire"
             },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Confirmer le modèle"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Si vous choisissez de ne pas confirmer, vous pouvez entrer vous-même le fabricant et le modèle"
-                },
-                "description": "Le fabricant \"{manufacturer}\" et le modèle \"{model}\" ont été automatiquement détectés pour votre appareil.{remarks}",
-                "title": "Bibliothèque"
-            },
             "manufacturer": {
                 "data": {
                     "manufacturer": "Fabricant"
@@ -105,16 +105,7 @@
                 "description": "Sélectionnez le modèle d'appareil. Consultez la [liste]({supported_models_link}) des modèles pris en charge pour plus d'informations",
                 "title": "Configuration du modèle"
             },
-            "sub_profile": {
-                "data": {
-                    "sub_profile": "Sous-profil"
-                },
-                "description": "Ce modèle a plusieurs sous-profils. Sélectionnez celui qui convient à votre appareil",
-                "title": "Configuration du sous-profil"
-            },
             "power_advanced": {
-                "title": "Options avancées",
-                "description": "Les options ci-dessous concernent la configuration avancée de powercalc. La plupart des utilisateurs ne l'utiliseront pas, vous pouvez donc les ignorer",
                 "data": {
                     "calculation_enabled_condition": "Condition de calcul activé",
                     "energy_integration_method": "Méthode d'intégration énergétique",
@@ -127,7 +118,16 @@
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
                     "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
-                }
+                },
+                "description": "Les options ci-dessous concernent la configuration avancée de powercalc. La plupart des utilisateurs ne l'utiliseront pas, vous pouvez donc les ignorer",
+                "title": "Options avancées"
+            },
+            "sub_profile": {
+                "data": {
+                    "sub_profile": "Sous-profil"
+                },
+                "description": "Ce modèle a plusieurs sous-profils. Sélectionnez celui qui convient à votre appareil",
+                "title": "Configuration du sous-profil"
             },
             "user": {
                 "data": {
@@ -172,8 +172,8 @@
             "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec des 'Etat de puissance' et non 'Puissance'",
             "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
             "linear_mandatory": "Vous devez spécifier au moins la puissance minimale ou la valeur d'étalonnage",
-            "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
             "linear_min_higher_as_max": "La puissance maximale ne peut pas être inférieure à la puissance minimale",
+            "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
             "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations"
         },
         "step": {
@@ -186,9 +186,10 @@
                     "create_utility_meters": "Créer un compteur d'électricité",
                     "energy_integration_method": "Méthode d'intégration énergétique",
                     "gamma_curve": "Courbe gamma",
+                    "group_energy_entities": "Entités d'énergies supplémentaires",
                     "group_member_sensors": "Membres capteurs powercalc",
                     "group_power_entities": "Entités de puissances supplémentaires",
-                    "group_energy_entities": "Entités d'énergies supplémentaires",
+                    "hide_members": "Cacher membres",
                     "ignore_unavailable_state": "Ignorer l'état indisponible",
                     "max_power": "Puissance Max",
                     "min_power": "Puissance Min",
@@ -200,7 +201,6 @@
                     "standby_power": "Consommation en veille",
                     "states_power": "Etats de puissance",
                     "sub_groups": "Sous-groupes",
-                    "hide_members": "Cacher membres",
                     "unavailable_power": "Alimentation indisponible",
                     "unit_of_measurement": "Unité de mesure",
                     "update_frequency": "Fréquence de mise à jour",
@@ -211,9 +211,9 @@
                     "attribute": "Spécifiez l'attribut. Lorsqu'il est laissé vide, la luminosité des lumières et le pourcentage des ventilateurs seront affichés.",
                     "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
                     "calibrate": "Mettez une valeur d'étalonnage sur chaque ligne. Exemple\n\n1 : 20",
+                    "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-                    "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
                     "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",

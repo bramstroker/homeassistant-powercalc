@@ -1,6 +1,5 @@
 {
     "config": {
-        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine Unique-Id an"
         },
@@ -15,6 +14,7 @@
             "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
             "unknown": "Unbekannter Fehler aufgetreten, bitte sehen in die Logs für weitere Informationen"
         },
+        "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
@@ -50,21 +50,31 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Utilitymeter erstellen",
+                    "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "group_member_sensors": "Mitglied powercalc sensors",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
-                    "group_energy_entities": "Energie-Entitäten der Gruppe",
+                    "hide_members": "Mitglieder ausblenden",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
-                    "hide_members": "Mitglieder ausblenden",
                     "unique_id": "Unique-Id"
                 },
                 "data_description": {
+                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
-                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 },
                 "title": "Einen Gruppensensor erstellen"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Bestätigen Sie das Modell"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Wenn Sie nicht bestätigen möchten, können Sie den Hersteller und das Modell selbst eingeben"
+                },
+                "description": "Hersteller \"{manufacturer}\" und Modell \"{model}\" wurden für Ihre Gerät automatisch erkannt.{remarks}",
+                "title": "Bibliothek"
             },
             "linear": {
                 "data": {
@@ -79,16 +89,6 @@
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20"
                 },
                 "title": "Linear Konfiguration"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Bestätigen Sie das Modell"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Wenn Sie nicht bestätigen möchten, können Sie den Hersteller und das Modell selbst eingeben"
-                },
-                "description": "Hersteller \"{manufacturer}\" und Modell \"{model}\" wurden für Ihre Gerät automatisch erkannt.{remarks}",
-                "title": "Bibliothek"
             },
             "manufacturer": {
                 "data": {
@@ -164,9 +164,10 @@
                     "create_energy_sensor": "Energiessensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "gamma_curve": "Gammakurve",
-                    "group_member_sensors": "Mitglied powercalc sensors",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
+                    "group_member_sensors": "Mitglied powercalc sensors",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
+                    "hide_members": "Mitglieder ausblenden",
                     "max_power": "Maximale Leistung",
                     "min_power": "Minimale Leistung",
                     "name": "Name",
@@ -176,7 +177,6 @@
                     "standby_power": "Standby-Leistung",
                     "states_power": "Leistung je Zustand",
                     "sub_groups": "Untergruppen",
-                    "hide_members": "Mitglieder ausblenden",
                     "unit_of_measurement": "Maßeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
                     "value": "Wert",
@@ -185,11 +185,11 @@
                 "data_description": {
                     "attribute": "Geben Sie das Attribut an. Bleibt es leer, wird die Helligkeit für Lichter und der Prozentsatz für Ventilatoren angegeben",
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20",
-                    "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
-                    "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
+                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
-                    "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
+                    "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
+                    "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 }
             }

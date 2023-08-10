@@ -1,6 +1,5 @@
 {
     "config": {
-        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Sensor är redan konfigurerad, specificera ett unikt ID"
         },
@@ -12,6 +11,7 @@
             "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
             "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt"
         },
+        "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
@@ -58,6 +58,16 @@
                 },
                 "title": "Skapa en gruppsensor"
             },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Bekräfta modell"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
+                },
+                "description": "Tillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}",
+                "title": "Bibliotek"
+            },
             "linear": {
                 "data": {
                     "attribute": "Attribut",
@@ -71,16 +81,6 @@
                     "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20"
                 },
                 "title": "Linjär konfig"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Bekräfta modell"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
-                },
-                "description": "Tillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}",
-                "title": "Bibliotek"
             },
             "manufacturer": {
                 "data": {
