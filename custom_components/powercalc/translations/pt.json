@@ -310,14 +310,14 @@
             "description": "Aumenta o valor do sensor por um valor.",
             "fields": {
                 "value": {
-                    "description": "Valor a adoicionar ao sensor.",
+                    "description": "Valor a adicionar ao sensor.",
                     "name": "Valor"
                 }
             },
             "name": "Aumentar o sensor de energia diário"
         },
         "reset_energy": {
-            "description": "Reiniciar um senosr de energia para zero kWh.",
+            "description": "Reiniciar um sensor de energia para zero kWh.",
             "name": "Reiniciar sensor de energia"
         },
         "stop_playbook": {
