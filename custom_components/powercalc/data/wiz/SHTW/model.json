@@ -9,5 +9,5 @@
         "VERSION": "v1.8.1:docker"
     },
     "name": "SHTW",
-    "standby_power": 7.12
+    "standby_power": 0.21
 }
