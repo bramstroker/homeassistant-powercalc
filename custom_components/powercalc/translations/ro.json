@@ -1,6 +1,5 @@
 {
     "config": {
-        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "Senzorul este deja configurat, specificați un ID unic"
         },
@@ -12,6 +11,7 @@
             "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
             "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă"
         },
+        "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
@@ -49,15 +49,25 @@
                     "create_utility_meters": "Creați contoare de utilitate",
                     "group_energy_entities": "Entități energetice membre",
                     "group_power_entities": "Entități de putere membre",
+                    "hide_group_members": "Ascunde membrii",
                     "name": "Nume",
                     "sub_groups": "Sub grupuri",
-                    "hide_group_members": "Ascunde membrii",
                     "unique_id": "ID unic"
                 },
                 "data_description": {
                     "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
                 },
                 "title": "Creați un senzor de grup"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirmați modelul"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
+                },
+                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru lumina dvs.{remarks}",
+                "title": "Bibliotecă"
             },
             "linear": {
                 "data": {
@@ -72,16 +82,6 @@
                     "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
                 },
                 "title": "Configurație liniară"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Confirmați modelul"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
-                },
-                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru lumina dvs.{remarks}",
-                "title": "Bibliotecă"
             },
             "manufacturer": {
                 "data": {
@@ -151,6 +151,7 @@
                     "gamma_curve": "Curba gamma",
                     "group_energy_entities": "Entități energetice membre",
                     "group_power_entities": "Entități de putere membre",
+                    "hide_members": "Ascunde membrii",
                     "max_power": "Putere maxima",
                     "min_power": "Putere minimă",
                     "name": "Nume",
@@ -160,7 +161,6 @@
                     "standby_power": "Putere in Standby",
                     "states_power": "Putere de stare",
                     "sub_groups": "Subgrupuri",
-                    "hide_members": "Ascunde membrii",
                     "unit_of_measurement": "Unitate de măsură",
                     "update_frequency": "Frecvență de actualizare",
                     "value": "Valoare",

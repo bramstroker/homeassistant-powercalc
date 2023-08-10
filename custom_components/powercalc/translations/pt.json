@@ -1,6 +1,5 @@
 {
     "config": {
-        "flow_title": "{name} ({manufacturer} {model})",
         "abort": {
             "already_configured": "O sensor já está configurado, especifique um unique_id"
         },
@@ -15,6 +14,7 @@
             "lut_wrong_domain": "Apenas entidades de luz podem usar o modo LUT",
             "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
         },
+        "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
@@ -50,21 +50,31 @@
             "group": {
                 "data": {
                     "create_utility_meters": "Criar medidores de utilidades",
+                    "group_energy_entities": "Entidades de energia adicionais",
                     "group_member_sensors": "Membros do sensor powercalc",
                     "group_power_entities": "Entidades de potência adicionais",
-                    "group_energy_entities": "Entidades de energia adicionais",
+                    "hide_members": "Ocultar membros",
                     "name": "Nome",
                     "sub_groups": "Subgrupos",
-                    "hide_members": "Ocultar membros",
                     "unique_id": "ID único"
                 },
                 "data_description": {
+                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc para incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
                 },
                 "title": "Criar um sensor de grupo"
+            },
+            "library": {
+                "data": {
+                    "confirm_autodisovered_model": "Confirmar modelo"
+                },
+                "data_description": {
+                    "confirm_autodisovered_model": "Se decidir não confirmar, poderá inserir manualmente o fabricante e o modelo"
+                },
+                "description": "O fabricante '({manufacturer})' e o modelo '({model})' foram detectados automaticamente para sua luz.{remarks}",
+                "title": "Biblioteca"
             },
             "linear": {
                 "data": {
@@ -80,16 +90,6 @@
                 },
                 "title": "Configuração linear"
             },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Confirmar modelo"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Se decidir não confirmar, poderá inserir manualmente o fabricante e o modelo"
-                },
-                "description": "O fabricante '({manufacturer})' e o modelo '({model})' foram detectados automaticamente para sua luz.{remarks}",
-                "title": "Biblioteca"
-            },
             "manufacturer": {
                 "data": {
                     "manufacturer": "Fabricante"
@@ -104,16 +104,7 @@
                 "description": "Selecione o modelo do dispositivo. Consulte a [lista]({supported_models_link}) de modelos compatíveis para obter mais informações",
                 "title": "Configuração modelo"
             },
-            "sub_profile": {
-                "data": {
-                    "sub_profile": "Sub-perfil"
-                },
-                "description": "Este modelo tem vários sub-perfis. Selecione um adequado ao seu dispositivo",
-                "title": "Sub-perfil config"
-            },
             "power_advanced": {
-                "title": "Opções avançadas",
-                "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
                 "data": {
                     "calculation_enabled_condition": "Condição para considerar o cálculo",
                     "energy_integration_method": "Método de integração de energia",
@@ -124,7 +115,16 @@
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar true ou 1, caso contrário retornará 0",
                     "ignore_unavailable_state": "Ligue esta opção para que o sensor de potência continue disponível mesmo que a entidade fonte fique indisponível",
                     "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes"
-                }
+                },
+                "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
+                "title": "Opções avançadas"
+            },
+            "sub_profile": {
+                "data": {
+                    "sub_profile": "Sub-perfil"
+                },
+                "description": "Este modelo tem vários sub-perfis. Selecione um adequado ao seu dispositivo",
+                "title": "Sub-perfil config"
             },
             "user": {
                 "data": {
@@ -182,10 +182,10 @@
                     "create_utility_meters": "Criar medidores de utilidade",
                     "energy_integration_method": "Metodo de cálculo de integração de energia",
                     "gamma_curve": "Curva gamma",
-                    "group_member_sensors": "Sensores powercalc membros",
-                    "group_power_entities": "Additional power entities",
-                    "group_power_entities": "Entidades de potência adicionais",
                     "group_energy_entities": "Entidades de energia adicionais",
+                    "group_member_sensors": "Sensores powercalc membros",
+                    "group_power_entities": "Entidades de potência adicionais",
+                    "hide_members": "Ocultar membros",
                     "max_power": "Potência máxima",
                     "min_power": "Potência mínima",
                     "multiply_factor": "Factor de multiplicação",
@@ -196,7 +196,6 @@
                     "standby_power": "Energia em espera",
                     "states_power": "Potência dos Estados",
                     "sub_groups": "Subgrupos",
-                    "hide_members": "Ocultar membros",
                     "unit_of_measurement": "Unidade de medida",
                     "update_frequency": "Frequência de atualização",
                     "value": "Valor",
@@ -206,9 +205,9 @@
                     "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e percentagens para ventoinhas",
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar true ou 1, caso contrário retornará 0",
                     "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20",
+                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc a incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-                    "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "ignore_unavailable_state": "Ligue esta opção para o sensor continuar disponível mesmo que a entidade fonte fique indisponível",
                     "multiply_factor": "Multiplica a potência calculada por este factor. Pode ser útil para grupos de luzes",
                     "power_template": "O modelo será avaliado para obter o valor da potência em W",
