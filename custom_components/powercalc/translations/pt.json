@@ -127,13 +127,13 @@
                     "calculation_enabled_condition": "Condição para considerar o cálculo",
                     "energy_integration_method": "Método de integração de energia",
                     "ignore_unavailable_state": "Ignorar para estado indisponível",
-                    "multiply_factor": "Factor de multiplicação"
+                    "multiply_factor": "Factor de multiplicação",
                     "unavailable_power": "Potência indisponível"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar 'true' ou 1, caso contrário retornará 0",
                     "ignore_unavailable_state": "Ligue esta opção para que o sensor de potência continue disponível mesmo que a entidade fonte fique indisponível",
-                    "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes"
+                    "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes",
                     "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível"
                 },
                 "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
@@ -188,7 +188,7 @@
                     "create_utility_meters": "Deixe o powercalc criar medidores de utilidade, que circulam diariamente, de hora em hora, etc.",
                     "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
                     "name": "Deixar em branco levará o nome da entidade de origem",
-                    "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando em estado OFF",
+                    "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando em estado desligado",
                     "unique_id": "Especifique um unique_id. Isso permitirá configurar vários sensores de potência para a mesma entidade. Quando não especificado, levará o unique_id da entidade de origem"
                 },
                 "description": "Consulte a documentação para obter mais informações sobre as possíveis estratégias e opções de configuração",
@@ -269,7 +269,7 @@
                     "power_template": "O modelo será avaliado para obter o valor da potência em W",
                     "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
                     "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima",
-                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
                     "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível"
                 }
             }
@@ -304,7 +304,7 @@
                     "name": "Valor"
                 }
             },
-            "name": "Calibrar nedidor de utilidade"
+            "name": "Calibrar medidor de utilidade"
         },
         "increase_daily_energy": {
             "description": "Aumenta o valor do sensor por um valor.",
