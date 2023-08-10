@@ -164,7 +164,7 @@
                     "sensor_type": "Sensor type"
                 },
                 "menu_options": {
-                    "daily_energy": "Dagelijkste energie",
+                    "daily_energy": "Dagelijkse energie",
                     "group": "Groep",
                     "menu_library": "Virtueel vermogen (bibliotheek)",
                     "real_power": "Energie bebaseerd op bestaande vermogensensor",
