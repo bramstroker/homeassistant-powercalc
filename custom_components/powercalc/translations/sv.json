@@ -1,177 +1,327 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Sensor är redan konfigurerad, specificera ett unikt ID"
-        },
-        "error": {
-            "daily_energy_mandatory": "Du måste ange minst ett värde eller en värdemall",
-            "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
-            "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
-            "group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
-            "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
-            "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt"
-        },
-        "flow_title": "{name} ({manufacturer} {model})",
-        "step": {
-            "daily_energy": {
-                "data": {
-                    "name": "Namn",
-                    "on_time": "Igång tid",
-                    "start_time": "Starttid",
-                    "unique_id": "Unikt id",
-                    "unit_of_measurement": "Mätenhet",
-                    "update_frequency": "Uppdateringsfrekvens",
-                    "value": "Värde",
-                    "value_template": "Värdemall"
-                },
-                "data_description": {
-                    "on_time": "Om lämnas tomt är standard 1 dag. Alltid på",
-                    "update_frequency": "Tid i sekunder mellan uppdatering av sensor"
-                },
-                "title": "Skapar en fast daglig sensor"
-            },
-            "fixed": {
-                "data": {
-                    "power": "Effekt",
-                    "power_template": "Effektmall",
-                    "states_power": "Effekttillstånd"
-                },
-                "data_description": {
-                    "power": "Ett fast värde i Watt när entiteten är igång",
-                    "power_template": "Mall för att beräkna effekten i W",
-                    "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan"
-                },
-                "description": "Definiera ett fast värde för din entitet. Alternativt kan du definiera ett värde per tillstånd. Till exempel: \n\n`spelar: 8.3`\n`pausad: 2.25`",
-                "title": "Fast konfig"
-            },
-            "group": {
-                "data": {
-                    "create_utility_meters": "Skapa bruksmätare",
-                    "group_energy_entities": "Medlem energi entiteter",
-                    "group_power_entities": "Medlem effekt entiteter",
-                    "name": "Namn",
-                    "sub_groups": "Undergrupper",
-                    "unique_id": "Unikt id"
-                },
-                "data_description": {
-                    "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
-                },
-                "title": "Skapa en gruppsensor"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Bekräfta modell"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
-                },
-                "description": "Tillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}",
-                "title": "Bibliotek"
-            },
-            "linear": {
-                "data": {
-                    "attribute": "Attribut",
-                    "calibrate": "Kalibreringsvärde",
-                    "gamma_curve": "Gamma kurva",
-                    "max_power": "Max effekt",
-                    "min_power": "Min effekt"
-                },
-                "data_description": {
-                    "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
-                    "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20"
-                },
-                "title": "Linjär konfig"
-            },
-            "manufacturer": {
-                "data": {
-                    "manufacturer": "Tillverkare"
-                },
-                "description": "Välj tillverkare",
-                "title": "Tillverkare konfig"
-            },
-            "model": {
-                "data": {
-                    "model": "Modell ID"
-                },
-                "description": "Välj enhetsmodell",
-                "title": "Modell konfig"
-            },
-            "user": {
-                "data": {
-                    "sensor_type": "Sensortyp"
-                },
-                "title": "Välj din sensortyp"
-            },
-            "virtual_power": {
-                "data": {
-                    "create_energy_sensor": "Skapa energisensor",
-                    "create_utility_meters": "Skapa bruksmätare",
-                    "entity_id": "Källentitet",
-                    "mode": "Beräkningsstrategi",
-                    "name": "Namn",
-                    "standby_power": "Standby effekt",
-                    "unique_id": "Unikt id"
-                },
-                "data_description": {
-                    "create_energy_sensor": "Ska powercalc skapa en kWh sensor",
-                    "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykel dag, timme etc.",
-                    "entity_id": "Entitet den virtuella effekten är baserad på, effektsensorn kommer lyssna på förändringar på denna entitet",
-                    "name": "Lämnas tom kommer namn tas från källentiteten",
-                    "standby_power": "Ange effekten som enheten förbrukar i avstängt läge",
-                    "unique_id": "Ange ett unikt ID. Detta tillåter att flera sensorer sätts upp för samma entitet. Om inte specificerat tas unikt id från källentiteten"
-                },
-                "description": "Se readme för mer information om möjliga strategier och inställnignsmöjligheter.",
-                "title": "Skapa virtuell effektsensor"
-            },
-            "wled": {
-                "data": {
-                    "power_factor": "Effektfaktor",
-                    "voltage": "Spänning"
-                },
-                "title": "WLED konfig"
-            }
-        }
-    },
-    "options": {
-        "error": {
-            "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
-            "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
-            "group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
-            "linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
-            "linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt"
-        },
-        "step": {
-            "init": {
-                "data": {
-                    "attribute": "Attribut",
-                    "calibrate": "Kalibreringsvärde",
-                    "create_energy_sensor": "Skapa energisensor",
-                    "create_utility_meters": "Skapa bruksmätare",
-                    "gamma_curve": "Gamma kurva",
-                    "group_energy_entities": "Medlem energi entiteter",
-                    "group_power_entities": "Medlem effekt entiteter",
-                    "max_power": "Max effekt",
-                    "min_power": "Min effekt",
-                    "name": "Namn",
-                    "on_time": "Igång tid",
-                    "power": "effekt",
-                    "power_template": "Effektmall",
-                    "standby_power": "Standby effekt",
-                    "states_power": "Effekttillstånd",
-                    "sub_groups": "Undergrupper",
-                    "unit_of_measurement": "Mätenhet",
-                    "update_frequency": "Uppdateringsfrekvens",
-                    "value": "Värde",
-                    "value_template": "Värdemall"
-                },
-                "data_description": {
-                    "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
-                    "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20",
-                    "power_template": "Mall för att beräkna effekten i W",
-                    "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
-                    "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
-                }
-            }
-        }
-    }
+	"config": {
+		"abort": {
+			"already_configured": "Sensor är redan konfigurerad, specificera ett unikt ID"
+		},
+		"error": {
+			"daily_energy_mandatory": "Du måste ange minst ett värde eller en värdemall",
+			"entity_mandatory": "Att välja en entitet krävs för alla strategier utom playbook",
+			"fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
+			"fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
+			"group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
+			"linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
+			"linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt",
+			"linear_unsupported_domain": "Entitetsområde stöds inte för linjärläge. Måste vara en av följande: fläkt, ljus eller mediaplayer. Du kan dock använda kalibreringsalternativet.",
+			"lut_unsupported_color_mode": "LUT profilen stöder inte ett av färglägena på din lampa. Se loggen för mer information",
+			"lut_wrong_domain": "Enbart lampentiteter kan använda LUT läge",
+			"playbook_mandatory": "Du måste speciifera minst en playbook",
+			"unknown": "Okänt fel inträffade, se loggen för mer information"
+		},
+		"flow_title": "{name} ({manufacturer} {model})",
+		"step": {
+			"daily_energy": {
+				"data": {
+					"name": "Namn",
+					"on_time": "Igång tid",
+					"start_time": "Starttid",
+					"unique_id": "Unikt id",
+					"unit_of_measurement": "Mätenhet",
+					"update_frequency": "Uppdateringsfrekvens",
+					"value": "Värde",
+					"value_template": "Värdemall"
+				},
+				"data_description": {
+					"on_time": "Om lämnas tomt är standard 1 dag. Alltid på",
+					"update_frequency": "Tid i sekunder mellan uppdatering av sensor"
+				},
+				"title": "Skapar en fast daglig sensor"
+			},
+			"fixed": {
+				"data": {
+					"power": "Effekt",
+					"power_template": "Effektmall",
+					"states_power": "Effekttillstånd"
+				},
+				"data_description": {
+					"power": "Ett fast värde i Watt när entiteten är igång",
+					"power_template": "Mall för att beräkna effekten i W",
+					"states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan"
+				},
+				"description": "Definiera ett fast värde för din entitet. Alternativt kan du definiera ett värde per tillstånd. Till exempel: \n\n`spelar: 8.3`\n`pausad: 2.25`",
+				"title": "Fast konfig"
+			},
+			"group": {
+				"data": {
+					"area": "Area",
+					"create_utility_meters": "Skapa bruksmätare",
+					"group_energy_entities": "Medlem energi entiteter",
+					"group_member_sensors": "Medlem powercalc sensorer",
+					"group_power_entities": "Medlem effekt entiteter",
+					"hide_members": "Dölj medlemmar",
+					"name": "Namn",
+					"sub_groups": "Undergrupper",
+					"unique_id": "Unikt id"
+				},
+				"data_description": {
+					"area": "Lägg till alla powercalc sensorer från det specifierade området",
+					"group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
+					"group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
+					"group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
+					"sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
+				},
+				"title": "Skapa en gruppsensor"
+			},
+			"library": {
+				"data": {
+					"confirm_autodisovered_model": "Bekräfta modell"
+				},
+				"data_description": {
+					"confirm_autodisovered_model": "Om du väljer att inte bekräfta kan du ange tillverkare och modell själv"
+				},
+				"description": "Tillverkare \"{manufacturer}\" och modell \"{model}\" var automatiskt detekterade för din lampa.{remarks}",
+				"title": "Bibliotek"
+			},
+			"linear": {
+				"data": {
+					"attribute": "Attribut",
+					"calibrate": "Kalibreringsvärde",
+					"gamma_curve": "Gamma kurva",
+					"max_power": "Max effekt",
+					"min_power": "Min effekt"
+				},
+				"data_description": {
+					"attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
+					"calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20"
+				},
+				"title": "Linjär konfig"
+			},
+			"manufacturer": {
+				"data": {
+					"manufacturer": "Tillverkare"
+				},
+				"description": "Välj tillverkare",
+				"title": "Tillverkare konfig"
+			},
+			"model": {
+				"data": {
+					"model": "Modell ID"
+				},
+				"description": "Välj enhetsmodell",
+				"title": "Modell konfig"
+			},
+			"playbook": {
+				"data": {
+					"autostart": "Autostart",
+					"playbooks": "Playbooks",
+					"repeat": "Repetera"
+				},
+				"data_description": {
+					"autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
+					"playbooks": "Lägg in en playbook per linje. Exampel \n\nprogram1: washing_machine/program1.csv",
+					"repeat": "Växla om du vill att playbooken ska repeteras när den är färdig"
+				},
+				"title": "Playbook config"
+			},
+			"power_advanced": {
+				"data": {
+					"calculation_enabled_condition": "Beräkning aktiverat vilkor",
+					"energy_integration_method": "Energi integrations-metod",
+					"ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
+					"multiply_factor": "Multipliceringsfaktor",
+					"unavailable_power": "Otillgänglig effekt"
+				},
+				"data_description": {
+					"calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
+					"ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
+					"multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
+					"unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+				},
+				"description": "Inställningarna nedan är för avancerad powercalc konfiguration. De flesta användare kommer inte använda dessa så du kan skippa dem",
+				"title": "Avancerade inställningar"
+			},
+			"real_power": {
+				"data": {
+					"create_utility_meters": "Skapa bruksmätare",
+					"entity_id": "Effekt sensor id",
+					"name": "Namn"
+				},
+				"data_description": {
+					"create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cyklar dag, timme etc.",
+					"name": "Basnamn för energi och bruksmätare. Fullt entitetsnamn kommer sättas enligt energy_sensor_naming inställningen"
+				},
+				"description": "Nuvarande specifik inställning kan bara bli konfigurerad globalt",
+				"title": "Skapa en energisensor för en befintlig effektsensor"
+			},
+			"sub_profile": {
+				"data": {
+					"sub_profile": "Underprofil"
+				},
+				"description": "Denna modellen har flera underprofiler. Välj en som passar din enhet",
+				"title": "Underprofil konfiguration"
+			},
+			"user": {
+				"data": {
+					"sensor_type": "Sensortyp"
+				},
+				"menu_options": {
+					"daily_energy": "Daglig energi",
+					"group": "Group",
+					"menu_library": "Virtuell effekt (bibliotek)",
+					"real_power": "Energi från riktig effektsensor",
+					"virtual_power": "Virtuell effekt (manuell)"
+				},
+				"title": "Välj din sensortyp"
+			},
+			"virtual_power": {
+				"data": {
+					"create_energy_sensor": "Skapa energisensor",
+					"create_utility_meters": "Skapa bruksmätare",
+					"entity_id": "Källentitet",
+					"mode": "Beräkningsstrategi",
+					"name": "Namn",
+					"standby_power": "Standby effekt",
+					"unique_id": "Unikt id"
+				},
+				"data_description": {
+					"create_energy_sensor": "Ska powercalc skapa en kWh sensor",
+					"create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykel dag, timme etc.",
+					"entity_id": "Entitet den virtuella effekten är baserad på, effektsensorn kommer lyssna på förändringar på denna entitet",
+					"name": "Lämnas tom kommer namn tas från källentiteten",
+					"standby_power": "Ange effekten som enheten förbrukar i avstängt läge",
+					"unique_id": "Ange ett unikt ID. Detta tillåter att flera sensorer sätts upp för samma entitet. Om inte specificerat tas unikt id från källentiteten"
+				},
+				"description": "Se readme för mer information om möjliga strategier och inställnignsmöjligheter.",
+				"title": "Skapa virtuell effektsensor"
+			},
+			"wled": {
+				"data": {
+					"power_factor": "Effektfaktor",
+					"voltage": "Spänning"
+				},
+				"title": "WLED konfig"
+			}
+		}
+	},
+	"issues": {
+		"deprecated_platform_yaml": {
+			"description": "Att konfigurera sensorer med sensor->plattform har fasats ut. Du behöver ändra din konfiguration till powercalc->sensorer. Klicka på 'Läs mer' för ytterligare instruktioner.",
+			"title": "Powercalc YAML konfiguration har flyttats"
+		}
+	},
+	"options": {
+		"error": {
+			"fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
+			"fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
+			"group_mandatory": "Du måste ange minst en subgrupp eller effekt och energi entititeter",
+			"linear_mandatory": "Du måste ange minst en av max_effekt eller kalibrera",
+			"linear_min_higher_as_max": "Max effekt kan inte vara lägre än min effekt",
+			"linear_unsupported_domain": "Entitetsdomän stöds inte i linjärläge. Måste vara en av följande: fläkt, ljus eller mediaplayer. Du kan dock använda kalibreringsalternativet",
+			"unknown": "Okänt fel inträffade, se loggen för mer information"
+		},
+		"step": {
+			"init": {
+				"data": {
+					"area": "Område",
+					"attribute": "Attribut",
+					"autostart": "Autostart",
+					"calculation_enabled_condition": "Beräkningsaktiverat villkor",
+					"calibrate": "Kalibreringsvärde",
+					"create_energy_sensor": "Skapa energisensor",
+					"create_utility_meters": "Skapa bruksmätare",
+					"energy_integration_method": "Energi integration method",
+					"gamma_curve": "Gamma kurva",
+					"group_energy_entities": "Medlem energi entiteter",
+					"group_member_sensors": "Medlem powercalc sensorer",
+					"group_power_entities": "Medlem effekt entiteter",
+					"hide_members": "Dölj medlemmar",
+					"ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
+					"max_power": "Max effekt",
+					"min_power": "Min effekt",
+					"multiply_factor": "Multipliceringsfaktor",
+					"name": "Namn",
+					"on_time": "Igång tid",
+					"playbooks": "Playbooks",
+					"power": "effekt",
+					"power_template": "Effektmall",
+					"repeat": "Repetera",
+					"standby_power": "Standby effekt",
+					"states_power": "Effekttillstånd",
+					"sub_groups": "Undergrupper",
+					"unavailable_power": "Otillgänglig effekt",
+					"unit_of_measurement": "Mätenhet",
+					"update_frequency": "Uppdateringsfrekvens",
+					"value": "Värde",
+					"value_template": "Värdemall"
+				},
+				"data_description": {
+					"area": "Lägg till alla powercalc sensorer från det specifierade området",
+					"attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
+					"autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
+					"calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
+					"calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20",
+					"group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
+					"group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
+					"group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
+					"ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
+					"multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
+					"playbooks": "Lägg in en playbook per linje. Exampel \n\nprogram1: washing_machine/program1.csv",
+					"power_template": "Mall för att beräkna effekten i W",
+					"repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
+					"states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
+					"sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
+					"unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+				}
+			}
+		}
+	},
+	"services": {
+		"activate_playbook": {
+			"description": "Starts körningen sv en playbook.",
+			"fields": {
+				"playbook_id": {
+					"description": "Playbookidentifierare.",
+					"name": "Playbook"
+				}
+			},
+			"name": "Aktivera playbook"
+		},
+		"calibrate_energy": {
+			"description": "Sätter en energisensor till ett givet kWh värde.",
+			"fields": {
+				"value": {
+					"description": "Värdet är satt.",
+					"name": "Värde"
+				}
+			},
+			"name": "Kalibrera energisensor"
+		},
+		"calibrate_utility_meter": {
+			"description": "Kalibrerar en bruksmätare.",
+			"fields": {
+				"value": {
+					"description": "Värdet är satt.",
+					"name": "Värde"
+				}
+			},
+			"name": "Kalibrera bruksmätare"
+		},
+		"increase_daily_energy": {
+			"description": "Ökar sensorn med det angivna värdet.",
+			"fields": {
+				"value": {
+					"description": "Mängd som ska läggas till sensorn.",
+					"name": "Värde"
+				}
+			},
+			"name": "Öka daglig energisensor"
+		},
+		"reset_energy": {
+			"description": "Återställ en energisensor till 0 kWh.",
+			"name": "Återställ energisensor"
+		},
+		"stop_playbook": {
+			"description": "Stoppa den nu aktiva playbooken.",
+			"name": "Stoppa playbook"
+		}
+	}
 }
