@@ -1,10 +1,11 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Le capteur est déjà configuré, spécifiez un unique_id"
+            "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique"
         },
         "error": {
             "daily_energy_mandatory": "Vous devez fournir au moins une valeur ou un modèle de valeur",
+            "entity_mandatory": "La sélection d'une entité est requise pour toute stratégie autre que le playbook",
             "fixed_mandatory": "Vous devez fournir au moins une alimentation, un modèle d'alimentation ou un état d'alimentation",
             "fixed_states_power_only": "Cette entité ne peut fonctionner qu'avec 'states_power' et non 'power'",
             "group_mandatory": "Vous devez définir au moins des sous-groupes ou des entités de puissance et d'énergie",
@@ -13,6 +14,7 @@
             "linear_unsupported_domain": "Domaine d'entité non pris en charge pour le mode linéaire. Doit être l'un des suivants : ventilateur, lumière ou lecteur multimédia. Vous pouvez cependant utiliser l'option de calibrage",
             "lut_unsupported_color_mode": "Le profil LUT ne prend pas en charge l'un des modes de couleur de votre lumière. Voir les journaux pour plus d'informations",
             "lut_wrong_domain": "Seules les entités lumineuses peuvent utiliser le mode LUT",
+            "playbook_mandatory": "Vous devez spécifier au moins un playbook",
             "unknown": "Une erreur inconnue s'est produite, veuillez consulter les journaux pour plus d'informations"
         },
         "flow_title": "{name} ({manufacturer} {model})",
@@ -50,6 +52,7 @@
             },
             "group": {
                 "data": {
+                    "area": "Zone",
                     "create_utility_meters": "Créer des compteurs d'électricité",
                     "group_energy_entities": "Entités énergétiques supplémentaires",
                     "group_member_sensors": "Membres des capteurs powercalc",
@@ -60,6 +63,7 @@
                     "unique_id": "Identifiant unique"
                 },
                 "data_description": {
+                    "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
                     "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
@@ -105,6 +109,19 @@
                 "description": "Sélectionnez le modèle d'appareil. Consultez la [liste]({supported_models_link}) des modèles pris en charge pour plus d'informations",
                 "title": "Configuration du modèle"
             },
+            "playbook": {
+                "data": {
+                    "autostart": "Démarrage automatique",
+                    "playbooks": "Playbooks",
+                    "repeat": "Répéter"
+                },
+                "data_description": {
+                    "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
+                    "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogram1 : washing_machine/program1.csv",
+                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé"
+                },
+                "title": "Configuration Playbook"
+            },
             "power_advanced": {
                 "data": {
                     "calculation_enabled_condition": "Condition de calcul activé",
@@ -122,6 +139,19 @@
                 "description": "Les options ci-dessous concernent la configuration avancée de powercalc. La plupart des utilisateurs ne l'utiliseront pas, vous pouvez donc les ignorer",
                 "title": "Options avancées"
             },
+            "real_power": {
+                "data": {
+                    "create_utility_meters": "Créer des compteurs d'électricité",
+                    "entity_id": "ID du capteur de puissance",
+                    "name": "Nom"
+                },
+                "data_description": {
+                    "create_utility_meters": "Laissez powercalc créer des compteurs de services publics, qui effectuent un cycle quotidien, horaire, etc.",
+                    "name": "Nom de base pour le compteur d'énergie et de services publics. Le nom complet de l'entité sera défini en fonction de energy_sensor_naming"
+                },
+                "description": "Actuellement, les paramètres spécifiques ne peuvent être configurés que globalement",
+                "title": "Créer un capteur d'énergie pour un capteur de puissance existant"
+            },
             "sub_profile": {
                 "data": {
                     "sub_profile": "Sous-profil"
@@ -132,6 +162,13 @@
             "user": {
                 "data": {
                     "sensor_type": "Type de capteur"
+                },
+                "menu_options": {
+                    "daily_energy": "Énergie quotidienne",
+                    "group": "Groupe",
+                    "menu_library": "Puissance virtuelle (bibliothèque)",
+                    "real_power": "Énergie du capteur de puissance réelle",
+                    "virtual_power": "Alimentation virtuelle (manuel)"
                 },
                 "title": "Choisissez votre type de capteur"
             },
@@ -152,7 +189,7 @@
                     "entity_id": "Entité sur laquelle la puissance virtuelle est basée, le capteur de puissance écoutera les changements d'état de cette entité à mettre à jour",
                     "name": "Laisser vide prendra le nom de l'entité source",
                     "standby_power": "Définir la quantité d'énergie que l'appareil consomme lorsqu'il est à l'état OFF",
-                    "unique_id": "Spécifiez un unique_id. Cela permettra de configurer plusieurs capteurs de puissance pour la même entité. Lorsqu'il n'est pas spécifié, il prendra l'unique_id de l'entité source"
+                    "unique_id": "Spécifiez un identifiant unique. Cela permettra de configurer plusieurs capteurs de puissance pour la même entité. Lorsqu'il n'est pas spécifié, il prendra l'identifiant unique de l'entité source"
                 },
                 "description": "Voir le fichier readme pour plus d'informations sur les stratégies possibles et les options de configuration",
                 "title": "Créer un capteur de puissance virtuel"
@@ -164,6 +201,12 @@
                 },
                 "title": "Configuration WLED"
             }
+        }
+    },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "description": "La configuration des capteurs à l'aide de `sensor->platform` est obsolète. Vous devez changer votre configuration en `powercalc->sensors`. Cliquez sur 'En savoir plus' pour plus d'instructions.",
+            "title": "La configuration Powercalc YAML a été déplacée"
         }
     },
     "options": {
@@ -179,7 +222,9 @@
         "step": {
             "init": {
                 "data": {
+                    "area": "Zone",
                     "attribute": "Attribut",
+                    "autostart": "Démarrage automatique",
                     "calculation_enabled_condition": "Condition de calcul activé",
                     "calibrate": "Valeurs d'étalonnage",
                     "create_energy_sensor": "Créer un capteur d'énergie",
@@ -196,8 +241,10 @@
                     "multiply_factor": "Facteur de multiplication",
                     "name": "Nom",
                     "on_time": "Temps de fonctionnement",
+                    "playbooks": "Playbooks",
                     "power": "Puissance",
                     "power_template": "Modèle de puissance",
+                    "repeat": "Répéter",
                     "standby_power": "Consommation en veille",
                     "states_power": "Etats de puissance",
                     "sub_groups": "Sous-groupes",
@@ -208,7 +255,9 @@
                     "value_template": "Modèle de valeur"
                 },
                 "data_description": {
+                    "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
                     "attribute": "Spécifiez l'attribut. Lorsqu'il est laissé vide, la luminosité des lumières et le pourcentage des ventilateurs seront affichés.",
+                    "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
                     "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
                     "calibrate": "Mettez une valeur d'étalonnage sur chaque ligne. Exemple\n\n1 : 20",
                     "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
@@ -216,12 +265,64 @@
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
+                    "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogramme1 : lave-linge/programme1.csv",
                     "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",
+                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
                     "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus",
                     "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
                     "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
                 }
             }
+        }
+    },
+    "services": {
+        "activate_playbook": {
+            "description": "Démarrer l'exécution d'un playbook.",
+            "fields": {
+                "playbook_id": {
+                    "description": "Identifiant Playbook.",
+                    "name": "Playbook"
+                }
+            },
+            "name": "Activer playbook"
+        },
+        "calibrate_energy": {
+            "description": "Règle le capteur d'énergie sur une valeur kWh donnée.",
+            "fields": {
+                "value": {
+                    "description": "La valeur à définir.",
+                    "name": "Valeur"
+                }
+            },
+            "name": "Calibrer le capteur d'énergie"
+        },
+        "calibrate_utility_meter": {
+            "description": "Étalonne un capteur de compteur de services publics.",
+            "fields": {
+                "value": {
+                    "description": "La valeur à définir.",
+                    "name": "Valeur"
+                }
+            },
+            "name": "Étalonner le compteur d'électricité"
+        },
+        "increase_daily_energy": {
+            "description": "Augmente le capteur d'une quantité donnée.",
+            "fields": {
+                "value": {
+                    "description": "Quantité à ajouter au capteur.",
+                    "name": "Valeur"
+                }
+            },
+            "name": "Augmenter le capteur d'énergie quotidien"
+        },
+        "reset_energy": {
+            "description": "Réinitialiser un capteur d'énergie à zéro kWh.",
+            "name": "Réinitialiser le capteur d'énergie"
+        },
+        "stop_playbook": {
+            "description": "Arrêter le playbook actuellement actif.",
+            "name": "Arrêter playbook"
         }
     }
 }
