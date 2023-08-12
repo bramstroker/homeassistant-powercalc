@@ -1,0 +1,11 @@
+{
+	"measure_description": "Used measure tool and took average during 5 minutes",
+	"measure_method": "script",
+	"measure_device": "Shelly Plug S",
+	"name": "Indoor Camera E220",
+	"device_type": "camera",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 1.32
+	}
+}
