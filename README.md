@@ -1,5 +1,6 @@
 ![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc?style=for-the-badge)
 ![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total?style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/bramstroker/homeassistant-powercalc?style=for-the-badge)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 ![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc&style=for-the-badge)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/psf/black)
