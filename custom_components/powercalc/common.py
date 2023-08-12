@@ -36,22 +36,21 @@ class SourceEntity(NamedTuple):
 
 async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEntity:
     """Create object containing all information about the source entity."""
-    if entity_id == DUMMY_ENTITY_ID:
-        domain, object_id = split_entity_id(DUMMY_ENTITY_ID)
-        return SourceEntity(
-            object_id=object_id,
-            entity_id=DUMMY_ENTITY_ID,
-            domain=domain,
-        )
 
     source_entity_domain, source_object_id = split_entity_id(entity_id)
+    if entity_id == DUMMY_ENTITY_ID:
+        return SourceEntity(
+            object_id=source_object_id,
+            entity_id=DUMMY_ENTITY_ID,
+            domain=source_entity_domain,
+        )
 
     entity_registry = er.async_get(hass)
     entity_entry = entity_registry.async_get(entity_id)
 
-    dev = dr.async_get(hass)
+    device_registry = dr.async_get(hass)
     device_entry = (
-        dev.async_get(entity_entry.device_id)
+        device_registry.async_get(entity_entry.device_id)
         if entity_entry and entity_entry.device_id
         else None
     )
@@ -59,21 +58,15 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
     unique_id = None
     supported_color_modes: list[ColorMode] = []
     if entity_entry:
-        source_entity_name = (
-            entity_entry.name or entity_entry.original_name or source_object_id
-        )
         source_entity_domain = entity_entry.domain
         unique_id = entity_entry.unique_id
         if entity_entry.capabilities:
             supported_color_modes = entity_entry.capabilities.get(  # type: ignore[assignment]
                 ATTR_SUPPORTED_COLOR_MODES,
             )
-    else:
-        source_entity_name = source_object_id.replace("_", " ")
 
     entity_state = hass.states.get(entity_id)
     if entity_state:
-        source_entity_name = entity_state.name
         supported_color_modes = entity_state.attributes.get(ATTR_SUPPORTED_COLOR_MODES)
 
     return SourceEntity(
@@ -81,11 +74,32 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         entity_id,
         source_entity_domain,
         unique_id,
-        source_entity_name,
+        get_wrapped_entity_name(hass, entity_id, source_object_id, entity_entry, device_entry),
         supported_color_modes or [],
         entity_entry,
         device_entry,
     )
+
+
+def get_wrapped_entity_name(
+    hass: HomeAssistant,
+    entity_id: str,
+    object_id: str,
+    entity_entry: er.RegistryEntry | None,
+    device_entry: dr.DeviceEntry | None,
+) -> str:
+    """Construct entity name based on the wrapped entity"""
+    if entity_entry:
+        if entity_entry.name is None and entity_entry.has_entity_name and device_entry:
+            return device_entry.name_by_user or device_entry.name or object_id
+
+        return entity_entry.name or entity_entry.original_name or object_id
+
+    entity_state = hass.states.get(entity_id)
+    if entity_state:
+        return str(entity_state.name)
+
+    return object_id
 
 
 def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> dict:

@@ -45,7 +45,7 @@ async def test_exception_raised_when_no_power_profile_passed_lut_strategy(
     ],
 )
 async def test_exception_raised_when_strategy_config_not_provided(
-    hass: HomeAssistant, strategy: CalculationStrategy
+    hass: HomeAssistant, strategy: CalculationStrategy,
 ) -> None:
     with pytest.raises(StrategyConfigurationError):
         factory = PowerCalculatorStrategyFactory(hass)
