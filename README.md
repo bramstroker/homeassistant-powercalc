@@ -1,11 +1,12 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
-![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc)
-![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc)
-![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
-[![Coverage Status](https://coveralls.io/repos/github/bramstroker/homeassistant-powercalc/badge.svg?branch=master)](https://coveralls.io/github/bramstroker/homeassistant-powercalc?branch=master)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=bramstroker_homeassistant-powercalc&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=bramstroker_homeassistant-powercalc)
+![Version](https://img.shields.io/github/v/release/bramstroker/homeassistant-powercalc?style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/bramstroker/homeassistant-powercalc/total?style=for-the-badge)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+![hacs installs](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Flauwbier.nl%2Fhacs%2Fpowercalc&style=for-the-badge)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/psf/black)
+[![Code style: black](https://img.shields.io/badge/type%20checked-mypy-blue.svg?style=for-the-badge)](https://mypy-lang.org/)
+[![Coverage Status](https://img.shields.io/coveralls/github/bramstroker/homeassistant-powercalc/badge.svg?branch=master&style=for-the-badge)](https://coveralls.io/github/bramstroker/homeassistant-powercalc?branch=master)
+[![Sonar quality gate](https://img.shields.io/sonar/alert_status/bramstroker_homeassistant-powercalc/master?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/summary/new_code?id=bramstroker_homeassistant-powercalc)
+[![BuyMeACoffee](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee&style=for-the-badge)](https://www.buymeacoffee.com/bramski)
 
 # :zap: PowerCalc: Home Assistant Virtual Power Sensors
 
