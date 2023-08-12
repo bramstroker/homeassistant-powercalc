@@ -74,7 +74,9 @@ async def create_source_entity(entity_id: str, hass: HomeAssistant) -> SourceEnt
         entity_id,
         source_entity_domain,
         unique_id,
-        get_wrapped_entity_name(hass, entity_id, source_object_id, entity_entry, device_entry),
+        get_wrapped_entity_name(
+            hass, entity_id, source_object_id, entity_entry, device_entry
+        ),
         supported_color_modes or [],
         entity_entry,
         device_entry,

@@ -8,7 +8,10 @@ from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
 )
-from custom_components.powercalc.common import get_merged_sensor_configuration, get_wrapped_entity_name
+from custom_components.powercalc.common import (
+    get_merged_sensor_configuration,
+    get_wrapped_entity_name,
+)
 from custom_components.powercalc.const import CONF_CREATE_ENERGY_SENSOR
 
 
@@ -107,6 +110,5 @@ async def test_get_wrapped_entity_name(
         object_id,
         entity_entry,
         device_entry,
-
     )
     assert name == expected_name

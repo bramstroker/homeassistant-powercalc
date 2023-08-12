@@ -409,7 +409,9 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     [
         (
             RegistryEntry(
-                entity_id="switch.test", unique_id=uuid.uuid4(), platform="switch",
+                entity_id="switch.test",
+                unique_id=uuid.uuid4(),
+                platform="switch",
             ),
             None,
             None,

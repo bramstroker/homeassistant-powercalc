@@ -143,7 +143,8 @@ async def test_include_light_group(hass: HomeAssistant) -> None:
 
 
 async def test_error_is_logged_when_light_group_not_exists(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
@@ -263,7 +264,8 @@ async def test_include_group(hass: HomeAssistant) -> None:
 
 
 async def test_error_is_logged_when_group_not_exists(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture,
+    hass: HomeAssistant,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     caplog.set_level(logging.ERROR)
     await run_powercalc_setup(
