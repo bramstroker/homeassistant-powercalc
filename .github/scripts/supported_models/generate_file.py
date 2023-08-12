@@ -21,6 +21,7 @@ DEVICE_TYPES = [
     ("light", "Lights"),
     ("smart_speaker", "Smart speakers"),
     ("smart_switch", "Smart switches / plugs"),
+    ("camera", "Cameras"),
     ("network", "Networking"),
 ]
 
