@@ -15,6 +15,7 @@ else:
     from homeassistant.backports.enum import StrEnum  # pragma: no cover
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
+from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -33,6 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeviceType(StrEnum):
+    CAMERA = "camera"
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
@@ -47,6 +49,7 @@ class SubProfileMatcherType(StrEnum):
 
 
 DEVICE_DOMAINS = {
+    DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
@@ -241,6 +244,7 @@ class PowerProfile:
             self.device_type == DeviceType.SMART_SWITCH
             and entity_entry
             and entity_entry.platform in ["hue"]
+            and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
         return DEVICE_DOMAINS[self.device_type] == source_entity.domain

@@ -59,6 +59,7 @@
         "device_type": {
             "type": "string",
             "enum": [
+                "camera",
                 "light",
                 "smart_switch",
                 "smart_speaker",
