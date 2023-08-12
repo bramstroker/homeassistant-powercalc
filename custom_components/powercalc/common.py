@@ -91,13 +91,13 @@ def get_wrapped_entity_name(
     """Construct entity name based on the wrapped entity"""
     if entity_entry:
         if entity_entry.name is None and entity_entry.has_entity_name and device_entry:
-            return device_entry.name_by_user or device_entry.name
+            return device_entry.name_by_user or device_entry.name or object_id
 
         return entity_entry.name or entity_entry.original_name or object_id
 
     entity_state = hass.states.get(entity_id)
     if entity_state:
-        return entity_state.name
+        return str(entity_state.name)
 
     return object_id
 
