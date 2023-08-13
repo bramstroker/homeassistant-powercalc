@@ -92,10 +92,10 @@ CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
 MENU_OPTION_LIBRARY = "menu_library"
 
 SENSOR_TYPE_MENU = {
-    SensorType.DAILY_ENERGY: "Daily energy",
-    SensorType.GROUP: "Group",
     SensorType.VIRTUAL_POWER: "Virtual power (manual)",
     MENU_OPTION_LIBRARY: "Virtual power (library)",
+    SensorType.GROUP: "Group",
+    SensorType.DAILY_ENERGY: "Daily energy",
     SensorType.REAL_POWER: "Energy from real power sensor",
 }
 

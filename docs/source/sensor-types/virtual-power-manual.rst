@@ -1,19 +1,10 @@
+=============================
 Virtual power sensor (manual)
 =============================
 
 To manually add virtual power sensors for your devices you can use the GUI or add some configuration to `configuration.yaml`.
 
-Powercalc offers various calculation methods that can be used to establish a new virtual power sensor. Each method is suitable for specific use cases. To learn about all the configuration options, refer to the dedicated section.
-
-.. toctree::
-   :maxdepth: 1
-
-   strategies/fixed
-   strategies/linear
-   strategies/lut
-   strategies/playbook
-   strategies/wled
-   strategies/composite
+Powercalc offers various calculation strategies that can be used to establish a new virtual power sensor. Each method is suitable for specific use cases. To learn about all options please see :doc:`/strategies/index`.
 
 GUI
 ---
@@ -52,7 +43,7 @@ Most basic example:
           fixed:
             power: 20
 
-For all the possible options see the strategy sections as linked above, :doc:`configuration/sensor-configuration` and the rest of the Powercalc documentation.
+For all the possible options see the strategy sections as linked above, :doc:`/configuration/sensor-configuration` and the rest of the Powercalc documentation.
 
 .. important::
 

@@ -112,7 +112,7 @@ You can use the following configuration:
 
 If you use the GUI to create the groups you can use :guilabel:`Additional power entities` and :guilabel:`Additional energy entities` options.
 
-.. image:: img/group_additional_entities.png
+.. image:: /img/group_additional_entities.png
 
 Also see :doc:`real-power-sensor`
 
@@ -138,4 +138,4 @@ Automatically include entities
 Powercalc has some options to automatically include entities in your group matching certain criteria.
 This can be useful to you don't have to manually specify each and every sensor.
 
-See :doc:`include-entities` for more information.
+See :doc:`group/include-entities` for more information.

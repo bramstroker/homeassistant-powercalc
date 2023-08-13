@@ -16,24 +16,28 @@ Getting Started
    :maxdepth: 1
 
    quick-start
-   setup
 
 Configuration
 ***********************
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :includehidden:
+   :titlesonly:
 
-   virtual-power-manual
-   virtual-power-library
-   daily-energy
-   group
-   real-power-sensor
+   sensor-types/index
+   strategies/index
    configuration/global-configuration
    configuration/sensor-configuration
-   energy-sensor
-   utility-meter
-   naming
+   configuration/standby-power
+
+Misc
+****
+
+.. toctree::
+   :maxdepth: 1
+
+   misc/naming
 
 Troubleshooting
 ********************
