@@ -328,7 +328,8 @@
             "description": "Een aantal profielen in de bibliotheek ondersteunen verschillende sub profielen. Deze service maakt het mogelijk om een andere te kiezen.",
             "fields": {
                 "profile": {
-                    "name": "Subprofiel"
+                    "name": "Subprofiel",
+                    "description": "Specificeer een van de mogelijke sub profielen"
                 }
             },
             "name": "Schakel over naar ander subprofiel"
