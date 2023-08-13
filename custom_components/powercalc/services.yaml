@@ -85,6 +85,7 @@ switch_sub_profile:
   fields:
     profile:
       name: Sub profile
+      description: Define one of the possible sub profiles
       example: "nigh_vision"
       required: true
       selector:
