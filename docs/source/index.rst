@@ -9,7 +9,7 @@ Follow :doc:`quick-start` for the initial installation / setup
 
    This project is under active development.
 
-Get Started
+Getting Started
 ***********************
 
 .. toctree::
@@ -23,14 +23,15 @@ Configuration
 .. toctree::
    :maxdepth: 1
 
-   virtual-power-sensor
-   energy-sensor
-   utility-meter
-   daily-fixed-energy
+   virtual-power-manual
+   virtual-power-library
+   daily-energy
+   group
    real-power-sensor
    configuration/global-configuration
    configuration/sensor-configuration
-   group
+   energy-sensor
+   utility-meter
    naming
 
 Troubleshooting

@@ -1,5 +1,5 @@
-Virtual power sensors
-=====================
+Virtual power sensor (manual)
+=============================
 
 To manually add virtual power sensors for your devices you can use the GUI or add some configuration to `configuration.yaml`.
 
