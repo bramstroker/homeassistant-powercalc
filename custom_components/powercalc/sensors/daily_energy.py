@@ -149,7 +149,10 @@ async def create_daily_fixed_energy_power_sensor(
     )
 
     return await create_virtual_power_sensor(
-        hass, power_sensor_config, source_entity, None,
+        hass,
+        power_sensor_config,
+        source_entity,
+        None,
     )
 
 

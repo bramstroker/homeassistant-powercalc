@@ -13,7 +13,7 @@ epub_show_urls = "footnote"
 
 html_static_path = ["_static"]
 
-extensions = ['sphinx_tabs.tabs']
+extensions = ["sphinx_tabs.tabs"]
 
 # These paths are either relative to html_static_path
 # or fully qualified paths (eg. https://...)
