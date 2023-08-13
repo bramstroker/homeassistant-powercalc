@@ -1,4 +1,5 @@
 import logging
+import uuid
 from datetime import timedelta
 
 import pytest
@@ -10,11 +11,13 @@ from homeassistant.components.vacuum import (
     STATE_RETURNING,
 )
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_ATTRIBUTE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    STATE_IDLE,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
@@ -25,6 +28,7 @@ from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssista
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     MockEntity,
     MockEntityPlatform,
     async_fire_time_changed,
@@ -51,11 +55,15 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SENSOR_TYPE,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
+    DOMAIN,
     DUMMY_ENTITY_ID,
+    SERVICE_SWITCH_SUB_PROFILE,
     CalculationStrategy,
+    SensorType,
 )
 from tests.common import (
     assert_entity_state,
@@ -602,3 +610,47 @@ async def test_entity_category(hass: HomeAssistant) -> None:
     power_entry = entity_registry.async_get("sensor.test_power")
     assert power_entry
     assert power_entry.entity_category == EntityCategory.DIAGNOSTIC
+
+
+async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
+    unique_id = str(uuid.uuid4())
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_ENTITY_ID: "camera.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile_camera/default",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile_camera"),
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+
+    hass.states.async_set("camera.test", STATE_IDLE)
+
+    await run_powercalc_setup(hass, {})
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state
+    assert power_state.state == "1.32"
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_SWITCH_SUB_PROFILE,
+        {
+            ATTR_ENTITY_ID: "sensor.test_power",
+            "profile": "night_vision",
+        },
+        blocking=True,
+    )
+
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test_power")
+    assert power_state
+    assert power_state.state == "2.35"
+
+    config_entry = hass.config_entries.async_get_entry(entry.entry_id)
+    assert config_entry.data.get(CONF_MODEL) == "sub_profile_camera/night_vision"

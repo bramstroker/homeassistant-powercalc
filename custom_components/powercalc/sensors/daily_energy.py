@@ -148,7 +148,7 @@ async def create_daily_fixed_energy_power_sensor(
         unique_id,
     )
 
-    return await create_virtual_power_sensor(hass, power_sensor_config, source_entity)
+    return await create_virtual_power_sensor(hass, power_sensor_config, source_entity, None)
 
 
 class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):

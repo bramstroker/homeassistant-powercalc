@@ -112,6 +112,7 @@ from .const import (
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
+    SERVICE_SWITCH_SUB_PROFILE,
     CalculationStrategy,
     PowercalcDiscoveryType,
     SensorType,
@@ -494,6 +495,12 @@ def register_entity_services() -> None:
         "async_stop_playbook",
     )
 
+    platform.async_register_entity_service(
+        SERVICE_SWITCH_SUB_PROFILE,
+        {vol.Required("profile"): cv.string},  # type: ignore
+        "async_switch_sub_profile",
+    )
+
 
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigType:
     """Convert the config entry structure to the sensor config which we use to create the entities."""
@@ -723,7 +730,7 @@ async def create_individual_sensors(
                 hass,
                 sensor_config,
                 source_entity,
-                discovery_info,
+                config_entry,
             )
 
             entities_to_add.append(power_sensor)
