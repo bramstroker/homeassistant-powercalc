@@ -42,7 +42,7 @@ Create a virtual power sensor by manual configuration. This is the main feature 
 
 Virtual power (library)
 -----------------------
-:doc:`virtual-power-manual`
+:doc:`virtual-power-library`
 
 Create a virtual power sensor by selecting from the library of power profiles. See `supported models`_.
 
