@@ -1,3 +1,7 @@
+==============
+Set up sensors
+==============
+
 You can create new Powercalc sensor either with the GUI or YAML.
 
 In the GUI just click the button to directly add a powercalc sensor:

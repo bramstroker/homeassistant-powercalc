@@ -16,6 +16,7 @@ Getting Started
    :maxdepth: 1
 
    quick-start
+   setup
 
 Configuration
 ***********************
