@@ -36,8 +36,8 @@ How can I setup an energy sensor for a device which has no entity in HA?
 
 You can use :doc:`/daily-energy` for that.
 
-My light model is not supported, what can I do?
------------------------------------------------
+My device is not supported, what can I do?
+------------------------------------------
 
 The built-in power profiles in powercalc are created by taking measurements using a smart plug. These profiles are submitted by the community, and the actual hardware (light, switch, smart speaker) is needed. Powercalc includes a script to automate this process.
 To run this script you'll need the bulb itself, a smart plug , some technical affinity and some time. See :doc:`/contributing/measure` for some documentation how to do this.
@@ -45,3 +45,9 @@ To run this script you'll need the bulb itself, a smart plug , some technical af
 When you can't contribute for whatever reason you can request a new light model on the `discussion section <https://github.com/bramstroker/homeassistant-powercalc/discussions/categories/request-light-models>`_. However it is no certainty if and when it will be added.
 
 Alternatively you can use the :doc:`/strategies/fixed` or :doc:`/strategies/linear` modes for manual configuration to get an approximation.
+
+Why does Powercalc create additional power sensor for my smart plug?
+--------------------------------------------------------------------
+
+Powercalc provides profiles for some smart plugs which don't provide their self usage. Even though their consumption is very small, they will add up to your total consumption in your house. So you'll get a power sensor so you'll know how much the smart plug itself uses. Hence the naming ``_device_power`` and ``_device_energy``.
+When you don't want these in your installation you can simply ignore the provided discoveries.
