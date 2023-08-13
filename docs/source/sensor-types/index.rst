@@ -50,7 +50,7 @@ Make a group of different individual powercalc sensors. For example you can get 
 :doc:`Daily fixed energy <daily-energy>`
 =========================================
 
-Use this for non smart devices which are not managed by HA, and which you known there daily kWh consumption of.
+Use this for non smart devices which are not managed by HA, and which you known the daily kWh consumption of.
 This allows you to create an energy sensor for that which you can add to the energy dashboard
 
 :doc:`Energy from real power sensor <real-power-sensor>`
