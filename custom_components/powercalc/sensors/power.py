@@ -663,6 +663,20 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         await self._strategy_instance.stop_playbook()
 
+    async def switch_sub_profile(self, profile: str) -> None:
+        """Switches to a new sub profile"""
+        if not self._power_profile.has_sub_profiles or self._power_profile.sub_profile_select:
+            raise HomeAssistantError(
+                "This is only supported for sensors having sub profiles, and no automatic profile selection",
+            )
+
+        if profile not in self._power_profile.get_sub_profiles():
+            raise HomeAssistantError(f"{profile} is not a possible sub profile")
+
+        self._power_profile.select_sub_profile(profile)
+        self._standby_power = Decimal(self._power_profile.standby_power)
+        self._standby_power_on = Decimal(self._power_profile.standby_power_on)
+
 
 class RealPowerSensor(PowerSensor):
     """Contains a reference to an existing real power sensor entity."""
