@@ -40,7 +40,7 @@ Some options can be changed afterwards, just click :guilabel:`Configure`
 YAML
 ----
 
-To create a power sensor with YAML you'll have to add a new entry under the ``sensor:`` line in `configuration.yaml`.
+To create a power sensor with YAML you'll have to add a new entry under ``powercalc->sensors`` line in `configuration.yaml`.
 
 Most basic example:
 
@@ -52,24 +52,33 @@ Most basic example:
           fixed:
             power: 20
 
-Tip: You can also setup multiple sensors in one go using the ``entities`` option.
-
-.. code-block:: yaml
-
-    powercalc:
-      sensors:
-        - entities:
-            - entity_id: light.my_light
-              fixed:
-                power: 20
-            - entity_id: light.my_light2
-              linear:
-                min_power: 2
-                max_power: 9
-
 For all the possible options see the strategy sections as linked above, :doc:`configuration/sensor-configuration` and the rest of the Powercalc documentation.
 
 .. important::
 
     After changing the configuration you'll need to restart HA to get your power sensors to appear.
+
+Splitting up configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Alternatively you could move all powercalc configuration and sensors to a separate YAML file to prevent getting one massive `configuration.yaml` and keep things maintainable.
+To do so add the following line to `configuration.yaml`:
+
+.. code-block:: yaml
+
+    powercalc: !include includes/powercalc.yaml
+
+Now in `powercalc.yaml` add all the global configuration and sensors. You need to omit `powercalc:` in this case.
+
+.. code-block:: yaml
+
+    sensors:
+      - entity_id: light.my_light
+        fixed:
+          power: 20
+      - entity_id: light.my_light2
+        fixed:
+          power: 40
+
+A third way would be to use the `packages <https://www.home-assistant.io/docs/configuration/packages/>`_ system which Home Assistant provides.
 
