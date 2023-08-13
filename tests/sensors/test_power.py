@@ -3,7 +3,12 @@ import uuid
 from datetime import timedelta
 
 import pytest
-from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_COLOR_TEMP, ColorMode
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    ATTR_COLOR_MODE,
+    ATTR_COLOR_TEMP,
+    ColorMode,
+)
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -658,7 +663,9 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
     assert config_entry.data.get(CONF_MODEL) == "sub_profile_camera/night_vision"
 
 
-async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profiles(hass: HomeAssistant) -> None:
+async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profiles(
+    hass: HomeAssistant,
+) -> None:
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -690,7 +697,9 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
         )
 
 
-async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(hass: HomeAssistant) -> None:
+async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
+    hass: HomeAssistant,
+) -> None:
     unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -709,7 +718,11 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(hass: 
     hass.states.async_set(
         "light.test",
         STATE_ON,
-        {ATTR_BRIGHTNESS: 20, ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_COLOR_TEMP: 20},
+        {
+            ATTR_BRIGHTNESS: 20,
+            ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
+            ATTR_COLOR_TEMP: 20,
+        },
     )
 
     await run_powercalc_setup(hass, {})

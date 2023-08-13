@@ -105,10 +105,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def create_power_sensor(
-        hass: HomeAssistant,
-        sensor_config: dict,
-        source_entity: SourceEntity,
-        config_entry: ConfigEntry | None,
+    hass: HomeAssistant,
+    sensor_config: dict,
+    source_entity: SourceEntity,
+    config_entry: ConfigEntry | None,
 ) -> PowerSensor:
     """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
@@ -124,10 +124,10 @@ async def create_power_sensor(
 
 
 async def create_virtual_power_sensor(
-        hass: HomeAssistant,
-        sensor_config: ConfigType,
-        source_entity: SourceEntity,
-        config_entry: ConfigEntry | None,
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity,
+    config_entry: ConfigEntry | None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity."""
     power_profile = None
@@ -178,7 +178,7 @@ async def create_virtual_power_sensor(
             unique_id=unique_id,
         )
         entity_category: str | None = (
-                sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
+            sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
         )
 
         strategy = detect_calculation_strategy(sensor_config, power_profile)
@@ -199,9 +199,9 @@ async def create_virtual_power_sensor(
                 standby_power_on = Decimal(power_profile.standby_power_on)
 
         if (
-                CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
-                and power_profile is not None
-                and power_profile.calculation_enabled_condition
+            CONF_CALCULATION_ENABLED_CONDITION not in sensor_config
+            and power_profile is not None
+            and power_profile.calculation_enabled_condition
         ):
             sensor_config[
                 CONF_CALCULATION_ENABLED_CONDITION
@@ -233,9 +233,9 @@ async def create_virtual_power_sensor(
             update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
             multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
             multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY)
-                                    or False,
+            or False,
             ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE)
-                                     or False,
+            or False,
             rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
             sensor_config=sensor_config,
             power_profile=power_profile,
@@ -253,8 +253,8 @@ async def create_virtual_power_sensor(
 
 
 async def create_real_power_sensor(
-        hass: HomeAssistant,
-        sensor_config: dict,
+    hass: HomeAssistant,
+    sensor_config: dict,
 ) -> RealPowerSensor:
     """Create reference to an existing power sensor."""
     power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
@@ -302,25 +302,25 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     _attr_should_poll: bool = False
 
     def __init__(
-            self,
-            hass: HomeAssistant,
-            calculation_strategy_factory: PowerCalculatorStrategyFactory,
-            calculation_strategy: CalculationStrategy,
-            entity_id: str,
-            entity_category: str | None,
-            name: str,
-            source_entity: SourceEntity,
-            unique_id: str | None,
-            standby_power: Decimal | Template,
-            standby_power_on: Decimal,
-            update_frequency: timedelta,
-            multiply_factor: float | None,
-            multiply_factor_standby: bool,
-            ignore_unavailable_state: bool,
-            rounding_digits: int,
-            sensor_config: dict,
-            power_profile: PowerProfile | None,
-            config_entry: ConfigEntry | None,
+        self,
+        hass: HomeAssistant,
+        calculation_strategy_factory: PowerCalculatorStrategyFactory,
+        calculation_strategy: CalculationStrategy,
+        entity_id: str,
+        entity_category: str | None,
+        name: str,
+        source_entity: SourceEntity,
+        unique_id: str | None,
+        standby_power: Decimal | Template,
+        standby_power_on: Decimal,
+        update_frequency: timedelta,
+        multiply_factor: float | None,
+        multiply_factor_standby: bool,
+        ignore_unavailable_state: bool,
+        rounding_digits: int,
+        sensor_config: dict,
+        power_profile: PowerProfile | None,
+        config_entry: ConfigEntry | None,
     ) -> None:
         """Initialize the sensor."""
         self._calculation_strategy = calculation_strategy
@@ -352,8 +352,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._power_profile = power_profile
         self._sub_profile_selector: SubProfileSelector | None = None
         if (
-                not self._ignore_unavailable_state
-                and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None
+            not self._ignore_unavailable_state
+            and self._sensor_config.get(CONF_UNAVAILABLE_POWER) is not None
         ):
             self._ignore_unavailable_state = True
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
@@ -464,9 +464,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async_track_time_interval(self.hass, async_update, self._update_frequency)
 
     async def _handle_source_entity_state_change(
-            self,
-            trigger_entity_id: str,
-            state: State | None,
+        self,
+        trigger_entity_id: str,
+        state: State | None,
     ) -> None:
         """Update power sensor based on new dependant entity state."""
         self._standby_sensors.pop(self.entity_id, None)
@@ -527,9 +527,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Calculate power consumption using configured strategy."""
         entity_state = state
         if (
-                state.entity_id != self._source_entity.entity_id
-                and (entity_state := self.hass.states.get(self._source_entity.entity_id))
-                is None
+            state.entity_id != self._source_entity.entity_id
+            and (entity_state := self.hass.states.get(self._source_entity.entity_id))
+            is None
         ):
             return None
 
@@ -566,9 +566,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         Uses SubProfileSelect class which contains all the matching logic.
         """
         if (
-                not self._power_profile
-                or not self._power_profile.sub_profile_select
-                or not self._sub_profile_selector
+            not self._power_profile
+            or not self._power_profile.sub_profile_select
+            or not self._sub_profile_selector
         ):
             return
 
@@ -675,7 +675,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
-        if not self._power_profile or not self._power_profile.has_sub_profiles or self._power_profile.sub_profile_select:
+        if (
+            not self._power_profile
+            or not self._power_profile.has_sub_profiles
+            or self._power_profile.sub_profile_select
+        ):
             raise HomeAssistantError(
                 "This is only supported for sensors having sub profiles, and no automatic profile selection",
             )
@@ -703,10 +707,10 @@ class RealPowerSensor(PowerSensor):
     """Contains a reference to an existing real power sensor entity."""
 
     def __init__(
-            self,
-            entity_id: str,
-            device_id: str | None = None,
-            unique_id: str | None = None,
+        self,
+        entity_id: str,
+        device_id: str | None = None,
+        unique_id: str | None = None,
     ) -> None:
         self.entity_id = entity_id
         self._device_id = device_id
