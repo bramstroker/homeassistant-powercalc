@@ -3,6 +3,7 @@ import uuid
 from datetime import timedelta
 
 import pytest
+from homeassistant.components.light import ATTR_BRIGHTNESS, ATTR_COLOR_MODE, ATTR_COLOR_TEMP, ColorMode
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     ATTR_BATTERY_LEVEL,
@@ -25,6 +26,7 @@ from homeassistant.const import (
     EntityCategory,
 )
 from homeassistant.core import EVENT_HOMEASSISTANT_START, CoreState, HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
@@ -654,3 +656,71 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
 
     config_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert config_entry.data.get(CONF_MODEL) == "sub_profile_camera/night_vision"
+
+
+async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profiles(hass: HomeAssistant) -> None:
+    unique_id = str(uuid.uuid4())
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "fixed/a",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("fixed"),
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+
+    hass.states.async_set("light.test", STATE_ON)
+
+    await run_powercalc_setup(hass, {})
+
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_SWITCH_SUB_PROFILE,
+            {
+                ATTR_ENTITY_ID: "sensor.test_power",
+                "profile": "b",
+            },
+            blocking=True,
+        )
+
+
+async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(hass: HomeAssistant) -> None:
+    unique_id = str(uuid.uuid4())
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: unique_id,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "sub_profile/a",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile"),
+        },
+        unique_id=unique_id,
+    )
+    entry.add_to_hass(hass)
+
+    hass.states.async_set(
+        "light.test",
+        STATE_ON,
+        {ATTR_BRIGHTNESS: 20, ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_COLOR_TEMP: 20},
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    with pytest.raises(HomeAssistantError):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_SWITCH_SUB_PROFILE,
+            {
+                ATTR_ENTITY_ID: "sensor.test_power",
+                "profile": "c",
+            },
+            blocking=True,
+        )
