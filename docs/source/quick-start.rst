@@ -45,7 +45,7 @@ After following the installation steps above and restarting HA power (W) and ene
 
 When this is not the case please check the logs for any errors, you can also enable :doc:`troubleshooting/debug-logging` to get more details about the discovery routine.
 
-When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. Please proceed to :doc:`setup` for further instructions.
+When your appliance is not supported out of the box (or you want to have more control) you have extensive options for manual configuration. Please proceed to :doc:`sensor-types/index` for further instructions.
 
 .. tip::
     When you don't want powercalc to automatically discover sensors in your installation you can disable that behaviour to get full manual control:
