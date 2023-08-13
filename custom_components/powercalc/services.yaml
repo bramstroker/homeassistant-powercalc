@@ -74,3 +74,19 @@ stop_playbook:
       domain: sensor
       integration: powercalc
       device_class: power
+switch_sub_profile:
+  name: Switch to another sub profile
+  description: Some profiles in the library has different sub profiles. This service allows you to switch to another one.
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+  fields:
+    profile:
+      name: Sub profile
+      description: Define one of the possible sub profiles
+      example: "nigh_vision"
+      required: true
+      selector:
+        text:

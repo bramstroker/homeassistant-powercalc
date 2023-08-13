@@ -323,6 +323,16 @@
         "stop_playbook": {
             "description": "Stop currently active playbook.",
             "name": "Stop playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+            "fields": {
+                "profile": {
+                    "name": "Sub profile",
+                    "description": "Define one of the possible sub profiles"
+                }
+            },
+            "name": "Switch to another sub profile"
         }
     }
 }
