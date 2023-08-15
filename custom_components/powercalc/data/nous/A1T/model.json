@@ -12,5 +12,8 @@
 	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 0.54
-	}
+	},
+	"aliases": [
+		"NOUS A1T"
+	]
 }
