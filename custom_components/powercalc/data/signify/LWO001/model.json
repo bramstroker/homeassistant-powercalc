@@ -6,7 +6,8 @@
     "standby_power": 0.35,
     "calculation_strategy": "lut",
     "aliases": [
-        "8718699688882" 
+        "8718699688882",
+        "LWA021",
     ]
 }
 
