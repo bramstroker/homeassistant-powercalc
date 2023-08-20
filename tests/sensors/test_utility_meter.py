@@ -17,6 +17,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
     mock_device_registry,
     mock_registry,
 )
@@ -28,9 +29,12 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
+    CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
+    DOMAIN,
     CalculationStrategy,
+    SensorType,
 )
 from tests.common import create_input_boolean, run_powercalc_setup
 
@@ -73,6 +77,35 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     general_sensor = hass.states.get("sensor.test_energy_daily")
     assert general_sensor
     assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
+
+
+async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "abc",
+            CONF_ENTITY_ID: "switch.test",
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+        unique_id="abc",
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(
+        hass,
+        {
+        },
+        {
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: ["daily"],
+        },
+    )
+
+    tariff_select = hass.states.get("select.test_energy_daily")
+    assert tariff_select
+    assert tariff_select.state == "peak"
 
 
 async def test_utility_meter_is_not_created_twice(
