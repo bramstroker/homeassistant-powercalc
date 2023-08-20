@@ -398,7 +398,9 @@ def _register_entity_id_change_listener(
         old_entity_id = event.data["old_entity_id"]
         new_entity_id = event.data[CONF_ENTITY_ID]
         _LOGGER.debug(
-            "Entity id has been changed, updating powercalc config. old_id=%s, new_id=%s", old_entity_id, new_entity_id,
+            "Entity id has been changed, updating powercalc config. old_id=%s, new_id=%s",
+            old_entity_id,
+            new_entity_id,
         )
         hass.config_entries.async_update_entry(
             entry,
@@ -625,7 +627,8 @@ async def create_sensors(
                 entities_to_add.extend_items(child_entities)
             except SensorConfigurationError as exception:
                 _LOGGER.error(
-                    "Group state might be misbehaving because there was an error with an entity", exc_info=exception,
+                    "Group state might be misbehaving because there was an error with an entity",
+                    exc_info=exception,
                 )
             continue
 

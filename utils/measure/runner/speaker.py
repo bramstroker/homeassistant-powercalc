@@ -82,7 +82,9 @@ class SpeakerRunner(MeasurementRunner):
     def measure_standby_power(self) -> float:
         self.media_controller.turn_off()
         start_time = time.time()
-        _LOGGER.info("Measuring standby power. Waiting for %d seconds...", config.SLEEP_STANDBY)
+        _LOGGER.info(
+            "Measuring standby power. Waiting for %d seconds...", config.SLEEP_STANDBY
+        )
         time.sleep(config.SLEEP_STANDBY)
         try:
             return self.measure_util.take_measurement(start_time)

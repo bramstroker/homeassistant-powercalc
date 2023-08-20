@@ -56,7 +56,8 @@ class MeasureUtil:
                 # Check if measurement is not outdated
                 if measurement.updated < start_timestamp:
                     error = OutdatedMeasurementError(
-                        "Power measurement is outdated. Aborting after %d successive retries", config.MAX_RETRIES,
+                        "Power measurement is outdated. Aborting after %d successive retries",
+                        config.MAX_RETRIES,
                     )
 
                 # Check if we not have a 0 measurement

@@ -488,7 +488,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                         self._rounding_digits,
                     )
                 _LOGGER.debug(
-                    "%s: Restoring state: %s", self.entity_id, self._attr_native_value,
+                    "%s: Restoring state: %s",
+                    self.entity_id,
+                    self._attr_native_value,
                 )
             except DecimalException as err:
                 _LOGGER.warning("Could not restore last state: %s", err)
@@ -672,7 +674,8 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         for entity_state in member_states:
             if entity_state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
                 _LOGGER.debug(
-                    "skipping state for %s, sensor unavailable or unknown", entity_state.entity_id,
+                    "skipping state for %s, sensor unavailable or unknown",
+                    entity_state.entity_id,
                 )
                 continue
             prev_state = self._prev_state_store.get_entity_state(
@@ -707,14 +710,17 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                 )
             if delta < 0:
                 _LOGGER.warning(
-                    "skipping state for %s, probably erroneous value or sensor was reset", entity_state.entity_id,
+                    "skipping state for %s, probably erroneous value or sensor was reset",
+                    entity_state.entity_id,
                 )
                 continue
 
             group_sum += delta
 
         _LOGGER.debug(
-            "%s: New value: %s", self.entity_id, round(group_sum, self._rounding_digits),
+            "%s: New value: %s",
+            self.entity_id,
+            round(group_sum, self._rounding_digits),
         )
         return group_sum
 

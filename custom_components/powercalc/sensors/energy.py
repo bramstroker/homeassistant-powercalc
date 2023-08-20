@@ -92,11 +92,13 @@ async def create_energy_sensor(
                 )
                 return real_energy_sensor
             _LOGGER.debug(
-                "No existing energy sensor found for the power sensor '%s'", power_sensor.entity_id,
+                "No existing energy sensor found for the power sensor '%s'",
+                power_sensor.entity_id,
             )
         else:
             _LOGGER.debug(
-                "Forced energy sensor generation for the power sensor '%s'", power_sensor.entity_id,
+                "Forced energy sensor generation for the power sensor '%s'",
+                power_sensor.entity_id,
             )
 
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.

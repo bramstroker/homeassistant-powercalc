@@ -212,7 +212,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                 self._state = Decimal(state.state)
             except decimal.DecimalException:
                 _LOGGER.warning(
-                    "%s: Cannot restore state: %s", self.entity_id, state.state,
+                    "%s: Cannot restore state: %s",
+                    self.entity_id,
+                    state.state,
                 )
                 self._state = Decimal(0)
             self._last_updated = state.last_changed.timestamp()
@@ -229,7 +231,11 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             delta = self.calculate_delta(self._update_frequency)
             if delta > 0:
                 self._state = self._state + delta
-                _LOGGER.debug("%s: Updating daily_fixed_energy sensor: %.4f", self.entity_id, self._state)
+                _LOGGER.debug(
+                    "%s: Updating daily_fixed_energy sensor: %.4f",
+                    self.entity_id,
+                    self._state,
+                )
                 self.async_schedule_update_ha_state()
                 self._last_updated = dt_util.now().timestamp()
 

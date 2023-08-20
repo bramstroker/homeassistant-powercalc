@@ -95,8 +95,7 @@ async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> No
 
     await run_powercalc_setup(
         hass,
-        {
-        },
+        {},
         {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
             CONF_UTILITY_METER_TYPES: ["daily"],

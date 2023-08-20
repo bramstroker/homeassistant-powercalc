@@ -110,7 +110,9 @@ class LightRunner(MeasurementRunner):
                 self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
 
             # Initially wait longer so the smartplug can settle
-            _LOGGER.info("Start taking measurements for color mode: %s", self.color_mode)
+            _LOGGER.info(
+                "Start taking measurements for color mode: %s", self.color_mode
+            )
             _LOGGER.info("Waiting %d seconds...", config.SLEEP_INITIAL)
             time.sleep(config.SLEEP_INITIAL)
 
@@ -120,7 +122,9 @@ class LightRunner(MeasurementRunner):
                     time_left = self.calculate_time_left(variations, variation, count)
                     progress_percentage = round(count / num_variations * 100)
                     _LOGGER.info(
-                        "Progress: %d%%, Estimated time left: %s", progress_percentage, time_left,
+                        "Progress: %d%%, Estimated time left: %s",
+                        progress_percentage,
+                        time_left,
                     )
                 _LOGGER.info("Changing light to: %s", variation)
                 variation_start_time = time.time()
@@ -177,7 +181,8 @@ class LightRunner(MeasurementRunner):
 
             csv_file.close()
             _LOGGER.info(
-                "Hooray! measurements finished. Exported CSV file %s", csv_file_path,
+                "Hooray! measurements finished. Exported CSV file %s",
+                csv_file_path,
             )
 
             self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
@@ -522,7 +527,8 @@ class LightRunner(MeasurementRunner):
         self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
         start_time = time.time()
         _LOGGER.info(
-            "Measuring standby power. Waiting for %d seconds...", config.SLEEP_STANDBY,
+            "Measuring standby power. Waiting for %d seconds...",
+            config.SLEEP_STANDBY,
         )
         time.sleep(config.SLEEP_STANDBY)
         try:
