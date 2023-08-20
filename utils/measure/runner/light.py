@@ -71,7 +71,7 @@ class LightRunner(MeasurementRunner):
         self.is_dummy_load_connected = bool(answers.get("dummy_load"))
         if self.is_dummy_load_connected:
             self.dummy_load_value = self.get_dummy_load_value()
-            _LOGGER.info(f"Using {self.dummy_load_value}W as dummy load value")
+            _LOGGER.info("Using %.2fW as dummy load value", self.dummy_load_value)
 
         self.light_info = self.light_controller.get_light_info()
 
@@ -99,7 +99,8 @@ class LightRunner(MeasurementRunner):
         num_variations = len(variations)
 
         _LOGGER.info(
-            f"Starting measurements. Estimated duration: {self.calculate_time_left(variations, variations[0])}",
+            "Starting measurements. Estimated duration: %s",
+            self.calculate_time_left(variations, variations[0]),
         )
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
@@ -109,8 +110,8 @@ class LightRunner(MeasurementRunner):
                 self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
 
             # Initially wait longer so the smartplug can settle
-            _LOGGER.info(f"Start taking measurements for color mode: {self.color_mode}")
-            _LOGGER.info(f"Waiting {config.SLEEP_INITIAL} seconds...")
+            _LOGGER.info("Start taking measurements for color mode: %s", self.color_mode)
+            _LOGGER.info("Waiting %d seconds...", config.SLEEP_INITIAL)
             time.sleep(config.SLEEP_INITIAL)
 
             previous_variation = None
@@ -119,9 +120,9 @@ class LightRunner(MeasurementRunner):
                     time_left = self.calculate_time_left(variations, variation, count)
                     progress_percentage = round(count / num_variations * 100)
                     _LOGGER.info(
-                        f"Progress: {progress_percentage}%, Estimated time left: {time_left}",
+                        "Progress: %d%%, Estimated time left: %s", progress_percentage, time_left,
                     )
-                _LOGGER.info(f"Changing light to: {variation}")
+                _LOGGER.info("Changing light to: %s", variation)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
                     self.color_mode,
@@ -161,7 +162,7 @@ class LightRunner(MeasurementRunner):
                     power = self.nudge_and_remeasure(self.color_mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
-                    _LOGGER.warning(f"Discarding measurement: {error}")
+                    _LOGGER.warning("Discarding measurement: %s", error)
                     if self.num_0_readings > MAX_ALLOWED_0_READINGS:
                         _LOGGER.error(
                             "Aborting measurement session. Received too many 0 readings",
@@ -169,14 +170,14 @@ class LightRunner(MeasurementRunner):
                         return None
                     continue
                 except PowerMeterError as error:
-                    _LOGGER.error(f"Aborting: {error}")
+                    _LOGGER.error("Aborting: %s", error)
                     return None
-                _LOGGER.info(f"Measured power: {power}")
+                _LOGGER.info("Measured power: %.2f", power)
                 csv_writer.write_measurement(variation, power)
 
             csv_file.close()
             _LOGGER.info(
-                f"Hooray! measurements finished. Exported CSV file {csv_file_path}",
+                "Hooray! measurements finished. Exported CSV file %s", csv_file_path,
             )
 
             self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
@@ -379,7 +380,7 @@ class LightRunner(MeasurementRunner):
                 continue
             except ZeroReadingError as error:
                 self.num_0_readings += 1
-                _LOGGER.warning(f"Discarding measurement: {error}")
+                _LOGGER.warning("Discarding measurement: %s", error)
                 if self.num_0_readings > MAX_ALLOWED_0_READINGS:
                     _LOGGER.error(
                         "Aborting measurement session. Received too many 0 readings",
@@ -521,7 +522,7 @@ class LightRunner(MeasurementRunner):
         self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
         start_time = time.time()
         _LOGGER.info(
-            f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds...",
+            "Measuring standby power. Waiting for %d seconds...", config.SLEEP_STANDBY,
         )
         time.sleep(config.SLEEP_STANDBY)
         try:

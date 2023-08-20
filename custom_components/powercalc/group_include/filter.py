@@ -24,14 +24,14 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
     filters: list[IncludeEntityFilter] = []
     if CONF_DOMAIN in filter_config:
         domain_config = filter_config.get(CONF_DOMAIN)
-        if type(domain_config) == list:
+        if isinstance(domain_config, list):
             filters.append(
                 CompositeFilter(
                     [DomainFilter(domain) for domain in domain_config],
                     FilterOperator.OR,
                 ),
             )
-        elif type(domain_config) == str:
+        elif isinstance(domain_config, str):
             filters.append(DomainFilter(domain_config))
 
     return CompositeFilter(filters, FilterOperator.AND)

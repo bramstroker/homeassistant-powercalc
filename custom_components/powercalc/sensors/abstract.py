@@ -39,7 +39,7 @@ class BaseEntity(Entity):
             not device_entry or device_entry.id == entity_entry.device_id
         ):  # pragma: no cover
             return
-        _LOGGER.debug(f"Binding {self.entity_id} to device {device_id}")
+        _LOGGER.debug("Binding %s to device %s", self.entity_id, device_id)
         entity_reg.async_update_entity(self.entity_id, device_id=device_id)
 
 

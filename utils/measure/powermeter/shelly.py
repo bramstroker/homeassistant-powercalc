@@ -68,7 +68,7 @@ class ShellyPowerMeter(PowerMeter):
         """Check the generation / supported API version. All shelly's should implement the /shelly endpoint"""
         try:
             uri = f"http://{self.ip_address}/shelly"
-            _LOGGER.debug(f"Checking API connection: {uri}")
+            _LOGGER.debug("Checking API connection: %s", uri)
             response = requests.get(uri, timeout=self.timeout)
         except requests.RequestException as ex:
             raise ApiConnectionError("Could not connect to Shelly Plug") from ex
@@ -80,7 +80,7 @@ class ShellyPowerMeter(PowerMeter):
 
         json = response.json()
         gen = json["gen"] if "gen" in json else 1
-        _LOGGER.debug(f"Shelly API version {gen} detected")
+        _LOGGER.debug("Shelly API version %d detected", gen)
         return int(gen)
 
     def process_answers(self, answers: dict[str, Any]) -> None:

@@ -44,14 +44,14 @@ class SpeakerRunner(MeasurementRunner):
         input("Hit enter when you are ready to start..")
 
         for volume in range(10, 101, 10):
-            _LOGGER.info(f"Setting volume to {volume}")
+            _LOGGER.info("Setting volume to %d", volume)
             self.media_controller.set_volume(volume)
             _LOGGER.info("Start streaming noise")
             self.media_controller.play_audio(STREAM_URL)
             time.sleep(SLEEP_PRE_MEASURE)
             summary[volume] = self.measure_util.take_average_measurement(duration)
 
-        _LOGGER.info(f"Muting volume and waiting for {SLEEP_MUTE} seconds")
+        _LOGGER.info("Muting volume and waiting for %d seconds", SLEEP_MUTE)
         time.sleep(SLEEP_MUTE)
         summary[0] = self.measure_util.take_average_measurement(duration)
 
@@ -82,9 +82,7 @@ class SpeakerRunner(MeasurementRunner):
     def measure_standby_power(self) -> float:
         self.media_controller.turn_off()
         start_time = time.time()
-        _LOGGER.info(
-            f"Measuring standby power. Waiting for {config.SLEEP_STANDBY} seconds...",
-        )
+        _LOGGER.info("Measuring standby power. Waiting for %d seconds...", config.SLEEP_STANDBY)
         time.sleep(config.SLEEP_STANDBY)
         try:
             return self.measure_util.take_measurement(start_time)

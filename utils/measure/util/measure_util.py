@@ -19,16 +19,16 @@ class MeasureUtil:
 
     def take_average_measurement(self, duration: int) -> float:
         """Measure average power consumption for a given time period in seconds"""
-        _LOGGER.info(f"Measuring average power for {duration} seconds")
+        _LOGGER.info("Measuring average power for %d seconds", duration)
         start_time = time.time()
         readings: list[float] = []
         while (time.time() - start_time) < duration:
             power = self.power_meter.get_power().power
-            _LOGGER.info(f"Measured power: {power}")
+            _LOGGER.info("Measured power: %.2f", power)
             readings.append(power)
             time.sleep(config.SLEEP_TIME)
         average = round(sum(readings) / len(readings), 2)
-        _LOGGER.info(f"Average power: {average}")
+        _LOGGER.info("Average power: %s", average)
         return average
 
     def take_measurement(
@@ -40,7 +40,7 @@ class MeasureUtil:
         measurements = []
         # Take multiple samples to reduce noise
         for i in range(1, config.SAMPLE_COUNT + 1):
-            _LOGGER.debug(f"Taking sample {i}")
+            _LOGGER.debug("Taking sample %d", i)
             error = None
             measurement: PowerMeasurementResult | None = None
             try:
@@ -48,7 +48,7 @@ class MeasureUtil:
                 updated_at = dt.fromtimestamp(measurement.updated).strftime(
                     "%d-%m-%Y, %H:%M:%S",
                 )
-                _LOGGER.debug(f"Measurement received (update_time={updated_at})")
+                _LOGGER.debug("Measurement received (update_time=%s)", updated_at)
             except PowerMeterError as err:
                 error = err
 
@@ -56,7 +56,7 @@ class MeasureUtil:
                 # Check if measurement is not outdated
                 if measurement.updated < start_timestamp:
                     error = OutdatedMeasurementError(
-                        f"Power measurement is outdated. Aborting after {config.MAX_RETRIES} successive retries",
+                        "Power measurement is outdated. Aborting after %d successive retries", config.MAX_RETRIES,
                     )
 
                 # Check if we not have a 0 measurement

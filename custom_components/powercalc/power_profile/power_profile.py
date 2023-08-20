@@ -221,7 +221,7 @@ class PowerProfile:
             return
 
         self._sub_profile_dir = os.path.join(self._directory, sub_profile)
-        _LOGGER.debug(f"Loading sub profile directory {sub_profile}")
+        _LOGGER.debug("Loading sub profile directory %s", sub_profile)
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupportedError(
                 f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
