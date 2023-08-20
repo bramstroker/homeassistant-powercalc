@@ -80,7 +80,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if self._active_playbook:
             await self.stop_playbook()
 
-        _LOGGER.debug(f"Activating playbook {playbook_id}")
+        _LOGGER.debug("Activating playbook %s", playbook_id)
         playbook = await self._load_playbook(playbook_id=playbook_id)
         self._active_playbook = playbook
         self._start_time = dt.utcnow()
@@ -112,13 +112,13 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         queue = self._active_playbook.queue
         if len(queue) == 0:
             if self._repeat:
-                _LOGGER.debug(f"Playbook {self._active_playbook.key} repeating")
+                _LOGGER.debug("Playbook %s repeating", self._active_playbook.key)
                 self._start_time = dt.utcnow()
                 queue.reset()
                 self._execute_playbook_entry()
                 return
 
-            _LOGGER.debug(f"Playbook {self._active_playbook.key} completed")
+            _LOGGER.debug("Playbook %s completed", self._active_playbook.key)
             self._active_playbook = None
             return
 
@@ -127,7 +127,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         @callback
         def _update_power(date_time: datetime) -> None:
             self._power = entry.power
-            _LOGGER.debug(f"playbook {self._active_playbook.key}: Update power {self._power}")  # type: ignore
+            _LOGGER.debug("playbook %s: Update power %.2f", self._active_playbook.key, self._power)  # type: ignore
             self._update_callback(self._power)
             # Schedule next update
             self._execute_playbook_entry()

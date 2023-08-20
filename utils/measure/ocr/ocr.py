@@ -316,11 +316,11 @@ class OCR:
                         frame,
                         config="-c tessedit_char_whitelist='0123456789.'",
                     )
-                    _LOGGER.debug(f"OCR match: {match.strip()}")
+                    _LOGGER.debug("OCR match: %s", match.strip())
                     if len(match) > 0:
                         try:
                             measurement = Decimal(match)
-                            _LOGGER.info(f"Measurement: {measurement!s}")
+                            _LOGGER.info("Measurement: %.2f", measurement)
                         except DecimalException:
                             _LOGGER.error("Cannot convert OCR match to decimal")
                             continue
@@ -330,7 +330,7 @@ class OCR:
                         self.write_result(self.measurement)
                     time.sleep(OCR_SLEEP)
                 except Exception as e:  # noqa: BLE001
-                    _LOGGER.error(f"OCR error: {e}")
+                    _LOGGER.error("OCR error: %s", e)
 
     def write_result(self, measurement: Decimal) -> None:
         if self.file is None:
@@ -373,7 +373,7 @@ class OCR:
 
         if self.measurement:
             diff_percentage = self.get_percentage_change(self.measurement, measurement)
-            _LOGGER.debug(f"Percentage diff: {diff_percentage}")
+            _LOGGER.debug("Percentage diff: %d", diff_percentage)
             if diff_percentage > 120:
                 _LOGGER.info(
                     "Difference between measurements is too high, this must be wrong",

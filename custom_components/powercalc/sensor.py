@@ -398,7 +398,9 @@ def _register_entity_id_change_listener(
         old_entity_id = event.data["old_entity_id"]
         new_entity_id = event.data[CONF_ENTITY_ID]
         _LOGGER.debug(
-            f"Entity id has been changed, updating powercalc config. old_id={old_entity_id}, new_id={new_entity_id}",
+            "Entity id has been changed, updating powercalc config. old_id=%s, new_id=%s",
+            old_entity_id,
+            new_entity_id,
         )
         hass.config_entries.async_update_entry(
             entry,
@@ -625,7 +627,8 @@ async def create_sensors(
                 entities_to_add.extend_items(child_entities)
             except SensorConfigurationError as exception:
                 _LOGGER.error(
-                    f"Group state might be misbehaving because there was an error with an entity: {exception}",
+                    "Group state might be misbehaving because there was an error with an entity",
+                    exc_info=exception,
                 )
             continue
 
@@ -799,7 +802,7 @@ async def attach_entities_to_source_device(
             try:
                 entity.source_device_id = source_entity.device_entry.id  # type: ignore
             except AttributeError:  # pragma: no cover
-                _LOGGER.error(f"{entity.entity_id}: Cannot set device id on entity")
+                _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
         if (
             config_entry
             and config_entry.entry_id not in source_entity.device_entry.config_entries

@@ -9,5 +9,8 @@
     },
     "name": "Hue White Ambiance Aurelle Rectangular",
     "standby_power": 0.35,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "929003099101"
+    ]
 }

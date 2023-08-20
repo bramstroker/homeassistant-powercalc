@@ -86,16 +86,19 @@ async def create_energy_sensor(
             real_energy_sensor = find_related_real_energy_sensor(hass, power_sensor)
             if real_energy_sensor:
                 _LOGGER.debug(
-                    f"Found existing energy sensor '{real_energy_sensor.entity_id}' "
-                    f"for the power sensor '{power_sensor.entity_id}'",
+                    "Found existing energy sensor '%s' for the power sensor '%s'",
+                    real_energy_sensor.entity_id,
+                    power_sensor.entity_id,
                 )
                 return real_energy_sensor
             _LOGGER.debug(
-                f"No existing energy sensor found for the power sensor '{power_sensor.entity_id}'",
+                "No existing energy sensor found for the power sensor '%s'",
+                power_sensor.entity_id,
             )
         else:
             _LOGGER.debug(
-                f"Forced energy sensor generation for the power sensor '{power_sensor.entity_id}'",
+                "Forced energy sensor generation for the power sensor '%s'",
+                power_sensor.entity_id,
             )
 
     # Create an energy sensor based on riemann integral integration, which uses the virtual powercalc sensor as source.
@@ -250,12 +253,12 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
     @callback
     def async_reset(self) -> None:
-        _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
+        _LOGGER.debug("%s: Reset energy sensor", self.entity_id)
         self._state = 0
         self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
-        _LOGGER.debug(f"{self.entity_id}: Calibrate energy sensor to: {value}")
+        _LOGGER.debug("%s: Calibrate energy sensor to: %s", self.entity_id, value)
         self._state = Decimal(value)
         self.async_write_ha_state()
 

@@ -21,5 +21,5 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
 
         return Decimal(power)  # type: ignore[arg-type]
     except decimal.DecimalException:
-        _LOGGER.error(f"Could not convert power value {power} to decimal")
+        _LOGGER.error("Could not convert power value %s to decimal", power)
         return None

@@ -212,7 +212,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
                 self._state = Decimal(state.state)
             except decimal.DecimalException:
                 _LOGGER.warning(
-                    f"{self.entity_id}: Cannot restore state: {state.state}",
+                    "%s: Cannot restore state: %s",
+                    self.entity_id,
+                    state.state,
                 )
                 self._state = Decimal(0)
             self._last_updated = state.last_changed.timestamp()
@@ -221,7 +223,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         else:
             self._state = Decimal(0)
 
-        _LOGGER.debug(f"{self.entity_id}: Restoring state: {self._state}")
+        _LOGGER.debug("%s: Restoring state: %s", self.entity_id, self._state)
 
         @callback
         def refresh(now: datetime) -> None:
@@ -230,7 +232,9 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             if delta > 0:
                 self._state = self._state + delta
                 _LOGGER.debug(
-                    f"{self.entity_id}: Updating daily_fixed_energy sensor: {round(self._state, 4)}",
+                    "%s: Updating daily_fixed_energy sensor: %.4f",
+                    self.entity_id,
+                    self._state,
                 )
                 self.async_schedule_update_ha_state()
                 self._last_updated = dt_util.now().timestamp()
@@ -277,17 +281,17 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     @callback
     def async_reset(self) -> None:
-        _LOGGER.debug(f"{self.entity_id}: Reset energy sensor")
+        _LOGGER.debug("%s: Reset energy sensor", self.entity_id)
         self._state = Decimal(0)
         self._attr_last_reset = dt_util.utcnow()
         self.async_write_ha_state()
 
     async def async_increase(self, value: str) -> None:
-        _LOGGER.debug(f"{self.entity_id}: Increasing energy sensor with {value}")
+        _LOGGER.debug("%s: Increasing energy sensor with %s", self.entity_id, value)
         self._state += Decimal(value)
         self.async_write_ha_state()
 
     async def async_calibrate(self, value: str) -> None:
-        _LOGGER.debug(f"{self.entity_id}: Calibrate energy sensor with {value}")
+        _LOGGER.debug("%s: Calibrate energy sensor with %s", self.entity_id, value)
         self._state = Decimal(value)
         self.async_write_ha_state()

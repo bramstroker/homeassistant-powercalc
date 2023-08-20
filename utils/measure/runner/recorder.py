@@ -38,7 +38,7 @@ class RecorderRunner(MeasurementRunner):
                 while True:
                     timestamp = time.time()
                     measurement = self.measure_util.take_measurement(timestamp)
-                    _LOGGER.info(f"Measurement {measurement}")
+                    _LOGGER.info("Measurement %.2f", measurement)
                     writer.writerow([timestamp - start_time, measurement])
                     time.sleep(INTERVAL)
         except KeyboardInterrupt:
