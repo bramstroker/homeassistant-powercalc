@@ -74,7 +74,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         max_value = max_calibrate[0]
 
         _LOGGER.debug(
-            f"{self._source_entity.entity_id}: Linear mode state value: {value} range({min_value}-{max_value})",
+            "%s: Linear mode state value: %d range(%d-%d)", self._source_entity.entity_id, value, min_value, max_value,
         )
 
         min_power = min_calibrate[1]
@@ -141,9 +141,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         if attribute:
             value: int | None = entity_state.attributes.get(attribute)
             if value is None:
-                _LOGGER.warning(
-                    f"No {attribute} attribute for entity: {entity_state.entity_id}",
-                )
+                _LOGGER.warning("No %s attribute for entity: %s", attribute, entity_state.entity_id)
                 return None
             if attribute == ATTR_BRIGHTNESS and value > 255:
                 value = 255
@@ -159,9 +157,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
         try:
             return int(float(entity_state.state))
         except ValueError:
-            _LOGGER.error(
-                f"Expecting state to be a number for entity: {entity_state.entity_id}",
-            )
+            _LOGGER.error("Expecting state to be a number for entity: %s", entity_state.entity_id)
             return None
 
     def get_attribute(self, entity_state: State) -> str | None:

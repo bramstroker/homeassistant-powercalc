@@ -89,14 +89,14 @@ class Measure:
         >>> measure.start()
         """
 
-        _LOGGER.info(f"Selected powermeter: {config.SELECTED_POWER_METER}")
+        _LOGGER.info("Selected powermeter: %s", config.SELECTED_POWER_METER)
         if self.measure_type == MeasureType.LIGHT:
             _LOGGER.info(
-                f"Selected light controller: {config.SELECTED_LIGHT_CONTROLLER}",
+                "Selected light controller: %s", config.SELECTED_LIGHT_CONTROLLER,
             )
         if self.measure_type == MeasureType.SPEAKER:
             _LOGGER.info(
-                f"Selected media controller: {config.SELECTED_MEDIA_CONTROLLER}",
+                "Selected media controller: %s", config.SELECTED_MEDIA_CONTROLLER,
             )
 
         if config.SELECTED_MEASURE_TYPE:
@@ -136,7 +136,7 @@ class Measure:
             try:
                 standby_power = self.runner.measure_standby_power()
             except PowerMeterError as error:
-                _LOGGER.error(f"Aborting: {error}")
+                _LOGGER.error("Aborting: %s", error)
                 return
 
             self.write_model_json(
@@ -151,7 +151,7 @@ class Measure:
             generate_model_json or isinstance(self.runner, LightRunner)
         ):
             _LOGGER.info(
-                f"Measurement session finished. Files exported to {export_directory}",
+                "Measurement session finished. Files exported to %s", export_directory,
             )
 
     @staticmethod
@@ -322,7 +322,7 @@ def main() -> None:
         measure.start()
         exit(0)
     except (PowerMeterError, LightControllerError, KeyboardInterrupt) as e:
-        _LOGGER.error(f"Aborting: {e}")
+        _LOGGER.error("Aborting: %s", e)
         exit(1)
 
 

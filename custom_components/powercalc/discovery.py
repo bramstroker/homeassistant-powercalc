@@ -210,7 +210,8 @@ class DiscoveryManager:
         ]
         if existing_entries:
             _LOGGER.debug(
-                f"{source_entity.entity_id}: Already setup with discovery, skipping new discovery",
+                "%s: Already setup with discovery, skipping new discovery",
+                source_entity.entity_id,
             )
             return
 

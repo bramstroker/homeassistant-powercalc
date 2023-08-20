@@ -38,7 +38,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
 ignore = ["ANN101"]
 line-length = 150
-target-version = "py310"
+target-version = "py311"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.per-file-ignores]
@@ -58,7 +58,7 @@ readme = "README.md"
 pre-commit = "^3.3"
 ruff = "^0.0"
 voluptuous-stubs = "^0.1"
-homeassistant-stubs = "2023.8.3"
+homeassistant-stubs = "2023.8.1"
 numpy = "^1.23"
 black = "^23.3"
 freezegun = "^1.2"

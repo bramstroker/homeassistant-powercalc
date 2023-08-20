@@ -346,7 +346,7 @@ async def create_domain_groups(
     _LOGGER.debug("Setting up domain based group sensors..")
     for domain in domains:
         if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
-            _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")
+            _LOGGER.error("Cannot setup group for domain %s, no entities found", domain)
             continue
 
         domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
