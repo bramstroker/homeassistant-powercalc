@@ -12,5 +12,8 @@
 	"calculation_strategy": "fixed",
 	"fixed_config": {
 		"power": 1.04
-	}
+	},
+    "aliases": [
+        "Plug 01"
+    ]
 }
