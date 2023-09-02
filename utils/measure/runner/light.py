@@ -111,7 +111,7 @@ class LightRunner(MeasurementRunner):
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(
-                "Start taking measurements for color mode: %s", self.color_mode
+                "Start taking measurements for color mode: %s", self.color_mode,
             )
             _LOGGER.info("Waiting %d seconds...", config.SLEEP_INITIAL)
             time.sleep(config.SLEEP_INITIAL)

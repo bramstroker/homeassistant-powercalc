@@ -122,6 +122,10 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
                 mode=selector.NumberSelectorMode.BOX,
             ),
         ),
+        vol.Optional(
+            CONF_CREATE_UTILITY_METERS,
+            default=False,
+        ): selector.BooleanSelector(),
     },
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(
@@ -416,9 +420,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
-            self.sensor_config.update(
-                {CONF_DAILY_FIXED_ENERGY: _build_daily_energy_config(user_input)},
-            )
+            self.sensor_config.update(_build_daily_energy_config(user_input))
             return self.create_config_entry()
 
         return self.async_show_form(
@@ -804,8 +806,7 @@ class OptionsFlowHandler(OptionsFlow):
     ) -> dict:
         """Save options, and return errors when validation fails."""
         if self.sensor_type == SensorType.DAILY_ENERGY:
-            daily_energy_config = _build_daily_energy_config(user_input)
-            self.current_config.update({CONF_DAILY_FIXED_ENERGY: daily_energy_config})
+            self.current_config.update(_build_daily_energy_config(user_input))
 
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             generic_option_schema = SCHEMA_POWER_OPTIONS.extend(
@@ -1162,11 +1163,18 @@ def _build_strategy_config(
 def _build_daily_energy_config(user_input: dict[str, Any]) -> dict[str, Any]:
     """Build the config under daily_energy: key."""
     schema = SCHEMA_DAILY_ENERGY_OPTIONS
-    config: dict[str, Any] = {}
+    config: dict[str, Any] = {
+        CONF_DAILY_FIXED_ENERGY: {},
+    }
     for key in schema.schema:
-        if user_input.get(key) is None:
+        val = user_input.get(key)
+        if val is None:
             continue
-        config[str(key)] = user_input.get(key)
+        if key == CONF_CREATE_UTILITY_METERS:
+            config[CONF_CREATE_UTILITY_METERS] = val
+            continue
+
+        config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
     return config
 
 
