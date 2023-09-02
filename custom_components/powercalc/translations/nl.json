@@ -21,7 +21,8 @@
         "step": {
             "daily_energy": {
                 "data": {
-                    "name": "Name",
+                    "create_utility_meters": "Creëer utiliteit meters",
+                    "name": "Naam",
                     "on_time": "Tijd aan per dag",
                     "start_time": "Start time",
                     "unique_id": "Uniek id",

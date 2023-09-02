@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.const import (
+    CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
@@ -60,6 +61,7 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
             CONF_VALUE: 0.5,
             CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
         },
+        CONF_CREATE_UTILITY_METERS: False,
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
     }
 

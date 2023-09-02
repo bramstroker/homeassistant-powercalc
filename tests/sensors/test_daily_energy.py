@@ -547,6 +547,7 @@ async def test_create_daily_energy_sensor_using_config_entry(
                 CONF_VALUE: 200,
                 CONF_UPDATE_FREQUENCY: 1800.0,
             },
+            CONF_CREATE_UTILITY_METERS: True,
         },
     )
     config_entry_group.add_to_hass(hass)
@@ -554,6 +555,8 @@ async def test_create_daily_energy_sensor_using_config_entry(
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
+
+    assert hass.states.get("sensor.test_energy_daily")
 
 
 async def _trigger_periodic_update(

@@ -1,0 +1,9 @@
+{
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "name": "Hue Disney Story Light",
+    "standby_power": 0.3,
+    "calculation_strategy": "lut",
+    "linked_lut":"signify/LLC012",
+    "aliases": []
+}

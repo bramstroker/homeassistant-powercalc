@@ -146,7 +146,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             value: int | None = entity_state.attributes.get(attribute)
             if value is None:
                 _LOGGER.warning(
-                    "No %s attribute for entity: %s", attribute, entity_state.entity_id
+                    "No %s attribute for entity: %s",
+                    attribute,
+                    entity_state.entity_id,
                 )
                 return None
             if attribute == ATTR_BRIGHTNESS and value > 255:
@@ -164,7 +166,8 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             return int(float(entity_state.state))
         except ValueError:
             _LOGGER.error(
-                "Expecting state to be a number for entity: %s", entity_state.entity_id
+                "Expecting state to be a number for entity: %s",
+                entity_state.entity_id,
             )
             return None
 

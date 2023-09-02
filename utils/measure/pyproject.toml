@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "measure"
 version = "0.1.0"
-description = "Powwercalc measurement tool"
+description = "Powercalc measurement tool"
 authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
 readme = "README.md"
 
