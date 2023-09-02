@@ -9,5 +9,5 @@
         "VERSION": "v1.9.2:docker"
     },
     "name": "Color temperature light (Classic B40 TW - LIGHTIFY)",
-    "standby_power": 0.3
+    "standby_power": 0.15
 }
