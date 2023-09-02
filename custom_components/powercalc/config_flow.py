@@ -122,6 +122,10 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
                 mode=selector.NumberSelectorMode.BOX,
             ),
         ),
+        vol.Optional(
+            CONF_CREATE_UTILITY_METERS,
+            default=False,
+        ): selector.BooleanSelector(),
     },
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(

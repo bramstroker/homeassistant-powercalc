@@ -21,6 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Create utility meters",
                     "name": "Name",
                     "on_time": "On time",
                     "start_time": "Start time",
