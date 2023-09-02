@@ -37,35 +37,21 @@ To update to the latest version of the script:
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. Currently the script is tested with version 3.8, 3.9 and 3.10.
+- Make sure you have Python 3 running on your system. Version 3.11 is recommended.
+- Install poetry. `curl -sSL https://install.python-poetry.org | python3 -` or see https://python-poetry.org/docs/
 
-Setup requirements for the script.
- It is advised to run in a virtual environment.
+Poetry allows you to create virtual environment and manage dependencies.
+To install the dependencies:
+
 ```
 cd utils/measure
-python3 -m venv measure
-source measure/bin/activate
-pip install -r requirements.txt
-```
-
-Alternatively use pyenv (https://github.com/pyenv/pyenv)
-```
-cd utils/measure
-pyenv virtualenv 3.10.4 measure
-pyenv activate measure
-pip install -r requirements.txt
-```
-
-When this is not working on your machine (i.e. windows) just install globally.
-```
-cd utils/measure
-pip install -r requirements.txt
+poetry install
 ```
 
 #### Start measurements
 
 ```
-python3 measure.py
+poetry run python measure.py
 ```
 
 The script will ask you a few questions, than proceed taking measurements.
