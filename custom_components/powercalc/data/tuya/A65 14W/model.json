@@ -9,6 +9,6 @@
     "VERSION": "v1.9.3:docker"
   },
   "name": "A65 14W \u4e94\u8def BK-N \u516c\u7248",
-  "standby_power": 0.05,
+  "standby_power": 0.425,
   "aliases": ["uebyc181yivkcndi", "A65 14W", "A65 14W 五路 BK-N 公版"]
 }
