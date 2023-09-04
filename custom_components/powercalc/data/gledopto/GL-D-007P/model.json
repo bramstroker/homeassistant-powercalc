@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plus 2PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.6.7:docker"
+    },
+    "name": "Zigbee 12W anti-glare downlight RGB+CCT (pro)",
+    "standby_power": 1.73
+}
