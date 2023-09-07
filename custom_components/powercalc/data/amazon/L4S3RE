@@ -1,0 +1,29 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 4.8",
+            "10 -> 4.9",
+            "20 -> 5.0",
+            "30 -> 5.5",
+            "40 -> 5.7",
+            "50 -> 6.1",
+            "60 -> 6.5",
+            "70 -> 7",
+            "80 -> 8",
+            "90 -> 9",
+            "100 -> 10"
+        ]
+    },
+    "measure_description": "Averaged a minute in a group of two Echo Gen 4 speakers",
+    "measure_device": "Teckin, TP22",
+    "measure_method": "manual",
+    "name": "Amazon Alexa Echo Gen 4",
+    "standby_power": 2.1,
+    "aliases": [
+        "A3RMGO6LYLH7YN",
+        "L4S3RE"
+    ]
+}
