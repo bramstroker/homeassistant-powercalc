@@ -190,7 +190,7 @@
 					"standby_power": "Ange effekten som enheten förbrukar i avstängt läge",
 					"unique_id": "Ange ett unikt ID. Detta tillåter att flera sensorer sätts upp för samma entitet. Om inte specificerat tas unikt id från källentiteten"
 				},
-				"description": "Se readme för mer information om möjliga strategier och inställnignsmöjligheter.",
+				"description": "Se readme för mer information om möjliga strategier och inställningsmöjligheter.",
 				"title": "Skapa virtuell effektsensor"
 			},
 			"wled": {
