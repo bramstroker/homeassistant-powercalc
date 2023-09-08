@@ -8,7 +8,10 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.3:docker"
   },
-  "name": "A65 14W \u4e94\u8def BK-N \u516c\u7248",
-  "standby_power": 0.46,
-  "aliases": ["uebyc181yivkcndi", "A65 14W", "A65 14W 五路 BK-N 公版"]
+  "name": "Sylstar Smart Ceiling Lamp 24W",
+  "standby_power": 0.73,
+  "aliases": [
+    "bcyytn6qryldlgax",
+    "SYLSTAR LED Ceiling Light, 24 W 1800 LM Dimmable Ceiling Lights"
+  ]
 }
