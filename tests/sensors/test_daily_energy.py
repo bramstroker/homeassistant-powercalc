@@ -563,7 +563,7 @@ async def _trigger_periodic_update(
     hass: HomeAssistant,
     number_of_updates: int = 1,
 ) -> None:
-    for _i in range(0, number_of_updates):
+    for _i in range(number_of_updates):
         async_fire_time_changed(
             hass,
             dt.utcnow() + timedelta(seconds=DEFAULT_DAILY_UPDATE_FREQUENCY),
