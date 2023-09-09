@@ -8,10 +8,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.9.3:docker"
   },
-  "name": "Sylstar Smart Ceiling Lamp 24W",
+  "name": "SYLSTAR LED Ceiling Light 24W",
   "standby_power": 0.73,
-  "aliases": [
-    "bcyytn6qryldlgax",
-    "SYLSTAR LED Ceiling Light, 24 W 1800 LM Dimmable Ceiling Lights"
-  ]
+  "aliases": ["bcyytn6qryldlgax", "Smart Ceiling Lamp"]
 }
