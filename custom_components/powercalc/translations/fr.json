@@ -21,6 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Créer des compteurs de services publics",
                     "name": "Nom",
                     "on_time": "Temps de fonctionnement",
                     "start_time": "Heure de début",
@@ -323,6 +324,16 @@
         "stop_playbook": {
             "description": "Arrêter le playbook actuellement actif.",
             "name": "Arrêter playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Certains profils de la bibliothèque ont différents sous-profils. Ce service vous permet de passer à un autre.",
+            "fields": {
+                "profile": {
+                    "name": "Sous profil",
+                    "description": "Définir un des sous profils possibles"
+                }
+            },
+            "name": "Passer à un autre sous-profil"
         }
     }
 }
