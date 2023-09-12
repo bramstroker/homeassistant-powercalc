@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "tasmota, s31",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 10,
+        "VERSION": "v1.9.3:docker"
+    },
+    "name": "juno",
+    "standby_power": 0
+}
