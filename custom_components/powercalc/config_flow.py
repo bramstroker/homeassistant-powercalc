@@ -967,13 +967,15 @@ def _create_virtual_power_schema(
                 ): STRATEGY_SELECTOR,
             },
         )
-        power_options = _fill_schema_defaults(
-            SCHEMA_POWER_OPTIONS,
-            _get_global_powercalc_config(hass),
-        )
-        return schema.extend(power_options.schema)  # type: ignore
+        options_schema = SCHEMA_POWER_OPTIONS
+    else:
+        options_schema = SCHEMA_POWER_OPTIONS_LIBRARY
 
-    return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)  # type: ignore
+    power_options = _fill_schema_defaults(
+        options_schema,
+        _get_global_powercalc_config(hass),
+    )
+    return schema.extend(power_options.schema)  # type: ignore
 
 
 def _create_group_options_schema(
