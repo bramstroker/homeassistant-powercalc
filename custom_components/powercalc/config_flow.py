@@ -69,6 +69,7 @@ from .const import (
     DISCOVERY_POWER_PROFILE,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
+    DOMAIN_CONFIG,
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
@@ -704,7 +705,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="power_advanced",
-            data_schema=SCHEMA_POWER_ADVANCED,
+            data_schema=_fill_schema_defaults(SCHEMA_POWER_ADVANCED, self.hass.data[DOMAIN][DOMAIN_CONFIG]),
             errors={},
         )
 
@@ -966,7 +967,11 @@ def _create_virtual_power_schema(
                 ): STRATEGY_SELECTOR,
             },
         )
-        return schema.extend(SCHEMA_POWER_OPTIONS.schema)  # type: ignore
+        power_options = _fill_schema_defaults(
+            SCHEMA_POWER_OPTIONS,
+            hass.data[DOMAIN][DOMAIN_CONFIG],
+        )
+        return schema.extend(power_options.schema)  # type: ignore
 
     return schema.extend(SCHEMA_POWER_OPTIONS_LIBRARY.schema)  # type: ignore
 
