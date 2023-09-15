@@ -705,7 +705,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="power_advanced",
-            data_schema=_fill_schema_defaults(SCHEMA_POWER_ADVANCED, self.hass.data[DOMAIN][DOMAIN_CONFIG]),
+            data_schema=_fill_schema_defaults(SCHEMA_POWER_ADVANCED, _get_global_powercalc_config(self.hass)),
             errors={},
         )
 
@@ -969,7 +969,7 @@ def _create_virtual_power_schema(
         )
         power_options = _fill_schema_defaults(
             SCHEMA_POWER_OPTIONS,
-            hass.data[DOMAIN][DOMAIN_CONFIG],
+            _get_global_powercalc_config(hass),
         )
         return schema.extend(power_options.schema)  # type: ignore
 
@@ -1215,3 +1215,8 @@ def _fill_schema_defaults(
                 new_key.description = {"suggested_value": options.get(key)}  # type: ignore
         schema[new_key] = val
     return vol.Schema(schema)
+
+
+def _get_global_powercalc_config(hass: HomeAssistant) -> dict[str, str]:
+    powercalc = hass.data.get(DOMAIN) or {}
+    return powercalc.get(DOMAIN_CONFIG) or {}
