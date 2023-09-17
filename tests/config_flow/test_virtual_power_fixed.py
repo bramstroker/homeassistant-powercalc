@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
@@ -7,14 +8,19 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc import CONF_FIXED, CONF_POWER_TEMPLATE
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MODE,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_STATES_POWER,
+    ENERGY_INTEGRATION_METHOD_RIGHT,
     CalculationStrategy,
     SensorType,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
+from tests.common import run_powercalc_setup
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -161,3 +167,36 @@ async def test_entity_selection_mandatory(hass: HomeAssistant) -> None:
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"entity_id": "entity_mandatory"}
+
+
+async def test_global_configuration_is_applied_to_field_default(hass: HomeAssistant) -> None:
+    """Field should be set to match powercalc global configuration by default"""
+    global_config = {
+        CONF_CREATE_UTILITY_METERS: True,
+        CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_RIGHT,
+        CONF_IGNORE_UNAVAILABLE_STATE: True,
+    }
+    await run_powercalc_setup(hass, {}, global_config)
+
+    result = await select_sensor_type(hass, SensorType.VIRTUAL_POWER)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {"suggested_value": True}
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+        },
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_POWER: 50},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "power_advanced"
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default() == ENERGY_INTEGRATION_METHOD_RIGHT
+    assert schema_keys[schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)].description == {"suggested_value": True}
+

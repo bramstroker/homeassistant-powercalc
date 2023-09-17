@@ -90,3 +90,23 @@ switch_sub_profile:
       required: true
       selector:
         text:
+change_gui_config:
+  name: Change GUI config
+  description: Batch change configuration of all Powercalc config entries
+  fields:
+    field:
+      name: Field
+      required: true
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - "create_energy_sensor"
+            - "create_utility_meters"
+            - "ignore_unavailable_state"
+            - "energy_integration_method"
+    value:
+      name: Value
+      required: true
+      selector:
+        text:
