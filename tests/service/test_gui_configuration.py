@@ -46,15 +46,23 @@ async def test_change_gui_configuration(hass: HomeAssistant) -> None:
     await run_powercalc_setup(hass, {}, {})
 
     await call_service(hass, CONF_IGNORE_UNAVAILABLE_STATE, "1")
-    await call_service(hass, CONF_ENERGY_INTEGRATION_METHOD, ENERGY_INTEGRATION_METHOD_LEFT)
+    await call_service(
+        hass, CONF_ENERGY_INTEGRATION_METHOD, ENERGY_INTEGRATION_METHOD_LEFT
+    )
 
     config_entry_a = hass.config_entries.async_get_entry(config_entry_a.entry_id)
     assert config_entry_a.data[CONF_IGNORE_UNAVAILABLE_STATE]
-    assert config_entry_a.data[CONF_ENERGY_INTEGRATION_METHOD] == ENERGY_INTEGRATION_METHOD_LEFT
+    assert (
+        config_entry_a.data[CONF_ENERGY_INTEGRATION_METHOD]
+        == ENERGY_INTEGRATION_METHOD_LEFT
+    )
 
     config_entry_b = hass.config_entries.async_get_entry(config_entry_b.entry_id)
     assert config_entry_b.data[CONF_IGNORE_UNAVAILABLE_STATE]
-    assert config_entry_b.data[CONF_ENERGY_INTEGRATION_METHOD] == ENERGY_INTEGRATION_METHOD_LEFT
+    assert (
+        config_entry_b.data[CONF_ENERGY_INTEGRATION_METHOD]
+        == ENERGY_INTEGRATION_METHOD_LEFT
+    )
 
     config_entry_c = hass.config_entries.async_get_entry(config_entry_c.entry_id)
     assert CONF_IGNORE_UNAVAILABLE_STATE not in config_entry_c.data
@@ -80,7 +88,9 @@ async def call_service(hass: HomeAssistant, field: str, value: str) -> None:
     await hass.async_block_till_done()
 
 
-def create_config_entry(entity_id: str, extra_entry_data: ConfigType) -> MockConfigEntry:
+def create_config_entry(
+    entity_id: str, extra_entry_data: ConfigType
+) -> MockConfigEntry:
     unique_id = str(uuid.uuid4())
     return MockConfigEntry(
         domain=DOMAIN,

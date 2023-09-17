@@ -169,7 +169,9 @@ async def test_entity_selection_mandatory(hass: HomeAssistant) -> None:
     assert result["errors"] == {"entity_id": "entity_mandatory"}
 
 
-async def test_global_configuration_is_applied_to_field_default(hass: HomeAssistant) -> None:
+async def test_global_configuration_is_applied_to_field_default(
+    hass: HomeAssistant,
+) -> None:
     """Field should be set to match powercalc global configuration by default"""
     global_config = {
         CONF_CREATE_UTILITY_METERS: True,
@@ -181,7 +183,9 @@ async def test_global_configuration_is_applied_to_field_default(hass: HomeAssist
     result = await select_sensor_type(hass, SensorType.VIRTUAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
-    assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {"suggested_value": True}
+    assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {
+        "suggested_value": True
+    }
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -197,6 +201,10 @@ async def test_global_configuration_is_applied_to_field_default(hass: HomeAssist
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "power_advanced"
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
-    assert schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default() == ENERGY_INTEGRATION_METHOD_RIGHT
-    assert schema_keys[schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)].description == {"suggested_value": True}
-
+    assert (
+        schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default()
+        == ENERGY_INTEGRATION_METHOD_RIGHT
+    )
+    assert schema_keys[
+        schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)
+    ].description == {"suggested_value": True}
