@@ -171,6 +171,7 @@ SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_CALIBRATE_UTILITY_METER = "calibrate_utility_meter"
 SERVICE_CALIBRATE_ENERGY = "calibrate_energy"
 SERVICE_SWITCH_SUB_PROFILE = "switch_sub_profile"
+SERVICE_CHANGE_GUI_CONFIGURATION = "change_gui_config"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 
