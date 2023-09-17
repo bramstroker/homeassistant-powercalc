@@ -43,4 +43,3 @@ def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> None:
         new_data = entry.data.copy()
         new_data[field] = value
         hass.config_entries.async_update_entry(entry, data=new_data)
-    return
