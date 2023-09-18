@@ -9,5 +9,5 @@
         "VERSION": "v1.9.4:docker"
     },
     "name": "STOFTMOLN ceiling/wall lamp WW37",
-    "standby_power": 0
+    "standby_power": 0.11
 }
