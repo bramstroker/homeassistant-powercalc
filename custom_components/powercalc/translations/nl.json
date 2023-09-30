@@ -307,6 +307,20 @@
             },
             "name": "Kalibreer utiliteitsmeter"
         },
+        "change_gui_config": {
+            "description": "Pas configuratie setting in één keer aan voor alle Powercalc GUI configuraties",
+            "fields": {
+                "field": {
+                    "description": "De optie die je aan wil passen",
+                    "name": "Optie"
+                },
+                "value": {
+                    "description": "De nieuwe waarde",
+                    "name": "Waarde"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
         "increase_daily_energy": {
             "description": "Verhoog de sensor.",
             "fields": {
