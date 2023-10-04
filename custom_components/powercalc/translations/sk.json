@@ -307,6 +307,20 @@
             },
             "name": "Kalibrácia merača spotreby"
         },
+        "change_gui_config": {
+            "description": "Dávková zmena konfigurácie všetkých položiek konfigurácie Powercalc",
+            "fields": {
+                "field": {
+                    "description": "Pole, ktoré chcete zmeniť",
+                    "name": "Hodnota"
+                },
+                "value": {
+                    "description": "Hodnota, ktorá sa má nastaviť.",
+                    "name": "Hodnota"
+                }
+            },
+            "name": "Kalibrujte elektromer"
+        },
         "increase_daily_energy": {
             "description": "Zväčší snímač o danú hodnotu.",
             "fields": {
