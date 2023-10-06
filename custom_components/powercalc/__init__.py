@@ -273,7 +273,8 @@ def setup_domain_groups(hass: HomeAssistant, global_config: ConfigType) -> None:
         for domain in domain_groups:
             if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
                 _LOGGER.error(
-                    "Cannot setup group for domain %s, no entities found", domain,
+                    "Cannot setup group for domain %s, no entities found",
+                    domain,
                 )
                 continue
 
@@ -300,7 +301,9 @@ def setup_domain_groups(hass: HomeAssistant, global_config: ConfigType) -> None:
 
 
 async def setup_yaml_sensors(
-    hass: HomeAssistant, config: ConfigType, domain_config: ConfigType,
+    hass: HomeAssistant,
+    config: ConfigType,
+    domain_config: ConfigType,
 ) -> None:
     sensors: list = domain_config.get(CONF_SENSORS, [])
     sorted_sensors = sorted(

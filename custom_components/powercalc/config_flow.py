@@ -706,7 +706,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="power_advanced",
             data_schema=_fill_schema_defaults(
-                SCHEMA_POWER_ADVANCED, _get_global_powercalc_config(self.hass),
+                SCHEMA_POWER_ADVANCED,
+                _get_global_powercalc_config(self.hass),
             ),
             errors={},
         )
