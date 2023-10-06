@@ -47,7 +47,7 @@ async def test_change_gui_configuration(hass: HomeAssistant) -> None:
 
     await call_service(hass, CONF_IGNORE_UNAVAILABLE_STATE, "1")
     await call_service(
-        hass, CONF_ENERGY_INTEGRATION_METHOD, ENERGY_INTEGRATION_METHOD_LEFT
+        hass, CONF_ENERGY_INTEGRATION_METHOD, ENERGY_INTEGRATION_METHOD_LEFT,
     )
 
     config_entry_a = hass.config_entries.async_get_entry(config_entry_a.entry_id)
@@ -89,7 +89,7 @@ async def call_service(hass: HomeAssistant, field: str, value: str) -> None:
 
 
 def create_config_entry(
-    entity_id: str, extra_entry_data: ConfigType
+    entity_id: str, extra_entry_data: ConfigType,
 ) -> MockConfigEntry:
     unique_id = str(uuid.uuid4())
     return MockConfigEntry(
