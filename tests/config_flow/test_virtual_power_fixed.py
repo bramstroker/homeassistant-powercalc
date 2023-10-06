@@ -184,7 +184,7 @@ async def test_global_configuration_is_applied_to_field_default(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {
-        "suggested_value": True
+        "suggested_value": True,
     }
 
     result = await hass.config_entries.flow.async_configure(

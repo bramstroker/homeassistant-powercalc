@@ -24,7 +24,7 @@ SERVICE_SCHEMA = vol.Schema(
     {
         vol.Required("field"): vol.In(ALLOWED_CONFIG_KEYS),
         vol.Required("value"): cv.string,
-    }
+    },
 )
 
 
