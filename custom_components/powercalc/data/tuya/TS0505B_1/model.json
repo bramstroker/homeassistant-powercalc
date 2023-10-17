@@ -8,11 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.9.3:docker"
     },
-    "name": "Tuya TS0505B_1",
-    "standby_power": 0.77,
-    "aliases": [
-        "_TZ3210_r5afgmkl",
-        "TS0505B_1",
-        "konouyouko"
-    ]
+    "name": "Tuya Smart Light E27 LED Lights Bulb RGB+WW+CW TS0505B _TZ3210_r5afgmkl",
+    "standby_power": 0.77
 }
