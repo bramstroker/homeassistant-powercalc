@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Tapo P110",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.9.3:docker"
+  },
+  "name": "SYLSTAR LED Ceiling Light 24W",
+  "standby_power": 0.73,
+  "aliases": []
+}

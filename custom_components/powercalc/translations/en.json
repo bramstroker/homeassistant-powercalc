@@ -307,6 +307,20 @@
             },
             "name": "Calibrate utility meter"
         },
+        "change_gui_config": {
+            "description": "Batch change configuration of all Powercalc config entries",
+            "fields": {
+                "field": {
+                    "description": "The field you'd like to change",
+                    "name": "Value"
+                },
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
         "increase_daily_energy": {
             "description": "Increases the sensor with a given amount.",
             "fields": {

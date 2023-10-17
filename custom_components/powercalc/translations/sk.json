@@ -5,6 +5,7 @@
         },
         "error": {
             "daily_energy_mandatory": "Musíte dodať aspoň jednu šablónu hodnoty alebo hodnoty",
+	    "entity_mandatory": "Výber subjektu je potrebný pre akúkoľvek inú stratégiu, než je stratégia playbook",
             "fixed_mandatory": "Musíte dodať aspoň jednu z možností Power, Power template alebo States power",
             "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
             "group_mandatory": "Musíte definovať aspoň podskupiny alebo silové a energetické entity",
@@ -13,12 +14,14 @@
             "linear_unsupported_domain": "Doména entity nie je podporovaná pre lineárny režim. Musí to byť jeden z: ventilátor, svetlo alebo prehrávač médií. Môžete však použiť možnosť kalibrácie",
             "lut_unsupported_color_mode": "Profil LUT nepodporuje jeden z farebných režimov vášho svetla. Viac informácií nájdete v protokoloch",
             "lut_wrong_domain": "Režim LUT môžu používať iba svetelné entity",
+            "playbook_mandatory": "Musíte zadať aspoň jeden playbook",
             "unknown": "Vyskytla sa neznáma chyba. Ďalšie informácie nájdete v protokoloch"
         },
         "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
+		    "create_utility_meters": "Vytvorenie meracích prístrojov",
                     "name": "Názov",
                     "on_time": "V čase",
                     "start_time": "Štart čas",
@@ -107,6 +110,19 @@
                 "description": "Vyberte model zariadenia. Pozrite si [list]({supported_models_link}) podporovaných modelov, kde nájdete ďalšie informácie",
                 "title": "Konfigurácia modelu"
             },
+            "playbook": {
+                "data": {
+                    "autostart": "Autoštart",
+                    "playbooks": "Playbooky",
+                    "repeat": "Opakovať"
+                },
+                "data_description": {
+                    "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
+                    "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
+                    "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení"
+                },
+                "title": "Playbook konfigurácia"
+	    },
             "power_advanced": {
                 "data": {
                     "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
@@ -124,6 +140,19 @@
                 "description": "Možnosti uvedené nižšie sú pre pokročilú konfiguráciu powercalc. Väčšina používateľov to nebude používať, takže ich môžete preskočiť",
                 "title": "Pokročilé nastavenia"
             },
+            "real_power": {
+                "data": {
+                    "create_utility_meters": "Vytvorenie meračov",
+                    "entity_id": "Id výkonového snímača",
+                    "name": "Názov"
+                },
+                "data_description": {
+                    "create_utility_meters": "Nechajte program powercalc vytvoriť merače spotreby, ktoré sa cyklicky opakujú denne, každú hodinu atď.",
+                    "name": "Základný názov pre merač energií a médií. Úplný názov entity sa nastaví podľa nastavenia energy_sensor_naming"
+                },
+                "description": "V súčasnosti možno špecifické nastavenia konfigurovať len globálne",
+                "title": "Vytvorenie snímača energie pre existujúci snímač energie"
+            },
             "sub_profile": {
                 "data": {
                     "sub_profile": "Pod profil"
@@ -134,6 +163,13 @@
             "user": {
                 "data": {
                     "sensor_type": "Typ snímača"
+                },
+		"menu_options": {
+                    "daily_energy": "Denná energia",
+                    "group": "Group",
+                    "menu_library": "Virtuálny výkon (knižnica)",
+                    "real_power": "Energia zo snímača skutočného výkonu",
+                    "virtual_power": "Virtuálne napájanie (manuálne)"
                 },
                 "title": "Zvoľte váš typ snímača"
             },
@@ -189,6 +225,7 @@
                 "data": {
                     "area": "Oblasť",
                     "attribute": "Attribút",
+                    "autostart": "Autoštart",
                     "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
                     "calibrate": "Kalibračné hodnoty",
                     "create_energy_sensor": "Vytvoriť snímač energie",
@@ -205,8 +242,10 @@
                     "multiply_factor": "Násobný faktor",
                     "name": "Názov",
                     "on_time": "V čase",
+		    "playbooks": "Playbooky",
                     "power": "Výkon",
                     "power_template": "Výkon šablóna",
+		    "repeat": "Opakovať",
                     "standby_power": "Napájanie v pohotovostnom režime",
                     "states_power": "Výkonové stavy",
                     "sub_groups": "Podskupiny",
@@ -219,6 +258,7 @@
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
                     "attribute": "Zadajte atribút. Keď zostane prázdne, bude jas pre svetlá a percento pre ventilátory",
+                    "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
                     "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
                     "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
@@ -226,12 +266,88 @@
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
                     "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
+                    "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
+                    "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
                     "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
                 }
             }
+        }
+    },
+    "services": {
+        "activate_playbook": {
+            "description": "Spustenie vykonávania plybook.",
+            "fields": {
+                "playbook_id": {
+                    "description": "Playbook identifikátor.",
+                    "name": "Playbook"
+                }
+            },
+            "name": "Aktivovať playbook"
+        },
+        "calibrate_energy": {
+            "description": "Nastaví snímač energie na danú hodnotu kWh.",
+            "fields": {
+                "value": {
+                    "description": "Hodnota, ktorú chcete nastaviť.",
+                    "name": "Hodnota"
+                }
+            },
+            "name": "Kalibrácia snímača energie"
+        },
+        "calibrate_utility_meter": {
+            "description": "Kalibruje snímač merača spotreby.",
+            "fields": {
+                "value": {
+                    "description": "Hodnota, ktorú chcete nastaviť.",
+                    "name": "Hodnota"
+                }
+            },
+            "name": "Kalibrácia merača spotreby"
+        },
+        "change_gui_config": {
+            "description": "Dávková zmena konfigurácie všetkých položiek konfigurácie Powercalc",
+            "fields": {
+                "field": {
+                    "description": "Pole, ktoré chcete zmeniť",
+                    "name": "Hodnota"
+                },
+                "value": {
+                    "description": "Hodnota, ktorá sa má nastaviť.",
+                    "name": "Hodnota"
+                }
+            },
+            "name": "Kalibrujte elektromer"
+        },
+        "increase_daily_energy": {
+            "description": "Zväčší snímač o danú hodnotu.",
+            "fields": {
+                "value": {
+                    "description": "Suma, ktorá sa má pridať do snímača.",
+                    "name": "Hodnota"
+                }
+            },
+            "name": "Zvýšenie denného energetického snímača"
+        },
+        "reset_energy": {
+            "description": "Resetovanie snímača energie na nulovú hodnotu kWh.",
+            "name": "Resetovanie snímača energie"
+        },
+        "stop_playbook": {
+            "description": "Zastavenie aktuálne aktívneho playbooku",
+            "name": "Zastaviť playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Niektoré profily v knižnici majú rôzne podprofily. Táto služba umožňuje prepnúť na iný.",
+            "fields": {
+                "profile": {
+                    "name": "Podprofil",
+                    "description": "Definujte jeden z možných podprofilov"
+                }
+            },
+            "name": "Prepnutie na iný podprofil"
         }
     }
 }

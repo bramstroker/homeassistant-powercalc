@@ -6,11 +6,12 @@
     "measure_settings": {
         "SAMPLE_COUNT": 2,
         "SLEEP_TIME": 3,
-        "VERSION": "v1.9.2:docker"
+        "VERSION": "v1.9.4:docker"
     },
-    "name": "TRADFRI bulb E12/E14 WS globe 450/470 lumen, dimmable, white spectrum, opal white (LED2101G4)",
-    "standby_power": 0.2,
+    "name": "Hue Play Gradient Light Tube Large",
+    "standby_power": 0.25,
+    "device_type": "light",
     "aliases": [
-        "TRADFRI bulb E14 WS globe 470lm"
+        "915005988101"
     ]
 }
