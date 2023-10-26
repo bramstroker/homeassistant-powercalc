@@ -402,3 +402,19 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.test_energy")
     assert state
     assert state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
+
+
+async def test_device_class_is_set_after_startup(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1887"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_POWER_SENSOR_ID: "sensor.test_power",
+        },
+    )
+
+    state = hass.states.get("sensor.test_energy")
+    assert state
+    assert state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
