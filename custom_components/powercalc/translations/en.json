@@ -129,12 +129,14 @@
                     "energy_integration_method": "Energy integration method",
                     "ignore_unavailable_state": "Ignore unavailable state",
                     "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "unavailable_power": "Unavailable power"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
                     "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
                     "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "unavailable_power": "Power in W to record when the source entity has an unavailable state"
                 },
                 "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
@@ -240,6 +242,7 @@
                     "max_power": "Max power",
                     "min_power": "Min power",
                     "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "name": "Name",
                     "on_time": "On time",
                     "playbooks": "Playbooks",
@@ -266,6 +269,7 @@
                     "group_power_entities": "Additional power sensors (W) from your HA installation to include",
                     "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
                     "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "Template will be evaluated to get the power value in W",
                     "repeat": "Toggle when you want to keep repeating the playbook after it completes",
