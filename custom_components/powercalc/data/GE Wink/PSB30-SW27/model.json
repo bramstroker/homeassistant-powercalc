@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 2 PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.9.5:docker"
+    },
+    "name": "GE Link BR30 Soft White Bulb",
+    "standby_power": 0.4
+}
