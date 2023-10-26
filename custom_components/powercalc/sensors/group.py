@@ -494,7 +494,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                 )
             except DecimalException as err:
                 _LOGGER.warning(
-                    "%s: Could not restore last state: %s", self.entity_id, err
+                    "%s: Could not restore last state: %s", self.entity_id, err,
                 )
 
             # throttle group energy updates to only once each 30 seconds

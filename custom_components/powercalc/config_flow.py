@@ -50,6 +50,7 @@ from .const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
+    CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
@@ -244,6 +245,7 @@ SCHEMA_POWER_ADVANCED = vol.Schema(
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): selector.BooleanSelector(),
         vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
         vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
+        vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY): selector.BooleanSelector(),
         vol.Optional(
             CONF_ENERGY_INTEGRATION_METHOD,
             default=ENERGY_INTEGRATION_METHOD_LEFT,
