@@ -23,11 +23,12 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_fire_time_changed,
+    mock_registry,
     mock_restore_cache_with_extra_data,
 )
 
@@ -37,6 +38,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_ENERGY_SENSOR_ID,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
@@ -1214,6 +1216,49 @@ async def test_reference_existing_sensor_in_group(hass: HomeAssistant) -> None:
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.test_power"}
+
+
+async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1895"""
+
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.existing_power",
+                unique_id="1234",
+                platform="sensor",
+                device_id="shelly-device-id",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.existing_energy": RegistryEntry(
+                entity_id="sensor.existing_energy",
+                unique_id="12345",
+                platform="sensor",
+                device_id="shelly-device-id",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_ENTITIES: [
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.existing_power",
+                        CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
+                    },
+                ],
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.testgroup_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.existing_power"}
 
 
 async def _create_energy_group(

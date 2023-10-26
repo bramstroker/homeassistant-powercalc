@@ -129,12 +129,14 @@
                     "energy_integration_method": "Energie integratie methode",
                     "ignore_unavailable_state": "Negeer onbeschikbaar status",
                     "multiply_factor": "Multiplicatie factor",
+                    "multiply_factor_standby": "Multiplicatie factor standby",
                     "unavailable_power": "Vermogen indien onbeschikbaar"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
                     "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+                    "multiply_factor_standby": "Pas multiplicatie factor toe op standby vermogen",
                     "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
                 },
                 "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
@@ -240,6 +242,7 @@
                     "max_power": "Max vermogen",
                     "min_power": "Min vermogen",
                     "multiply_factor": "Multiplicatie factor",
+                    "multiply_facto_standby": "Multiplicatie factor standby",
                     "name": "Naam",
                     "on_time": "Tijd aan per dag",
                     "playbooks": "Playbooks",
@@ -266,6 +269,7 @@
                     "group_power_entities": "Additionele vermogen entiteiten (W)",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
                     "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+                    "multiply_factor_standby": "Pas multiplicatie factor toe op standby vermogen",
                     "playbooks": "Plaats een playbook op iedere regel. Example\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "Template die geevalueerd wordt om het vermogen (W) te bepalen",
                     "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
