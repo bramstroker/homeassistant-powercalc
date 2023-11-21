@@ -9,5 +9,5 @@
         "VERSION": "v1.9.7:docker"
     },
     "name": "Festavia string lights (LCX016)",
-    "standby_power": 0
+    "standby_power": 0.05
 }
