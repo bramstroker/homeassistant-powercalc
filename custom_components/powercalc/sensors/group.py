@@ -499,11 +499,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                     "%s: Could not restore last state: %s", self.entity_id, err,
                 )
 
-        self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
+            state_listener = Throttle(timedelta(seconds=30))(state_listener)
 
-        # throttle group updates to only once each X seconds, to prevent overloading the state machine
-        throttle_secs = 30 if isinstance(self, GroupedEnergySensor) else 5
-        state_listener = Throttle(timedelta(seconds=throttle_secs))(state_listener)
+        self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         self.async_on_remove(
             async_track_state_change_event(
