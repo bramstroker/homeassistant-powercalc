@@ -9,5 +9,5 @@
         "VERSION": "v1.9.8:docker"
     },
     "name": "Hue White and Colour Ambiance Amarant linear outdoor light",
-    "standby_power": -0.02
+    "standby_power": 0.05
 }
