@@ -17,6 +17,9 @@ To start measuring you'll need the following:
 Taking measurements
 -------------------
 
+.. important::
+    Devices must have a unique and specific model identification. Generic model identifiers, which could represent multiple different models, are not acceptable. This is important for accurate auto-discovery and integration. Devices that are rebranded or sold under different names on platforms like AliExpress may not be suitable for integration, as it's challenging to ensure they are the same across different users.    
+
 The measure script will walk through different brightness and color settings and take measurements with your smart plug.
 
 Before you are going to take the actual measurements you have to select a ``POWER_METER`` and ``LIGHT_CONTROLLER`` by editing the `.env` file. You also need to set the credentials and information depending on which power meter and light controller you are using.
