@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.9.8:docker"
     },
-    "name": "LIGHTIFY Surface Light LED Tunable White (AB401130055)",
+    "name": "LIGHTIFY Surface Light LED Tunable White",
     "standby_power": 0.4
 }
