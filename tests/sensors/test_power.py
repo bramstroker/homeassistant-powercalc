@@ -296,6 +296,34 @@ async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
     assert hass.states.get(power_entity_id).state == "1.50"
 
 
+async def test_strategy_enabled_condition_template_tracking(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.my_entity",
+            CONF_CALCULATION_ENABLED_CONDITION: "{{ is_state('sensor.other_entity', 'foo') }}",
+            CONF_FIXED: {
+                CONF_POWER: 5,
+            },
+        },
+    )
+
+    hass.states.async_set("sensor.my_entity", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.my_entity_power").state == "0.00"
+
+    hass.states.async_set("sensor.other_entity", "foo")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.my_entity_power").state == "5.00"
+
+    hass.states.async_set("sensor.other_entity", "bar")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.my_entity_power").state == "0.00"
+
+
 async def test_template_entity_tracking(hass: HomeAssistant) -> None:
     await create_input_number(hass, "test", 0)
     await create_input_boolean(hass)
