@@ -1,14 +1,15 @@
-- [Lights](#Lights) (298)
+- [Lights](#Lights) (299)
 - [Smart speakers](#Smart-speakers) (26)
 - [Smart switches / plugs](#Smart-switches-/-plugs) (30)
 - [Cameras](#Cameras) (1)
 - [Networking](#Networking) (1)
 
 ## Lights
-#### 298 total
+#### 299 total
 
 | manufacturer  |        model id         |                                            name                                             |                                                                                                                                               aliases                                                                                                                                                |standby|      color modes       |
 |---------------|-------------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------:|------------------------|
+|3a smarthome   |LXN60-LS27-Z30          |Smart Nue ZigBee 9W RGBW downlight                                                          |                                                                                                                                                                                                                                                                                                      |  0.640|color_temp,hs           |
 |3a smarthome   |LXT56-LS27LX1.7          |Smart Nue ZigBee 12W RGBW downlight                                                          |                                                                                                                                                                                                                                                                                                      |  0.720|color_temp,hs           |
 |ajax online    |AJ_ZB_GU10               |Smart Zigbee pro GU10 spotlight bulb                                                         |                                                                                                                                                                                                                                                                                                      |  0.350|color_temp,hs           |
 |ajax online    |AJ_ZIGPROA60             |Smart Zigbee pro 12W A60 bulb                                                                |                                                                                                                                                                                                                                                                                                      |  0.500|color_temp,hs           |
