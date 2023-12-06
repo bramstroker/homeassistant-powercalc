@@ -18,7 +18,7 @@ Taking measurements
 -------------------
 
 .. important::
-    Devices must have a unique and specific model identification. Generic model identifiers, which could represent multiple different models, are not acceptable. This is important for accurate auto-discovery and integration. Devices that are rebranded or sold under different names on platforms like AliExpress may not be suitable for integration, as it's challenging to ensure they are the same across different users.    
+    Devices must have a unique and specific model identification. Generic model identifiers, which could represent multiple different models, are not acceptable. A common example for this are lights identifying as Tuya TS0505B. This is important for accurate auto-discovery and integration. Devices that are rebranded or sold under different names on platforms like AliExpress may not be suitable for integration, as it's challenging to ensure they are the same across different users. These profiles are not acceptable to get included in Powercalc library, but you are free of course to use them in your own installation.
 
 The measure script will walk through different brightness and color settings and take measurements with your smart plug.
 
