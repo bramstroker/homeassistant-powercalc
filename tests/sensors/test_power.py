@@ -296,7 +296,9 @@ async def test_strategy_enabled_condition(hass: HomeAssistant) -> None:
     assert hass.states.get(power_entity_id).state == "1.50"
 
 
-async def test_strategy_enabled_condition_template_tracking(hass: HomeAssistant) -> None:
+async def test_strategy_enabled_condition_template_tracking(
+    hass: HomeAssistant,
+) -> None:
     await run_powercalc_setup(
         hass,
         {
