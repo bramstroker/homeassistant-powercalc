@@ -496,7 +496,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                 )
             except DecimalException as err:
                 _LOGGER.warning(
-                    "%s: Could not restore last state: %s", self.entity_id, err,
+                    "%s: Could not restore last state: %s",
+                    self.entity_id,
+                    err,
                 )
 
             state_listener = Throttle(timedelta(seconds=30))(state_listener)
