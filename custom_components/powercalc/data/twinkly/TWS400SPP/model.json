@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.9.8:docker"
     },
-    "name": "Twinkly TWS400SPP",
+    "name": "TWS400SPP",
     "standby_power": 2.73
 }
