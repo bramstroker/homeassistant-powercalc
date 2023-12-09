@@ -5,6 +5,8 @@ from typing import Protocol
 
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.const import __version__ as HA_VERSION  # noqa
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.template import Template
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
     from enum import StrEnum
@@ -66,6 +68,16 @@ class WildcardFilter(IncludeEntityFilter):
     def create_regex(pattern: str) -> str:
         pattern = pattern.replace("?", ".")
         return pattern.replace("*", ".*")
+
+class TemplateFilter(IncludeEntityFilter):
+    def __init__(self, hass: HomeAssistant, template: str|Template) -> None:
+        if not isinstance(template, Template):
+            template = Template(template)
+        template.hass = hass
+        self.entity_ids = template.async_render()
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return entity.entity_id in self.entity_ids
 
 
 
