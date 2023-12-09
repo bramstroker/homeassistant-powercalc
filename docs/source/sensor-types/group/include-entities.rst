@@ -60,6 +60,22 @@ Domain
           include:
             domain: light
 
+Wildcard
+--------
+
+Match certain entity id's by a wildcard pattern
+
+``*`` matches any character
+``?`` matches a single character
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: Office spots
+          include:
+            wildcard: light.office_spot_*
+
 Template
 --------
 
@@ -77,6 +93,8 @@ Template
 
 Filters
 =======
+
+Besides the base filters described above which build the base include you can also apply additional filters to further narrow down the list of items.
 
 Domain
 ------
@@ -108,7 +126,7 @@ Wildcard
 .. code-block:: yaml
 
   filter:
-    wildcard: "- light.office_spot_*"
+    wildcard: light.office_spot_*
 
 And / OR
 --------
@@ -119,7 +137,7 @@ You can combine multiple filters as follows:
 
   filter:
     or:
-      - wildcard: "- light.office_spot_*"
+      - wildcard: light.office_spot_*
       - domain:
         - light
         - switch
