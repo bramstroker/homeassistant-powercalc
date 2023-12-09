@@ -36,7 +36,7 @@ def create_filter(filter_config: ConfigType, hass: HomeAssistant, filter_operato
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
     for key, val in filter_config.items():
-        entity_filter = None
+        entity_filter: IncludeEntityFilter | None = None
         if key == CONF_DOMAIN:
             entity_filter = DomainFilter(val)
         if key == CONF_AREA:
