@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Protocol
 
 from awesomeversion.awesomeversion import AwesomeVersion
@@ -53,6 +54,19 @@ class DomainFilter(IncludeEntityFilter):
 class NullFilter(IncludeEntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return True
+
+class WildcardFilter(IncludeEntityFilter):
+    def __init__(self, pattern: str) -> None:
+        self.regex = self.create_regex(pattern)
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return re.search(self.regex, entity.entity_id) is not None
+
+    @staticmethod
+    def create_regex(pattern: str) -> str:
+        pattern = pattern.replace("?", ".")
+        return pattern.replace("*", ".*")
+
 
 
 class CompositeFilter(IncludeEntityFilter):

@@ -9,6 +9,7 @@ from custom_components.powercalc.group_include.filter import (
     DomainFilter,
     FilterOperator,
     NullFilter,
+    WildcardFilter,
     create_filter,
 )
 
@@ -58,6 +59,18 @@ async def test_domain_filter_multiple() -> None:
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
+
+@pytest.mark.parametrize(
+    "pattern,expected_result",
+    [
+        ("switch.*", True),
+        ("sensor.*", False),
+        ("switch.t?st", True),
+        ("switch.t??st", False),
+    ],
+)
+async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
+    assert WildcardFilter(pattern).is_valid(_create_registry_entry()) == expected_result
 
 def _create_registry_entry() -> RegistryEntry:
     return RegistryEntry(entity_id="switch.test", unique_id="abc", platform="test")

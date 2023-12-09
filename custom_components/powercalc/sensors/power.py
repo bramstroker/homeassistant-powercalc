@@ -448,7 +448,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             track_templates.append(TrackTemplate(self._standby_power, None, None))
         if self._calculation_enabled_condition:
             track_templates.append(
-                TrackTemplate(self._calculation_enabled_condition, None, None)
+                TrackTemplate(self._calculation_enabled_condition, None, None),
             )
         if track_templates:
             async_track_template_result(
