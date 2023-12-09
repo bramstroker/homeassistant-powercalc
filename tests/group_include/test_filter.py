@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-from homeassistant.const import CONF_DOMAIN
 from homeassistant.helpers.entity_registry import RegistryEntry
 
 from custom_components.powercalc.group_include.filter import (
@@ -10,7 +9,6 @@ from custom_components.powercalc.group_include.filter import (
     FilterOperator,
     NullFilter,
     WildcardFilter,
-    create_filter,
 )
 
 
@@ -41,20 +39,16 @@ async def test_composite_filter(
         == expected_result
     )
 
-
-async def test_domain_filter() -> None:
-    registry_entry = _create_registry_entry()
-    entity_filter = DomainFilter("switch")
-    assert entity_filter.is_valid(registry_entry) is True
-
-    entity_filter = DomainFilter("light")
-    assert entity_filter.is_valid(registry_entry) is False
-
-
-async def test_domain_filter_multiple() -> None:
-    entity_filter = create_filter({CONF_DOMAIN: ["switch", "light"]})
-    assert entity_filter.is_valid(_create_registry_entry()) is True
-
+@pytest.mark.parametrize(
+    "domain,expected_result",
+    [
+        ("switch", True),
+        ("light", False),
+        (["switch", "light"], True),
+    ],
+)
+async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
+    assert DomainFilter(domain).is_valid(_create_registry_entry()) is expected_result
 
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True

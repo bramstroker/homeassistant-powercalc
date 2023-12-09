@@ -7,7 +7,7 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import area_registry, device_registry, entity_registry
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity_platform import split_entity_id
@@ -27,7 +27,17 @@ from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import CompositeFilter, FilterOperator, TemplateFilter, WildcardFilter, create_filter
+from .filter import (
+    AreaFilter,
+    CompositeFilter,
+    DomainFilter,
+    FilterOperator,
+    GroupFilter,
+    IncludeEntityFilter,
+    TemplateFilter,
+    WildcardFilter,
+    create_filter,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -88,44 +98,35 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    entities: dict[str, entity_registry.RegistryEntry | None] = {}
-    entity_reg = entity_registry.async_get(hass)
-
-    # Include entities from a certain area
-    if CONF_AREA in include_config:
-        area_id = str(include_config.get(CONF_AREA))
-        _LOGGER.debug("Including entities from area: %s", area_id)
-        entities = entities | resolve_area_entities(hass, area_id)
-
-    # Include entities from a certain group
-    if CONF_GROUP in include_config:
-        group_id = str(include_config.get(CONF_GROUP))
-        _LOGGER.debug("Including entities from group: %s", group_id)
-        entities = entities | resolve_include_groups(hass, group_id)
-
     base_filters = []
+    if CONF_GROUP in include_config:
+        base_filters.append(GroupFilter(hass, include_config.get(CONF_GROUP)))
     if CONF_WILDCARD in include_config:
         base_filters.append(WildcardFilter(include_config.get(CONF_WILDCARD)))
     if CONF_DOMAIN in include_config:
-        base_filters.append(WildcardFilter(include_config.get(CONF_DOMAIN)))
+        base_filters.append(DomainFilter(include_config.get(CONF_DOMAIN)))
     if CONF_TEMPLATE in include_config:
         base_filters.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))
+    if CONF_AREA in include_config:
+        base_filters.append(AreaFilter(hass, include_config.get(CONF_AREA)))
 
+    entity_filter: IncludeEntityFilter | None = None
     if base_filters:
-        base_filter = CompositeFilter(base_filters, FilterOperator.OR)
-        entities = entities | {
-            entry.entity_id: entry for entry in entity_reg.entities.values() if base_filter.is_valid(entry)
-        }
+        entity_filter = CompositeFilter(base_filters, FilterOperator.OR)
 
     if CONF_FILTER in include_config:
-        entity_filter = create_filter(include_config.get(CONF_FILTER))  # type: ignore
-        entities = {
-            entity_id: entity
-            for entity_id, entity in entities.items()
-            if entity is not None and entity_filter.is_valid(entity)
-        }
+        if entity_filter:
+            entity_filter = CompositeFilter(
+                [entity_filter, create_filter(include_config.get(CONF_FILTER))],
+                FilterOperator.AND,
+            )
+        else:
+            entity_filter = create_filter(include_config.get(CONF_FILTER))  # type: ignore
 
-    return entities
+    entity_reg = entity_registry.async_get(hass)
+    return {
+        entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry)
+    }
 
 
 @callback
@@ -185,40 +186,3 @@ def resolve_light_group_entities(
 
     return resolved_entities
 
-
-@callback
-def resolve_area_entities(
-    hass: HomeAssistant,
-    area_id_or_name: str,
-) -> dict[str, entity_registry.RegistryEntry]:
-    """Get a listing of al entities in a given area."""
-    area_reg = area_registry.async_get(hass)
-    area = area_reg.async_get_area(area_id_or_name)
-    if area is None:
-        area = area_reg.async_get_area_by_name(str(area_id_or_name))
-
-    if area is None or area.id is None:
-        raise SensorConfigurationError(
-            f"No area with id or name '{area_id_or_name}' found in your HA instance",
-        )
-
-    area_id = area.id
-    entity_reg = entity_registry.async_get(hass)
-
-    entities = entity_registry.async_entries_for_area(entity_reg, area_id)
-
-    device_reg = device_registry.async_get(hass)
-    # We also need to add entities tied to a device in the area that don't themselves
-    # have an area specified since they inherit the area from the device.
-    entities.extend(
-        [
-            entity
-            for device in device_registry.async_entries_for_area(device_reg, area_id)
-            for entity in entity_registry.async_entries_for_device(
-                entity_reg,
-                device.id,
-            )
-            if entity.area_id is None
-        ],
-    )
-    return {entity.entity_id: entity for entity in entities}

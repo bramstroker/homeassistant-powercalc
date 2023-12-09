@@ -226,6 +226,23 @@ async def test_include_template(hass: HomeAssistant) -> None:
 
 async def test_include_group(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.tv", "on")
+
+    mock_registry(
+        hass,
+        {
+            "switch.tv": RegistryEntry(
+                entity_id="switch.tv",
+                unique_id="12345",
+                platform="switch",
+            ),
+            "switch.soundbar": RegistryEntry(
+                entity_id="switch.soundbar",
+                unique_id="123456",
+                platform="switch",
+            ),
+        },
+    )
+
     await async_setup_component(
         hass,
         SWITCH_DOMAIN,
