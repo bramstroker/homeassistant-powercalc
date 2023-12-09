@@ -18,6 +18,7 @@ from custom_components.powercalc.const import (
     CONF_FILTER,
     CONF_GROUP,
     CONF_TEMPLATE,
+    CONF_WILDCARD,
     DATA_CONFIGURED_ENTITIES,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
@@ -27,7 +28,7 @@ from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import create_filter
+from .filter import CompositeFilter, FilterOperator, WildcardFilter, create_filter
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -97,16 +98,6 @@ def resolve_include_source_entities(
         _LOGGER.debug("Including entities from area: %s", area_id)
         entities = entities | resolve_area_entities(hass, area_id)
 
-    # Include entities from a certain domain
-    if CONF_DOMAIN in include_config:
-        domain = include_config.get(CONF_DOMAIN)
-        _LOGGER.debug("Including entities from domain: %s", domain)
-        entities = entities | {
-            entity.entity_id: entity
-            for entity in entity_reg.entities.values()
-            if entity.domain == domain
-        }
-
     # Include entities from a certain group
     if CONF_GROUP in include_config:
         group_id = str(include_config.get(CONF_GROUP))
@@ -122,6 +113,18 @@ def resolve_include_source_entities(
         entity_ids = template.async_render()
         entities = entities | {
             entity_id: entity_reg.async_get(entity_id) for entity_id in entity_ids
+        }
+
+    base_filters = []
+    if CONF_WILDCARD in include_config:
+        base_filters.append(WildcardFilter(include_config.get(CONF_WILDCARD)))
+    if CONF_DOMAIN in include_config:
+        base_filters.append(WildcardFilter(include_config.get(CONF_DOMAIN)))
+
+    if base_filters:
+        base_filter = CompositeFilter(base_filters, FilterOperator.OR)
+        entities = entities | {
+            entry.entity_id: entry for entry in entity_reg.entities.values() if base_filter.is_valid(entry)
         }
 
     if CONF_FILTER in include_config:
