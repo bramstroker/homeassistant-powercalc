@@ -13,7 +13,9 @@ from homeassistant.helpers import area_registry, device_registry, entity_registr
 from homeassistant.helpers.area_registry import AreaEntry
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.template import Template
+from homeassistant.helpers.typing import ConfigType
 
+from custom_components.powercalc.const import CONF_AREA, CONF_GROUP, CONF_TEMPLATE, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
@@ -30,14 +32,26 @@ class FilterOperator(StrEnum):
     OR = "or"
 
 
-def create_filter(filter_config: dict) -> IncludeEntityFilter:
+def create_filter(filter_config: ConfigType, hass: HomeAssistant, filter_operator: FilterOperator) -> IncludeEntityFilter:
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
-    if CONF_DOMAIN in filter_config:
-        domain_config = filter_config.get(CONF_DOMAIN)
-        filters.append(DomainFilter(domain_config))  # type: ignore
+    for key, val in filter_config.items():
+        entity_filter = None
+        if key == CONF_DOMAIN:
+            entity_filter = DomainFilter(val)
+        if key == CONF_AREA:
+            entity_filter = AreaFilter(hass, val)
+        if key == CONF_WILDCARD:
+            entity_filter = WildcardFilter(val)
+        if key == CONF_GROUP:
+            entity_filter = GroupFilter(hass, val)
+        if key == CONF_TEMPLATE:
+            entity_filter = TemplateFilter(hass, val)
 
-    return CompositeFilter(filters, FilterOperator.AND)
+        if entity_filter:
+            filters.append(entity_filter)
+
+    return CompositeFilter(filters, filter_operator)
 
 
 class IncludeEntityFilter(Protocol):

@@ -127,17 +127,3 @@ Wildcard
 
   filter:
     wildcard: light.office_spot_*
-
-And / OR
---------
-
-You can combine multiple filters as follows:
-
-.. code-block:: yaml
-
-  filter:
-    or:
-      - wildcard: light.office_spot_*
-      - domain:
-        - light
-        - switch

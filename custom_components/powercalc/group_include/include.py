@@ -2,17 +2,13 @@ import logging
 
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_DOMAIN, CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc.const import (
-    CONF_AREA,
     CONF_FILTER,
-    CONF_GROUP,
-    CONF_TEMPLATE,
-    CONF_WILDCARD,
     DATA_CONFIGURED_ENTITIES,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
@@ -22,13 +18,8 @@ from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
 from .filter import (
-    AreaFilter,
     CompositeFilter,
-    DomainFilter,
     FilterOperator,
-    GroupFilter,
-    TemplateFilter,
-    WildcardFilter,
     create_filter,
 )
 
@@ -91,21 +82,11 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    entity_filter = CompositeFilter([], FilterOperator.OR)
-    if CONF_GROUP in include_config:
-        entity_filter.append(GroupFilter(hass, include_config.get(CONF_GROUP)))  # type: ignore
-    if CONF_WILDCARD in include_config:
-        entity_filter.append(WildcardFilter(include_config.get(CONF_WILDCARD)))  # type: ignore
-    if CONF_DOMAIN in include_config:
-        entity_filter.append(DomainFilter(include_config.get(CONF_DOMAIN)))  # type: ignore
-    if CONF_TEMPLATE in include_config:
-        entity_filter.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))  # type: ignore
-    if CONF_AREA in include_config:
-        entity_filter.append(AreaFilter(hass, include_config.get(CONF_AREA)))  # type: ignore
+    entity_filter = create_filter(include_config, hass, FilterOperator.OR)
 
     if CONF_FILTER in include_config:
         entity_filter = CompositeFilter(
-            [entity_filter, create_filter(include_config.get(CONF_FILTER))],  # type: ignore
+            [entity_filter, create_filter(include_config.get(CONF_FILTER), hass, FilterOperator.OR)],  # type: ignore
             FilterOperator.AND,
         )
 
