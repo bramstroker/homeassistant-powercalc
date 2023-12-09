@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     CONF_TEMPLATE,
+    CONF_WILDCARD,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -693,6 +694,36 @@ async def test_power_group_does_not_include_binary_sensors(
     assert group_state
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
+
+async def test_include_by_wildcard(
+    hass: HomeAssistant,
+    area_reg: AreaRegistry,
+) -> None:
+    mock_registry(
+        hass,
+        {
+            "binary_sensor.test": RegistryEntry(
+                entity_id="sensor.tv_power",
+                unique_id="1111",
+                platform="binary_sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_WILDCARD: "sensor.tv_*",
+            },
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power"}
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,

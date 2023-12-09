@@ -93,6 +93,7 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
+    CONF_WILDCARD,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
@@ -197,6 +198,7 @@ SENSOR_CONFIG = {
             vol.Optional(CONF_GROUP): cv.entity_id,
             vol.Optional(CONF_TEMPLATE): cv.template,
             vol.Optional(CONF_DOMAIN): cv.string,
+            vol.Optional(CONF_WILDCARD): cv.string,
             vol.Optional(CONF_FILTER): vol.Schema(
                 {
                     vol.Required(CONF_DOMAIN): vol.Any(cv.string, [cv.string]),

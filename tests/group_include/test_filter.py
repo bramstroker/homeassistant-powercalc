@@ -50,10 +50,6 @@ async def test_composite_filter(
 async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
     assert DomainFilter(domain).is_valid(_create_registry_entry()) is expected_result
 
-async def test_null_filter() -> None:
-    assert NullFilter().is_valid(_create_registry_entry()) is True
-
-
 @pytest.mark.parametrize(
     "pattern,expected_result",
     [
@@ -65,6 +61,10 @@ async def test_null_filter() -> None:
 )
 async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
     assert WildcardFilter(pattern).is_valid(_create_registry_entry()) == expected_result
+
+
+async def test_null_filter() -> None:
+    assert NullFilter().is_valid(_create_registry_entry()) is True
 
 def _create_registry_entry() -> RegistryEntry:
     return RegistryEntry(entity_id="switch.test", unique_id="abc", platform="test")
