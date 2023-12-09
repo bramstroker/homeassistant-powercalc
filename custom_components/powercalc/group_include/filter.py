@@ -133,9 +133,7 @@ class WildcardFilter(IncludeEntityFilter):
         return pattern.replace("*", ".*")
 
 class TemplateFilter(IncludeEntityFilter):
-    def __init__(self, hass: HomeAssistant, template: str|Template) -> None:
-        if not isinstance(template, Template):
-            template = Template(template)
+    def __init__(self, hass: HomeAssistant, template: Template) -> None:
         template.hass = hass
         self.entity_ids = template.async_render()
 
@@ -178,3 +176,6 @@ class CompositeFilter(IncludeEntityFilter):
             return any(evaluations)
 
         return all(evaluations)
+
+    def append(self, entity_filter: IncludeEntityFilter) -> None:
+        self.filters.append(entity_filter)

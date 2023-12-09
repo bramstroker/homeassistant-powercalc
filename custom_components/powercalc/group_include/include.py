@@ -27,7 +27,6 @@ from .filter import (
     DomainFilter,
     FilterOperator,
     GroupFilter,
-    IncludeEntityFilter,
     TemplateFilter,
     WildcardFilter,
     create_filter,
@@ -92,30 +91,23 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    base_filters = []
+    entity_filter = CompositeFilter([], FilterOperator.OR)
     if CONF_GROUP in include_config:
-        base_filters.append(GroupFilter(hass, include_config.get(CONF_GROUP)))
+        entity_filter.append(GroupFilter(hass, include_config.get(CONF_GROUP)))
     if CONF_WILDCARD in include_config:
-        base_filters.append(WildcardFilter(include_config.get(CONF_WILDCARD)))
+        entity_filter.append(WildcardFilter(include_config.get(CONF_WILDCARD)))
     if CONF_DOMAIN in include_config:
-        base_filters.append(DomainFilter(include_config.get(CONF_DOMAIN)))
+        entity_filter.append(DomainFilter(include_config.get(CONF_DOMAIN)))
     if CONF_TEMPLATE in include_config:
-        base_filters.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))
+        entity_filter.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))
     if CONF_AREA in include_config:
-        base_filters.append(AreaFilter(hass, include_config.get(CONF_AREA)))
-
-    entity_filter: IncludeEntityFilter | None = None
-    if base_filters:
-        entity_filter = CompositeFilter(base_filters, FilterOperator.OR)
+        entity_filter.append(AreaFilter(hass, include_config.get(CONF_AREA)))
 
     if CONF_FILTER in include_config:
-        if entity_filter:
-            entity_filter = CompositeFilter(
-                [entity_filter, create_filter(include_config.get(CONF_FILTER))],
-                FilterOperator.AND,
-            )
-        else:
-            entity_filter = create_filter(include_config.get(CONF_FILTER))  # type: ignore
+        entity_filter = CompositeFilter(
+            [entity_filter, create_filter(include_config.get(CONF_FILTER))],
+            FilterOperator.AND,
+        )
 
     entity_reg = entity_registry.async_get(hass)
     return {
