@@ -324,6 +324,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     ) -> None:
         """Initialize the sensor."""
         self._calculation_strategy = calculation_strategy
+        self._calculation_enabled_condition: Template | None = None
         self._source_entity = source_entity
         self._attr_name = name
         self._power: Decimal | None = None
@@ -380,6 +381,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         await super().async_added_to_hass()
         await self.ensure_strategy_instance()
         assert self._strategy_instance is not None
+        self.init_calculation_enabled_condition()
 
         async def appliance_state_listener(event: Event) -> None:
             """Handle for state changes for dependent sensors."""
@@ -444,6 +446,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if isinstance(self._standby_power, Template):
             self._standby_power.hass = self.hass
             track_templates.append(TrackTemplate(self._standby_power, None, None))
+        if self._calculation_enabled_condition:
+            track_templates.append(
+                TrackTemplate(self._calculation_enabled_condition, None, None)
+            )
         if track_templates:
             async_track_template_result(
                 self.hass,
@@ -462,6 +468,21 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self.async_schedule_update_ha_state(True)
 
         async_track_time_interval(self.hass, async_update, self._update_frequency)
+
+    def init_calculation_enabled_condition(self) -> None:
+        if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
+            return
+
+        template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+        if isinstance(template, str):
+            template = template.replace("[[entity]]", self.source_entity)
+            template = Template(template)
+
+        if not isinstance(template, Template):
+            _LOGGER.error("Invalid calculation_enabled_condition: %s", template)
+            return
+
+        self._calculation_enabled_condition = template
 
     async def _handle_source_entity_state_change(
         self,
@@ -620,16 +641,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return standby_power
 
     async def is_calculation_enabled(self) -> bool:
-        if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
+        template = self._calculation_enabled_condition
+        if not template:
             return True
-
-        template = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
-        if isinstance(template, str):
-            template = template.replace("[[entity]]", self.source_entity)
-            template = Template(template)
-
-        if not isinstance(template, Template):
-            return True  # pragma: no cover
 
         template.hass = self.hass
         return bool(template.async_render())
