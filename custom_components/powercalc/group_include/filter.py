@@ -35,7 +35,7 @@ def create_filter(filter_config: dict) -> IncludeEntityFilter:
     filters: list[IncludeEntityFilter] = []
     if CONF_DOMAIN in filter_config:
         domain_config = filter_config.get(CONF_DOMAIN)
-        filters.append(DomainFilter(domain_config))
+        filters.append(DomainFilter(domain_config))  # type: ignore
 
     return CompositeFilter(filters, FilterOperator.AND)
 
@@ -98,7 +98,7 @@ class LightGroupFilter(IncludeEntityFilter):
             None,
         )
 
-        entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)
+        entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
         for entity_id in entity_ids:
             registry_entry = entity_reg.async_get(entity_id)
             if registry_entry is None:

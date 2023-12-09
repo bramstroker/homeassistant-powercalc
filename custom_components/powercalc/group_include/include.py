@@ -93,19 +93,19 @@ def resolve_include_source_entities(
 ) -> dict[str, entity_registry.RegistryEntry | None]:
     entity_filter = CompositeFilter([], FilterOperator.OR)
     if CONF_GROUP in include_config:
-        entity_filter.append(GroupFilter(hass, include_config.get(CONF_GROUP)))
+        entity_filter.append(GroupFilter(hass, include_config.get(CONF_GROUP)))  # type: ignore
     if CONF_WILDCARD in include_config:
-        entity_filter.append(WildcardFilter(include_config.get(CONF_WILDCARD)))
+        entity_filter.append(WildcardFilter(include_config.get(CONF_WILDCARD)))  # type: ignore
     if CONF_DOMAIN in include_config:
-        entity_filter.append(DomainFilter(include_config.get(CONF_DOMAIN)))
+        entity_filter.append(DomainFilter(include_config.get(CONF_DOMAIN)))  # type: ignore
     if CONF_TEMPLATE in include_config:
-        entity_filter.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))
+        entity_filter.append(TemplateFilter(hass, include_config.get(CONF_TEMPLATE)))  # type: ignore
     if CONF_AREA in include_config:
-        entity_filter.append(AreaFilter(hass, include_config.get(CONF_AREA)))
+        entity_filter.append(AreaFilter(hass, include_config.get(CONF_AREA)))  # type: ignore
 
     if CONF_FILTER in include_config:
         entity_filter = CompositeFilter(
-            [entity_filter, create_filter(include_config.get(CONF_FILTER))],
+            [entity_filter, create_filter(include_config.get(CONF_FILTER))],  # type: ignore
             FilterOperator.AND,
         )
 

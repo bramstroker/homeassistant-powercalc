@@ -473,7 +473,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
             return
 
-        template: Template | str = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)
+        template: Template | str = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)  # type: ignore
         if isinstance(template, str):
             template = template.replace("[[entity]]", self.source_entity)
             template = Template(template)
