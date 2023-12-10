@@ -1028,6 +1028,7 @@ def _create_group_options_schema(
                 multiple=True,
             ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
+            vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
                 default=False,
