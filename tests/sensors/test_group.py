@@ -12,6 +12,7 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DEVICE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -23,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
@@ -1260,6 +1262,51 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.existing_power"}
 
+
+async def test_bind_to_configured_device(
+    hass: HomeAssistant,
+    entity_reg: er.EntityRegistry,
+    device_reg: DeviceRegistry,
+) -> None:
+    """
+    Test that all powercalc created sensors are attached to same device as the source entity
+    """
+
+    # Create a device
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    device_entry = device_reg.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        connections={("dummy", "abcdef")},
+        manufacturer="Google Inc.",
+        model="Google Home Mini",
+    )
+
+    # Create powercalc sensors
+    member_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_DEVICE: device_entry.id,
+            CONF_GROUP_MEMBER_SENSORS: [member_entry.entry_id],
+        },
+    )
+
+    # Assert that all the entities are bound to correct device
+    group_entity = entity_reg.async_get("sensor.mygroup_power")
+    assert group_entity
+    assert group_entity.device_id == device_entry.id
 
 async def _create_energy_group(
     hass: HomeAssistant,

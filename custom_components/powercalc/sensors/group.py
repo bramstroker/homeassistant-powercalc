@@ -18,6 +18,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DEVICE,
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_NAME,
@@ -405,6 +406,7 @@ def create_grouped_power_sensor(
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION)
         or DEFAULT_POWER_SENSOR_PRECISION,
         entity_id=entity_id,
+        device_id=sensor_config.get(CONF_DEVICE),
     )
 
 
@@ -437,6 +439,7 @@ def create_grouped_energy_sensor(
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)
         or DEFAULT_ENERGY_SENSOR_PRECISION,
         entity_id=entity_id,
+        device_id=sensor_config.get(CONF_DEVICE),
     )
 
 
@@ -453,6 +456,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         sensor_config: dict[str, Any],
         rounding_digits: int,
         unique_id: str | None = None,
+        device_id: str | None = None,
     ) -> None:
         self._attr_name = name
         # Remove own entity from entities, when it happens to be there. To prevent recursion
@@ -468,6 +472,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if unique_id:
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
+        self.source_device_id = device_id
         self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
 
     async def async_added_to_hass(self) -> None:
@@ -623,6 +628,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         sensor_config: dict[str, Any],
         rounding_digits: int,
         unique_id: str | None = None,
+        device_id: str | None = None,
     ) -> None:
         super().__init__(
             name,
@@ -631,6 +637,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             sensor_config,
             rounding_digits,
             unique_id,
+            device_id,
         )
         unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
         if unit_prefix == UnitPrefix.KILO:
