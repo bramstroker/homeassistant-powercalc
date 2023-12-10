@@ -80,6 +80,8 @@ Match certain entity id's by a wildcard pattern
 ``*`` matches any character
 ``?`` matches a single character
 
+When you don't supply any of the above wildcard the filter checks for an exact match of the entity_id
+
 .. code-block:: yaml
 
     powercalc:
@@ -121,3 +123,22 @@ For example to include all light entities from area outdoor.
             filter:
               domain: light
 
+AND/OR
+------
+
+You can also chain nested filter using and / or construction:
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: Outdoor lights
+          include:
+            area: outdoor
+            filter:
+              or:
+                - domain: light
+                - wildcard: switch.pond
+                - and:
+                  - domain: binary_sensor
+                  - wildcard: *swimming_pool*
