@@ -43,6 +43,7 @@ async def test_composite_filter(
         == expected_result
     )
 
+
 @pytest.mark.parametrize(
     "domain,expected_result",
     [
@@ -53,6 +54,7 @@ async def test_composite_filter(
 )
 async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
     assert DomainFilter(domain).is_valid(_create_registry_entry()) is expected_result
+
 
 @pytest.mark.parametrize(
     "pattern,expected_result",
@@ -70,17 +72,20 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
+
 async def test_complex_nested_filters(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
         {
             CONF_DOMAIN: "switch",
             CONF_OR: [
-                { CONF_WILDCARD: "switch.humidifier" },
-                { CONF_WILDCARD: "switch.tv" },
-                { CONF_AND: [
-                    { CONF_WILDCARD: "switch.some?" },
-                    { CONF_WILDCARD: "switch.other?" },
-                ]},
+                {CONF_WILDCARD: "switch.humidifier"},
+                {CONF_WILDCARD: "switch.tv"},
+                {
+                    CONF_AND: [
+                        {CONF_WILDCARD: "switch.some?"},
+                        {CONF_WILDCARD: "switch.other?"},
+                    ]
+                },
             ],
         },
         hass,
@@ -89,6 +94,7 @@ async def test_complex_nested_filters(hass: HomeAssistant) -> None:
     assert entity_filter.is_valid(_create_registry_entry("switch.humidifier"))
     assert not entity_filter.is_valid(_create_registry_entry("switch.humidifier2"))
     assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
+
 
 def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
     return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test")

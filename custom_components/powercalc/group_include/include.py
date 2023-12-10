@@ -92,5 +92,7 @@ def resolve_include_source_entities(
 
     entity_reg = entity_registry.async_get(hass)
     return {
-        entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry)
+        entry.entity_id: entry
+        for entry in entity_reg.entities.values()
+        if entity_filter.is_valid(entry)
     }

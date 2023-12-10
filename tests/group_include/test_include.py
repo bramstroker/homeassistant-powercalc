@@ -726,7 +726,10 @@ async def test_include_by_wildcard(
     assert group_state
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power"}
 
-async def test_include_complex_nested_filters(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+
+async def test_include_complex_nested_filters(
+    hass: HomeAssistant, area_reg: AreaRegistry
+) -> None:
     area = area_reg.async_get_or_create("Living room")
     mock_registry(
         hass,
@@ -770,8 +773,8 @@ async def test_include_complex_nested_filters(hass: HomeAssistant, area_reg: Are
                     CONF_AREA: "Living room",
                     CONF_FILTER: {
                         CONF_OR: [
-                            { CONF_DOMAIN: "switch" },
-                            { CONF_WILDCARD: "*ambilights" },
+                            {CONF_DOMAIN: "switch"},
+                            {CONF_WILDCARD: "*ambilights"},
                         ],
                     },
                 },
@@ -781,7 +784,11 @@ async def test_include_complex_nested_filters(hass: HomeAssistant, area_reg: Are
 
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
-    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power", "sensor.tv_ambilights_power"}
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.tv_power",
+        "sensor.tv_ambilights_power",
+    }
+
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,

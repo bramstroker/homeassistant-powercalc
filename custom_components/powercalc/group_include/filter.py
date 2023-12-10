@@ -15,7 +15,14 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_GROUP, CONF_OR, CONF_TEMPLATE, CONF_WILDCARD
+from custom_components.powercalc.const import (
+    CONF_AND,
+    CONF_AREA,
+    CONF_GROUP,
+    CONF_OR,
+    CONF_TEMPLATE,
+    CONF_WILDCARD,
+)
 from custom_components.powercalc.errors import SensorConfigurationError
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
@@ -32,8 +39,11 @@ class FilterOperator(StrEnum):
     OR = "or"
 
 
-def create_composite_filter(filter_configs: ConfigType | list[ConfigType], hass: HomeAssistant,
-                            filter_operator: FilterOperator) -> IncludeEntityFilter:
+def create_composite_filter(
+    filter_configs: ConfigType | list[ConfigType],
+    hass: HomeAssistant,
+    filter_operator: FilterOperator,
+) -> IncludeEntityFilter:
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
 
@@ -48,7 +58,9 @@ def create_composite_filter(filter_configs: ConfigType | list[ConfigType], hass:
     return CompositeFilter(filters, filter_operator)
 
 
-def create_filter(filter_type: str, filter_config: ConfigType, hass: HomeAssistant) -> IncludeEntityFilter:
+def create_filter(
+    filter_type: str, filter_config: ConfigType, hass: HomeAssistant
+) -> IncludeEntityFilter:
     if filter_type == CONF_DOMAIN:
         return DomainFilter(filter_config)  # type: ignore
     if filter_type == CONF_AREA:
@@ -84,8 +96,11 @@ class DomainFilter(IncludeEntityFilter):
 class GroupFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         domain = split_entity_id(group_id)[0]
-        self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass,
-                                                                                                          group_id)
+        self.filter = (
+            LightGroupFilter(hass, group_id)
+            if domain == LIGHT_DOMAIN
+            else StandardGroupFilter(hass, group_id)
+        )
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return self.filter.is_valid(entity)
@@ -108,7 +123,9 @@ class LightGroupFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
         light_group = next(
-            filter(lambda entity: entity.entity_id == group_id, light_component.entities),
+            filter(
+                lambda entity: entity.entity_id == group_id, light_component.entities
+            ),
             None,
         )
         if light_group is None or light_group.platform.platform_name != GROUP_DOMAIN:
@@ -119,12 +136,16 @@ class LightGroupFilter(IncludeEntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.entity_id in self.entity_ids
 
-    def find_all_entity_ids_recursively(self, hass: HomeAssistant, group_entity_id: str, all_entity_ids: list[str]) -> \
-    list[str]:
+    def find_all_entity_ids_recursively(
+        self, hass: HomeAssistant, group_entity_id: str, all_entity_ids: list[str]
+    ) -> list[str]:
         entity_reg = entity_registry.async_get(hass)
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
         light_group = next(
-            filter(lambda entity: entity.entity_id == group_entity_id, light_component.entities),
+            filter(
+                lambda entity: entity.entity_id == group_entity_id,
+                light_component.entities,
+            ),
             None,
         )
 
@@ -189,7 +210,10 @@ class AreaFilter(IncludeEntityFilter):
         self.area: AreaEntry = area
 
         device_reg = device_registry.async_get(hass)
-        self.area_devices = [device.id for device in device_registry.async_entries_for_area(device_reg, area.id)]
+        self.area_devices = [
+            device.id
+            for device in device_registry.async_entries_for_area(device_reg, area.id)
+        ]
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id == self.area.id or entity.device_id in self.area_devices
@@ -197,9 +221,9 @@ class AreaFilter(IncludeEntityFilter):
 
 class CompositeFilter(IncludeEntityFilter):
     def __init__(
-            self,
-            filters: list[IncludeEntityFilter],
-            operator: FilterOperator,
+        self,
+        filters: list[IncludeEntityFilter],
+        operator: FilterOperator,
     ) -> None:
         self.filters = filters
         self.operator = operator

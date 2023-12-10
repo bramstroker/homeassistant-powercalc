@@ -152,13 +152,15 @@ _LOGGER = logging.getLogger(__name__)
 
 MAX_GROUP_NESTING_LEVEL = 5
 
-FILTER_CONFIG = vol.Schema({
-    vol.Optional(CONF_AREA): cv.string,
-    vol.Optional(CONF_GROUP): cv.entity_id,
-    vol.Optional(CONF_TEMPLATE): cv.template,
-    vol.Optional(CONF_DOMAIN): cv.string,
-    vol.Optional(CONF_WILDCARD): cv.string,
-})
+FILTER_CONFIG = vol.Schema(
+    {
+        vol.Optional(CONF_AREA): cv.string,
+        vol.Optional(CONF_GROUP): cv.entity_id,
+        vol.Optional(CONF_TEMPLATE): cv.template,
+        vol.Optional(CONF_DOMAIN): cv.string,
+        vol.Optional(CONF_WILDCARD): cv.string,
+    }
+)
 
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
