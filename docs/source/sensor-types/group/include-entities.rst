@@ -60,6 +60,36 @@ Domain
           include:
             domain: light
 
+You might also filter by multiple domains:
+
+.. code-block:: yaml
+
+  powercalc:
+      sensors:
+        - create_group: All lights
+          include:
+            domain:
+              - light
+              - switch
+
+Wildcard
+--------
+
+Match certain entity id's by a wildcard pattern
+
+``*`` matches any character
+``?`` matches a single character
+
+When you don't supply any of the above wildcard the filter checks for an exact match of the entity_id
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: Office spots
+          include:
+            wildcard: light.office_spot_*
+
 Template
 --------
 
@@ -78,8 +108,10 @@ Template
 Filters
 =======
 
-Domain
-------
+Besides the base filters described above which build the base include you can also apply additional filters to further narrow down the list of items.
+These filters accept the same configuration as described above.
+
+For example to include all light entities from area outdoor.
 
 .. code-block:: yaml
 
@@ -91,13 +123,22 @@ Domain
             filter:
               domain: light
 
-This will include only light entities from area outdoor.
+AND/OR
+------
 
-You can also filter by multiple domains:
+You can also chain nested filter using and / or construction:
 
 .. code-block:: yaml
 
-  filter:
-    domain:
-      - light
-      - switch
+    powercalc:
+      sensors:
+        - create_group: Outdoor lights
+          include:
+            area: outdoor
+            filter:
+              or:
+                - domain: light
+                - wildcard: switch.pond
+                - and:
+                  - domain: binary_sensor
+                  - wildcard: *swimming_pool*

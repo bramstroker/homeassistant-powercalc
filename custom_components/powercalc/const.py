@@ -100,6 +100,7 @@ CONF_VALUE = "value"
 CONF_VALUE_TEMPLATE = "value_template"
 CONF_VOLTAGE = "voltage"
 CONF_WLED = "wled"
+CONF_WILDCARD = "wildcard"
 CONF_STATES_POWER = "states_power"
 CONF_START_TIME = "start_time"
 CONF_STANDBY_POWER = "standby_power"
@@ -111,6 +112,8 @@ CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_OFFSET = "utility_meter_offset"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
 CONF_UTILITY_METER_TARIFFS = "utility_meter_tariffs"
+CONF_OR = "or"
+CONF_AND = "and"
 
 # Redefine constants from integration component.
 # Has been refactored in HA 2022.4, we need to support older HA versions as well.
