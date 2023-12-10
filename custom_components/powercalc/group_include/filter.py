@@ -15,7 +15,7 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_AREA, CONF_GROUP, CONF_OR, CONF_TEMPLATE, CONF_WILDCARD
+from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_GROUP, CONF_OR, CONF_TEMPLATE, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
@@ -42,10 +42,8 @@ def create_composite_filter(filter_configs: ConfigType | list[ConfigType], hass:
 
     for filter_config in filter_configs:
         for key, val in filter_config.items():
-            filters.append(create_filter(key, val, hass))
-
-    if len(filters) == 0:
-        return NullFilter()
+            filter_instance = create_filter(key, val, hass)
+            filters.append(filter_instance)
 
     return CompositeFilter(filters, filter_operator)
 
@@ -63,7 +61,7 @@ def create_filter(filter_type: str, filter_config: ConfigType, hass: HomeAssista
         return TemplateFilter(hass, filter_config)  # type: ignore
     if filter_type == CONF_OR:
         return create_composite_filter(filter_config, hass, FilterOperator.OR)
-    if filter_type == CONF_OR:
+    if filter_type == CONF_AND:
         return create_composite_filter(filter_config, hass, FilterOperator.AND)
     return NullFilter()
 
@@ -163,7 +161,8 @@ class WildcardFilter(IncludeEntityFilter):
     @staticmethod
     def create_regex(pattern: str) -> str:
         pattern = pattern.replace("?", ".")
-        return pattern.replace("*", ".*")
+        pattern = pattern.replace("*", ".*")
+        return "^" + pattern + "$"
 
 
 class TemplateFilter(IncludeEntityFilter):

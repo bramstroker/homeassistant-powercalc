@@ -1,14 +1,18 @@
 from unittest.mock import MagicMock
 
 import pytest
+from homeassistant.const import CONF_DOMAIN
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import RegistryEntry
 
+from custom_components.powercalc.const import CONF_AND, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.group_include.filter import (
     CompositeFilter,
     DomainFilter,
     FilterOperator,
     NullFilter,
     WildcardFilter,
+    create_composite_filter,
 )
 
 
@@ -66,5 +70,25 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
-def _create_registry_entry() -> RegistryEntry:
-    return RegistryEntry(entity_id="switch.test", unique_id="abc", platform="test")
+async def test_complex_nested_filters(hass: HomeAssistant) -> None:
+    entity_filter = create_composite_filter(
+        {
+            CONF_DOMAIN: "switch",
+            CONF_OR: [
+                { CONF_WILDCARD: "switch.humidifier" },
+                { CONF_WILDCARD: "switch.tv" },
+                { CONF_AND: [
+                    { CONF_WILDCARD: "switch.some?" },
+                    { CONF_WILDCARD: "switch.other?" },
+                ]},
+            ],
+        },
+        hass,
+        FilterOperator.AND,
+    )
+    assert entity_filter.is_valid(_create_registry_entry("switch.humidifier"))
+    assert not entity_filter.is_valid(_create_registry_entry("switch.humidifier2"))
+    assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
+
+def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
+    return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test")
