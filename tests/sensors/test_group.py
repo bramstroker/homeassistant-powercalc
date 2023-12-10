@@ -1308,6 +1308,7 @@ async def test_bind_to_configured_device(
     assert group_entity
     assert group_entity.device_id == device_entry.id
 
+
 async def _create_energy_group(
     hass: HomeAssistant,
     name: str,

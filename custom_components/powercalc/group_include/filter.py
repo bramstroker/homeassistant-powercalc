@@ -59,7 +59,9 @@ def create_composite_filter(
 
 
 def create_filter(
-    filter_type: str, filter_config: ConfigType, hass: HomeAssistant,
+    filter_type: str,
+    filter_config: ConfigType,
+    hass: HomeAssistant,
 ) -> IncludeEntityFilter:
     if filter_type == CONF_DOMAIN:
         return DomainFilter(filter_config)  # type: ignore
@@ -124,7 +126,8 @@ class LightGroupFilter(IncludeEntityFilter):
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
         light_group = next(
             filter(
-                lambda entity: entity.entity_id == group_id, light_component.entities,
+                lambda entity: entity.entity_id == group_id,
+                light_component.entities,
             ),
             None,
         )
@@ -137,7 +140,10 @@ class LightGroupFilter(IncludeEntityFilter):
         return entity.entity_id in self.entity_ids
 
     def find_all_entity_ids_recursively(
-        self, hass: HomeAssistant, group_entity_id: str, all_entity_ids: list[str],
+        self,
+        hass: HomeAssistant,
+        group_entity_id: str,
+        all_entity_ids: list[str],
     ) -> list[str]:
         entity_reg = entity_registry.async_get(hass)
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
