@@ -12,6 +12,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.const import (
     CONF_ATTRIBUTE,
+    CONF_DEVICE,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -262,6 +263,7 @@ SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+        vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
 

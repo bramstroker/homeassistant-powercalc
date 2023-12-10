@@ -728,7 +728,7 @@ async def test_include_by_wildcard(
 
 
 async def test_include_complex_nested_filters(
-    hass: HomeAssistant, area_reg: AreaRegistry
+    hass: HomeAssistant, area_reg: AreaRegistry,
 ) -> None:
     area = area_reg.async_get_or_create("Living room")
     mock_registry(

@@ -84,7 +84,7 @@ async def test_complex_nested_filters(hass: HomeAssistant) -> None:
                     CONF_AND: [
                         {CONF_WILDCARD: "switch.some?"},
                         {CONF_WILDCARD: "switch.other?"},
-                    ]
+                    ],
                 },
             ],
         },

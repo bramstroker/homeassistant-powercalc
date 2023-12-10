@@ -54,6 +54,7 @@
             "group": {
                 "data": {
                     "area": "Ruimte",
+                    "device": "Apparaat",
                     "create_utility_meters": "Creëer utiliteit meters",
                     "group_energy_entities": "Additionele energie entiteiten",
                     "group_member_sensors": "Individuele Powercalc sensoren",
@@ -65,6 +66,7 @@
                 },
                 "data_description": {
                     "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+                    "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele vermogen entiteiten (W)",
@@ -232,6 +234,7 @@
                     "calibrate": "Kalibratie waardes",
                     "create_energy_sensor": "Creëer energie sensoren",
                     "create_utility_meters": "Creëer utiliteit meters",
+                    "device": "Apparaat",
                     "energy_integration_method": "Energie integratie methode",
                     "gamma_curve": "Gamma curve",
                     "group_energy_entities": "Additionele energie entiteiten",
@@ -264,6 +267,7 @@
                     "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
                     "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
                     "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
+                    "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele vermogen entiteiten (W)",

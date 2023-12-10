@@ -159,7 +159,7 @@ FILTER_CONFIG = vol.Schema(
         vol.Optional(CONF_TEMPLATE): cv.template,
         vol.Optional(CONF_DOMAIN): cv.string,
         vol.Optional(CONF_WILDCARD): cv.string,
-    }
+    },
 )
 
 SENSOR_CONFIG = {
