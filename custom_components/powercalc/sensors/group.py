@@ -37,6 +37,7 @@ from homeassistant.core import (
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
@@ -207,6 +208,16 @@ async def create_group_sensors_from_config_entry(
                 net_consumption=True,
             ),
         )
+
+    device_id = entry.data.get(CONF_DEVICE)
+    if device_id:
+        device_reg = device_registry.async_get(hass)
+        device_entry = device_reg.async_get(device_id)
+        if entry.entry_id not in device_entry.config_entries:
+            device_reg.async_update_device(
+                device_id,
+                add_config_entry_id=entry.entry_id,
+            )
 
     return group_sensors
 
