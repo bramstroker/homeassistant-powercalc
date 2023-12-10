@@ -213,7 +213,7 @@ async def create_group_sensors_from_config_entry(
     if device_id:
         device_reg = device_registry.async_get(hass)
         device_entry = device_reg.async_get(device_id)
-        if entry.entry_id not in device_entry.config_entries:
+        if device_entry and entry.entry_id not in device_entry.config_entries:
             device_reg.async_update_device(
                 device_id,
                 add_config_entry_id=entry.entry_id,
