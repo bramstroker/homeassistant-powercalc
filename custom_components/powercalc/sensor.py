@@ -46,6 +46,7 @@ from .common import (
     validate_name_pattern,
 )
 from .const import (
+    CONF_AND,
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
@@ -76,6 +77,7 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
+    CONF_OR,
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
@@ -150,6 +152,14 @@ _LOGGER = logging.getLogger(__name__)
 
 MAX_GROUP_NESTING_LEVEL = 5
 
+FILTER_CONFIG = vol.Schema({
+    vol.Optional(CONF_AREA): cv.string,
+    vol.Optional(CONF_GROUP): cv.entity_id,
+    vol.Optional(CONF_TEMPLATE): cv.template,
+    vol.Optional(CONF_DOMAIN): cv.string,
+    vol.Optional(CONF_WILDCARD): cv.string,
+})
+
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
@@ -194,14 +204,12 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
     vol.Optional(CONF_INCLUDE): vol.Schema(
         {
-            vol.Optional(CONF_AREA): cv.string,
-            vol.Optional(CONF_GROUP): cv.entity_id,
-            vol.Optional(CONF_TEMPLATE): cv.template,
-            vol.Optional(CONF_DOMAIN): cv.string,
-            vol.Optional(CONF_WILDCARD): cv.string,
+            **FILTER_CONFIG.schema,
             vol.Optional(CONF_FILTER): vol.Schema(
                 {
-                    vol.Required(CONF_DOMAIN): vol.Any(cv.string, [cv.string]),
+                    **FILTER_CONFIG.schema,
+                    vol.Optional(CONF_OR): vol.All(cv.ensure_list, [FILTER_CONFIG]),
+                    vol.Optional(CONF_AND): vol.All(cv.ensure_list, [FILTER_CONFIG]),
                 },
             ),
         },

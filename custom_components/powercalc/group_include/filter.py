@@ -15,7 +15,7 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_AREA, CONF_GROUP, CONF_TEMPLATE, CONF_WILDCARD
+from custom_components.powercalc.const import CONF_AREA, CONF_GROUP, CONF_OR, CONF_TEMPLATE, CONF_WILDCARD
 from custom_components.powercalc.errors import SensorConfigurationError
 
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
@@ -32,26 +32,40 @@ class FilterOperator(StrEnum):
     OR = "or"
 
 
-def create_filter(filter_config: ConfigType, hass: HomeAssistant, filter_operator: FilterOperator) -> IncludeEntityFilter:
+def create_composite_filter(filter_configs: ConfigType | list[ConfigType], hass: HomeAssistant,
+                            filter_operator: FilterOperator) -> IncludeEntityFilter:
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
-    for key, val in filter_config.items():
-        entity_filter: IncludeEntityFilter | None = None
-        if key == CONF_DOMAIN:
-            entity_filter = DomainFilter(val)
-        if key == CONF_AREA:
-            entity_filter = AreaFilter(hass, val)
-        if key == CONF_WILDCARD:
-            entity_filter = WildcardFilter(val)
-        if key == CONF_GROUP:
-            entity_filter = GroupFilter(hass, val)
-        if key == CONF_TEMPLATE:
-            entity_filter = TemplateFilter(hass, val)
 
-        if entity_filter:
-            filters.append(entity_filter)
+    if not isinstance(filter_configs, list):
+        filter_configs = [{key: value} for key, value in filter_configs.items()]
+
+    for filter_config in filter_configs:
+        for key, val in filter_config.items():
+            filters.append(create_filter(key, val, hass))
+
+    if len(filters) == 0:
+        return NullFilter()
 
     return CompositeFilter(filters, filter_operator)
+
+
+def create_filter(filter_type: str, filter_config: ConfigType, hass: HomeAssistant) -> IncludeEntityFilter:
+    if filter_type == CONF_DOMAIN:
+        return DomainFilter(filter_config)  # type: ignore
+    if filter_type == CONF_AREA:
+        return AreaFilter(hass, filter_config)  # type: ignore
+    if filter_type == CONF_WILDCARD:
+        return WildcardFilter(filter_config)  # type: ignore
+    if filter_type == CONF_GROUP:
+        return GroupFilter(hass, filter_config)  # type: ignore
+    if filter_type == CONF_TEMPLATE:
+        return TemplateFilter(hass, filter_config)  # type: ignore
+    if filter_type == CONF_OR:
+        return create_composite_filter(filter_config, hass, FilterOperator.OR)
+    if filter_type == CONF_OR:
+        return create_composite_filter(filter_config, hass, FilterOperator.AND)
+    return NullFilter()
 
 
 class IncludeEntityFilter(Protocol):
@@ -68,13 +82,16 @@ class DomainFilter(IncludeEntityFilter):
             return entity.domain in self.domain
         return entity.domain == self.domain
 
+
 class GroupFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         domain = split_entity_id(group_id)[0]
-        self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, group_id)
+        self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass,
+                                                                                                          group_id)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return self.filter.is_valid(entity)
+
 
 class StandardGroupFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
@@ -104,7 +121,8 @@ class LightGroupFilter(IncludeEntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.entity_id in self.entity_ids
 
-    def find_all_entity_ids_recursively(self, hass: HomeAssistant, group_entity_id: str, all_entity_ids: list[str]) -> list[str]:
+    def find_all_entity_ids_recursively(self, hass: HomeAssistant, group_entity_id: str, all_entity_ids: list[str]) -> \
+    list[str]:
         entity_reg = entity_registry.async_get(hass)
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
         light_group = next(
@@ -134,6 +152,7 @@ class NullFilter(IncludeEntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return True
 
+
 class WildcardFilter(IncludeEntityFilter):
     def __init__(self, pattern: str) -> None:
         self.regex = self.create_regex(pattern)
@@ -145,6 +164,7 @@ class WildcardFilter(IncludeEntityFilter):
     def create_regex(pattern: str) -> str:
         pattern = pattern.replace("?", ".")
         return pattern.replace("*", ".*")
+
 
 class TemplateFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, template: Template) -> None:
@@ -175,11 +195,12 @@ class AreaFilter(IncludeEntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id == self.area.id or entity.device_id in self.area_devices
 
+
 class CompositeFilter(IncludeEntityFilter):
     def __init__(
-        self,
-        filters: list[IncludeEntityFilter],
-        operator: FilterOperator,
+            self,
+            filters: list[IncludeEntityFilter],
+            operator: FilterOperator,
     ) -> None:
         self.filters = filters
         self.operator = operator

@@ -33,6 +33,7 @@ from custom_components.powercalc.const import (
     CONF_FIXED,
     CONF_GROUP,
     CONF_INCLUDE,
+    CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
@@ -724,6 +725,63 @@ async def test_include_by_wildcard(
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power"}
+
+async def test_include_complex_nested_filters(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    area = area_reg.async_get_or_create("Living room")
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="binary_sensor.test",
+                unique_id="1111",
+                platform="binary_sensor",
+            ),
+            "switch.tv": RegistryEntry(
+                entity_id="switch.tv",
+                unique_id="2222",
+                platform="switch",
+                area_id=area.id,
+            ),
+            "light.tv_ambilights": RegistryEntry(
+                entity_id="light.tv_ambilights",
+                unique_id="3333",
+                platform="light",
+                area_id=area.id,
+            ),
+            "light.living_room": RegistryEntry(
+                entity_id="light.living_room",
+                unique_id="4444",
+                platform="light",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.test"),
+            get_simple_fixed_config("switch.tv"),
+            get_simple_fixed_config("light.tv_ambilights"),
+            get_simple_fixed_config("light.living_room"),
+            {
+                CONF_CREATE_GROUP: "Test include",
+                CONF_INCLUDE: {
+                    CONF_AREA: "Living room",
+                    CONF_FILTER: {
+                        CONF_OR: [
+                            { CONF_DOMAIN: "switch" },
+                            { CONF_WILDCARD: "*ambilights" },
+                        ],
+                    },
+                },
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power", "sensor.tv_ambilights_power"}
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,

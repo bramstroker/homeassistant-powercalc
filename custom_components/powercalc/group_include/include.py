@@ -20,7 +20,7 @@ from custom_components.powercalc.sensors.power import RealPowerSensor
 from .filter import (
     CompositeFilter,
     FilterOperator,
-    create_filter,
+    create_composite_filter,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,11 +82,11 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    entity_filter = create_filter(include_config, hass, FilterOperator.OR)
+    entity_filter = create_composite_filter(include_config, hass, FilterOperator.OR)
 
     if CONF_FILTER in include_config:
         entity_filter = CompositeFilter(
-            [entity_filter, create_filter(include_config.get(CONF_FILTER), hass, FilterOperator.OR)],  # type: ignore
+            [entity_filter, create_composite_filter(include_config.get(CONF_FILTER), hass, FilterOperator.OR)],  # type: ignore
             FilterOperator.AND,
         )
 

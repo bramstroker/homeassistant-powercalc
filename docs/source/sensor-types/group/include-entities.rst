@@ -60,6 +60,18 @@ Domain
           include:
             domain: light
 
+You might also filter by multiple domains:
+
+.. code-block:: yaml
+
+  powercalc:
+      sensors:
+        - create_group: All lights
+          include:
+            domain:
+              - light
+              - switch
+
 Wildcard
 --------
 
@@ -95,9 +107,9 @@ Filters
 =======
 
 Besides the base filters described above which build the base include you can also apply additional filters to further narrow down the list of items.
+These filters accept the same configuration as described above.
 
-Domain
-------
+For example to include all light entities from area outdoor.
 
 .. code-block:: yaml
 
@@ -109,21 +121,3 @@ Domain
             filter:
               domain: light
 
-This will include only light entities from area outdoor.
-
-You can also filter by multiple domains:
-
-.. code-block:: yaml
-
-  filter:
-    domain:
-      - light
-      - switch
-
-Wildcard
---------
-
-.. code-block:: yaml
-
-  filter:
-    wildcard: light.office_spot_*
