@@ -1,0 +1,14 @@
+{
+ 	"measure_description": "Manually measured. Pictures in the Pull Request comments.",
+ 	"measure_method": "manual",
+ 	"measure_device": "Zhurui PR10",
+ 	"name": "Aqara Smart Plug",
+ 	"standby_power": 0.17,
+	"standby_power_on": 0.46,
+ 	"sensor_config": {
+ 		"power_sensor_naming": "{} Device Power",
+ 		"energy_sensor_naming": "{} Device Energy"
+   	},
+ 	"device_type": "smart_switch",
+ 	"calculation_strategy": "fixed"
+ }
