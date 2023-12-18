@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, PlusPlugS",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 4,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.9.10:docker"
+    },
+    "name": "RB 266 Smart Bulb White E27 780lm (2700K)",
+    "standby_power": 0.31
+}

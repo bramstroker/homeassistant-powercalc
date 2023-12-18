@@ -1,11 +1,11 @@
-- [Lights](#Lights) (300)
+- [Lights](#Lights) (301)
 - [Smart speakers](#Smart-speakers) (26)
-- [Smart switches / plugs](#Smart-switches-/-plugs) (30)
+- [Smart switches / plugs](#Smart-switches-/-plugs) (31)
 - [Cameras](#Cameras) (1)
 - [Networking](#Networking) (1)
 
 ## Lights
-#### 300 total
+#### 301 total
 
 | manufacturer  |        model id         |                                            name                                             |                                                                                                                                               aliases                                                                                                                                                |standby|      color modes       |
 |---------------|-------------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------:|------------------------|
@@ -85,6 +85,7 @@
 |innr           |RB 185 C                 |RB 185 C - E27 Smart Color Bulb                                                              |                                                                                                                                                                                                                                                                                                      |  0.400|hs,color_temp           |
 |innr           |RB 250 C                 |RB 250 C 470lm E14 RGBW                                                                      |                                                                                                                                                                                                                                                                                                      |  0.400|hs,color_temp           |
 |innr           |RB 265                   |RB 265-2 Smart Bulb White E27 (2700K)                                                        |                                                                                                                                                                                                                                                                                                      |  0.500|brightness              |
+|innr           |RB 266                   |RB 266 Smart Bulb White E27 780lm (2700K)                                                    |                                                                                                                                                                                                                                                                                                      |  0.310|brightness              |
 |innr           |RB 285 C                 |RB 285 C 806lm E27 RGBW                                                                      |                                                                                                                                                                                                                                                                                                      |  0.400|hs,color_temp           |
 |innr           |RCL 110                  |Innr RCL 110                                                                                 |                                                                                                                                                                                                                                                                                                      |  0.400|brightness              |
 |innr           |RF 263                   |RF 263-2 Smart Filament Bulb E27 Vintage (2200K)                                             |                                                                                                                                                                                                                                                                                                      |  0.330|brightness              |
@@ -343,10 +344,11 @@
 |sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame                       |   2.40|
 
 ## Smart switches / plugs
-#### 30 total
+#### 31 total
 
 |manufacturer|       model id       |                                       name                                        |                        aliases                        |standby|
 |------------|----------------------|-----------------------------------------------------------------------------------|-------------------------------------------------------|------:|
+|aqara       |lumi.plug.maeu01      |Aqara Smart Plug                                                                   |                                                       |  0.170|
 |arlec       |PC191HA               |Arlec White Grid Connect Smart Plug In Socket With Energy Meter                    |                                                       |  0.267|
 |arlec       |PC192HA               |Arlec Grid Connect Smart Plug In Multi-Function Socket With USB                    |                                                       |  0.660|
 |arlec       |PC287HA               |Arlec Grid Connect Smart Twin Socket With Energy Meter And Surge Protection PC287HA|                                                       |  0.290|
@@ -357,7 +359,7 @@
 |everspring  |AN158                 |Everspring AN158                                                                   |                                                       |  0.300|
 |fibaro      |FGWP102               |Fibaro FGWP102                                                                     |                                                       |  0.300|
 |greenwave   |GWPN1                 |Greenwave GWPN1                                                                    |                                                       |  0.300|
-|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                       |  0.400|
+|ikea        |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                       |  0.230|
 |innr        |SP 120                |Innr Zigbee Smart Plug                                                             |                                                       |  0.410|
 |innr        |SP 224                |Innr Zigbee Smart Plug                                                             |                                                       |  0.180|
 |neo-coolcam |NAS-WR01Z             |Smart Power Plug                                                                   |                                                       |  0.310|

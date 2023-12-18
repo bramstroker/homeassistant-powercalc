@@ -1,10 +1,10 @@
 {
- 	"measure_description": "Manually measured. Transcribed from https://github.com/bramstroker/homeassistant-powercalc/discussions/207#discussioncomment-1484985",
+ 	"measure_description": "Manually measured. Pictures in the Pull Request comments.",
  	"measure_method": "manual",
  	"measure_device": "Zhurui PR10",
- 	"name": "TRADFRI control outlet",
- 	"standby_power": 0.23,
-	"standby_power_on": 0.98,
+ 	"name": "Aqara Smart Plug",
+ 	"standby_power": 0.17,
+	"standby_power_on": 0.46,
  	"sensor_config": {
  		"power_sensor_naming": "{} Device Power",
  		"energy_sensor_naming": "{} Device Energy"
