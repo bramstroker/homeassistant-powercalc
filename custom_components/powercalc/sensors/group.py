@@ -30,7 +30,6 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
-    Event,
     HomeAssistant,
     State,
     callback,
@@ -558,7 +557,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, _) -> None:  # type: ignore[no-untyped-def]
+    def on_state_change(self, _: Any) -> None:  # noqa
         """Triggered when one of the group entities changes state."""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
