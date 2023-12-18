@@ -134,6 +134,8 @@ async def test_group_include_area(
         CONF_UNIQUE_ID: "My group sensor",
         CONF_CREATE_UTILITY_METERS: True,
     }
+
+    hass.states.async_set("sensor.test_power", 5)
     await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.my_group_sensor_power")
