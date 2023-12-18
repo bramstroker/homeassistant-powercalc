@@ -38,6 +38,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     DOMAIN,
@@ -100,6 +101,7 @@ async def test_related_energy_sensor_is_used_for_existing_power_sensor(
                     CONF_POWER_SENSOR_ID: "sensor.existing_power",
                 },
             ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -171,6 +173,7 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
                     CONF_FORCE_ENERGY_SENSOR_CREATION: True,
                 },
             ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 

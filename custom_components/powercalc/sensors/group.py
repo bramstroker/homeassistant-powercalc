@@ -30,14 +30,12 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
-    CoreState,
-    Event,
     HomeAssistant,
     State,
     callback,
 )
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import device_registry
+from homeassistant.helpers import device_registry, start
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
@@ -66,6 +64,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
@@ -521,6 +520,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
+        if isinstance(self, GroupedPowerSensor):
+            self.async_on_remove(start.async_at_start(self.hass, state_listener))
+
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
@@ -555,11 +557,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, event: Event) -> None:
+    def on_state_change(self, _: Any) -> None:  # noqa
         """Triggered when one of the group entities changes state."""
-        if self.hass.state != CoreState.running:  # pragma: no cover
-            return
-
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [
@@ -568,7 +567,11 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
         if not available_states:
-            self._attr_available = False
+            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) and isinstance(self, GroupedPowerSensor):
+                self._attr_native_value = 0
+                self._attr_available = True
+            else:
+                self._attr_available = False
             self.async_write_ha_state()
             return
 

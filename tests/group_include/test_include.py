@@ -32,6 +32,7 @@ from custom_components.powercalc.const import (
     CONF_FILTER,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_OR,
     CONF_POWER,
@@ -550,6 +551,7 @@ async def test_include_non_powercalc_entities_in_group(
             CONF_INCLUDE: {
                 CONF_AREA: "bedroom",
             },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -688,6 +690,7 @@ async def test_power_group_does_not_include_binary_sensors(
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom",
             },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -719,6 +722,7 @@ async def test_include_by_wildcard(
             CONF_INCLUDE: {
                 CONF_WILDCARD: "sensor.tv_*",
             },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -779,6 +783,7 @@ async def test_include_complex_nested_filters(
                         ],
                     },
                 },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
             },
         ],
     )

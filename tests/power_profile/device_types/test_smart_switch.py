@@ -162,12 +162,12 @@ async def test_smart_switch_power_input_gui_config_flow(
     hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "50.80"
+    assert hass.states.get(power_sensor_id).state == "50.98"
 
     hass.states.async_set(switch_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.40"
+    assert hass.states.get(power_sensor_id).state == "0.23"
 
     # Change the power value via the options
     result = await hass.config_entries.options.async_init(
@@ -184,7 +184,7 @@ async def test_smart_switch_power_input_gui_config_flow(
     hass.states.async_set(switch_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "100.80"
+    assert hass.states.get(power_sensor_id).state == "100.98"
 
 
 async def test_hue_smart_plug_is_discovered(
