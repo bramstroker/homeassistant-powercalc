@@ -55,6 +55,7 @@ from .const import (
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
     DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
@@ -209,8 +210,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
     }
 
+    discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
@@ -222,7 +225,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     await hass.async_add_executor_job(register_services, hass)
 
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
 
     await setup_yaml_sensors(hass, config, domain_config)

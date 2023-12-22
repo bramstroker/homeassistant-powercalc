@@ -176,7 +176,7 @@ async def create_group_sensors_from_config_entry(
         sensor_config[CONF_UNIQUE_ID] = entry.entry_id
 
     power_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER),
+        await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER),
     )
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
@@ -188,7 +188,7 @@ async def create_group_sensors_from_config_entry(
         group_sensors.append(power_sensor)
 
     energy_sensor_ids: set[str] = set(
-        resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY),
+        await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY),
     )
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
@@ -323,8 +323,7 @@ async def add_to_associated_group(
     return group_entry
 
 
-@callback
-def resolve_entity_ids_recursively(
+async def resolve_entity_ids_recursively(
     hass: HomeAssistant,
     entry: ConfigEntry,
     device_class: SensorDeviceClass,
@@ -360,12 +359,13 @@ def resolve_entity_ids_recursively(
 
     # Include entities from defined areas
     if CONF_AREA in entry.data:
+        resolved_area_entities, _ = await resolve_include_entities(
+            hass,
+            {CONF_AREA: entry.data[CONF_AREA]},
+        )
         area_entities = [
             entity.entity_id
-            for entity in resolve_include_entities(
-                hass,
-                {CONF_AREA: entry.data[CONF_AREA]},
-            )
+            for entity in resolved_area_entities
             if isinstance(
                 entity,
                 PowerSensor
@@ -385,7 +385,7 @@ def resolve_entity_ids_recursively(
         if subgroup_entry is None:
             _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
             continue
-        resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
+        await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
 
     return resolved_ids
 
