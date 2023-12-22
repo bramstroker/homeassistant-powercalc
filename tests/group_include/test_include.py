@@ -760,11 +760,18 @@ async def test_include_by_wildcard_in_nested_groups(
 
     group_a_state = hass.states.get("sensor.test_include_a_power")
     assert group_a_state
-    assert group_a_state.attributes.get(CONF_ENTITIES) == {"sensor.some_a_power", "sensor.other_b_power", "sensor.other_c_power"}
+    assert group_a_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.some_a_power",
+        "sensor.other_b_power",
+        "sensor.other_c_power",
+    }
 
     group_b_state = hass.states.get("sensor.test_include_b_power")
     assert group_b_state
-    assert group_b_state.attributes.get(CONF_ENTITIES) == {"sensor.other_b_power", "sensor.other_c_power"}
+    assert group_b_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.other_b_power",
+        "sensor.other_c_power",
+    }
 
 
 async def test_include_complex_nested_filters(

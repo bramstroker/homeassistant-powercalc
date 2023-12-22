@@ -120,7 +120,9 @@ class DiscoveryManager:
             model_info = await autodiscover_model(self.hass, entity_entry)
             if not model_info:
                 continue
-            power_profile = await self.get_power_profile(entity_entry.entity_id, model_info)
+            power_profile = await self.get_power_profile(
+                entity_entry.entity_id, model_info
+            )
             source_entity = await create_source_entity(
                 entity_entry.entity_id,
                 self.hass,
@@ -132,7 +134,9 @@ class DiscoveryManager:
 
         _LOGGER.debug("Done auto discovering entities")
 
-    async def get_power_profile(self, entity_id: str, model_info: ModelInfo) -> PowerProfile | None:
+    async def get_power_profile(
+        self, entity_id: str, model_info: ModelInfo
+    ) -> PowerProfile | None:
         if entity_id in self.power_profiles:
             return self.power_profiles[entity_id]
 
@@ -150,7 +154,6 @@ class DiscoveryManager:
             )
             return None
 
-
     async def is_entity_supported(self, entity_entry: er.RegistryEntry) -> bool:
         if not self.should_process_entity(entity_entry):
             return False
@@ -165,13 +168,13 @@ class DiscoveryManager:
         )
 
         if (
-                model_info.manufacturer == MANUFACTURER_WLED
-                and entity_entry.domain == LIGHT_DOMAIN
-                and not re.search(
-            "master|segment",
-            str(entity_entry.original_name),
-            flags=re.IGNORECASE,
-        )
+            model_info.manufacturer == MANUFACTURER_WLED
+            and entity_entry.domain == LIGHT_DOMAIN
+            and not re.search(
+                "master|segment",
+                str(entity_entry.original_name),
+                flags=re.IGNORECASE,
+            )
         ):
             self._init_entity_discovery(
                 source_entity,
@@ -189,7 +192,7 @@ class DiscoveryManager:
             return False
 
         if power_profile and not power_profile.is_entity_domain_supported(
-                source_entity,
+            source_entity,
         ):
             return False
 
@@ -259,8 +262,6 @@ class DiscoveryManager:
             context={"source": SOURCE_INTEGRATION_DISCOVERY},
             data=discovery_data,
         )
-
-
 
     def _is_user_configured(self, entity_id: str) -> bool:
         """Check if user have setup powercalc sensors for a given entity_id.

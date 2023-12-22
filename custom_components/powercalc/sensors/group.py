@@ -385,7 +385,9 @@ async def resolve_entity_ids_recursively(
         if subgroup_entry is None:
             _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
             continue
-        await resolve_entity_ids_recursively(hass, subgroup_entry, device_class, resolved_ids)
+        await resolve_entity_ids_recursively(
+            hass, subgroup_entry, device_class, resolved_ids
+        )
 
     return resolved_ids
 
@@ -567,7 +569,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
         if not available_states:
-            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) and isinstance(self, GroupedPowerSensor):
+            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) and isinstance(
+                self, GroupedPowerSensor
+            ):
                 self._attr_native_value = 0
                 self._attr_available = True
             else:
