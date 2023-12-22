@@ -752,7 +752,7 @@ async def test_include_by_wildcard_in_nested_groups(
                     CONF_INCLUDE: {
                         CONF_WILDCARD: "light.other_*",
                     },
-                }
+                },
             ],
             CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
