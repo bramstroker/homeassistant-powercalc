@@ -58,7 +58,7 @@ async def resolve_include_entities(hass: HomeAssistant, include_config: dict) ->
             elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
-        if await discovery_manager.is_entity_supported(source_entity):
+        if source_entity and await discovery_manager.is_entity_supported(source_entity):
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities

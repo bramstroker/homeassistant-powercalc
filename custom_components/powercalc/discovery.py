@@ -109,7 +109,7 @@ class DiscoveryManager:
     def __init__(self, hass: HomeAssistant, ha_config: ConfigType) -> None:
         self.hass = hass
         self.ha_config = ha_config
-        self.power_profiles: dict[str, PowerProfile] = {}
+        self.power_profiles: dict[str, PowerProfile | None] = {}
         self.manually_configured_entities: list[str] | None = None
 
     async def start_discovery(self) -> None:
@@ -118,6 +118,8 @@ class DiscoveryManager:
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
             model_info = await autodiscover_model(self.hass, entity_entry)
+            if not model_info:
+                continue
             power_profile = await self.get_power_profile(entity_entry.entity_id, model_info)
             source_entity = await create_source_entity(
                 entity_entry.entity_id,
@@ -130,7 +132,7 @@ class DiscoveryManager:
 
         _LOGGER.debug("Done auto discovering entities")
 
-    async def get_power_profile(self, entity_id: str, model_info: ModelInfo) -> PowerProfile|None:
+    async def get_power_profile(self, entity_id: str, model_info: ModelInfo) -> PowerProfile | None:
         if entity_id in self.power_profiles:
             return self.power_profiles[entity_id]
 
@@ -146,6 +148,7 @@ class DiscoveryManager:
                 "%s: Model not found in library, skipping discovery",
                 entity_id,
             )
+            return None
 
 
     async def is_entity_supported(self, entity_entry: er.RegistryEntry) -> bool:
