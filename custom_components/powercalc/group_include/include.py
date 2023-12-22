@@ -7,9 +7,11 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import Entity
 
+from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
     CONF_FILTER,
     DATA_CONFIGURED_ENTITIES,
+    DATA_DISCOVERY_MANAGER,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -26,11 +28,14 @@ from .filter import (
 _LOGGER = logging.getLogger(__name__)
 
 
-def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[Entity]:
+async def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> tuple[list[Entity], list[str]]:
     """ "
     For a given include configuration fetch all power and energy sensors from the HA instance
     """
+    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+
     resolved_entities: list[Entity] = []
+    discoverable_entities: list[str] = []
     source_entities = resolve_include_source_entities(hass, include_config)
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug(
@@ -53,7 +58,10 @@ def resolve_include_entities(hass: HomeAssistant, include_config: dict) -> list[
             elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
-    return resolved_entities
+        if await discovery_manager.is_entity_supported(source_entity):
+            discoverable_entities.append(source_entity.entity_id)
+
+    return resolved_entities, discoverable_entities
 
 
 def find_powercalc_entities_by_source_entity(

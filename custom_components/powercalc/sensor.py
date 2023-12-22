@@ -649,7 +649,10 @@ async def create_sensors(
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-        entities_to_add.existing.extend(resolve_include_entities(hass, config.get(CONF_INCLUDE)))  # type: ignore
+        found_entities, discoverable_entities = await resolve_include_entities(hass, config.get(CONF_INCLUDE))
+        entities_to_add.existing.extend(found_entities)  # type: ignore
+        for entity_id in discoverable_entities:
+            sensor_configs.update({entity_id: {CONF_ENTITY_ID: entity_id}})
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
