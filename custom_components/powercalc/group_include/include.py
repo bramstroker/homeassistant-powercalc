@@ -29,7 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def resolve_include_entities(
-    hass: HomeAssistant, include_config: dict
+    hass: HomeAssistant, include_config: dict,
 ) -> tuple[list[Entity], list[str]]:
     """ "
     For a given include configuration fetch all power and energy sensors from the HA instance

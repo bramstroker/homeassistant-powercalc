@@ -121,7 +121,7 @@ class DiscoveryManager:
             if not model_info:
                 continue
             power_profile = await self.get_power_profile(
-                entity_entry.entity_id, model_info
+                entity_entry.entity_id, model_info,
             )
             source_entity = await create_source_entity(
                 entity_entry.entity_id,
@@ -135,7 +135,7 @@ class DiscoveryManager:
         _LOGGER.debug("Done auto discovering entities")
 
     async def get_power_profile(
-        self, entity_id: str, model_info: ModelInfo
+        self, entity_id: str, model_info: ModelInfo,
     ) -> PowerProfile | None:
         if entity_id in self.power_profiles:
             return self.power_profiles[entity_id]
