@@ -10,7 +10,6 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
     CONF_NAME,
-    TIME_HOURS,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
@@ -130,7 +129,7 @@ async def create_energy_sensor(
         name=name,
         round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),  # type: ignore
         unit_prefix=unit_prefix,
-        unit_time=TIME_HOURS,  # type: ignore
+        unit_time=UnitOfTime.HOURS,
         integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
         or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
