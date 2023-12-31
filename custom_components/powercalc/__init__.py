@@ -81,6 +81,7 @@ from .const import (
 from .discovery import DiscoveryManager
 from .sensor import SENSOR_CONFIG
 from .sensors.group import (
+    get_entries_having_subgroup,
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
 )
@@ -336,6 +337,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+    # Also reload all "parent" groups referring this group as a subgroup
+    for related_entry in await get_entries_having_subgroup(hass, entry):
+        await hass.config_entries.async_reload(related_entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
