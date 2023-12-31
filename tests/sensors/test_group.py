@@ -207,6 +207,58 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
     }
 
 
+async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> None:
+    """When an entity is added to a subgroup all the groups referring this subgroup should be reloaded"""
+
+    config_entry_group_sub = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupSub",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupMain",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test2_power"],
+            CONF_SUB_GROUPS: [
+                config_entry_group_sub.entry_id,
+            ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    main_group_state = hass.states.get("sensor.groupmain_power")
+    assert main_group_state
+    assert main_group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_power",
+        "sensor.test2_power",
+    }
+
+    hass.config_entries.async_update_entry(
+        config_entry_group_sub,
+        data={
+            **config_entry_group_sub.data,
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power", "sensor.test3_power"],
+        },
+    )
+    await hass.async_block_till_done()
+
+    main_group_state = hass.states.get("sensor.groupmain_power")
+    assert main_group_state
+    assert main_group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_power",
+        "sensor.test2_power",
+        "sensor.test3_power",
+    }
+
+
+
 async def test_reset_service(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test1", "test2"])
 

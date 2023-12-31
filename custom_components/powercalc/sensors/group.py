@@ -392,6 +392,14 @@ async def resolve_entity_ids_recursively(
     return resolved_ids
 
 
+async def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
+    return [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
+           and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
+    ]
+
 @callback
 def create_grouped_power_sensor(
     hass: HomeAssistant,
