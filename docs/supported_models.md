@@ -371,7 +371,7 @@
 |nodon       |Micro Smart Plug      |NodOn Micro Smart Plug                                                             |MSP-3-1-X1                                             |  0.670|
 |nous        |A1T                   |NOUS A1T                                                                           |NOUS A1T                                               |  0.290|
 |nous        |A1Z                   |Smart plug (with power monitoring)                                                 |A1Z                                                    |  0.100|
-|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |Plug 01                                                |  0.440|
+|osram       |LIGHTIFY Plug 01      |Osram Lightify Plug 01                                                             |Plug 01<br />AB3257001NJ                               |  0.440|
 |qubino      |Smart Plug 16A        |Qubino Smart Plug 16A                                                              |                                                       |  0.300|
 |shelly      |shelly plug s         |Shelly Plug S                                                                      |                                                       |  0.520|
 |shelly      |shelly plus plug s    |Shelly Plus Plug S                                                                 |                                                       |  0.800|
