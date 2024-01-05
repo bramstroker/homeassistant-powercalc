@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 3.24",
+            "20 -> 3.13",
+            "30 -> 3.12",
+            "40 -> 3.1",
+            "50 -> 3.16",
+            "60 -> 3.24",
+            "70 -> 3.23",
+            "80 -> 3.37",
+            "90 -> 3.07",
+            "100 -> 3.11",
+            "0 -> 2.81"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plus Plug US",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.9.14:docker"
+    },
+    "name": "Amazon Echo Show 5",
+    "standby_power": 2.95
+}
