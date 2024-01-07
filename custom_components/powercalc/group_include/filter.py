@@ -48,7 +48,7 @@ def create_composite_filter(
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
 
-    if CONF_FILTER in filter_configs:
+    if CONF_FILTER in filter_configs and isinstance(filter_configs, dict):
         filter_configs.update(filter_configs[CONF_FILTER])
         filter_configs.pop(CONF_FILTER)
 
