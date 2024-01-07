@@ -54,6 +54,7 @@
             "group": {
                 "data": {
                     "area": "Oblasť",
+                    "device": "Zariadenie",
                     "create_utility_meters": "Vytvorte merače spotreby",
                     "group_energy_entities": "Ďlšie energetické entity",
                     "group_member_sensors": "Členské snímače powercalc",
@@ -65,6 +66,7 @@
                 },
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+                    "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
@@ -199,7 +201,7 @@
             },
             "wled": {
                 "data": {
-                    "power_factor": "Účiník",
+                    "power_factor": "Účinník",
                     "voltage": "Napätie"
                 },
                 "title": "WLED konfigurácia"
@@ -232,6 +234,7 @@
                     "calibrate": "Kalibračné hodnoty",
                     "create_energy_sensor": "Vytvoriť snímač energie",
                     "create_utility_meters": "Vytvorte merače spotreby",
+                    "device": "Zariadenie",
                     "energy_integration_method": "Metóda energetickej integrácie",
                     "gamma_curve": "Gamma krivka",
                     "group_energy_entities": "Ďalšie energetické entity",
@@ -264,6 +267,7 @@
                     "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
                     "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
                     "calibrate": "Na každý riadok uveďte kalibračnú hodnotu. Príklad\n\n1: 20",
+                    "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
