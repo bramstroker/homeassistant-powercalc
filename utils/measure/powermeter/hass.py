@@ -29,6 +29,8 @@ class HassPowerMeter(PowerMeter):
             time.sleep(1)
 
         state = self.client.get_state(entity_id=self._entity_id)
+        if state == "unavailable":
+            raise PowerMeterError(f"Power sensor {self._entity_id} unavailable")
         last_updated = state.last_updated.timestamp()
         return PowerMeasurementResult(float(state.state), last_updated)
 
