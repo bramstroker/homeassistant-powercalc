@@ -886,8 +886,8 @@ async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, 
                         CONF_INCLUDE: {
                             CONF_AREA: "conservatory",
                             CONF_FILTER: {
-                                CONF_DOMAIN: "light"
-                            }
+                                CONF_DOMAIN: "light",
+                            },
                         },
                         CONF_IGNORE_UNAVAILABLE_STATE: True,
                     },
@@ -896,11 +896,11 @@ async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, 
                         CONF_INCLUDE: {
                             CONF_AREA: "kitchen",
                             CONF_FILTER: {
-                                CONF_DOMAIN: "light"
-                            }
+                                CONF_DOMAIN: "light",
+                            },
                         },
                         CONF_IGNORE_UNAVAILABLE_STATE: True,
-                    }
+                    },
                 ],
                 CONF_IGNORE_UNAVAILABLE_STATE: True,
             },

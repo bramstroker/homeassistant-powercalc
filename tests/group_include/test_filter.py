@@ -8,7 +8,8 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.group_include.filter import (
-    AreaFilter, CompositeFilter,
+    AreaFilter,
+    CompositeFilter,
     DomainFilter,
     FilterOperator,
     NullFilter,
@@ -103,8 +104,8 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_reg: AreaRegis
         {
             CONF_AREA: "kitchen",
             CONF_FILTER: {
-                CONF_DOMAIN: "light"
-            }
+                CONF_DOMAIN: "light",
+            },
         },
         hass,
         FilterOperator.AND,

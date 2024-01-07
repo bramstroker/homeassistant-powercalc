@@ -18,7 +18,8 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.const import (
     CONF_AND,
     CONF_AREA,
-    CONF_FILTER, CONF_GROUP,
+    CONF_FILTER,
+    CONF_GROUP,
     CONF_OR,
     CONF_TEMPLATE,
     CONF_WILDCARD,
