@@ -9,7 +9,6 @@ from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
-    CONF_FILTER,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
@@ -20,7 +19,6 @@ from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
 from .filter import (
-    CompositeFilter,
     FilterOperator,
     create_composite_filter,
 )
@@ -93,12 +91,6 @@ def resolve_include_source_entities(
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
     entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
-
-    if CONF_FILTER in include_config:
-        entity_filter = CompositeFilter(
-            [entity_filter, create_composite_filter(include_config.get(CONF_FILTER), hass, FilterOperator.OR)],  # type: ignore
-            FilterOperator.AND,
-        )
 
     entity_reg = entity_registry.async_get(hass)
     return {

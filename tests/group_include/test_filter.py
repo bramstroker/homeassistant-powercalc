@@ -15,6 +15,7 @@ from custom_components.powercalc.group_include.filter import (
     NullFilter,
     WildcardFilter,
     create_composite_filter,
+    create_filter,
 )
 
 
@@ -74,6 +75,16 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
+@pytest.mark.parametrize(
+    "filter_type,filter_config,expected_type",
+    [
+        ("unknown", {}, NullFilter),
+        ("domain", {}, DomainFilter),
+    ],
+)
+async def test_create_filter(hass: HomeAssistant, filter_type: str, filter_config: dict, expected_type: type) -> None:
+    filter_instance = create_filter(filter_type, filter_config, hass)
+    assert isinstance(filter_instance, expected_type)
 
 async def test_create_composite_filter(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
