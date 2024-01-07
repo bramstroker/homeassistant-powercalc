@@ -92,7 +92,7 @@ def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
 ) -> dict[str, entity_registry.RegistryEntry | None]:
-    entity_filter = create_composite_filter(include_config, hass, FilterOperator.OR)
+    entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
 
     if CONF_FILTER in include_config:
         entity_filter = CompositeFilter(

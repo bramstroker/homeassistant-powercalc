@@ -3,10 +3,12 @@ from unittest.mock import MagicMock
 import pytest
 from homeassistant.const import CONF_DOMAIN
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
 
-from custom_components.powercalc.const import CONF_AND, CONF_OR, CONF_WILDCARD
+from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.group_include.filter import (
+    AreaFilter,
     CompositeFilter,
     DomainFilter,
     FilterOperator,
@@ -73,7 +75,7 @@ async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
 
-async def test_complex_nested_filters(hass: HomeAssistant) -> None:
+async def test_create_composite_filter(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
         {
             CONF_DOMAIN: "switch",
@@ -95,6 +97,23 @@ async def test_complex_nested_filters(hass: HomeAssistant) -> None:
     assert not entity_filter.is_valid(_create_registry_entry("switch.humidifier2"))
     assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
 
+
+async def test_create_composite_filter2(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    area_reg.async_get_or_create("kitchen")
+    entity_filter = create_composite_filter(
+        {
+            CONF_AREA: "kitchen",
+            CONF_FILTER: {
+                CONF_DOMAIN: "light",
+            },
+        },
+        hass,
+        FilterOperator.AND,
+    )
+    assert isinstance(entity_filter, CompositeFilter)
+    assert len(entity_filter.filters) == 2
+    assert isinstance(entity_filter.filters[0], AreaFilter)
+    assert isinstance(entity_filter.filters[1], DomainFilter)
 
 def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
     return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test")
