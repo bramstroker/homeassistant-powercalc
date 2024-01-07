@@ -18,7 +18,7 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.const import (
     CONF_AND,
     CONF_AREA,
-    CONF_GROUP,
+    CONF_FILTER, CONF_GROUP,
     CONF_OR,
     CONF_TEMPLATE,
     CONF_WILDCARD,
@@ -46,6 +46,10 @@ def create_composite_filter(
 ) -> IncludeEntityFilter:
     """Create filter class."""
     filters: list[IncludeEntityFilter] = []
+
+    if CONF_FILTER in filter_configs:
+        filter_configs.update(filter_configs[CONF_FILTER])
+        filter_configs.pop(CONF_FILTER)
 
     if not isinstance(filter_configs, list):
         filter_configs = [{key: value} for key, value in filter_configs.items()]
