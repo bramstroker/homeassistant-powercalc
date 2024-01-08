@@ -134,7 +134,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 color_mode,
             )
         except LutFileNotFoundError:
-            _LOGGER.error(
+            _LOGGER.warning(
                 "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
                 self._profile.model,

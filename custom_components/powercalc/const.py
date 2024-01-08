@@ -19,13 +19,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 
-MIN_HA_VERSION = "2022.11"
+MIN_HA_VERSION = "2023.1"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
 DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
+DATA_DISCOVERY_MANAGER = "discovery_manager"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"

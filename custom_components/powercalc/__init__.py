@@ -55,6 +55,7 @@ from .const import (
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
     DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
@@ -80,6 +81,7 @@ from .const import (
 from .discovery import DiscoveryManager
 from .sensor import SENSOR_CONFIG
 from .sensors.group import (
+    get_entries_having_subgroup,
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
 )
@@ -209,8 +211,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
     }
 
+    discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
@@ -222,7 +226,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     await hass.async_add_executor_job(register_services, hass)
 
     if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        discovery_manager = DiscoveryManager(hass, config)
         await discovery_manager.start_discovery()
 
     await setup_yaml_sensors(hass, config, domain_config)
@@ -334,6 +337,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+    # Also reload all "parent" groups referring this group as a subgroup
+    for related_entry in await get_entries_having_subgroup(hass, entry):
+        await hass.config_entries.async_reload(related_entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
