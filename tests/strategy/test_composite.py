@@ -45,7 +45,7 @@ async def test_composite(hass: HomeAssistant) -> None:
                 platform="light",
                 device_id="my-device-id",
             ),
-        }
+        },
     )
 
     sensor_config = {
