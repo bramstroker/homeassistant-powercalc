@@ -19,13 +19,14 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 
-MIN_HA_VERSION = "2022.11"
+MIN_HA_VERSION = "2023.1"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
 DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
+DATA_DISCOVERY_MANAGER = "discovery_manager"
 DATA_DISCOVERED_ENTITIES = "discovered_entities"
 DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
@@ -100,6 +101,7 @@ CONF_VALUE = "value"
 CONF_VALUE_TEMPLATE = "value_template"
 CONF_VOLTAGE = "voltage"
 CONF_WLED = "wled"
+CONF_WILDCARD = "wildcard"
 CONF_STATES_POWER = "states_power"
 CONF_START_TIME = "start_time"
 CONF_STANDBY_POWER = "standby_power"
@@ -111,6 +113,8 @@ CONF_CUSTOM_MODEL_DIRECTORY = "custom_model_directory"
 CONF_UTILITY_METER_OFFSET = "utility_meter_offset"
 CONF_UTILITY_METER_TYPES = "utility_meter_types"
 CONF_UTILITY_METER_TARIFFS = "utility_meter_tariffs"
+CONF_OR = "or"
+CONF_AND = "and"
 
 # Redefine constants from integration component.
 # Has been refactored in HA 2022.4, we need to support older HA versions as well.

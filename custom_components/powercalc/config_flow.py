@@ -12,6 +12,7 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.const import (
     CONF_ATTRIBUTE,
+    CONF_DEVICE,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -262,6 +263,7 @@ SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+        vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
 
@@ -370,7 +372,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.hass,
                 )
                 unique_id = user_input.get(CONF_UNIQUE_ID)
-                if not unique_id:
+                if not unique_id and self.source_entity_id != DUMMY_ENTITY_ID:
                     source_unique_id = (
                         self.source_entity.unique_id or self.source_entity_id
                     )
@@ -1026,6 +1028,7 @@ def _create_group_options_schema(
                 multiple=True,
             ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
+            vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
                 default=False,

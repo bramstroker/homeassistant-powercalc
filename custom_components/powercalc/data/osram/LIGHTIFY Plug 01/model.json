@@ -13,7 +13,8 @@
 	"fixed_config": {
 		"power": 1.04
 	},
-    "aliases": [
-        "Plug 01"
-    ]
+	"aliases": [
+		"Plug 01",
+		"AB3257001NJ"
+	]
 }

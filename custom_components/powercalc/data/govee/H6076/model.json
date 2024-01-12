@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TP-Link, P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 30,
+        "VERSION": "v1.9.8:docker"
+    },
+    "name": "Govee RGBICW Smart Corner Floor Lamp",
+    "standby_power": 2.14
+}

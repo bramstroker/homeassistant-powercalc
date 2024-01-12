@@ -32,11 +32,14 @@ from custom_components.powercalc.const import (
     CONF_FILTER,
     CONF_FIXED,
     CONF_GROUP,
+    CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
+    CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     CONF_TEMPLATE,
+    CONF_WILDCARD,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
@@ -182,14 +185,55 @@ async def test_include_domain(hass: HomeAssistant) -> None:
         ],
     )
 
-    await hass.async_start()
-    await hass.async_block_till_done()
-
     group_state = hass.states.get("sensor.lights_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.bathroom_spots_power",
         "sensor.kitchen_power",
+    }
+
+
+async def test_include_domain_list(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="1111",
+                platform="switch",
+            ),
+            "light.test2": RegistryEntry(
+                entity_id="light.test2",
+                unique_id="2222",
+                platform="light",
+            ),
+            "sensor.test3": RegistryEntry(
+                entity_id="sensor.test3",
+                unique_id="3333",
+                platform="sensor",
+            ),
+        },
+    )
+    _create_powercalc_config_entry(hass, "switch.test")
+    _create_powercalc_config_entry(hass, "light.test2")
+    _create_powercalc_config_entry(hass, "sensor.test3")
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "mygroup",
+                CONF_INCLUDE: {CONF_DOMAIN: ["switch", "light"]},
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.mygroup_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test_power",
+        "sensor.test2_power",
     }
 
 
@@ -226,6 +270,23 @@ async def test_include_template(hass: HomeAssistant) -> None:
 
 async def test_include_group(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.tv", "on")
+
+    mock_registry(
+        hass,
+        {
+            "switch.tv": RegistryEntry(
+                entity_id="switch.tv",
+                unique_id="12345",
+                platform="switch",
+            ),
+            "switch.soundbar": RegistryEntry(
+                entity_id="switch.soundbar",
+                unique_id="123456",
+                platform="switch",
+            ),
+        },
+    )
+
     await async_setup_component(
         hass,
         SWITCH_DOMAIN,
@@ -251,9 +312,6 @@ async def test_include_group(hass: HomeAssistant) -> None:
             },
         ],
     )
-
-    await hass.async_start()
-    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.powercalc_group_power")
     assert group_state
@@ -531,6 +589,7 @@ async def test_include_non_powercalc_entities_in_group(
             CONF_INCLUDE: {
                 CONF_AREA: "bedroom",
             },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -669,6 +728,7 @@ async def test_power_group_does_not_include_binary_sensors(
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom",
             },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -676,6 +736,233 @@ async def test_power_group_does_not_include_binary_sensors(
     assert group_state
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
+
+async def test_include_by_wildcard(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "binary_sensor.test": RegistryEntry(
+                entity_id="sensor.tv_power",
+                unique_id="1111",
+                platform="binary_sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_WILDCARD: "sensor.tv_*",
+            },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.tv_power"}
+
+
+async def test_include_by_wildcard_in_nested_groups(
+    hass: HomeAssistant,
+) -> None:
+    light_a = create_discoverable_light("some_a", "111")
+    light_b = create_discoverable_light("other_b", "222")
+    light_c = create_discoverable_light("other_c", "333")
+    await create_mock_light_entity(
+        hass,
+        [light_a, light_b, light_c],
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include a",
+            CONF_ENTITIES: [
+                {
+                    CONF_ENTITY_ID: "light.some_a",
+                },
+                {
+                    CONF_CREATE_GROUP: "Test include b",
+                    CONF_INCLUDE: {
+                        CONF_WILDCARD: "light.other_*",
+                    },
+                },
+            ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    group_a_state = hass.states.get("sensor.test_include_a_power")
+    assert group_a_state
+    assert group_a_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.some_a_power",
+        "sensor.other_b_power",
+        "sensor.other_c_power",
+    }
+
+    group_b_state = hass.states.get("sensor.test_include_b_power")
+    assert group_b_state
+    assert group_b_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.other_b_power",
+        "sensor.other_c_power",
+    }
+
+
+async def test_include_complex_nested_filters(
+    hass: HomeAssistant,
+    area_reg: AreaRegistry,
+) -> None:
+    area = area_reg.async_get_or_create("Living room")
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="binary_sensor.test",
+                unique_id="1111",
+                platform="binary_sensor",
+            ),
+            "switch.tv": RegistryEntry(
+                entity_id="switch.tv",
+                unique_id="2222",
+                platform="switch",
+                area_id=area.id,
+            ),
+            "light.tv_ambilights": RegistryEntry(
+                entity_id="light.tv_ambilights",
+                unique_id="3333",
+                platform="light",
+                area_id=area.id,
+            ),
+            "light.living_room": RegistryEntry(
+                entity_id="light.living_room",
+                unique_id="4444",
+                platform="light",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.test"),
+            get_simple_fixed_config("switch.tv"),
+            get_simple_fixed_config("light.tv_ambilights"),
+            get_simple_fixed_config("light.living_room"),
+            {
+                CONF_CREATE_GROUP: "Test include",
+                CONF_INCLUDE: {
+                    CONF_AREA: "Living room",
+                    CONF_FILTER: {
+                        CONF_OR: [
+                            {CONF_DOMAIN: "switch"},
+                            {CONF_WILDCARD: "*ambilights"},
+                        ],
+                    },
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.tv_power",
+        "sensor.tv_ambilights_power",
+    }
+
+
+async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1984"""
+    area_kitchen = area_reg.async_get_or_create("kitchen")
+    area_conservatory = area_reg.async_get_or_create("conservatory")
+    mock_registry(
+        hass,
+        {
+            "switch.kitchen_switch": RegistryEntry(
+                entity_id="switch.kitchen_switch",
+                unique_id="1111",
+                platform="switch",
+                area_id=area_kitchen.id,
+            ),
+            "switch.conservatory_switch": RegistryEntry(
+                entity_id="switch.conservatory_switch",
+                unique_id="2222",
+                platform="switch",
+                area_id=area_conservatory.id,
+            ),
+            "light.kitchen_light": RegistryEntry(
+                entity_id="light.kitchen_light",
+                unique_id="3333",
+                platform="light",
+                area_id=area_kitchen.id,
+            ),
+            "light.conservatory_light": RegistryEntry(
+                entity_id="light.conservatory_light",
+                unique_id="4444",
+                platform="light",
+                area_id=area_conservatory.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("light.kitchen_light"),
+            get_simple_fixed_config("light.conservatory_light"),
+            {
+                CONF_CREATE_GROUP: "Indoor lights",
+                CONF_ENTITIES: [
+                    {
+                        CONF_CREATE_GROUP: "Conservatory",
+                        CONF_INCLUDE: {
+                            CONF_AREA: "conservatory",
+                            CONF_FILTER: {
+                                CONF_DOMAIN: "light",
+                            },
+                        },
+                        CONF_IGNORE_UNAVAILABLE_STATE: True,
+                    },
+                    {
+                        CONF_CREATE_GROUP: "Kitchen",
+                        CONF_INCLUDE: {
+                            CONF_AREA: "kitchen",
+                            CONF_FILTER: {
+                                CONF_DOMAIN: "light",
+                            },
+                        },
+                        CONF_IGNORE_UNAVAILABLE_STATE: True,
+                    },
+                ],
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.indoor_lights_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.kitchen_light_power",
+        "sensor.conservatory_light_power",
+    }
+
+    group_kitchen_state = hass.states.get("sensor.kitchen_power")
+    assert group_kitchen_state
+    assert group_kitchen_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.kitchen_light_power",
+    }
+
+    group_conservatory_state = hass.states.get("sensor.conservatory_power")
+    assert group_conservatory_state
+    assert group_conservatory_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.conservatory_light_power",
+    }
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,

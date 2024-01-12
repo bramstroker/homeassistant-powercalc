@@ -12,6 +12,7 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DEVICE,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -23,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
@@ -141,6 +143,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
             CONF_NAME: "GroupA",
             CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power"],
             CONF_GROUP_ENERGY_ENTITIES: ["sensor.test1_energy"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -155,6 +158,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
                 config_entry_group_a.entry_id,
                 "464354354543",  # Non existing entry_id, should not break setup
             ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -166,6 +170,7 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
             CONF_GROUP_POWER_ENTITIES: ["sensor.test3_power"],
             CONF_GROUP_ENERGY_ENTITIES: ["sensor.test3_energy"],
             CONF_SUB_GROUPS: [config_entry_group_b.entry_id],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -200,6 +205,58 @@ async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
         "sensor.test2_power",
         "sensor.test3_power",
     }
+
+
+async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> None:
+    """When an entity is added to a subgroup all the groups referring this subgroup should be reloaded"""
+
+    config_entry_group_sub = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupSub",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "GroupMain",
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test2_power"],
+            CONF_SUB_GROUPS: [
+                config_entry_group_sub.entry_id,
+            ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    main_group_state = hass.states.get("sensor.groupmain_power")
+    assert main_group_state
+    assert main_group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_power",
+        "sensor.test2_power",
+    }
+
+    hass.config_entries.async_update_entry(
+        config_entry_group_sub,
+        data={
+            **config_entry_group_sub.data,
+            CONF_GROUP_POWER_ENTITIES: ["sensor.test1_power", "sensor.test3_power"],
+        },
+    )
+    await hass.async_block_till_done()
+
+    main_group_state = hass.states.get("sensor.groupmain_power")
+    assert main_group_state
+    assert main_group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test1_power",
+        "sensor.test2_power",
+        "sensor.test3_power",
+    }
+
 
 
 async def test_reset_service(hass: HomeAssistant) -> None:
@@ -1189,6 +1246,7 @@ async def test_unknown_member_config_entry_is_skipped_from_group(
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "group",
             CONF_GROUP_MEMBER_SENSORS: [member_entry.entry_id, "foobar"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -1209,6 +1267,7 @@ async def test_reference_existing_sensor_in_group(hass: HomeAssistant) -> None:
                         CONF_ENTITY_ID: "switch.test",
                     },
                 ],
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
             },
         ],
     )
@@ -1252,6 +1311,7 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
                         CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
                     },
                 ],
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
             },
         ],
     )
@@ -1259,6 +1319,76 @@ async def test_create_group_with_real_power_sensors(hass: HomeAssistant) -> None
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.existing_power"}
+
+
+async def test_bind_to_configured_device(
+    hass: HomeAssistant,
+    entity_reg: er.EntityRegistry,
+    device_reg: DeviceRegistry,
+) -> None:
+    """
+    Test that all powercalc created sensors are attached to same device as the source entity
+    """
+
+    # Create a device
+    config_entry = MockConfigEntry(domain="test")
+    config_entry.add_to_hass(hass)
+    device_entry = device_reg.async_get_or_create(
+        config_entry_id=config_entry.entry_id,
+        connections={("dummy", "abcdef")},
+        manufacturer="Google Inc.",
+        model="Google Home Mini",
+    )
+
+    # Create powercalc sensors
+    member_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_DEVICE: device_entry.id,
+            CONF_GROUP_MEMBER_SENSORS: [member_entry.entry_id],
+        },
+    )
+
+    # Assert that all the entities are bound to correct device
+    group_entity = entity_reg.async_get("sensor.mygroup_power")
+    assert group_entity
+    assert group_entity.device_id == device_entry.id
+
+
+async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/1922"""
+    hass.states.async_set("sensor.my_power", STATE_UNAVAILABLE)
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.my_power",
+                    },
+                ],
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.testgroup_power")
+    assert group_state
+    assert group_state.state == "0"
 
 
 async def _create_energy_group(

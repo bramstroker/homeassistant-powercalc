@@ -55,7 +55,7 @@ class LutRegistry:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_{color_mode}_{power_profile.sub_profile}"
         lookup_dict = self._lookup_dictionaries.get(cache_key)
         if lookup_dict is None:
-            defaultdict_of_dict = partial(defaultdict, dict)
+            defaultdict_of_dict = partial(defaultdict, dict)  # type: ignore[var-annotated]
             lookup_dict = defaultdict(defaultdict_of_dict)
 
             with self.get_lut_file(power_profile, color_mode) as csv_file:
@@ -134,7 +134,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 color_mode,
             )
         except LutFileNotFoundError:
-            _LOGGER.error(
+            _LOGGER.warning(
                 "%s: Lookup table not found (model: %s, color_mode: %s)",
                 entity_state.entity_id,
                 self._profile.model,

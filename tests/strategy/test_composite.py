@@ -7,6 +7,9 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -22,6 +25,29 @@ from tests.common import (
 
 
 async def test_composite(hass: HomeAssistant) -> None:
+    mock_device_registry(
+        hass,
+        {
+            "my-device-id": DeviceEntry(
+                id="my-device-id",
+                manufacturer="foo",
+                model="bar",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="my-device-id",
+            ),
+        },
+    )
+
     sensor_config = {
         CONF_ENTITY_ID: "light.test",
         CONF_COMPOSITE: [

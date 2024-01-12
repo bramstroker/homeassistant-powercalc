@@ -46,6 +46,7 @@ from .common import (
     validate_name_pattern,
 )
 from .const import (
+    CONF_AND,
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
@@ -76,6 +77,7 @@ from .const import (
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
+    CONF_OR,
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
@@ -93,6 +95,7 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
+    CONF_WILDCARD,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
@@ -149,6 +152,16 @@ _LOGGER = logging.getLogger(__name__)
 
 MAX_GROUP_NESTING_LEVEL = 5
 
+FILTER_CONFIG = vol.Schema(
+    {
+        vol.Optional(CONF_AREA): cv.string,
+        vol.Optional(CONF_GROUP): cv.entity_id,
+        vol.Optional(CONF_TEMPLATE): cv.template,
+        vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
+        vol.Optional(CONF_WILDCARD): cv.string,
+    },
+)
+
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
@@ -193,13 +206,12 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
     vol.Optional(CONF_INCLUDE): vol.Schema(
         {
-            vol.Optional(CONF_AREA): cv.string,
-            vol.Optional(CONF_GROUP): cv.entity_id,
-            vol.Optional(CONF_TEMPLATE): cv.template,
-            vol.Optional(CONF_DOMAIN): cv.string,
+            **FILTER_CONFIG.schema,
             vol.Optional(CONF_FILTER): vol.Schema(
                 {
-                    vol.Required(CONF_DOMAIN): vol.Any(cv.string, [cv.string]),
+                    **FILTER_CONFIG.schema,
+                    vol.Optional(CONF_OR): vol.All(cv.ensure_list, [FILTER_CONFIG]),
+                    vol.Optional(CONF_AND): vol.All(cv.ensure_list, [FILTER_CONFIG]),
                 },
             ),
         },
@@ -567,7 +579,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     return sensor_config
 
 
-async def create_sensors(
+async def create_sensors(  # noqa: C901
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
@@ -637,7 +649,10 @@ async def create_sensors(
 
     # Automatically add a bunch of entities by area or evaluating template
     if CONF_INCLUDE in config:
-        entities_to_add.existing.extend(resolve_include_entities(hass, config.get(CONF_INCLUDE)))  # type: ignore
+        found_entities, discoverable_entities = await resolve_include_entities(hass, config.get(CONF_INCLUDE))  # type: ignore
+        entities_to_add.existing.extend(found_entities)
+        for entity_id in discoverable_entities:
+            sensor_configs.update({entity_id: {CONF_ENTITY_ID: entity_id}})
 
     # Create sensors for each entity
     for sensor_config in sensor_configs.values():
