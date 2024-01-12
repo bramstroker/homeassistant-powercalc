@@ -372,7 +372,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self.hass,
                 )
                 unique_id = user_input.get(CONF_UNIQUE_ID)
-                if not unique_id:
+                if not unique_id and self.source_entity_id != DUMMY_ENTITY_ID:
                     source_unique_id = (
                         self.source_entity.unique_id or self.source_entity_id
                     )
