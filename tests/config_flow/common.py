@@ -86,10 +86,11 @@ async def goto_virtual_power_strategy_step(
         user_input,
     )
 
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
     # Lut has alternate flows depending on auto discovery, don't need to assert here
     if strategy != CalculationStrategy.LUT:
         assert result["step_id"] == strategy
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     return result
 
