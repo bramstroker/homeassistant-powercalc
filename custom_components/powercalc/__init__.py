@@ -239,10 +239,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 def register_services(hass: HomeAssistant) -> None:
     """Register generic services"""
 
+    async def handle_service(call):
+        await change_gui_configuration(hass, call)
+
     hass.services.register(
         DOMAIN,
         SERVICE_CHANGE_GUI_CONFIGURATION,
-        lambda call: change_gui_configuration(hass, call),
+        handle_service,
         schema=SERVICE_SCHEMA,
     )
 
