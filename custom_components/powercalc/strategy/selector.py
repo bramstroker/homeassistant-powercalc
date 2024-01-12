@@ -1,7 +1,7 @@
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
-    CONF_FIXED,
+    CONF_COMPOSITE, CONF_FIXED,
     CONF_LINEAR,
     CONF_MODE,
     CONF_PLAYBOOK,
@@ -33,7 +33,7 @@ def detect_calculation_strategy(
     if config.get(CONF_WLED):
         return CalculationStrategy.WLED
 
-    if config.get("composite"):
+    if config.get(CONF_COMPOSITE):
         return CalculationStrategy.COMPOSITE
 
     if power_profile:
