@@ -1,7 +1,8 @@
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
-    CONF_COMPOSITE, CONF_FIXED,
+    CONF_COMPOSITE,
+    CONF_FIXED,
     CONF_LINEAR,
     CONF_MODE,
     CONF_PLAYBOOK,
