@@ -19,7 +19,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.typing import ConfigType
 
@@ -239,7 +239,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 def register_services(hass: HomeAssistant) -> None:
     """Register generic services"""
 
-    async def handle_service(call):
+    async def handle_service(call: ServiceCall) -> None:
         await change_gui_configuration(hass, call)
 
     hass.services.register(
