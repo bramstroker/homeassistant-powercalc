@@ -185,14 +185,55 @@ async def test_include_domain(hass: HomeAssistant) -> None:
         ],
     )
 
-    await hass.async_start()
-    await hass.async_block_till_done()
-
     group_state = hass.states.get("sensor.lights_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.bathroom_spots_power",
         "sensor.kitchen_power",
+    }
+
+
+async def test_include_domain_list(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="1111",
+                platform="switch",
+            ),
+            "light.test2": RegistryEntry(
+                entity_id="light.test2",
+                unique_id="2222",
+                platform="light",
+            ),
+            "sensor.test3": RegistryEntry(
+                entity_id="sensor.test3",
+                unique_id="3333",
+                platform="sensor",
+            ),
+        },
+    )
+    _create_powercalc_config_entry(hass, "switch.test")
+    _create_powercalc_config_entry(hass, "light.test2")
+    _create_powercalc_config_entry(hass, "sensor.test3")
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "mygroup",
+                CONF_INCLUDE: {CONF_DOMAIN: ["switch", "light"]},
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.mygroup_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "sensor.test_power",
+        "sensor.test2_power",
     }
 
 
@@ -271,9 +312,6 @@ async def test_include_group(hass: HomeAssistant) -> None:
             },
         ],
     )
-
-    await hass.async_start()
-    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.powercalc_group_power")
     assert group_state
