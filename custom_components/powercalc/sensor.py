@@ -481,25 +481,25 @@ def register_entity_services() -> None:
 
     platform.async_register_entity_service(
         SERVICE_CALIBRATE_UTILITY_METER,
-        {vol.Required(CONF_VALUE): validate_is_number},  # type: ignore
+        {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
     )
 
     platform.async_register_entity_service(
         SERVICE_CALIBRATE_ENERGY,
-        {vol.Required(CONF_VALUE): validate_is_number},  # type: ignore
+        {vol.Required(CONF_VALUE): validate_is_number},
         "async_calibrate",
     )
 
     platform.async_register_entity_service(
         SERVICE_INCREASE_DAILY_ENERGY,
-        {vol.Required(CONF_VALUE): validate_is_number},  # type: ignore
+        {vol.Required(CONF_VALUE): validate_is_number},
         "async_increase",
     )
 
     platform.async_register_entity_service(
         SERVICE_ACTIVATE_PLAYBOOK,
-        {vol.Required("playbook_id"): cv.string},  # type: ignore
+        {vol.Required("playbook_id"): cv.string},
         "async_activate_playbook",
     )
 
@@ -511,7 +511,7 @@ def register_entity_services() -> None:
 
     platform.async_register_entity_service(
         SERVICE_SWITCH_SUB_PROFILE,
-        {vol.Required("profile"): cv.string},  # type: ignore
+        {vol.Required("profile"): cv.string},
         "async_switch_sub_profile",
     )
 
