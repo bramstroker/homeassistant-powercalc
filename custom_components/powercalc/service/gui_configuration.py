@@ -29,7 +29,7 @@ SERVICE_SCHEMA = vol.Schema(
 
 
 @bind_hass
-def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> None:
+async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> None:
     field = call.data["field"]
     value = call.data["value"]
 
