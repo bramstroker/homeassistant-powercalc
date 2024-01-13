@@ -1,0 +1,15 @@
+{
+	"measure_description": "Measured with utils/measure script",
+	"measure_method": "script",
+	"measure_device": "NOUS A1T with ESPHome 2023.12.5",
+	"name": "TRADFRI Signal Repeater",
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "network",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 0.26
+	}
+}
