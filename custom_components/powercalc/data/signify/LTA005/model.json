@@ -8,6 +8,9 @@
         "VERSION": "master"
     },
     "name": "Hue White Ambiance Filament Standard",
+    "aliases": [
+        "8719514392830"
+    ],
     "standby_power": 0.13,
     "calculation_strategy": "lut"
 }
