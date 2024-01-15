@@ -86,6 +86,11 @@ HASS_CALL_UPDATE_ENTITY_SERVICE = config(
     default=False,
     cast=bool,
 )
+LIGHT_TRANSITION_TIME = config(
+    "LIGHT_TRANSITION_TIME",
+    default=0,
+    cast=int
+)
 TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
 KASA_DEVICE_IP = config("KASA_DEVICE_IP")
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import inquirer
@@ -11,9 +12,10 @@ from .errors import LightControllerError
 
 
 class HassLightController(LightController):
-    def __init__(self, api_url: str, token: str) -> None:
+    def __init__(self, api_url: str, token: str, transition_time: int) -> None:
         self._entity_id: str | None = None
         self._model_id: str | None = None
+        self._transition_time: int = transition_time
         try:
             self.client = Client(api_url, token, cache_session=False)
             self.client.get_config()
@@ -38,6 +40,7 @@ class HassLightController(LightController):
             json = self.build_bri_json_body(**kwargs)
 
         self.client.trigger_service("light", "turn_on", **json)
+        time.sleep(self._transition_time);
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(entity_id=self._entity_id)
@@ -70,7 +73,7 @@ class HassLightController(LightController):
     def build_hs_json_body(self, bri: int, hue: int, sat: int) -> dict:
         return {
             "entity_id": self._entity_id,
-            "transition": 0,
+            "transition": self._transition_time,
             "brightness": bri,
             "hs_color": [hue / 65535 * 360, sat / 255 * 100],
         }
@@ -78,10 +81,10 @@ class HassLightController(LightController):
     def build_ct_json_body(self, bri: int, ct: int) -> dict:
         return {
             "entity_id": self._entity_id,
-            "transition": 0,
+            "transition": self._transition_time,
             "brightness": bri,
             "color_temp": ct,
         }
 
     def build_bri_json_body(self, bri: int) -> dict:
-        return {"entity_id": self._entity_id, "transition": 0, "brightness": bri}
+        return {"entity_id": self._entity_id, "transition": self._transition_time, "brightness": bri}

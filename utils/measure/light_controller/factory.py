@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger("measure")
 class LightControllerFactory:
     @staticmethod
     def hass() -> HassLightController:
-        return HassLightController(config.HASS_URL, config.HASS_TOKEN)
+        return HassLightController(config.HASS_URL, config.HASS_TOKEN, config.LIGHT_TRANSITION_TIME)
 
     @staticmethod
     def hue() -> HueLightController:
