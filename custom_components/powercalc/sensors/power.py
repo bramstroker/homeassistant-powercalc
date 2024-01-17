@@ -533,10 +533,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
 
-        if not self._ignore_unavailable_state and state.state == STATE_UNAVAILABLE:
-            return False
-
-        if state.state == STATE_UNKNOWN:
+        if not self._ignore_unavailable_state and state.state in [STATE_UNAVAILABLE, STATE_UNKNOWN]:
             return False
 
         return True
