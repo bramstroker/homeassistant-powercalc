@@ -16,6 +16,7 @@ from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
+    CONF_ALL,
     CONF_AND,
     CONF_AREA,
     CONF_FILTER,
@@ -78,6 +79,8 @@ def create_filter(
         return GroupFilter(hass, filter_config)  # type: ignore
     if filter_type == CONF_TEMPLATE:
         return TemplateFilter(hass, filter_config)  # type: ignore
+    if filter_type == CONF_ALL:
+        return NullFilter()
     if filter_type == CONF_OR:
         return create_composite_filter(filter_config, hass, FilterOperator.OR)
     if filter_type == CONF_AND:
