@@ -38,6 +38,7 @@ ENTRY_DATA_POWER_ENTITY = "_power_entity"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 
+CONF_ALL = "all"
 CONF_AREA = "area"
 CONF_AUTOSTART = "autostart"
 CONF_CALIBRATE = "calibrate"

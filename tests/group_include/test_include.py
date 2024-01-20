@@ -27,6 +27,7 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    CONF_ALL,
     CONF_AREA,
     CONF_CREATE_GROUP,
     CONF_FILTER,
@@ -962,6 +963,53 @@ async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, 
     assert group_conservatory_state
     assert group_conservatory_state.attributes.get(CONF_ENTITIES) == {
         "sensor.conservatory_light_power",
+    }
+
+
+async def test_include_all(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    mock_registry(
+        hass,
+        {
+            "switch.switch": RegistryEntry(
+                entity_id="switch.switch",
+                unique_id="1111",
+                platform="switch",
+            ),
+            "light.light": RegistryEntry(
+                entity_id="light.light",
+                unique_id="2222",
+                platform="light",
+            ),
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.existing_power",
+                unique_id="3333",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("light.light"),
+            get_simple_fixed_config("switch.switch"),
+            {
+                CONF_CREATE_GROUP: "All",
+                CONF_INCLUDE: {
+                    CONF_ALL: None,
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.all_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.switch_power",
+        "sensor.light_power",
+        "sensor.existing_power",
     }
 
 def _create_powercalc_config_entry(

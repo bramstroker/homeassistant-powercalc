@@ -46,6 +46,7 @@ from .common import (
     validate_name_pattern,
 )
 from .const import (
+    CONF_ALL,
     CONF_AND,
     CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
@@ -154,6 +155,7 @@ MAX_GROUP_NESTING_LEVEL = 5
 
 FILTER_CONFIG = vol.Schema(
     {
+        vol.Optional(CONF_ALL): None,
         vol.Optional(CONF_AREA): cv.string,
         vol.Optional(CONF_GROUP): cv.entity_id,
         vol.Optional(CONF_TEMPLATE): cv.template,
