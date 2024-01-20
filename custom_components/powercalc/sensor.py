@@ -155,7 +155,7 @@ MAX_GROUP_NESTING_LEVEL = 5
 
 FILTER_CONFIG = vol.Schema(
     {
-        vol.Optional(CONF_ALL): cv.string,
+        vol.Optional(CONF_ALL): None,
         vol.Optional(CONF_AREA): cv.string,
         vol.Optional(CONF_GROUP): cv.entity_id,
         vol.Optional(CONF_TEMPLATE): cv.template,

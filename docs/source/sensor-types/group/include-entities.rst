@@ -105,6 +105,20 @@ Template
     The template option sometimes does not work correctly because of loading order of components in HA which powercalc cannot influence.
     So it's actually discouraged to use this and should only be used when you have no other options.
 
+All
+---
+
+Include all powercalc sensors and other power sensors of the HA installation in the group.
+You can combine that with the filters mentioned below.
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: General
+          include:
+            all:
+
 Filters
 =======
 

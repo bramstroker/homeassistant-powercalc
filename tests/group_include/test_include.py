@@ -997,7 +997,7 @@ async def test_include_all(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
             {
                 CONF_CREATE_GROUP: "All",
                 CONF_INCLUDE: {
-                    CONF_ALL: {},
+                    CONF_ALL: None,
                 },
                 CONF_IGNORE_UNAVAILABLE_STATE: True,
             },
