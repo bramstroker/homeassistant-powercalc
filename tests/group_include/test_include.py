@@ -1027,8 +1027,8 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
                         CONF_CREATE_GROUP: "Include group",
                         CONF_INCLUDE: {
                             CONF_WILDCARD: "light.some*",
-                        }
-                    }
+                        },
+                    },
                 ],
                 CONF_IGNORE_UNAVAILABLE_STATE: True,
             },

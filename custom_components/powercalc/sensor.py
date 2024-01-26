@@ -865,7 +865,7 @@ class EntitiesBucket:
         self.new.extend(bucket.new)
         self.existing.extend(bucket.existing)
 
-    def all(self) -> list[Entity]:  # noqa: A003
+    def all(self) -> list[Entity]:
         """Return all entities both new and existing"""
         return self.new + self.existing
 
