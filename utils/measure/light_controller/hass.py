@@ -40,7 +40,7 @@ class HassLightController(LightController):
             json = self.build_bri_json_body(**kwargs)
 
         self.client.trigger_service("light", "turn_on", **json)
-        time.sleep(self._transition_time);
+        time.sleep(self._transition_time)
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(entity_id=self._entity_id)
