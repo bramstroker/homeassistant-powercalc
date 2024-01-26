@@ -56,3 +56,11 @@ Contributing
 
    contributing/measure
 
+Community
+*********
+
+.. toctree::
+   :maxdepth: 1
+
+   community/tutorials
+
