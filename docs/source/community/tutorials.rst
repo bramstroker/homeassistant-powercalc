@@ -50,3 +50,7 @@ Blog posts
 - https://seanblanchfield.com/2022/02/virtual-energy-meters-with-powercalc (English)
 - https://roenning.net/?p=654 (English)
 - https://www.teknikihemmet.se/2022/04/energiforbrukning-pa-smarta-lampor/ (Swedish)
+
+.. note::
+
+Did you also make a Youtube video or textual tutorial please let me in discussions section and I'll happily include it here.
