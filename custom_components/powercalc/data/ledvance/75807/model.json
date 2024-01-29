@@ -9,5 +9,5 @@
         "VERSION": "v1.10.0:docker"
     },
     "name": "SYLVANIA Wifi LED Smart A19 RGBW Color (2000K)",
-    "standby_power": 0
+    "standby_power": 0.50
 }
