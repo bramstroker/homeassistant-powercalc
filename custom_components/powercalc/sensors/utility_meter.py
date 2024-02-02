@@ -185,6 +185,8 @@ async def create_utility_meter(
         params["cron_pattern"] = None
     if "periodically_resetting" in signature.parameters:
         params["periodically_resetting"] = False
+    if "sensor_always_available" in signature.parameters:
+        params["sensor_always_available"] = False
 
     utility_meter = VirtualUtilityMeter(**params)
     utility_meter.rounding_digits = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)  # type: ignore
