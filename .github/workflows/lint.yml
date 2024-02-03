@@ -10,7 +10,7 @@ on:
       - '**.py'
 
 env:
-  POETRY_VERSION: 1.5.1
+  POETRY_VERSION: 1.7.1
 
 jobs:
   mypy:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Load cached Poetry installation
         id: cached-poetry
         uses: actions/cache@v3

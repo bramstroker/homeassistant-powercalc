@@ -16,9 +16,9 @@ classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
-requires-python = ">=3.11.0"
+requires-python = ">=3.12.0"
 dependencies = ["homeassistant"]
 
 [tool.pytest.ini_options]
@@ -31,7 +31,7 @@ profile = "black"
 multi_line_output = 3
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
@@ -94,7 +94,7 @@ psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = ">=3.12,<3.13"
 
 [build-system]
 requires = ["poetry-core"]

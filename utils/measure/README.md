@@ -37,7 +37,7 @@ To update to the latest version of the script:
 Use this installation method when the docker method is not working for you or you want to do any development on the script.
 
 **Prerequisites:**
-- Make sure you have Python 3 running on your system. Version 3.11 is recommended.
+- Make sure you have Python 3 running on your system. Version 3.12 is recommended.
 - Install poetry. `curl -sSL https://install.python-poetry.org | python3 -` or see https://python-poetry.org/docs/
 
 Poetry allows you to create virtual environment and manage dependencies.

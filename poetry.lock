@@ -296,12 +296,10 @@ files = [
 ]
 
 [package.dependencies]
-bleak-winrt = {version = ">=1.2.0,<2.0.0", markers = "platform_system == \"Windows\" and python_version < \"3.12\""}
 dbus-fast = {version = ">=1.83.0,<3", markers = "platform_system == \"Linux\""}
 pyobjc-core = {version = ">=9.2,<10.0", markers = "platform_system == \"Darwin\""}
 pyobjc-framework-CoreBluetooth = {version = ">=9.2,<10.0", markers = "platform_system == \"Darwin\""}
 pyobjc-framework-libdispatch = {version = ">=9.2,<10.0", markers = "platform_system == \"Darwin\""}
-typing-extensions = {version = ">=4.7.0", markers = "python_version < \"3.12\""}
 "winrt-Windows.Devices.Bluetooth" = {version = "2.0.0b1", markers = "platform_system == \"Windows\" and python_version >= \"3.12\""}
 "winrt-Windows.Devices.Bluetooth.Advertisement" = {version = "2.0.0b1", markers = "platform_system == \"Windows\" and python_version >= \"3.12\""}
 "winrt-Windows.Devices.Bluetooth.GenericAttributeProfile" = {version = "2.0.0b1", markers = "platform_system == \"Windows\" and python_version >= \"3.12\""}
@@ -326,27 +324,6 @@ files = [
 bleak = ">=0.21.0"
 bluetooth-adapters = {version = ">=0.15.2", markers = "platform_system == \"Linux\""}
 dbus-fast = {version = ">=1.14.0", markers = "platform_system == \"Linux\""}
-
-[[package]]
-name = "bleak-winrt"
-version = "1.2.0"
-description = "Python WinRT bindings for Bleak"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "bleak-winrt-1.2.0.tar.gz", hash = "sha256:0577d070251b9354fc6c45ffac57e39341ebb08ead014b1bdbd43e211d2ce1d6"},
-    {file = "bleak_winrt-1.2.0-cp310-cp310-win32.whl", hash = "sha256:a2ae3054d6843ae0cfd3b94c83293a1dfd5804393977dd69bde91cb5099fc47c"},
-    {file = "bleak_winrt-1.2.0-cp310-cp310-win_amd64.whl", hash = "sha256:677df51dc825c6657b3ae94f00bd09b8ab88422b40d6a7bdbf7972a63bc44e9a"},
-    {file = "bleak_winrt-1.2.0-cp311-cp311-win32.whl", hash = "sha256:9449cdb942f22c9892bc1ada99e2ccce9bea8a8af1493e81fefb6de2cb3a7b80"},
-    {file = "bleak_winrt-1.2.0-cp311-cp311-win_amd64.whl", hash = "sha256:98c1b5a6a6c431ac7f76aa4285b752fe14a1c626bd8a1dfa56f66173ff120bee"},
-    {file = "bleak_winrt-1.2.0-cp37-cp37m-win32.whl", hash = "sha256:623ac511696e1f58d83cb9c431e32f613395f2199b3db7f125a3d872cab968a4"},
-    {file = "bleak_winrt-1.2.0-cp37-cp37m-win_amd64.whl", hash = "sha256:13ab06dec55469cf51a2c187be7b630a7a2922e1ea9ac1998135974a7239b1e3"},
-    {file = "bleak_winrt-1.2.0-cp38-cp38-win32.whl", hash = "sha256:5a36ff8cd53068c01a795a75d2c13054ddc5f99ce6de62c1a97cd343fc4d0727"},
-    {file = "bleak_winrt-1.2.0-cp38-cp38-win_amd64.whl", hash = "sha256:810c00726653a962256b7acd8edf81ab9e4a3c66e936a342ce4aec7dbd3a7263"},
-    {file = "bleak_winrt-1.2.0-cp39-cp39-win32.whl", hash = "sha256:dd740047a08925bde54bec357391fcee595d7b8ca0c74c87170a5cbc3f97aa0a"},
-    {file = "bleak_winrt-1.2.0-cp39-cp39-win_amd64.whl", hash = "sha256:63130c11acfe75c504a79c01f9919e87f009f5e742bfc7b7a5c2a9c72bf591a7"},
-]
 
 [[package]]
 name = "bluetooth-adapters"
@@ -3386,5 +3363,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.11,<3.13"
-content-hash = "1fd973cebf68048ab74d09d1fa501c89e2d59105ea0eeeb57a7fb84115986892"
+python-versions = ">=3.12,<3.13"
+content-hash = "1f4cb39f748e472ccf199d9716d9cc80b6713e7f3260b6baee69ac298acf2c17"
