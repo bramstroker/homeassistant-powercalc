@@ -12,7 +12,6 @@ from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    mock_area_registry,
     mock_device_registry,
     mock_registry,
 )
@@ -24,6 +23,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
+from tests.common import mock_area_registry
 
 
 @pytest.fixture(autouse=True)

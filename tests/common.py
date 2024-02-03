@@ -29,6 +29,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+import homeassistant.helpers.area_registry as ar
 
 
 async def create_mock_light_entity(
@@ -178,6 +179,30 @@ async def create_mocked_virtual_power_sensor_entry(
     assert await hass.config_entries.async_setup(config_entry.entry_id)
     await hass.async_block_till_done()
     return config_entry
+
+
+def mock_area_registry(
+    hass: HomeAssistant, mock_entries: dict[str, ar.AreaEntry] | None = None
+) -> ar.AreaRegistry:
+    """Mock the Area Registry.
+
+    This should only be used if you need to mock/re-stage a clean mocked
+    area registry in your current hass object. It can be useful to,
+    for example, pre-load the registry with items.
+
+    This mock will thus replace the existing registry in the running hass.
+
+    If you just need to access the existing registry, use the `area_registry`
+    fixture instead.
+    """
+    registry = ar.AreaRegistry(hass)
+    items = ar.AreaRegistryItems()
+    items.data = mock_entries or {}
+    registry.areas = items
+    registry._area_data = items.data
+
+    hass.data[ar.DATA_REGISTRY] = registry
+    return registry
 
 
 def assert_entity_state(
