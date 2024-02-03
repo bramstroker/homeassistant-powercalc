@@ -21,7 +21,7 @@ from homeassistant.helpers.typing import StateType
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
-    CONF_UTILITY_METER_OFFSET,
+    CONF_IGNORE_UNAVAILABLE_STATE, CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
@@ -186,7 +186,7 @@ async def create_utility_meter(
     if "periodically_resetting" in signature.parameters:
         params["periodically_resetting"] = False
     if "sensor_always_available" in signature.parameters:
-        params["sensor_always_available"] = False
+        params["sensor_always_available"] = sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) or False
 
     utility_meter = VirtualUtilityMeter(**params)
     utility_meter.rounding_digits = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)  # type: ignore
