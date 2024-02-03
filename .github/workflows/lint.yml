@@ -10,7 +10,7 @@ on:
       - '**.py'
 
 env:
-  POETRY_VERSION: 1.5.1
+  POETRY_VERSION: 1.7.1
 
 jobs:
   mypy:
