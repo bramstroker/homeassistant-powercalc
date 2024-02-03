@@ -196,10 +196,14 @@ def mock_area_registry(
     fixture instead.
     """
     registry = ar.AreaRegistry(hass)
-    items = ar.AreaRegistryItems()
-    items.data = mock_entries or {}
-    registry.areas = items
-    registry._area_data = items.data  # noqa: SLF001
+
+    try:
+        items = ar.AreaRegistryItems()
+        items.data = mock_entries or {}
+        registry.areas = items
+        registry._area_data = items.data  # noqa: SLF001
+    except AttributeError:
+        registry.areas = mock_entries or {}
 
     hass.data[ar.DATA_REGISTRY] = registry
     return registry
