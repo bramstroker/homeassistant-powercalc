@@ -1,5 +1,6 @@
 import os
 
+import homeassistant.helpers.area_registry as ar
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
 from homeassistant.components.light import ColorMode
@@ -29,7 +30,6 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-import homeassistant.helpers.area_registry as ar
 
 
 async def create_mock_light_entity(
@@ -182,7 +182,7 @@ async def create_mocked_virtual_power_sensor_entry(
 
 
 def mock_area_registry(
-    hass: HomeAssistant, mock_entries: dict[str, ar.AreaEntry] | None = None
+    hass: HomeAssistant, mock_entries: dict[str, ar.AreaEntry] | None = None,
 ) -> ar.AreaRegistry:
     """Mock the Area Registry.
 
@@ -199,7 +199,7 @@ def mock_area_registry(
     items = ar.AreaRegistryItems()
     items.data = mock_entries or {}
     registry.areas = items
-    registry._area_data = items.data
+    registry._area_data = items.data  # noqa: SLF001
 
     hass.data[ar.DATA_REGISTRY] = registry
     return registry
