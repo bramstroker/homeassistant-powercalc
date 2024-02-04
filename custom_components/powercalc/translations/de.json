@@ -11,7 +11,7 @@
             "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
             "linear_mandatory": "Sie müssen mindestens Minimale Leistung oder Kalibrierungswert angeben",
             "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
-			"linear_unsupported_domain": "Die Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Sie können jedoch die Kalibrierungsoption verwenden",
+            "linear_unsupported_domain": "Die Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Sie können jedoch die Kalibrierungsoption verwenden",
             "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
             "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
             "playbook_mandatory": "Sie müssen mindestens ein Playbook angeben",
@@ -21,6 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Utilitymeter erstellen",
                     "name": "Name",
                     "on_time": "Dauer",
                     "start_time": "Startzeit",
@@ -53,6 +54,7 @@
             "group": {
                 "data": {
                     "area": "Bereich",
+                    "device": "Gerät",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "group_member_sensors": "Mitglied powercalc sensors",
@@ -64,6 +66,7 @@
                 },
                 "data_description": {
                     "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
+                    "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
                     "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
@@ -106,7 +109,7 @@
                 "data": {
                     "model": "Modelnummer"
                 },
-                "description": "Wählen Sie das Gerätemodell",
+                "description": "Wählen Sie das Gerätemodell. Siehe in der [list]({supported_models_link}) der unterstützten Modelle für weitere Informationen.",
                 "title": "Modelnummer Konfiguration"
             },
             "playbook": {
@@ -128,12 +131,14 @@
                     "energy_integration_method": "Integrations/Summierungs-Methode",
                     "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
                     "multiply_factor": "Multiplikationsfaktor",
+                    "multiply_factor_standby": "Multiplikationsfaktor Standby",
                     "unavailable_power": "Leistung im Status 'nicht verfügbar'"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
                     "ignore_unavailable_state": "Schalten Sie diese Einstellung um, wenn Sie möchten, dass der Leistungssensor auch dann verfügbar bleibt, wenn die Quell-Entität nicht verfügbar ist",
                     "multiply_factor": "Multipliziert die berechnete Leistung mit diesem Faktor. Kann für Licht-Gruppen nützlich sein",
+                    "multiply_factor_standby": "ob der Multiplikationsfaktor auch auf die Standby-Leistung angewendet werden soll",
                     "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist"
                 },
                 "description": "Die folgenden Optionen sind für die erweiterte Powercalc-Konfiguration gedacht. Die meisten Benutzer werden diese Optionen nicht verwenden, so dass Sie diese überspringen können",
@@ -229,6 +234,7 @@
                     "calibrate": "Kalibrierungswerte",
                     "create_energy_sensor": "Energiessensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
+                    "device": "Gerät",
                     "energy_integration_method": "Integrations/Summierungs-Methode",
                     "gamma_curve": "Gammakurve",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
@@ -239,6 +245,7 @@
                     "max_power": "Maximale Leistung",
                     "min_power": "Minimale Leistung",
                     "multiply_factor": "Multiplikationsfaktor",
+                    "multiply_factor_standby": "Multiplikationsfaktor Standby",
                     "name": "Name",
                     "on_time": "Dauer",
                     "playbooks": "Playbook",
@@ -260,11 +267,13 @@
                     "autostart": "Geben Sie an, dass ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
                     "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
                     "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20",
+                    "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
                     "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
                     "ignore_unavailable_state": "Schalten Sie diese Einstellung um, wenn Sie möchten, dass der Leistungssensor auch dann verfügbar bleibt, wenn die Quell-Entität nicht verfügbar ist",
                     "multiply_factor": "Multipliziert die berechnete Leistung mit diesem Faktor. Kann für Licht-Gruppen nützlich sein",
+                    "multiply_factor_standby": "ob der Multiplikationsfaktor auch auf die Standby-Leistung angewendet werden soll",
                     "playbooks": "Geben Sie in jeder Zeile ein Playbook ein. Beispiel\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
@@ -306,6 +315,20 @@
             },
             "name": "Utilitymeter kalibrieren"
         },
+        "change_gui_config": {
+            "description": "Batch-Änderung der Konfiguration aller Powercalc-Konfigurationseinträge",
+            "fields": {
+                "field": {
+                    "description": "Das zu ändernde Feld",
+                    "name": "Wert"
+                },
+                "value": {
+                    "description": "Der Wert, den das Feld erhalten soll",
+                    "name": "Wert"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
         "increase_daily_energy": {
             "description": "Erhöht den Sensor um einen bestimmten Wert.",
             "fields": {
@@ -323,6 +346,16 @@
         "stop_playbook": {
             "description": "Stoppe aktuell aktive Playbooks.",
             "name": "Stoppe Playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Einige Profile in der Bibliothek haben verschiedene Unterprofile. Mit diesem Dienst können Sie zu einem anderen Profil wechseln.",
+            "fields": {
+                "profile": {
+                    "name": "Unterprofil",
+                    "description": "Definieren eines der möglichen Unterprofile"
+                }
+            },
+            "name": "Unterprofil wechseln"
         }
     }
 }
