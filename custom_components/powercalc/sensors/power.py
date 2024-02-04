@@ -188,7 +188,7 @@ async def create_virtual_power_sensor(
             DOMAIN
         ][DATA_CALCULATOR_FACTORY]
 
-        standby_power = Decimal(0)
+        standby_power: Template | Decimal = Decimal(0)
         standby_power_on = Decimal(0)
         if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
             if sensor_config.get(CONF_STANDBY_POWER) is not None:
@@ -464,7 +464,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
 
         @callback
-        def async_update(event_time: datetime | None = None) -> None:
+        def async_update(__: datetime | None = None) -> None:
             """Update the entity."""
             self.async_schedule_update_ha_state(True)
 
