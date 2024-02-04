@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.10.0:docker"
     },
-    "name": "Sengled Smart LED Extra Bright Soft White A19 Bulb",
+    "name": "Smart LED Extra Bright Soft White A19 Bulb",
     "standby_power": 0.3
 }
