@@ -226,7 +226,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         _LOGGER.debug("%s: Restoring state: %s", self.entity_id, self._state)
 
         @callback
-        def refresh(now: datetime) -> None:
+        def refresh(__: datetime) -> None:
             """Update the energy sensor state."""
             delta = self.calculate_delta(self._update_frequency)
             if delta > 0:
