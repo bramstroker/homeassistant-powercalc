@@ -221,7 +221,7 @@
             "group_mandatory": "Musisz zdefiniować przynajmniej podgrupy lub encje mocy i energii",
             "linear_mandatory": "Musisz dostarczyć co najmniej jedno z: Maksymalna moc lub Kalibracja",
             "linear_min_higher_as_max": "Maksymalna moc nie może być mniejsza niż Minimalna moc",
-            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
+            "linear_unsupported_domain": "Domena encji nie jest obsługiwana w trybie liniowym. Musi być jedną z: 'fan', 'light' lub 'mediaplayer'. Możesz jednak użyć opcji kalibracji",
             "unknown": "Wystąpił nieznany błąd, sprawdź logi, aby uzyskać dodatkowe informacje"
         },
         "step": {
