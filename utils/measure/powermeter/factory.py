@@ -13,6 +13,7 @@ from .powermeter import PowerMeter
 from .shelly import ShellyPowerMeter
 from .tasmota import TasmotaPowerMeter
 from .tuya import TuyaPowerMeter
+from .mystrom import MyStromPowerMeter
 
 _LOGGER = logging.getLogger("measure")
 
@@ -51,6 +52,10 @@ class PowerMeterFactory:
         return TasmotaPowerMeter(config.TASMOTA_DEVICE_IP)
 
     @staticmethod
+    def mystrom() -> MyStromPowerMeter:
+        return MyStromPowerMeter(config.MYSTROM_DEVICE_IP)
+
+    @staticmethod
     def tuya() -> TuyaPowerMeter:
         return TuyaPowerMeter(
             config.TUYA_DEVICE_ID,
@@ -70,6 +75,7 @@ class PowerMeterFactory:
             PowerMeterType.TASMOTA: self.tasmota,
             PowerMeterType.TUYA: self.tuya,
             PowerMeterType.DUMMY: self.dummy,
+            PowerMeterType.MYSTROM: self.mystrom,
         }
         factory = factories.get(config.SELECTED_POWER_METER)
         if factory is None:
