@@ -10,3 +10,4 @@ class PowerMeterType(str, Enum):
     SHELLY = "shelly"
     TASMOTA = "tasmota"
     TUYA = "tuya"
+    MYSTROM = "mystrom"
