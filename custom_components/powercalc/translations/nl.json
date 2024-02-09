@@ -24,7 +24,7 @@
                     "create_utility_meters": "Creëer utiliteit meters",
                     "name": "Naam",
                     "on_time": "Tijd aan per dag",
-                    "start_time": "Start time",
+                    "start_time": "Begintijd",
                     "unique_id": "Uniek id",
                     "unit_of_measurement": "Eenheid",
                     "update_frequency": "Update frequentie",
@@ -154,8 +154,8 @@
                     "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc.",
                     "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling"
                 },
-                "description": "Currently specific settings can only be configured globally",
-                "title": "Create an energy sensor for an existing power sensor"
+                "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
+                "title": "Maak een energiesensor voor een bestaande stroomsensor"
             },
             "sub_profile": {
                 "data": {
@@ -166,7 +166,7 @@
             },
             "user": {
                 "data": {
-                    "sensor_type": "Sensor type"
+                    "sensor_type": "Type sensor"
                 },
                 "menu_options": {
                     "daily_energy": "Dagelijkse energie",
@@ -201,8 +201,8 @@
             },
             "wled": {
                 "data": {
-                    "power_factor": "Power factor",
-                    "voltage": "Voltage"
+                    "power_factor": "Vermogensfactor",
+                    "voltage": "Spanning"
                 },
                 "title": "WLED configuratie"
             }
@@ -245,7 +245,7 @@
                     "max_power": "Max vermogen",
                     "min_power": "Min vermogen",
                     "multiply_factor": "Multiplicatie factor",
-                    "multiply_facto_standby": "Multiplicatie factor standby",
+                    "multiply_factor_standby": "Multiplicatie factor standby",
                     "name": "Naam",
                     "on_time": "Tijd aan per dag",
                     "playbooks": "Playbooks",
@@ -327,7 +327,7 @@
                     "name": "Waarde"
                 }
             },
-            "name": "Calibrate utility meter"
+            "name": "Kalibreer utiliteitsmeter"
         },
         "increase_daily_energy": {
             "description": "Verhoog de sensor.",

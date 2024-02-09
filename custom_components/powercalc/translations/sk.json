@@ -5,7 +5,7 @@
         },
         "error": {
             "daily_energy_mandatory": "Musíte dodať aspoň jednu šablónu hodnoty alebo hodnoty",
-	    "entity_mandatory": "Výber subjektu je potrebný pre akúkoľvek inú stratégiu, než je stratégia playbook",
+            "entity_mandatory": "Výber subjektu je potrebný pre akúkoľvek inú stratégiu, než je stratégia playbook",
             "fixed_mandatory": "Musíte dodať aspoň jednu z možností Power, Power template alebo States power",
             "fixed_states_power_only": "Táto entita môže pracovať iba s 'states_power', nie 'power'",
             "group_mandatory": "Musíte definovať aspoň podskupiny alebo silové a energetické entity",
@@ -21,7 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
-		    "create_utility_meters": "Vytvorenie meracích prístrojov",
+                    "create_utility_meters": "Vytvorenie meracích prístrojov",
                     "name": "Názov",
                     "on_time": "V čase",
                     "start_time": "Štart čas",
@@ -124,21 +124,21 @@
                     "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení"
                 },
                 "title": "Playbook konfigurácia"
-	    },
+            },
             "power_advanced": {
                 "data": {
                     "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
                     "energy_integration_method": "Metóda energetickej integrácie",
                     "ignore_unavailable_state": "Ignorovať nedostupný stav",
                     "multiply_factor": "Násobný faktor",
-		    "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
+                    "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
                     "unavailable_power": "Nedostupné napájanie"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
                     "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
                     "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
-		    "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
+                    "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav"
                 },
                 "description": "Možnosti uvedené nižšie sú pre pokročilú konfiguráciu powercalc. Väčšina používateľov to nebude používať, takže ich môžete preskočiť",
@@ -168,7 +168,7 @@
                 "data": {
                     "sensor_type": "Typ snímača"
                 },
-		"menu_options": {
+                "menu_options": {
                     "daily_energy": "Denná energia",
                     "group": "Group",
                     "menu_library": "Virtuálny výkon (knižnica)",
@@ -245,13 +245,13 @@
                     "max_power": "Max výkon",
                     "min_power": "Min výkon",
                     "multiply_factor": "Násobný faktor",
-		    "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
+                    "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
                     "name": "Názov",
                     "on_time": "V čase",
-		    "playbooks": "Playbooky",
+                    "playbooks": "Playbooky",
                     "power": "Výkon",
                     "power_template": "Výkon šablóna",
-		    "repeat": "Opakovať",
+                    "repeat": "Opakovať",
                     "standby_power": "Napájanie v pohotovostnom režime",
                     "states_power": "Výkonové stavy",
                     "sub_groups": "Podskupiny",

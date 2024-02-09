@@ -5,19 +5,23 @@
         },
         "error": {
             "daily_energy_mandatory": "Você deve fornecer pelo menos um modelo de Valor ou Valor",
+            "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
             "fixed_mandatory": "Você deve fornecer pelo menos um Power, Power template ou States power",
             "fixed_states_power_only": "Esta entidade só pode trabalhar com 'states_power' e não 'power'",
             "group_mandatory": "Você deve definir pelo menos subgrupos ou entidades de poder e energia",
             "linear_mandatory": "Você deve fornecer pelo menos um de max_power ou calibrar",
             "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
+            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
             "lut_unsupported_color_mode": "O perfil LUT não suporta um dos modos de cor da sua luz. Veja os logs para mais informações",
             "lut_wrong_domain": "Apenas entidades de luz podem usar o modo LUT",
+            "playbook_mandatory": "You need to specify at least one playbook",
             "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
         },
         "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Create utility meters",
                     "name": "Nome",
                     "on_time": "Na hora",
                     "start_time": "Hora de início",
@@ -49,6 +53,8 @@
             },
             "group": {
                 "data": {
+                    "area": "Area",
+                    "device": "Device",
                     "create_utility_meters": "Criar medidores de utilidade",
                     "group_energy_entities": "Entidades de energia adicionais",
                     "group_member_sensors": "Sensores powercalc membros",
@@ -59,6 +65,8 @@
                     "unique_id": "ID único"
                 },
                 "data_description": {
+                    "area": "Adds all powercalc sensors from the specified area",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc para incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
@@ -104,6 +112,51 @@
                 "description": "Selecione o modelo do dispositivo. Consulte a [lista]({supported_models_link}) de modelos compatíveis para obter mais informações",
                 "title": "Configuração modelo"
             },
+            "playbook": {
+                "data": {
+                    "autostart": "Autostart",
+                    "playbooks": "Playbooks",
+                    "repeat": "Repeat"
+                },
+                "data_description": {
+                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
+                    "repeat": "Toggle when you want to keep repeating the playbook after it completes"
+                },
+                "title": "Playbook config"
+            },
+            "power_advanced": {
+                "data": {
+                    "calculation_enabled_condition": "Calculation enabled condition",
+                    "energy_integration_method": "Energy integration method",
+                    "ignore_unavailable_state": "Ignore unavailable state",
+                    "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
+                    "unavailable_power": "Unavailable power"
+                },
+                "data_description": {
+                    "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+                    "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+                },
+                "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
+                "title": "Advanced options"
+            },
+            "real_power": {
+                "data": {
+                    "create_utility_meters": "Create utility meters",
+                    "entity_id": "Power sensor id",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting"
+                },
+                "description": "Currently specific settings can only be configured globally",
+                "title": "Create an energy sensor for an existing power sensor"
+            },
             "sub_profile": {
                 "data": {
                     "sub_profile": "Subperfil"
@@ -114,6 +167,13 @@
             "user": {
                 "data": {
                     "sensor_type": "Tipo de sensor"
+                },
+                "menu_options": {
+                    "daily_energy": "Daily energy",
+                    "group": "Group",
+                    "menu_library": "Virtual power (library)",
+                    "real_power": "Energy from real power sensor",
+                    "virtual_power": "Virtual power (manual)"
                 },
                 "title": "Escolha seu tipo de sensor"
             },
@@ -148,6 +208,12 @@
             }
         }
     },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
+            "title": "Powercalc YAML configuration has moved"
+        }
+    },
     "options": {
         "error": {
             "fixed_mandatory": "Você deve fornecer pelo menos um Power, Power template ou States power",
@@ -155,45 +221,141 @@
             "group_mandatory": "Você deve definir pelo menos subgrupos ou entidades de poder e energia",
             "linear_mandatory": "Você deve fornecer pelo menos um de max_power ou calibrar",
             "linear_min_higher_as_max": "A potência máxima não pode ser inferior à potência mínima",
+            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
             "unknown": "Ocorreu um erro desconhecido. Consulte os logs para obter informações adicionais"
         },
         "step": {
             "init": {
                 "data": {
+                    "area": "Area",
                     "attribute": "Atributo",
+                    "autostart": "Autostart",
+                    "calculation_enabled_condition": "Calculation enabled condition",
                     "calibrate": "Valores de calibração",
                     "create_energy_sensor": "Criar sensor de energia",
                     "create_utility_meters": "Criar medidores de utilidade",
+                    "device": "Device",
+                    "energy_integration_method": "Energy integration method",
                     "gamma_curve": "Curva gama",
                     "group_energy_entities": "Entidades de energia adicionais",
                     "group_member_sensors": "Sensores powercalc membros",
                     "group_power_entities": "Entidades de potência adicionais",
                     "hide_members": "Ocultar membros",
+                    "ignore_unavailable_state": "Ignore unavailable state",
                     "max_power": "poder maximo",
                     "min_power": "Potência mínima",
+                    "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "name": "Nome",
                     "on_time": "Na hora",
+                    "playbooks": "Playbooks",
                     "power": "Potência",
                     "power_template": "Modelo de energia",
+                    "repeat": "Repeat",
                     "standby_power": "Energia em espera",
                     "states_power": "Potência dos Estados",
                     "sub_groups": "Subgrupos",
+                    "unavailable_power": "Unavailable power",
                     "unit_of_measurement": "Unidade de medida",
                     "update_frequency": "Frequência de atualização",
                     "value": "Valor",
                     "value_template": "Modelo de valor"
                 },
                 "data_description": {
+                    "area": "Adds all powercalc sensors from the specified area",
                     "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e porcentagem para ventiladores",
+                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+                    "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
                     "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc para incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
+                    "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
+                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "O modelo será avaliado para obter o valor da potência em W",
+                    "repeat": "Toggle when you want to keep repeating the playbook after it completes",
                     "states_power": "Um par 'estado: poder' em cada linha, veja o exemplo acima",
-                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
                 }
             }
+        }
+    },
+    "services": {
+        "activate_playbook": {
+            "description": "Start execution of a playbook.",
+            "fields": {
+                "playbook_id": {
+                    "description": "Playbook identifier.",
+                    "name": "Playbook"
+                }
+            },
+            "name": "Activate playbook"
+        },
+        "calibrate_energy": {
+            "description": "Sets the energy sensor to a given kWh value.",
+            "fields": {
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate energy sensor"
+        },
+        "calibrate_utility_meter": {
+            "description": "Calibrates a utility meter sensor.",
+            "fields": {
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
+        "change_gui_config": {
+            "description": "Batch change configuration of all Powercalc config entries",
+            "fields": {
+                "field": {
+                    "description": "The field you'd like to change",
+                    "name": "Value"
+                },
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
+        "increase_daily_energy": {
+            "description": "Increases the sensor with a given amount.",
+            "fields": {
+                "value": {
+                    "description": "Amount to add to the sensor.",
+                    "name": "Value"
+                }
+            },
+            "name": "Increase daily energy sensor"
+        },
+        "reset_energy": {
+            "description": "Reset an energy sensor to zero kWh.",
+            "name": "Reset energy sensor"
+        },
+        "stop_playbook": {
+            "description": "Stop currently active playbook.",
+            "name": "Stop playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+            "fields": {
+                "profile": {
+                    "name": "Sub profile",
+                    "description": "Define one of the possible sub profiles"
+                }
+            },
+            "name": "Switch to another sub profile"
         }
     }
 }
