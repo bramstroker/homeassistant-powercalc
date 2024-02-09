@@ -5,16 +5,23 @@
         },
         "error": {
             "daily_energy_mandatory": "Trebuie să furnizați cel puțin o Valoare sau șablonul Valoare",
+            "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
             "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
             "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
             "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
             "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
-            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă"
+            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
+            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
+            "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
+            "lut_wrong_domain": "Only light entities can use the LUT mode",
+            "playbook_mandatory": "You need to specify at least one playbook",
+            "unknown": "Unknown error occured, please see the logs for additional information"
         },
         "flow_title": "{name} ({manufacturer} {model})",
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Create utility meters",
                     "name": "Nume",
                     "on_time": "Timp pornit",
                     "start_time": "Timpul de începere",
@@ -46,15 +53,23 @@
             },
             "group": {
                 "data": {
+                    "area": "Area",
+                    "device": "Device",
                     "create_utility_meters": "Creați contoare de utilitate",
                     "group_energy_entities": "Entități energetice membre",
+                    "group_member_sensors": "Member powercalc sensors",
                     "group_power_entities": "Entități de putere membre",
-                    "hide_group_members": "Ascunde membrii",
+                    "hide_members": "Hide members",
                     "name": "Nume",
                     "sub_groups": "Sub grupuri",
                     "unique_id": "ID unic"
                 },
                 "data_description": {
+                    "area": "Adds all powercalc sensors from the specified area",
+                    "device": "Add the group entities powercalc creates to an existing device",
+                    "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+                    "group_member_sensors": "Powercalc sensors to include in the group",
+                    "group_power_entities": "Additional power sensors (W) from your HA installation to include",
                     "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
                 },
                 "title": "Creați un senzor de grup"
@@ -97,9 +112,68 @@
                 "description": "Selectați modelul dispozitivului",
                 "title": "Configurare Model"
             },
+            "playbook": {
+                "data": {
+                    "autostart": "Autostart",
+                    "playbooks": "Playbooks",
+                    "repeat": "Repeat"
+                },
+                "data_description": {
+                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
+                    "repeat": "Toggle when you want to keep repeating the playbook after it completes"
+                },
+                "title": "Playbook config"
+            },
+            "power_advanced": {
+                "data": {
+                    "calculation_enabled_condition": "Calculation enabled condition",
+                    "energy_integration_method": "Energy integration method",
+                    "ignore_unavailable_state": "Ignore unavailable state",
+                    "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
+                    "unavailable_power": "Unavailable power"
+                },
+                "data_description": {
+                    "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+                    "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
+                },
+                "description": "The options below are for advanced powercalc configuration. Most users will not use this so you may skip these",
+                "title": "Advanced options"
+            },
+            "real_power": {
+                "data": {
+                    "create_utility_meters": "Create utility meters",
+                    "entity_id": "Power sensor id",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting"
+                },
+                "description": "Currently specific settings can only be configured globally",
+                "title": "Create an energy sensor for an existing power sensor"
+            },
+            "sub_profile": {
+                "data": {
+                    "sub_profile": "Sub profile"
+                },
+                "description": "This model has multiple sub profiles. Select one that suites your device",
+                "title": "Sub profile config"
+            },
             "user": {
                 "data": {
                     "sensor_type": "Tip senzor"
+                },
+                "menu_options": {
+                    "daily_energy": "Daily energy",
+                    "group": "Group",
+                    "menu_library": "Virtual power (library)",
+                    "real_power": "Energy from real power sensor",
+                    "virtual_power": "Virtual power (manual)"
                 },
                 "title": "Alegeți tipul dvs. de senzor"
             },
@@ -108,6 +182,7 @@
                     "create_energy_sensor": "Creați un senzor de energie",
                     "create_utility_meters": "Creați contoare de utilitate",
                     "entity_id": "Entitatea sursă",
+                    "group": "Add to group",
                     "mode": "Strategia de calcul",
                     "name": "Nume",
                     "standby_power": "Putere in Standby",
@@ -133,47 +208,154 @@
             }
         }
     },
+    "issues": {
+        "deprecated_platform_yaml": {
+            "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
+            "title": "Powercalc YAML configuration has moved"
+        }
+    },
     "options": {
         "error": {
             "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
             "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
             "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
             "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
-            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă"
+            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
+            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
+            "unknown": "Unknown error occured, please see the logs for additional information"
         },
         "step": {
             "init": {
                 "data": {
+                    "area": "Area",
                     "attribute": "Atribut",
+                    "autostart": "Autostart",
+                    "calculation_enabled_condition": "Calculation enabled condition",
                     "calibrate": "Valori de calibrare",
                     "create_energy_sensor": "Creați un senzor de energie",
                     "create_utility_meters": "Creați contoare de utilitate",
+                    "device": "Device",
+                    "energy_integration_method": "Energy integration method",
                     "gamma_curve": "Curba gamma",
                     "group_energy_entities": "Entități energetice membre",
+                    "group_member_sensors": "Member powercalc sensors",
                     "group_power_entities": "Entități de putere membre",
                     "hide_members": "Ascunde membrii",
+                    "ignore_unavailable_state": "Ignore unavailable state",
                     "max_power": "Putere maxima",
                     "min_power": "Putere minimă",
+                    "multiply_factor": "Multiply factor",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "name": "Nume",
                     "on_time": "Timp pornit",
+                    "playbooks": "Playbooks",
                     "power": "Putere",
                     "power_template": "Șablon de putere",
+                    "repeat": "Repeat",
                     "standby_power": "Putere in Standby",
                     "states_power": "Putere de stare",
                     "sub_groups": "Subgrupuri",
+                    "unavailable_power": "Unavailable power",
                     "unit_of_measurement": "Unitate de măsură",
                     "update_frequency": "Frecvență de actualizare",
                     "value": "Valoare",
                     "value_template": "șablon valoare"
                 },
                 "data_description": {
+                    "area": "Adds all powercalc sensors from the specified area",
                     "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
+                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+                    "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
                     "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20",
+                    "device": "Add the group entities powercalc creates to an existing device",
+                    "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+                    "group_member_sensors": "Powercalc sensors to include in the group",
+                    "group_power_entities": "Additional power sensors (W) from your HA installation to include",
+                    "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
+                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
+                    "repeat": "Toggle when you want to keep repeating the playbook after it completes",
                     "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus",
-                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
+                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
+                    "unavailable_power": "Power in W to record when the source entity has an unavailable state"
                 }
             }
+        }
+    },
+    "services": {
+        "activate_playbook": {
+            "description": "Start execution of a playbook.",
+            "fields": {
+                "playbook_id": {
+                    "description": "Playbook identifier.",
+                    "name": "Playbook"
+                }
+            },
+            "name": "Activate playbook"
+        },
+        "calibrate_energy": {
+            "description": "Sets the energy sensor to a given kWh value.",
+            "fields": {
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate energy sensor"
+        },
+        "calibrate_utility_meter": {
+            "description": "Calibrates a utility meter sensor.",
+            "fields": {
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
+        "change_gui_config": {
+            "description": "Batch change configuration of all Powercalc config entries",
+            "fields": {
+                "field": {
+                    "description": "The field you'd like to change",
+                    "name": "Value"
+                },
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
+        "increase_daily_energy": {
+            "description": "Increases the sensor with a given amount.",
+            "fields": {
+                "value": {
+                    "description": "Amount to add to the sensor.",
+                    "name": "Value"
+                }
+            },
+            "name": "Increase daily energy sensor"
+        },
+        "reset_energy": {
+            "description": "Reset an energy sensor to zero kWh.",
+            "name": "Reset energy sensor"
+        },
+        "stop_playbook": {
+            "description": "Stop currently active playbook.",
+            "name": "Stop playbook"
+        },
+        "switch_sub_profile": {
+            "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+            "fields": {
+                "profile": {
+                    "name": "Sub profile",
+                    "description": "Define one of the possible sub profiles"
+                }
+            },
+            "name": "Switch to another sub profile"
         }
     }
 }

@@ -21,6 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
+                    "create_utility_meters": "Create utility meters",
                     "name": "Nome",
                     "on_time": "Na hora",
                     "start_time": "Hora de início",
@@ -53,6 +54,7 @@
             "group": {
                 "data": {
                     "area": "Área",
+                    "device": "Device",
                     "create_utility_meters": "Criar medidores de utilidade",
                     "group_energy_entities": "Entidades de energia adicionais",
                     "group_member_sensors": "Membros do sensor powercalc",
@@ -64,6 +66,7 @@
                 },
                 "data_description": {
                     "area": "Adiciona todos os sensores powercalc à área especificada",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc para incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
@@ -128,12 +131,14 @@
                     "energy_integration_method": "Método de integração de energia",
                     "ignore_unavailable_state": "Ignorar para estado indisponível",
                     "multiply_factor": "Factor de multiplicação",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "unavailable_power": "Potência indisponível"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar 'true' ou 1, caso contrário retornará 0",
                     "ignore_unavailable_state": "Ligue esta opção para que o sensor de potência continue disponível mesmo que a entidade fonte fique indisponível",
                     "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível"
                 },
                 "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
@@ -229,6 +234,7 @@
                     "calibrate": "Valores de calibração",
                     "create_energy_sensor": "Criar sensor de energia",
                     "create_utility_meters": "Criar medidores de utilidade",
+                    "device": "Device",
                     "energy_integration_method": "Método de cálculo de integração de energia",
                     "gamma_curve": "Curva gama",
                     "group_energy_entities": "Entidades de energia adicionais",
@@ -239,6 +245,7 @@
                     "max_power": "Potência máxima",
                     "min_power": "Potência mínima",
                     "multiply_factor": "Factor de multiplicação",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "name": "Nome",
                     "on_time": "Na hora",
                     "playbooks": "Gravações",
@@ -260,11 +267,13 @@
                     "autostart": "Instruir para iniciar uma Sequência automaticamente quando o HA iniciar. Ex: 'program1'",
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar true ou 1, caso contrário retornará 0",
                     "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc a incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
                     "ignore_unavailable_state": "Ligue esta opção para o sensor continuar disponível mesmo que a entidade fonte fique indisponível",
                     "multiply_factor": "Multiplica a potência calculada por este factor. Pode ser útil para grupos de luzes",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "playbooks": "Introduza uma Sequência em cada linha. Examplo\n\nprogram1: washing_machine/program1.csv",
                     "power_template": "O modelo será avaliado para obter o valor da potência em W",
                     "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
@@ -306,6 +315,20 @@
             },
             "name": "Calibrar medidor de utilidade"
         },
+        "change_gui_config": {
+            "description": "Batch change configuration of all Powercalc config entries",
+            "fields": {
+                "field": {
+                    "description": "The field you'd like to change",
+                    "name": "Value"
+                },
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
+        },
         "increase_daily_energy": {
             "description": "Aumenta o valor do sensor por um valor.",
             "fields": {
@@ -323,6 +346,16 @@
         "stop_playbook": {
             "description": "Parar Sequência activa.",
             "name": "Parar Sequência"
+        },
+        "switch_sub_profile": {
+            "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+            "fields": {
+                "profile": {
+                    "name": "Sub profile",
+                    "description": "Define one of the possible sub profiles"
+                }
+            },
+            "name": "Switch to another sub profile"
         }
     }
 }

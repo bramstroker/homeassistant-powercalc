@@ -54,6 +54,7 @@
             "group": {
                 "data": {
                     "area": "Zone",
+                    "device": "Device",
                     "create_utility_meters": "Créer des compteurs d'électricité",
                     "group_energy_entities": "Entités énergétiques supplémentaires",
                     "group_member_sensors": "Membres des capteurs powercalc",
@@ -65,6 +66,7 @@
                 },
                 "data_description": {
                     "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
@@ -129,12 +131,14 @@
                     "energy_integration_method": "Méthode d'intégration énergétique",
                     "ignore_unavailable_state": "Ignorer l'état indisponible",
                     "multiply_factor": "Facteur de multiplication",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "unavailable_power": "Alimentation indisponible"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
                 },
                 "description": "Les options ci-dessous concernent la configuration avancée de powercalc. La plupart des utilisateurs ne l'utiliseront pas, vous pouvez donc les ignorer",
@@ -230,6 +234,7 @@
                     "calibrate": "Valeurs d'étalonnage",
                     "create_energy_sensor": "Créer un capteur d'énergie",
                     "create_utility_meters": "Créer un compteur d'électricité",
+                    "device": "Device",
                     "energy_integration_method": "Méthode d'intégration énergétique",
                     "gamma_curve": "Courbe gamma",
                     "group_energy_entities": "Entités d'énergies supplémentaires",
@@ -240,6 +245,7 @@
                     "max_power": "Puissance Max",
                     "min_power": "Puissance Min",
                     "multiply_factor": "Facteur de multiplication",
+                    "multiply_factor_standby": "Multiply factor standby",
                     "name": "Nom",
                     "on_time": "Temps de fonctionnement",
                     "playbooks": "Playbooks",
@@ -261,11 +267,13 @@
                     "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
                     "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
                     "calibrate": "Mettez une valeur d'étalonnage sur chaque ligne. Exemple\n\n1 : 20",
+                    "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
+                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogramme1 : lave-linge/programme1.csv",
                     "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",
                     "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
@@ -306,6 +314,20 @@
                 }
             },
             "name": "Étalonner le compteur d'électricité"
+        },
+        "change_gui_config": {
+            "description": "Batch change configuration of all Powercalc config entries",
+            "fields": {
+                "field": {
+                    "description": "The field you'd like to change",
+                    "name": "Value"
+                },
+                "value": {
+                    "description": "The value to set.",
+                    "name": "Value"
+                }
+            },
+            "name": "Calibrate utility meter"
         },
         "increase_daily_energy": {
             "description": "Augmente le capteur d'une quantité donnée.",
