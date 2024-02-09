@@ -1,7 +1,6 @@
 name: Crowdin download
 
 on:
-  push:
   workflow_dispatch:
 
 permissions: write-all

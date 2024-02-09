@@ -2,9 +2,9 @@ name: Crowdin upload
 
 on:
   push:
-#    paths:
-#      - custom_components/powercalc/translations/*
-    branches: [ master, crowdin_action ]
+    paths:
+      - custom_components/powercalc/translations/*
+    branches: [ master ]
 
 jobs:
   synchronize-with-crowdin:
