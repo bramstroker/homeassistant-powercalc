@@ -327,7 +327,7 @@
                     "name": "Waarde"
                 }
             },
-            "name": "Change GUI config"
+            "name": "GUI configuratie wijzigen"
         },
         "increase_daily_energy": {
             "description": "Verhoog de sensor.",
