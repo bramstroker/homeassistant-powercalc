@@ -327,7 +327,7 @@
                     "name": "Värde"
                 }
             },
-            "name": "Calibrate utility meter"
+            "name": "Change GUI config"
         },
         "increase_daily_energy": {
             "description": "Ökar sensorn med det angivna värdet.",
