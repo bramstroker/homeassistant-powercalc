@@ -21,7 +21,7 @@
         "step": {
             "daily_energy": {
                 "data": {
-                    "create_utility_meters": "Create utility meters",
+                    "create_utility_meters": "Skapa bruksmätare",
                     "name": "Namn",
                     "on_time": "Igång tid",
                     "start_time": "Starttid",
@@ -53,7 +53,7 @@
             },
             "group": {
                 "data": {
-                    "area": "Area",
+                    "area": "Område",
                     "device": "Enhet",
                     "create_utility_meters": "Skapa bruksmätare",
                     "group_energy_entities": "Medlem energi entiteter",
@@ -114,7 +114,7 @@
             },
             "playbook": {
                 "data": {
-                    "autostart": "Autostart",
+                    "autostart": "Starta automatiskt",
                     "playbooks": "Playbooks",
                     "repeat": "Repetera"
                 },
@@ -131,7 +131,7 @@
                     "energy_integration_method": "Energi integrations-metod",
                     "ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
                     "multiply_factor": "Multipliceringsfaktor",
-                    "multiply_factor_standby": "Multiply factor standby",
+                    "multiply_factor_standby": "Multipliceringsfaktor för standby",
                     "unavailable_power": "Otillgänglig effekt"
                 },
                 "data_description": {
@@ -170,7 +170,7 @@
                 },
                 "menu_options": {
                     "daily_energy": "Daglig energi",
-                    "group": "Group",
+                    "group": "Grupp",
                     "menu_library": "Virtuell effekt (bibliotek)",
                     "real_power": "Energi från riktig effektsensor",
                     "virtual_power": "Virtuell effekt (manuell)"
@@ -327,7 +327,7 @@
                     "name": "Värde"
                 }
             },
-            "name": "Change GUI config"
+            "name": "Ändra GUI-konfiguration"
         },
         "increase_daily_energy": {
             "description": "Ökar sensorn med det angivna värdet.",
