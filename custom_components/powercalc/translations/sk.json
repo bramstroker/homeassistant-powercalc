@@ -327,7 +327,7 @@
                     "name": "Hodnota"
                 }
             },
-            "name": "Kalibrujte elektromer"
+            "name": "Change GUI config"
         },
         "increase_daily_energy": {
             "description": "Zväčší snímač o danú hodnotu.",

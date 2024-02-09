@@ -327,7 +327,7 @@
                     "name": "Wartość"
                 }
             },
-            "name": "Kalibracja licznika mediów"
+            "name": "Change GUI config"
         },
         "increase_daily_energy": {
             "description": "Zwiększa sensor o zadaną wartość.",

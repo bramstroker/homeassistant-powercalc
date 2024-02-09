@@ -327,7 +327,7 @@
                     "name": "Waarde"
                 }
             },
-            "name": "Kalibreer utiliteitsmeter"
+            "name": "Change GUI config"
         },
         "increase_daily_energy": {
             "description": "Verhoog de sensor.",
