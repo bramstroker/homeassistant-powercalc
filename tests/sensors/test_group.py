@@ -24,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.util import dt
@@ -37,7 +38,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
-    CONF_CREATE_GROUP,
+    CONF_AREA, CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_ID,
@@ -1390,6 +1391,64 @@ async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
     assert group_state
     assert group_state.state == "0"
 
+
+async def test_prevent_duplicate_calculation(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    """https://github.com/bramstroker/homeassistant-powercalc/issues/2034"""
+    area = area_reg.async_get_or_create("Living room")
+    await hass.async_block_till_done()
+
+    mock_registry(
+        hass,
+        {
+            "light.a": RegistryEntry(
+                entity_id="light.a",
+                unique_id="1111",
+                platform="light",
+                area_id=area.id,
+            ),
+            "light.b": RegistryEntry(
+                entity_id="light.b",
+                unique_id="2222",
+                platform="light",
+                area_id=area.id,
+            ),
+        },
+    )
+
+    member_entry_a = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.a",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+    member_entry_b = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.b",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+        },
+    )
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "MyGroup",
+            CONF_AREA: area.id,
+            CONF_GROUP_MEMBER_SENSORS: [member_entry_a.entry_id, member_entry_b.entry_id],
+        },
+    )
+
+    hass.states.async_set("light.a", STATE_ON)
+    hass.states.async_set("light.b", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.mygroup_power").state == "100.00"
 
 async def _create_energy_group(
     hass: HomeAssistant,
