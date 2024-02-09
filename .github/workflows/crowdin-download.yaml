@@ -1,4 +1,4 @@
-name: Crowdin Action
+name: Crowdin download
 
 on:
   workflow_dispatch:
