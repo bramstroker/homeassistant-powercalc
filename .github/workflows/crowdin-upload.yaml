@@ -5,6 +5,7 @@ on:
     paths:
       - custom_components/powercalc/translations/*
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   synchronize-with-crowdin:
