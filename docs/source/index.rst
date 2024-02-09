@@ -55,6 +55,7 @@ Contributing
    :maxdepth: 1
 
    contributing/measure
+   contributing/translating
 
 Community
 *********
