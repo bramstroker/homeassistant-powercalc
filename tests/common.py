@@ -156,15 +156,27 @@ def get_test_config_dir() -> str:
     )
 
 
+async def setup_config_entry(hass: HomeAssistant, entry_data: dict, unique_id: str | None = None) -> MockConfigEntry:
+    """Setup and add a Powercalc config entry"""
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data=entry_data,
+        unique_id=unique_id
+    )
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    return config_entry
+
+
 async def create_mocked_virtual_power_sensor_entry(
     hass: HomeAssistant,
     name: str,
-    unique_id: str | None,
+    unique_id: str | None = None,
 ) -> config_entries.ConfigEntry:
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        unique_id=unique_id,
-        data={
+    return await setup_config_entry(
+        hass,
+        {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_UNIQUE_ID: unique_id,
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
@@ -172,13 +184,8 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
         },
-        title=name,
+        unique_id
     )
-
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-    return config_entry
 
 
 def mock_area_registry(
