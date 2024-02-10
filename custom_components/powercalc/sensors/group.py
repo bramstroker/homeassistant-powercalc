@@ -175,9 +175,7 @@ async def create_group_sensors_from_config_entry(
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.entry_id
 
-    power_sensor_ids: set[str] = set(
-        await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER),
-    )
+    power_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
             hass,
@@ -187,9 +185,7 @@ async def create_group_sensors_from_config_entry(
         )
         group_sensors.append(power_sensor)
 
-    energy_sensor_ids: set[str] = set(
-        await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY),
-    )
+    energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
     if energy_sensor_ids:
         energy_sensor = create_grouped_energy_sensor(
             hass,
@@ -327,11 +323,11 @@ async def resolve_entity_ids_recursively(
     hass: HomeAssistant,
     entry: ConfigEntry,
     device_class: SensorDeviceClass,
-    resolved_ids: list[str] | None = None,
-) -> list[str]:
+    resolved_ids: set[str] | None = None,
+) -> set[str]:
     """Get all the entity id's for the current group and all the subgroups."""
     if resolved_ids is None:
-        resolved_ids = []
+        resolved_ids = set()
 
     # Include the power/energy sensors for an existing Virtual Power config entry
     member_entry_ids = entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
@@ -347,7 +343,7 @@ async def resolve_entity_ids_recursively(
         if key not in member_entry.data:  # pragma: no cover
             continue
 
-        resolved_ids.extend([member_entry.data.get(key)])
+        resolved_ids.update([member_entry.data.get(key)])
 
     # Include the additional power/energy sensors the user specified
     conf_key = (
@@ -355,7 +351,7 @@ async def resolve_entity_ids_recursively(
         if device_class == SensorDeviceClass.POWER
         else CONF_GROUP_ENERGY_ENTITIES
     )
-    resolved_ids.extend(entry.data.get(conf_key) or [])
+    resolved_ids.update(entry.data.get(conf_key) or [])
 
     # Include entities from defined areas
     if CONF_AREA in entry.data:
@@ -373,7 +369,7 @@ async def resolve_entity_ids_recursively(
                 else EnergySensor,
             )
         ]
-        resolved_ids.extend(area_entities)
+        resolved_ids.update(area_entities)
 
     # Include the entities from sub groups
     subgroups = entry.data.get(CONF_SUB_GROUPS)

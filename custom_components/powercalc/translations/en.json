@@ -65,7 +65,7 @@
                     "unique_id": "Unique id"
                 },
                 "data_description": {
-                    "area": "Adds all powercalc sensors from the specified area",
+                    "area": "Adds all power sensors from the specified area",
                     "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
                     "group_member_sensors": "Powercalc sensors to include in the group",

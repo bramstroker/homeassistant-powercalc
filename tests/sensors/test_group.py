@@ -72,6 +72,7 @@ from tests.common import (
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
+    setup_config_entry,
 )
 
 
@@ -256,7 +257,6 @@ async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> 
         "sensor.test2_power",
         "sensor.test3_power",
     }
-
 
 
 async def test_reset_service(hass: HomeAssistant) -> None:
@@ -1405,14 +1405,3 @@ async def _create_energy_group(
             CONF_GROUP_ENERGY_ENTITIES: member_entities,
         },
     )
-
-
-async def setup_config_entry(hass: HomeAssistant, entry_data: dict) -> MockConfigEntry:
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        data=entry_data,
-    )
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    await hass.async_block_till_done()
-    return config_entry
