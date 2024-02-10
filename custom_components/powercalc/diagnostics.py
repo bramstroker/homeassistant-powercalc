@@ -12,12 +12,10 @@ async def async_get_config_entry_diagnostics(
 ) -> dict:
     """Return diagnostics for a config entry."""
 
-    data = {"entry": entry.as_dict()}
+    data: dict = {"entry": entry.as_dict()}
 
     if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
-        data.update({
-            "power_entities": await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER),
-            "energy_entities": await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY),
-        })
+        data["power_entities"] = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
+        data["energy_entities"] = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
 
     return data
