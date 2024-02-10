@@ -86,7 +86,7 @@
             },
             "linear": {
                 "data": {
-                    "attribute": "Attribute",
+                    "attribute": "Attribut",
                     "calibrate": "Kalibrierungswert",
                     "gamma_curve": "Gammakurve",
                     "max_power": "Maximale Leistung",
@@ -115,7 +115,7 @@
             "playbook": {
                 "data": {
                     "autostart": "Autostart",
-                    "playbooks": "Playbooks",
+                    "playbooks": "Playbook",
                     "repeat": "Wiederholen"
                 },
                 "data_description": {
@@ -228,7 +228,7 @@
             "init": {
                 "data": {
                     "area": "Bereich",
-                    "attribute": "Attribute",
+                    "attribute": "Attribut",
                     "autostart": "Autostart",
                     "calculation_enabled_condition": "Bedingung zur Aktivierung der Berechnung",
                     "calibrate": "Kalibrierungswerte",
@@ -327,7 +327,7 @@
                     "name": "Wert"
                 }
             },
-            "name": "Change GUI config"
+            "name": "GUI-Konfiguration ändern"
         },
         "increase_daily_energy": {
             "description": "Erhöht den Sensor um einen bestimmten Wert.",
