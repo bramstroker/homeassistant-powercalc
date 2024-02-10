@@ -160,14 +160,14 @@ async def setup_config_entry(
         hass: HomeAssistant,
         entry_data: dict,
         unique_id: str | None = None,
-        title: str = "Mock Title"
+        title: str = "Mock Title",
 ) -> MockConfigEntry:
     """Setup and add a Powercalc config entry"""
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         data=entry_data,
         unique_id=unique_id,
-        title=title
+        title=title,
     )
     config_entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(config_entry.entry_id)
@@ -191,7 +191,7 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_FIXED: {CONF_POWER: 50},
         },
         unique_id,
-        name
+        name,
     )
 
 
