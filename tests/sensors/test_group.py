@@ -259,7 +259,6 @@ async def test_parent_group_reloaded_on_subgroup_update(hass: HomeAssistant) -> 
     }
 
 
-
 async def test_reset_service(hass: HomeAssistant) -> None:
     await create_input_booleans(hass, ["test1", "test2"])
 

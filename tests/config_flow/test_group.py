@@ -222,6 +222,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
     data_schema: vol.Schema = result["data_schema"]
     select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
     options = select.config["options"]
+    assert len(options) == 2
     assert {"value": config_entry_1.entry_id, "label": "VirtualPower1"} in options
     assert {"value": config_entry_2.entry_id, "label": "VirtualPower2"} not in options
 
