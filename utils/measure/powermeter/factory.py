@@ -8,12 +8,12 @@ from .errors import PowerMeterError
 from .hass import HassPowerMeter
 from .kasa import KasaPowerMeter
 from .manual import ManualPowerMeter
+from .mystrom import MyStromPowerMeter
 from .ocr import OcrPowerMeter
 from .powermeter import PowerMeter
 from .shelly import ShellyPowerMeter
 from .tasmota import TasmotaPowerMeter
 from .tuya import TuyaPowerMeter
-from .mystrom import MyStromPowerMeter
 
 _LOGGER = logging.getLogger("measure")
 

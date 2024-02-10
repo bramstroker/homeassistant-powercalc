@@ -77,7 +77,8 @@ from tests.common import (
     create_input_number,
     get_simple_fixed_config,
     get_test_profile_dir,
-    run_powercalc_setup, setup_config_entry,
+    run_powercalc_setup,
+    setup_config_entry,
 )
 from tests.conftest import MockEntityWithModel
 
@@ -660,7 +661,7 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
             CONF_MODEL: "sub_profile_camera/default",
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile_camera"),
         },
-        unique_id
+        unique_id,
     )
 
     hass.states.async_set("camera.test", STATE_IDLE)
@@ -705,7 +706,7 @@ async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profi
             CONF_MODEL: "fixed/a",
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("fixed"),
         },
-        unique_id
+        unique_id,
     )
 
     hass.states.async_set("light.test", STATE_ON)
@@ -738,7 +739,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
             CONF_MODEL: "sub_profile/a",
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("sub_profile"),
         },
-        unique_id
+        unique_id,
     )
 
     hass.states.async_set(

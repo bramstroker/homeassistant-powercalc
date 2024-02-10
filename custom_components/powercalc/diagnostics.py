@@ -17,7 +17,7 @@ async def async_get_config_entry_diagnostics(
     if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP:
         data.update({
             "power_entities": set(await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)),
-            "energy_entities": set(await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY))
+            "energy_entities": set(await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)),
         })
 
     return data

@@ -71,7 +71,8 @@ from tests.common import (
     create_input_booleans,
     create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
-    run_powercalc_setup, setup_config_entry,
+    run_powercalc_setup,
+    setup_config_entry,
 )
 
 
