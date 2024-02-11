@@ -50,6 +50,7 @@ Blog posts
 - https://seanblanchfield.com/2022/02/virtual-energy-meters-with-powercalc (English)
 - https://roenning.net/?p=654 (English)
 - https://www.teknikihemmet.se/2022/04/energiforbrukning-pa-smarta-lampor/ (Swedish)
+- https://indomus.it/progetti/stimare-assorbimenti-e-consumi-elettrici-sulla-domotica-home-assistant-con-powercalc/ (Italian)
 
 .. note::
 
