@@ -11,9 +11,7 @@ You could either install with HACS (recommended) or manual.
 
     .. tab:: HACS (recommended)
 
-        This integration is part of the default HACS_ repository. Just click :guilabel:`Explore and add repository` and search for :guilabel:`powercalc` to install.
-
-        You *could* also use this link
+        This integration is part of the default HACS_ repository. Just click :guilabel:`Explore and add repository` and search for :guilabel:`powercalc` to install, or use this link to go directly there:
 
         .. image:: https://my.home-assistant.io/badges/hacs_repository.svg
            :target: https://my.home-assistant.io/redirect/hacs_repository/?owner=bramstroker&repository=homeassistant-powercalc&category=integration
@@ -24,14 +22,13 @@ You could either install with HACS (recommended) or manual.
 
 **Post installation steps**
 
-- Restart HA
-- Add the following entry to `configuration.yaml`:
+1. Add the following entry to `configuration.yaml`:
 
 .. code-block:: yaml
 
     powercalc:
 
-- Restart HA final time
+2. Restart HA final time
 
 Set up power sensors
 --------------------
