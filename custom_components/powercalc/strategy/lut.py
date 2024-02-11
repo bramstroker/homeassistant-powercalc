@@ -272,6 +272,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
         if not color_modes:
             return
         for color_mode in filter_supported_color_modes(color_modes):
+            if color_mode in COLOR_MODES_COLOR:
+                color_mode = ColorMode.HS
             if color_mode in LUT_COLOR_MODES:
                 try:
                     await self._lut_registry.get_lookup_dictionary(
