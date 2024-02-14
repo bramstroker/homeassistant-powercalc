@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Tamsmota",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.11.2"
+    },
+    "name": "TuYa TS0505B",
+    "standby_power": 0.3,
+    "calculation_strategy": "lut"
+}
