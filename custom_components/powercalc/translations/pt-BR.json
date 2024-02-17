@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Create utility meters",
                     "entity_id": "Power sensor id",
-                    "name": "Name"
+                    "name": "Name",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting"
+                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Currently specific settings can only be configured globally",
                 "title": "Create an energy sensor for an existing power sensor"

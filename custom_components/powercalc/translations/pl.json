@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
                     "entity_id": "Identyfikator sensora mocy",
-                    "name": "Nazwa"
+                    "name": "Nazwa",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
-                    "name": "Podstawowa nazwa licznika energii i mediów. Pełna nazwa encji zostanie ustawiona zgodnie z ustawieniem energy_sensor_naming"
+                    "name": "Podstawowa nazwa licznika energii i mediów. Pełna nazwa encji zostanie ustawiona zgodnie z ustawieniem energy_sensor_naming",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Obecnie określone ustawienia można konfigurować wyłącznie globalnie",
                 "title": "Utwórz sensor energii dla istniejącego sensora mocy"

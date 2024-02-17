@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Skapa bruksmätare",
                     "entity_id": "Effekt sensor id",
-                    "name": "Namn"
+                    "name": "Namn",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
-                    "name": "Basnamn för energi och bruksmätare. Fullt entitetsnamn kommer sättas enligt energy_sensor_naming inställningen"
+                    "name": "Basnamn för energi och bruksmätare. Fullt entitetsnamn kommer sättas enligt energy_sensor_naming inställningen",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Nuvarande specifik inställning kan bara konfigureras globalt",
                 "title": "Skapa en energisensor för en befintlig effektsensor"

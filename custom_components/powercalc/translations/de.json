@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Utilitymeter erstellen",
                     "entity_id": "Quell-Entität",
-                    "name": "Name"
+                    "name": "Name",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die täglich, stündlich usw. zyklisch sind",
-                    "name": "Basisname für den Energie- und Versorgungszähler. Der vollständige Name der Entität wird entsprechend der Einstellung energy_sensor_naming festgelegt"
+                    "name": "Basisname für den Energie- und Versorgungszähler. Der vollständige Name der Entität wird entsprechend der Einstellung energy_sensor_naming festgelegt",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Derzeit können bestimmte Einstellungen nur global konfiguriert werden",
                 "title": "Erstellen eines Energiesensors für einen vorhandenen Leistungssensor"

@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Creëer utiliteit meters",
                     "entity_id": "Vermogensensor id",
-                    "name": "Naam"
+                    "name": "Naam",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc.",
-                    "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling"
+                    "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
                 "title": "Maak een energiesensor voor een bestaande stroomsensor"

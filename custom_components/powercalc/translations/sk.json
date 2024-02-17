@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Vytvorenie meračov",
                     "entity_id": "Id výkonového snímača",
-                    "name": "Názov"
+                    "name": "Názov",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Nechajte program powercalc vytvoriť merače spotreby, ktoré sa cyklicky opakujú denne, každú hodinu atď.",
-                    "name": "Základný názov pre merač energií a médií. Úplný názov entity sa nastaví podľa nastavenia energy_sensor_naming"
+                    "name": "Základný názov pre merač energií a médií. Úplný názov entity sa nastaví podľa nastavenia energy_sensor_naming",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "V súčasnosti možno špecifické nastavenia konfigurovať len globálne",
                 "title": "Vytvorenie snímača energie pre existujúci snímač energie"

@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Criar medidores de utilidade",
                     "entity_id": "ID do sensor de potência",
-                    "name": "Nome"
+                    "name": "Nome",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Deixar o powercalc criar medidores de utilidade, que reiniciam diariamente, de hora a hora, etc.",
-                    "name": "Nome base para a energia e medidor de utilidade. O nome completo da entidade será definido de acordo com a definição de 'energy_sensor_naming'."
+                    "name": "Nome base para a energia e medidor de utilidade. O nome completo da entidade será definido de acordo com a definição de 'energy_sensor_naming'.",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "As definições especificadas só podem ser configuradas globalmente",
                 "title": "Criar um sensor de energia a partir de um sensor de potência existente"

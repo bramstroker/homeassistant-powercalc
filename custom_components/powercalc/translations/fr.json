@@ -148,11 +148,13 @@
                 "data": {
                     "create_utility_meters": "Créer des compteurs d'électricité",
                     "entity_id": "ID du capteur de puissance",
-                    "name": "Nom"
+                    "name": "Nom",
+                    "device": "Device"
                 },
                 "data_description": {
                     "create_utility_meters": "Laissez powercalc créer des compteurs de services publics, qui effectuent un cycle quotidien, horaire, etc.",
-                    "name": "Nom de base pour le compteur d'énergie et de services publics. Le nom complet de l'entité sera défini en fonction de energy_sensor_naming"
+                    "name": "Nom de base pour le compteur d'énergie et de services publics. Le nom complet de l'entité sera défini en fonction de energy_sensor_naming",
+                    "device": "Add the created energy sensor to an specific device"
                 },
                 "description": "Actuellement, les paramètres spécifiques ne peuvent être configurés que globalement",
                 "title": "Créer un capteur d'énergie pour un capteur de puissance existant"
