@@ -28,7 +28,7 @@ You could either install with HACS (recommended) or manual.
 
     powercalc:
 
-2. Restart HA final time
+2. Restart HA
 
 Set up power sensors
 --------------------
