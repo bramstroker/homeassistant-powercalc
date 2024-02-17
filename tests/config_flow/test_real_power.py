@@ -158,3 +158,18 @@ async def test_attach_to_custom_device(hass: HomeAssistant) -> None:
     energy_sensor_entry = entity_registry.async_get("sensor.test_energy")
     assert energy_sensor_entry.device_id == device_id
 
+
+async def test_no_error_is_raised_when_device_not_exists(hass: HomeAssistant) -> None:
+    result = await select_sensor_type(hass, SensorType.REAL_POWER)
+    await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.my_smart_plug",
+            CONF_DEVICE: "non_existing",
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy")
