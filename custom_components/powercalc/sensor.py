@@ -20,6 +20,7 @@ from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_CONDITION,
+    CONF_DEVICE,
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -27,7 +28,7 @@ from homeassistant.const import (
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import Event, HomeAssistant, callback
-from homeassistant.helpers import entity_platform
+from homeassistant.helpers import device_registry, entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import (
@@ -321,6 +322,9 @@ async def async_setup_entry(
     """Setup sensors from config entry (GUI config flow)."""
     sensor_config = convert_config_entry_to_sensor_config(entry)
     sensor_type = entry.data.get(CONF_SENSOR_TYPE)
+
+    bind_config_entry_to_device(hass, entry)
+
     if sensor_type == SensorType.GROUP:
         global_config: dict = hass.data[DOMAIN][DOMAIN_CONFIG]
         merged_sensor_config = get_merged_sensor_configuration(
@@ -853,6 +857,24 @@ async def check_entity_not_already_configured(
     entity_id = source_entity.entity_id
     if unique_id is None and entity_id in configured_entities:
         raise SensorAlreadyConfiguredError(source_entity.entity_id, existing_entities)
+
+
+def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """
+    When the user selected a specific device in the config flow, bind the config entry to that device
+    This will let HA bind all the powercalc entities for that config entry to the concerning device
+    """
+    device_id = config_entry.data.get(CONF_DEVICE)
+    if not device_id:
+        return
+
+    device_reg = device_registry.async_get(hass)
+    device_entry = device_reg.async_get(device_id)
+    if device_entry and config_entry.entry_id not in device_entry.config_entries:
+        device_reg.async_update_device(
+            device_id,
+            add_config_entry_id=config_entry.entry_id,
+        )
 
 
 @dataclass

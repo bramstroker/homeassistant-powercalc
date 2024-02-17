@@ -147,6 +147,7 @@ SCHEMA_REAL_POWER_OPTIONS = vol.Schema(
             CONF_CREATE_UTILITY_METERS,
             default=False,
         ): selector.BooleanSelector(),
+        vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
 

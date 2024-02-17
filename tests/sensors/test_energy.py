@@ -333,6 +333,7 @@ async def test_set_entity_category(hass: HomeAssistant) -> None:
         powercalc_source_entity="light.test",
         powercalc_source_domain="light",
         sensor_config={},
+        device_info=None,
     )
     assert energy_sensor.entity_category == EntityCategory.DIAGNOSTIC
 
