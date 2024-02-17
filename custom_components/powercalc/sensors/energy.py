@@ -9,12 +9,15 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
+    CONF_DEVICE,
     CONF_NAME,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import device_registry
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
 
@@ -135,6 +138,7 @@ async def create_energy_sensor(
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
         sensor_config=sensor_config,
+        device_info=get_device_info(hass, sensor_config, power_sensor),
     )
 
 
@@ -158,6 +162,22 @@ def get_unit_prefix(
     if unit_prefix == UnitPrefix.NONE:
         unit_prefix = None
     return unit_prefix
+
+
+def get_device_info(hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor) -> DeviceInfo | None:
+    device_id = sensor_config.get(CONF_DEVICE)
+    if device_id is None:
+        return power_sensor.device_info
+
+    device_reg = device_registry.async_get(hass)
+    device = device_reg.async_get(device_id)
+    if device is None:
+        return None
+
+    return DeviceInfo(
+        identifiers=device.identifiers,
+        connections=device.connections,
+    )
 
 
 @callback
@@ -213,6 +233,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         powercalc_source_entity: str,
         powercalc_source_domain: str,
         sensor_config: ConfigType,
+        device_info: DeviceInfo | None,
     ) -> None:
         super().__init__(
             source_entity=source_entity,
@@ -222,6 +243,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             unit_time=unit_time,
             integration_method=integration_method,
             unique_id=unique_id,
+            device_info=device_info,
         )
 
         self._powercalc_source_entity = powercalc_source_entity
