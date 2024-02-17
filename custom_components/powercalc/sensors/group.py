@@ -386,6 +386,7 @@ async def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: Confi
            and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
     ]
 
+
 @callback
 def create_grouped_power_sensor(
     hass: HomeAssistant,

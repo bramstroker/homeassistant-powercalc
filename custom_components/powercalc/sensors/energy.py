@@ -9,14 +9,12 @@ from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     ATTR_UNIT_OF_MEASUREMENT,
-    CONF_DEVICE,
     CONF_NAME,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import device_registry
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.typing import ConfigType
@@ -36,6 +34,7 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
 )
+from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
 
 from .abstract import (
@@ -138,7 +137,7 @@ async def create_energy_sensor(
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
         sensor_config=sensor_config,
-        device_info=get_device_info(hass, sensor_config, power_sensor),
+        device_info=get_device_info(hass, sensor_config, source_entity),
     )
 
 
@@ -162,22 +161,6 @@ def get_unit_prefix(
     if unit_prefix == UnitPrefix.NONE:
         unit_prefix = None
     return unit_prefix
-
-
-def get_device_info(hass: HomeAssistant, sensor_config: ConfigType, power_sensor: PowerSensor) -> DeviceInfo | None:
-    device_id = sensor_config.get(CONF_DEVICE)
-    if device_id is None:
-        return power_sensor.device_info
-
-    device_reg = device_registry.async_get(hass)
-    device = device_reg.async_get(device_id)
-    if device is None:
-        return None
-
-    return DeviceInfo(
-        identifiers=device.identifiers,
-        connections=device.connections,
-    )
 
 
 @callback
