@@ -132,14 +132,16 @@
                     "ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
                     "multiply_factor": "Multipliceringsfaktor",
                     "multiply_factor_standby": "Multipliceringsfaktor för standby",
-                    "unavailable_power": "Otillgänglig effekt"
+                    "unavailable_power": "Otillgänglig effekt",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
                     "ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
                     "multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
                     "multiply_factor_standby": "Om multipliceringsfaktor ska läggas på standby ström",
-                    "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+                    "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "description": "Inställningarna nedan är för avancerad powercalc konfiguration. De flesta användare kommer inte använda dessa så du kan skippa dem",
                 "title": "Avancerade inställningar"
@@ -260,6 +262,7 @@
                     "unavailable_power": "Otillgänglig effekt",
                     "unit_of_measurement": "Mätenhet",
                     "update_frequency": "Uppdateringsfrekvens",
+                    "utility_meter_tariffs": "Utility meter tariffs",
                     "value": "Värde",
                     "value_template": "Värdemall"
                 },
@@ -281,7 +284,8 @@
                     "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
                     "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
                     "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
-                    "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+                    "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 }
             }
         }
