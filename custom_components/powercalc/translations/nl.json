@@ -133,7 +133,7 @@
                     "multiply_factor": "Multiplicatie factor",
                     "multiply_factor_standby": "Multiplicatie factor standby",
                     "unavailable_power": "Vermogen indien onbeschikbaar",
-                    "utility_meter_tariffs": "Utility meter tariffs"
+                    "utility_meter_tariffs": "Nutsmeter tarieven"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
@@ -141,7 +141,7 @@
                     "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
                     "multiply_factor_standby": "Pas multiplicatie factor toe op standby vermogen",
                     "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
                 },
                 "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
                 "title": "Geavanceerde opties"
@@ -151,12 +151,12 @@
                     "create_utility_meters": "Creëer utiliteit meters",
                     "entity_id": "Vermogensensor id",
                     "name": "Naam",
-                    "device": "Device"
+                    "device": "Apparaat"
                 },
                 "data_description": {
                     "create_utility_meters": "Laat powercalc utiliteit meters maken, Deze resetten dagelijks, uurlijks etc.",
                     "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
-                    "device": "Add the created energy sensor to an specific device"
+                    "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
                 },
                 "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
                 "title": "Maak een energiesensor voor een bestaande stroomsensor"
@@ -262,7 +262,7 @@
                     "unavailable_power": "Vermogen indien onbeschikbaar",
                     "unit_of_measurement": "Eenheid",
                     "update_frequency": "Update frequentie",
-                    "utility_meter_tariffs": "Utility meter tariffs",
+                    "utility_meter_tariffs": "Nutsmeter tarieven",
                     "value": "Waarde",
                     "value_template": "Waarde template"
                 },
@@ -285,7 +285,7 @@
                     "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven",
                     "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
                     "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
                 }
             }
         }
