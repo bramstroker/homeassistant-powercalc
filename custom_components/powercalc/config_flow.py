@@ -268,7 +268,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def __init__(self) -> None:
         """Initialize options flow."""
-        self.sensor_config: dict[str, Any] = {}
+        self.sensor_config: ConfigType = {}
         self.selected_sensor_type: str | None = None
         self.name: str | None = None
         self.source_entity: SourceEntity | None = None
@@ -999,7 +999,7 @@ def _create_schema_advanced(sensor_config: ConfigType) -> vol.Schema:
     if sensor_config.get(CONF_CREATE_UTILITY_METERS):
         schema = schema.extend(
             {
-                vol.Required(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
+                vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
                     selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
                 ),
             },

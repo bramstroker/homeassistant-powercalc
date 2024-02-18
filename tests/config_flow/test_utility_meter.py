@@ -6,7 +6,7 @@ from custom_components.powercalc.const import CONF_CREATE_UTILITY_METERS, CONF_M
 from tests.config_flow.common import DEFAULT_ENTITY_ID, DEFAULT_UNIQUE_ID, goto_virtual_power_strategy_step
 
 
-async def test_utility_meter_tarrifs(hass: HomeAssistant) -> None:
+async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(
         hass,
         CalculationStrategy.FIXED,
