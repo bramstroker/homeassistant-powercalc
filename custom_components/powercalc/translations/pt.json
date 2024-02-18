@@ -132,14 +132,16 @@
                     "ignore_unavailable_state": "Ignorar para estado indisponível",
                     "multiply_factor": "Factor de multiplicação",
                     "multiply_factor_standby": "Multiply factor standby",
-                    "unavailable_power": "Potência indisponível"
+                    "unavailable_power": "Potência indisponível",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar 'true' ou 1, caso contrário retornará 0",
                     "ignore_unavailable_state": "Ligue esta opção para que o sensor de potência continue disponível mesmo que a entidade fonte fique indisponível",
                     "multiply_factor": "Multiplica a potência calculada por este valor. Pode ser útil para grupos de luzes",
                     "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-                    "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível"
+                    "unavailable_power": "Potência em W para considerar quando a entidade fonte está em estado indisponível",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "description": "As opções abaixo são para configurações avançadas de powercalc. A maioria dos utilizadores não usará estas opções e podem ser ignoradas.",
                 "title": "Opções avançadas"
@@ -260,6 +262,7 @@
                     "unavailable_power": "Potência indisponível",
                     "unit_of_measurement": "Unidade de medida",
                     "update_frequency": "Frequência de atualização",
+                    "utility_meter_tariffs": "Utility meter tariffs",
                     "value": "Valor",
                     "value_template": "Modelo de valor"
                 },
@@ -281,7 +284,8 @@
                     "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
                     "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima",
                     "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
-                    "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível"
+                    "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 }
             }
         }

@@ -132,14 +132,16 @@
                     "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
                     "multiply_factor": "Multiplikationsfaktor",
                     "multiply_factor_standby": "Multiplikationsfaktor Standby",
-                    "unavailable_power": "Leistung im Status 'nicht verfügbar'"
+                    "unavailable_power": "Leistung im Status 'nicht verfügbar'",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
                     "ignore_unavailable_state": "Schalten Sie diese Einstellung um, wenn Sie möchten, dass der Leistungssensor auch dann verfügbar bleibt, wenn die Quell-Entität nicht verfügbar ist",
                     "multiply_factor": "Multipliziert die berechnete Leistung mit diesem Faktor. Kann für Licht-Gruppen nützlich sein",
                     "multiply_factor_standby": "ob der Multiplikationsfaktor auch auf die Standby-Leistung angewendet werden soll",
-                    "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist"
+                    "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "description": "Die folgenden Optionen sind für die erweiterte Powercalc-Konfiguration gedacht. Die meisten Benutzer werden diese Optionen nicht verwenden, so dass Sie diese überspringen können",
                 "title": "Erweiterte Optionen"
@@ -260,6 +262,7 @@
                     "unavailable_power": "Leistung im Status 'nicht verfügbar'",
                     "unit_of_measurement": "Maßeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
+                    "utility_meter_tariffs": "Utility meter tariffs",
                     "value": "Wert",
                     "value_template": "Wert-Template"
                 },
@@ -281,7 +284,8 @@
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
-                    "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist"
+                    "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 }
             }
         }

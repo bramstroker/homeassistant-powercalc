@@ -132,14 +132,16 @@
                     "ignore_unavailable_state": "Ignorer l'état indisponible",
                     "multiply_factor": "Facteur de multiplication",
                     "multiply_factor_standby": "Multiply factor standby",
-                    "unavailable_power": "Alimentation indisponible"
+                    "unavailable_power": "Alimentation indisponible",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
                     "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
                     "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
                     "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-                    "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
+                    "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "description": "Les options ci-dessous concernent la configuration avancée de powercalc. La plupart des utilisateurs ne l'utiliseront pas, vous pouvez donc les ignorer",
                 "title": "Options avancées"
@@ -260,6 +262,7 @@
                     "unavailable_power": "Alimentation indisponible",
                     "unit_of_measurement": "Unité de mesure",
                     "update_frequency": "Fréquence de mise à jour",
+                    "utility_meter_tariffs": "Utility meter tariffs",
                     "value": "Valeur",
                     "value_template": "Modèle de valeur"
                 },
@@ -281,7 +284,8 @@
                     "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
                     "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus",
                     "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
-                    "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
+                    "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 }
             }
         }

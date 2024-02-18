@@ -132,14 +132,16 @@
                     "ignore_unavailable_state": "Ignoruj stan niedostępny",
                     "multiply_factor": "Mnożnik",
                     "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
-                    "unavailable_power": "Wartość mocy dla niedostęności"
+                    "unavailable_power": "Wartość mocy dla niedostęności",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
                     "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
                     "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
                     "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
-                    "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)"
+                    "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "description": "Poniższe opcje dotyczą zaawansowanej konfiguracji Powercalc. Większość użytkowników nie będzie z tego korzystać, więc możesz je pominąć",
                 "title": "Opcje zaawansowane"
@@ -260,6 +262,7 @@
                     "unavailable_power": "Wartość mocy dla niedostęności",
                     "unit_of_measurement": "Jednostka pomiaru",
                     "update_frequency": "Częstotliwość aktualizacji",
+                    "utility_meter_tariffs": "Utility meter tariffs",
                     "value": "Wartość",
                     "value_template": "Szablon wartości"
                 },
@@ -281,7 +284,8 @@
                     "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
                     "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej",
                     "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy",
-                    "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)"
+                    "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 }
             }
         }
