@@ -6,7 +6,7 @@ authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 aiohttp = "^3.8"
 chardet = "^5.1"
 charset-normalizer = "^3.1"
@@ -17,14 +17,14 @@ opencv-python = "^4.7"
 phue = {git = "https://github.com/studioimaginaire/phue.git", rev = "6d8976be9b17da94887365e001e8475fe58c5f2d"}
 pytesseract = "^0.3"
 python-decouple = "^3.4"
-python-kasa = "^0.5"
+python-kasa = "^0.6"
 readchar = "^4.0"
 requests = "^2.28"
 tuyapower = "^0.2"
 typing-extensions = "^4.6"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.0.272"
+ruff = "^0.2"
 
 [build-system]
 requires = ["poetry-core"]

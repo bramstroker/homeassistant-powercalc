@@ -58,16 +58,18 @@ ignore_missing_imports = true
 source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
-select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
-ignore = ["ANN101"]
 line-length = 150
 target-version = "py311"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
+ignore = ["ANN101"]
+
+[tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 15
 
 [tool.poetry]
@@ -79,9 +81,9 @@ readme = "README.md"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3"
-ruff = "^0.1"
+ruff = "^0.2"
 voluptuous-stubs = "^0.1"
-homeassistant-stubs = "2024.2.1"
+homeassistant-stubs = "2024.2.2"
 freezegun = "^1.2"
 pytest-homeassistant-custom-component = "^0.13"
 types-pytz = "^2023.3"
