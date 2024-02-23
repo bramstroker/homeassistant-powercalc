@@ -79,7 +79,7 @@ class ShellyPowerMeter(PowerMeter):
             )
 
         json = response.json()
-        gen = json["gen"] if "gen" in json else 1
+        gen = json.get("gen", 1)
         _LOGGER.debug("Shelly API version %d detected", gen)
         return int(gen)
 
