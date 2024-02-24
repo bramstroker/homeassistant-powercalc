@@ -42,3 +42,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             title: 'Failed E2E tests 🙀'
             annotationLevel: 'failure'
+      - name: add label
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: light-model
