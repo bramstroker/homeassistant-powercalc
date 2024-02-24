@@ -5,6 +5,8 @@ sort-direction: ascending
 exclude-contributors:
   - 'github-actions[bot]'
   - 'github-actions'
+  - 'renovate[bot]'
+  - 'renovate'
 exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
