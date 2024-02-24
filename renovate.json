@@ -18,6 +18,17 @@
       ]
     },
     {
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
+    {
       "matchManagers": ["poetry"],
       "enabled": false
     },
