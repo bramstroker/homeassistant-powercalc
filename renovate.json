@@ -9,5 +9,13 @@
   },
   "pip_requirements": {
     "enabled": false
-  }
+  },
+  "packageRules": [
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": [
+        "github-actions"
+      ]
+    }
+  ]
 }
