@@ -45,13 +45,29 @@ jobs:
               poetry run python plot.py $github_workspace/${file} --output=test.png
             fi
           done
-      - name: Upload failed tests
-        uses: edunad/actions-image@v2.0.0
+#      - name: Upload generated plots
+#        uses: edunad/actions-image@v2.0.0
+#        with:
+#            path: './utils/visualize/*.png'
+#            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#            title: 'Failed E2E tests 🙀'
+#            annotationLevel: 'failure'
+      - name: Upload the plots to Imgur
+        uses: devicons/public-upload-to-imgur@v2.2.2
+        id: imgur_step
         with:
-            path: './utils/visualize/*.png'
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            title: 'Failed E2E tests 🙀'
-            annotationLevel: 'failure'
+          path: ./utils/visualize/*.png
+          client_id: ${{secrets.IMGUR_CLIENT_ID}}
+      - name: Comment on the PR about the result
+        uses: github-actions-up-and-running/pr-comment@v1.0.1
+        env:
+          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
+          MESSAGE: |
+            Here is the picture that was uploaded:
+            ![Image]({0})
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          message: ${{format(env.MESSAGE, env.IMG_URL)}}
       - name: add label
         uses: actions-ecosystem/action-add-labels@v1
         with:
