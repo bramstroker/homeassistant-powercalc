@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Third Reality 3RSP02028BZ",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 15,
+        "VERSION": "v1.10.4:docker"
+    },
+    "name": "Lumiman Smart Color Changing Bulb A19 800LM 2.4Ghz ",
+    "standby_power": 0.3
+}
