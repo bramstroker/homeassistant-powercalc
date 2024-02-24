@@ -52,8 +52,8 @@ jobs:
         id: build-pr-message
         run: |
           echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
-          echo "Thank you for submitting light measurements!\n" >> $GITHUB_OUTPUT
-          echo "Here are some visualizations for the CSV files.\n\n" >> $GITHUB_OUTPUT
+          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
+          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
           for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
           do
             echo "![Image](${url})" >> $GITHUB_OUTPUT
