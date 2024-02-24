@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install dependencies
@@ -29,11 +29,11 @@ jobs:
       - name: Generate file
         run: |
           python3 ${{ github.workspace }}/.github/scripts/supported_models/generate_file.py
-      - uses: EndBug/add-and-commit@v7
+      - uses: EndBug/add-and-commit@v9
         with:
           add: 'docs/supported_models.md'
           message: 'Update support model list'
-      - uses: EndBug/add-and-commit@v7
+      - uses: EndBug/add-and-commit@v9
         with:
           add: 'custom_components/powercalc/data/manufacturer_device_types.json'
           message: 'Update manufacturer_device_types.json'
