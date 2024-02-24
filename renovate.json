@@ -10,6 +10,7 @@
   "pip_requirements": {
     "enabled": false
   },
+  "dependencyDashboard": false,
   "packageRules": [
     {
       "groupName": "GitHub Actions",
