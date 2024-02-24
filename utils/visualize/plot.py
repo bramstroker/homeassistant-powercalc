@@ -157,7 +157,7 @@ def resolve_absolute_file_path(file_path: str) -> str:
     if os.path.exists(file_path):
         return library_path
 
-    raise Exception("File not found")
+    raise Exception(f"File not found: {file_path}")
 
 
 if __name__ == "__main__":
