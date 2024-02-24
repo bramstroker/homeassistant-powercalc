@@ -146,6 +146,7 @@ def main() -> None:
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
+    print(file_path)
     if os.path.exists(file_path):
         return file_path
 
