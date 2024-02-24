@@ -9,19 +9,12 @@ on:
     paths:
       - '**.py'
 
-env:
-  POETRY_VERSION: 1.7.1
-
 jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Powercalc
         uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
       - uses: ./.github/workflows/poetry-composite-action
       - name: Run MyPy
         run: |

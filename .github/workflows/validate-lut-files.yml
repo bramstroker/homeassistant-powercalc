@@ -26,13 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
       - uses: ./.github/workflows/poetry-composite-action
         with:
           directory: './utils/visualize'
+          python-version: '3.11'
       - uses: ankitjain28may/list-files-in-pr@v1.0
         id: list-files
         with:
