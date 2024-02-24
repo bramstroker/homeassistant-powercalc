@@ -1,6 +1,5 @@
 name: "Install poetry and dependencies"
 description: "Install poetry and dependencies"
-shell: bash
 runs:
   using: "composite"
   steps:
@@ -24,5 +23,6 @@ runs:
         path: .venv
         key: pydeps-${{ hashFiles('**/poetry.lock') }}
     - name: Install dependencies
+      shell: bash
       run: poetry install --no-interaction --no-root
       if: steps.cache-deps.outputs.cache-hit != 'true'
