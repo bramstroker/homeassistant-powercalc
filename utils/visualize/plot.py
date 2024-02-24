@@ -139,6 +139,7 @@ def main() -> None:
     plt.ylabel("watt")
     if args.output:
         plt.savefig(args.output)
+        print(f"Save plot to {args.output}")
     plt.show()
 
 
