@@ -52,6 +52,8 @@ jobs:
         id: build-pr-message
         run: |
           echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
+          for url in ${{ fromJSON(steps.imgur_step.outputs.imgur_urls) }} do:
+            echo "![Image]({url})" >> $GITHUB_OUTPUT
           echo "foo" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
       - name: Add comment to PR
