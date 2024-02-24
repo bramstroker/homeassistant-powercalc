@@ -138,7 +138,13 @@ def main() -> None:
     plt.xlabel("brightness")
     plt.ylabel("watt")
     if args.output:
-        plt.savefig(args.output)
+        output = args.output
+        if output == "auto":
+            output = f"{color_mode}.png"
+        plt.savefig(output)
+        print(f"Save plot to {output}")
+        return
+
     plt.show()
 
 
@@ -154,7 +160,7 @@ def resolve_absolute_file_path(file_path: str) -> str:
     if os.path.exists(file_path):
         return library_path
 
-    raise Exception("File not found")
+    raise FileNotFoundError(f"File not found: {file_path}")
 
 
 if __name__ == "__main__":
