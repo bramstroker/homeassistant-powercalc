@@ -7,7 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-#colour = "^0.1"
 colour-science = "0.4.3"
 contourpy = "^1.0"
 cycler = "^0.11"
