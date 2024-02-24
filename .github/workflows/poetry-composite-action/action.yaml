@@ -1,5 +1,6 @@
 name: "Install poetry and dependencies"
 description: "Install poetry and dependencies"
+shell: bash
 runs:
   using: "composite"
   steps:
