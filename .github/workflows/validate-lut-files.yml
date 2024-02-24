@@ -36,13 +36,13 @@ jobs:
         with:
           githubToken: ${{ github.token }}
           outputFormat: 'space-delimited'
-      - run: poetry run python ./utils/visualise/plot.py custom_components/powercalc/data/test/test/color_temp.csv.gz --output=test1.png
+      - run: poetry run python ./utils/visualize/plot.py custom_components/powercalc/data/test/test/color_temp.csv.gz --output=test1.png
       - run: |
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
             if [ "$file" == "*.csv.gz" ]
             then
               echo "Changed Files - ${file}."
-              poetry run python ./utils/visualise/plot.py ${file} --output=test.png
+              poetry run python ./utils/visualize/plot.py ${file} --output=test.png
             fi
           done
       - name: Upload failed tests
