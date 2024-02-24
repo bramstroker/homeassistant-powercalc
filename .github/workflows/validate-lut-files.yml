@@ -38,7 +38,7 @@ jobs:
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
             if [[ ${file} =~ \.csv\.gz$ ]];
             then
-              echo "Changed Files - ${file}."
+              echo "Generating plot for - ${file}."
               poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
@@ -48,16 +48,27 @@ jobs:
         with:
           path: ./utils/visualize/*.png
           client_id: ${{secrets.IMGUR_CLIENT_ID}}
-      - name: Comment on the PR about the result
-        uses: github-actions-up-and-running/pr-comment@v1.0.1
-        env:
-          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
-          MESSAGE: |
-            Here is the picture that was uploaded:
-            ![Image]({0})
+      - name: Build PR message
+        id: build-pr-message
+        run: |
+          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
+          echo "foo" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+      - name: Add comment to PR
+        uses: mshick/add-pr-comment@v2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          message: ${{format(env.MESSAGE, env.IMG_URL)}}
+          message: |
+            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
+#      - name: Comment on the PR about the result
+#        uses: github-actions-up-and-running/pr-comment@v1.0.1
+#        env:
+#          IMG_URL: ${{ fromJSON(steps.imgur_step.outputs.imgur_urls)[0] }}
+#          MESSAGE: |
+#            Here is the picture that was uploaded:
+#            ![Image]({0})
+#        with:
+#          repo-token: ${{ secrets.GITHUB_TOKEN }}
+#          message: ${{format(env.MESSAGE, env.IMG_URL)}}
       - name: add label
         uses: actions-ecosystem/action-add-labels@v1
         with:
