@@ -5,6 +5,8 @@ import colorsys
 import gzip
 import math
 import os
+from enum import StrEnum
+from pathlib import Path
 
 import colour
 import matplotlib.pyplot as plt
@@ -13,12 +15,18 @@ import pandas
 import pandas as pd
 
 
-def create_scatter_plot(df: pandas.DataFrame, color_mode: str) -> None:
+class ColorMode(StrEnum):
+    BRIGHTNESS = "brightness"
+    COLOR_TEMP = "color_temp"
+    HS = "hs"
+
+
+def create_scatter_plot(df: pandas.DataFrame, color_mode: ColorMode) -> None:
     bri = df["bri"]
     watt = df["watt"]
-    if color_mode == "brightness":
+    if color_mode == ColorMode.BRIGHTNESS:
         df["color"] = "#1f77b4"
-    elif color_mode == "color_temp":
+    elif color_mode == ColorMode.COLOR_TEMP:
         df["color"] = df["mired"].apply(convert_mired_to_rgb)
     else:
         df["color"] = df.apply(
@@ -111,31 +119,42 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="CLI script to output powercalc LUT file as a plot",
     )
-    parser.add_argument("manufacturer")
-    parser.add_argument("model")
-    parser.add_argument("color_mode")
+    parser.add_argument("file")
     parser.add_argument("--output", required=False)
     args = parser.parse_args()
 
-    data_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        "../../custom_components/powercalc/data",
-        args.manufacturer,
-        args.model,
-    )
-    file_path = os.path.join(data_path, f"{args.color_mode}.csv.gz")
+    file_path = resolve_absolute_file_path(args.file)
+    color_mode = ColorMode(Path(file_path).stem.removesuffix(".csv"))
 
-    csv_file = gzip.open(file_path, "rt")
+    if file_path.endswith(".gz"):
+        csv_file = gzip.open(file_path, "rt")
+    else:
+        csv_file = open(file_path, "rt")
 
     dataframe = pd.read_csv(csv_file)
 
     plt.figure(figsize=(10, 6))
-    create_scatter_plot(dataframe, args.color_mode)
+    create_scatter_plot(dataframe, color_mode)
     plt.xlabel("brightness")
     plt.ylabel("watt")
     if args.output:
         plt.savefig(args.output)
     plt.show()
+
+
+def resolve_absolute_file_path(file_path: str) -> str:
+    if os.path.exists(file_path):
+        return file_path
+
+    library_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "../../custom_components/powercalc/data",
+        file_path
+    )
+    if os.path.exists(file_path):
+        return library_path
+
+    raise Exception("File not found")
 
 
 if __name__ == "__main__":
