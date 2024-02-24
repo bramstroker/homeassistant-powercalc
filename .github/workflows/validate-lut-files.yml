@@ -40,7 +40,7 @@ jobs:
             if [[ ${file} =~ \.csv\.gz$ ]];
             then
               echo "Changed Files - ${file}."
-              poetry run python plot.py '$github_workspace/${file}' --output=test.png
+              poetry run python plot.py '${{ github.workspace }}/${file}' --output=test.png
             fi
           done
       - name: Upload the plots to Imgur
