@@ -16,6 +16,15 @@
       "matchManagers": [
         "github-actions"
       ]
+    },
+    {
+      "matchManagers": ["poetry"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["poetry"],
+      "matchFileNames": ["pyproject.toml"],
+      "enabled": true
     }
   ]
 }
