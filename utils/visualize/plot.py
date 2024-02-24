@@ -140,6 +140,8 @@ def main() -> None:
     if args.output:
         plt.savefig(args.output)
         print(f"Save plot to {args.output}")
+        return
+
     plt.show()
 
 
