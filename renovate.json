@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-
+  "labels": ["dependencies"],
   "npm": {
     "enabled": false
   },
