@@ -38,7 +38,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: .venv
-        key: pydeps-${{ hashFiles('${{ inputs.directory }}/poetry.lock') }}
+        key: pydeps-${{ hashFiles(format('{0}/poetry.lock', inputs.directory)) }}
     - name: Install dependencies
       shell: bash
       run: cd $INPUT_DIRECTORY; poetry install --no-interaction --no-root
