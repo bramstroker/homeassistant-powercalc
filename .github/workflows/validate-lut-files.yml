@@ -1,9 +1,9 @@
 name: validate-light-model
 
 on:
-  push:
-    paths:
-      - '**.csv.gz'
+#  push:
+#    paths:
+#      - '**.csv.gz'
   pull_request:
     paths:
        - '**.csv.gz'
