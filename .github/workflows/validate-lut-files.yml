@@ -36,6 +36,7 @@ jobs:
         with:
           githubToken: ${{ github.token }}
           outputFormat: 'space-delimited'
+      - run: poetry run python ./utils/visualise/plot.py custom_components/powercalc/data/test/test/color_temp.csv.gz --output=test1.png
       - run: |
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
             if [ "$file" == "*.csv.gz" ]
