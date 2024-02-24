@@ -53,9 +53,8 @@ jobs:
         run: |
           echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
           for url in ${{ fromJSON(steps.imgur_step.outputs.imgur_urls) }}; do
-            echo "![Image]({url})" >> $GITHUB_OUTPUT
+            echo "![Image](${url})" >> $GITHUB_OUTPUT
           done
-          echo "foo" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
       - name: Add comment to PR
         uses: mshick/add-pr-comment@v2
