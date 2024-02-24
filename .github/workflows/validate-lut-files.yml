@@ -1,4 +1,4 @@
-name: validate-light-model
+name: LUT file validation
 
 on:
   pull_request:
@@ -37,7 +37,7 @@ jobs:
       - run: |
           cd ./utils/visualize
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
-            if [ "$file" == "*.csv.gz" ]
+            if [[ ${file} =~ \.csv\.gz$ ]];
             then
               echo "Changed Files - ${file}."
               poetry run python plot.py '$github_workspace/${file}' --output=test.png
