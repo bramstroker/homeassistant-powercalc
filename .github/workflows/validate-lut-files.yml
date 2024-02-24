@@ -22,9 +22,14 @@ jobs:
     - name: Validate LUT CSV files
       run: node .github/scripts/lut_validator/validate.js
   visualize:
-    name: Add plots to the PR comments for inspection
+    name: Add plot to PR
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - uses: ./.github/workflows/poetry-composite-action
       - uses: ankitjain28may/list-files-in-pr@v1.0
         id: list-files
         with:
@@ -32,13 +37,16 @@ jobs:
           outputFormat: 'space-delimited'
       - run: |
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
-            echo "Changed Files - ${file}."
+            if [ "$file" == "*.txt" ]
+            then
+              echo "Changed Files - ${file}."
+              poetry run python ./utils/visualise/plot.py ${file} --output=test.png
+            fi
           done
       - name: Upload failed tests
-        if: ${{ failure() }}
         uses: edunad/actions-image@v2.0.0
         with:
-            path: './failed_tests/**/*.png'
+            path: './*.png'
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             title: 'Failed E2E tests 🙀'
             annotationLevel: 'failure'
