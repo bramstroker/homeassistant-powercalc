@@ -4,12 +4,6 @@
     "config:recommended"
   ],
   "labels": ["dependencies"],
-  "npm": {
-    "enabled": false
-  },
-  "pip_requirements": {
-    "enabled": false
-  },
   "dependencyDashboard": false,
   "packageRules": [
     {
