@@ -138,15 +138,17 @@ def main() -> None:
     plt.xlabel("brightness")
     plt.ylabel("watt")
     if args.output:
-        plt.savefig(args.output)
-        print(f"Save plot to {args.output}")
+        output = args.output
+        if output == "auto":
+            output = f"{color_mode}.png"
+        plt.savefig(output)
+        print(f"Save plot to {output}")
         return
 
     plt.show()
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
-    print(file_path)
     if os.path.exists(file_path):
         return file_path
 
