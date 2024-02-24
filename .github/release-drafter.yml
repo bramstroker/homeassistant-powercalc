@@ -7,6 +7,7 @@ exclude-contributors:
   - 'github-actions'
 exclude-labels:
   - 'skip-changelog'
+  - 'dependencies'
 categories:
   - title: '💡 Light models'
     labels:
