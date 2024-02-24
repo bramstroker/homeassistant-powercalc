@@ -38,7 +38,7 @@ jobs:
           outputFormat: 'space-delimited'
       - run: |
           for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
-            if [ "$file" == "*.txt" ]
+            if [ "$file" == "*.csv.gz" ]
             then
               echo "Changed Files - ${file}."
               poetry run python ./utils/visualise/plot.py ${file} --output=test.png
