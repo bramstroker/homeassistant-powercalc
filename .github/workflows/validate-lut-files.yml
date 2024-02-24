@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
         cd .github/scripts/lut_validator
@@ -22,7 +22,7 @@ jobs:
     name: Add plot to PR
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/poetry-composite-action
         with:
           directory: './utils/visualize'
@@ -43,7 +43,7 @@ jobs:
             fi
           done
       - name: Upload the plots to Imgur
-        uses: devicons/public-upload-to-imgur@v2.2.2
+        uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
         with:
           path: ./utils/visualize/*.png
@@ -67,4 +67,4 @@ jobs:
       - name: add label
         uses: actions-ecosystem/action-add-labels@v1
         with:
-          labels: light-model
+          labels: lightmodel
