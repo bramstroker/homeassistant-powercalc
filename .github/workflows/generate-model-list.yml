@@ -1,10 +1,12 @@
 name: Generate support model list
 
 on:
+  pull_request:
+    paths:
+      - '.github/scripts/supported_models/**'
   push:
     paths:
       - '**/model.json'
-      - '.github/scripts/supported_models/**'
     branches:
       - master
   workflow_dispatch:
