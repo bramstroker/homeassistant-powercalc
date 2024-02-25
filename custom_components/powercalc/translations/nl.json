@@ -62,7 +62,8 @@
                     "hide_members": "Verberg onderliggende sensoren",
                     "name": "Naam",
                     "sub_groups": "Sub groepen",
-                    "unique_id": "Uniek id"
+                    "unique_id": "Uniek id",
+                    "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen"
                 },
                 "data_description": {
                     "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
@@ -70,7 +71,8 @@
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele vermogen entiteiten (W)",
-                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+                    "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie"
                 },
                 "title": "Creëer een groep sensor"
             },
@@ -246,6 +248,7 @@
                     "group_power_entities": "Additionele vermogen entiteiten",
                     "hide_members": "Verberg onderliggende sensoren",
                     "ignore_unavailable_state": "Negeer unavailable status",
+                    "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
                     "max_power": "Max vermogen",
                     "min_power": "Min vermogen",
                     "multiply_factor": "Multiplicatie factor",
@@ -277,6 +280,7 @@
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
                     "group_power_entities": "Additionele vermogen entiteiten (W)",
                     "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+                    "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
                     "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
                     "multiply_factor_standby": "Pas multiplicatie factor toe op standby vermogen",
                     "playbooks": "Plaats een playbook op iedere regel. Example\n\nprogram1: washing_machine/program1.csv",

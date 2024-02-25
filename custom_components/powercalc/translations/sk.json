@@ -62,7 +62,8 @@
                     "hide_members": "Skrytý členovania",
                     "name": "Názov",
                     "sub_groups": "Podskupiny",
-                    "unique_id": "Jedinečné id"
+                    "unique_id": "Jedinečné id",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors"
                 },
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
@@ -70,7 +71,8 @@
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
-                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
+                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
                 },
                 "title": "Vytvoriť skupinu snímača"
             },
@@ -246,6 +248,7 @@
                     "group_power_entities": "Ďalšie výkonové entity",
                     "hide_members": "Skrytí členovia",
                     "ignore_unavailable_state": "Ignorovať nedostupný stav",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "max_power": "Max výkon",
                     "min_power": "Min výkon",
                     "multiply_factor": "Násobný faktor",
@@ -277,6 +280,7 @@
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
                     "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
                     "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
                     "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",

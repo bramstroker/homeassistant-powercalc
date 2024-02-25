@@ -62,7 +62,8 @@
                     "hide_members": "Ocultar membros",
                     "name": "Nome",
                     "sub_groups": "Subgrupos",
-                    "unique_id": "ID único"
+                    "unique_id": "ID único",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors"
                 },
                 "data_description": {
                     "area": "Adiciona todos os sensores powercalc à área especificada",
@@ -70,7 +71,8 @@
                     "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
                     "group_member_sensors": "Sensores Powercalc para incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+                    "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
                 },
                 "title": "Criar um sensor de grupo"
             },
@@ -246,6 +248,7 @@
                     "group_power_entities": "Entidades de potência adicionais",
                     "hide_members": "Ocultar membros",
                     "ignore_unavailable_state": "Ignorar estado indisponível",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "max_power": "Potência máxima",
                     "min_power": "Potência mínima",
                     "multiply_factor": "Factor de multiplicação",
@@ -277,6 +280,7 @@
                     "group_member_sensors": "Sensores Powercalc a incluir no grupo",
                     "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
                     "ignore_unavailable_state": "Ligue esta opção para o sensor continuar disponível mesmo que a entidade fonte fique indisponível",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
                     "multiply_factor": "Multiplica a potência calculada por este factor. Pode ser útil para grupos de luzes",
                     "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "playbooks": "Introduza uma Sequência em cada linha. Examplo\n\nprogram1: washing_machine/program1.csv",
