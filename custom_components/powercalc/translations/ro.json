@@ -62,7 +62,8 @@
                     "hide_members": "Hide members",
                     "name": "Nume",
                     "sub_groups": "Sub grupuri",
-                    "unique_id": "ID unic"
+                    "unique_id": "ID unic",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors"
                 },
                 "data_description": {
                     "area": "Adds all powercalc sensors from the specified area",
@@ -70,7 +71,8 @@
                     "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
                     "group_member_sensors": "Powercalc sensors to include in the group",
                     "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
+                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
                 },
                 "title": "Creați un senzor de grup"
             },
@@ -246,6 +248,7 @@
                     "group_power_entities": "Entități de putere membre",
                     "hide_members": "Ascunde membrii",
                     "ignore_unavailable_state": "Ignore unavailable state",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "max_power": "Putere maxima",
                     "min_power": "Putere minimă",
                     "multiply_factor": "Multiply factor",
@@ -277,6 +280,7 @@
                     "group_member_sensors": "Powercalc sensors to include in the group",
                     "group_power_entities": "Additional power sensors (W) from your HA installation to include",
                     "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
                     "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
                     "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
                     "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
