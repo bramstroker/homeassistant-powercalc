@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
        - '**.csv.gz'
+       - '.github/scripts/lut_validator/**'
+
+permissions:
+   pull-requests: write
 
 jobs:
   validate-lut:
