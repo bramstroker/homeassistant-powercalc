@@ -8,6 +8,9 @@ In addition to that you can use filters to exclude certain entities.
 .. note::
     only entities will be included which are in the `supported models`_ list (these can be auto configured). You can combine ``include`` and ``entities`` to extend the group with custom configured entities.
 
+.. important::
+    Powercalc will include any power sensors found in your HA installation matching the include rules. When you don't want that see `Exclude non powercalc sensors`_
+
 Include
 =======
 
@@ -156,3 +159,29 @@ You can also chain nested filter using and / or construction:
                 - and:
                   - domain: binary_sensor
                   - wildcard: *swimming_pool*
+
+Exclude non powercalc sensors
+=============================
+
+By default all the include options will include any power and/or energy sensor from your system, also power sensors provided by other installations.
+When you don't want that behaviour you can set ``include_non_powercalc_sensors`` to `false`.
+
+.. code-block:: yaml
+
+    .. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: Outdoor lights
+          include:
+            area: outdoor
+            include_non_powercalc_sensors: false
+
+You can also set this option globally:
+
+.. code-block:: yaml
+
+    .. code-block:: yaml
+
+    powercalc:
+      include_non_powercalc_sensors: false

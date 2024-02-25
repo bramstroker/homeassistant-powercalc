@@ -40,6 +40,7 @@ from .const import (
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
@@ -170,6 +171,7 @@ CONFIG_SCHEMA = vol.Schema(
                         cv.ensure_list,
                         [SENSOR_CONFIG],
                     ),
+                    vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
                 },
             ),
         ),
@@ -209,6 +211,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_ENABLE_AUTODISCOVERY: True,
         CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
 
     discovery_manager = DiscoveryManager(hass, config)
