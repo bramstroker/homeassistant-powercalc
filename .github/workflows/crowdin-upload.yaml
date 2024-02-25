@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - custom_components/powercalc/translations/*
+      - crowdin.yaml
     branches: [ master ]
   workflow_dispatch:
 
