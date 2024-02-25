@@ -9,6 +9,7 @@ files: [
     "translation": "/custom_components/powercalc/translations/%locale%.json",
     "languages_mapping": {
         "locale": {
+            "cz": "cz",
             "de": "de",
             "fr": "fr",
             "nl": "nl",
@@ -17,7 +18,7 @@ files: [
             "pt-BR": "pt-BR",
             "ro": "ro",
             "sk": "sk",
-            "sv": "sv"
+            "sv": "sv",
         }
     }
   }
