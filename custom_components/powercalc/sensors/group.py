@@ -348,8 +348,10 @@ async def resolve_entity_ids_recursively(
     if CONF_AREA in entry.data:
         resolved_area_entities, _ = await resolve_include_entities(
             hass,
-            {CONF_AREA: entry.data[CONF_AREA]},
-            bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)),
+            {
+                CONF_AREA: entry.data[CONF_AREA],
+                CONF_INCLUDE_NON_POWERCALC_SENSORS: entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS),
+            },
         )
         area_entities = [
             entity.entity_id

@@ -9,6 +9,7 @@ from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
@@ -27,13 +28,14 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def resolve_include_entities(
-    hass: HomeAssistant, include_config: dict, include_non_powercalc: bool = True,
+    hass: HomeAssistant, include_config: dict,
 ) -> tuple[list[Entity], list[str]]:
     """ "
     For a given include configuration fetch all power and energy sensors from the HA instance
     """
     discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
 
+    include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
     source_entities = resolve_include_source_entities(hass, include_config)

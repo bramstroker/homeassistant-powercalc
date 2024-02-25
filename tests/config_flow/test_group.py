@@ -1,5 +1,6 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITIES,
@@ -10,9 +11,9 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
-from homeassistant.helpers.entity_registry import EntityRegistry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.const import (
@@ -34,6 +35,7 @@ from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,
+    setup_config_entry,
 )
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
@@ -186,6 +188,54 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
     }
+
+
+async def test_include_area_powercalc_only(
+    hass: HomeAssistant,
+    area_reg: AreaRegistry,
+) -> None:
+    area = area_reg.async_get_or_create("My area")
+    mock_registry(
+        hass,
+        {
+            "switch.switch": RegistryEntry(
+                entity_id="switch.switch",
+                unique_id="1111",
+                platform="switch",
+                area_id=area.id,
+            ),
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.existing_power",
+                unique_id="3333",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await setup_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
+
+    result = await select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_AREA: area.id,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: False,
+        CONF_CREATE_UTILITY_METERS: False,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert not result["data"][CONF_INCLUDE_NON_POWERCALC_SENSORS]
+
+    hass.states.async_set("sensor.test_power", 5)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.my_group_sensor_power")
+    assert power_state
+    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
 
 
 async def test_can_select_existing_powercalc_entry_as_group_member(
