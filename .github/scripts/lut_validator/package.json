@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^5.0.1",
-    "csval": "^1.1.1",
+    "csval": "^2.0.0",
     "node-gzip": "^1.1.2",
     "readdirp": "^3.6.0"
   }
