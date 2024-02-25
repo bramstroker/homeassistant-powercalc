@@ -9,6 +9,3 @@ cov.xml
 .DS_Store
 
 custom_components/test
-
-custom_components/powercalc/data/manufacturer_device_types.json
-docs/supported_models.md
