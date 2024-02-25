@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**/model.json'
+      - '.github/scripts/supported_models/**'
     branches:
       - master
   workflow_dispatch:
