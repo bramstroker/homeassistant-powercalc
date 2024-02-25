@@ -9,6 +9,7 @@ from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
@@ -34,6 +35,7 @@ async def resolve_include_entities(
     """
     discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
 
+    include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
     source_entities = resolve_include_source_entities(hass, include_config)
@@ -49,7 +51,7 @@ async def resolve_include_entities(
 
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
-        if source_entity and source_entity.domain == sensor.DOMAIN:
+        if include_non_powercalc and source_entity and source_entity.domain == sensor.DOMAIN:
             device_class = (
                 source_entity.device_class or source_entity.original_device_class
             )

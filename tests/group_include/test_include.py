@@ -35,6 +35,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -1012,6 +1013,46 @@ async def test_include_all(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
         "sensor.existing_power",
     }
 
+
+async def test_exclude_non_powercalc_sensors(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
+    mock_registry(
+        hass,
+        {
+            "switch.switch": RegistryEntry(
+                entity_id="switch.switch",
+                unique_id="1111",
+                platform="switch",
+            ),
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.existing_power",
+                unique_id="3333",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            get_simple_fixed_config("switch.switch"),
+            {
+                CONF_CREATE_GROUP: "All",
+                CONF_INCLUDE: {
+                    CONF_ALL: None,
+                    CONF_INCLUDE_NON_POWERCALC_SENSORS: False,
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.all_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {
+        "sensor.switch_power",
+    }
+
 async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """See github discussion #2008"""
 
@@ -1038,6 +1079,7 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
     error_messages = [record for record in caplog.records if record.levelno == logging.ERROR]
     assert len(error_messages) == 0
     assert "Could not resolve any entities in group" in caplog.text
+
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
