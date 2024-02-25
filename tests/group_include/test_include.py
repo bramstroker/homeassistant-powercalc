@@ -1012,6 +1012,7 @@ async def test_include_all(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
         "sensor.existing_power",
     }
 
+
 async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """See github discussion #2008"""
 
@@ -1038,6 +1039,7 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
     error_messages = [record for record in caplog.records if record.levelno == logging.ERROR]
     assert len(error_messages) == 0
     assert "Could not resolve any entities in group" in caplog.text
+
 
 def _create_powercalc_config_entry(
     hass: HomeAssistant,

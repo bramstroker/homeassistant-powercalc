@@ -22,7 +22,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
-    CONF_MODE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS, CONF_MODE,
     CONF_POWER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
@@ -62,6 +62,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_HIDE_MEMBERS: False,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -86,6 +87,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_HIDE_MEMBERS: False,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
         CONF_UNIQUE_ID: "My group sensor",
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -132,6 +134,7 @@ async def test_group_include_area(
         CONF_HIDE_MEMBERS: False,
         CONF_AREA: area.id,
         CONF_UNIQUE_ID: "My group sensor",
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: True,
     }
 
@@ -179,6 +182,7 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
     assert updated_entry.data == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
     }
 
@@ -243,6 +247,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_HIDE_MEMBERS: False,
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 

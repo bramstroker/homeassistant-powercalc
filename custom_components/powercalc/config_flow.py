@@ -44,7 +44,7 @@ from .const import (
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_LINEAR,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS, CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
@@ -1057,6 +1057,7 @@ def _create_group_options_schema(
                 default=False,
             ): selector.BooleanSelector(),
             vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         },
     )
 
