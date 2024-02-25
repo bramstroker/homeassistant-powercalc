@@ -450,7 +450,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         return self.async_show_form(
             step_id="group",
-            data_schema=group_schema,
+            data_schema=_fill_schema_defaults(
+                group_schema,
+                _get_global_powercalc_config(self.hass),
+            ),
             errors=errors,
         )
 

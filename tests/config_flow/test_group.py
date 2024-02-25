@@ -35,6 +35,7 @@ from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
     create_mocked_virtual_power_sensor_entry,
+    run_powercalc_setup,
     setup_config_entry,
 )
 from tests.config_flow.common import (
@@ -393,3 +394,14 @@ async def test_group_options_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_POWER_ENTITIES] == new_entities
+
+
+async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) -> None:
+    """Check that the toggle is default disabled when we set include_non_powercalc_sensors globally to false"""
+    await run_powercalc_setup(hass, {}, {CONF_INCLUDE_NON_POWERCALC_SENSORS: False})
+
+    result = await select_sensor_type(hass, SensorType.GROUP)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert not schema_keys[schema_keys.index(CONF_INCLUDE_NON_POWERCALC_SENSORS)].default()
