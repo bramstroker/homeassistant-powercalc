@@ -3,7 +3,11 @@ name: Test
 on:
   workflow_dispatch:
   push:
+    paths:
+      - '**.py'
   pull_request:
+    paths:
+      - '**.py'
 
 jobs:
   tests:
