@@ -24,6 +24,7 @@ jobs:
     steps:
       - name: Checkout Powercalc
         uses: actions/checkout@v4
+      - uses: ./.github/workflows/poetry-composite-action
       - name: Run Ruff
         run: |
           poetry run ruff .
