@@ -65,7 +65,8 @@ from custom_components.powercalc.const import (
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_INCLUDE_NON_POWERCALC_SENSORS, CONF_POWER_SENSOR_PRECISION,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
     DEFAULT_ENERGY_SENSOR_PRECISION,
@@ -348,7 +349,7 @@ async def resolve_entity_ids_recursively(
         resolved_area_entities, _ = await resolve_include_entities(
             hass,
             {CONF_AREA: entry.data[CONF_AREA]},
-            bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True))
+            bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)),
         )
         area_entities = [
             entity.entity_id

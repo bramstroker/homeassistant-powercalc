@@ -70,7 +70,8 @@ from .const import (
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
-    CONF_INCLUDE_NON_POWERCALC_SENSORS, CONF_LINEAR,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -215,7 +216,7 @@ SENSOR_CONFIG = {
                     vol.Optional(CONF_AND): vol.All(cv.ensure_list, [FILTER_CONFIG]),
                 },
             ),
-            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): cv.boolean
+            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): cv.boolean,
         },
     ),
     vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
