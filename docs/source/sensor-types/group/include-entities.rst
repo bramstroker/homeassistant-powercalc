@@ -163,8 +163,8 @@ You can also chain nested filter using and / or construction:
 Exclude non powercalc sensors
 =============================
 
-By default all the include options will include any power and/or energy sensor from your system, also power sensors provided by other installations.
-When you don't want that behaviour you can set ``include_non_powercalc_sensors`` to `false`.
+By default all the include options will include any power and/or energy sensor from your system, also power sensors provided by other integrations.
+When you don't want that behaviour you can set ``include_non_powercalc_sensors`` to ``false``.
 
 .. code-block:: yaml
 
