@@ -44,6 +44,7 @@ from .const import (
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
@@ -449,7 +450,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         return self.async_show_form(
             step_id="group",
-            data_schema=group_schema,
+            data_schema=_fill_schema_defaults(
+                group_schema,
+                _get_global_powercalc_config(self.hass),
+            ),
             errors=errors,
         )
 
@@ -1057,6 +1061,7 @@ def _create_group_options_schema(
                 default=False,
             ): selector.BooleanSelector(),
             vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
+            vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         },
     )
 

@@ -62,7 +62,8 @@
                     "hide_members": "Ukryj członków",
                     "name": "Nazwa",
                     "sub_groups": "Podgrupy",
-                    "unique_id": "Unikatowy identyfikator"
+                    "unique_id": "Unikatowy identyfikator",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors"
                 },
                 "data_description": {
                     "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
@@ -70,7 +71,8 @@
                     "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
                     "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
                     "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-                    "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
+                    "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
                 },
                 "title": "Utwórz czujnik grupy"
             },
@@ -246,6 +248,7 @@
                     "group_power_entities": "Członek encji mocy",
                     "hide_members": "Ukryj członków",
                     "ignore_unavailable_state": "Ignoruj stan niedostępny",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "max_power": "Maksymalna moc",
                     "min_power": "Minimalna moc",
                     "multiply_factor": "Mnożnik",
@@ -277,6 +280,7 @@
                     "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
                     "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
                     "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
                     "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
                     "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
                     "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
