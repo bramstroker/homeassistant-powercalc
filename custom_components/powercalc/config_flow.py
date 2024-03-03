@@ -19,7 +19,8 @@ from homeassistant.const import (
     CONF_UNIT_OF_MEASUREMENT,
     Platform,
     UnitOfEnergy,
-    UnitOfPower, UnitOfTime,
+    UnitOfPower,
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
