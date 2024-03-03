@@ -1,4 +1,5 @@
 from homeassistant import data_entry_flow
+from homeassistant.components.utility_meter.const import DAILY, WEEKLY
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -8,7 +9,8 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, SensorType
+from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, CONF_UTILITY_METER_TARIFFS, \
+    CONF_UTILITY_METER_TYPES, SensorType
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -28,6 +30,13 @@ async def test_real_power(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
+
+    # Submit utility meter options step with default settings
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
     await hass.async_block_till_done()
@@ -69,7 +78,7 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
         {
             CONF_NAME: "Test",
             CONF_ENTITY_ID: power_sensor_id,
-            CONF_CREATE_UTILITY_METERS: True,
+            CONF_CREATE_UTILITY_METERS: False,
         },
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -173,3 +182,36 @@ async def test_no_error_is_raised_when_device_not_exists(hass: HomeAssistant) ->
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_energy")
+
+
+async def test_create_utility_meter_tariff_sensors(hass: HomeAssistant) -> None:
+    result = await select_sensor_type(hass, SensorType.REAL_POWER)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_NAME: "Test",
+            CONF_ENTITY_ID: "sensor.my_smart_plug",
+            CONF_CREATE_UTILITY_METERS: True,
+        },
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == "utility_meter_options"
+
+    await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: [DAILY, WEEKLY]
+        },
+    )
+
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_energy")
+    assert hass.states.get("select.test_energy_daily")
+    assert hass.states.get("sensor.test_energy_daily_peak")
+    assert hass.states.get("sensor.test_energy_daily_offpeak")
+    assert hass.states.get("sensor.test_energy_weekly_peak")
+    assert hass.states.get("sensor.test_energy_weekly_offpeak")
