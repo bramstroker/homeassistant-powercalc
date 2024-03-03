@@ -849,6 +849,9 @@ class OptionsFlowHandler(OptionsFlow):
         schema: vol.Schema,
     ) -> dict:
         """Save options, and return errors when validation fails."""
+        if self.sensor_type in [SensorType.GROUP, SensorType.REAL_POWER, SensorType.DAILY_ENERGY]:
+            self._process_user_input(user_input, schema)
+
         if self.sensor_type == SensorType.DAILY_ENERGY:
             self.current_config.update(_build_daily_energy_config(user_input))
 
@@ -881,9 +884,6 @@ class OptionsFlowHandler(OptionsFlow):
                     await strategy_object.validate_config()
                 except StrategyConfigurationError as error:
                     return {"base": error.get_config_flow_translate_key()}
-
-        if self.sensor_type in [SensorType.GROUP, SensorType.REAL_POWER]:
-            self._process_user_input(user_input, schema)
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
@@ -943,6 +943,9 @@ class OptionsFlowHandler(OptionsFlow):
 
         if self.sensor_type == SensorType.GROUP:
             data_schema = _create_group_options_schema(self.hass, self.config_entry)
+
+        if self.current_config.get(CONF_CREATE_UTILITY_METERS):
+            data_schema = data_schema.extend(SCHEMA_UTILITY_METER_OPTIONS.schema)
 
         return _fill_schema_defaults(
             data_schema,
