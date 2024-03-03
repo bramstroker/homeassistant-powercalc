@@ -15,7 +15,6 @@ from custom_components.powercalc.const import (
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
-    CONF_UTILITY_METER_TARIFFS,
     CONF_VALUE,
 )
 from tests.config_flow.common import (

@@ -28,7 +28,8 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
-    CONF_UTILITY_METER_TARIFFS, DOMAIN,
+    CONF_UTILITY_METER_TARIFFS,
+    DOMAIN,
     CalculationStrategy,
 )
 from custom_components.test.light import MockLight
@@ -147,7 +148,7 @@ async def test_group_include_area(
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: True,
-        CONF_UTILITY_METER_TARIFFS: []
+        CONF_UTILITY_METER_TARIFFS: [],
     }
 
     hass.states.async_set("sensor.test_power", 5)

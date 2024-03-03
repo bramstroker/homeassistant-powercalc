@@ -9,8 +9,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, CONF_UTILITY_METER_TARIFFS, \
-    CONF_UTILITY_METER_TYPES, SensorType
+from custom_components.powercalc import CONF_CREATE_UTILITY_METERS, CONF_UTILITY_METER_TARIFFS, CONF_UTILITY_METER_TYPES, SensorType
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -203,7 +202,7 @@ async def test_create_utility_meter_tariff_sensors(hass: HomeAssistant) -> None:
         result["flow_id"],
         {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: [DAILY, WEEKLY]
+            CONF_UTILITY_METER_TYPES: [DAILY, WEEKLY],
         },
     )
 

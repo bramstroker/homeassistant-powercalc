@@ -69,7 +69,8 @@ from .const import (
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
-    CONF_UTILITY_METER_TYPES, CONF_VALUE,
+    CONF_UTILITY_METER_TYPES,
+    CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     CONF_WLED,
     DISCOVERY_POWER_PROFILE,
@@ -270,10 +271,10 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
         ),
         vol.Optional(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=METER_TYPES, translation_key=CONF_METER_TYPE, multiple=True
+                options=METER_TYPES, translation_key=CONF_METER_TYPE, multiple=True,
             ),
         ),
-    }
+    },
 )
 
 
