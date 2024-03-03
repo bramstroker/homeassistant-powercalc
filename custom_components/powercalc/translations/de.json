@@ -183,6 +183,18 @@
                 },
                 "title": "Wählen Sie Ihren Sensortyp"
             },
+            "utility_meter_options": {
+                "title": "Utility meter options",
+                "description": "Define the settings for utility meter creation here",
+                "data": {
+                    "utility_meter_types": "Cycles",
+                    "utility_meter_tariffs": "Tariffs"
+                },
+                "data_description": {
+                    "utility_meter_types": "Create utility meters for specified cycles",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                }
+            },
             "virtual_power": {
                 "data": {
                     "create_energy_sensor": "Energiesensor erstellen",
