@@ -19,7 +19,7 @@ from homeassistant.const import (
     CONF_UNIT_OF_MEASUREMENT,
     Platform,
     UnitOfEnergy,
-    UnitOfPower,
+    UnitOfPower, UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
@@ -123,7 +123,7 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
         ): selector.NumberSelector(
             selector.NumberSelectorConfig(
                 min=10,
-                unit_of_measurement="sec",
+                unit_of_measurement=UnitOfTime.SECONDS,
                 mode=selector.NumberSelectorMode.BOX,
             ),
         ),
@@ -131,6 +131,9 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
             CONF_CREATE_UTILITY_METERS,
             default=False,
         ): selector.BooleanSelector(),
+        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
+        ),
     },
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(
