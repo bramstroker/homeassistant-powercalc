@@ -15,7 +15,8 @@ from custom_components.powercalc.const import (
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
-    CONF_UTILITY_METER_TARIFFS, CONF_VALUE,
+    CONF_UTILITY_METER_TARIFFS,
+    CONF_VALUE,
 )
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
@@ -130,7 +131,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
             CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
             CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 50},
             CONF_CREATE_UTILITY_METERS: True,
-            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"]
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
         },
     )
 
