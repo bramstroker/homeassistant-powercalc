@@ -1,4 +1,5 @@
 from homeassistant import data_entry_flow
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -124,18 +125,32 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
 
 
 async def test_utility_meter_options(hass: HomeAssistant) -> None:
-    entry = create_mock_entry(
-        hass,
+    result = await select_sensor_type(hass, SensorType.DAILY_ENERGY)
+
+    user_input = {
+        CONF_NAME: "My daily energy sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_VALUE: 10,
+        CONF_CREATE_UTILITY_METERS: True,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
         {
-            CONF_NAME: "My daily energy sensor",
-            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
-            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 50},
-            CONF_CREATE_UTILITY_METERS: True,
-            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"]
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    config_entry: ConfigEntry = result["result"]
+
+    result = await hass.config_entries.options.async_init(
+        config_entry.entry_id,
+        data=None,
+    )
 
     user_input = {CONF_UTILITY_METER_TARIFFS: ["peak"]}
     result = await hass.config_entries.options.async_configure(
@@ -144,4 +159,4 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_UTILITY_METER_TARIFFS] == ["peak"]
+    assert config_entry.data[CONF_UTILITY_METER_TARIFFS] == ["peak"]
