@@ -29,7 +29,8 @@
                     "unit_of_measurement": "Unit of measurement",
                     "update_frequency": "Update frequency",
                     "value": "Value",
-                    "value_template": "Value template"
+                    "value_template": "Value template",
+                    "utility_meter_tariffs": "Utility meter tariffs"
                 },
                 "data_description": {
                     "on_time": "When left empty defaults to 1 day. always on",
@@ -72,7 +73,8 @@
                     "group_member_sensors": "Powercalc sensors to include in the group",
                     "group_power_entities": "Additional power sensors (W) from your HA installation to include",
                     "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
                 },
                 "title": "Create a group sensor"
             },
