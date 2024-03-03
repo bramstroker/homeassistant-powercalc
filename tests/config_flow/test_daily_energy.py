@@ -15,7 +15,6 @@ from custom_components.powercalc.const import (
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
-    CONF_UTILITY_METER_TARIFFS,
     CONF_VALUE,
 )
 from tests.config_flow.common import (
@@ -61,7 +60,6 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
             CONF_UPDATE_FREQUENCY: 1800,
             CONF_VALUE: 0.5,
             CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
-            CONF_UTILITY_METER_TARIFFS: [],
         },
         CONF_CREATE_UTILITY_METERS: False,
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,

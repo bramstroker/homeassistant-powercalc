@@ -29,8 +29,7 @@
                     "unit_of_measurement": "Unit of measurement",
                     "update_frequency": "Update frequency",
                     "value": "Value",
-                    "value_template": "Value template",
-                    "utility_meter_tariffs": "Utility meter tariffs"
+                    "value_template": "Value template"
                 },
                 "data_description": {
                     "on_time": "When left empty defaults to 1 day. always on",
@@ -73,8 +72,7 @@
                     "group_member_sensors": "Powercalc sensors to include in the group",
                     "group_power_entities": "Additional power sensors (W) from your HA installation to include",
                     "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
                 },
                 "title": "Create a group sensor"
             },
@@ -184,6 +182,18 @@
                     "virtual_power": "Virtual power (manual)"
                 },
                 "title": "Choose your sensor type"
+            },
+            "utility_meter_options": {
+                "title": "Utility meter options",
+                "description": "Define the settings for utility meter creation here",
+                "data": {
+                    "utility_meter_types": "Cycles",
+                    "utility_meter_tariffs": "Tariffs"
+                },
+                "data_description": {
+                    "utility_meter_types": "Create utility meters for specified cycles",
+                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                }
             },
             "virtual_power": {
                 "data": {

@@ -9,6 +9,7 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.const import (
     CONF_ATTRIBUTE,
@@ -68,6 +69,7 @@ from .const import (
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
+    CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     CONF_WLED,
@@ -132,9 +134,6 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
             CONF_CREATE_UTILITY_METERS,
             default=False,
         ): selector.BooleanSelector(),
-        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
-        ),
     },
 )
 SCHEMA_DAILY_ENERGY = vol.Schema(
@@ -149,11 +148,11 @@ SCHEMA_REAL_POWER_OPTIONS = vol.Schema(
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(
             selector.EntitySelectorConfig(device_class=SensorDeviceClass.POWER),
         ),
+        vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
         vol.Optional(
             CONF_CREATE_UTILITY_METERS,
             default=False,
         ): selector.BooleanSelector(),
-        vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
 
@@ -262,6 +261,19 @@ SCHEMA_GROUP = vol.Schema(
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
+    },
+)
+
+SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
+    {
+        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
+        ),
+        vol.Optional(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=METER_TYPES, translation_key=CONF_METER_TYPE, multiple=True,
+            ),
+        ),
     },
 )
 
@@ -424,6 +436,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
 
             self.sensor_config.update(_build_daily_energy_config(user_input))
+            if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                return await self.async_step_utility_meter_options()
             return self.create_config_entry()
 
         return self.async_show_form(
@@ -447,6 +461,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
 
             if not errors:
+                if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                    return await self.async_step_utility_meter_options()
                 return self.create_config_entry()
 
         group_schema = SCHEMA_GROUP.extend(
@@ -600,6 +616,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
+            if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                return await self.async_step_utility_meter_options()
             return self.create_config_entry()
 
         return self.async_show_form(
@@ -712,6 +730,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="power_advanced",
             data_schema=_fill_schema_defaults(
                 _create_schema_advanced(self.sensor_config),
+                _get_global_powercalc_config(self.hass),
+            ),
+            errors={},
+        )
+
+    async def async_step_utility_meter_options(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        if user_input is not None:
+            self.sensor_config.update(user_input or {})
+            return self.create_config_entry()
+
+        return self.async_show_form(
+            step_id="utility_meter_options",
+            data_schema=_fill_schema_defaults(
+                SCHEMA_UTILITY_METER_OPTIONS,
                 _get_global_powercalc_config(self.hass),
             ),
             errors={},
