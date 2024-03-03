@@ -460,6 +460,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
 
             if not errors:
+                if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                    return await self.async_step_utility_meter_options()
                 return self.create_config_entry()
 
         group_schema = SCHEMA_GROUP.extend(

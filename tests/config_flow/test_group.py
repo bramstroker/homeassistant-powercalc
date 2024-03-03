@@ -28,7 +28,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
-    DOMAIN,
+    CONF_UTILITY_METER_TARIFFS, DOMAIN,
     CalculationStrategy,
 )
 from custom_components.test.light import MockLight
@@ -131,6 +131,13 @@ async def test_group_include_area(
         result["flow_id"],
         user_input,
     )
+
+    # Submit utility_meter_options step with default settings
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
@@ -140,6 +147,7 @@ async def test_group_include_area(
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: True,
+        CONF_UTILITY_METER_TARIFFS: []
     }
 
     hass.states.async_set("sensor.test_power", 5)
