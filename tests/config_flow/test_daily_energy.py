@@ -15,7 +15,7 @@ from custom_components.powercalc.const import (
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
-    CONF_VALUE,
+    CONF_UTILITY_METER_TARIFFS, CONF_VALUE,
 )
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
@@ -120,3 +120,27 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
         "minutes": 20,
         "seconds": 30,
     }
+
+
+async def test_utility_meter_options(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "My daily energy sensor",
+            CONF_SENSOR_TYPE: SensorType.DAILY_ENERGY,
+            CONF_DAILY_FIXED_ENERGY: {CONF_VALUE: 50},
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"]
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry)
+
+    user_input = {CONF_UTILITY_METER_TARIFFS: ["peak"]}
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_UTILITY_METER_TARIFFS] == ["peak"]
