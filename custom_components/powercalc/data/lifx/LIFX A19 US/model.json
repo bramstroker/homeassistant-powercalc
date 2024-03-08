@@ -9,7 +9,5 @@
     },
     "name": "LIFX A19 US",
     "standby_power": 0.2,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

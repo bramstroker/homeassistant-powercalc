@@ -1,10 +1,16 @@
 {
-    "name": "Hue White A60 E27 800lm",
-    "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, Plus1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "aliases": [
+        "9290011370"
     ],
-    "measure_method": "manual",
-    "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
-    "measure_description": "Was not able to measure the standby power, the value is assumed. Two bulbs were measured and the higher reading at each dim setting (0-100) was used"
+    "name": "Hue white A60 bulb E27/B22",
+    "standby_power": 0.4
 }

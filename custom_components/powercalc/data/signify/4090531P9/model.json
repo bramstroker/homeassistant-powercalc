@@ -1,0 +1,16 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "name": "Hue Flourish Ceiling Light",
+    "standby_power": 0.4,
+    "aliases": [
+        "929003053501"
+    ]
+}

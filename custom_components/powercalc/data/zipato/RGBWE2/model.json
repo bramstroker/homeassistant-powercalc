@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Fibaro FGWP102",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 1,
+        "SLEEP_TIME": 2,
+        "VERSION": "v0.26.1:docker"
+    },
+    "name": "Zipato RGBW Bulb V2",
+    "standby_power": 0.3,
+    "calculation_strategy": "lut"
+}

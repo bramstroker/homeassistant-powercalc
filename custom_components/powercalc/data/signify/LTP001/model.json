@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 2,
+        "VERSION": "master"
+    },
+    "name": "Hue Cher Suspension Light",
+    "standby_power": 0.53
+}

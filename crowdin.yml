@@ -1,0 +1,25 @@
+"project_id_env": "CROWDIN_PROJECT_ID"
+"api_token_env": "CROWDIN_PERSONAL_TOKEN"
+"base_path": "."
+"base_url": "https://api.crowdin.com"
+"preserve_hierarchy": true
+files: [
+  {
+    "source": "/custom_components/powercalc/translations/en.json",
+    "translation": "/custom_components/powercalc/translations/%locale%.json",
+    "languages_mapping": {
+        "locale": {
+            "cz": "cz",
+            "de": "de",
+            "fr": "fr",
+            "nl": "nl",
+            "pl": "pl",
+            "pt": "pt",
+            "pt-BR": "pt-BR",
+            "ro": "ro",
+            "sk": "sk",
+            "sv": "sv"
+        }
+    }
+  }
+]

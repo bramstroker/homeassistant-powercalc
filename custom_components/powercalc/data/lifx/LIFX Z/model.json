@@ -9,7 +9,5 @@
     },
     "name": "LIFX Z",
     "standby_power": 0.57,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

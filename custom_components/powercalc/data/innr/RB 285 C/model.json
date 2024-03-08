@@ -8,7 +8,5 @@
     },
     "name": "RB 285 C 806lm E27 RGBW",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

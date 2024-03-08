@@ -9,7 +9,5 @@
     },
     "name": "WiZ Globe G95 E27 Color (type SHRGB1C, model 9290023839)",
     "standby_power": 0.96,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

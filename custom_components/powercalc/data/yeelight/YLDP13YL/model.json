@@ -9,7 +9,5 @@
     },
     "name": "Yeelight LED Bulb 1S",
     "standby_power": 1.22,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

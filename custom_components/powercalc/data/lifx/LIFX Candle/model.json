@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Kasa KP115",
+    "measure_device": "TP-Link Kasa KP115",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 1,
@@ -9,7 +9,5 @@
     },
     "name": "LIFX Candle",
     "standby_power": 0.56,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -1,12 +1,12 @@
 {
     "properties": {
       "bri": {
-        "type": "number",
+        "type": "integer",
         "minimum": 0,
         "maximum": 255
       },
       "mired": {
-        "type": "number",
+        "type": "integer",
         "minimum": 0,
         "maximum": 670
       },

@@ -1,0 +1,29 @@
+{
+    "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using Docker container; manual mute/zero volume measurement.",
+    "measure_method": "script",
+    "measure_device": "TP-Link Kasa KP115",
+    "name": "Sonos Play:3",
+    "standby_power": 4.17,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 5.08",
+            "10 -> 5.15",
+            "20 -> 5.17",
+            "30 -> 5.19",
+            "40 -> 5.21",
+            "50 -> 5.32",
+            "60 -> 5.65",
+            "70 -> 6.53",
+            "80 -> 8.38",
+            "90 -> 12.17",
+            "100 -> 13.27"
+        ]
+    },
+    "aliases": [
+        "Play:3"
+    ],
+    "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore."
+}

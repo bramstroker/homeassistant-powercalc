@@ -1,0 +1,19 @@
+{
+	"measure_description": "Manually measured",
+	"measure_method": "manual",
+	"measure_device": "Brennenstuhl PM 231 E",
+	"name": "Smart plug (with power monitoring)",
+	"standby_power": 0.1,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 0.4
+	},
+	"aliases": [
+		"A1Z"
+	]
+}

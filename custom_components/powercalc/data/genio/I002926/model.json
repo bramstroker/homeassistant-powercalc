@@ -9,7 +9,5 @@
     },
     "name": "Mirabella Genio Wi-Fi Dimmable 5.5W ES RGBW Spiral Filament LED Bulb",
     "standby_power": 0.7,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

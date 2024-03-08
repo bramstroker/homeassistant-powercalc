@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 8.2",
+            "20 -> 8.63",
+            "30 -> 8.63",
+            "40 -> 9.01",
+            "50 -> 10.09",
+            "60 -> 12.96",
+            "70 -> 21.15",
+            "80 -> 33.44",
+            "90 -> 36.44",
+            "100 -> 37.56",
+            "0 -> 8.8"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Gosund, UP111 (ESPHome)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "name": "Bose SoundTouch 300",
+    "standby_power": 1.5
+}

@@ -1,0 +1,15 @@
+{
+    "name": "Test",
+    "standby_power": 0.47,
+    "calculation_strategy": "lut",
+    "sub_profile_select": {
+        "matchers": [
+            {
+                "type": "entity_id",
+                "pattern": ".*_nightlight$",
+                "profile": "nightlight"
+            }
+        ],
+        "default": "default"
+    }
+}

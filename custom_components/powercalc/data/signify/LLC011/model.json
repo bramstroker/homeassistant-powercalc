@@ -1,9 +1,7 @@
 {
     "name": "Living Colours Bloom 7099760PH",
     "standby_power": 0.29,
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "measure_description": "Measured with script made by bramstroker and partially verified manual"

@@ -1,0 +1,14 @@
+{
+    "measure_description": "Manually sampled at 10% volume increases, radio, listening to EDM. Max power is from manufacturer specs",
+    "measure_method": "manual",
+    "measure_device": "TP-Link Tapo P110",
+    "name": "Google Home",
+    "standby_power": 2.4,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "min_power": 2.4,
+        "max_power": 3.87
+    }
+}

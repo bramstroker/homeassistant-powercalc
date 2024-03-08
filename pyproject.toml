@@ -1,3 +1,103 @@
+[project]
+name = "Powercalc"
+description = "Custom Home Assistant component for virtual power sensors"
+maintainers = [
+  { name = "Bram Gerritsen", email = "bgerritsen@gmail.com" },
+]
+keywords = [
+  "homeassistant",
+  "energy",
+  "power",
+  "custom-component",
+  "custom-integration",
+]
+classifiers = [
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.12.0"
+dependencies = ["homeassistant"]
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+norecursedirs = ".git"
+asyncio_mode = "auto"
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.12"
+show_error_codes = true
+follow_imports = "silent"
+local_partial_types = true
+strict_equality = true
+no_implicit_optional = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+warn_return_any = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "homeassistant.components.*"
+ignore_missing_imports = true
+
+[tool.coverage.paths]
+source = ["custom_components/powercalc", "utils", "tests"]
+
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
+ignore = ["ANN101"]
+
+[tool.ruff.lint.per-file-ignores]
+"utils/measure/**.py" = ["T201"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.poetry]
+name = "powercalc"
+version = "0.1.0"
+description = "Powercalc HA custom component"
+authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3"
+ruff = "^0.3.0"
+voluptuous-stubs = "^0.1"
+homeassistant-stubs = "2024.3.0"
+freezegun = "1.4.0"
+pytest-homeassistant-custom-component = "^0.13"
+types-pytz = "^2024.1"
+types-croniter = "^2.0"
+croniter = "^2.0"
+pytest-cov = "^4.0"
+coverage = "7.4.3"
+# Requirements below are needed since HA 2023.9.3, not sure why
+psutil_home_assistant = "*"
+fnv_hash_fast = "*"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

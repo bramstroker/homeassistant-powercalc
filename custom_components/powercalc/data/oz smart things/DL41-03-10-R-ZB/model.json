@@ -1,0 +1,16 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly 2.5",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.1.3:docker"
+    },
+    "name": "Oz Smart Things Zigbee Downlight",
+    "standby_power": 0.72,
+    "calculation_strategy": "lut",
+    "aliases": [
+        "DL41-03-10-R-ZB"
+    ]
+}

@@ -4,7 +4,9 @@
     "measure_device": "unknown",
     "measure_method": "script",
     "measure_description": "",
-    "supported_modes": [
-        "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "9290012573A"
     ]
 }
+

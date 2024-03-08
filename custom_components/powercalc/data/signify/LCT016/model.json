@@ -1,6 +1,6 @@
 {
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "TPLink Smart Wi-Fi Plug Mini",
+  "measure_device": "TP-Link Smart Wi-Fi Plug Mini",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 1,
@@ -9,5 +9,5 @@
   },
   "name": "Philips Hue 800 Lumen White and Color A19",
   "standby_power": 0.34,
-  "supported_modes": ["lut"]
+  "calculation_strategy": "lut"
 }

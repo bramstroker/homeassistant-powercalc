@@ -1,10 +1,8 @@
 {
     "name": "Philips Hue White and Color Ambience (1 gen)",
-    "supported_modes": [
-        "lut"
-    ],
+    "calculation_strategy": "lut",
     "standby_power": 0.22,
     "measure_method": "script",
-    "measure_device": "Shelly PM1",
+    "measure_device": "Shelly 1PM",
     "measure_description": "Used HASS based script"
 }

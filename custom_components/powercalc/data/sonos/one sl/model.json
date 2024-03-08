@@ -1,0 +1,26 @@
+{
+    "measure_description": "Streamed 'Pink noise' from https://www.genelec.com/audio-test-signals and measured using docker container",
+    "measure_method": "script",
+    "measure_device": "Shelly Plug US",
+    "name": "Sonos One SL",
+    "standby_power": 2.83,
+    "device_type": "smart_speaker",
+    "calculation_strategy": "linear",
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "linear_config": {
+        "calibrate": [
+            "0 -> 3.48",
+            "10 -> 5.28",
+            "20 -> 5.38",
+            "30 -> 5.46",
+            "40 -> 5.6",
+            "50 -> 6.01",
+            "60 -> 6.89",
+            "70 -> 8.3",
+            "80 -> 9.66",
+            "90 -> 10.65",
+            "100 -> 15.53"
+        ]
+    },
+    "config_flow_discovery_remarks": "**Warning**, please verify this device is a single speaker and not part of a stereo or Home theater configuration. This powercalc profile is specifically for a single speaker, so when you accept it anyway power estimation will be way off. When this is the case for you please ignore this discovery by clicking the three dots and ignore."
+}

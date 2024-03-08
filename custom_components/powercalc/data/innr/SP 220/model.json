@@ -1,0 +1,19 @@
+{
+	"measure_description": "Manually measured",
+	"measure_method": "manual",
+	"measure_device": "Shelly Plus Plug S / AVM FRITZ!DECT 200",
+	"name": "Innr Zigbee Smart Plug SP220",
+	"standby_power": 0.50,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+ 	},
+	"device_type": "smart_switch",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 1.25
+	},
+    	"aliases": [
+        	"On/Off plug (SP 220)"
+    	]
+}

@@ -9,7 +9,8 @@
     },
     "name": "Yeelight YLDL01YL Downlight",
     "standby_power": 0.72,
-    "supported_modes": [
-        "lut"
+    "calculation_strategy": "lut",
+    "aliases": [
+        "ceiling10"
     ]
 }

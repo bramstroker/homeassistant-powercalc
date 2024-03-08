@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TP-Link Tapo P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.22.1:docker"
+    },
+    "name": "Mirabella Genio Wi-Fi 7W LED Tube Lamp",
+    "standby_power": 0.7,
+    "calculation_strategy": "lut"
+}

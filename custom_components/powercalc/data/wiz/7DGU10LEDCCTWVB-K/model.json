@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured 5 bulbs with utils/measure script with no dummy load",
-    "measure_device": "Kasa KP115",
+    "measure_device": "TP-Link Kasa KP115",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,5 @@
     },
     "name": "Wiz (Evoluziona) Spot PAR16 GU10 TW (type SHTW, model 7DGU10LEDCCTWVB-K, 7W 120V)",
     "standby_power": 0.63,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

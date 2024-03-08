@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script. TP-link kp125 was having inconsistent readings towards the 0.52 watt and lower range, so I manually smoothed out some of the outliers",
-    "measure_device": "TP-Link KP125",
+    "measure_device": "TP-Link Kasa KP125",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
@@ -9,7 +9,20 @@
     },
     "name": "LIFX A19 Night Vision",
     "standby_power": 0.47,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut",
+    "sub_profile_select": {
+        "matchers": [
+            {
+                "type": "entity_state",
+                "entity_id": "select.{{source_object_id}}_infrared_brightness",
+                "map": {
+                    "Disabled": "infrared_off",
+                    "25%": "infrared_25",
+                    "50%": "infrared_50",
+                    "100%": "infrared_100"
+                }
+            }
+        ],
+        "default": "infrared_off"
+    }
 }

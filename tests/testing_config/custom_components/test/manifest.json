@@ -1,10 +1,10 @@
 {
   "domain": "test",
   "name": "Test Components",
-  "iot_class": "assumed_state",
-  "documentation": "https://example.com",
-  "requirements": [],
-  "dependencies": [],
   "codeowners": [],
+  "dependencies": [],
+  "documentation": "https://example.com",
+  "iot_class": "assumed_state",
+  "requirements": [],
   "version": "1.2.3"
 }

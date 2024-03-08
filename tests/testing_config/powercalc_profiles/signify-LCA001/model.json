@@ -3,7 +3,5 @@
     "measure_method": "script",
     "measure_device": "Shelly Plug S",
     "standby_power": 0.33,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

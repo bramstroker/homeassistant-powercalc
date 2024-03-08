@@ -5,32 +5,30 @@ from __future__ import annotations
 import logging
 
 import homeassistant.helpers.config_validation as cv
-import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.utility_meter import DEFAULT_OFFSET, max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
-    CONF_ENTITY_ID,
-    CONF_PLATFORM,
+    CONF_DOMAIN,
+    CONF_ENTITIES,
     CONF_SCAN_INTERVAL,
-    CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
 )
-from homeassistant.const import __version__ as HA_VERSION
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import discovery
+from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.helpers.discovery import async_load_platform
+from homeassistant.helpers.typing import ConfigType
 
-from .common import create_source_entity, validate_name_pattern
+from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -38,18 +36,29 @@ from .const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
+    CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_INCLUDE,
+    CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_POWER_TEMPLATE,
+    CONF_SENSOR_TYPE,
+    CONF_SENSORS,
+    CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERED_ENTITIES,
+    DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
+    DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
@@ -59,21 +68,25 @@ from .const import (
     DEFAULT_POWER_SENSOR_PRECISION,
     DEFAULT_UPDATE_FREQUENCY,
     DEFAULT_UTILITY_METER_TYPES,
-    DISCOVERY_LIGHT_MODEL,
-    DISCOVERY_SOURCE_ENTITY,
+    DISCOVERY_TYPE,
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
     MIN_HA_VERSION,
+    SERVICE_CHANGE_GUI_CONFIGURATION,
+    PowercalcDiscoveryType,
+    SensorType,
     UnitPrefix,
 )
-from .errors import ModelNotSupported
-from .power_profile.model_discovery import (
-    get_light_model,
-    has_manufacturer_and_model_information,
+from .discovery import DiscoveryManager
+from .sensor import SENSOR_CONFIG
+from .sensors.group import (
+    get_entries_having_subgroup,
+    remove_group_from_power_sensor_entry,
+    remove_power_sensor_from_associated_groups,
 )
-from .sensors.group import create_group_sensors
+from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
@@ -82,42 +95,55 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
             cv.deprecated(
-                CONF_SCAN_INTERVAL, replacement_key=CONF_FORCE_UPDATE_FREQUENCY
+                CONF_SCAN_INTERVAL,
+                replacement_key=CONF_FORCE_UPDATE_FREQUENCY,
             ),
             vol.Schema(
                 {
                     vol.Optional(
-                        CONF_FORCE_UPDATE_FREQUENCY, default=DEFAULT_UPDATE_FREQUENCY
+                        CONF_FORCE_UPDATE_FREQUENCY,
+                        default=DEFAULT_UPDATE_FREQUENCY,
                     ): cv.time_period,
                     vol.Optional(
-                        CONF_POWER_SENSOR_NAMING, default=DEFAULT_POWER_NAME_PATTERN
+                        CONF_POWER_SENSOR_NAMING,
+                        default=DEFAULT_POWER_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_POWER_SENSOR_FRIENDLY_NAMING
+                        CONF_POWER_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_POWER_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                        CONF_POWER_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_NAMING, default=DEFAULT_ENERGY_NAME_PATTERN
+                        CONF_ENERGY_SENSOR_NAMING,
+                        default=DEFAULT_ENERGY_NAME_PATTERN,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING
+                        CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
                     ): validate_name_pattern,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_CATEGORY, default=DEFAULT_ENTITY_CATEGORY
+                        CONF_ENERGY_SENSOR_CATEGORY,
+                        default=DEFAULT_ENTITY_CATEGORY,
                     ): vol.In(ENTITY_CATEGORIES),
+                    vol.Optional(
+                        CONF_DISABLE_EXTENDED_ATTRIBUTES,
+                        default=False,
+                    ): cv.boolean,
                     vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): cv.boolean,
                     vol.Optional(CONF_CREATE_UTILITY_METERS, default=False): cv.boolean,
                     vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string]
+                        cv.ensure_list,
+                        [cv.string],
                     ),
                     vol.Optional(
-                        CONF_UTILITY_METER_TYPES, default=DEFAULT_UTILITY_METER_TYPES
+                        CONF_UTILITY_METER_TYPES,
+                        default=DEFAULT_UTILITY_METER_TYPES,
                     ): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
                     vol.Optional(
-                        CONF_UTILITY_METER_OFFSET, default=DEFAULT_OFFSET
+                        CONF_UTILITY_METER_OFFSET,
+                        default=DEFAULT_OFFSET,
                     ): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
                     vol.Optional(
                         CONF_ENERGY_INTEGRATION_METHOD,
@@ -132,14 +158,23 @@ CONFIG_SCHEMA = vol.Schema(
                         default=DEFAULT_POWER_SENSOR_PRECISION,
                     ): cv.positive_int,
                     vol.Optional(
-                        CONF_ENERGY_SENSOR_UNIT_PREFIX, default=UnitPrefix.KILO
+                        CONF_ENERGY_SENSOR_UNIT_PREFIX,
+                        default=UnitPrefix.KILO,
                     ): vol.In([cls.value for cls in UnitPrefix]),
                     vol.Optional(CONF_CREATE_DOMAIN_GROUPS, default=[]): vol.All(
-                        cv.ensure_list, [cv.string]
+                        cv.ensure_list,
+                        [cv.string],
                     ),
-                }
+                    vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE): cv.boolean,
+                    vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
+                    vol.Optional(CONF_SENSORS): vol.All(
+                        cv.ensure_list,
+                        [SENSOR_CONFIG],
+                    ),
+                    vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
+                },
             ),
-        )
+        ),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -147,15 +182,18 @@ CONFIG_SCHEMA = vol.Schema(
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):
-        _LOGGER.critical(
-            "Your HA version is outdated for this version of powercalc. Minimum required HA version is %s",
-            MIN_HA_VERSION,
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    if AwesomeVersion(HA_VERSION) < AwesomeVersion(MIN_HA_VERSION):  # pragma: no cover
+        msg = (
+            "This integration requires at least HomeAssistant version "
+            f" {MIN_HA_VERSION}, you are running version {HA_VERSION}."
+            " Please upgrade HomeAssistant to continue use this integration."
         )
+        _notify_message(hass, "inv_ha_version", "PowerCalc", msg)
+        _LOGGER.critical(msg)
         return False
 
-    domain_config = config.get(DOMAIN) or {
+    domain_config: ConfigType = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -165,45 +203,139 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
         CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
+        CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
+        CONF_IGNORE_UNAVAILABLE_STATE: False,
         CONF_CREATE_DOMAIN_GROUPS: [],
         CONF_CREATE_ENERGY_SENSORS: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENABLE_AUTODISCOVERY: True,
         CONF_UTILITY_METER_OFFSET: DEFAULT_OFFSET,
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
 
+    discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
         DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
     }
 
-    await autodiscover_entities(config, domain_config, hass)
+    await hass.async_add_executor_job(register_services, hass)
 
-    if domain_config.get(CONF_CREATE_DOMAIN_GROUPS):
+    if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
+        await discovery_manager.start_discovery()
 
-        async def _create_domain_groups(event: None):
-            await create_domain_groups(
-                hass,
-                domain_config,
-                domain_config.get(CONF_CREATE_DOMAIN_GROUPS),
-            )
+    await setup_yaml_sensors(hass, config, domain_config)
 
-        hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STARTED,
-            _create_domain_groups,
-        )
+    setup_domain_groups(hass, domain_config)
+    setup_standby_group(hass, domain_config)
 
     return True
 
 
+def register_services(hass: HomeAssistant) -> None:
+    """Register generic services"""
+
+    async def handle_service(call: ServiceCall) -> None:
+        await change_gui_configuration(hass, call)
+
+    hass.services.register(
+        DOMAIN,
+        SERVICE_CHANGE_GUI_CONFIGURATION,
+        handle_service,
+        schema=SERVICE_SCHEMA,
+    )
+
+
+def setup_standby_group(hass: HomeAssistant, domain_config: ConfigType) -> None:
+    async def _create_standby_group(event: None) -> None:
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {DISCOVERY_TYPE: PowercalcDiscoveryType.STANDBY_GROUP},
+                domain_config,
+            ),
+        )
+
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _create_standby_group,
+    )
+
+
+def setup_domain_groups(hass: HomeAssistant, global_config: ConfigType) -> None:
+    domain_groups: list[str] | None = global_config.get(CONF_CREATE_DOMAIN_GROUPS)
+    if not domain_groups:
+        return
+
+    async def _create_domain_groups(event: None) -> None:
+        """Create group sensors aggregating all power sensors from given domains."""
+        _LOGGER.debug("Setting up domain based group sensors..")
+        for domain in domain_groups:
+            if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
+                _LOGGER.error(
+                    "Cannot setup group for domain %s, no entities found",
+                    domain,
+                )
+                continue
+
+            domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
+
+            hass.async_create_task(
+                async_load_platform(
+                    hass,
+                    SENSOR_DOMAIN,
+                    DOMAIN,
+                    {
+                        DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
+                        CONF_ENTITIES: domain_entities,
+                        CONF_DOMAIN: domain,
+                    },
+                    global_config,
+                ),
+            )
+
+    hass.bus.async_listen_once(
+        EVENT_HOMEASSISTANT_STARTED,
+        _create_domain_groups,
+    )
+
+
+async def setup_yaml_sensors(
+    hass: HomeAssistant,
+    config: ConfigType,
+    domain_config: ConfigType,
+) -> None:
+    sensors: list = domain_config.get(CONF_SENSORS, [])
+    sorted_sensors = sorted(
+        sensors,
+        key=lambda item: 1 if CONF_INCLUDE in item else 0,
+    )
+    for sensor_config in sorted_sensors:
+        sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                Platform.SENSOR,
+                DOMAIN,
+                sensor_config,
+                config,
+            ),
+        )
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
     return True
 
@@ -212,11 +344,16 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
     await hass.config_entries.async_reload(entry.entry_id)
 
+    # Also reload all "parent" groups referring this group as a subgroup
+    for related_entry in await get_entries_having_subgroup(hass, entry):
+        await hass.config_entries.async_reload(related_entry.entry_id)
+
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
+        config_entry,
+        PLATFORMS,
     )
 
     if unload_ok:
@@ -226,101 +363,58 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
         except ValueError:
             return True
 
-        entity_registry = er.async_get(hass)
-        entries = er.async_entries_for_config_entry(
-            entity_registry, config_entry.entry_id
-        )
-        for entry in entries:
-            entity_registry.async_remove(entry.entity_id)
-            _LOGGER.debug(f"Removing {entry.entity_id}")
-
     return unload_ok
 
 
-async def autodiscover_entities(config: dict, domain_config: dict, hass: HomeAssistant):
-    """Discover entities supported for powercalc autoconfiguration in HA instance"""
+async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """Called after a config entry is removed."""
+    updated_entries: list[ConfigEntry] = []
 
-    if not domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        return
-
-    _LOGGER.debug("Start auto discovering entities")
-    entity_registry = er.async_get(hass)
-    for entity_entry in list(entity_registry.entities.values()):
-        if entity_entry.disabled:
-            continue
-
-        if entity_entry.domain not in (LIGHT_DOMAIN, SWITCH_DOMAIN):
-            continue
-
-        if not await has_manufacturer_and_model_information(hass, entity_entry):
-            continue
-
-        manual_configuration = get_manual_configuration(config, entity_entry.entity_id)
-
-        source_entity = await create_source_entity(entity_entry.entity_id, hass)
-        try:
-            light_model = await get_light_model(hass, {}, source_entity.entity_entry)
-            if light_model.is_additional_configuration_required:
-                if not manual_configuration:
-                    _LOGGER.warning(
-                        f"{entity_entry.entity_id}: Model found in database, but needs additional manual configuration to be loaded"
-                    )
-                    continue
-        except ModelNotSupported:
-            _LOGGER.debug(
-                "%s: Model not found in library, skipping auto configuration",
-                entity_entry.entity_id,
-            )
-            continue
-
-        if not light_model:
-            continue
-
-        if not light_model.is_entity_domain_supported(source_entity.domain):
-            continue
-
-        discovery_info = {
-            CONF_ENTITY_ID: entity_entry.entity_id,
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_LIGHT_MODEL: light_model,
-        }
-        hass.async_create_task(
-            discovery.async_load_platform(
-                hass, SENSOR_DOMAIN, DOMAIN, discovery_info, config
-            )
+    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
+    if sensor_type == SensorType.VIRTUAL_POWER:
+        updated_entries = await remove_power_sensor_from_associated_groups(
+            hass,
+            config_entry,
         )
+    if sensor_type == SensorType.GROUP:
+        updated_entries = await remove_group_from_power_sensor_entry(hass, config_entry)
 
-    _LOGGER.debug("Done auto discovering entities")
-
-
-def get_manual_configuration(config: dict, entity_id: str) -> dict | None:
-    if SENSOR_DOMAIN not in config:
-        return None
-    sensor_config = config.get(SENSOR_DOMAIN)
-    for item in sensor_config:
-        if item.get(CONF_PLATFORM) == DOMAIN and item.get(CONF_ENTITY_ID) == entity_id:
-            return item
-    return None
+    for entry in updated_entries:
+        if entry.state == ConfigEntryState.LOADED:
+            await hass.config_entries.async_reload(entry.entry_id)
 
 
-async def create_domain_groups(
-    hass: HomeAssistant, global_config: dict, domains: list[str]
-):
-    """Create group sensors aggregating all power sensors from given domains"""
-    sensor_component = hass.data[SENSOR_DOMAIN]
-    sensor_config = global_config.copy()
-    _LOGGER.debug(f"Setting up domain based group sensors..")
-    for domain in domains:
-        if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
-            _LOGGER.error(f"Cannot setup group for domain {domain}, no entities found")
-            continue
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    version = config_entry.version
+    if version == 1:
+        data = {**config_entry.data}
+        if (
+            CONF_FIXED in data
+            and CONF_POWER in data[CONF_FIXED]
+            and CONF_POWER_TEMPLATE in data[CONF_FIXED]
+        ):
+            data[CONF_FIXED].pop(CONF_POWER, None)
+        hass.config_entries.async_update_entry(config_entry, data=data, version=2)
 
-        domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
-        sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
-        group_name = f"All {domain}"
+    return True
 
-        entities = await create_group_sensors(
-            group_name, sensor_config, domain_entities, hass
-        )
-        await sensor_component.async_add_entities(entities)
-    return []
+
+def _notify_message(
+    hass: HomeAssistant,
+    notification_id: str,
+    title: str,
+    message: str,
+) -> None:  # pragma: no cover
+    """Notify user with persistent notification."""
+    hass.async_create_task(
+        hass.services.async_call(
+            domain="persistent_notification",
+            service="create",
+            service_data={
+                "title": title,
+                "message": message,
+                "notification_id": f"{DOMAIN}.{notification_id}",
+            },
+        ),
+    )

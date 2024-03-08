@@ -1,15 +1,13 @@
 {
+    "calculation_strategy": "lut",
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Gosund SP111 with Tasmota",
+    "measure_device": "Shelly, Plug E (gen1)",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 2,
         "SLEEP_TIME": 3,
-        "VERSION": "v0.22.0:docker"
+        "VERSION": "v1.3.3:docker"
     },
-    "name": "Livarno Lux LED Outdoor Floodlight RGBW",
-    "standby_power": 0.35,
-    "supported_modes": [
-        "lut"
-    ]
+    "name": "HG08010",
+    "standby_power": 0.58
 }

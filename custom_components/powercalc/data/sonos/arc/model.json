@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 13.51",
+            "20 -> 13.53",
+            "30 -> 13.54",
+            "40 -> 13.56",
+            "50 -> 13.66",
+            "60 -> 14.0",
+            "70 -> 15.42",
+            "80 -> 21.11",
+            "90 -> 31.42",
+            "100 -> 45.34",
+            "0 -> 13.50"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly Plug S",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 1,
+        "VERSION": "v1.3.13:docker"
+    },
+    "name": "Sonos Arc",
+    "standby_power": 4.4
+}

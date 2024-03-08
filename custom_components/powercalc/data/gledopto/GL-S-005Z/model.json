@@ -1,0 +1,13 @@
+{
+    "measure_description": "Measured with utils/measure script.  Controller: hue, Bulbs: 1, Dummy Load: None",
+    "measure_device": "TP-Link Kasa KP115(US)",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v0.24.8:docker"
+    },
+    "name": "Gledopto 4W MR16 Dual White and Color 120°",
+    "standby_power": 0.49,
+    "calculation_strategy": "lut"
+}

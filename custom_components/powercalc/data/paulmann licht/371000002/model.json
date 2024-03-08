@@ -9,7 +9,5 @@
     },
     "name": "Amaris RGBW LED Panels 595x295mm",
     "standby_power": 1.33,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

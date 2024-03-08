@@ -9,7 +9,5 @@
     },
     "name": "ENKI Lexman E27 14W to 100W LED RGBW v2",
     "standby_power": 0.4,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

@@ -1,0 +1,19 @@
+{
+	"measure_description": "Manually measured.",
+	"measure_method": "manual",
+	"measure_device": "TP-Link Tapo P110",
+	"name": "HS100",
+	"standby_power": 0.89,
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "smart_switch",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 1.461
+	},
+	"aliases": [
+		"HS100(EU)"
+	]
+}

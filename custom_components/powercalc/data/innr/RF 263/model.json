@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured 3 bulbs simultaneously with utils/measure script",
+    "measure_device": "Nous A1T",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.3.6:docker"
+    },
+    "name": "RF 263-2 Smart Filament Bulb E27 Vintage (2200K)",
+    "standby_power": 0.33
+}

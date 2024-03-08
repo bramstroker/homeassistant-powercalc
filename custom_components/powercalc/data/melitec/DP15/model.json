@@ -9,7 +9,5 @@
     },
     "name": "LightZone DP15 LED-Pendelleuchte",
     "standby_power": 0.83,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }

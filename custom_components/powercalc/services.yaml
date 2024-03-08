@@ -5,3 +5,108 @@ reset_energy:
     entity:
       domain: sensor
       device_class: energy
+calibrate_utility_meter:
+  name: Calibrate utility meter
+  description: Calibrates a utility meter sensor.
+  target:
+    entity:
+      domain: sensor
+  fields:
+    value:
+      name: Value
+      description: Value to which set the meter
+      example: "100"
+      required: true
+      selector:
+        text:
+calibrate_energy:
+  name: Calibrate energy sensor
+  description: Sets the energy sensor to a given kWh value.
+  target:
+    entity:
+      domain: sensor
+      device_class: energy
+  fields:
+    value:
+      name: Value
+      description: Value to which set the meter
+      example: "100"
+      required: true
+      selector:
+        text:
+increase_daily_energy:
+  name: Increase daily energy sensor
+  description: Increases the sensor with a given amount
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: energy
+  fields:
+    value:
+      name: Value
+      description: Amount to add to the sensor
+      example: "100"
+      required: true
+      selector:
+        text:
+activate_playbook:
+  name: Activate playbook
+  description: Activate playbook
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+  fields:
+    playbook_id:
+      name: Playbook
+      description: Playbook identifier
+      required: true
+      example: program1
+      selector:
+        text:
+stop_playbook:
+  name: Stop playbook
+  description: Stop active playbook
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+switch_sub_profile:
+  name: Switch to another sub profile
+  description: Some profiles in the library has different sub profiles. This service allows you to switch to another one.
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
+      device_class: power
+  fields:
+    profile:
+      name: Sub profile
+      description: Define one of the possible sub profiles
+      example: "nigh_vision"
+      required: true
+      selector:
+        text:
+change_gui_config:
+  name: Change GUI config
+  description: Batch change configuration of all Powercalc config entries
+  fields:
+    field:
+      name: Field
+      required: true
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - "create_energy_sensor"
+            - "create_utility_meters"
+            - "ignore_unavailable_state"
+            - "energy_integration_method"
+    value:
+      name: Value
+      required: true
+      selector:
+        text:

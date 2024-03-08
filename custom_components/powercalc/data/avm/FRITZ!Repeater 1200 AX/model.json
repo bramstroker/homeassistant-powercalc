@@ -1,0 +1,15 @@
+{
+	"measure_description": "Manually measured. See https://github.com/bramstroker/homeassistant-powercalc/issues/1726",
+	"measure_method": "manual",
+	"measure_device": "NOUS A1Z",
+	"name": "FRITZ!Repeater 1200 AX",
+	"sensor_config": {
+		"power_sensor_naming": "{} Device Power",
+		"energy_sensor_naming": "{} Device Energy"
+  	},
+	"device_type": "network",
+	"calculation_strategy": "fixed",
+	"fixed_config": {
+		"power": 3.0
+	}
+}

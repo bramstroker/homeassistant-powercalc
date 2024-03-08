@@ -1,0 +1,13 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Kasa KP115",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.9.15:docker"
+    },
+    "name": "Hue White and Color Ambiance GU10 w/BT",
+    "standby_power": 0.4
+}

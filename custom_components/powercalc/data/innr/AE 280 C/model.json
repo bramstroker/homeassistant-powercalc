@@ -1,6 +1,6 @@
 {
     "measure_description": "Measured with utils/measure script",
-    "measure_device": "Sonoff, S31",
+    "measure_device": "Sonoff S31",
     "measure_method": "script",
     "measure_settings": {
         "SAMPLE_COUNT": 3,
@@ -9,7 +9,5 @@
     },
     "name": "Smart Bulb Color E27",
     "standby_power": 0.11,
-    "supported_modes": [
-        "lut"
-    ]
+    "calculation_strategy": "lut"
 }
