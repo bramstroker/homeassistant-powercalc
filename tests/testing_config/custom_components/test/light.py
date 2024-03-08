@@ -5,7 +5,7 @@ Call init before using it in your tests to ensure clean test data.
 """
 import uuid
 
-from homeassistant.components.light import LightEntity
+from homeassistant.components.light import ColorMode, LightEntity, LightEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
@@ -53,11 +53,11 @@ async def async_setup_entry(
 class MockLight(MockToggleEntity, LightEntity):
     """Mock light class."""
 
-    color_mode = None
+    color_mode = ColorMode.BRIGHTNESS
     max_mireds = 500
     min_mireds = 153
-    supported_color_modes = None
-    supported_features = 0
+    supported_color_modes = [ColorMode.BRIGHTNESS]
+    supported_features = LightEntityFeature(0)
 
     brightness = None
     color_temp = None
