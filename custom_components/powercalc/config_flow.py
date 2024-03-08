@@ -1116,7 +1116,7 @@ def _create_group_selector(
     options = [
         selector.SelectOptionDict(
             value=config_entry.entry_id,
-            label=config_entry.data.get(CONF_NAME),
+            label=str(config_entry.data.get(CONF_NAME)),
         )
         for config_entry in hass.config_entries.async_entries(DOMAIN)
         if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP

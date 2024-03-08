@@ -170,7 +170,7 @@ async def create_group_sensors_from_config_entry(
     """Create group sensors based on a config_entry."""
     group_sensors: list[SensorEntity] = []
 
-    group_name = entry.data.get(CONF_NAME)
+    group_name = str(entry.data.get(CONF_NAME))
 
     if CONF_UNIQUE_ID not in sensor_config:
         sensor_config[CONF_UNIQUE_ID] = entry.entry_id
@@ -284,7 +284,7 @@ async def add_to_associated_group(
     if CONF_GROUP not in config_entry.data:
         return None
 
-    group_entry_id = config_entry.data.get(CONF_GROUP)
+    group_entry_id = str(config_entry.data.get(CONF_GROUP))
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
 
     if not group_entry:
@@ -333,7 +333,7 @@ async def resolve_entity_ids_recursively(
         if key not in member_entry.data:  # pragma: no cover
             continue
 
-        resolved_ids.update([member_entry.data.get(key)])
+        resolved_ids.update([str(member_entry.data.get(key))])
 
     # Include the additional power/energy sensors the user specified
     conf_key = (

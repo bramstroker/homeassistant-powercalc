@@ -299,7 +299,7 @@ class DiscoveryManager:
         # Add entities from existing config entries
         entities.extend(
             [
-                entry.data.get(CONF_ENTITY_ID)
+                str(entry.data.get(CONF_ENTITY_ID))
                 for entry in self.hass.config_entries.async_entries(DOMAIN)
                 if entry.source == SOURCE_USER
             ],
