@@ -184,15 +184,15 @@
                 "title": "Kies het gewenste sensor type"
             },
             "utility_meter_options": {
-                "title": "Utility meter options",
-                "description": "Define the settings for utility meter creation here",
+                "title": "Nutsmeter opties",
+                "description": "Definieer de instellingen voor de aanmaak van nutsmeters",
                 "data": {
-                    "utility_meter_types": "Cycles",
-                    "utility_meter_tariffs": "Tariffs"
+                    "utility_meter_types": "Cycli",
+                    "utility_meter_tariffs": "Tarieven"
                 },
                 "data_description": {
-                    "utility_meter_types": "Create utility meters for specified cycles",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
+                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven, laat leeg als er maar één tarief nodig is."
                 }
             },
             "virtual_power": {
