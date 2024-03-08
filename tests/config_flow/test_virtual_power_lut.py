@@ -1,5 +1,6 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
+from homeassistant.components.light import ColorMode
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
@@ -30,6 +31,8 @@ from tests.conftest import MockEntityWithModel
 
 async def test_lut_manual_flow(hass: HomeAssistant) -> None:
     light_entity = MockLight("test", STATE_ON, DEFAULT_UNIQUE_ID)
+    light_entity.supported_color_modes = [ColorMode.COLOR_TEMP, ColorMode.HS]
+    light_entity.color_mode = ColorMode.COLOR_TEMP
     await create_mock_light_entity(hass, light_entity)
 
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
