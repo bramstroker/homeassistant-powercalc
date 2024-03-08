@@ -388,7 +388,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     """Migrate old entry."""
     version = config_entry.version
     if version == 1:
-        data = {**config_entry.data, **{version: 2}}
+        data = {**config_entry.data, version: 2}
         if (
             CONF_FIXED in data
             and CONF_POWER in data[CONF_FIXED]
