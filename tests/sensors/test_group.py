@@ -335,6 +335,9 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
         },
     )
 
+    hass.states.async_set("sensor.test1_energy", "20")
+    await hass.async_block_till_done()
+
     await hass.services.async_call(
         DOMAIN,
         SERVICE_CALIBRATE_ENERGY,
@@ -372,6 +375,7 @@ async def test_restore_state(hass: HomeAssistant) -> None:
             CONF_ENTITIES: [
                 get_simple_fixed_config("input_boolean.test1"),
             ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 

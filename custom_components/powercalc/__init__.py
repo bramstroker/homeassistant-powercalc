@@ -359,7 +359,8 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     if unload_ok:
         used_unique_ids: list[str] = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS]
         try:
-            used_unique_ids.remove(config_entry.unique_id)
+            if config_entry.unique_id:
+                used_unique_ids.remove(config_entry.unique_id)
         except ValueError:
             return True
 
