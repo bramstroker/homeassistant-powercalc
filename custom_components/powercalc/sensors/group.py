@@ -568,10 +568,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
         ]
         if not available_states:
-            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) and isinstance(
-                self, GroupedPowerSensor,
-            ):
-                self._attr_native_value = 0
+            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE):
+                if isinstance(self, GroupedPowerSensor):
+                    self._attr_native_value = 0
                 self._attr_available = True
             else:
                 self._attr_available = False
