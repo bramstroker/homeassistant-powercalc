@@ -39,14 +39,13 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
-    EventStateChangedData, async_track_state_change_event,
+    async_track_state_change_event,
     async_track_time_interval,
 )
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, EventType
-from homeassistant.util import Throttle
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.unit_conversion import (
     EnergyConverter,
     PowerConverter,

@@ -1085,7 +1085,7 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
-    unique_id: str | None = None
+    unique_id: str | None = None,
 ) -> MockConfigEntry:
     __, object_id = split_entity_id(source_entity_id)
 

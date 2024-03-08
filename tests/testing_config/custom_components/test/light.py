@@ -4,6 +4,7 @@ Provide a mock light platform.
 Call init before using it in your tests to ensure clean test data.
 """
 import uuid
+from typing import ClassVar
 
 from homeassistant.components.light import ColorMode, LightEntity, LightEntityFeature
 from homeassistant.config_entries import ConfigEntry
@@ -56,7 +57,7 @@ class MockLight(MockToggleEntity, LightEntity):
     color_mode = ColorMode.BRIGHTNESS
     max_mireds = 500
     min_mireds = 153
-    supported_color_modes = [ColorMode.BRIGHTNESS]
+    supported_color_modes: ClassVar = [ColorMode.BRIGHTNESS]
     supported_features = LightEntityFeature(0)
 
     brightness = None
