@@ -352,9 +352,9 @@ async def test_combine_include_with_entities(hass: HomeAssistant) -> None:
         [light_a, light_b, light_c, light_d, light_e, light_f],
     )
 
-    _create_powercalc_config_entry(hass, "light.light_a")
-    _create_powercalc_config_entry(hass, "light.light_e")
-    _create_powercalc_config_entry(hass, "light.light_f")
+    _create_powercalc_config_entry(hass, "light.light_a", light_a.unique_id)
+    _create_powercalc_config_entry(hass, "light.light_e", light_e.unique_id)
+    _create_powercalc_config_entry(hass, "light.light_f", light_f.unique_id)
 
     # Ugly hack, maybe I can figure out something better in the future.
     # Light domain is already setup for platform test, remove the component so we can setup light group
@@ -1053,6 +1053,7 @@ async def test_exclude_non_powercalc_sensors(hass: HomeAssistant, area_reg: Area
         "sensor.switch_power",
     }
 
+
 async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """See github discussion #2008"""
 
@@ -1084,10 +1085,12 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
 def _create_powercalc_config_entry(
     hass: HomeAssistant,
     source_entity_id: str,
+    unique_id: str | None = None
 ) -> MockConfigEntry:
     __, object_id = split_entity_id(source_entity_id)
 
-    unique_id = str(uuid.uuid4())
+    if unique_id is None:
+        unique_id = str(uuid.uuid4())
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={
