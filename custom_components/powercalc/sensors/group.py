@@ -39,13 +39,13 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
-    async_track_state_change_event,
+    EventStateChangedData, async_track_state_change_event,
     async_track_time_interval,
 )
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType, EventType
 from homeassistant.util import Throttle
 from homeassistant.util.unit_conversion import (
     EnergyConverter,
@@ -517,8 +517,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                     err,
                 )
 
-            state_listener = Throttle(timedelta(seconds=30))(state_listener)
-
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         if isinstance(self, GroupedPowerSensor):
@@ -560,6 +558,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     @callback
     def on_state_change(self, _: Any) -> None:  # noqa
         """Triggered when one of the group entities changes state."""
+
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [
