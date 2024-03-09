@@ -63,7 +63,7 @@
                     "name": "Názov",
                     "sub_groups": "Podskupiny",
                     "unique_id": "Jedinečné id",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače"
                 },
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
@@ -72,7 +72,7 @@
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc"
                 },
                 "title": "Vytvoriť skupinu snímača"
             },
@@ -109,7 +109,7 @@
             },
             "model": {
                 "data": {
-                    "model": "Model ID"
+                    "model": "ID modelu"
                 },
                 "description": "Vyberte model zariadenia. Pozrite si [list]({supported_models_link}) podporovaných modelov, kde nájdete ďalšie informácie",
                 "title": "Konfigurácia modelu"
@@ -135,7 +135,7 @@
                     "multiply_factor": "Násobný faktor",
                     "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
                     "unavailable_power": "Nedostupné napájanie",
-                    "utility_meter_tariffs": "Utility meter tariffs"
+                    "utility_meter_tariffs": "Tarify za elektromery"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Konfigurovaná stratégia výpočtu výkonu sa vykoná len vtedy, keď sa táto šablóna vyhodnotí ako pravda alebo 1, inak snímač výkonu zobrazí 0",
@@ -143,7 +143,7 @@
                     "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
                     "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jeden tarif."
                 },
                 "description": "Možnosti uvedené nižšie sú pre pokročilú konfiguráciu powercalc. Väčšina používateľov to nebude používať, takže ich môžete preskočiť",
                 "title": "Pokročilé nastavenia"
@@ -153,12 +153,12 @@
                     "create_utility_meters": "Vytvorenie meračov",
                     "entity_id": "Id výkonového snímača",
                     "name": "Názov",
-                    "device": "Device"
+                    "device": "Zariadenie"
                 },
                 "data_description": {
                     "create_utility_meters": "Nechajte program powercalc vytvoriť merače spotreby, ktoré sa cyklicky opakujú denne, každú hodinu atď.",
                     "name": "Základný názov pre merač energií a médií. Úplný názov entity sa nastaví podľa nastavenia energy_sensor_naming",
-                    "device": "Add the created energy sensor to an specific device"
+                    "device": "Pridajte vytvorený energetický senzor do konkrétneho zariadenia"
                 },
                 "description": "V súčasnosti možno špecifické nastavenia konfigurovať len globálne",
                 "title": "Vytvorenie snímača energie pre existujúci snímač energie"
@@ -176,7 +176,7 @@
                 },
                 "menu_options": {
                     "daily_energy": "Denná energia",
-                    "group": "Group",
+                    "group": "Skupiny",
                     "menu_library": "Virtuálny výkon (knižnica)",
                     "real_power": "Energia zo snímača skutočného výkonu",
                     "virtual_power": "Virtuálne napájanie (manuálne)"
@@ -184,15 +184,15 @@
                 "title": "Zvoľte váš typ snímača"
             },
             "utility_meter_options": {
-                "title": "Utility meter options",
-                "description": "Define the settings for utility meter creation here",
+                "title": "Možnosti elektromera",
+                "description": "Tu definujte nastavenia pre vytváranie elektromerov",
                 "data": {
-                    "utility_meter_types": "Cycles",
-                    "utility_meter_tariffs": "Tariffs"
+                    "utility_meter_types": "Cykly",
+                    "utility_meter_tariffs": "Tarify"
                 },
                 "data_description": {
-                    "utility_meter_types": "Create utility meters for specified cycles",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_types": "Vytvorte merače spotreby pre špecifikované cykly",
+                    "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jeden tarif."
                 }
             },
             "virtual_power": {
@@ -260,7 +260,7 @@
                     "group_power_entities": "Ďalšie výkonové entity",
                     "hide_members": "Skrytí členovia",
                     "ignore_unavailable_state": "Ignorovať nedostupný stav",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors",
+                    "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
                     "max_power": "Max výkon",
                     "min_power": "Min výkon",
                     "multiply_factor": "Násobný faktor",
@@ -277,7 +277,7 @@
                     "unavailable_power": "Nedostupný výkon",
                     "unit_of_measurement": "Jednotka merania",
                     "update_frequency": "Frekvencia aktualizácie",
-                    "utility_meter_tariffs": "Utility meter tariffs",
+                    "utility_meter_tariffs": "Tarify za elektromery",
                     "value": "Hodnota",
                     "value_template": "Šablóna hodnoty"
                 },
@@ -292,7 +292,7 @@
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "ignore_unavailable_state": "Toto nastavenie prepnite, ak chcete, aby snímač výkonu zostal dostupný, aj keď zdrojová entita nie je k dispozícii",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
                     "multiply_factor": "Vynásobí vypočítaný výkon týmto pomerom. Môže byť užitočné pre ľahké skupiny",
                     "multiply_factor_standby": "Či sa má použiť multiplikačný faktor aj na výkon v pohotovostnom režime",
                     "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
@@ -301,18 +301,18 @@
                     "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jednu tarifu."
                 }
             }
         }
     },
     "services": {
         "activate_playbook": {
-            "description": "Spustenie vykonávania plybook.",
+            "description": "Spustenie vykonávania playbooku.",
             "fields": {
                 "playbook_id": {
                     "description": "Playbook identifikátor.",
-                    "name": "Playbook"
+                    "name": "Prehrávač"
                 }
             },
             "name": "Aktivovať playbook"
@@ -349,7 +349,7 @@
                     "name": "Hodnota"
                 }
             },
-            "name": "Change GUI config"
+            "name": "Zmeniť GUI nastavenie"
         },
         "increase_daily_energy": {
             "description": "Zväčší snímač o danú hodnotu.",
