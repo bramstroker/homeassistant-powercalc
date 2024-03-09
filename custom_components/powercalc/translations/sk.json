@@ -29,7 +29,8 @@
                     "unit_of_measurement": "Jednotky merania",
                     "update_frequency": "Aktualizácia frekvencie",
                     "value": "Hodnota",
-                    "value_template": "Šablóna hodnoty"
+                    "value_template": "Šablóna hodnoty",
+                    "utility_meter_tariffs": "Tarify za elektromery"
                 },
                 "data_description": {
                     "on_time": "Keď ponecháte prázdne, predvolene je 1 deň. vždy zapnutý",
@@ -72,7 +73,8 @@
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jeden tarif."
                 },
                 "title": "Vytvoriť skupinu snímača"
             },
@@ -182,18 +184,6 @@
                     "virtual_power": "Virtuálne napájanie (manuálne)"
                 },
                 "title": "Zvoľte váš typ snímača"
-            },
-            "utility_meter_options": {
-                "title": "Utility meter options",
-                "description": "Define the settings for utility meter creation here",
-                "data": {
-                    "utility_meter_types": "Cycles",
-                    "utility_meter_tariffs": "Tariffs"
-                },
-                "data_description": {
-                    "utility_meter_types": "Create utility meters for specified cycles",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
-                }
             },
             "virtual_power": {
                 "data": {
