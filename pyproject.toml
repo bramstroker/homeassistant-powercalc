@@ -90,7 +90,7 @@ types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^2.0"
 pytest-cov = "^4.0"
-coverage = "7.4.3"
+coverage = "7.4.4"
 # Requirements below are needed since HA 2023.9.3, not sure why
 psutil_home_assistant = "*"
 fnv_hash_fast = "*"
