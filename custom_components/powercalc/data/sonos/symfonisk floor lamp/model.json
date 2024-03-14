@@ -1,0 +1,30 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 4.86",
+            "20 -> 4.88",
+            "30 -> 4.9",
+            "40 -> 4.93",
+            "50 -> 5.22",
+            "60 -> 5.42",
+            "70 -> 5.80",
+            "80 -> 6.40",
+            "90 -> 7.00",
+            "100 -> 9.50",
+            "0 -> 4.60"
+        ]
+    },
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "TAPO, P110",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "v1.10.0:docker"
+    },
+    "name": "SYMFONISK Floor lamp",
+    "standby_power": 2.75
+}
