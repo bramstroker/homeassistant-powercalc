@@ -9,5 +9,8 @@
   },
   "name": "Philips Hue 800 Lumen White and Color A19",
   "standby_power": 0.34,
-  "calculation_strategy": "lut"
+  "calculation_strategy": "lut",
+  "aliases": [
+      "3216431P6"
+  ]
 }
