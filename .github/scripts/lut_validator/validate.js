@@ -46,7 +46,7 @@ const main = async () => {
             } catch (ex) {
                 console.log(chalk.red('Invalid'))
                 console.log(chalk.red(ex.message))
-                errors.push({model: model_dir.path, message: ex.message})
+                errors.push({model: model_dir.path, colorMode: colorMode, message: ex.message})
                 continue;
             }
             console.log(chalk.green('Valid'))
@@ -57,7 +57,7 @@ const main = async () => {
                 validateColorModes(colorModes)
             } catch (ex) {
                 console.log(chalk.red(ex))
-                errors.push({model: model_dir.path, message: ex.message})
+                errors.push({model: model_dir.path, colorMode: colorMode, message: ex.message})
             }
         }
     }
@@ -66,7 +66,7 @@ const main = async () => {
         console.log('There were errors:')
         for (let i = 0; i < errors.length; i++) {
             const error = errors[i]
-            console.log(chalk.red(error.model + ': ' + error.message))
+            console.log(chalk.red(error.model + ' - ' + error.colorMode + ': ' + error.message))
         }
         process.exit(1)
     }
