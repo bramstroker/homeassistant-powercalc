@@ -371,6 +371,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             entity_id = user_input.get(CONF_ENTITY_ID)
             if (
                 selected_strategy is not CalculationStrategy.PLAYBOOK
+                and user_input.get(CONF_NAME) is None
                 and entity_id is None
             ):
                 errors[CONF_ENTITY_ID] = "entity_mandatory"

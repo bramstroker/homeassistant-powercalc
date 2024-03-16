@@ -1,6 +1,8 @@
+import json
 from collections.abc import Mapping
 from typing import Any
 
+import pytest
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
@@ -85,6 +87,9 @@ async def goto_virtual_power_strategy_step(
         result["flow_id"],
         user_input,
     )
+
+    if len(result.get("errors")):
+        pytest.fail(reason=json.dumps(result["errors"]))
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 

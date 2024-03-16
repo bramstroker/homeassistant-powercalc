@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_FIXED, CONF_POWER_TEMPLATE
@@ -208,3 +208,25 @@ async def test_global_configuration_is_applied_to_field_default(
     assert schema_keys[
         schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)
     ].description == {"suggested_value": True}
+
+
+async def test_sensor_is_created_without_providing_source_entity(hass: HomeAssistant) -> None:
+    result = await goto_virtual_power_strategy_step(
+        hass,
+        CalculationStrategy.FIXED,
+        user_input={
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_NAME: "My nice sensor",
+        },
+    )
+    result = await set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_POWER: 20},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.my_nice_sensor_power")
+    assert hass.states.get("sensor.my_nice_sensor_energy")
