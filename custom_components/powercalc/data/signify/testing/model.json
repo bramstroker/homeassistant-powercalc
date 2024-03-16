@@ -1,0 +1,16 @@
+{
+    "calculation_strategy": "lut",
+    "measure_description": "Measured with utils/measure script",
+    "measure_device": "Shelly, Plus1PM",
+    "measure_method": "script",
+    "measure_settings": {
+        "SAMPLE_COUNT": 2,
+        "SLEEP_TIME": 3,
+        "VERSION": "master"
+    },
+    "aliases": [
+        "9290011370"
+    ],
+    "name": "Hue white A60 bulb E27/B22",
+    "standby_power": 0.4
+}
