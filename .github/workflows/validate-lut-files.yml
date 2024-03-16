@@ -32,23 +32,20 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - uses: ./.github/workflows/poetry-composite-action
+        with:
+          directory: './utils/visualize'
+          python_version: '3.11'
+          cache_dependencies: 'false'
       - uses: actions/github-script@v6
+        id: list-files
         with:
           script: |
             const { execSync } = require('child_process')
             const { commits } = context.payload.pull_request
             const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits}`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
-            
-            console.log(files)
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 2
-#      - uses: ./.github/workflows/poetry-composite-action
-#        with:
-#          directory: './utils/visualize'
-#          python_version: '3.11'
-#          cache_dependencies: 'false'
+            core.setOutput('changedFiles', files)
 #      - name: Get changed files
 #        run: git diff --name-only -r HEAD^1 HEAD
 #      - uses: ankitjain28may/list-files-in-pr@v1.0
@@ -56,38 +53,38 @@ jobs:
 #        with:
 #          githubToken: ${{ github.token }}
 #          outputFormat: 'space-delimited'
-#      - run: |
-#          cd ./utils/visualize
-#          for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
-#            if [[ ${file} =~ \.csv\.gz$ ]];
-#            then
-#              echo "Generating plot for - ${file}."
-#              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
-#            fi
-#          done
-#      - name: Upload the plots to Imgur
-#        uses: devicons/public-upload-to-imgur@v2
-#        id: imgur_step
-#        with:
-#          path: ./utils/visualize/*.png
-#          client_id: ${{secrets.IMGUR_CLIENT_ID}}
-#      - name: Build PR message
-#        id: build-pr-message
-#        run: |
-#          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
-#          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
-#          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
-#          for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
-#          do
-#            echo "![Image](${url})" >> $GITHUB_OUTPUT
-#          done
-#          echo 'EOF' >> $GITHUB_OUTPUT
-#      - name: Add comment to PR
-#        uses: mshick/add-pr-comment@v2
-#        with:
-#          message: |
-#            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-#      - name: add label
-#        uses: actions-ecosystem/action-add-labels@v1
-#        with:
-#          labels: lightmodel
+      - run: |
+          cd ./utils/visualize
+          for file in ${{ steps.list-files.outputs.changedFiles }}; do
+            if [[ ${file} =~ \.csv\.gz$ ]];
+            then
+              echo "Generating plot for - ${file}."
+              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+            fi
+          done
+      - name: Upload the plots to Imgur
+        uses: devicons/public-upload-to-imgur@v2
+        id: imgur_step
+        with:
+          path: ./utils/visualize/*.png
+          client_id: ${{secrets.IMGUR_CLIENT_ID}}
+      - name: Build PR message
+        id: build-pr-message
+        run: |
+          echo 'PR_MESSAGE<<EOF' >> $GITHUB_OUTPUT
+          echo "Thank you for submitting light measurements!" >> $GITHUB_OUTPUT
+          echo -e "Here are some visualizations for the CSV files.\n" >> $GITHUB_OUTPUT
+          for url in ${{ join(fromJSON(steps.imgur_step.outputs.imgur_urls), ' ') }}
+          do
+            echo "![Image](${url})" >> $GITHUB_OUTPUT
+          done
+          echo 'EOF' >> $GITHUB_OUTPUT
+      - name: Add comment to PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
+      - name: add label
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: lightmodel
