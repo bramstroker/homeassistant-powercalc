@@ -29,13 +29,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: ./.github/workflows/poetry-composite-action
         with:
           directory: './utils/visualize'
           python_version: '3.11'
           cache_dependencies: 'false'
       - name: Get changed files
-        run: git diff --name-only -r ${{ github.base_ref }} HEAD | xargs
+        run: git diff --name-only -r HEAD^1 HEAD
       - uses: ankitjain28may/list-files-in-pr@v1.0
         id: list-files
         with:
