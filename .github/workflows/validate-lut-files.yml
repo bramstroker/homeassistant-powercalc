@@ -32,6 +32,8 @@ jobs:
           directory: './utils/visualize'
           python_version: '3.11'
           cache_dependencies: 'false'
+      - name: Get changed files
+        run: git diff --name-only -r ${{ github.base_ref }} HEAD | xargs
       - uses: ankitjain28may/list-files-in-pr@v1.0
         id: list-files
         with:
