@@ -28,6 +28,11 @@ After you have walked through the wizard the new powercalc sensor must be create
 When you click on it you can see the entities which are created.
 Some options can be changed afterwards, just click :guilabel:`Configure`
 
+.. important::
+
+    You can omit source entity when you want to setup a calculation based on for example a template. In this case you MUST provide a name thought.
+    So either source entity or name are mandatory to setup a virtual power sensor.
+
 YAML
 ----
 
