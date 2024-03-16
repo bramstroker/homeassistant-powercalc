@@ -216,8 +216,8 @@ async def test_sensor_is_created_without_providing_source_entity(hass: HomeAssis
         CalculationStrategy.FIXED,
         user_input={
             CONF_MODE: CalculationStrategy.FIXED,
-            CONF_NAME: "My nice sensor"
-        }
+            CONF_NAME: "My nice sensor",
+        },
     )
     result = await set_virtual_power_configuration(
         hass,
