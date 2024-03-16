@@ -1,8 +1,6 @@
 name: LUT file validation
 
 on:
-  push:
-  pull_request:
   pull_request_target:
     paths:
        - '**.csv.gz'
@@ -38,6 +36,7 @@ jobs:
           python_version: '3.11'
           cache_dependencies: 'false'
       - uses: actions/github-script@v6
+        name: List changed files from the PR
         id: list-files
         with:
           script: |
@@ -46,14 +45,8 @@ jobs:
             const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits}`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
             core.setOutput('changedFiles', files)
-#      - name: Get changed files
-#        run: git diff --name-only -r HEAD^1 HEAD
-#      - uses: ankitjain28may/list-files-in-pr@v1.0
-#        id: list-files
-#        with:
-#          githubToken: ${{ github.token }}
-#          outputFormat: 'space-delimited'
-      - run: |
+      - name: Run visualization tool
+        run: |
           cd ./utils/visualize
           for file in ${{ steps.list-files.outputs.changedFiles }}; do
             if [[ ${file} =~ \.csv\.gz$ ]];
