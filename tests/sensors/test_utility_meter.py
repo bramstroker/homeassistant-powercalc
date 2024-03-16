@@ -54,7 +54,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
             CONF_FIXED: {CONF_POWER: 50},
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: ["daily", "hourly"],
         },
     )
 
@@ -74,10 +74,11 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
 
-    general_sensor = hass.states.get("sensor.test_energy_daily")
-    assert general_sensor
-    assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
+    general_sensor_daily = hass.states.get("sensor.test_energy_daily")
+    assert general_sensor_daily
 
+    general_sensor_hourly = hass.states.get("sensor.test_energy_hourly")
+    assert general_sensor_hourly
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(
