@@ -53,7 +53,9 @@ jobs:
             if [[ ${file} =~ \.csv\.gz$ ]];
             then
               echo "Generating plot for - ${file}."
-              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              if [ -f "${{ github.workspace }}/${file}" ]; then
+                poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              fi
             fi
           done
       - name: Upload the plots to Imgur
