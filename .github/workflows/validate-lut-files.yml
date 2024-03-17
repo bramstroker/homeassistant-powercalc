@@ -27,23 +27,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
       - uses: ./.github/workflows/poetry-composite-action
         with:
           directory: './utils/visualize'
           python_version: '3.11'
           cache_dependencies: 'false'
-      - uses: ankitjain28may/list-files-in-pr@v1.0
+      - uses: actions/github-script@v7
+        name: List changed files from the PR
         id: list-files
         with:
-          githubToken: ${{ github.token }}
-          outputFormat: 'space-delimited'
-      - run: |
+          script: |
+            const { execSync } = require('child_process')
+            const { commits } = context.payload.pull_request
+            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits}`).toString()
+            const files = rawFiles.split('\n').filter(Boolean)
+            core.setOutput('changedFiles', files.join(" "))
+      - name: Run visualization tool
+        run: |
           cd ./utils/visualize
-          for file in ${{ steps.list-files.outputs.pullRequestFiles }}; do
+          for file in ${{ steps.list-files.outputs.changedFiles }}; do
             if [[ ${file} =~ \.csv\.gz$ ]];
             then
               echo "Generating plot for - ${file}."
-              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              if [ -f "${{ github.workspace }}/${file}" ]; then
+                poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
+              fi
             fi
           done
       - name: Upload the plots to Imgur

@@ -90,7 +90,7 @@ async def create_utility_meters(
 
         # Create utility meter for each tariff, and the tariff select entity which allows you to select a tariff.
         if tariffs:
-            filtered_tariffs = tariffs = [
+            filtered_tariffs = [
                 t for t in list(tariffs) if t != GENERAL_TARIFF
             ]
             tariff_select = await create_tariff_select(

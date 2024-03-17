@@ -25,7 +25,7 @@ const validColorModeCombinations = [
 
 const main = async () => {
     const dataDirectory = path.join(__dirname, '../../../custom_components/powercalc/data')
-    let hasError = false
+    let errors = []
     for await (const model_dir of readdirp(dataDirectory, {depth: 2, type: 'directories'})) {
         if (!model_dir.path.includes('/')) {
             continue
@@ -46,7 +46,7 @@ const main = async () => {
             } catch (ex) {
                 console.log(chalk.red('Invalid'))
                 console.log(chalk.red(ex.message))
-                hasError = true
+                errors.push({model: model_dir.path, colorMode: colorMode, message: ex.message})
                 continue;
             }
             console.log(chalk.green('Valid'))
@@ -57,12 +57,17 @@ const main = async () => {
                 validateColorModes(colorModes)
             } catch (ex) {
                 console.log(chalk.red(ex))
-                hasError = true
+                errors.push({model: model_dir.path, colorMode: colorMode, message: ex.message})
             }
         }
     }
 
-    if (hasError) {
+    if (errors) {
+        console.log('There were errors:')
+        for (let i = 0; i < errors.length; i++) {
+            const error = errors[i]
+            console.log(chalk.red(error.model + ' - ' + error.colorMode + ': ' + error.message))
+        }
         process.exit(1)
     }
 };

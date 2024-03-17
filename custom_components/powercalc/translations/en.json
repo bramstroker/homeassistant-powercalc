@@ -214,7 +214,7 @@
                     "standby_power": "Define the amount of power the device is consuming when in an OFF state",
                     "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
                 },
-                "description": "See the readme for more information about the possible strategies and configuration options",
+                "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
                 "title": "Create a virtual power sensor"
             },
             "wled": {
