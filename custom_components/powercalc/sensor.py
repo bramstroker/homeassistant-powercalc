@@ -434,9 +434,9 @@ def _register_entity_id_change_listener(
         if type(event) is Event:  # Intentionally avoid `isinstance` because it's slow and we trust `Event` is not subclassed
             event = event.data
         return (
-            event["action"] == "update"
-            and "old_entity_id" in event
-            and event["old_entity_id"] == source_entity_id
+            event["action"] == "update"  # type: ignore
+            and "old_entity_id" in event  # type: ignore
+            and event["old_entity_id"] == source_entity_id  # type: ignore
         )
 
     hass.bus.async_listen(
