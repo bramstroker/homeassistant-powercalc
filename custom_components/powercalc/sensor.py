@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any
@@ -426,12 +427,16 @@ def _register_entity_id_change_listener(
         )
 
     @callback
-    def _filter_entity_id(event: Event) -> bool:
+    def _filter_entity_id(event: Mapping[str, Any] | Event) -> bool:
         """Only dispatch the listener for update events concerning the source entity"""
+
+        # Breaking change in 2024.4.0, check for Event for versions prior to this
+        if type(event) is Event:  # Intentionally avoid `isinstance` because it's slow and we trust `Event` is not subclassed
+            event = event.data
         return (
-            event.data["action"] == "update"
-            and "old_entity_id" in event.data
-            and event.data["old_entity_id"] == source_entity_id
+            event["action"] == "update"  # type: ignore
+            and "old_entity_id" in event  # type: ignore
+            and event["old_entity_id"] == source_entity_id  # type: ignore
         )
 
     hass.bus.async_listen(
