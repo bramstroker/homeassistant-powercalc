@@ -50,6 +50,9 @@ Most basic example:
 
 For all the possible options see the strategy sections as linked above, :doc:`/configuration/sensor-configuration` and the rest of the Powercalc documentation.
 
+Adding a sensor using the YAML method will not add the Powercalc integration page. Only entities created with the GUI will appear there.
+The sensor will functionally be the same, and you can find it in the global entities list.
+
 .. important::
 
     After changing the configuration you'll need to restart HA to get your power sensors to appear.
