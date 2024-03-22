@@ -139,8 +139,8 @@ from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
     create_domain_group_sensor,
-    create_group_sensors,
-    create_group_sensors_from_config_entry,
+    create_group_sensors_gui,
+    create_group_sensors_yaml,
 )
 from .sensors.group_standby import create_general_standby_sensors
 from .sensors.power import VirtualPowerSensor, create_power_sensor
@@ -332,7 +332,7 @@ async def async_setup_entry(
             global_config,
             sensor_config,
         )
-        entities = await create_group_sensors_from_config_entry(
+        entities = await create_group_sensors_gui(
             hass=hass,
             entry=entry,
             sensor_config=merged_sensor_config,
@@ -697,7 +697,7 @@ async def create_sensors(  # noqa: C901
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
         entities_to_add.new.extend(
-            await create_group_sensors(
+            await create_group_sensors_yaml(
                 str(config.get(CONF_CREATE_GROUP)),
                 get_merged_sensor_configuration(global_config, config, validate=False),
                 entities_to_add.all(),
