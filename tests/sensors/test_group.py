@@ -37,6 +37,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -1369,6 +1370,38 @@ async def test_bind_to_configured_device(
     group_entity = entity_reg.async_get("sensor.mygroup_power")
     assert group_entity
     assert group_entity.device_id == device_entry.id
+
+
+async def test_disable_energy_sensor_creation(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/2143"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1"),
+                get_simple_fixed_config("input_boolean.test2"),
+            ],
+            CONF_CREATE_ENERGY_SENSOR: False,
+        },
+    )
+
+    assert hass.states.get("sensor.testgroup_energy") is None
+
+
+async def test_disable_energy_sensor_creation_gui(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/2143"""
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_CREATE_ENERGY_SENSOR: False,
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
+        },
+    )
+
+    assert hass.states.get("sensor.testgroup_energy") is None
 
 
 async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
