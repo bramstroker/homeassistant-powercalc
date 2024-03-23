@@ -1428,6 +1428,52 @@ async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
     assert group_state.state == "0"
 
 
+async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.furnace_power": RegistryEntry(
+                entity_id="sensor.furnace_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.furnace_energy": RegistryEntry(
+                entity_id="sensor.furnace_energy",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_ENTITY_ID: "fan.ceiling_fan",
+                        CONF_FIXED: {CONF_POWER: 50},
+                    },
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.furnace_power",
+                        CONF_ENERGY_SENSOR_ID: "sensor.furnace_energy",
+                    },
+                ],
+            },
+        ],
+    )
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state.attributes.get(ATTR_ENTITIES) == {"sensor.ceiling_fan_power", "sensor.furnace_power"}
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.attributes.get(ATTR_ENTITIES) == {"sensor.ceiling_fan_energy", "sensor.furnace_energy"}
+
+
 async def _create_energy_group(
     hass: HomeAssistant,
     name: str,
