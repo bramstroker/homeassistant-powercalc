@@ -38,6 +38,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -1453,10 +1454,12 @@ async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
             {
                 CONF_CREATE_GROUP: "TestGroup",
                 CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_CREATE_ENERGY_SENSOR: True,
                 CONF_ENTITIES: [
                     {
                         CONF_ENTITY_ID: "fan.ceiling_fan",
                         CONF_FIXED: {CONF_POWER: 50},
+                        CONF_CREATE_ENERGY_SENSOR: True,
                     },
                     {
                         CONF_POWER_SENSOR_ID: "sensor.furnace_power",
@@ -1465,6 +1468,9 @@ async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
                 ],
             },
         ],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+        },
     )
 
     power_state = hass.states.get("sensor.testgroup_power")
