@@ -66,7 +66,7 @@
                     "include_non_powercalc_sensors": "Include senzori non-powercalc"
                 },
                 "data_description": {
-                    "area": "Adaugă toți senzorii powercalc din zona specificată",
+                    "area": "Adaugă toți senzorii de putere din zona specificată",
                     "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
                     "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
                     "group_member_sensors": "Senzori Powercalc de inclus în grup",
@@ -247,7 +247,7 @@
                 "data": {
                     "area": "Zona",
                     "attribute": "Atribut",
-                    "autostart": "Autostart",
+                    "autostart": "Pornire automată",
                     "calculation_enabled_condition": "Condiție de calcul activat",
                     "calibrate": "Valori de calibrare",
                     "create_energy_sensor": "Creați un senzor de energie",
@@ -259,7 +259,7 @@
                     "group_member_sensors": "Senzori powercalc membri",
                     "group_power_entities": "Entități de putere suplimentare",
                     "hide_members": "Ascunde membrii",
-                    "ignore_unavailable_state": "Ignore unavailable state",
+                    "ignore_unavailable_state": "Ignorați starea indisponibilă",
                     "include_non_powercalc_sensors": "Includeți senzori non-powercalc",
                     "max_power": "Putere maxima",
                     "min_power": "Putere minimă",
