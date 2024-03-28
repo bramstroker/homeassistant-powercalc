@@ -405,6 +405,7 @@ def create_grouped_power_sensor(
     _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedPowerSensor(
+        hass=hass,
         name=name,
         entities=power_sensor_ids,
         unique_id=unique_id,
@@ -438,6 +439,7 @@ def create_grouped_energy_sensor(
     _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedEnergySensor(
+        hass=hass,
         name=name,
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
@@ -456,6 +458,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         name: str,
         entities: set[str],
         entity_id: str,
@@ -479,7 +482,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
         self.source_device_id = device_id
-        self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
+        self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -632,6 +635,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         name: str,
         entities: set[str],
         entity_id: str,
@@ -641,6 +645,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         device_id: str | None = None,
     ) -> None:
         super().__init__(
+            hass,
             name,
             entities,
             entity_id,
