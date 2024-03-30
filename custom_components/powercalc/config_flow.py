@@ -281,7 +281,7 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -1099,6 +1099,10 @@ def _create_group_options_schema(
             ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
+            vol.Optional(
+                CONF_CREATE_ENERGY_SENSOR,
+                default=True,
+            ): selector.BooleanSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
                 default=False,
