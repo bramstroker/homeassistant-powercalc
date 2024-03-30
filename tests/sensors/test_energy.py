@@ -213,6 +213,7 @@ async def test_force_create_energy_sensor_overrides_create_energy_sensors_option
         hass,
         {
             CONF_POWER_SENSOR_ID: "sensor.bedroom_airco_power",
+            CONF_NAME: "Bedroom airco",
             CONF_FORCE_ENERGY_SENSOR_CREATION: True,
             CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
