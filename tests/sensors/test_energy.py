@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_ID,
@@ -189,6 +190,40 @@ async def test_force_create_energy_sensor_for_existing_power_sensor(
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.mysensor_energy",
     }
+
+
+async def test_force_create_energy_sensor_overrides_create_energy_sensors_option(hass: HomeAssistant) -> None:
+    """
+    When you use force_energy_sensor_creation, it should override create_energy_sensors option,
+    and create an energy sensor
+    """
+    mock_registry(
+        hass,
+        {
+            "sensor.existing_power": RegistryEntry(
+                entity_id="sensor.bedroom_airco_power",
+                unique_id="1234",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_POWER_SENSOR_ID: "sensor.bedroom_airco_power",
+            CONF_FORCE_ENERGY_SENSOR_CREATION: True,
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+        },
+    )
+    await hass.async_block_till_done()
+
+    energy_state = hass.states.get("sensor.bedroom_airco_energy")
+    assert energy_state
 
 
 async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
