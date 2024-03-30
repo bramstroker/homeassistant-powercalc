@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Zonă",
-                    "device": "Dispozitiv",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Creați contoare",
+                    "device": "Dispozitiv",
                     "group_energy_entities": "Entități energetice suplimentare",
                     "group_member_sensors": "Senzori powercalc membri",
                     "group_power_entities": "Entități de putere suplimentare",
                     "hide_members": "Ascunde members",
+                    "include_non_powercalc_sensors": "Include senzori non-powercalc",
                     "name": "Nume",
                     "sub_groups": "Subgrupuri",
-                    "unique_id": "ID unic",
-                    "include_non_powercalc_sensors": "Include senzori non-powercalc"
+                    "unique_id": "ID unic"
                 },
                 "data_description": {
                     "area": "Adaugă toți senzorii de putere din zona specificată",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
                     "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
                     "group_member_sensors": "Senzori Powercalc de inclus în grup",
                     "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
-                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
-                    "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă"
+                    "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
+                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
                 },
                 "title": "Creați un senzor de grup"
             },

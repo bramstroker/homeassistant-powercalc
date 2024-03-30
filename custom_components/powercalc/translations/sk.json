@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Oblasť",
-                    "device": "Zariadenie",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Vytvorte merače spotreby",
+                    "device": "Zariadenie",
                     "group_energy_entities": "Ďlšie energetické entity",
                     "group_member_sensors": "Členské snímače powercalc",
                     "group_power_entities": "Ďalšie výkonové entity",
                     "hide_members": "Skrytý členovania",
+                    "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače",
                     "name": "Názov",
                     "sub_groups": "Podskupiny",
-                    "unique_id": "Jedinečné id",
-                    "include_non_powercalc_sensors": "Zahrnúť nie powercalc snímače"
+                    "unique_id": "Jedinečné id"
                 },
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
                     "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
-                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
-                    "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc"
+                    "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
+                    "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny"
                 },
                 "title": "Vytvoriť skupinu snímača"
             },
