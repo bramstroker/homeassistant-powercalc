@@ -770,7 +770,11 @@ async def create_individual_sensors(
             return EntitiesBucket()
 
         # Create energy sensor which integrates the power sensor
-        if sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or CONF_ENERGY_SENSOR_ID in sensor_config:
+        if (
+            sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or
+            sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) or
+            CONF_ENERGY_SENSOR_ID in sensor_config
+        ):
             energy_sensor = await create_energy_sensor(
                 hass,
                 sensor_config,
