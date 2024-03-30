@@ -18,8 +18,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_r
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.const import (
     CONF_AREA,
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
@@ -98,6 +101,30 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
+
+
+async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
+    """
+    Test if the energy sensor is created when `create_energy_sensors` is disabled on the global level,
+    but enabled for the config entry
+    """
+    await run_powercalc_setup(hass, {}, {CONF_CREATE_ENERGY_SENSORS: False})
+
+    result = await select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
+        CONF_GROUP_ENERGY_ENTITIES: ["sensor.balcony_energy"],
+        CONF_CREATE_ENERGY_SENSOR: True,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.my_group_sensor_power")
+    assert hass.states.get("sensor.my_group_sensor_energy")
 
 
 async def test_group_include_area(
