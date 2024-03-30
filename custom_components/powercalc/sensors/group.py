@@ -59,6 +59,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -78,6 +79,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.group_include.include import resolve_include_entities
 
 from .abstract import (
@@ -87,7 +89,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from .energy import EnergySensor
+from .energy import EnergySensor, VirtualEnergySensor
 from .power import PowerSensor
 from .utility_meter import create_utility_meters
 
@@ -171,24 +173,26 @@ async def create_group_sensors(
 
     group_sensors: list[Entity] = []
 
+    power_sensor = None
     if power_sensor_ids:
-        group_sensors.append(
-            create_grouped_power_sensor(
-                hass,
-                group_name,
-                sensor_config,
-                set(power_sensor_ids),
-            ),
+        power_sensor = create_grouped_power_sensor(
+            hass,
+            group_name,
+            sensor_config,
+            set(power_sensor_ids),
         )
+        group_sensors.append(power_sensor)
 
     create_energy_sensor: bool = sensor_config.get(CONF_CREATE_ENERGY_SENSOR, True)
-    if energy_sensor_ids and create_energy_sensor:
+    if create_energy_sensor:
         energy_sensor = create_grouped_energy_sensor(
             hass,
             group_name,
             sensor_config,
             set(energy_sensor_ids),
+            power_sensor,
         )
+
         group_sensors.append(energy_sensor)
 
         group_sensors.extend(
@@ -423,7 +427,8 @@ def create_grouped_energy_sensor(
     group_name: str,
     sensor_config: dict,
     energy_sensor_ids: set[str],
-) -> GroupedEnergySensor:
+    power_sensor: GroupedPowerSensor | None,
+) -> EnergySensor:
     name = generate_energy_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     energy_unique_id = None
@@ -437,6 +442,17 @@ def create_grouped_energy_sensor(
     )
 
     _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
+
+    force_calculate_energy = bool(sensor_config.get(CONF_FORCE_CALCULATE_GROUP_ENERGY, False))
+    if power_sensor and (force_calculate_energy or not energy_sensor_ids):
+        return VirtualEnergySensor(
+            source_entity=power_sensor.entity_id,
+            entity_id=entity_id,
+            name=name,
+            unique_id=energy_unique_id,
+            sensor_config=sensor_config,
+            device_info=get_device_info(hass, sensor_config, None),
+        )
 
     return GroupedEnergySensor(
         hass=hass,

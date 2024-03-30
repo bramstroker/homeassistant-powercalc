@@ -16,7 +16,6 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfEnergy,
     UnitOfPower,
-    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -324,12 +323,9 @@ async def test_set_entity_category(hass: HomeAssistant) -> None:
         source_entity="sensor.test_power",
         entity_id="sensor.test_energy",
         name="Test energy",
-        round_digits=2,
         unit_prefix="k",
-        unit_time=UnitOfTime(UnitOfTime.HOURS),
         unique_id="1234",
         entity_category=EntityCategory(EntityCategory.DIAGNOSTIC),
-        integration_method="",
         powercalc_source_entity="light.test",
         powercalc_source_domain="light",
         sensor_config={},
