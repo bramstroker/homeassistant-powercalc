@@ -71,6 +71,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -96,6 +97,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -174,6 +176,7 @@ async def test_group_include_area(
         CONF_AREA: area.id,
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: True,
         CONF_UTILITY_METER_TARIFFS: [],
     }
@@ -221,6 +224,7 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
@@ -336,6 +340,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
