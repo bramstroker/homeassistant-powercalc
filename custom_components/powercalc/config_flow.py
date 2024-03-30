@@ -281,7 +281,7 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         """Initialize options flow."""

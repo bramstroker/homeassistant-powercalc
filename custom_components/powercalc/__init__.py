@@ -26,6 +26,7 @@ from homeassistant.helpers.typing import ConfigType
 from .common import validate_name_pattern
 from .const import (
     CONF_CREATE_DOMAIN_GROUPS,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -397,6 +398,12 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         ):
             data[CONF_FIXED].pop(CONF_POWER, None)
         hass.config_entries.async_update_entry(config_entry, data=data, version=2)
+
+    if version == 2:
+        data = {**config_entry.data}
+        if data.get(CONF_SENSOR_TYPE) and CONF_CREATE_ENERGY_SENSOR not in data:
+            data[CONF_CREATE_ENERGY_SENSOR] = True
+        hass.config_entries.async_update_entry(config_entry, data=data, version=3)
 
     return True
 
