@@ -5,8 +5,10 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
     CONF_ENTITY_ID,
     CONF_NAME,
+    STATE_IDLE,
     STATE_OFF,
     STATE_ON,
+    STATE_PAUSED,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
@@ -20,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOKS,
     CONF_REPEAT,
     CONF_STANDBY_POWER,
+    CONF_STATE_TRIGGER,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
@@ -267,6 +270,37 @@ async def test_multiply_factor(hass: HomeAssistant) -> None:
     await _activate_playbook(hass, "playbook")
 
     await elapse_and_assert_power(hass, 2, "60.00")
+
+
+async def test_state_trigger(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "media_player.sonos",
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "idle": "states_mapping/idle.csv",
+                    "paused": "states_mapping/paused.csv",
+                },
+                CONF_STATE_TRIGGER: {
+                    STATE_IDLE: "idle",
+                    STATE_PAUSED: "paused",
+                },
+            },
+        },
+    )
+
+    hass.states.async_set("media_player.sonos", STATE_PAUSED)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 2, "2.00")
+
+    hass.states.async_set("media_player.sonos", STATE_IDLE)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 2, "5.00")
 
 
 async def elapse_and_assert_power(
