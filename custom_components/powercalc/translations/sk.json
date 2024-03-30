@@ -54,7 +54,7 @@
             "group": {
                 "data": {
                     "area": "Oblasť",
-                    "create_energy_sensor": "Create energy sensor",
+                    "create_energy_sensor": "Vytvoriť snímač energie",
                     "create_utility_meters": "Vytvorte merače spotreby",
                     "device": "Zariadenie",
                     "group_energy_entities": "Ďlšie energetické entity",
@@ -68,7 +68,7 @@
                 },
                 "data_description": {
                     "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+                    "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
                     "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
                     "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
                     "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",

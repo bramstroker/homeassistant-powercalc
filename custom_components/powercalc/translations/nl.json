@@ -54,7 +54,7 @@
             "group": {
                 "data": {
                     "area": "Ruimte",
-                    "create_energy_sensor": "Create energy sensor",
+                    "create_energy_sensor": "Creëer energie sensoren",
                     "create_utility_meters": "Creëer utiliteit meters",
                     "device": "Apparaat",
                     "group_energy_entities": "Additionele energie entiteiten",
@@ -68,7 +68,7 @@
                 },
                 "data_description": {
                     "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+                    "create_energy_sensor": "Laat powercalc een kWh meter maken",
                     "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
                     "group_energy_entities": "Additionele energie entiteiten (kWh)",
                     "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
