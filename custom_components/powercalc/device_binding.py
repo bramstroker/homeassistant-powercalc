@@ -54,16 +54,17 @@ def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry) 
         )
 
 
-def get_device_info(hass: HomeAssistant, sensor_config: ConfigType, source_entity: SourceEntity) -> DeviceInfo | None:
+def get_device_info(hass: HomeAssistant, sensor_config: ConfigType, source_entity: SourceEntity | None) -> DeviceInfo | None:
     """
     Get device info for a given powercalc entity configuration.
     Prefer user configured device, when it is not set fallback to the same device as the source entity
     """
     device_id = sensor_config.get(CONF_DEVICE)
+    device = None
     if device_id is not None:
         device_reg = device_registry.async_get(hass)
         device = device_reg.async_get(device_id)
-    else:
+    elif source_entity:
         device = source_entity.device_entry
 
     if device is None:

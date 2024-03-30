@@ -129,11 +129,7 @@ async def create_energy_sensor(
         entity_id=entity_id,
         entity_category=entity_category,
         name=name,
-        round_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION),  # type: ignore
         unit_prefix=unit_prefix,
-        unit_time=UnitOfTime.HOURS,
-        integration_method=sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD)
-        or DEFAULT_ENERGY_INTEGRATION_METHOD,
         powercalc_source_entity=source_entity.entity_id,
         powercalc_source_domain=source_entity.domain,
         sensor_config=sensor_config,
@@ -205,25 +201,26 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     def __init__(
         self,
         source_entity: str,
-        unique_id: str | None,
         entity_id: str,
-        entity_category: EntityCategory | None,
-        name: str | None,
-        round_digits: int,
-        unit_prefix: str | None,
-        unit_time: UnitOfTime,
-        integration_method: str,
-        powercalc_source_entity: str,
-        powercalc_source_domain: str,
         sensor_config: ConfigType,
-        device_info: DeviceInfo | None,
+        powercalc_source_entity: str | None = None,
+        powercalc_source_domain: str | None = None,
+        unique_id: str | None = None,
+        entity_category: EntityCategory | None = None,
+        name: str | None = None,
+        unit_prefix: str | None = None,
+        device_info: DeviceInfo | None = None,
     ) -> None:
+
+        round_digits: int = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, 2)
+        integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
+
         super().__init__(
             source_entity=source_entity,
             name=name,
             round_digits=round_digits,
             unit_prefix=unit_prefix,
-            unit_time=unit_time,
+            unit_time=UnitOfTime.HOURS,
             integration_method=integration_method,
             unique_id=unique_id,
             device_info=device_info,
@@ -243,9 +240,12 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return super().extra_state_attributes
 
+        if self._powercalc_source_entity is None:
+            return None
+
         attrs = {
-            ATTR_SOURCE_ENTITY: self._powercalc_source_entity,
-            ATTR_SOURCE_DOMAIN: self._powercalc_source_domain,
+            ATTR_SOURCE_ENTITY: self._powercalc_source_entity or "",
+            ATTR_SOURCE_DOMAIN: self._powercalc_source_domain or "",
         }
         super_attrs = super().extra_state_attributes
         if super_attrs:

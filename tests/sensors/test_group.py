@@ -46,6 +46,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -1478,6 +1479,58 @@ async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
 
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state.attributes.get(ATTR_ENTITIES) == {"sensor.ceiling_fan_energy", "sensor.furnace_energy"}
+
+
+async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
+    """
+    When `force_calculate_group_energy` is set to true,
+    the energy sensor should be a Riemann sensor integrating the power sensor
+    """
+
+    mock_registry(
+        hass,
+        {
+            "sensor.furnace_power": RegistryEntry(
+                entity_id="sensor.furnace_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.lights_power": RegistryEntry(
+                entity_id="sensor.lights_power",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_CREATE_ENERGY_SENSOR: True,
+                CONF_FORCE_CALCULATE_GROUP_ENERGY: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.furnace_power",
+                    },
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.lights_power",
+                    },
+                ],
+            },
+        ],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+        },
+    )
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state
+    assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
 
 
 async def _create_energy_group(
