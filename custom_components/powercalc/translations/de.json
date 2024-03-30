@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Bereich",
-                    "device": "Gerät",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Utilitymeter erstellen",
+                    "device": "Gerät",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "group_member_sensors": "Mitglied powercalc sensors",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "hide_members": "Mitglieder ausblenden",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
-                    "unique_id": "Unique-Id",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "unique_id": "Unique-Id"
                 },
                 "data_description": {
                     "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
                     "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
-                    "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 },
                 "title": "Einen Gruppensensor erstellen"
             },
