@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Autostart",
                     "playbooks": "Playbook'i",
-                    "repeat": "Powtarzaj"
+                    "repeat": "Powtarzaj",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
                     "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
-                    "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu"
+                    "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Konfiguracja Playbook'ów"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "Change GUI config"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Zwiększa sensor o zadaną wartość.",
