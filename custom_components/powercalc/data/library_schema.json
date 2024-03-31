@@ -51,7 +51,8 @@
             "type": "object",
             "required": [
                 "id",
-                "device_type"
+                "device_type",
+                "update_timestamp"
             ],
             "properties": {
                 "id": {
@@ -65,7 +66,12 @@
                     "items": {
                         "type": "string"
                     }
-                }
+                },
+                "update_timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Timestamp of the last update of the model"
+                },
             }
         },
         "device_type": {

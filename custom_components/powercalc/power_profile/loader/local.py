@@ -15,6 +15,7 @@ CUSTOM_DATA_DIRECTORY = "powercalc/models"
 class LocalLoader(Loader):
     def __init__(self, hass: HomeAssistant) -> None:
         self._manufacturer_device_types: dict[str, list] | None = None
+        self._model_aliases: dict[str, dict[str, str]] | None = None
         self._data_directories: list[str] = [
             d
             for d in (
@@ -26,7 +27,10 @@ class LocalLoader(Loader):
             if os.path.exists(d)
         ]
 
-    def get_manufacturer_listing(self, device_type: DeviceType | None) -> list[str]:
+    async def initialize(self) -> None:
+        pass
+
+    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> list[str]:
         """Get listing of available manufacturers."""
 
         if self._manufacturer_device_types is None:
@@ -48,7 +52,7 @@ class LocalLoader(Loader):
                 manufacturers.append(manufacturer)
         return manufacturers
 
-    def get_model_listing(self, manufacturer: str) -> list[str]:
+    async def get_model_listing(self, manufacturer: str) -> list[str]:
         """Get listing of available models for a given manufacturer."""
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
             manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
@@ -59,11 +63,15 @@ class LocalLoader(Loader):
             manufacturer_dir = os.path.join(data_dir, manufacturer)
             if not os.path.exists(manufacturer_dir):
                 continue
-            model_dirs = [f for f in os.listdir(manufacturer_dir) if f[0] not in [".", "@"]]
-            models.extend(model_dirs)
+            for model in os.listdir(manufacturer_dir):
+                if model[0] in [".", "@"]:
+                    continue
+                models.append(model)
+                model_json = json.load(open(os.path.join(manufacturer_dir, model, "model.json")))
+                self._model_aliases[manufacturer_dir] = model_json.get("aliases", [])
         return models
 
-    def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
+    async def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
         base_dir = directory
         if not directory:
             for data_dir in self._data_directories:
@@ -84,3 +92,19 @@ class LocalLoader(Loader):
 
         with open(model_json_path) as file:
             return json.load(file), base_dir
+
+    async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
+            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
+        manufacturer = manufacturer.lower()
+
+        for data_dir in self._data_directories:
+            manufacturer_dir = os.path.join(data_dir, manufacturer)
+            if not os.path.exists(manufacturer_dir):
+                continue
+            model_dirs = os.listdir(manufacturer_dir)
+            for model in search:
+                if model in model_dirs:
+                    return model
+
+        return None

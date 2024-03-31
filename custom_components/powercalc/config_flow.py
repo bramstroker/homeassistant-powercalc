@@ -641,7 +641,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
             return await self.async_step_model()
 
-        schema = _create_schema_manufacturer(self.hass, self.source_entity.domain)  # type: ignore
+        schema = await _create_schema_manufacturer(self.hass, self.source_entity.domain)  # type: ignore
         return self.async_show_form(
             step_id="manufacturer",
             data_schema=schema,
@@ -656,7 +656,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
-            library = ProfileLibrary.factory(self.hass)
+            library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
                     self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
@@ -966,7 +966,8 @@ async def _create_strategy_object(
     """Create the calculation strategy object."""
     factory = PowerCalculatorStrategyFactory(hass)
     if power_profile is None and CONF_MANUFACTURER in config:
-        power_profile = await ProfileLibrary.factory(hass).get_profile(
+        library = await ProfileLibrary.factory(hass)
+        power_profile = await library.get_profile(
             ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL)),  # type: ignore
         )
     return await factory.create(config, strategy, power_profile, source_entity)
@@ -1171,12 +1172,12 @@ def _create_linear_schema(source_entity_id: str) -> vol.Schema:
     )
 
 
-def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.Schema:
+async def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -> vol.Schema:
     """Create manufacturer schema."""
-    library = ProfileLibrary.factory(hass)
+    library = await ProfileLibrary.factory(hass)
     manufacturers = [
         selector.SelectOptionDict(value=manufacturer, label=manufacturer)
-        for manufacturer in library.get_manufacturer_listing(entity_domain)
+        for manufacturer in await library.get_manufacturer_listing(entity_domain)
     ]
     return vol.Schema(
         {
@@ -1196,7 +1197,7 @@ async def _create_schema_model(
     source_entity: SourceEntity,
 ) -> vol.Schema:
     """Create model schema."""
-    library = ProfileLibrary.factory(hass)
+    library = await ProfileLibrary.factory(hass)
     models = [
         selector.SelectOptionDict(value=profile.model, label=profile.model)
         for profile in await library.get_profiles_by_manufacturer(manufacturer)
@@ -1219,7 +1220,7 @@ async def _create_schema_sub_profile(
     model_info: ModelInfo,
 ) -> vol.Schema:
     """Create sub profile schema."""
-    library = ProfileLibrary.factory(hass)
+    library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(model_info)
     sub_profiles = [
         selector.SelectOptionDict(value=sub_profile, label=sub_profile)

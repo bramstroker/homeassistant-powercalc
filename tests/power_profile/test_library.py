@@ -10,7 +10,7 @@ from tests.common import get_test_profile_dir
 
 async def test_manufacturer_listing(hass: HomeAssistant) -> None:
     library = ProfileLibrary(hass)
-    manufacturers = library.get_manufacturer_listing()
+    manufacturers = await library.get_manufacturer_listing()
     assert "signify" in manufacturers
     assert "ikea" in manufacturers
     assert "bladiebla" not in manufacturers
@@ -18,7 +18,7 @@ async def test_manufacturer_listing(hass: HomeAssistant) -> None:
 
 async def test_model_listing(hass: HomeAssistant) -> None:
     library = ProfileLibrary(hass)
-    models = library.get_model_listing("signify")
+    models = await library.get_model_listing("signify")
     assert "LCT010" in models
     assert "LCA007" in models
 
@@ -41,7 +41,7 @@ async def test_non_existing_manufacturer_returns_empty_model_list(
     hass: HomeAssistant,
 ) -> None:
     library = ProfileLibrary(hass)
-    assert not library.get_model_listing("foo")
+    assert not await library.get_model_listing("foo")
 
 
 async def test_get_profile(hass: HomeAssistant) -> None:
@@ -53,9 +53,17 @@ async def test_get_profile(hass: HomeAssistant) -> None:
     assert profile.get_model_directory().endswith("signify/LCT010")
 
 
+async def test_get_profile_with_full_model_name(hass: HomeAssistant) -> None:
+    library = ProfileLibrary(hass)
+    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCA001"))
+    assert profile
+    assert profile.manufacturer == "signify"
+    assert profile.get_model_directory().endswith("signify/LCA001")
+
+
 async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant) -> None:
     library = ProfileLibrary(hass)
-    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCT010"))
+    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "Hue go (LLC020)"))
     assert profile
     assert profile.manufacturer == "signify"
     assert profile.get_model_directory().endswith("signify/LCT010")
