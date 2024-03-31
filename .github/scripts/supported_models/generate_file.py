@@ -38,7 +38,7 @@ def generate_supported_model_list(model_listing: list[dict]):
         relevant_models = [
             model
             for model in model_listing
-            if (model.get("device_type") or "light") == device_type[0]
+            if model.get("device_type") == device_type[0]
         ]
         num_devices = len(relevant_models)
 
@@ -100,6 +100,34 @@ def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
     print("Generated manufacturer_device_types.json")
 
 
+def generate_library_json(model_listing: list[dict]) -> None:
+    manufacturers: dict[str, dict] = {}
+    for model in model_listing:
+        manufacturer_name = model.get("manufacturer")
+        manufacturer = manufacturers.get(manufacturer_name)
+        if not manufacturer:
+            manufacturer = {"name": manufacturer_name, "models": []}
+            manufacturers[manufacturer_name] = manufacturer
+
+        key_mapping = {"name": "name", "device_type": "device_type", "model": "id"}
+
+        # Create a new dictionary with updated keys
+        mapped_dict = {key_mapping.get(key, key): value for key, value in model.items()}
+        manufacturer["models"].append({key: mapped_dict[key] for key in key_mapping.values() if key in mapped_dict})
+
+    json_data = {
+        "manufacturers": list(manufacturers.values()),
+    }
+
+    with open(
+        os.path.join(DATA_DIR, "library.json"),
+        "w",
+    ) as json_file:
+        json_file.write(json.dumps(json_data))
+
+    print("Generated library.json")
+
+
 def get_model_list() -> list[dict]:
     """Get a listing of all available powercalc models"""
     models = []
@@ -118,6 +146,8 @@ def get_model_list() -> list[dict]:
                     "color_modes": color_modes,
                 },
             )
+            if "device_type" not in model_data:
+                model_data["device_type"] = "light"
             models.append(model_data)
 
     return models
@@ -147,3 +177,4 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
 model_list = get_model_list()
 generate_supported_model_list(model_list)
 generate_manufacturer_device_types_file(model_list)
+generate_library_json(model_list)
