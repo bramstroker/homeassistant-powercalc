@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DUMMY_ENTITY_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
+    SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_STOP_PLAYBOOK,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
@@ -90,6 +91,37 @@ async def test_stop_playbook_service(hass: HomeAssistant) -> None:
 
     await elapse_and_assert_power(hass, 3, "20.50")
     await elapse_and_assert_power(hass, 4.5, "20.50")
+
+
+async def test_get_active_playbook_service(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "playbook1": "test.csv",
+                    "playbook2": "test2.csv",
+                },
+            },
+        },
+    )
+
+    assert await _get_active_playbook(hass) is None
+
+    await _activate_playbook(hass, "playbook1")
+
+    assert await _get_active_playbook(hass) == "playbook1"
+
+    await _activate_playbook(hass, "playbook2")
+
+    assert await _get_active_playbook(hass) == "playbook2"
+
+    await _stop_playbook(hass)
+
+    assert await _get_active_playbook(hass) is None
 
 
 async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
@@ -332,3 +364,18 @@ async def _stop_playbook(hass: HomeAssistant) -> None:
         blocking=True,
     )
     await hass.async_block_till_done()
+
+
+async def _get_active_playbook(hass: HomeAssistant) -> str | None:
+    result = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GET_ACTIVE_PLAYBOOK,
+        {ATTR_ENTITY_ID: POWER_SENSOR_ID},
+        blocking=True,
+        return_response=True,
+    )
+
+    data = next(iter(result.values()))
+    if data:
+        return data.get("id")
+    return None

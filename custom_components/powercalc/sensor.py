@@ -26,7 +26,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -115,6 +115,7 @@ from .const import (
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
+    SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
@@ -520,6 +521,13 @@ def register_entity_services() -> None:
         SERVICE_STOP_PLAYBOOK,
         {},
         "async_stop_playbook",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_GET_ACTIVE_PLAYBOOK,
+        {},
+        "get_active_playbook",
+        supports_response=SupportsResponse.ONLY,
     )
 
     platform.async_register_entity_service(

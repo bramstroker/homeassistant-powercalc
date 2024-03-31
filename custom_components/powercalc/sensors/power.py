@@ -681,6 +681,17 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         await self._strategy_instance.stop_playbook()
 
+    def get_active_playbook(self) -> dict[str, str]:
+        """Stop an active playbook"""
+        assert self._strategy_instance is not None
+        if not isinstance(self._strategy_instance, PlaybookStrategy):
+            raise HomeAssistantError("supported only playbook enabled sensors")
+
+        playbook = self._strategy_instance.get_active_playbook()
+        if not playbook:
+            return {}
+        return {"id": playbook.key}
+
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
         if (

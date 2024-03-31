@@ -174,6 +174,7 @@ ATTR_SOURCE_DOMAIN = "source_domain"
 
 SERVICE_ACTIVATE_PLAYBOOK = "activate_playbook"
 SERVICE_STOP_PLAYBOOK = "stop_playbook"
+SERVICE_GET_ACTIVE_PLAYBOOK = "get_active_playbook"
 SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_CALIBRATE_UTILITY_METER = "calibrate_utility_meter"
