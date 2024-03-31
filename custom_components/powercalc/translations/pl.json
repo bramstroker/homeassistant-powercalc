@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Obszar",
-                    "device": "Urządzenie",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+                    "device": "Urządzenie",
                     "group_energy_entities": "Członek encji energii",
                     "group_member_sensors": "Członek czujników powercalc",
                     "group_power_entities": "Członek encji mocy",
                     "hide_members": "Ukryj członków",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "name": "Nazwa",
                     "sub_groups": "Podgrupy",
-                    "unique_id": "Unikatowy identyfikator",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "unique_id": "Unikatowy identyfikator"
                 },
                 "data_description": {
                     "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Dodaj encje grupy utworzone przez Powercalc dla istniejącego urządzenia",
                     "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
                     "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
                     "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-                    "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
                 },
                 "title": "Utwórz czujnik grupy"
             },
@@ -118,12 +120,14 @@
                 "data": {
                     "autostart": "Autostart",
                     "playbooks": "Playbook'i",
-                    "repeat": "Powtarzaj"
+                    "repeat": "Powtarzaj",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
                     "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
-                    "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu"
+                    "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Konfiguracja Playbook'ów"
             },
@@ -350,6 +354,10 @@
                 }
             },
             "name": "Change GUI config"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Zwiększa sensor o zadaną wartość.",

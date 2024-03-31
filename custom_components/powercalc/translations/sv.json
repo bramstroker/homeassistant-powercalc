@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Område",
-                    "device": "Enhet",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Skapa bruksmätare",
+                    "device": "Enhet",
                     "group_energy_entities": "Medlem energi entiteter",
                     "group_member_sensors": "Medlem powercalc sensorer",
                     "group_power_entities": "Medlem effekt entiteter",
                     "hide_members": "Dölj medlemmar",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "name": "Namn",
                     "sub_groups": "Undergrupper",
-                    "unique_id": "Unikt id",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "unique_id": "Unikt id"
                 },
                 "data_description": {
                     "area": "Lägg till alla powercalc sensorer från det specifierade området",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
                     "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
                     "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
                     "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-                    "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
                 },
                 "title": "Skapa en gruppsensor"
             },
@@ -118,12 +120,14 @@
                 "data": {
                     "autostart": "Starta automatiskt",
                     "playbooks": "Playbooks",
-                    "repeat": "Repetera"
+                    "repeat": "Repetera",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
                     "playbooks": "Lägg in en playbook per linje. Exempel \n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig"
+                    "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook config"
             },
@@ -350,6 +354,10 @@
                 }
             },
             "name": "Ändra GUI-konfiguration"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Ökar sensorn med det angivna värdet.",

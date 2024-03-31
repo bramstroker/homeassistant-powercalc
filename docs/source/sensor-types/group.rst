@@ -139,3 +139,34 @@ Powercalc has some options to automatically include entities in your group match
 This can be useful to you don't have to manually specify each and every sensor.
 
 See :doc:`group/include-entities` for more information.
+
+Force creating Riemann sum sensor
+---------------------------------
+
+By default the group energy sensor created by Powercalc is a simple sum of the energy sensors of the individual entities.
+When you have ``create_energy_sensor: false`` for the individual entities, the group energy sensor will not be created.
+``force_calculate_group_energy`` can be used to force the creation of a Riemann sum sensor for the group. This will take the group power sensor as the source and integrate it over time.
+
+For example:
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - create_group: all lights
+          create_energy_sensor: true
+          force_calculate_group_energy: true
+          entities:
+            - create_group: living lights
+              create_energy_sensor: false
+              entities:
+                - entity_id: light.tv_lamp
+                - entity_id: light.reading_light
+                - ...
+
+This way you can still create an energy sensor even when the individual entities don't have one.
+When you are not interested in the individual energy sensors of each light this could be a good solution.
+
+.. important::
+    Beware that if your group also consists of :doc:`daily-energy` sensors the Riemann sum sensor will not be accurate, as it's could be missing the data of this sensor, because it does not always have a power sensor.
+    So you only must use this option when the group power sensor contains all the power data from individual entities.

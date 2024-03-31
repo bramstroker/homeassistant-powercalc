@@ -63,6 +63,7 @@ from .const import (
     CONF_REPEAT,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
+    CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
@@ -239,6 +240,7 @@ SCHEMA_POWER_PLAYBOOK = vol.Schema(
         vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(),
         vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
         vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
+        vol.Optional(CONF_STATE_TRIGGER): selector.ObjectSelector(),
     },
 )
 
@@ -281,7 +283,7 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         """Initialize options flow."""
@@ -1099,6 +1101,10 @@ def _create_group_options_schema(
             ),
             vol.Optional(CONF_AREA): selector.AreaSelector(),
             vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
+            vol.Optional(
+                CONF_CREATE_ENERGY_SENSOR,
+                default=True,
+            ): selector.BooleanSelector(),
             vol.Optional(
                 CONF_CREATE_UTILITY_METERS,
                 default=False,

@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Oblast",
-                    "device": "Zařízení",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Create utility meters",
+                    "device": "Zařízení",
                     "group_energy_entities": "Additional energy entities",
                     "group_member_sensors": "Member powercalc sensors",
                     "group_power_entities": "Additional power entities",
                     "hide_members": "Hide members",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "name": "Název",
                     "sub_groups": "Podskupiny",
-                    "unique_id": "Unikátní id",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "unique_id": "Unikátní id"
                 },
                 "data_description": {
                     "area": "Přidá všechny energetické senzory z určené oblasti",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
                     "group_member_sensors": "Powercalc sensors to include in the group",
                     "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
-                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
                 },
                 "title": "Create a group sensor"
             },
@@ -118,12 +120,14 @@
                 "data": {
                     "autostart": "Autostart",
                     "playbooks": "Playbooks",
-                    "repeat": "Opakovat"
+                    "repeat": "Opakovat",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
                     "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Toggle when you want to keep repeating the playbook after it completes"
+                    "repeat": "Toggle when you want to keep repeating the playbook after it completes",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook config"
             },
@@ -350,6 +354,10 @@
                 }
             },
             "name": "Change GUI config"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Increases the sensor with a given amount.",

@@ -163,7 +163,7 @@ class LightGroupFilter(IncludeEntityFilter):
             None,
         )
 
-        entity_ids = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
+        entity_ids: list[str] = light_group.extra_state_attributes.get(ATTR_ENTITY_ID)  # type: ignore
         for entity_id in entity_ids:
             registry_entry = entity_reg.async_get(entity_id)
             if registry_entry is None:

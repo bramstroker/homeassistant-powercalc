@@ -2,7 +2,6 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.loader import bind_hass
 
 from custom_components.powercalc import (
     CONF_CREATE_UTILITY_METERS,
@@ -28,7 +27,6 @@ SERVICE_SCHEMA = vol.Schema(
 )
 
 
-@bind_hass
 async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> None:
     field = call.data["field"]
     value = call.data["value"]

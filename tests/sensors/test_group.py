@@ -37,6 +37,8 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
@@ -44,6 +46,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_NAMING,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FIXED,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -1371,6 +1374,38 @@ async def test_bind_to_configured_device(
     assert group_entity.device_id == device_entry.id
 
 
+async def test_disable_energy_sensor_creation(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/2143"""
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "TestGroup",
+            CONF_ENTITIES: [
+                get_simple_fixed_config("input_boolean.test1"),
+                get_simple_fixed_config("input_boolean.test2"),
+            ],
+            CONF_CREATE_ENERGY_SENSOR: False,
+        },
+    )
+
+    assert hass.states.get("sensor.testgroup_energy") is None
+
+
+async def test_disable_energy_sensor_creation_gui(hass: HomeAssistant) -> None:
+    """See https://github.com/bramstroker/homeassistant-powercalc/issues/2143"""
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_CREATE_ENERGY_SENSOR: False,
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
+        },
+    )
+
+    assert hass.states.get("sensor.testgroup_energy") is None
+
+
 async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1922"""
     hass.states.async_set("sensor.my_power", STATE_UNAVAILABLE)
@@ -1393,6 +1428,109 @@ async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state
     assert group_state.state == "0"
+
+
+async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.furnace_power": RegistryEntry(
+                entity_id="sensor.furnace_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.furnace_energy": RegistryEntry(
+                entity_id="sensor.furnace_energy",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_CREATE_ENERGY_SENSOR: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_ENTITY_ID: "fan.ceiling_fan",
+                        CONF_FIXED: {CONF_POWER: 50},
+                        CONF_CREATE_ENERGY_SENSOR: True,
+                    },
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.furnace_power",
+                        CONF_ENERGY_SENSOR_ID: "sensor.furnace_energy",
+                    },
+                ],
+            },
+        ],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+        },
+    )
+
+    power_state = hass.states.get("sensor.testgroup_power")
+    assert power_state.attributes.get(ATTR_ENTITIES) == {"sensor.ceiling_fan_power", "sensor.furnace_power"}
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state.attributes.get(ATTR_ENTITIES) == {"sensor.ceiling_fan_energy", "sensor.furnace_energy"}
+
+
+async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
+    """
+    When `force_calculate_group_energy` is set to true,
+    the energy sensor should be a Riemann sensor integrating the power sensor
+    """
+
+    mock_registry(
+        hass,
+        {
+            "sensor.furnace_power": RegistryEntry(
+                entity_id="sensor.furnace_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.lights_power": RegistryEntry(
+                entity_id="sensor.lights_power",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_CREATE_ENERGY_SENSOR: True,
+                CONF_FORCE_CALCULATE_GROUP_ENERGY: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.furnace_power",
+                    },
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.lights_power",
+                    },
+                ],
+            },
+        ],
+        {
+            CONF_CREATE_ENERGY_SENSORS: False,
+        },
+    )
+
+    energy_state = hass.states.get("sensor.testgroup_energy")
+    assert energy_state
+    assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
 
 
 async def _create_energy_group(

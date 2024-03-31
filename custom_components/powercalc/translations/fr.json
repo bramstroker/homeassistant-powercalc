@@ -54,25 +54,27 @@
             "group": {
                 "data": {
                     "area": "Zone",
-                    "device": "Device",
+                    "create_energy_sensor": "Create energy sensor",
                     "create_utility_meters": "Créer des compteurs d'électricité",
+                    "device": "Device",
                     "group_energy_entities": "Entités énergétiques supplémentaires",
                     "group_member_sensors": "Membres des capteurs powercalc",
                     "group_power_entities": "Entités de puissance supplémentaires",
                     "hide_members": "Masquer les membres",
+                    "include_non_powercalc_sensors": "Include non powercalc sensors",
                     "name": "Nom",
                     "sub_groups": "Sous-groupes",
-                    "unique_id": "Identifiant unique",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors"
+                    "unique_id": "Identifiant unique"
                 },
                 "data_description": {
                     "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
+                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "device": "Add the group entities powercalc creates to an existing device",
                     "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
                     "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
                     "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-                    "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option"
+                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe"
                 },
                 "title": "Créer un capteur de groupe"
             },
@@ -118,12 +120,14 @@
                 "data": {
                     "autostart": "Démarrage automatique",
                     "playbooks": "Playbooks",
-                    "repeat": "Répéter"
+                    "repeat": "Répéter",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
                     "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogram1 : washing_machine/program1.csv",
-                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé"
+                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configuration Playbook"
             },
@@ -350,6 +354,10 @@
                 }
             },
             "name": "Calibrate utility meter"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Augmente le capteur d'une quantité donnée.",

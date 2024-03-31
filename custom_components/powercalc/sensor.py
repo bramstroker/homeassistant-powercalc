@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any
@@ -25,7 +26,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
 )
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.core import Event, HomeAssistant, SupportsResponse, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -65,6 +66,7 @@ from .const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FILTER,
     CONF_FIXED,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
     CONF_GROUP,
     CONF_HIDE_MEMBERS,
@@ -113,6 +115,7 @@ from .const import (
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
+    SERVICE_GET_ACTIVE_PLAYBOOK,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
@@ -138,8 +141,8 @@ from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
     create_domain_group_sensor,
-    create_group_sensors,
-    create_group_sensors_from_config_entry,
+    create_group_sensors_gui,
+    create_group_sensors_yaml,
 )
 from .sensors.group_standby import create_general_standby_sensors
 from .sensors.power import VirtualPowerSensor, create_power_sensor
@@ -176,6 +179,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_CUSTOM_MODEL_DIRECTORY): cv.string,
     vol.Optional(CONF_POWER_SENSOR_ID): cv.entity_id,
     vol.Optional(CONF_FORCE_ENERGY_SENSOR_CREATION): cv.boolean,
+    vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
@@ -331,7 +335,7 @@ async def async_setup_entry(
             global_config,
             sensor_config,
         )
-        entities = await create_group_sensors_from_config_entry(
+        entities = await create_group_sensors_gui(
             hass=hass,
             entry=entry,
             sensor_config=merged_sensor_config,
@@ -426,12 +430,16 @@ def _register_entity_id_change_listener(
         )
 
     @callback
-    def _filter_entity_id(event: Event) -> bool:
+    def _filter_entity_id(event: Mapping[str, Any] | Event) -> bool:
         """Only dispatch the listener for update events concerning the source entity"""
+
+        # Breaking change in 2024.4.0, check for Event for versions prior to this
+        if type(event) is Event:  # Intentionally avoid `isinstance` because it's slow and we trust `Event` is not subclassed
+            event = event.data
         return (
-            event.data["action"] == "update"
-            and "old_entity_id" in event.data
-            and event.data["old_entity_id"] == source_entity_id
+            event["action"] == "update"  # type: ignore
+            and "old_entity_id" in event  # type: ignore
+            and event["old_entity_id"] == source_entity_id  # type: ignore
         )
 
     hass.bus.async_listen(
@@ -513,6 +521,13 @@ def register_entity_services() -> None:
         SERVICE_STOP_PLAYBOOK,
         {},
         "async_stop_playbook",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_GET_ACTIVE_PLAYBOOK,
+        {},
+        "get_active_playbook",
+        supports_response=SupportsResponse.ONLY,
     )
 
     platform.async_register_entity_service(
@@ -692,7 +707,7 @@ async def create_sensors(  # noqa: C901
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
         entities_to_add.new.extend(
-            await create_group_sensors(
+            await create_group_sensors_yaml(
                 str(config.get(CONF_CREATE_GROUP)),
                 get_merged_sensor_configuration(global_config, config, validate=False),
                 entities_to_add.all(),
@@ -763,7 +778,11 @@ async def create_individual_sensors(
             return EntitiesBucket()
 
         # Create energy sensor which integrates the power sensor
-        if sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
+        if (
+            sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or
+            sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) or
+            CONF_ENERGY_SENSOR_ID in sensor_config
+        ):
             energy_sensor = await create_energy_sensor(
                 hass,
                 sensor_config,

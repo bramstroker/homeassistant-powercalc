@@ -35,5 +35,8 @@ to use an existing power sensor and let powercalc create the energy sensors and 
 This also enables you to combine virtual power sensors (created with powercalc) and existing power sensors in your HA installation into
 a YAML group. Without this configuration option power_sensor_id that would not be possible.
 
+When using `force_energy_sensor_creation` you need to provide either a source entity (``entity_id``) or a ``name`` for the energy sensor.
+If you don't provide this Powercalc has no way to determine how the energy sensor should be named.
+
 .. note::
     If you don't define `force_energy_sensor_creation` or you set it to `false` an energy sensor will not be created if the device already has an energy sensor. This can be a problem if you want to create an energy sensor for an MQTT device with multiple energy and power sensors already in it.

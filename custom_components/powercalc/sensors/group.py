@@ -55,9 +55,11 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
     CONF_AREA,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
@@ -77,6 +79,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
+from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.group_include.include import resolve_include_entities
 
 from .abstract import (
@@ -86,7 +89,7 @@ from .abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from .energy import EnergySensor
+from .energy import EnergySensor, VirtualEnergySensor
 from .power import PowerSensor
 from .utility_meter import create_utility_meters
 
@@ -99,7 +102,7 @@ STORAGE_VERSION = 2
 STATE_DUMP_INTERVAL = timedelta(minutes=10)
 
 
-async def create_group_sensors(
+async def create_group_sensors_yaml(
     group_name: str,
     sensor_config: dict[str, Any],
     entities: list[Entity],
@@ -126,49 +129,26 @@ async def create_group_sensors(
             )
         ]
 
-    group_sensors: list[Entity] = []
-
     power_sensor_ids = _get_filtered_entity_ids_by_class(entities, filters, PowerSensor)
-    power_sensor = create_grouped_power_sensor(
-        hass,
-        group_name,
-        sensor_config,
-        set(power_sensor_ids),
-    )
-    group_sensors.append(power_sensor)
 
-    energy_sensor_ids = _get_filtered_entity_ids_by_class(
-        entities,
-        filters,
-        EnergySensor,
-    )
-    energy_sensor = create_grouped_energy_sensor(
-        hass,
-        group_name,
-        sensor_config,
-        set(energy_sensor_ids),
-    )
-    group_sensors.append(energy_sensor)
+    create_energy_sensor: bool = sensor_config.get(CONF_CREATE_ENERGY_SENSOR, True)
+    energy_sensor_ids = []
+    if create_energy_sensor:
+        energy_sensor_ids = _get_filtered_entity_ids_by_class(
+            entities,
+            filters,
+            EnergySensor,
+        )
 
-    group_sensors.extend(
-        await create_utility_meters(
-            hass,
-            energy_sensor,
-            sensor_config,
-            net_consumption=True,
-        ),
-    )
-
-    return group_sensors
+    return await create_group_sensors(hass, group_name, sensor_config, set(power_sensor_ids), set(energy_sensor_ids))
 
 
-async def create_group_sensors_from_config_entry(
+async def create_group_sensors_gui(
     hass: HomeAssistant,
     entry: ConfigEntry,
     sensor_config: dict,
-) -> list[SensorEntity]:
+) -> list[Entity]:
     """Create group sensors based on a config_entry."""
-    group_sensors: list[SensorEntity] = []
 
     group_name = str(entry.data.get(CONF_NAME))
 
@@ -176,23 +156,43 @@ async def create_group_sensors_from_config_entry(
         sensor_config[CONF_UNIQUE_ID] = entry.entry_id
 
     power_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.POWER)
+
+    energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
+
+    return await create_group_sensors(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
+
+
+async def create_group_sensors(
+    hass: HomeAssistant,
+    group_name: str,
+    sensor_config: dict[str, Any],
+    power_sensor_ids: set[str],
+    energy_sensor_ids: set[str],
+) -> list[Entity]:
+    """Create grouped power and energy sensors."""
+
+    group_sensors: list[Entity] = []
+
+    power_sensor = None
     if power_sensor_ids:
         power_sensor = create_grouped_power_sensor(
             hass,
             group_name,
             sensor_config,
-            power_sensor_ids,
+            set(power_sensor_ids),
         )
         group_sensors.append(power_sensor)
 
-    energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
-    if energy_sensor_ids:
+    create_energy_sensor: bool = sensor_config.get(CONF_CREATE_ENERGY_SENSOR, True)
+    if create_energy_sensor:
         energy_sensor = create_grouped_energy_sensor(
             hass,
             group_name,
             sensor_config,
-            energy_sensor_ids,
+            set(energy_sensor_ids),
+            power_sensor,
         )
+
         group_sensors.append(energy_sensor)
 
         group_sensors.extend(
@@ -217,7 +217,7 @@ async def create_domain_group_sensor(
     sensor_config[
         CONF_UNIQUE_ID
     ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
-    return await create_group_sensors(
+    return await create_group_sensors_yaml(
         f"All {domain}",
         sensor_config,
         discovery_info[CONF_ENTITIES],
@@ -409,6 +409,7 @@ def create_grouped_power_sensor(
     _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
 
     return GroupedPowerSensor(
+        hass=hass,
         name=name,
         entities=power_sensor_ids,
         unique_id=unique_id,
@@ -426,7 +427,8 @@ def create_grouped_energy_sensor(
     group_name: str,
     sensor_config: dict,
     energy_sensor_ids: set[str],
-) -> GroupedEnergySensor:
+    power_sensor: GroupedPowerSensor | None,
+) -> EnergySensor:
     name = generate_energy_sensor_name(sensor_config, group_name)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     energy_unique_id = None
@@ -441,7 +443,19 @@ def create_grouped_energy_sensor(
 
     _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
 
+    force_calculate_energy = bool(sensor_config.get(CONF_FORCE_CALCULATE_GROUP_ENERGY, False))
+    if power_sensor and (force_calculate_energy or not energy_sensor_ids):
+        return VirtualEnergySensor(
+            source_entity=power_sensor.entity_id,
+            entity_id=entity_id,
+            name=name,
+            unique_id=energy_unique_id,
+            sensor_config=sensor_config,
+            device_info=get_device_info(hass, sensor_config, None),
+        )
+
     return GroupedEnergySensor(
+        hass=hass,
         name=name,
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
@@ -460,6 +474,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         name: str,
         entities: set[str],
         entity_id: str,
@@ -483,7 +498,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             self._attr_unique_id = unique_id
         self.entity_id = entity_id
         self.source_device_id = device_id
-        self._prev_state_store: PreviousStateStore = PreviousStateStore(self.hass)
+        self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -636,6 +651,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
 
     def __init__(
         self,
+        hass: HomeAssistant,
         name: str,
         entities: set[str],
         entity_id: str,
@@ -645,6 +661,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         device_id: str | None = None,
     ) -> None:
         super().__init__(
+            hass,
             name,
             entities,
             entity_id,

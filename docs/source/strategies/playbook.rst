@@ -23,15 +23,16 @@ So it could look like this:
 Configuration options
 ---------------------
 
-+---------------+--------+--------------+----------+--------------------------------------------------------------------------+
-| Name          | Type   | Requirement  | Default  | Description                                                              |
-+===============+========+==============+==========+==========================================================================+
-| playbooks     | dict   | **Required** |          | Mapping of playbook id's and file paths                                  |
-+---------------+--------+--------------+----------+--------------------------------------------------------------------------+
-| autostart     | string | **Optional** |          | key of the playbook which you want to start when HA starts.              |
-+---------------+--------+--------------+----------+--------------------------------------------------------------------------+
-| repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes |
-+---------------+--------+--------------+----------+--------------------------------------------------------------------------+
++---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
+| Name          | Type   | Requirement  | Default  | Description                                                                              |
++===============+========+==============+==========+==========================================================================================+
+| playbooks     | dict   | **Required** |          | Mapping of playbook id's and file paths                                                  |
++---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
+| autostart     | string | **Optional** |          | key of the playbook which you want to start when HA starts.                              |
++---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
+| repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes                 |
++---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
+| state_trigger | dict   | **Optional** |          | Activate a playbook when the entity has a certain state. Mapping of state -> playbook_id |                                                      |
 
 Setup a power sensor with playbook support.
 The example below will create entity ``sensor.washing_machine_power``
@@ -73,6 +74,27 @@ Example using ``autostart`` and ``repeat`` options:
               playbook: refrigerator.csv
           autostart: playbook
           repeat: true
+
+Active playbook based on state trigger
+--------------------------------------
+
+To activate a playbook based on a state trigger you can use the ``state_trigger`` option.
+This option is a mapping of state -> playbook_id.
+When the entity enters the state the playbook will be activated.
+
+.. code-block:: yaml
+
+    powercalc:
+      sensors:
+        - entity_id: sensor.sonos
+          name: Sonos
+          playbook:
+            playbooks:
+              idle: sonos_play/idle.csv
+              paused: sonos_play/paused.csv
+            state_trigger:
+              idle: idle
+              paused: paused
 
 Manually executing the playbook
 -------------------------------

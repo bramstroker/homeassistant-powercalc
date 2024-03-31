@@ -20,6 +20,7 @@ from custom_components.powercalc.const import (
     CONF_AUTOSTART,
     CONF_PLAYBOOKS,
     CONF_REPEAT,
+    CONF_STATE_TRIGGER,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 
@@ -32,6 +33,9 @@ CONFIG_SCHEMA = vol.Schema(
         ),
         vol.Optional(CONF_AUTOSTART): cv.string,
         vol.Optional(CONF_REPEAT, default=False): cv.boolean,
+        vol.Optional(CONF_STATE_TRIGGER): vol.Schema(
+            {cv.string: cv.string},
+        ),
     },
 )
 
@@ -55,6 +59,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._repeat: bool = bool(config.get(CONF_REPEAT))
         self._autostart: str | None = config.get(CONF_AUTOSTART)
         self._power = Decimal(0)
+        self._states_trigger: dict[str, str] | None = config.get(CONF_STATE_TRIGGER)
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
                 hass.config.config_dir,
@@ -69,6 +74,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._update_callback = update_callback
 
     async def calculate(self, entity_state: State) -> Decimal | None:
+        if self._states_trigger and entity_state.state in self._states_trigger:
+            playbook_id = self._states_trigger[entity_state.state]
+            await self.activate_playbook(playbook_id)
+
         return self._power
 
     async def on_start(self, hass: HomeAssistant) -> None:
@@ -97,6 +106,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if self._cancel_timer is not None:
             self._cancel_timer()
             self._cancel_timer = None
+
+    def get_active_playbook(self) -> Playbook | None:
+        """Get running playbook"""
+        return self._active_playbook
 
     @callback
     def _execute_playbook_entry(self) -> None:

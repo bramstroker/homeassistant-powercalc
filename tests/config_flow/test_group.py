@@ -15,11 +15,14 @@ from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
 
-from custom_components.powercalc import SensorType
+from custom_components.powercalc import SensorType, async_migrate_entry
 from custom_components.powercalc.const import (
     CONF_AREA,
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
@@ -68,6 +71,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -93,11 +97,36 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
+
+
+async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
+    """
+    Test if the energy sensor is created when `create_energy_sensors` is disabled on the global level,
+    but enabled for the config entry
+    """
+    await run_powercalc_setup(hass, {}, {CONF_CREATE_ENERGY_SENSORS: False})
+
+    result = await select_sensor_type(hass, SensorType.GROUP)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
+        CONF_GROUP_ENERGY_ENTITIES: ["sensor.balcony_energy"],
+        CONF_CREATE_ENERGY_SENSOR: True,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.my_group_sensor_power")
+    assert hass.states.get("sensor.my_group_sensor_energy")
 
 
 async def test_group_include_area(
@@ -147,6 +176,7 @@ async def test_group_include_area(
         CONF_AREA: area.id,
         CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: True,
         CONF_UTILITY_METER_TARIFFS: [],
     }
@@ -194,6 +224,7 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
@@ -309,6 +340,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
 
@@ -414,3 +446,13 @@ async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert not schema_keys[schema_keys.index(CONF_INCLUDE_NON_POWERCALC_SENSORS)].default()
+
+
+async def test_migrate_entity_to_version_3(hass: HomeAssistant) -> None:
+    """Test migration of a group sensor entry to version 3. Should add `create_energy_sensor` field."""
+    mock_entry = MockConfigEntry(domain=DOMAIN, data={CONF_SENSOR_TYPE: SensorType.GROUP}, version=2)
+    mock_entry.add_to_hass(hass)
+    await async_migrate_entry(hass, mock_entry)
+    hass.config_entries.async_get_entry(mock_entry.entry_id)
+    assert mock_entry.version == 3
+    assert mock_entry.data.get(CONF_CREATE_ENERGY_SENSOR)
