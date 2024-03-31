@@ -1,5 +1,5 @@
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import ATTR_ENTITY_ID, CONF_ENTITY_ID, STATE_IDLE, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
@@ -9,6 +9,9 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOKS,
     CONF_REPEAT,
     CONF_SENSOR_TYPE,
+    CONF_STATE_TRIGGER,
+    DOMAIN,
+    SERVICE_GET_ACTIVE_PLAYBOOK,
     CalculationStrategy,
     SensorType,
 )
@@ -110,3 +113,40 @@ async def test_playbooks_mandatory(hass: HomeAssistant) -> None:
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"base": "playbook_mandatory"}
+
+
+async def test_state_trigger(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    result = await goto_virtual_power_strategy_step(
+        hass,
+        CalculationStrategy.PLAYBOOK,
+        {CONF_ENTITY_ID: "media_player.test"},
+    )
+    await set_virtual_power_configuration(
+        hass,
+        result,
+        {
+            CONF_PLAYBOOKS: {
+                "playbook1": "test.csv",
+                "playbook2": "test2.csv",
+            },
+            CONF_STATE_TRIGGER: {
+                STATE_IDLE: "playbook1",
+                STATE_PLAYING: "playbook2",
+            },
+        },
+    )
+
+    hass.states.async_set("media_player.test", STATE_IDLE)
+    await hass.async_block_till_done()
+
+    result = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GET_ACTIVE_PLAYBOOK,
+        {ATTR_ENTITY_ID: "sensor.test_power"},
+        blocking=True,
+        return_response=True,
+    )
+
+    data = next(iter(result.values()))
+    assert data["id"] == "playbook1"

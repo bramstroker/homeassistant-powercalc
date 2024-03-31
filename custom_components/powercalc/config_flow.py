@@ -63,6 +63,7 @@ from .const import (
     CONF_REPEAT,
     CONF_SENSOR_TYPE,
     CONF_STANDBY_POWER,
+    CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
@@ -239,6 +240,7 @@ SCHEMA_POWER_PLAYBOOK = vol.Schema(
         vol.Optional(CONF_PLAYBOOKS): selector.ObjectSelector(),
         vol.Optional(CONF_REPEAT): selector.BooleanSelector(),
         vol.Optional(CONF_AUTOSTART): selector.TextSelector(),
+        vol.Optional(CONF_STATE_TRIGGER): selector.ObjectSelector(),
     },
 )
 

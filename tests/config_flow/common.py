@@ -81,6 +81,8 @@ async def goto_virtual_power_strategy_step(
             CONF_MODE: strategy,
             CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         }
+    elif CONF_MODE not in user_input:
+        user_input[CONF_MODE] = strategy
 
     result = await select_sensor_type(hass, SensorType.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(

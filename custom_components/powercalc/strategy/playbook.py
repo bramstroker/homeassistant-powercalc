@@ -107,6 +107,10 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             self._cancel_timer()
             self._cancel_timer = None
 
+    def get_active_playbook(self) -> Playbook | None:
+        """Get running playbook"""
+        return self._active_playbook
+
     @callback
     def _execute_playbook_entry(self) -> None:
         """Execute one step of the playbook"""
