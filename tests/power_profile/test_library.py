@@ -98,4 +98,4 @@ async def test_exception_is_raised_when_no_model_json_present(
         ModelInfo("foo", "bar"),
         get_test_profile_dir("no-model-json"),
     )
-    assert "model.json file not found in directory" in caplog.text
+    assert "model.json file not found" in caplog.text

@@ -28,60 +28,6 @@ DEVICE_TYPES = [
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 DATA_DIR = f"{PROJECT_ROOT}/custom_components/powercalc/data"
 
-
-def generate_supported_model_list(model_listing: list[dict]):
-    """Generate static file containing the supported models."""
-    toc_links: list[str] = []
-    tables_output: str = ""
-
-    for device_type in DEVICE_TYPES:
-        relevant_models = [
-            model
-            for model in model_listing
-            if model.get("device_type") == device_type[0]
-        ]
-        num_devices = len(relevant_models)
-
-        anchor = device_type[1].replace(" ", "-")
-        toc_links.append(f"- [{device_type[1]}](#{anchor}) ({num_devices})\n")
-
-        writer = MarkdownTableWriter()
-        headers = [
-            "manufacturer",
-            "model id",
-            "name",
-            "aliases",
-            "standby",
-        ]
-        if device_type[0] == "light":
-            headers.append("color modes")
-
-        writer.header_list = headers
-        rows = []
-        for model in relevant_models:
-            row = [
-                model["manufacturer"],
-                model["model"],
-                model["name"],
-                "<br />".join(model.get("aliases") or []),
-                model.get("standby_power") or 0,
-            ]
-            if device_type[0] == "light":
-                row.append(",".join(model.get("color_modes") or []))
-            rows.append(row)
-
-        rows = sorted(rows, key=lambda x: (x[0], x[1]))
-        writer.value_matrix = rows
-        tables_output += f"\n## {device_type[1]}\n#### {num_devices} total\n\n"
-        tables_output += writer.dumps()
-
-    md_file = open(os.path.join(PROJECT_ROOT, "docs/supported_models.md"), "w")
-    md_file.write("".join(toc_links) + tables_output)
-    md_file.close()
-
-    print("Generated supported_models.md")
-
-
 def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
     manufacturer_device_types: dict[str, list] = {}
     for model in model_listing:
@@ -98,38 +44,6 @@ def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
         json_file.write(json.dumps(manufacturer_device_types))
 
     print("Generated manufacturer_device_types.json")
-
-
-def generate_library_json(model_listing: list[dict]) -> None:
-    manufacturers: dict[str, dict] = {}
-    for model in model_listing:
-        manufacturer_name = model.get("manufacturer")
-        manufacturer = manufacturers.get(manufacturer_name)
-        if not manufacturer:
-            manufacturer = {"name": manufacturer_name, "models": [], "device_types": []}
-            manufacturers[manufacturer_name] = manufacturer
-
-        device_type = model.get("device_type")
-        if device_type not in manufacturer["device_types"]:
-            manufacturer["device_types"].append(device_type)
-
-        key_mapping = {"model": "id", "name": "name", "device_type": "device_type", "aliases": "aliases"}
-
-        # Create a new dictionary with updated keys
-        mapped_dict = {key_mapping.get(key, key): value for key, value in model.items()}
-        manufacturer["models"].append({key: mapped_dict[key] for key in key_mapping.values() if key in mapped_dict})
-
-    json_data = {
-        "manufacturers": list(manufacturers.values()),
-    }
-
-    with open(
-        os.path.join(DATA_DIR, "library.json"),
-        "w",
-    ) as json_file:
-        json_file.write(json.dumps(json_data))
-
-    print("Generated library.json")
 
 
 def get_model_list() -> list[dict]:
@@ -150,8 +64,6 @@ def get_model_list() -> list[dict]:
                     "color_modes": color_modes,
                 },
             )
-            if "device_type" not in model_data:
-                model_data["device_type"] = "light"
             models.append(model_data)
 
     return models
@@ -181,4 +93,3 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
 model_list = get_model_list()
 generate_supported_model_list(model_list)
 generate_manufacturer_device_types_file(model_list)
-generate_library_json(model_list)

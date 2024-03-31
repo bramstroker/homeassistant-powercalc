@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 from typing import NamedTuple
@@ -10,7 +9,8 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
 
-from .power_profile import DEVICE_DOMAINS, PowerProfile
+from .loader.local import LocalLoader
+from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
 
 BUILT_IN_DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), "../data")
 CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
@@ -30,6 +30,7 @@ class ProfileLibrary:
             )
             if os.path.exists(d)
         ]
+        self._loader = LocalLoader(hass)
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_device_types: dict[str, list] | None = None
 
@@ -49,47 +50,15 @@ class ProfileLibrary:
         return library
 
     def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
-        """Get listing of available manufacturers.
+        """Get listing of available manufacturers."""
 
-        @param entity_domain   Only return manufacturers providing profiles for a given domain
-        """
-        if self._manufacturer_device_types is None:
-            with open(
-                os.path.join(BUILT_IN_DATA_DIRECTORY, "manufacturer_device_types.json"),
-            ) as file:
-                self._manufacturer_device_types = json.load(file)
-
-        manufacturers: list[str] = []
-        for data_dir in self._data_directories:
-            for manufacturer in next(os.walk(data_dir))[1]:
-                if (
-                    entity_domain
-                    and data_dir == BUILT_IN_DATA_DIRECTORY
-                    and len(
-                        [
-                            device_type
-                            for device_type in self._manufacturer_device_types.get(
-                                manufacturer,
-                            )
-                            or []
-                            if DEVICE_DOMAINS[device_type] == entity_domain
-                        ],
-                    )
-                    == 0
-                ):
-                    continue
-
-                manufacturers.append(manufacturer)
+        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
+        manufacturers = self._loader.get_manufacturer_listing(device_type)
         return sorted(manufacturers)
 
     def get_model_listing(self, manufacturer: str) -> list[str]:
         """Get listing of available models for a given manufacturer."""
-        models: list[str] = []
-        for data_dir in self._data_directories:
-            manufacturer_dir = os.path.join(data_dir, manufacturer)
-            if not os.path.exists(manufacturer_dir):
-                continue
-            models.extend(os.listdir(manufacturer_dir))
+        models = self._loader.get_model_listing(manufacturer)
         return sorted(models)
 
     async def get_profile(
@@ -141,21 +110,15 @@ class ProfileLibrary:
             return self._profiles[manufacturer]
 
         profiles = []
-        for data_dir in self._data_directories:
-            manufacturer_dir = os.path.join(data_dir, manufacturer)
-            if not os.path.exists(manufacturer_dir):
+        models = self._loader.get_model_listing(manufacturer)
+        for model in models:
+            power_profile = await self.create_power_profile(
+                ModelInfo(manufacturer, model),
+            )
+            if power_profile is None:  # pragma: no cover
                 continue
-            for model in next(os.walk(manufacturer_dir))[1]:
-                if model[0] in [".", "@"]:
-                    continue
-                power_profile = await self.create_power_profile(
-                    ModelInfo(manufacturer, model),
-                    os.path.join(manufacturer_dir, model),
-                )
-                if power_profile is None:  # pragma: no cover
-                    continue
 
-                profiles.append(power_profile)
+            profiles.append(power_profile)
 
         self._profiles[manufacturer] = profiles
         return profiles
@@ -163,27 +126,28 @@ class ProfileLibrary:
     async def create_power_profile(
         self,
         model_info: ModelInfo,
-        directory: str,
+        custom_directory: str | None = None,
     ) -> PowerProfile | None:
         """Create a power profile object from the model JSON data."""
-        model_json_path = os.path.join(directory, "model.json")
-        try:
-            with open(model_json_path) as file:
-                json_data = json.load(file)
-                profile = PowerProfile(
-                    self._hass,
-                    manufacturer=model_info.manufacturer,
-                    model=model_info.model,
-                    directory=directory,
-                    json_data=json_data,
-                )
-                # When the power profile supplies multiple sub profiles we select one by default
-                if not profile.sub_profile and profile.sub_profile_select:
-                    profile.select_sub_profile(profile.sub_profile_select.default)
 
+        try:
+            json_data, directory = self._loader.load_model(model_info.manufacturer, model_info.model, custom_directory)
         except FileNotFoundError:
-            _LOGGER.error("model.json file not found in directory %s", directory)
+            _LOGGER.error("model.json file not found")
             return None
+
+        if not json_data:
+            return None
+        profile = PowerProfile(
+            self._hass,
+            manufacturer=model_info.manufacturer,
+            model=model_info.model,
+            directory=directory,
+            json_data=json_data,
+        )
+        # When the power profile supplies multiple sub profiles we select one by default
+        if not profile.sub_profile and profile.sub_profile_select:
+            profile.select_sub_profile(profile.sub_profile_select.default)
 
         return profile
 

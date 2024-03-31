@@ -88,7 +88,7 @@ from .discovery import autodiscover_model
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
+from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
@@ -990,7 +990,7 @@ def _create_source_entity_selector(
 ) -> selector.EntitySelector:
     if is_library_flow:
         return selector.EntitySelector(
-            selector.EntitySelectorConfig(domain=list(DEVICE_DOMAINS.values())),
+            selector.EntitySelectorConfig(domain=list(DOMAIN_DEVICE_TYPE.keys())),
         )
     return selector.EntitySelector()
 

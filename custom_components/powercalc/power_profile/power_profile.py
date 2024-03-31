@@ -48,12 +48,12 @@ class SubProfileMatcherType(StrEnum):
     INTEGRATION = "integration"
 
 
-DEVICE_DOMAINS = {
-    DeviceType.CAMERA: CAMERA_DOMAIN,
-    DeviceType.LIGHT: LIGHT_DOMAIN,
-    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
-    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
-    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
+DOMAIN_DEVICE_TYPE = {
+    CAMERA_DOMAIN: DeviceType.CAMERA,
+    LIGHT_DOMAIN: DeviceType.LIGHT,
+    SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
+    MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
+    BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
 }
 
 
@@ -247,7 +247,9 @@ class PowerProfile:
             and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
-        return DEVICE_DOMAINS[self.device_type] == source_entity.domain
+
+        entity_domain = [k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type][0]
+        return entity_domain == source_entity.domain
 
 
 class SubProfileSelector:
