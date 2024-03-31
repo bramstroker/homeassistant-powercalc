@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Autoštart",
                     "playbooks": "Playbooky",
-                    "repeat": "Opakovať"
+                    "repeat": "Opakovať",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
                     "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení"
+                    "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook konfigurácia"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "Zmeniť GUI nastavenie"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Zväčší snímač o danú hodnotu.",

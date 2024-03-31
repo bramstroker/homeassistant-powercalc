@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Iniciar automaticamente",
                     "playbooks": "Gravações",
-                    "repeat": "Repetir"
+                    "repeat": "Repetir",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indicar para iniciar uma determinada sequência quando o HA inicia. Ex: 'program1'",
                     "playbooks": "Introduza uma sequência em cada linha. Exemplo\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Alternar se pretende que a sequência reinicie e repita após terminar"
+                    "repeat": "Alternar se pretende que a sequência reinicie e repita após terminar",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configuração de Sequência"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "Calibrate utility meter"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Aumenta o valor do sensor por um valor.",

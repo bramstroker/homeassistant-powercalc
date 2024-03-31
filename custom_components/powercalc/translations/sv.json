@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Starta automatiskt",
                     "playbooks": "Playbooks",
-                    "repeat": "Repetera"
+                    "repeat": "Repetera",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
                     "playbooks": "Lägg in en playbook per linje. Exempel \n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig"
+                    "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook config"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "Ändra GUI-konfiguration"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Ökar sensorn med det angivna värdet.",
