@@ -248,7 +248,7 @@ class PowerProfile:
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
 
-        entity_domain = [k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type][0]
+        entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
         return entity_domain == source_entity.domain
 
 

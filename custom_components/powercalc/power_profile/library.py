@@ -10,6 +10,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
 
+from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
 from .loader.remote import RemoteLoader
 from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
@@ -23,19 +24,14 @@ _LOGGER = logging.getLogger(__name__)
 class ProfileLibrary:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
-        self._data_directories: list[str] = [
-            d
-            for d in (
-                os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
-                os.path.join(os.path.dirname(__file__), "../custom_data"),
-                BUILT_IN_DATA_DIRECTORY,
-            )
-            if os.path.exists(d)
-        ]
-        self._loader = LocalLoader(hass)
-        #self._loader = RemoteLoader(hass)
+        self._loader = CompositeLoader(
+            [
+                LocalLoader(hass),
+                RemoteLoader(hass),
+            ],
+        )
         self._profiles: dict[str, list[PowerProfile]] = {}
-        self._manufacturer_models: dict[str, list] | None = None
+        self._manufacturer_models: dict[str, list[str]] = {}
         self._manufacturer_device_types: dict[str, list] = {}
 
     async def initialize(self) -> None:
@@ -85,16 +81,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model)
 
-        profile = None
-        if custom_directory:
-            profile = await self.create_power_profile(model_info, custom_directory)
-        else:
-            profile = await self.create_power_profile(model_info)
-            # profiles = await self.get_profiles_by_manufacturer(model_info.manufacturer)
-            # for p in profiles:
-            #     if p.supports(model_info.model):
-            #         profile = p
-            #         break
+        profile = await self.create_power_profile(model_info, custom_directory)
 
         if not profile:
             return None
@@ -143,26 +130,33 @@ class ProfileLibrary:
     ) -> PowerProfile | None:
         """Create a power profile object from the model JSON data."""
 
+        manufacturer = model_info.manufacturer
+        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
+            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
+        manufacturer = manufacturer.lower()
+
         try:
-            model = model_info.model
+            resolved_model: str | None = model_info.model
             if not custom_directory:
-                model = await self.find_model(model_info)
-                if not model:
-                    return None
+                resolved_model = await self.find_model(manufacturer, model_info.model)
 
-            json_data, directory = await self._loader.load_model(model_info.manufacturer, model, custom_directory)
+            if not resolved_model:
+                return None
+
+            result = await self._loader.load_model(manufacturer, resolved_model, custom_directory)
         except FileNotFoundError:
-            #_LOGGER.error("model.json file not found for %s/%s", model_info.manufacturer, model_info.model)
+            _LOGGER.error("model.json file not found")
             return None
 
-        if not json_data:
+        if not result:
             return None
+
         profile = PowerProfile(
             self._hass,
-            manufacturer=model_info.manufacturer,
-            model=model_info.model,
-            directory=directory,
-            json_data=json_data,
+            manufacturer=manufacturer,
+            model=resolved_model,
+            directory=result[1],
+            json_data=result[0],
         )
         # When the power profile supplies multiple sub profiles we select one by default
         if not profile.sub_profile and profile.sub_profile_select:
@@ -170,20 +164,21 @@ class ProfileLibrary:
 
         return profile
 
-    async def find_model(self, model_info: ModelInfo) -> str | None:
+    async def find_model(self, manufacturer: str, model: str) -> str | None:
         """Check whether this power profile supports a given model ID.
         Also looks at possible aliases.
         """
 
-        model = model_info.model
         search = {
             model,
+            model.replace("#slash#", "/"),
             model.lower(),
             model.lower().replace("#slash#", "/"),
-            re.sub(r"\(([^\(\)]+)\)$", "$1", model),
+            re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model),
         }
 
-        return await self._loader.find_model(model_info.manufacturer, search)
+        return await self._loader.find_model(manufacturer, search)
+
 
 class ModelInfo(NamedTuple):
     manufacturer: str

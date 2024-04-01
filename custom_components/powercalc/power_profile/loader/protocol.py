@@ -4,15 +4,15 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 
 class Loader(Protocol):
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize the loader."""
         ...
 
-    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> list[str]:
+    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of possible manufacturers."""
         ...
 
-    async def get_model_listing(self, manufacturer: str) -> list[str]:
+    async def get_model_listing(self, manufacturer: str) -> set[str]:
         """Get listing of available models for a given manufacturer."""
         ...
 

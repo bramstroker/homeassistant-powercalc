@@ -15,7 +15,7 @@ CUSTOM_DATA_DIRECTORY = "powercalc/models"
 class LocalLoader(Loader):
     def __init__(self, hass: HomeAssistant) -> None:
         self._manufacturer_device_types: dict[str, list] | None = None
-        self._model_aliases: dict[str, dict[str, str]] | None = None
+        self._model_aliases: dict[str, dict[str, str]] = {}
         self._data_directories: list[str] = [
             d
             for d in (
@@ -30,7 +30,7 @@ class LocalLoader(Loader):
     async def initialize(self) -> None:
         pass
 
-    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> list[str]:
+    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
 
         if self._manufacturer_device_types is None:
@@ -39,7 +39,7 @@ class LocalLoader(Loader):
             ) as file:
                 self._manufacturer_device_types = json.load(file)
 
-        manufacturers: list[str] = []
+        manufacturers: set[str] = set()
         for data_dir in self._data_directories:
             for manufacturer in next(os.walk(data_dir))[1]:
                 if (
@@ -49,16 +49,16 @@ class LocalLoader(Loader):
                 ):
                     continue
 
-                manufacturers.append(manufacturer)
+                manufacturers.add(manufacturer)
         return manufacturers
 
-    async def get_model_listing(self, manufacturer: str) -> list[str]:
+    async def get_model_listing(self, manufacturer: str) -> set[str]:
         """Get listing of available models for a given manufacturer."""
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
             manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
         manufacturer = manufacturer.lower()
 
-        models: list[str] = []
+        models: set[str] = set()
         for data_dir in self._data_directories:
             manufacturer_dir = os.path.join(data_dir, manufacturer)
             if not os.path.exists(manufacturer_dir):
@@ -66,8 +66,9 @@ class LocalLoader(Loader):
             for model in os.listdir(manufacturer_dir):
                 if model[0] in [".", "@"]:
                     continue
-                models.append(model)
-                model_json = json.load(open(os.path.join(manufacturer_dir, model, "model.json")))
+                models.add(model)
+                with open(os.path.join(manufacturer_dir, model, "model.json")) as f:
+                    model_json = json.load(f)
                 self._model_aliases[manufacturer_dir] = model_json.get("aliases", [])
         return models
 
@@ -94,10 +95,6 @@ class LocalLoader(Loader):
             return json.load(file), base_dir
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
-        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
-        manufacturer = manufacturer.lower()
-
         for data_dir in self._data_directories:
             manufacturer_dir = os.path.join(data_dir, manufacturer)
             if not os.path.exists(manufacturer_dir):

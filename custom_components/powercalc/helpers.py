@@ -1,5 +1,6 @@
 import decimal
 import logging
+import os.path
 from decimal import Decimal
 
 from homeassistant.helpers.template import Template
@@ -23,3 +24,9 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
     except decimal.DecimalException:
         _LOGGER.error("Could not convert power value %s to decimal", power)
         return None
+
+
+def get_library_path(sub_path: str = "") -> str:
+    """Get the path to the library.json file."""
+    base_path = os.path.join(os.path.dirname(__file__), "data")
+    return f"{base_path}/{sub_path}"

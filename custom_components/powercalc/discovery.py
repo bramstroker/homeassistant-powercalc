@@ -203,7 +203,7 @@ class DiscoveryManager:
         if entity_entry.disabled:
             return False
 
-        if entity_entry.domain not in DOMAIN_DEVICE_TYPE.keys():
+        if entity_entry.domain not in DOMAIN_DEVICE_TYPE:
             return False
 
         if entity_entry.entity_category in [
