@@ -16,19 +16,20 @@ class LocalLoader(Loader):
     def __init__(self, hass: HomeAssistant) -> None:
         self._manufacturer_device_types: dict[str, list] | None = None
         self._model_aliases: dict[str, dict[str, str]] = {}
+        self._data_directories: list[str] = []
+        self._hass = hass
+
+    async def initialize(self) -> None:
         self._data_directories: list[str] = [
             d
             for d in (
-                os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
-                os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
+                os.path.join(self._hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
+                os.path.join(self._hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
                 os.path.join(os.path.dirname(__file__), "../../custom_data"),
-                #BUILT_IN_DATA_DIRECTORY,
+                # BUILT_IN_DATA_DIRECTORY,
             )
             if os.path.exists(d)
         ]
-
-    async def initialize(self) -> None:
-        pass
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
