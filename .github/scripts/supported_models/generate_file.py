@@ -113,7 +113,13 @@ def generate_library_json(model_listing: list[dict]) -> None:
         if device_type not in manufacturer["device_types"]:
             manufacturer["device_types"].append(device_type)
 
-        key_mapping = {"model": "id", "name": "name", "device_type": "device_type", "aliases": "aliases"}
+        key_mapping = {
+            "model": "id",
+            "name": "name",
+            "device_type": "device_type",
+            "aliases": "aliases",
+            "modified": "update_timestamp"
+        }
 
         # Create a new dictionary with updated keys
         mapped_dict = {key_mapping.get(key, key): value for key, value in model.items()}
@@ -148,6 +154,8 @@ def get_model_list() -> list[dict]:
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "color_modes": color_modes,
+                    "directory": model_directory,
+                    "modified": get_local_modification_time(model_directory),
                 },
             )
             if "device_type" not in model_data:
@@ -176,6 +184,13 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
             return manufacturer
 
     return None
+
+
+def get_local_modification_time(folder: str) -> float:
+    """Get the latest modification time of the local profile directory."""
+    times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
+    times.sort(reverse=True)
+    return times[0] if times else 0
 
 
 model_list = get_model_list()
