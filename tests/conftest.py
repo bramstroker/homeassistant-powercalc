@@ -156,7 +156,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
 
 
 @pytest.fixture(scope="session", autouse=True)
-def mock_remote_loader() -> None:
+def mock_remote_loader() -> Generator:
     def side_effect(manufacturer: str, model: str, storage_path: str) -> None:
         source_dir = get_library_path(f"{manufacturer}/{model}")
         if os.path.exists(storage_path):
