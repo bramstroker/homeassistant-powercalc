@@ -133,7 +133,7 @@ class RemoteLoader(Loader):
             async with session.get(endpoint) as resp:
                 if resp.status != 200:
                     raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
-                resources = json.loads(await resp.read())
+                resources = await resp.json()
 
             os.makedirs(storage_path, exist_ok=True)
 

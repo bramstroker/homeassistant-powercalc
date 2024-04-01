@@ -13,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from pytest_asyncio.plugin import SubRequest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -155,8 +156,12 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
     return _mock_entity_with_model_information
 
 
-@pytest.fixture(scope="session", autouse=True)
-def mock_remote_loader() -> Generator:
+@pytest.fixture(autouse=True)
+def mock_remote_loader(request: SubRequest) -> Generator:
+    if "skip_remote_loader_mocking" in request.keywords:
+        yield
+        return
+
     def side_effect(manufacturer: str, model: str, storage_path: str) -> None:
         source_dir = get_library_path(f"{manufacturer}/{model}")
         if os.path.exists(storage_path):

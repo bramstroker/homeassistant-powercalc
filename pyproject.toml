@@ -96,6 +96,7 @@ fnv_hash_fast = "*"
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
+aioresponses = "^0.7.6"
 
 [build-system]
 requires = ["poetry-core"]

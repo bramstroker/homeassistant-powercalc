@@ -26,7 +26,7 @@ class LocalLoader(Loader):
                 os.path.join(self._hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
                 os.path.join(self._hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
                 os.path.join(os.path.dirname(__file__), "../../custom_data"),
-                # BUILT_IN_DATA_DIRECTORY,
+                BUILT_IN_DATA_DIRECTORY,
             )
             if os.path.exists(d)
         ]
