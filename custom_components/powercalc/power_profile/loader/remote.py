@@ -18,6 +18,7 @@ DOWNLOAD_PROXY = "http://localhost:3000"
 ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
 ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
 
+
 class RemoteLoader(Loader):
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
@@ -26,7 +27,7 @@ class RemoteLoader(Loader):
         self.manufacturer_models: dict[str, list[dict]] = {}
 
     async def initialize(self) -> None:
-        await self.load_library_json()
+        self.library_contents = await self.load_library_json()
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -40,17 +41,16 @@ class RemoteLoader(Loader):
                     self.manufacturer_models[manufacturer_name] = []
                 self.manufacturer_models[manufacturer_name].append(model)
 
-    async def load_library_json(self) -> None:
+    @staticmethod
+    async def load_library_json() -> dict:
         """Load library.json file"""
+
         async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
             if resp.status != 200:
                 _LOGGER.debug("Failed to download library.json from github, falling back to local copy")
                 with open(get_library_path("library.json")) as f:
-                    self.library_contents = json.load(f)
-            self.library_contents = await resp.json()
-
-        if not self.library_contents:
-            raise LibraryLoadingError("Library.json JSON invalid")
+                    return json.load(f)
+            return await resp.json()
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
@@ -95,7 +95,7 @@ class RemoteLoader(Loader):
                 needs_update = True
 
         if needs_update:
-            await self._download_profile(manufacturer, model, storage_path)
+            await self.download_profile(manufacturer, model, storage_path)
 
         model_path = os.path.join(storage_path, "model.json")
 
@@ -121,7 +121,8 @@ class RemoteLoader(Loader):
         times.sort(reverse=True)
         return times[0] if times else 0
 
-    async def _download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
+    @staticmethod
+    async def download_profile(manufacturer: str, model: str, storage_path: str) -> None:
         """Download the profile from github."""
 
         _LOGGER.info("Downloading profile: %s/%s from github", manufacturer, model)

@@ -25,8 +25,6 @@ from custom_components.powercalc.strategy.strategy_interface import (
 from .common import create_source_entity
 
 
-@pytest.mark.enable_socket
-@pytest.mark.allow_hosts(["140.82.121.5,140.82.121.6"])
 async def test_colortemp_lut(hass: HomeAssistant) -> None:
     """Test LUT lookup in color_temp mode"""
 
