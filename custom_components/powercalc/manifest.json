@@ -17,6 +17,6 @@
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
-  "requirements": ["numpy>=1.21.1", "pygithub>=2.3.0"],
+  "requirements": ["numpy>=1.21.1", "githubkit>=0.11"],
   "version": "0.1.0"
 }
