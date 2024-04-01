@@ -37,6 +37,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> No
     assert not power_profile.is_strategy_supported(CalculationStrategy.FIXED)
     assert power_profile.device_type == DeviceType.LIGHT
     assert power_profile.name == "Hue White and Color Ambiance A19 E26/E27 (Gen 5)"
+    assert not power_profile.aliases
 
 
 async def test_load_fixed_profile(hass: HomeAssistant) -> None:

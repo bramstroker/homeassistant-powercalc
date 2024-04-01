@@ -10,8 +10,10 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
 
+from .error import LibraryError
 from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
+from .loader.protocol import Loader
 from .loader.remote import RemoteLoader
 from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
 
@@ -22,14 +24,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ProfileLibrary:
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, loader: Loader) -> None:
         self._hass = hass
-        self._loader = CompositeLoader(
-            [
-                LocalLoader(hass),
-                RemoteLoader(hass),
-            ],
-        )
+        self._loader = loader
         self._profiles: dict[str, list[PowerProfile]] = {}
         self._manufacturer_models: dict[str, list[str]] = {}
         self._manufacturer_device_types: dict[str, list] = {}
@@ -48,26 +45,33 @@ class ProfileLibrary:
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
             return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
-        library = ProfileLibrary(hass)
+        loader = CompositeLoader(
+            [
+                LocalLoader(hass),
+                RemoteLoader(hass),
+            ],
+        )
+        library = ProfileLibrary(hass, loader)
         await library.initialize()
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
         return library
 
     async def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
         """Get listing of available manufacturers."""
-
         device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
         manufacturers = await self._loader.get_manufacturer_listing(device_type)
         return sorted(manufacturers)
 
-    async def get_model_listing(self, manufacturer: str) -> list[str]:
+    async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
         """Get listing of available models for a given manufacturer."""
-        cached_models = self._manufacturer_models.get(manufacturer)
+        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
+        cache_key = f"{manufacturer}/{device_type}"
+        cached_models = self._manufacturer_models.get(cache_key)
         if cached_models:
             return cached_models
-        models = await self._loader.get_model_listing(manufacturer)
-        self._manufacturer_models[manufacturer] = sorted(models)
-        return self._manufacturer_models[manufacturer]
+        models = await self._loader.get_model_listing(manufacturer, device_type)
+        self._manufacturer_models[cache_key] = sorted(models)
+        return self._manufacturer_models[cache_key]
 
     async def get_profile(
         self,
@@ -91,38 +95,6 @@ class ProfileLibrary:
 
         return profile
 
-    async def get_profiles_by_manufacturer(
-        self,
-        manufacturer: str,
-    ) -> list[PowerProfile]:
-        """Lazy loads a list of power profiles per manufacturer.
-
-        Using the following lookup fallback mechanism:
-         - check in user defined directory (config/powercalc-custom-models)
-         - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
-         - check in built-in directory (config/custom_components/powercalc/data)
-        """
-        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
-        manufacturer = manufacturer.lower()
-
-        if manufacturer in self._profiles:
-            return self._profiles[manufacturer]
-
-        profiles = []
-        models = await self._loader.get_model_listing(manufacturer)
-        for model in models:
-            power_profile = await self.create_power_profile(
-                ModelInfo(manufacturer, model),
-            )
-            if power_profile is None:  # pragma: no cover
-                continue
-
-            profiles.append(power_profile)
-
-        self._profiles[manufacturer] = profiles
-        return profiles
-
     async def create_power_profile(
         self,
         model_info: ModelInfo,
@@ -144,11 +116,10 @@ class ProfileLibrary:
                 return None
 
             result = await self._loader.load_model(manufacturer, resolved_model, custom_directory)
-        except FileNotFoundError:
-            _LOGGER.error("model.json file not found")
-            return None
-
-        if not result:
+            if not result:
+                raise LibraryError(f"Model {manufacturer} {resolved_model} not found")
+        except LibraryError as e:
+            _LOGGER.error("Problem loading model: %s", e)
             return None
 
         profile = PowerProfile(

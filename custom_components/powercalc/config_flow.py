@@ -1199,9 +1199,8 @@ async def _create_schema_model(
     """Create model schema."""
     library = await ProfileLibrary.factory(hass)
     models = [
-        selector.SelectOptionDict(value=profile.model, label=profile.model)
-        for profile in await library.get_profiles_by_manufacturer(manufacturer)
-        if profile.is_entity_domain_supported(source_entity)
+        selector.SelectOptionDict(value=model, label=model)
+        for model in await library.get_model_listing(manufacturer, source_entity.domain)
     ]
     return vol.Schema(
         {
