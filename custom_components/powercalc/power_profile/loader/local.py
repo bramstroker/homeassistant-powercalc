@@ -20,7 +20,7 @@ class LocalLoader(Loader):
         self._hass = hass
 
     async def initialize(self) -> None:
-        self._data_directories: list[str] = [
+        self._data_directories = [
             d
             for d in (
                 os.path.join(self._hass.config.config_dir, CUSTOM_DATA_DIRECTORY),

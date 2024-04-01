@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+from typing import Any, cast
 
 import aiohttp
 from homeassistant.core import HomeAssistant
@@ -42,15 +43,15 @@ class RemoteLoader(Loader):
                 self.manufacturer_models[manufacturer_name].append(model)
 
     @staticmethod
-    async def load_library_json() -> dict:
+    async def load_library_json() -> dict[str, Any]:
         """Load library.json file"""
 
         async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
             if resp.status != 200:
                 _LOGGER.debug("Failed to download library.json from github, falling back to local copy")
                 with open(get_library_path("library.json")) as f:
-                    return json.load(f)
-            return await resp.json()
+                    return cast(dict[str, Any], json.load(f))
+            return cast(dict[str, Any], await resp.json())
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
