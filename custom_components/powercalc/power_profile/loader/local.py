@@ -90,7 +90,8 @@ class LocalLoader(Loader):
                 )
                 if not os.path.exists(base_dir):
                     base_dir = None
-                    continue
+                else:
+                    break
 
         if base_dir is None:
             return None
