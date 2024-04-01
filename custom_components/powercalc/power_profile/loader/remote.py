@@ -3,8 +3,6 @@ import logging
 import os
 
 import aiohttp
-from githubkit import GitHub, TokenAuthStrategy
-from githubkit.versions.v2022_11_28.models import ContentDirectoryItems
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
@@ -12,9 +10,6 @@ from custom_components.powercalc.helpers import get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
-
-REPO_OWNER = "bramstroker"
-REPO_NAME = "homeassistant-powercalc"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,15 +45,19 @@ class RemoteLoader(Loader):
         """Get listing of available manufacturers."""
 
         return {
-            m["name"] for m
+            manufacturer["name"] for manufacturer
             in self.library_contents.get("manufacturers", [])
-            if device_type in m.get("device_types", [])
+            if not device_type or device_type in manufacturer.get("device_types", [])
         }
 
-    async def get_model_listing(self, manufacturer: str) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
-        return {model["id"] for model in self.manufacturer_models.get(manufacturer, [])}
+        return {
+            model["id"] for model
+            in self.manufacturer_models.get(manufacturer, [])
+            if not device_type or device_type in model.get("device_types", [])
+        }
 
     async def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
 
@@ -68,7 +67,7 @@ class RemoteLoader(Loader):
 
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
-            raise FileNotFoundError("Model not found in library: %s/%s", manufacturer, model)
+            raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
 
         storage_path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model)
 
@@ -113,29 +112,23 @@ class RemoteLoader(Loader):
 
     async def _download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """Download the profile from github."""
-        folder = "custom_components/powercalc/data/signify/LCT010"
-
-        github = GitHub(TokenAuthStrategy("<access_token>"))
 
         _LOGGER.info("Downloading profile: %s/%s from github", manufacturer, model)
 
-        content_response = await github.rest.repos.async_get_content(
-            owner=REPO_OWNER,
-            repo=REPO_NAME,
-            path=folder,
-        )
+        uri = f"http://localhost:3000/?manufacturer={manufacturer}&model={model}"
 
-        if content_response.status_code != 200:
-            raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(uri) as resp:
+                if resp.status != 200:
+                    raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
+                resources = json.loads(await resp.read())
 
         os.makedirs(storage_path, exist_ok=True)
 
         # Download the files
         async with aiohttp.ClientSession() as session:
-            for file in content_response.parsed_data:
-                if not isinstance(file, ContentDirectoryItems) or not file.download_url:
-                    continue
-                async with session.get(file.download_url) as resp:
-                    with open(os.path.join(storage_path, file.name), "wb") as f:
+            for resource in resources:
+                async with session.get(resource.url) as resp:
+                    with open(os.path.join(storage_path, resource.filename), "wb") as f:
                         f.write(await resp.read())
 

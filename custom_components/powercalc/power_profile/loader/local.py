@@ -4,6 +4,7 @@ import os
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
+from custom_components.powercalc.power_profile.error import LibraryLoadingError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 
@@ -52,8 +53,15 @@ class LocalLoader(Loader):
                 manufacturers.add(manufacturer)
         return manufacturers
 
-    async def get_model_listing(self, manufacturer: str) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
+        """Lazy loads a list of power profiles per manufacturer.
+
+                Using the following lookup fallback mechanism:
+                 - check in user defined directory (config/powercalc-custom-models)
+                 - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
+                 - check in built-in directory (config/custom_components/powercalc/data)
+                """
         if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
             manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
         manufacturer = manufacturer.lower()
@@ -66,9 +74,12 @@ class LocalLoader(Loader):
             for model in os.listdir(manufacturer_dir):
                 if model[0] in [".", "@"]:
                     continue
-                models.add(model)
                 with open(os.path.join(manufacturer_dir, model, "model.json")) as f:
                     model_json = json.load(f)
+                supported_device_type = DeviceType(model_json.get("device_type", DeviceType.LIGHT))
+                if device_type and device_type != supported_device_type:
+                    continue
+                models.add(model)
                 self._model_aliases[manufacturer_dir] = model_json.get("aliases", [])
         return models
 
@@ -82,14 +93,15 @@ class LocalLoader(Loader):
                     model,
                 )
                 if not os.path.exists(base_dir):
+                    base_dir = None
                     continue
 
         if base_dir is None:
             return None
 
         model_json_path = os.path.join(base_dir, "model.json")
-        if model_json_path is None:
-            raise FileNotFoundError(f"model.json not found for {manufacturer} {model}")
+        if not model_json_path or not os.path.exists(model_json_path):
+            raise LibraryLoadingError(f"model.json not found for {manufacturer} {model}")
 
         with open(model_json_path) as file:
             return json.load(file), base_dir

@@ -21,10 +21,10 @@ class CompositeLoader(Loader):
             for manufacturer in await loader.get_manufacturer_listing(device_type)
         }
 
-    async def get_model_listing(self, manufacturer: str) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
-        return {model for loader in self.loaders for model in await loader.get_model_listing(manufacturer)}
+        return {model for loader in self.loaders for model in await loader.get_model_listing(manufacturer, device_type)}
 
     async def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
 

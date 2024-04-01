@@ -84,26 +84,6 @@ class PowerProfile:
 
         return self._sub_profile_dir or self._directory
 
-    def supports(self, model: str) -> bool:
-        """Check whether this power profile supports a given model ID.
-        Also looks at possible aliases.
-        """
-        model = model.lower().replace("#slash#", "/")
-
-        if self._model.lower() == model:
-            return True
-
-        # @todo implement Regex/Json path
-        for alias in self.aliases:
-            if alias.lower() == model:
-                return True
-
-        # Also try to match model ID between parentheses.
-        if match := re.search(r"\(([^\(\)]+)\)$", model):
-            return self.supports(match.group(1))
-
-        return False
-
     @property
     def manufacturer(self) -> str:
         return self._manufacturer
