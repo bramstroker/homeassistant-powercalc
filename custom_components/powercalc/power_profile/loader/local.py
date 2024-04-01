@@ -3,14 +3,13 @@ import os
 
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.power_profile.error import LibraryLoadingError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 BUILT_IN_DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), "../../data")
 LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
-CUSTOM_DATA_DIRECTORY = "powercalc/models"
+CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
 
 
 class LocalLoader(Loader):
@@ -62,9 +61,6 @@ class LocalLoader(Loader):
                  - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
                  - check in built-in directory (config/custom_components/powercalc/data)
                 """
-        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
-        manufacturer = manufacturer.lower()
 
         models: set[str] = set()
         for data_dir in self._data_directories:

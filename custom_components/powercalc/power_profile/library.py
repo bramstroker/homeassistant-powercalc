@@ -64,6 +64,10 @@ class ProfileLibrary:
 
     async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
         """Get listing of available models for a given manufacturer."""
+        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
+            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
+        manufacturer = manufacturer.lower()
+
         device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
         cache_key = f"{manufacturer}/{device_type}"
         cached_models = self._manufacturer_models.get(cache_key)

@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.aliases import MANUFACTURER_IKEA, MANUFACTURER_SIGNIFY
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
-from tests.common import get_test_profile_dir
+from tests.common import get_test_config_dir, get_test_profile_dir
 
 
 async def test_manufacturer_listing(hass: HomeAssistant) -> None:
@@ -96,6 +96,7 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
+    hass.config.config_dir = get_test_config_dir()
     caplog.set_level(logging.ERROR)
     library = await ProfileLibrary.factory(hass)
     models = await library.get_model_listing(
@@ -123,6 +124,7 @@ async def test_create_power_profile_raises_library_error(hass: HomeAssistant, ca
     caplog.set_level(logging.ERROR)
     mock_loader = LocalLoader(hass)
     mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
     await library.create_power_profile(ModelInfo("signify", "LCT010"))
