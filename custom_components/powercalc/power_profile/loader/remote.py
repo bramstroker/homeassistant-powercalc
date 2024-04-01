@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 
 import aiohttp
 from homeassistant.core import HomeAssistant
@@ -41,13 +42,12 @@ class RemoteLoader(Loader):
 
     async def load_library_json(self) -> None:
         """Load library.json file"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(ENDPOINT_LIBRARY) as resp:
-                if resp.status != 200:
-                    _LOGGER.debug("Failed to download library.json from github, falling back to local copy")
-                    with open(get_library_path("library.json")) as f:
-                        self.library_contents = json.load(f)
-                self.library_contents = await resp.json()
+        async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
+            if resp.status != 200:
+                _LOGGER.debug("Failed to download library.json from github, falling back to local copy")
+                with open(get_library_path("library.json")) as f:
+                    self.library_contents = json.load(f)
+            self.library_contents = await resp.json()
 
         if not self.library_contents:
             raise LibraryLoadingError("Library.json JSON invalid")
@@ -87,14 +87,13 @@ class RemoteLoader(Loader):
         if not path_exists:
             needs_update = True
 
-        # if path_exists:
-        #     remote_modification_time = model_info.get("last_update", time.time())
-        #     local_modification_time = self._get_local_modification_time(storage_path)
-        #     if remote_modification_time > local_modification_time:
-        #         _LOGGER.debug("Remote profile is newer than local profile")
-        #         needs_update = True
-        #
-        # needs_update = True
+        if path_exists:
+            remote_modification_time = model_info.get("last_update", time.time())
+            local_modification_time = self._get_local_modification_time(storage_path)
+            if remote_modification_time > local_modification_time:
+                _LOGGER.debug("Remote profile is newer than local profile")
+                needs_update = True
+
         if needs_update:
             await self._download_profile(manufacturer, model, storage_path)
 
@@ -134,10 +133,9 @@ class RemoteLoader(Loader):
                     raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                 resources = json.loads(await resp.read())
 
-        os.makedirs(storage_path, exist_ok=True)
+            os.makedirs(storage_path, exist_ok=True)
 
-        # Download the files
-        async with aiohttp.ClientSession() as session:
+            # Download the files
             for resource in resources:
                 async with session.get(resource["url"]) as resp:
                     path = os.path.join(storage_path, resource["path"])
