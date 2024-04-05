@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "start": "node dist/index.js | pino-pretty",
+    "dev": "nodemon src/index.ts | pino-pretty"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +15,10 @@
     "@octokit/rest": "^20.0.2",
     "apicache": "^1.6.3",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "pino": "^8.19.0",
+    "pino-pretty": "^11.0.0",
+    "prom-client": "^15.1.1"
   },
   "devDependencies": {
     "@types/apicache": "^1.6.6",
