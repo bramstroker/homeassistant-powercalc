@@ -1065,7 +1065,7 @@ def _create_group_options_schema(
     member_sensors = [
         selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
         for config_entry in hass.config_entries.async_entries(DOMAIN)
-        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
+        if config_entry.data.get(CONF_SENSOR_TYPE) in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER]
         and config_entry.unique_id is not None
         and config_entry.title is not None
     ]
