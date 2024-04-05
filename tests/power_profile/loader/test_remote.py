@@ -1,10 +1,13 @@
+import json
 import os
 
 import pytest
 from aioresponses import aioresponses
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.power_profile.loader.remote import RemoteLoader
+from custom_components.powercalc.helpers import get_library_path
+from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, RemoteLoader
+from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_profile_dir
 
 
@@ -24,7 +27,7 @@ async def test_download(hass: HomeAssistant, mock_aioresponse: aioresponses) -> 
     ]
 
     mock_aioresponse.get(
-        "http://localhost:3000/download/signify/LCA001",
+        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
         status=200,
         payload=remote_files,
     )
@@ -43,3 +46,39 @@ async def test_download(hass: HomeAssistant, mock_aioresponse: aioresponses) -> 
 
     for remote_file in remote_files:
         assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
+
+
+async def test_get_manufacturer_listing(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    local_library_path = get_library_path("library.json")
+    with open(local_library_path) as f:
+        library_json = json.load(f)
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/library",
+        status=200,
+        payload=library_json,
+    )
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+    manufacturers = await loader.get_manufacturer_listing(DeviceType.LIGHT)
+    assert "signify" in manufacturers
+    assert len(manufacturers) > 40
+
+
+async def test_get_model_listing(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    local_library_path = get_library_path("library.json")
+    with open(local_library_path) as f:
+        library_json = json.load(f)
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/library",
+        status=200,
+        payload=library_json,
+    )
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+    models = await loader.get_model_listing("signify", DeviceType.LIGHT)
+    assert "LCT010" in models
+    assert len(models) > 40
