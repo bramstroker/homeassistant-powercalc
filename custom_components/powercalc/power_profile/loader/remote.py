@@ -15,7 +15,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 _LOGGER = logging.getLogger(__name__)
 
-DOWNLOAD_PROXY = "http://localhost:3000"
+DOWNLOAD_PROXY = "https://powercalc.lauwbier.nl"
 ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
 ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
 
@@ -96,6 +96,7 @@ class RemoteLoader(Loader):
                 needs_update = True
 
         if needs_update:
+            #TODO, catch error and return local profile if download fails
             await self.download_profile(manufacturer, model, storage_path)
 
         model_path = os.path.join(storage_path, "model.json")
