@@ -21,6 +21,7 @@ from homeassistant.const import (
     CONF_DEVICE,
     CONF_DOMAIN,
     CONF_ENTITIES,
+    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
     EVENT_HOMEASSISTANT_STOP,
@@ -325,11 +326,10 @@ async def resolve_entity_ids_recursively(
         member_entry = hass.config_entries.async_get_entry(member_entry_id)
         if member_entry is None:
             continue
-        key = (
-            ENTRY_DATA_POWER_ENTITY
-            if device_class == SensorDeviceClass.POWER
-            else ENTRY_DATA_ENERGY_ENTITY
-        )
+        if member_entry.data.get(CONF_SENSOR_TYPE) == SensorType.REAL_POWER:
+            key = CONF_ENTITY_ID if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
+        else:
+            key = ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
         if key not in member_entry.data:  # pragma: no cover
             continue
 
