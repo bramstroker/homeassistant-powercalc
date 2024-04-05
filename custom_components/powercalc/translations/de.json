@@ -54,21 +54,21 @@
             "group": {
                 "data": {
                     "area": "Bereich",
-                    "create_energy_sensor": "Create energy sensor",
+                    "create_energy_sensor": "Energiesensor erstellen",
                     "create_utility_meters": "Utilitymeter erstellen",
                     "device": "Gerät",
                     "group_energy_entities": "Energie-Entitäten der Gruppe",
                     "group_member_sensors": "Mitglied powercalc sensors",
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "hide_members": "Mitglieder ausblenden",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors",
+                    "include_non_powercalc_sensors": "Nicht powercalc Sensoren einschließen",
                     "name": "Name",
                     "sub_groups": "Untergruppen",
                     "unique_id": "Unique-Id"
                 },
                 "data_description": {
                     "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+                    "create_energy_sensor": "Ob powercalc einen kWh Sensor erstellen muss",
                     "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
                     "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
@@ -121,7 +121,7 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbook",
                     "repeat": "Wiederholen",
-                    "state_trigger": "State trigger"
+                    "state_trigger": "Status Auslöser"
                 },
                 "data_description": {
                     "autostart": "Geben Sie an, wenn ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
@@ -139,7 +139,7 @@
                     "multiply_factor": "Multiplikationsfaktor",
                     "multiply_factor_standby": "Multiplikationsfaktor Standby",
                     "unavailable_power": "Leistung im Status 'nicht verfügbar'",
-                    "utility_meter_tariffs": "Utility meter tariffs"
+                    "utility_meter_tariffs": "Verbrauchszähler Tarife"
                 },
                 "data_description": {
                     "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
@@ -147,7 +147,7 @@
                     "multiply_factor": "Multipliziert die berechnete Leistung mit diesem Faktor. Kann für Licht-Gruppen nützlich sein",
                     "multiply_factor_standby": "ob der Multiplikationsfaktor auch auf die Standby-Leistung angewendet werden soll",
                     "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Eine Liste der unterstützten Tarife, leer lassen, wenn nur ein einziger Tarif benötigt wird."
                 },
                 "description": "Die folgenden Optionen sind für die erweiterte Powercalc-Konfiguration gedacht. Die meisten Benutzer werden diese Optionen nicht verwenden, so dass Sie diese überspringen können",
                 "title": "Erweiterte Optionen"
@@ -157,12 +157,12 @@
                     "create_utility_meters": "Utilitymeter erstellen",
                     "entity_id": "Quell-Entität",
                     "name": "Name",
-                    "device": "Device"
+                    "device": "Gerät"
                 },
                 "data_description": {
                     "create_utility_meters": "Powercalc soll Utility-Meter erstellen, die täglich, stündlich usw. zyklisch sind",
                     "name": "Basisname für den Energie- und Versorgungszähler. Der vollständige Name der Entität wird entsprechend der Einstellung energy_sensor_naming festgelegt",
-                    "device": "Add the created energy sensor to an specific device"
+                    "device": "Fügen Sie den erzeugten Energiesensor zu einem bestimmten Gerät hinzu"
                 },
                 "description": "Derzeit können bestimmte Einstellungen nur global konfiguriert werden",
                 "title": "Erstellen eines Energiesensors für einen vorhandenen Leistungssensor"
@@ -188,15 +188,15 @@
                 "title": "Wählen Sie Ihren Sensortyp"
             },
             "utility_meter_options": {
-                "title": "Utility meter options",
-                "description": "Define the settings for utility meter creation here",
+                "title": "Verbrauchszähler Einstellungen",
+                "description": "Definieren Sie die Einstellungen für die Erstellung von Verbrauchszählern",
                 "data": {
-                    "utility_meter_types": "Cycles",
-                    "utility_meter_tariffs": "Tariffs"
+                    "utility_meter_types": "Intervalle",
+                    "utility_meter_tariffs": "Tarife"
                 },
                 "data_description": {
-                    "utility_meter_types": "Create utility meters for specified cycles",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_types": "Erstelle Verbrauchszähler für bestimmte Zeitintervalle",
+                    "utility_meter_tariffs": "Eine Liste der unterstützten Tarife, leer lassen, wenn nur ein einziger Tarif benötigt wird."
                 }
             },
             "virtual_power": {
@@ -281,7 +281,7 @@
                     "unavailable_power": "Leistung im Status 'nicht verfügbar'",
                     "unit_of_measurement": "Maßeinheit",
                     "update_frequency": "Aktualisierungsfrequenz",
-                    "utility_meter_tariffs": "Utility meter tariffs",
+                    "utility_meter_tariffs": "Verbrauchszähler Tarife",
                     "value": "Wert",
                     "value_template": "Wert-Template"
                 },
@@ -305,7 +305,7 @@
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
                     "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+                    "utility_meter_tariffs": "Eine Liste der unterstützten Tarife, leer lassen, wenn nur ein einziger Tarif benötigt wird."
                 }
             }
         }
