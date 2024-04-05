@@ -4,17 +4,23 @@ import apicache from "apicache";
 import { Octokit } from "@octokit/rest";
 import pino from "pino";
 import promClient from "prom-client";
+import promBundle from "express-prom-bundle";
 
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 const githubToken = process.env.GITHUB_TOKEN;
 const bearerToken = process.env.BEARER_TOKEN;
+const logLevel = process.env.LOG_LEVEL || 'info'
 const owner = "bramstroker";
 const repo = "homeassistant-powercalc";
 
 const app: Express = express();
-const logger = pino();
+const logger = pino(
+    {
+        level: logLevel
+    }
+);
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 const Registry = promClient.Registry;
 const register = new Registry();
@@ -32,6 +38,19 @@ let promDownloadCounter = new promClient.Counter({
 });
 register.registerMetric(promDownloadCounter);
 
+const metricsMiddleware = promBundle({
+    autoregister: false,
+    includeMethod: true,
+    includePath: true,
+    includeStatusCode: true,
+    includeUp: true,
+    promClient: {
+        collectDefaultMetrics: {
+        }
+      }
+});
+app.use(metricsMiddleware)
+
 // API cache middleware
 apicache.options({
   statusCodes: {
@@ -47,6 +66,8 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     res.status(401).send("Authentication required.");
     return;
   }
+  logger.debug("Request token: %s", bearerToken)
+  logger.debug("Env token: %s", token)
   if (token != bearerToken) {
     res.status(403).send("Invalid token.");
     return;
@@ -123,7 +144,6 @@ app.get(
         return;
       }
       logger.info("Data successfully retrieved for %s/%s", manufacturer, model);
-      logger.info("Data successfully", { manufacturer: "foo" });
       promDownloadCounter.inc(labels);
       res.json(files);
     } catch (error) {

@@ -1,0 +1,7 @@
+services:
+    library_downloader:
+        image: bramgerritsen/powercalc-download-proxy:latest
+        ports:
+          - "3000:3000"
+        env_file:
+          - .env
