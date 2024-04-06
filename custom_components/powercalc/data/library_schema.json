@@ -59,7 +59,9 @@
                     "type": "string",
                     "description": "Identifier of the model"
                 },
-                "device_type": { "$ref": "#/$defs/device_type" },
+                "device_type": {
+                    "$ref": "#/$defs/device_type"
+                },
                 "aliases": {
                     "type": "array",
                     "description": "List of aliases for the model",
@@ -71,7 +73,7 @@
                     "type": "string",
                     "format": "date-time",
                     "description": "Timestamp of the last update of the model"
-                },
+                }
             }
         },
         "device_type": {
