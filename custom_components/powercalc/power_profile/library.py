@@ -9,7 +9,6 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
-from custom_components.powercalc.helpers import get_library_path
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -51,10 +50,11 @@ class ProfileLibrary:
             os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
             os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
             os.path.join(os.path.dirname(__file__), "../custom_data"),
-            get_library_path(),
+            #get_library_path(),
         ]:
             if os.path.exists(data_dir):
                 loaders.append(LocalLoader(hass, data_dir))
+
         loaders.append(RemoteLoader(hass))
         loader = CompositeLoader(loaders)
         library = ProfileLibrary(hass, loader)
@@ -125,7 +125,10 @@ class ProfileLibrary:
             if not resolved_model:
                 return None
 
-            result = await self._loader.load_model(manufacturer, resolved_model, custom_directory)
+            loader = self._loader
+            if custom_directory:
+                loader = LocalLoader(self._hass, custom_directory, is_custom_directory=True)
+            result = await loader.load_model(manufacturer, resolved_model)
             if not result:
                 raise LibraryError(f"Model {manufacturer} {resolved_model} not found")
         except LibraryError as e:

@@ -71,12 +71,7 @@ class RemoteLoader(Loader):
             if not device_type or device_type in model.get("device_type", DeviceType.LIGHT)
         }
 
-    async def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
-
-        # This loader does not support loading from local directory
-        if directory is not None:
-            return None
-
+    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)

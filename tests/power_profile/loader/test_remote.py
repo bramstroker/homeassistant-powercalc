@@ -110,13 +110,9 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     assert len(caplog.records) == 1
 
 
-async def test_load_model_ignores_local_directory(remote_loader: RemoteLoader) -> None:
-    assert not await remote_loader.load_model("signify", "LCA001", get_test_profile_dir("signify-LCA001"))
-
-
 async def test_load_model_raises_library_exception_on_non_existing_model(remote_loader: RemoteLoader) -> None:
     with pytest.raises(LibraryLoadingError):
-        await remote_loader.load_model("signify", "NON_EXISTING_MODEL", None)
+        await remote_loader.load_model("signify", "NON_EXISTING_MODEL")
 
 
 async def test_download_profile_exception_unexpected_status_code(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
@@ -184,7 +180,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     if exists_locally:
         await loader.download_profile("signify", "LCA001", local_storage_path)
 
-    await loader.load_model("signify", "LCA001", None)
+    await loader.load_model("signify", "LCA001")
 
     expected_call_count = 1 if expected_download else 0
     if exists_locally:

@@ -9,9 +9,9 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 
 class LocalLoader(Loader):
-    def __init__(self, hass: HomeAssistant, directory: str) -> None:
+    def __init__(self, hass: HomeAssistant, directory: str, is_custom_directory: bool = False) -> None:
         self._model_aliases: dict[str, dict[str, str]] = {}
-        self._data_directories: list[str] = []
+        self._is_custom_directory = is_custom_directory
         self._data_directory = directory
         self._hass = hass
 
@@ -55,18 +55,14 @@ class LocalLoader(Loader):
             self._model_aliases[manufacturer_dir] = model_json.get("aliases", [])
         return models
 
-    async def load_model(self, manufacturer: str, model: str, directory: str | None) -> tuple[dict, str] | None:
-        base_dir = directory
-        if not directory:
-            base_dir = os.path.join(
-                self._data_directory,
-                manufacturer.lower(),
-                model,
-            )
-            if not os.path.exists(base_dir):
-                base_dir = None
+    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
+        base_dir = self._data_directory if self._is_custom_directory else os.path.join(
+            self._data_directory,
+            manufacturer.lower(),
+            model,
+        )
 
-        if base_dir is None:
+        if not os.path.exists(base_dir):
             return None
 
         model_json_path = os.path.join(base_dir, "model.json")
