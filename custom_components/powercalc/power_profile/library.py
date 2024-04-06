@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
+from custom_components.powercalc.helpers import get_library_path
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -17,8 +18,8 @@ from .loader.protocol import Loader
 from .loader.remote import RemoteLoader
 from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
 
-BUILT_IN_DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), "../data")
-CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
+LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
+CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,12 +46,17 @@ class ProfileLibrary:
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
             return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
-        loader = CompositeLoader(
-            [
-                LocalLoader(hass),
-                RemoteLoader(hass),
-            ],
-        )
+        loaders: list[Loader] = []
+        for data_dir in [
+            os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
+            os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
+            os.path.join(os.path.dirname(__file__), "../custom_data"),
+            get_library_path(),
+        ]:
+            if os.path.exists(data_dir):
+                loaders.append(LocalLoader(hass, data_dir))
+        loaders.append(RemoteLoader(hass))
+        loader = CompositeLoader(loaders)
         library = ProfileLibrary(hass, loader)
         await library.initialize()
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library

@@ -122,7 +122,7 @@ async def test_exception_is_raised_when_no_model_json_present(
 async def test_create_power_profile_raises_library_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """When no loader is able to load the model, a LibraryError should be raised."""
     caplog.set_level(logging.ERROR)
-    mock_loader = LocalLoader(hass)
+    mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
     mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
     library = ProfileLibrary(hass, loader=mock_loader)
