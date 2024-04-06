@@ -26,7 +26,8 @@
         "VERSION": "v1.11.3:docker"
     },
     "aliases": [
-        "Play:5"
+        "Play:5",
+        "Five"
     ],
     "name": "Sonos Play:5",
     "standby_power": 2.15
