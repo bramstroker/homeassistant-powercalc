@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shutil
 import time
 
 import pytest
@@ -129,10 +130,11 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
 
 
 @pytest.mark.parametrize(
-    "remote_modification_time,expected_download",
+    "remote_modification_time,exists_locally,expected_download",
     [
-        (time.time() + 400, True),
-        (time.time() - 4000, False),
+        (time.time() - 5000, False, True),
+        (time.time() + 400, True, True),
+        (time.time() - 4000, True, False),
     ],
 )
 async def test_profile_redownloaded_when_newer_version_available(
@@ -140,6 +142,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     mock_aioresponse: aioresponses,
     mock_download_profile_endpoints: None,
     remote_modification_time: float,
+    exists_locally: bool,
     expected_download: bool,
 ) -> None:
     def _count_download_requests() -> int:
@@ -174,14 +177,18 @@ async def test_profile_redownloaded_when_newer_version_available(
     loader = RemoteLoader(hass)
     await loader.initialize()
 
-    # Force download of the profile, so we have it locally modified at current time
-    storage_path = loader.get_storage_path("signify", "LCA001")
-    await loader.download_profile("signify", "LCA001", storage_path)
+    # Clean local directory first so we have consistent test results
+    # When scenario exists_locally=True, we download the profile first, to fake the local existence
+    local_storage_path = loader.get_storage_path("signify", "LCA001")
+    shutil.rmtree(local_storage_path)
+    if exists_locally:
+        await loader.download_profile("signify", "LCA001", local_storage_path)
 
     await loader.load_model("signify", "LCA001", None)
 
-    # Account for the initial force download of the profile
-    expected_call_count = 2 if expected_download else 1
+    expected_call_count = 1 if expected_download else 0
+    if exists_locally:
+        expected_call_count += 1
     assert _count_download_requests() == expected_call_count
 
 
