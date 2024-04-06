@@ -8,7 +8,7 @@ import pytest
 from aioresponses import aioresponses
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.helpers import get_library_json_path
+from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
@@ -95,21 +95,6 @@ async def test_get_model_listing(remote_loader: RemoteLoader) -> None:
     assert len(models) > 40
 
 
-async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
-    caplog.set_level(logging.ERROR)
-    mock_aioresponse.get(
-        ENDPOINT_LIBRARY,
-        status=404,
-        repeat=True,
-    )
-
-    loader = RemoteLoader(hass)
-    await loader.initialize()
-
-    assert "signify" in loader.manufacturer_models
-    assert len(caplog.records) == 1
-
-
 async def test_load_model_raises_library_exception_on_non_existing_model(remote_loader: RemoteLoader) -> None:
     with pytest.raises(LibraryLoadingError):
         await remote_loader.load_model("signify", "NON_EXISTING_MODEL")
@@ -187,6 +172,42 @@ async def test_profile_redownloaded_when_newer_version_available(
     if exists_locally:
         expected_call_count += 1
     assert _count_download_requests() == expected_call_count
+
+
+async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=404,
+        repeat=True,
+    )
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+
+    assert "signify" in loader.manufacturer_models
+    assert len(caplog.records) == 1
+
+
+async def test_fallback_to_local_profile(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+    mock_library_json_response: None,
+) -> None:
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+
+    local_storage_path = loader.get_storage_path("signify", "LCA001")
+    shutil.rmtree(local_storage_path, ignore_errors=True)
+    shutil.copytree(get_library_path("signify/LCA001"), local_storage_path)
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        status=500,
+        repeat=True,
+    )
+
+    await loader.load_model("signify", "LCA001")
 
 
 async def _create_loader(hass: HomeAssistant) -> RemoteLoader:

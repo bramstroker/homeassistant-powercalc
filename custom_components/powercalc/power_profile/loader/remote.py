@@ -91,7 +91,12 @@ class RemoteLoader(Loader):
                 needs_update = True
 
         if needs_update:
-            await self.download_profile(manufacturer, model, storage_path)
+            try:
+                await self.download_profile(manufacturer, model, storage_path)
+            except ProfileDownloadError as e:
+                if not path_exists:
+                    raise e
+                _LOGGER.error("Failed to download profile, falling back to local profile")
 
         model_path = os.path.join(storage_path, "model.json")
 
@@ -122,24 +127,33 @@ class RemoteLoader(Loader):
 
     @staticmethod
     async def download_profile(manufacturer: str, model: str, storage_path: str) -> None:
-        """Download the profile from github."""
+        """
+        Download the profile from Github using the Powercalc download API
+        Saves the profile to manufacturer/model directory in .storage/powercalc_profiles folder
+        """
 
         _LOGGER.info("Downloading profile: %s/%s from github", manufacturer, model)
 
         endpoint = f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}"
         async with aiohttp.ClientSession() as session:
-            async with session.get(endpoint) as resp:
-                if resp.status != 200:
-                    raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
-                resources = await resp.json()
+            try:
+                async with session.get(endpoint) as resp:
+                    if resp.status != 200:
+                        raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
+                    resources = await resp.json()
 
-            os.makedirs(storage_path, exist_ok=True)
+                os.makedirs(storage_path, exist_ok=True)
 
-            # Download the files
-            for resource in resources:
-                async with session.get(resource["url"]) as resp:
-                    path = os.path.join(storage_path, resource["path"])
-                    os.makedirs(os.path.dirname(path), exist_ok=True)
-                    with open(path, "wb") as f:
-                        f.write(await resp.read())
+                # Download the files
+                for resource in resources:
+                    url = resource.get("url")
+                    async with session.get(url) as resp:
+                        if resp.status != 200:
+                            raise ProfileDownloadError(f"Failed to download github URL: {url}")
+                        path = os.path.join(storage_path, resource["path"])
+                        os.makedirs(os.path.dirname(path), exist_ok=True)
+                        with open(path, "wb") as f:
+                            f.write(await resp.read())
+            except aiohttp.ClientError as e:
+                raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
