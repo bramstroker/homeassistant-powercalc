@@ -17,6 +17,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_r
 
 from custom_components.powercalc import SensorType, async_migrate_entry
 from custom_components.powercalc.const import (
+    ATTR_ENTITIES,
     CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
@@ -343,6 +344,61 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
+
+
+async def test_real_power_entry_selectable_as_group_member(
+    hass: HomeAssistant,
+) -> None:
+    """
+    Test if we can select both virtual power sensor and real power sensor into the group,
+    and the total power is calculated correctly
+    """
+
+    config_entry_1 = await create_mocked_virtual_power_sensor_entry(
+        hass,
+        "VirtualPower1",
+        "abcdef",
+    )
+    config_entry_2 = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+            CONF_UNIQUE_ID: "abcdefg",
+            CONF_ENTITY_ID: "sensor.real_power",
+        },
+        title="RealPower1",
+    )
+    config_entry_2.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry_2.entry_id)
+    await hass.async_block_till_done()
+
+    result = await select_sensor_type(hass, SensorType.GROUP)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    data_schema: vol.Schema = result["data_schema"]
+    select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
+    options = select.config["options"]
+    assert len(options) == 2
+    assert {"value": config_entry_1.entry_id, "label": "VirtualPower1"} in options
+    assert {"value": config_entry_2.entry_id, "label": "RealPower1"} in options
+
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id, config_entry_2.entry_id],
+    }
+    await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+
+    hass.states.async_set("sensor.real_power", "25.00")
+    await hass.async_block_till_done()
+
+    group_state = hass.states.get("sensor.my_group_sensor_power")
+    assert group_state.attributes.get(ATTR_ENTITIES) == {"sensor.virtualpower1_power", "sensor.real_power"}
+    assert group_state
+    assert group_state.state == "75.00"
 
 
 async def test_group_error_mandatory(hass: HomeAssistant) -> None:
