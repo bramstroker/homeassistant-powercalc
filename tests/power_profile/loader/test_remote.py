@@ -176,7 +176,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     # Clean local directory first so we have consistent test results
     # When scenario exists_locally=True, we download the profile first, to fake the local existence
     local_storage_path = loader.get_storage_path("signify", "LCA001")
-    shutil.rmtree(local_storage_path)
+    shutil.rmtree(local_storage_path, ignore_errors=True)
 
     if exists_locally:
         await loader.download_profile("signify", "LCA001", local_storage_path)
