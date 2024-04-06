@@ -81,7 +81,7 @@ class RemoteLoader(Loader):
         if not model_info:
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
 
-        storage_path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model)
+        storage_path = self.get_storage_path(manufacturer, model)
 
         needs_update = False
         path_exists = os.path.exists(storage_path)
@@ -96,7 +96,6 @@ class RemoteLoader(Loader):
                 needs_update = True
 
         if needs_update:
-            #TODO, catch error and return local profile if download fails
             await self.download_profile(manufacturer, model, storage_path)
 
         model_path = os.path.join(storage_path, "model.json")
@@ -105,6 +104,9 @@ class RemoteLoader(Loader):
             json_data = json.load(f)
 
         return json_data, storage_path
+
+    def get_storage_path(self, manufacturer: str, model: str) -> str:
+        return self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model)
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
         """Find the model in the library."""

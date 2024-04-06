@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 
 import pytest
 from aioresponses import aioresponses
@@ -13,6 +14,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_profile_dir
 
 pytestmark = pytest.mark.skip_remote_loader_mocking
+
 
 @pytest.fixture
 def mock_aioresponse() -> aioresponses:
@@ -40,18 +42,22 @@ async def remote_loader(hass: HomeAssistant, mock_library_json_response: None) -
     return loader
 
 
-async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
-    """Mock the API response for the download of a profile."""
+@pytest.fixture
+async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> list[dict]:
     remote_files = [
-        {"path": "color_temp.csv.gz", "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/color_temp.csv.gz"},
-        {"path": "hs.csv.gz", "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/hs.csv.gz"},
-        {"path": "model.json", "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/model.json"},
+        {"path": "color_temp.csv.gz",
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/color_temp.csv.gz"},
+        {"path": "hs.csv.gz",
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/hs.csv.gz"},
+        {"path": "model.json",
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/model.json"},
     ]
 
     mock_aioresponse.get(
         f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
         status=200,
         payload=remote_files,
+        repeat=True,
     )
 
     for remote_file in remote_files:
@@ -60,7 +66,14 @@ async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoa
                 remote_file["url"],
                 status=200,
                 body=f.read(),
+                repeat=True,
             )
+    return remote_files
+
+
+async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoader, mock_download_profile_endpoints: list[dict]) -> None:
+    """Mock the API response for the download of a profile."""
+    remote_files = mock_download_profile_endpoints
 
     storage_dir = get_test_profile_dir("download")
     await remote_loader.download_profile("signify", "LCA001", storage_dir)
@@ -113,6 +126,63 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
 
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
+
+
+@pytest.mark.parametrize(
+    "remote_modification_time,expected_download",
+    [
+        (time.time() + 400, True),
+        (time.time() - 4000, False),
+    ],
+)
+async def test_profile_redownloaded_when_newer_version_available(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+    mock_download_profile_endpoints: None,
+    remote_modification_time: float,
+    expected_download: bool,
+) -> None:
+    def _count_download_requests() -> int:
+        for req, calls in mock_aioresponse.requests.items():
+            if str(req[1]).startswith(ENDPOINT_DOWNLOAD):
+                return len(calls)
+        return 0
+
+    def _mock_library_json(profile_last_update: float) -> None:
+        mock_aioresponse.get(
+            ENDPOINT_LIBRARY,
+            status=200,
+            payload={
+                "manufacturers": [
+                    {
+                        "name": "signify",
+                        "models": [
+                            {
+                                "id": "LCA001",
+                                "device_type": "light",
+                                "last_update": profile_last_update,
+                            },
+                        ],
+                    },
+                ],
+            },
+            repeat=True,
+        )
+
+    _mock_library_json(remote_modification_time)
+
+    loader = RemoteLoader(hass)
+    await loader.initialize()
+
+    # Force download of the profile, so we have it locally modified at current time
+    storage_path = loader.get_storage_path("signify", "LCA001")
+    await loader.download_profile("signify", "LCA001", storage_path)
+
+    await loader.load_model("signify", "LCA001", None)
+
+    # Account for the initial force download of the profile
+    expected_call_count = 2 if expected_download else 1
+    assert _count_download_requests() == expected_call_count
 
 
 async def _create_loader(hass: HomeAssistant) -> RemoteLoader:
