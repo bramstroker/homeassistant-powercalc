@@ -5,6 +5,7 @@ import shutil
 import time
 
 import pytest
+from aiohttp import ClientError
 from aioresponses import aioresponses
 from homeassistant.core import HomeAssistant
 
@@ -109,6 +110,35 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
 
+
+async def test_exception_is_raised_on_connection_error(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        exception=ClientError("test"))
+
+    with pytest.raises(ProfileDownloadError):
+        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
+
+
+async def test_exception_is_raised_on_github_resource_unavailable(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
+    remote_file = {
+        "path": "color_temp.csv.gz",
+        "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/color_temp.csv.gz",
+    }
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        status=200,
+        payload=[remote_file],
+    )
+
+    mock_aioresponse.get(
+        remote_file["url"],
+        status=500,
+    )
+
+    with pytest.raises(ProfileDownloadError):
+        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
 
 @pytest.mark.parametrize(
     "remote_modification_time_delta,exists_locally,expected_download",
