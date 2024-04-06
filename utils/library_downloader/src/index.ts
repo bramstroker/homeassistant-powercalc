@@ -14,6 +14,7 @@ const bearerToken = process.env.BEARER_TOKEN;
 const logLevel = process.env.LOG_LEVEL || 'info'
 const owner = "bramstroker";
 const repo = "homeassistant-powercalc";
+const libraryPath = "custom_components/powercalc/data"
 
 const app: Express = express();
 const logger = pino(
@@ -116,7 +117,6 @@ app.get(
       const subContents = await Promise.all(
         data.map(async (item): Promise<LibraryFile[]> => {
           if (item.type === "file") {
-            // console.log(item)
             let regex = new RegExp(path, "g");
             let modifiedPath = item.path.replace(regex, "").substring(1);
             return [{ path: modifiedPath, url: item.download_url ?? "" }];
@@ -136,7 +136,7 @@ app.get(
 
     try {
       const files = await fetchContents(
-        "custom_components/powercalc/data/" + manufacturer + "/" + model
+        libraryPath + "/" + manufacturer + "/" + model
       );
       if (files.length === 0) {
         console.error("No data found", manufacturer, model);
@@ -156,6 +156,7 @@ app.get(
 );
 
 app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
+  // TODO: dynamic URL
   const url =
     "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/feat/library-download/custom_components/powercalc/data/library.json";
   logger.info("Fetching library");
