@@ -126,18 +126,18 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
 
 
 @pytest.mark.parametrize(
-    "remote_modification_time,exists_locally,expected_download",
+    "remote_modification_time_delta,exists_locally,expected_download",
     [
-        (time.time() - 5000, False, True),
-        (time.time() + 400, True, True),
-        (time.time() - 4000, True, False),
+        (-5000, False, True),
+        (+400, True, True),
+        (-4000, True, False),
     ],
 )
 async def test_profile_redownloaded_when_newer_version_available(
     hass: HomeAssistant,
     mock_aioresponse: aioresponses,
     mock_download_profile_endpoints: None,
-    remote_modification_time: float,
+    remote_modification_time_delta: int,
     exists_locally: bool,
     expected_download: bool,
 ) -> None:
@@ -167,29 +167,21 @@ async def test_profile_redownloaded_when_newer_version_available(
             },
             repeat=True,
         )
-    print("1")
 
-    _mock_library_json(remote_modification_time)
-
-    print("2")
+    _mock_library_json(time.time() + remote_modification_time_delta)
 
     loader = RemoteLoader(hass)
     await loader.initialize()
-
-    print("3")
 
     # Clean local directory first so we have consistent test results
     # When scenario exists_locally=True, we download the profile first, to fake the local existence
     local_storage_path = loader.get_storage_path("signify", "LCA001")
     shutil.rmtree(local_storage_path)
 
-    print("4")
     if exists_locally:
         await loader.download_profile("signify", "LCA001", local_storage_path)
 
     await loader.load_model("signify", "LCA001")
-
-    print("5")
 
     expected_call_count = 1 if expected_download else 0
     if exists_locally:
