@@ -82,24 +82,6 @@ def generate_supported_model_list(model_listing: list[dict]):
     print("Generated supported_models.md")
 
 
-def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
-    manufacturer_device_types: dict[str, list] = {}
-    for model in model_listing:
-        device_type = model.get("device_type") or "light"
-        manufacturer = model.get("manufacturer")
-        if manufacturer not in manufacturer_device_types:
-            manufacturer_device_types[manufacturer] = []
-        if device_type not in manufacturer_device_types[manufacturer]:
-            manufacturer_device_types[manufacturer].append(device_type)
-    with open(
-        os.path.join(DATA_DIR, "manufacturer_device_types.json"),
-        "w",
-    ) as json_file:
-        json_file.write(json.dumps(manufacturer_device_types))
-
-    print("Generated manufacturer_device_types.json")
-
-
 def generate_library_json(model_listing: list[dict]) -> None:
     manufacturers: dict[str, dict] = {}
     for model in model_listing:
@@ -195,5 +177,4 @@ def get_local_modification_time(folder: str) -> float:
 
 model_list = get_model_list()
 generate_supported_model_list(model_list)
-generate_manufacturer_device_types_file(model_list)
 generate_library_json(model_list)
