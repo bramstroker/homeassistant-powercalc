@@ -101,7 +101,7 @@ class RemoteLoader(Loader):
         return json_data, storage_path
 
     def get_storage_path(self, manufacturer: str, model: str) -> str:
-        return self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model)
+        return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
         """Find the model in the library."""
