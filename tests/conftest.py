@@ -27,7 +27,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
-from custom_components.powercalc.helpers import get_library_path
+from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from tests.common import mock_area_registry
 
 
@@ -173,7 +173,7 @@ def mock_remote_loader(request: SubRequest) -> Generator:
         mock_download.side_effect = side_effect
 
         def load_library_json() -> dict:
-            with open(get_library_path("library.json")) as f:
+            with open(get_library_json_path()) as f:
                 return json.load(f)
         mock_load_lib.side_effect = load_library_json
         yield

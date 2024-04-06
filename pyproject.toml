@@ -25,6 +25,9 @@ dependencies = ["homeassistant"]
 testpaths = "tests"
 norecursedirs = ".git"
 asyncio_mode = "auto"
+markers = [
+    "skip_remote_loader_mocking: Do not mock globally registered remote loader mock",
+]
 
 [tool.isort]
 profile = "black"

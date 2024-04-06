@@ -8,7 +8,7 @@ import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
-from custom_components.powercalc.helpers import get_library_path
+from custom_components.powercalc.helpers import get_library_json_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
@@ -48,8 +48,8 @@ class RemoteLoader(Loader):
 
         async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
             if resp.status != 200:
-                _LOGGER.debug("Failed to download library.json from github, falling back to local copy")
-                with open(get_library_path("library.json")) as f:
+                _LOGGER.error("Failed to download library.json from github, falling back to local copy")
+                with open(get_library_json_path()) as f:
                     return cast(dict[str, Any], json.load(f))
             return cast(dict[str, Any], await resp.json())
 
