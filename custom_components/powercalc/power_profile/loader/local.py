@@ -31,13 +31,6 @@ class LocalLoader(Loader):
 
     async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
-        """Lazy loads a list of power profiles per manufacturer.
-
-                Using the following lookup fallback mechanism:
-                 - check in user defined directory (config/powercalc-custom-models)
-                 - check in alternative user defined directory (config/custom_components/powercalc/custom_data)
-                 - check in built-in directory (config/custom_components/powercalc/data)
-                """
 
         models: set[str] = set()
         manufacturer_dir = os.path.join(self._data_directory, manufacturer)
