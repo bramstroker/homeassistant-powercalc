@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Automatisch starten",
                     "playbooks": "Playbooks",
-                    "repeat": "Herhalen"
+                    "repeat": "Herhalen",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
                     "playbooks": "Plaats een playbook op iedere regel. Example\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd"
+                    "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook configuratie"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "GUI configuratie wijzigen"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Verhoog de sensor.",

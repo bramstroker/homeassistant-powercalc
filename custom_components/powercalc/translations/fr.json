@@ -120,12 +120,14 @@
                 "data": {
                     "autostart": "Démarrage automatique",
                     "playbooks": "Playbooks",
-                    "repeat": "Répéter"
+                    "repeat": "Répéter",
+                    "state_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
                     "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogram1 : washing_machine/program1.csv",
-                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé"
+                    "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
+                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configuration Playbook"
             },
@@ -352,6 +354,10 @@
                 }
             },
             "name": "Calibrate utility meter"
+        },
+        "get_active_playbook": {
+            "description": "Get current running playbook",
+            "name": "Get active playbook"
         },
         "increase_daily_energy": {
             "description": "Augmente le capteur d'une quantité donnée.",
