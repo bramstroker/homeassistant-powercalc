@@ -261,14 +261,14 @@ async def create_real_power_sensor(
     power_sensor_id = sensor_config.get(CONF_POWER_SENSOR_ID)
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     device_id = None
-    unit_of_measurement = UnitOfPower.WATT
+    unit_of_measurement = None
     ent_reg = er.async_get(hass)
     entity_entry = ent_reg.async_get(power_sensor_id)  # type: ignore
     if entity_entry:
         if not unique_id:
             unique_id = entity_entry.unique_id
         device_id = entity_entry.device_id
-        unit_of_measurement = entity_entry.unit_of_measurement or UnitOfPower.WATT
+        unit_of_measurement = entity_entry.unit_of_measurement
 
     return RealPowerSensor(
         entity_id=power_sensor_id,  # type: ignore
