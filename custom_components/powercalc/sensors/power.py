@@ -272,6 +272,7 @@ async def create_real_power_sensor(
         entity_id=power_sensor_id,  # type: ignore
         device_id=device_id,
         unique_id=unique_id,
+        unit_of_measurement=entity_entry.unit_of_measurement or UnitOfPower.WATT,
     )
 
 
@@ -728,12 +729,14 @@ class RealPowerSensor(PowerSensor):
     def __init__(
         self,
         entity_id: str,
+        unit_of_measurement: str,
         device_id: str | None = None,
         unique_id: str | None = None,
     ) -> None:
         self.entity_id = entity_id
         self._device_id = device_id
         self._unique_id = unique_id
+        self._attr_unit_of_measurement = unit_of_measurement
 
     @property
     def device_id(self) -> str | None:

@@ -399,6 +399,29 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
     Fixes https://github.com/bramstroker/homeassistant-powercalc/issues/1676
     """
 
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntry(
+                entity_id="sensor.test_power",
+                unique_id="12345",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                unit_of_measurement=UnitOfPower.KILO_WATT,
+            ),
+        },
+
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_NAME: "Test",
+            CONF_UNIQUE_ID: "1234353",
+            CONF_POWER_SENSOR_ID: "sensor.test_power",
+        },
+    )
+
     hass.states.async_set(
         "sensor.test_power",
         "100",
@@ -409,15 +432,6 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
         },
     )
     await hass.async_block_till_done()
-
-    await run_powercalc_setup(
-        hass,
-        {
-            CONF_NAME: "Test",
-            CONF_UNIQUE_ID: "1234353",
-            CONF_POWER_SENSOR_ID: "sensor.test_power",
-        },
-    )
 
     state = hass.states.get("sensor.test_energy")
     assert state
