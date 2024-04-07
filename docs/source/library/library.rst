@@ -1,8 +1,8 @@
-Light model library
-===================
+Profile library
+===============
 
 The component ships with predefined power profiles for different devices.
-#TODO. link to supported models
+You can find the list of supported devices in the `supported models`_ section.
 This library will keep extending by the effort of community users.
 
 At startup powercalc will check whether any of your entities are in the library, and will provide a discovered entry for you to setup.
@@ -14,9 +14,9 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 
 #TODO: maybe add option to disable remote loading
 
-For more information about the library structure, See :ref:`custom-models`.
+For more information about the library structure, See :doc:`structure`.
 
-To contribute see
+To contribute see the :doc:`measure <contributing/measure>` section.
 
 Custom models
 -------------
