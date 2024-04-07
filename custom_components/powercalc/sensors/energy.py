@@ -122,7 +122,13 @@ async def create_energy_sensor(
 
     unit_prefix = get_unit_prefix(hass, sensor_config, power_sensor)
 
-    _LOGGER.debug("Creating energy sensor: %s", name)
+    _LOGGER.debug(
+        "Creating energy sensor (entity_id=%s, source_entity=%s, unit_prefix=%s)",
+        entity_id,
+        power_sensor.entity_id,
+        unit_prefix,
+    )
+
     return VirtualEnergySensor(
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
