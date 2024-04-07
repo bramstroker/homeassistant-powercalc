@@ -731,14 +731,14 @@ class RealPowerSensor(PowerSensor):
     def __init__(
         self,
         entity_id: str,
-        unit_of_measurement: str,
+        unit_of_measurement: str | None = None,
         device_id: str | None = None,
         unique_id: str | None = None,
     ) -> None:
         self.entity_id = entity_id
         self._device_id = device_id
         self._unique_id = unique_id
-        self._attr_unit_of_measurement = unit_of_measurement
+        self._attr_unit_of_measurement = unit_of_measurement or UnitOfPower.WATT
 
     @property
     def device_id(self) -> str | None:
