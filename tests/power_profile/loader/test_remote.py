@@ -84,6 +84,35 @@ async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoa
         assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
 
 
+async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
+    remote_files = [
+        {"path": "model.json",
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/google/Home Mini (HOA)/model.json"},
+    ]
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/google/Home Mini (HOA)",
+        status=200,
+        payload=remote_files,
+        repeat=True,
+    )
+
+    for remote_file in remote_files:
+        with open(get_library_path("google/Home Mini (HOA)") + f"/{remote_file['path']}", "rb") as f:
+            mock_aioresponse.get(
+                remote_file["url"],
+                status=200,
+                body=f.read(),
+                repeat=True,
+            )
+
+    storage_dir = get_test_profile_dir("download")
+    await remote_loader.download_profile("google", "Home Mini (HOA)", storage_dir)
+
+    for remote_file in remote_files:
+        assert os.path.exists(os.path.join(storage_dir, remote_file["path"]))
+
+
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
     manufacturers = await remote_loader.get_manufacturer_listing(DeviceType.LIGHT)
     assert "signify" in manufacturers
@@ -174,7 +203,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                             {
                                 "id": "LCA001",
                                 "device_type": "light",
-                                "last_update": profile_last_update,
+                                "update_timestamp": profile_last_update,
                             },
                         ],
                     },
