@@ -8,6 +8,6 @@
         "SLEEP_TIME": 5,
         "VERSION": "v1.10.0:docker"
     },
-    "name": "Livarno Lux smart LED mood light",
+    "name": "TRADFRI bulb GU10 WS 345 lm, dimmable, white spectrum",
     "standby_power": 0.2
 }
