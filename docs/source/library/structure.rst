@@ -7,7 +7,7 @@ model.json
 ----------
 
 Every model MUST contain a ``model.json`` file which defines the supported calculation modes and other configuration.
-See the `json schema <https://github.com/bramstroker/homeassistant-powercalc/blob/master/custom_components/powercalc/data/model_schema.json>`_ how the file must be structured or the examples below.
+See the `json schema <https://github.com/bramstroker/homeassistant-powercalc/blob/master/profile_library/model_schema.json>`_ how the file must be structured or the examples below.
 
 When the calculation strategy is ``lut`` also [CSV lookup files](#lut-data-files) must be provided, which can be created by running the measure tool.
 

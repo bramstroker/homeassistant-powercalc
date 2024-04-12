@@ -48,11 +48,11 @@ async def remote_loader(hass: HomeAssistant, mock_library_json_response: None) -
 async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> list[dict]:
     remote_files = [
         {"path": "color_temp.csv.gz",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/color_temp.csv.gz"},
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz"},
         {"path": "hs.csv.gz",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/hs.csv.gz"},
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/hs.csv.gz"},
         {"path": "model.json",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/model.json"},
+         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/model.json"},
     ]
 
     mock_aioresponse.get(
@@ -123,7 +123,7 @@ async def test_exception_is_raised_on_connection_error(mock_aioresponse: aioresp
 async def test_exception_is_raised_on_github_resource_unavailable(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
     remote_file = {
         "path": "color_temp.csv.gz",
-        "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/custom_components/powercalc/data/signify/LCA001/color_temp.csv.gz",
+        "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz",
     }
 
     mock_aioresponse.get(

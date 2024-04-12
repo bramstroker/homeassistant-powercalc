@@ -14,7 +14,7 @@ const bearerToken = process.env.BEARER_TOKEN;
 const logLevel = process.env.LOG_LEVEL || 'info'
 const defaultOwner = "bramstroker";
 const defaultRepo = "homeassistant-powercalc";
-const defaultPath = "custom_components/powercalc/data"
+const defaultPath = "profile_library"
 
 const app: Express = express();
 const logger = pino(

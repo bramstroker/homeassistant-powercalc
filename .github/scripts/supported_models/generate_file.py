@@ -26,7 +26,7 @@ DEVICE_TYPES = [
 ]
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
-DATA_DIR = f"{PROJECT_ROOT}/custom_components/powercalc/data"
+DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 
 
 def generate_supported_model_list(model_listing: list[dict]):

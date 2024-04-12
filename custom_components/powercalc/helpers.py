@@ -28,7 +28,7 @@ async def evaluate_power(power: Template | Decimal | float) -> Decimal | None:
 
 def get_library_path(sub_path: str = "") -> str:
     """Get the path to the library file."""
-    base_path = os.path.join(os.path.dirname(__file__), "data")
+    base_path = os.path.join(os.path.dirname(__file__), "../../profile_library")
     return f"{base_path}/{sub_path}"
 
 

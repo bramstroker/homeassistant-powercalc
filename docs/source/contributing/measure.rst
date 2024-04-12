@@ -62,7 +62,7 @@ Submitting your work with a Pull Request
 To create a Pull Request (PR) on the Powercalc GitHub repository, follow these steps:
 
 1. Fork the repository by clicking on the "Fork" button on the top right of the repository page. This will create a copy of the repository under your own account.
-2. Next, upload the directory containing your changes to the custom_components/powercalc/data directory of your forked repository. Make sure to keep the manufacturer/model folders intact.
+2. Next, upload the directory containing your changes to the profile_library directory of your forked repository. Make sure to keep the manufacturer/model folders intact.
 3. If you're familiar with Git, you can also use a Git client to make the changes to your local copy of the repository, commit the changes, and push them to your forked repository on GitHub.
 4. Once your changes have been uploaded to your forked repository, go to the original repository and click on the "New Pull Request" button. This will open a new page where you can review the changes and submit the PR for review.
 5. Once the PR is submitted, the repository maintainers will review your changes and may request additional changes or merge the PR into the main repository.

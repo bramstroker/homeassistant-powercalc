@@ -9,6 +9,8 @@ from typing import NamedTuple, Protocol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 
+from custom_components.powercalc.helpers import get_library_path
+
 if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
     from enum import StrEnum
 else:
@@ -77,7 +79,7 @@ class PowerProfile:
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
         if self.linked_lut:
-            return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
+            return get_library_path(self.linked_lut)
 
         if root_only:
             return self._directory

@@ -154,7 +154,7 @@ def resolve_absolute_file_path(file_path: str) -> str:
 
     library_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        "../../custom_components/powercalc/data",
+        "../../profile_library",
         file_path
     )
     if os.path.exists(file_path):
