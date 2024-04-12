@@ -56,7 +56,7 @@ async def resolve_include_entities(
                 source_entity.device_class or source_entity.original_device_class
             )
             if device_class == SensorDeviceClass.POWER:
-                resolved_entities.append(RealPowerSensor(source_entity.entity_id))
+                resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
             elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
