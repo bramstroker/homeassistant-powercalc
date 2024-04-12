@@ -84,7 +84,7 @@ class RemoteLoader(Loader):
             needs_update = True
 
         if path_exists:
-            remote_modification_time = model_info.get("last_update", time.time())
+            remote_modification_time = model_info.get("update_timestamp", time.time())
             local_modification_time = self._get_local_modification_time(storage_path)
             if remote_modification_time > local_modification_time:
                 _LOGGER.debug("Remote profile is newer than local profile")

@@ -163,7 +163,7 @@ app.get(
         libraryPath + "/" + manufacturer + "/" + model
       );
       if (files.length === 0) {
-        logger.error("No data found", manufacturer, model);
+        logger.error("No data found for: %s/%s", manufacturer, model);
         res.status(404).json({ message: "No download url's found" });
         return;
       }
@@ -186,6 +186,7 @@ app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
   logger.info("Fetching library");
   try {
     const resp = await fetch(url);
+    res.set('Cache-Control', 'public, max-age=3600');
     res.json(await resp.json());
   } catch (error) {
     logger.error("Error fetching library: %s", error);
