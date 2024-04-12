@@ -15,6 +15,7 @@ const logLevel = process.env.LOG_LEVEL || 'info'
 const defaultOwner = "bramstroker";
 const defaultRepo = "homeassistant-powercalc";
 const defaultPath = "profile_library"
+const defaultBranch = process.env.REPO_BRANCH || "master"
 
 const app: Express = express();
 const logger = pino(
@@ -34,6 +35,7 @@ export interface Repository {
   owner: string;
   repo: string;
   path: string;
+  branch: string;
 }
 
 let promDownloadCounter = new promClient.Counter({
@@ -84,10 +86,11 @@ const getRepository: (req: Request) => Repository = (req: Request) => {
         return {
             owner: parts[0],
             repo: parts[1],
-            path: parts.slice(2).join('/')
+            branch: parts[2],
+            path: parts.slice(3).join('/')
         }
     }
-    return { owner: defaultOwner, repo: defaultRepo, path: defaultPath }
+    return { owner: defaultOwner, repo: defaultRepo, path: defaultPath, branch: defaultBranch }
 };
 
 app.get(
@@ -124,6 +127,7 @@ app.get(
         owner: repository.owner,
         repo: repository.repo,
         path: newPath,
+        ref: repository.branch
       });
 
       if (!Array.isArray(data)) {
@@ -134,8 +138,10 @@ app.get(
       const subContents = await Promise.all(
         data.map(async (item): Promise<LibraryFile[]> => {
           if (item.type === "file") {
-            let regex = new RegExp(path, "g");
-            let modifiedPath = item.path.replace(regex, "").substring(1);
+            if (!item.path.startsWith(path)) {
+                throw new Error("No match found.");
+            }
+            const modifiedPath = item.path.substring(path.length + 1);
             return [{ path: modifiedPath, url: item.download_url ?? "" }];
           } else if (item.type === "dir") {
             const newPath = `${path}/${item.name}`;
@@ -176,8 +182,7 @@ app.get(
 
 app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
   const repository = getRepository(req)
-  //const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/main/${repository.path}/library.json`;
-  const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/feat/library-download/${repository.path}/library.json`;
+  const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/${repository.branch}/${repository.path}/library.json`;
   logger.info("Fetching library");
   try {
     const resp = await fetch(url);
