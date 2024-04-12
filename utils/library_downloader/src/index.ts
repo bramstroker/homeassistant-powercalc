@@ -12,9 +12,9 @@ const port = process.env.PORT || 3000;
 const githubToken = process.env.GITHUB_TOKEN;
 const bearerToken = process.env.BEARER_TOKEN;
 const logLevel = process.env.LOG_LEVEL || 'info'
-const owner = "bramstroker";
-const repo = "homeassistant-powercalc";
-const libraryPath = "custom_components/powercalc/data"
+const defaultOwner = "bramstroker";
+const defaultRepo = "homeassistant-powercalc";
+const defaultPath = "custom_components/powercalc/data"
 
 const app: Express = express();
 const logger = pino(
@@ -30,6 +30,12 @@ collectDefaultMetrics({ register });
 export interface LibraryFile {
   path: string;
   url: string;
+}
+
+export interface Repository {
+  owner: string;
+  repo: string;
+  path: string;
 }
 
 let promDownloadCounter = new promClient.Counter({
@@ -76,6 +82,20 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
+const getRepository: (req: Request) => Repository = (req: Request) => {
+  const repositoryHeader = req.header("X-Powercalc-Repository")
+    if (repositoryHeader) {
+        const parts = repositoryHeader.split("/")
+
+        return {
+            owner: parts[0],
+            repo: parts[1],
+            path: parts.slice(2).join('/')
+        }
+    }
+    return { owner: defaultOwner, repo: defaultRepo, path: defaultPath }
+};
+
 app.get(
   "/download/:manufacturer/:model",
   cache("1 hour"),
@@ -95,6 +115,9 @@ app.get(
       return;
     }
 
+    const repository = getRepository(req)
+    logger.debug("Repository: %s/%s/%s", repository.owner, repository.repo, repository.path)
+
     const fetchContents = async (
       path: string,
       newPath: string | null = null
@@ -104,11 +127,12 @@ app.get(
       }
 
       const { data } = await octokit.repos.getContent({
-        owner: owner,
-        repo: repo,
+        owner: repository.owner,
+        repo: repository.repo,
         path: newPath,
       });
 
+      logger.info(data)
       if (!Array.isArray(data)) {
         return [];
       }
@@ -135,11 +159,12 @@ app.get(
     const labels = { manufacturer: manufacturer, model: model };
 
     try {
+      const libraryPath = repository.path;
       const files = await fetchContents(
         libraryPath + "/" + manufacturer + "/" + model
       );
       if (files.length === 0) {
-        console.error("No data found", manufacturer, model);
+        logger.error("No data found", manufacturer, model);
         res.status(404).json({ message: "No download url's found" });
         return;
       }
@@ -147,7 +172,8 @@ app.get(
       promDownloadCounter.inc(labels);
       res.json(files);
     } catch (error) {
-      logger.error("Model not found");
+      logger.error("Error fetching data: %s", error);
+      logger.error("Model not found %s/%s", manufacturer, model);
       res
         .status(404)
         .json({ message: "Model not found %s/%s", manufacturer, model });
@@ -156,12 +182,17 @@ app.get(
 );
 
 app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
-  // TODO: dynamic URL
-  const url =
-    "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/feat/library-download/custom_components/powercalc/data/library.json";
+  const repository = getRepository(req)
+  //const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/main/${repository.path}/library.json`;
+  const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/feat/library-download/${repository.path}/library.json`;
   logger.info("Fetching library");
-  const resp = await fetch(url);
-  res.json(await resp.json());
+  try {
+    const resp = await fetch(url);
+    res.json(await resp.json());
+  } catch (error) {
+    logger.error("Error fetching library: %s", error);
+    res.status(500).json({ message: "Error fetching library" });
+  }
 });
 
 app.get("/cache/index", verifyToken, (req, res) => {
