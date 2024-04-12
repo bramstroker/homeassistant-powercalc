@@ -125,8 +125,7 @@ class RemoteLoader(Loader):
         times.sort(reverse=True)
         return times[0] if times else 0
 
-    @staticmethod
-    async def download_profile(manufacturer: str, model: str, storage_path: str) -> None:
+    async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """
         Download the profile from Github using the Powercalc download API
         Saves the profile to manufacturer/model directory in .storage/powercalc_profiles folder
@@ -135,6 +134,14 @@ class RemoteLoader(Loader):
         _LOGGER.info("Downloading profile: %s/%s from github", manufacturer, model)
 
         endpoint = f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}"
+
+        def _save_file(data: bytes, directory: str) -> None:
+            """Save file from Github to local storage directory"""
+            path = os.path.join(storage_path, directory)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as f:
+                f.write(data)
+
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(endpoint) as resp:
@@ -142,7 +149,7 @@ class RemoteLoader(Loader):
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                     resources = await resp.json()
 
-                os.makedirs(storage_path, exist_ok=True)
+                await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
 
                 # Download the files
                 for resource in resources:
@@ -150,10 +157,9 @@ class RemoteLoader(Loader):
                     async with session.get(url) as resp:
                         if resp.status != 200:
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
-                        path = os.path.join(storage_path, resource["path"])
-                        os.makedirs(os.path.dirname(path), exist_ok=True)
-                        with open(path, "wb") as f:
-                            f.write(await resp.read())
+
+                        contents = await resp.read()
+                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
             except aiohttp.ClientError as e:
                 raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 
