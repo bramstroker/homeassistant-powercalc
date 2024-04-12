@@ -26,7 +26,7 @@ DEVICE_TYPES = [
 ]
 
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
-DATA_DIR = f"{PROJECT_ROOT}/custom_components/powercalc/data"
+DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 
 
 def generate_supported_model_list(model_listing: list[dict]):
@@ -38,7 +38,7 @@ def generate_supported_model_list(model_listing: list[dict]):
         relevant_models = [
             model
             for model in model_listing
-            if (model.get("device_type") or "light") == device_type[0]
+            if model.get("device_type") == device_type[0]
         ]
         num_devices = len(relevant_models)
 
@@ -82,22 +82,42 @@ def generate_supported_model_list(model_listing: list[dict]):
     print("Generated supported_models.md")
 
 
-def generate_manufacturer_device_types_file(model_listing: list[dict]) -> None:
-    manufacturer_device_types: dict[str, list] = {}
+def generate_library_json(model_listing: list[dict]) -> None:
+    manufacturers: dict[str, dict] = {}
     for model in model_listing:
-        device_type = model.get("device_type") or "light"
-        manufacturer = model.get("manufacturer")
-        if manufacturer not in manufacturer_device_types:
-            manufacturer_device_types[manufacturer] = []
-        if device_type not in manufacturer_device_types[manufacturer]:
-            manufacturer_device_types[manufacturer].append(device_type)
+        manufacturer_name = model.get("manufacturer")
+        manufacturer = manufacturers.get(manufacturer_name)
+        if not manufacturer:
+            manufacturer = {"name": manufacturer_name, "models": [], "device_types": []}
+            manufacturers[manufacturer_name] = manufacturer
+
+        device_type = model.get("device_type")
+        if device_type not in manufacturer["device_types"]:
+            manufacturer["device_types"].append(device_type)
+
+        key_mapping = {
+            "model": "id",
+            "name": "name",
+            "device_type": "device_type",
+            "aliases": "aliases",
+            "modified": "update_timestamp"
+        }
+
+        # Create a new dictionary with updated keys
+        mapped_dict = {key_mapping.get(key, key): value for key, value in model.items()}
+        manufacturer["models"].append({key: mapped_dict[key] for key in key_mapping.values() if key in mapped_dict})
+
+    json_data = {
+        "manufacturers": list(manufacturers.values()),
+    }
+
     with open(
-        os.path.join(DATA_DIR, "manufacturer_device_types.json"),
+        os.path.join(DATA_DIR, "library.json"),
         "w",
     ) as json_file:
-        json_file.write(json.dumps(manufacturer_device_types))
+        json_file.write(json.dumps(json_data))
 
-    print("Generated manufacturer_device_types.json")
+    print("Generated library.json")
 
 
 def get_model_list() -> list[dict]:
@@ -116,8 +136,12 @@ def get_model_list() -> list[dict]:
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "color_modes": color_modes,
+                    "directory": model_directory,
+                    "modified": get_local_modification_time(model_directory),
                 },
             )
+            if "device_type" not in model_data:
+                model_data["device_type"] = "light"
             models.append(model_data)
 
     return models
@@ -144,6 +168,13 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
     return None
 
 
+def get_local_modification_time(folder: str) -> float:
+    """Get the latest modification time of the local profile directory."""
+    times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
+    times.sort(reverse=True)
+    return times[0] if times else 0
+
+
 model_list = get_model_list()
 generate_supported_model_list(model_list)
-generate_manufacturer_device_types_file(model_list)
+generate_library_json(model_list)

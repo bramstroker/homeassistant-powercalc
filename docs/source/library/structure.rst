@@ -1,19 +1,13 @@
-Light model library
-===================
+Library structure
+=================
 
-The component ships with predefined light measurements for some light models.
-This library will keep extending by the effort of community users.
-
-These models are located in `config/custom_components/powercalc/data` directory.
-You can also define your own models in `config/powercalc-custom-models` directory, when a manufacturer/model exists in this directory this will take precedence over the default data directory.
-
-Each light model has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010
+Each power profile has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010, containing a `model.json` file and optionally CSV files for the LUT calculation strategy.
 
 model.json
 ----------
 
 Every model MUST contain a ``model.json`` file which defines the supported calculation modes and other configuration.
-See the `json schema <https://github.com/bramstroker/homeassistant-powercalc/blob/master/custom_components/powercalc/data/model_schema.json>`_ how the file must be structured or the examples below.
+See the `json schema <https://github.com/bramstroker/homeassistant-powercalc/blob/master/profile_library/model_schema.json>`_ how the file must be structured or the examples below.
 
 When the calculation strategy is ``lut`` also [CSV lookup files](#lut-data-files) must be provided, which can be created by running the measure tool.
 
@@ -45,10 +39,14 @@ Example linear mode
         "measure_device": "From manufacturer specifications"
     }
 
+You can use ``aliases`` to define alternative model names, which will be used during discovery.
+This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.
+
 LUT data files
 --------------
 
-To calculate power consumption a lookup is done into CSV data files.
+For light profiles using the ``lut`` calculation strategy, the power consumption is calculated based on a lookup table.
+These lookup tables are saved as CSV files in the model directory.
 
 Depending on the supported color modes of the light the integration expects one or more CSV files here:
 

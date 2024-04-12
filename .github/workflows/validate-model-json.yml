@@ -4,7 +4,7 @@ on:
   pull_request_target:
     paths:
        - '**/model.json'
-       - 'custom_components/powercalc/data/model_schema.json'
+       - 'profile_library/model_schema.json'
 
 permissions:
   issues: write
@@ -23,7 +23,7 @@ jobs:
         uses: bramstroker/json-schema-validator@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          json_schema: ./custom_components/powercalc/data/model_schema.json
+          json_schema: ./profile_library/model_schema.json
           json_path_pattern: .*/data/([^/]+/)?([^/]+/)?model.json$
           send_comment: true
           clear_comments: true

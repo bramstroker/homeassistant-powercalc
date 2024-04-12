@@ -1,3 +1,6 @@
+import json
+import os
+import shutil
 import uuid
 from collections.abc import Generator
 from typing import Any, Protocol
@@ -10,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from pytest_asyncio.plugin import SubRequest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -23,6 +27,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
+from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from tests.common import mock_area_registry
 
 
@@ -149,3 +154,26 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         )
 
     return _mock_entity_with_model_information
+
+
+@pytest.fixture(autouse=True)
+def mock_remote_loader(request: SubRequest) -> Generator:
+    if "skip_remote_loader_mocking" in request.keywords:
+        yield
+        return
+
+    def side_effect(manufacturer: str, model: str, storage_path: str) -> None:
+        source_dir = get_library_path(f"{manufacturer}/{model}")
+        if os.path.exists(storage_path):
+            return
+        shutil.copytree(source_dir, storage_path)
+
+    remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
+    with patch(f"{remote_loader_class}.download_profile") as mock_download, patch(f"{remote_loader_class}.load_library_json") as mock_load_lib:
+        mock_download.side_effect = side_effect
+
+        def load_library_json() -> dict:
+            with open(get_library_json_path()) as f:
+                return json.load(f)
+        mock_load_lib.side_effect = load_library_json
+        yield

@@ -36,7 +36,7 @@ async def get_power_profile(
             custom_model_directory,
         )
 
-    library = ProfileLibrary.factory(hass)
+    library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(
         ModelInfo(manufacturer, model),
         custom_model_directory,

@@ -38,6 +38,7 @@ Misc
    :maxdepth: 1
 
    misc/naming
+   library/library
 
 Troubleshooting
 ********************

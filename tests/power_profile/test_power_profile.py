@@ -25,7 +25,8 @@ from tests.common import get_test_profile_dir
 
 
 async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
         get_test_profile_dir("signify-LCA001"),
     )
@@ -36,10 +37,12 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> No
     assert not power_profile.is_strategy_supported(CalculationStrategy.FIXED)
     assert power_profile.device_type == DeviceType.LIGHT
     assert power_profile.name == "Hue White and Color Ambiance A19 E26/E27 (Gen 5)"
+    assert not power_profile.aliases
 
 
 async def test_load_fixed_profile(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("fixed"),
     )
@@ -52,7 +55,8 @@ async def test_load_fixed_profile(hass: HomeAssistant) -> None:
 
 
 async def test_load_linear_profile(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("linear"),
     )
@@ -65,7 +69,8 @@ async def test_load_linear_profile(hass: HomeAssistant) -> None:
 
 
 async def test_load_linked_profile(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("signify", "LCA007"),
         get_test_profile_dir("linked_profile"),
     )
@@ -76,7 +81,8 @@ async def test_load_linked_profile(hass: HomeAssistant) -> None:
 
 
 async def test_load_sub_profile(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("yeelight", "YLDL01YL/ambilight"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
@@ -88,7 +94,8 @@ async def test_load_sub_profile(hass: HomeAssistant) -> None:
 
 async def test_load_sub_profile_without_model_json(hass: HomeAssistant) -> None:
     """Test if sub profile can be loaded correctly when the sub directories don't have an own model.json"""
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("test", "test/a"),
         get_test_profile_dir("sub_profile"),
     )
@@ -107,13 +114,15 @@ async def test_default_calculation_strategy_lut(hass: HomeAssistant) -> None:
 
 async def test_error_when_sub_profile_not_exists(hass: HomeAssistant) -> None:
     with pytest.raises(ModelNotSupportedError):
-        await ProfileLibrary.factory(hass).get_profile(
+        library = await ProfileLibrary.factory(hass)
+        await library.get_profile(
             ModelInfo("yeelight", "YLDL01YL/ambilight_boo"),
         )
 
 
 async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("signify", "LCA007"),
     )
     assert power_profile.is_entity_domain_supported(
@@ -125,7 +134,8 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
 
 
 async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("signify", "LOM001"),
     )
     assert power_profile.is_entity_domain_supported(
@@ -143,7 +153,8 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
 
 
 async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_attribute"),
     )
@@ -165,7 +176,8 @@ async def test_sub_profile_matcher_attribute(hass: HomeAssistant) -> None:
 
 
 async def test_sub_profile_matcher_entity_id(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_entity_id"),
     )
@@ -210,7 +222,8 @@ async def test_sub_profile_matcher_integration(
     registry_entry: RegistryEntry,
     expected_profile: str | None,
 ) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("Test", "Test"),
         get_test_profile_dir("sub_profile_match_integration"),
     )
@@ -261,7 +274,8 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
     For power profiles not supporting sub profiles it should ignore setting the sub profile
     This should not happen anyway
     """
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("smart_switch"),
     )
@@ -271,7 +285,8 @@ async def test_selecting_sub_profile_is_ignored(hass: HomeAssistant) -> None:
 
 
 async def test_device_type(hass: HomeAssistant) -> None:
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo("dummy", "dummy"),
         get_test_profile_dir("media_player"),
     )
