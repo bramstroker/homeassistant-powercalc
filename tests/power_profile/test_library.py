@@ -4,10 +4,13 @@ from unittest.mock import AsyncMock
 import pytest
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
 from custom_components.powercalc.aliases import MANUFACTURER_IKEA, MANUFACTURER_SIGNIFY
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
+from custom_components.powercalc.power_profile.loader.composite import CompositeLoader
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
-from tests.common import get_test_config_dir, get_test_profile_dir
+from custom_components.powercalc.power_profile.loader.remote import RemoteLoader
+from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_manufacturer_listing(hass: HomeAssistant) -> None:
@@ -130,3 +133,18 @@ async def test_create_power_profile_raises_library_error(hass: HomeAssistant, ca
     await library.create_power_profile(ModelInfo("signify", "LCT010"))
 
     assert "Problem loading model" in caplog.text
+
+
+async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {},
+        {
+            CONF_DISABLE_LIBRARY_DOWNLOAD: True,
+        },
+    )
+
+    library = await ProfileLibrary.factory(hass)
+    composite_loader: CompositeLoader = library.get_loader()
+    has_remote_loader = any(isinstance(loader, RemoteLoader) for loader in composite_loader.loaders)
+    assert not has_remote_loader

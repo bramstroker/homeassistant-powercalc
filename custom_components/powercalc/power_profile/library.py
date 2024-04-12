@@ -8,7 +8,7 @@ from typing import NamedTuple
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
-from custom_components.powercalc.const import DATA_PROFILE_LIBRARY, DOMAIN
+from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DATA_PROFILE_LIBRARY, DOMAIN, DOMAIN_CONFIG
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -50,12 +50,15 @@ class ProfileLibrary:
             os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
             os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
             os.path.join(os.path.dirname(__file__), "../custom_data"),
-            #get_library_path(),
         ]:
             if os.path.exists(data_dir):
                 loaders.append(LocalLoader(hass, data_dir))
 
-        loaders.append(RemoteLoader(hass))
+        global_config = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
+        disable_library_download: bool = bool(global_config.get(CONF_DISABLE_LIBRARY_DOWNLOAD, False))
+        if not disable_library_download:
+            loaders.append(RemoteLoader(hass))
+
         loader = CompositeLoader(loaders)
         library = ProfileLibrary(hass, loader)
         await library.initialize()
@@ -162,6 +165,9 @@ class ProfileLibrary:
         }
 
         return await self._loader.find_model(manufacturer, search)
+
+    def get_loader(self) -> Loader:
+        return self._loader
 
 
 class ModelInfo(NamedTuple):

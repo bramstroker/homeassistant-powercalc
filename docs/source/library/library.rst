@@ -12,7 +12,9 @@ Starting from version 1.12.0 all the power profiles are moved out of the compone
 This way we can roll out updates to the library without the need to update the component.
 Also you only need to download the profiles you actually use, saving bandwidth and storage.
 
-#TODO: maybe add option to disable remote loading
+.. note::
+    The library is hosted on GitHub, so you need an internet connection to download the profiles.
+    When you prefer to have full local control, you can disable the library in the configuration. See `Disable download feature`_.
 
 For more information about the library structure, See :doc:`structure`.
 
@@ -42,3 +44,17 @@ For example:
 
 .. note::
     Custom models are loaded before the built-in library models, so you can override the library models by creating a custom model with the same manufacturer and model id.
+
+Disable download feature
+------------------------
+
+If you want to disable the download feature, you can set the use the ``disable_library_download`` option in the configuration.
+
+.. code-block:: yaml
+
+    powercalc:
+      disable_library_download: true
+
+This will prevent the component from downloading the library profiles from the internet.
+
+You will have to manage the library profiles yourself, by downloading them from the GitHub repository and placing them in the ``config/powercalc/profiles`` directory.
