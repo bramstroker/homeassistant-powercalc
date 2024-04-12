@@ -23,9 +23,7 @@ const logger = pino(
     }
 );
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
-const Registry = promClient.Registry;
-const register = new Registry();
-collectDefaultMetrics({ register });
+collectDefaultMetrics();
 
 export interface LibraryFile {
   path: string;
@@ -43,7 +41,7 @@ let promDownloadCounter = new promClient.Counter({
   help: "Number of downloads for a profile",
   labelNames: ["manufacturer", "model"] as const,
 });
-register.registerMetric(promDownloadCounter);
+promClient.register.registerMetric(promDownloadCounter);
 
 const metricsMiddleware = promBundle({
     autoregister: false,
@@ -51,10 +49,6 @@ const metricsMiddleware = promBundle({
     includePath: true,
     includeStatusCode: true,
     includeUp: true,
-    promClient: {
-        collectDefaultMetrics: {
-        }
-      }
 });
 app.use(metricsMiddleware)
 
@@ -132,7 +126,6 @@ app.get(
         path: newPath,
       });
 
-      logger.info(data)
       if (!Array.isArray(data)) {
         return [];
       }
@@ -204,8 +197,8 @@ app.get("/cache/clear", verifyToken, (req, res) => {
 });
 
 app.get("/metrics", verifyToken, async (req, res) => {
-  res.setHeader("Content-Type", register.contentType);
-  res.send(await register.metrics());
+  res.setHeader("Content-Type", promClient.register.contentType);
+  res.send(await promClient.register.metrics());
 });
 
 app.listen(port, () => {
