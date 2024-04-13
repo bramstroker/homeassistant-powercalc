@@ -123,7 +123,7 @@ app.get(
         newPath = path;
       }
 
-      const { data } = await octokit.repos.getContent({
+      let { data } = await octokit.repos.getContent({
         owner: repository.owner,
         repo: repository.repo,
         path: newPath,
@@ -131,18 +131,21 @@ app.get(
       });
 
       if (!Array.isArray(data)) {
-        return [];
+        data = [data]
       }
 
-      // If it's a directory, recursively fetch its contents
       const subContents = await Promise.all(
         data.map(async (item): Promise<LibraryFile[]> => {
+          logger.debug(item.type)
           if (item.type === "file") {
             if (!item.path.startsWith(path)) {
                 throw new Error("No match found.");
             }
             const modifiedPath = item.path.substring(path.length + 1);
             return [{ path: modifiedPath, url: item.download_url ?? "" }];
+          } else if (item.type === "symlink") {
+            const target = (item as any).target
+            return await fetchContents(target.replace("../", repository.path + "/"))
           } else if (item.type === "dir") {
             const newPath = `${path}/${item.name}`;
             return await fetchContents(path, newPath);
