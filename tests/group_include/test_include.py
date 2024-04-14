@@ -487,6 +487,7 @@ async def test_include_filter_domain(
 
     hass.states.async_set("light.test_light", STATE_OFF)
     await hass.async_block_till_done()
+    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
