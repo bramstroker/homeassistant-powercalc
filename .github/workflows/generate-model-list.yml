@@ -37,6 +37,9 @@ jobs:
         with:
           add: 'docs/supported_models.md'
           message: 'Update support model list'
+      - name: Purge powercalc API memory cache
+        run: |
+          curl -X GET "https://powercalc.lauwbier.nl/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
       - name: Purge cloudflare cache
         uses: jakejarvis/cloudflare-purge-action@master
         env:
