@@ -149,7 +149,7 @@ class RemoteLoader(Loader):
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                     resources = await resp.json()
 
-                await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
+                await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))  # type: ignore
 
                 # Download the files
                 for resource in resources:
@@ -159,7 +159,7 @@ class RemoteLoader(Loader):
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
 
                         contents = await resp.read()
-                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
+                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))  # type: ignore
             except aiohttp.ClientError as e:
                 raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
 

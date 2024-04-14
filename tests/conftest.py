@@ -7,13 +7,13 @@ from typing import Any, Protocol
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from _pytest.fixtures import SubRequest
 from homeassistant import loader
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
-from pytest_asyncio.plugin import SubRequest
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
