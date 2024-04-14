@@ -216,7 +216,7 @@ def mock_area_registry(
         for key, entry in mock_entries.items():
             registry.areas[key] = entry
 
-    registry._area_data = registry.areas.data
+    registry._area_data = registry.areas.data  # noqa: SLF001
 
     hass.data[ar.DATA_REGISTRY] = registry
     return registry
