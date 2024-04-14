@@ -1,5 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import apicache from "apicache";
 import { Octokit } from "@octokit/rest";
 import pino from "pino";
@@ -53,6 +54,8 @@ const metricsMiddleware = promBundle({
     includeUp: true,
 });
 app.use(metricsMiddleware)
+
+app.use(cors())
 
 // API cache middleware
 apicache.options({
