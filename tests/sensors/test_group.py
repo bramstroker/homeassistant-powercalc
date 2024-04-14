@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import timedelta
 from unittest.mock import patch
@@ -105,6 +106,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     hass.states.async_set("input_boolean.test2", STATE_ON)
 
     await hass.async_block_till_done()
+    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     power_entry = ent_reg.async_get("sensor.testgroup_power")
     assert power_entry
@@ -425,6 +427,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
     hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
     await hass.async_block_till_done()
+    await asyncio.sleep(0.1)  # Needed on 2024.4.3. Check if we can remove later
 
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state.state == STATE_UNAVAILABLE
@@ -438,6 +441,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     ):
         hass.states.async_set("input_boolean.test1", STATE_ON)
         await hass.async_block_till_done()
+        await hass.async_block_till_done() # Needed on 2024.4.3. Check if we can remove later
 
         power_state = hass.states.get("sensor.testgroup_power")
         assert power_state.state != STATE_UNAVAILABLE
@@ -1081,6 +1085,7 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
     hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
 
     await hass.async_block_till_done()
+    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
 

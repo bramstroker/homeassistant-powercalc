@@ -14,6 +14,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -210,14 +211,12 @@ def mock_area_registry(
     fixture instead.
     """
     registry = ar.AreaRegistry(hass)
+    registry.areas = NormalizedNameBaseRegistryItems[ar.AreaEntry]()
+    if mock_entries:
+        for key, entry in mock_entries.items():
+            registry.areas[key] = entry
 
-    try:
-        items = ar.AreaRegistryItems()
-        items.data = mock_entries or {}
-        registry.areas = items
-        registry._area_data = items.data  # noqa: SLF001
-    except AttributeError:
-        registry.areas = mock_entries or {}
+    registry._area_data = registry.areas.data  # noqa: SLF001
 
     hass.data[ar.DATA_REGISTRY] = registry
     return registry

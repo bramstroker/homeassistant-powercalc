@@ -435,7 +435,7 @@ def _register_entity_id_change_listener(
 
         # Breaking change in 2024.4.0, check for Event for versions prior to this
         if type(event) is Event:  # Intentionally avoid `isinstance` because it's slow and we trust `Event` is not subclassed
-            event = event.data
+            event = event.data  # pragma: no cover
         return (
             event["action"] == "update"  # type: ignore
             and "old_entity_id" in event  # type: ignore

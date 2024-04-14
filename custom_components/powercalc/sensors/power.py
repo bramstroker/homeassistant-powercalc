@@ -32,6 +32,7 @@ from homeassistant.helpers import start
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import (
+    EventStateChangedData,
     TrackTemplate,
     async_call_later,
     async_track_state_change_event,
@@ -387,7 +388,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         assert self._strategy_instance is not None
         self.init_calculation_enabled_condition()
 
-        async def appliance_state_listener(event: Event) -> None:
+        async def appliance_state_listener(event: Event[EventStateChangedData]) -> None:
             """Handle for state changes for dependent sensors."""
             new_state = event.data.get("new_state")
             await self._handle_source_entity_state_change(

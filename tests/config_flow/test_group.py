@@ -120,7 +120,7 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
         CONF_GROUP_ENERGY_ENTITIES: ["sensor.balcony_energy"],
         CONF_CREATE_ENERGY_SENSOR: True,
     }
-    result = await hass.config_entries.flow.async_configure(
+    await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,
     )

@@ -87,6 +87,7 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
 
     hass.states.async_set("input_boolean.test", STATE_ON)
     await hass.async_block_till_done()
+    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "50.00"
@@ -179,6 +180,7 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     hass.states.async_set("input_boolean.test2", STATE_ON)
 
     await hass.async_block_till_done()
+    await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     group1 = hass.states.get("sensor.testgroup1_power")
     assert group1.attributes[ATTR_ENTITIES] == {
@@ -200,6 +202,7 @@ async def test_create_nested_group_sensor(hass: HomeAssistant) -> None:
     ):
         hass.states.async_set("input_boolean.test2", STATE_OFF)
         await hass.async_block_till_done()
+        await hass.async_block_till_done()  # Needed on 2024.4.3. Check if we can remove later
 
     group1 = hass.states.get("sensor.testgroup1_power")
     assert group1.state == "100.00"
