@@ -200,9 +200,9 @@ app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
 app.get("/cache/index", verifyToken, (req, res) => {
   res.json(apicache.getIndex());
 });
-
-app.get("/cache/clear", verifyToken, (req, res) => {
-  res.json(apicache.clear([]));
+ 
+app.get("/cache/flush", verifyToken, (req, res) => {
+  res.json(apicache.clear(''));
 });
 
 app.get("/metrics", verifyToken, async (req, res) => {
