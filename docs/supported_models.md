@@ -391,6 +391,7 @@
 |greenwave  |GWPN1                 |Greenwave GWPN1                                                                    |                                                       |0.300|
 |ikea       |ASKVADER              |ASKVADER                                                                           |E1836<br />On/Off plug (ASKVADER on/off switch)        |0.210|
 |ikea       |TRADFRI control outlet|TRADFRI control outlet                                                             |                                                       |0.230|
+|ikea       |TRETAKT Smart plug    |TRETAKT Smart plug                                                                 |                                                       |0.130|
 |innr       |SP 120                |Innr Zigbee Smart Plug                                                             |                                                       |0.410|
 |innr       |SP 220                |Innr Zigbee Smart Plug SP220                                                       |On/Off plug (SP 220)                                   |0.500|
 |innr       |SP 224                |Innr Zigbee Smart Plug                                                             |                                                       |0.180|
