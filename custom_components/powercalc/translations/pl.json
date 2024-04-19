@@ -121,13 +121,13 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbook'i",
                     "repeat": "Powtarzaj",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
                     "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
                     "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Konfiguracja Playbook'ów"
             },

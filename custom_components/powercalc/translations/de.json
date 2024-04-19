@@ -121,13 +121,13 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbook",
                     "repeat": "Wiederholen",
-                    "state_trigger": "Status Auslöser"
+                    "states_trigger": "Status Auslöser"
                 },
                 "data_description": {
                     "autostart": "Geben Sie an, wenn ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
                     "playbooks": "Geben Sie in jeder Zeile ein Playbook ein. Example\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook-Konfiguration"
             },

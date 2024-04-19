@@ -121,13 +121,13 @@
                     "autostart": "Autoštart",
                     "playbooks": "Playbooky",
                     "repeat": "Opakovať",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
                     "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook konfigurácia"
             },
