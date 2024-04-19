@@ -100,7 +100,8 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "name": "name",
             "device_type": "device_type",
             "aliases": "aliases",
-            "modified": "update_timestamp"
+            "modified": "update_timestamp",
+            "color_modes": "color_modes"
         }
 
         # Create a new dictionary with updated keys
