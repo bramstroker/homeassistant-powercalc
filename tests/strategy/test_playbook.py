@@ -313,10 +313,12 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
             CONF_NAME: "Test",
             CONF_PLAYBOOK: {
                 CONF_PLAYBOOKS: {
+                    "off": "states_mapping/off.csv",
                     "idle": "states_mapping/idle.csv",
                     "paused": "states_mapping/paused.csv",
                 },
                 CONF_STATE_TRIGGER: {
+                    STATE_OFF: "off",
                     STATE_IDLE: "idle",
                     STATE_PAUSED: "paused",
                 },
@@ -333,6 +335,11 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     await elapse_and_assert_power(hass, 2, "5.00")
+
+    hass.states.async_set("media_player.sonos", STATE_OFF)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 1, "0.10")
 
 
 async def elapse_and_assert_power(
