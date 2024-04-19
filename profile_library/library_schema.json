@@ -62,6 +62,13 @@
                 "device_type": {
                     "$ref": "#/$defs/device_type"
                 },
+                "color_modes": {
+                    "type": "array",
+                    "description": "List of color modes supported by the model",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "aliases": {
                     "type": "array",
                     "description": "List of aliases for the model",
