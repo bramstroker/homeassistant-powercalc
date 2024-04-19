@@ -15,7 +15,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 _LOGGER = logging.getLogger(__name__)
 
-DOWNLOAD_PROXY = "https://powercalc.lauwbier.nl"
+DOWNLOAD_PROXY = "https://powercalc.lauwbier.nl/api"
 ENDPOINT_LIBRARY = f"{DOWNLOAD_PROXY}/library"
 ENDPOINT_DOWNLOAD = f"{DOWNLOAD_PROXY}/download"
 
