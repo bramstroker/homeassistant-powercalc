@@ -11,6 +11,7 @@ from decimal import Decimal
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from homeassistant.const import STATE_OFF
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_point_in_time
 from homeassistant.helpers.typing import ConfigType
@@ -185,6 +186,9 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         return self._loaded_playbooks[playbook_id]
+
+    def can_calculate_standby(self) -> bool:
+        return bool(self._states_trigger and STATE_OFF in self._states_trigger)
 
 
 class PlaybookQueue:
