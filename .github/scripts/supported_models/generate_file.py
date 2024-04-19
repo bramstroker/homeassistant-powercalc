@@ -136,13 +136,15 @@ def get_model_list() -> list[dict]:
                 {
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
-                    "color_modes": color_modes,
                     "directory": model_directory,
                     "modified": get_local_modification_time(model_directory),
                 },
             )
             if "device_type" not in model_data:
                 model_data["device_type"] = "light"
+
+            if color_modes:
+                model_data["color_modes"] = list(color_modes)
             models.append(model_data)
 
     return models
