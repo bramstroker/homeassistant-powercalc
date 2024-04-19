@@ -269,6 +269,11 @@ async def test_fallback_to_local_profile(
     await loader.load_model("signify", "LCA001")
 
 
+async def test_find_model(remote_loader: RemoteLoader) -> None:
+    model = await remote_loader.find_model("apple", {"HomePod (gen 2)"})
+    assert model == "MQJ83"
+
+
 async def _create_loader(hass: HomeAssistant) -> RemoteLoader:
     loader = RemoteLoader(hass)
     await loader.initialize()
