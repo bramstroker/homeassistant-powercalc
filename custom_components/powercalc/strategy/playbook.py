@@ -188,7 +188,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         return self._loaded_playbooks[playbook_id]
 
     def can_calculate_standby(self) -> bool:
-        return self._states_trigger and STATE_OFF in self._states_trigger
+        return bool(self._states_trigger and STATE_OFF in self._states_trigger)
 
 
 class PlaybookQueue:
