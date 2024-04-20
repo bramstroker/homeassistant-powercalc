@@ -9,5 +9,6 @@
         "VERSION": "v1.3.6:docker"
     },
     "name": "Ynoa Smart White & Color Tones",
-    "standby_power": 0.19
+    "standby_power": 0.19,
+    "created_at": "2023-03-03T10:26:20"
 }

@@ -9,5 +9,6 @@
         "VERSION": "v1.11.6:docker"
     },
     "name": "Nanoleaf - Essentials Matter A19 Smart LED Light Bulb",
-    "standby_power": 0.13
+    "standby_power": 0.13,
+    "created_at": "2024-04-10T20:05:34"
 }

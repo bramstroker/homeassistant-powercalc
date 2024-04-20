@@ -9,5 +9,6 @@
         "VERSION": "master"
     },
     "name": "Hue Infuse Large Ceiling Lamp",
-    "standby_power": 0.34
+    "standby_power": 0.34,
+    "created_at": "2023-02-28T18:32:53"
 }

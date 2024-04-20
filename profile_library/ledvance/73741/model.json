@@ -9,5 +9,6 @@
         "VERSION": "v1.3.3:docker"
     },
     "name": "LIGHTIFY LED adjustable color RT 5/6",
-    "standby_power": 0.62
+    "standby_power": 0.62,
+    "created_at": "2023-02-13T19:22:42"
 }

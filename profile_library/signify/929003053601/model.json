@@ -9,5 +9,6 @@
         "VERSION": "master"
     },
     "name": "Hue Flourish Pendant Light",
-    "standby_power": 0.42
+    "standby_power": 0.42,
+    "created_at": "2023-02-28T18:32:53"
 }

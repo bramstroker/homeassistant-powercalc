@@ -26,5 +26,6 @@
         "VERSION": "v1.10.0:docker"
     },
     "name": "SYMFONISK Floor lamp",
-    "standby_power": 2.75
+    "standby_power": 2.75,
+    "created_at": "2024-03-16T10:14:55"
 }

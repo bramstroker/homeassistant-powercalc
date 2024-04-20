@@ -9,5 +9,6 @@
         "VERSION": "v1.9.2:docker"
     },
     "name": "Extended color light (CLA60 RGBW)",
-    "standby_power": 0.5
+    "standby_power": 0.5,
+    "created_at": "2023-09-03T13:31:57"
 }

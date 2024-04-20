@@ -9,5 +9,6 @@
     },
     "name": "LEDVANCE SMART+ Wifi Planon 30x30 TW",
     "standby_power": 0.9,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-11-16T20:39:28"
 }

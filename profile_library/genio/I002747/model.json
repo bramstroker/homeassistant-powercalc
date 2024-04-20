@@ -9,5 +9,6 @@
     },
     "name": "Genio Wi-Fi Dimmable 5W G95 ES CCT Filament LED Bulb",
     "standby_power": 0.7,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-07-24T10:11:16"
 }

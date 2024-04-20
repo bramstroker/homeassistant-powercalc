@@ -9,5 +9,6 @@
         "VERSION": "v1.9.2:docker"
     },
     "name": "Lightify Classic B 40 TW 6 W E14",
-    "standby_power": 0.15
+    "standby_power": 0.15,
+    "created_at": "2023-09-05T12:50:26"
 }

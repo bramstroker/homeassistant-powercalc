@@ -9,5 +9,6 @@
         "VERSION": "v1.10.6:docker"
     },
     "name": "Smart light JL01 (2APYC-JL01)",
-    "standby_power": 0.4
+    "standby_power": 0.4,
+    "created_at": "2024-02-24T21:34:35"
 }

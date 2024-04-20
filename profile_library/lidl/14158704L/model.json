@@ -9,5 +9,6 @@
         "VERSION": "v1.11.3:docker"
     },
     "name": "Livarno Home LED floor lamp",
-    "standby_power": 0.6
+    "standby_power": 0.6,
+    "created_at": "2024-03-29T20:38:10"
 }

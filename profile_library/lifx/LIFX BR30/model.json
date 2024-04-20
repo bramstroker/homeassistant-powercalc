@@ -9,5 +9,6 @@
     },
     "name": "LIFX BR30",
     "standby_power": 0.63,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-10-21T19:04:10"
 }

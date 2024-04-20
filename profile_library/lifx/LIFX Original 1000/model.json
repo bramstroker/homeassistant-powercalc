@@ -9,5 +9,6 @@
     },
     "name": "LIFX Original 1000",
     "standby_power": 2.46,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-02-19T20:16:46"
 }

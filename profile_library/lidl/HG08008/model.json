@@ -9,5 +9,6 @@
         "VERSION": "v1.3.5:docker"
     },
     "name": "HG08008",
-    "standby_power": 0.2
+    "standby_power": 0.2,
+    "created_at": "2023-02-18T16:04:50"
 }

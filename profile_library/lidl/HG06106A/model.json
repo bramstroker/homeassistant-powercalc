@@ -9,5 +9,6 @@
         "VERSION": "v1.10.0:docker"
     },
     "name": "Livarno Lux GU10 9W RGB Bulb",
-    "standby_power": 0.36
+    "standby_power": 0.36,
+    "created_at": "2024-02-03T09:39:50"
 }

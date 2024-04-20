@@ -9,5 +9,6 @@
     },
     "name": "LIFX Candle",
     "standby_power": 0.56,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-02-19T20:16:46"
 }

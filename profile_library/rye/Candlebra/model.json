@@ -9,5 +9,6 @@
     },
     "name": "Candlebra",
     "standby_power": 0.4,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-09-20T10:04:24"
 }

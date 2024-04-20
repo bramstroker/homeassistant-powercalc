@@ -1,6 +1,6 @@
 {
     "name": "Hue Play",
-    "standby_power": 0.100,
+    "standby_power": 0.1,
     "calculation_strategy": "lut",
     "measure_method": "script",
     "measure_device": "TP-Link Kasa HS110",
@@ -9,5 +9,6 @@
         "440400982841",
         "440400982842",
         "915005733701"
-    ]
+    ],
+    "created_at": "2021-08-21T14:47:39"
 }

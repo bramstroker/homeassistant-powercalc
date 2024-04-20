@@ -9,5 +9,6 @@
         "VERSION": "v1.10.4:docker"
     },
     "name": "Sengled White 5000K A19/E26 Bulb E11-G13 Zigbee ",
-    "standby_power": 0.3
+    "standby_power": 0.3,
+    "created_at": "2024-02-19T18:30:18"
 }

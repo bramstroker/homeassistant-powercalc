@@ -9,5 +9,6 @@
     },
     "name": "Teckin SB50",
     "standby_power": 0.81,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-11-10T19:42:22"
 }

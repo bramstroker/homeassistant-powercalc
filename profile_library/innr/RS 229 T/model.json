@@ -9,5 +9,6 @@
         "VERSION": "master"
     },
     "name": "RS 229 T",
-    "standby_power": 0.53
+    "standby_power": 0.53,
+    "created_at": "2023-06-08T18:15:31"
 }

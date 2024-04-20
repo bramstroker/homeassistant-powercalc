@@ -4,5 +4,6 @@
     "measure_method": "script",
     "name": "Sonoff B02 Light with dimmer and temperature",
     "standby_power": 0.4,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2021-08-13T18:12:48"
 }

@@ -9,5 +9,6 @@
         "VERSION": "v1.8.1:docker"
     },
     "name": "Bulb RGBCW",
-    "standby_power": 0.56
+    "standby_power": 0.56,
+    "created_at": "2023-07-22T18:25:43"
 }

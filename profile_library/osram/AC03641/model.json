@@ -9,5 +9,6 @@
         "VERSION": "v1.4.0:docker"
     },
     "name": "LIGHTIFY LED Classic A60 clear",
-    "standby_power": 0.4
+    "standby_power": 0.4,
+    "created_at": "2023-04-07T17:05:39"
 }

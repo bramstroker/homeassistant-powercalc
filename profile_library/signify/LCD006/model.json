@@ -9,5 +9,6 @@
         "VERSION": "v1.9.15:docker"
     },
     "name": "Hue White and Color Ambiance Downlight 4 inch",
-    "standby_power": 0.3
+    "standby_power": 0.3,
+    "created_at": "2024-01-08T20:35:44"
 }

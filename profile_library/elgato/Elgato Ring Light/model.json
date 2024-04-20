@@ -9,5 +9,6 @@
         "VERSION": "master"
     },
     "name": "Elgato Ring Light",
-    "standby_power": 0.45
+    "standby_power": 0.45,
+    "created_at": "2023-02-14T20:16:53"
 }

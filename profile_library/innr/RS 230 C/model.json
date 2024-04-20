@@ -9,5 +9,6 @@
     },
     "name": "RS 230 C",
     "standby_power": 0.37,
-    "calculation_strategy": "lut"
+    "calculation_strategy": "lut",
+    "created_at": "2022-09-06T08:20:35"
 }
