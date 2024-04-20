@@ -76,10 +76,10 @@
                         "type": "string"
                     }
                 },
-                "update_timestamp": {
+                "updated_at": {
                     "type": "string",
                     "format": "date-time",
-                    "description": "Timestamp of the last update of the model"
+                    "description": "Last update of the model"
                 }
             }
         },

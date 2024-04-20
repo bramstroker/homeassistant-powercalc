@@ -4,6 +4,7 @@ import glob
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from pytablewriter import MarkdownTableWriter
@@ -100,7 +101,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "name": "name",
             "device_type": "device_type",
             "aliases": "aliases",
-            "modified": "update_timestamp",
+            "updated_at": "updated_at",
             "color_modes": "color_modes"
         }
 
@@ -132,12 +133,13 @@ def get_model_list() -> list[dict]:
             model_directory = os.path.dirname(json_path)
             model_data: dict = json.load(json_file)
             color_modes = get_color_modes(model_directory, DATA_DIR, model_data)
+            updated_at = datetime.fromtimestamp(get_local_modification_time(model_directory)).isoformat()
             model_data.update(
                 {
                     "model": os.path.basename(model_directory),
                     "manufacturer": os.path.basename(os.path.dirname(model_directory)),
                     "directory": model_directory,
-                    "modified": get_local_modification_time(model_directory),
+                    "updated_at": updated_at,
                 },
             )
             if "device_type" not in model_data:

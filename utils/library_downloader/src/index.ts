@@ -96,6 +96,10 @@ const getRepository: (req: Request) => Repository = (req: Request) => {
     return { owner: defaultOwner, repo: defaultRepo, path: defaultPath, branch: defaultBranch }
 };
 
+const getRawBaseUri: (repository: Repository) => string = (repository: Repository) => {
+  return `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/${repository.branch}/${repository.path}`
+}
+
 app.get(
   "/download/:manufacturer/:model",
   cache("1 hour"),
@@ -186,9 +190,38 @@ app.get(
   }
 );
 
+app.get("/profile/:manufacturer/:model", cache("1 hour"), async (req: Request, res: Response) => {
+  const repository = getRepository(req)
+
+  const manufacturer = req.params.manufacturer;
+    const model = req.params.model;
+    if (!manufacturer || !model) {
+      logger.error(
+        "Manufacturer %s or model %s not provided",
+        manufacturer,
+        model
+      );
+      res.status(422).json({ message: "No manufacturer or model provided" });
+      return;
+    }
+
+    const url = getRawBaseUri(repository) + '/' + manufacturer + '/' + model + '/model.json';
+    logger.debug("Fetching profile: %s/%s", manufacturer, model);
+
+    try {
+      const resp = await fetch(url);
+      res.set('Cache-Control', 'public, max-age=3600');
+      res.json(await resp.json());
+    } catch (error) {
+      logger.error("Error fetching profile: %s", error);
+      res.status(404).json({ message: "Could not find profile" });
+    }
+});
+
 app.get("/library", cache("1 hour"), async (req: Request, res: Response) => {
   const repository = getRepository(req)
-  const url = `https://raw.githubusercontent.com/${repository.owner}/${repository.repo}/${repository.branch}/${repository.path}/library.json`;
+  const url = getRawBaseUri(repository) + '/library.json';
+  console.log(url)
   logger.info("Fetching library");
   try {
     const resp = await fetch(url);

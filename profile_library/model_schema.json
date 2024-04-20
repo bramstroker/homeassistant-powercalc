@@ -9,6 +9,11 @@
         "calculation_strategy"
     ],
     "properties": {
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation date of the profile"
+        },
         "name": {
             "type": "string",
             "description": "The full name"
