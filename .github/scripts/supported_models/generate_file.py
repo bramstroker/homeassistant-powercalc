@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import glob
 import json
+import math
 import os
 import sys
 from datetime import datetime
@@ -177,7 +178,7 @@ def get_local_modification_time(folder: str) -> float:
     """Get the latest modification time of the local profile directory."""
     times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
     times.sort(reverse=True)
-    return times[0] if times else 0
+    return math.floor(times[0] if times else 0)
 
 
 model_list = get_model_list()
