@@ -677,7 +677,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self.source_entity,  # type: ignore
             ),
             description_placeholders={
-                "supported_models_link": "https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/supported_models.md",
+                "supported_models_link": "https://powercalc.lauwbier.nl",
             },
             errors=errors,
             last_step=False,
