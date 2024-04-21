@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -169,6 +170,7 @@ async def test_exception_is_raised_on_github_resource_unavailable(mock_aiorespon
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
 
+
 @pytest.mark.parametrize(
     "remote_modification_time_delta,exists_locally,expected_download",
     [
@@ -191,7 +193,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                 return len(calls)
         return 0
 
-    def _mock_library_json(profile_last_update: float) -> None:
+    def _mock_library_json(profile_updated_at: str) -> None:
         mock_aioresponse.get(
             ENDPOINT_LIBRARY,
             status=200,
@@ -203,7 +205,7 @@ async def test_profile_redownloaded_when_newer_version_available(
                             {
                                 "id": "LCA001",
                                 "device_type": "light",
-                                "update_timestamp": profile_last_update,
+                                "updated_at": profile_updated_at,
                             },
                         ],
                     },
@@ -212,7 +214,8 @@ async def test_profile_redownloaded_when_newer_version_available(
             repeat=True,
         )
 
-    _mock_library_json(time.time() + remote_modification_time_delta)
+    remote_date = datetime.datetime.fromtimestamp(time.time() + remote_modification_time_delta).isoformat()
+    _mock_library_json(remote_date)
 
     loader = RemoteLoader(hass)
     await loader.initialize()

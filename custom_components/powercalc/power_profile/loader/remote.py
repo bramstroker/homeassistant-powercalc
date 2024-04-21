@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -84,7 +85,7 @@ class RemoteLoader(Loader):
             needs_update = True
 
         if path_exists:
-            remote_modification_time = model_info.get("update_timestamp", time.time())
+            remote_modification_time = self._get_remote_modification_time(model_info)
             local_modification_time = self._get_local_modification_time(storage_path)
             if remote_modification_time > local_modification_time:
                 _LOGGER.debug("Remote profile is newer than local profile")
@@ -124,6 +125,13 @@ class RemoteLoader(Loader):
         times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
         times.sort(reverse=True)
         return times[0] if times else 0
+
+    @staticmethod
+    def _get_remote_modification_time(model_info: dict) -> float:
+        remote_modification_time = model_info.get("updated_at", time.time())
+        if isinstance(remote_modification_time, str):
+            remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
+        return remote_modification_time
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """
