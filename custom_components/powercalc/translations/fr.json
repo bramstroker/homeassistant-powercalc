@@ -121,13 +121,13 @@
                     "autostart": "Démarrage automatique",
                     "playbooks": "Playbooks",
                     "repeat": "Répéter",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
                     "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogram1 : washing_machine/program1.csv",
                     "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configuration Playbook"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Répéter",
                     "standby_power": "Consommation en veille",
                     "states_power": "Etats de puissance",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Sous-groupes",
                     "unavailable_power": "Alimentation indisponible",
                     "unit_of_measurement": "Unité de mesure",
@@ -303,6 +304,7 @@
                     "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",
                     "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
                     "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
                     "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible",
                     "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."

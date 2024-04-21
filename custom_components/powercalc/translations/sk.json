@@ -121,13 +121,13 @@
                     "autostart": "Autoštart",
                     "playbooks": "Playbooky",
                     "repeat": "Opakovať",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
                     "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook konfigurácia"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Opakovať",
                     "standby_power": "Napájanie v pohotovostnom režime",
                     "states_power": "Výkonové stavy",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Podskupiny",
                     "unavailable_power": "Nedostupný výkon",
                     "unit_of_measurement": "Jednotka merania",
@@ -303,6 +304,7 @@
                     "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
                     "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
                     "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",
                     "unavailable_power": "Výkon vo W na zaznamenanie, keď má zdrojová entita nedostupný stav",
                     "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jednu tarifu."

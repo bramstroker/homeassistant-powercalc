@@ -121,13 +121,13 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbook'i",
                     "repeat": "Powtarzaj",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
                     "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
                     "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Konfiguracja Playbook'ów"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Powtarzaj",
                     "standby_power": "Moc w trybie czuwania",
                     "states_power": "Moce stanów",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Podgrupy",
                     "unavailable_power": "Wartość mocy dla niedostęności",
                     "unit_of_measurement": "Jednostka pomiaru",
@@ -303,6 +304,7 @@
                     "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
                     "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
                     "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy",
                     "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
                     "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."

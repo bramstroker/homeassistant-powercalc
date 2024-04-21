@@ -1,17 +1,17 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Der Sensor ist bereits konfiguriert, geben Sie eine Unique-Id an"
+            "already_configured": "Der Sensor ist bereits konfiguriert, bitte eine einzigartige ID angeben"
         },
         "error": {
-            "daily_energy_mandatory": "Sie müssen mindestens Value oder Valuetemplate angeben",
+            "daily_energy_mandatory": "Du musst mindestens einen Wert oder ein Werte-Template angeben",
             "entity_mandatory": "Die Auswahl einer Entität ist für jede Strategie mit Ausnahme des Playbooks erforderlich",
-            "fixed_mandatory": "Sie müssen mindestens Leistung, Leistung-Template oder Leistung je Zustand angeben",
+            "fixed_mandatory": "Du musst mindestens Leistung, Leistungs-Template oder Leistung je Zustand angeben",
             "fixed_states_power_only": "Diese Entität kann nur mit Leistung je Zustand und nicht mit Leistung arbeiten",
-            "group_mandatory": "Sie müssen mindestens Untergruppen oder Leistung- und Energie-Entitäten definieren",
-            "linear_mandatory": "Sie müssen mindestens Minimale Leistung oder Kalibrierungswert angeben",
-            "linear_min_higher_as_max": "Maximale Leistung kann nicht niedriger sein als Minimale Leistung",
-            "linear_unsupported_domain": "Die Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Sie können jedoch die Kalibrierungsoption verwenden",
+            "group_mandatory": "Du musst mindestens Untergruppen oder Leistungs- und Energie-Entitäten definieren",
+            "linear_mandatory": "Du musst mindestens die minimale Leistung oder den Kalibrierungswert angeben",
+            "linear_min_higher_as_max": "Die maximale Leistung kann nicht niedriger als die minimale Leistung sein",
+            "linear_unsupported_domain": "Die Domäne der Entität wird für den linearen Modus nicht unterstützt. Muss einer der folgenden Werte sein: Ventilator, Licht oder Mediaplayer. Du kannst jedoch die Kalibrierungsoption verwenden",
             "lut_unsupported_color_mode": "Das LUT-Profil unterstützt einen der Farbmodi Ihres Lichts nicht. Siehe in die Logs für weitere Informationen",
             "lut_wrong_domain": "Nur Licht Entitäten können den LUT Modus verwenden",
             "playbook_mandatory": "Sie müssen mindestens ein Playbook angeben",
@@ -73,7 +73,7 @@
                     "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
                     "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
                     "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+                    "include_non_powercalc_sensors": "Lege fest, ob nicht-powercalc-Sensoren bei Verwendung der Bereichs-Option mit einbezogen werden sollen",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
                 },
                 "title": "Einen Gruppensensor erstellen"
@@ -121,13 +121,13 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbook",
                     "repeat": "Wiederholen",
-                    "state_trigger": "Status Auslöser"
+                    "states_trigger": "Status Auslöser"
                 },
                 "data_description": {
                     "autostart": "Geben Sie an, wenn ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
                     "playbooks": "Geben Sie in jeder Zeile ein Playbook ein. Example\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook-Konfiguration"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Wiederholen",
                     "standby_power": "Standby-Leistung",
                     "states_power": "Leistung je Zustand",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Untergruppen",
                     "unavailable_power": "Leistung im Status 'nicht verfügbar'",
                     "unit_of_measurement": "Maßeinheit",
@@ -303,6 +304,7 @@
                     "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
                     "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
                     "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
                     "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
                     "utility_meter_tariffs": "Eine Liste der unterstützten Tarife, leer lassen, wenn nur ein einziger Tarif benötigt wird."

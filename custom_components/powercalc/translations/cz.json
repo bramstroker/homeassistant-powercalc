@@ -121,13 +121,13 @@
                     "autostart": "Autostart",
                     "playbooks": "Playbooks",
                     "repeat": "Opakovat",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
                     "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook config"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Opakovat",
                     "standby_power": "Standby power",
                     "states_power": "States power",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Podskupiny",
                     "unavailable_power": "Unavailable power",
                     "unit_of_measurement": "Jednotka měření",
@@ -303,6 +304,7 @@
                     "power_template": "Template will be evaluated to get the power value in W",
                     "repeat": "Toggle when you want to keep repeating the playbook after it completes",
                     "states_power": "One 'state: power' pair on each row, see example above",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
                     "unavailable_power": "Power in W to record when the source entity has an unavailable state",
                     "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."

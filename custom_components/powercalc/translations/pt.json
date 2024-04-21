@@ -121,13 +121,13 @@
                     "autostart": "Iniciar automaticamente",
                     "playbooks": "Gravações",
                     "repeat": "Repetir",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indicar para iniciar uma determinada sequência quando o HA inicia. Ex: 'program1'",
                     "playbooks": "Introduza uma sequência em cada linha. Exemplo\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Alternar se pretende que a sequência reinicie e repita após terminar",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configuração de Sequência"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Repetir",
                     "standby_power": "Energia em espera",
                     "states_power": "Potência dos Estados",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Subgrupos",
                     "unavailable_power": "Potência indisponível",
                     "unit_of_measurement": "Unidade de medida",
@@ -303,6 +304,7 @@
                     "power_template": "O modelo será avaliado para obter o valor da potência em W",
                     "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
                     "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
                     "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível",
                     "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."

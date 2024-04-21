@@ -121,13 +121,13 @@
                     "autostart": "Pornire automată",
                     "playbooks": "Playbooks",
                     "repeat": "Repeta",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
                     "playbooks": "Introduceți un manual pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Configurare Playbook"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Repeta",
                     "standby_power": "Putere in Standby",
                     "states_power": "Putere de stare",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Subgrupuri",
                     "unavailable_power": "Putere indisponibilă",
                     "unit_of_measurement": "Unitate de măsură",
@@ -303,6 +304,7 @@
                     "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
                     "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
                     "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
                     "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
                     "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."

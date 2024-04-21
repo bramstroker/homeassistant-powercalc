@@ -121,13 +121,13 @@
                     "autostart": "Starta automatiskt",
                     "playbooks": "Playbooks",
                     "repeat": "Repetera",
-                    "state_trigger": "State trigger"
+                    "states_trigger": "State trigger"
                 },
                 "data_description": {
                     "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
                     "playbooks": "Lägg in en playbook per linje. Exempel \n\nprogram1: washing_machine/program1.csv",
                     "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
-                    "state_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
                 },
                 "title": "Playbook config"
             },
@@ -277,6 +277,7 @@
                     "repeat": "Repetera",
                     "standby_power": "Standby effekt",
                     "states_power": "Effekttillstånd",
+                    "states_trigger": "State trigger",
                     "sub_groups": "Undergrupper",
                     "unavailable_power": "Otillgänglig effekt",
                     "unit_of_measurement": "Mätenhet",
@@ -303,6 +304,7 @@
                     "power_template": "Mall för att beräkna effekten i W",
                     "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
                     "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
+                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
                     "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
                     "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
                     "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
