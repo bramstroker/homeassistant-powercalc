@@ -5,9 +5,11 @@ on:
   push:
     paths:
       - '**.py'
+      - 'poetry.lock'
   pull_request:
     paths:
       - '**.py'
+      - 'poetry.lock'
 
 jobs:
   mypy:
