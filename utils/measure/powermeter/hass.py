@@ -16,7 +16,7 @@ class HassPowerMeter(PowerMeter):
         self._entity_id: str | None = None
         try:
             self.client = Client(api_url, token, cache_session=False)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}") from e
 
     def get_power(self) -> PowerMeasurementResult:
