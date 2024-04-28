@@ -4,6 +4,7 @@ import glob
 import json
 import math
 import os
+import git
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -134,7 +135,7 @@ def get_model_list() -> list[dict]:
             model_directory = os.path.dirname(json_path)
             model_data: dict = json.load(json_file)
             color_modes = get_color_modes(model_directory, DATA_DIR, model_data)
-            updated_at = datetime.fromtimestamp(get_local_modification_time(model_directory)).isoformat()
+            updated_at = get_last_commit_time(model_directory).isoformat()
             model_data.update(
                 {
                     "model": os.path.basename(model_directory),
@@ -174,11 +175,14 @@ def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
     return None
 
 
-def get_local_modification_time(folder: str) -> float:
-    """Get the latest modification time of the local profile directory."""
-    times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
-    times.sort(reverse=True)
-    return math.floor(times[0] if times else 0)
+def get_last_commit_time(directory: str) -> datetime:
+    repo = git.Repo(directory, search_parent_directories=True)
+    commits = list(repo.iter_commits(paths=directory))
+    if commits:
+        last_commit = commits[0]
+        return last_commit.committed_datetime
+    else:
+        return datetime.fromtimestamp(0)
 
 
 model_list = get_model_list()
