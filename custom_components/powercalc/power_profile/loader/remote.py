@@ -27,9 +27,11 @@ class RemoteLoader(Loader):
         self.library_contents: dict = {}
         self.model_infos: dict[str, dict] = {}
         self.manufacturer_models: dict[str, list[dict]] = {}
+        self.last_update_time: float | None = None
 
     async def initialize(self) -> None:
         self.library_contents = await self.load_library_json()
+        self.last_update_time = self.get_last_update_time()
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -86,14 +88,14 @@ class RemoteLoader(Loader):
 
         if path_exists:
             remote_modification_time = self._get_remote_modification_time(model_info)
-            local_modification_time = self._get_local_modification_time(storage_path)
-            if remote_modification_time > local_modification_time:
+            if self.last_update_time and remote_modification_time > self.last_update_time:
                 _LOGGER.debug("Remote profile is newer than local profile")
                 needs_update = True
 
         if needs_update:
             try:
                 await self.download_profile(manufacturer, model, storage_path)
+                self.set_last_update_time(time.time())
             except ProfileDownloadError as e:
                 if not path_exists:
                     raise e
@@ -109,6 +111,22 @@ class RemoteLoader(Loader):
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
 
+    def get_last_update_time(self) -> float | None:
+        """Get the last update time of the local library"""
+        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
+        if not os.path.exists(path):
+            return None
+
+        with open(path) as f:
+            return float(f.read())
+
+    def set_last_update_time(self, time: float) -> None:
+        """Set the last update time of the local library"""
+        self.last_update_time = time
+        path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
+        with open(path, "w") as f:
+            f.write(str(time))
+
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
         """Find the model in the library."""
 
@@ -120,18 +138,11 @@ class RemoteLoader(Loader):
                      if string == model.get("id") or string in model.get("aliases", [])), None)
 
     @staticmethod
-    def _get_local_modification_time(folder: str) -> float:
-        """Get the latest modification time of the local profile directory."""
-        times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
-        times.sort(reverse=True)
-        return times[0] if times else 0
-
-    @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
         remote_modification_time = model_info.get("updated_at", time.time())
         if isinstance(remote_modification_time, str):
             remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
-        return remote_modification_time
+        return remote_modification_time  # type: ignore
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """
