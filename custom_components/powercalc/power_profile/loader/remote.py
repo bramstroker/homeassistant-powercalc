@@ -27,11 +27,11 @@ class RemoteLoader(Loader):
         self.library_contents: dict = {}
         self.model_infos: dict[str, dict] = {}
         self.manufacturer_models: dict[str, list[dict]] = {}
-        self.last_update_time = 0
+        self.last_update_time: float | None = None
 
     async def initialize(self) -> None:
         self.library_contents = await self.load_library_json()
-        self.last_update_time: float | None = self.get_last_update_time()
+        self.last_update_time = self.get_last_update_time()
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -140,7 +140,7 @@ class RemoteLoader(Loader):
         remote_modification_time = model_info.get("updated_at", time.time())
         if isinstance(remote_modification_time, str):
             remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
-        return remote_modification_time
+        return remote_modification_time  # type: ignore
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """
