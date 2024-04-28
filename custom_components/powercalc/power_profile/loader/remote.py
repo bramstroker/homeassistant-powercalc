@@ -136,13 +136,6 @@ class RemoteLoader(Loader):
                      if string == model.get("id") or string in model.get("aliases", [])), None)
 
     @staticmethod
-    def _get_local_modification_time(folder: str) -> float:
-        """Get the latest modification time of the local profile directory."""
-        times = [os.path.getmtime(os.path.join(folder, f)) for f in os.listdir(folder)]
-        times.sort(reverse=True)
-        return times[0] if times else 0
-
-    @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
         remote_modification_time = model_info.get("updated_at", time.time())
         if isinstance(remote_modification_time, str):
