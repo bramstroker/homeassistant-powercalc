@@ -95,6 +95,7 @@ class RemoteLoader(Loader):
         if needs_update:
             try:
                 await self.download_profile(manufacturer, model, storage_path)
+                self.set_last_update_time(time.time())
             except ProfileDownloadError as e:
                 if not path_exists:
                     raise e
@@ -121,6 +122,7 @@ class RemoteLoader(Loader):
 
     def set_last_update_time(self, time: float) -> None:
         """Set the last update time of the local library"""
+        self.last_update_time = time
         path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
         with open(path, "w") as f:
             f.write(str(time))

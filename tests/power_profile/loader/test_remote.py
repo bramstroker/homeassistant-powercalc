@@ -226,7 +226,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     shutil.rmtree(local_storage_path, ignore_errors=True)
 
     if exists_locally:
-        loader.set_last_update_time(time.time() - 100)
+        loader.set_last_update_time(time.time())
         await loader.download_profile("signify", "LCA001", local_storage_path)
 
     await loader.load_model("signify", "LCA001")
