@@ -49,6 +49,7 @@ class RemoteLoader(Loader):
     async def load_library_json() -> dict[str, Any]:
         """Load library.json file"""
 
+        _LOGGER.debug("Loading library.json from github")
         async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
             if resp.status != 200:
                 _LOGGER.error("Failed to download library.json from github, falling back to local copy")
@@ -150,7 +151,7 @@ class RemoteLoader(Loader):
         Saves the profile to manufacturer/model directory in .storage/powercalc_profiles folder
         """
 
-        _LOGGER.info("Downloading profile: %s/%s from github", manufacturer, model)
+        _LOGGER.debug("Downloading profile: %s/%s from github", manufacturer, model)
 
         endpoint = f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}"
 
