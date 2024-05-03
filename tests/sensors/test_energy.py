@@ -324,7 +324,7 @@ async def test_unit_prefix_none(hass: HomeAssistant) -> None:
         dt.utcnow() + timedelta(hours=1),
     )
 
-    hass.states.async_set("sensor.test_power", "50.00")
+    hass.states.async_set("sensor.test_power", "50.00", {ATTR_UNIT_OF_MEASUREMENT: "W"})
 
     await hass.async_block_till_done()
 
@@ -346,7 +346,7 @@ async def test_unit_prefix_kwh_default(hass: HomeAssistant) -> None:
         dt.utcnow() + timedelta(hours=1),
     )
 
-    hass.states.async_set("sensor.test_power", "50.00")
+    hass.states.async_set("sensor.test_power", "50.00", {ATTR_UNIT_OF_MEASUREMENT: "W"})
 
     await hass.async_block_till_done()
 
