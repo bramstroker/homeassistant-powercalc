@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import re
+from enum import StrEnum
 from typing import Protocol, cast
 
-from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry
 from homeassistant.helpers.area_registry import AreaEntry
 from homeassistant.helpers.entity_component import EntityComponent
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -26,14 +27,6 @@ from custom_components.powercalc.const import (
     CONF_WILDCARD,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
-
-if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
-    from enum import StrEnum
-else:
-    from homeassistant.backports.enum import StrEnum  # pragma: no cover
-
-from homeassistant.const import CONF_DOMAIN
-from homeassistant.helpers.entity_registry import RegistryEntry
 
 
 class FilterOperator(StrEnum):
