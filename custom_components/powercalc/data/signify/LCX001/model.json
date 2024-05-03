@@ -8,6 +8,6 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.11.7:docker"
     },
-    "name": "LCX001",
+    "name": "Hue Gradient Lightstrip",
     "standby_power": 0.13
 }
