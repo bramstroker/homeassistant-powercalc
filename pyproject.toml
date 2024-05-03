@@ -25,6 +25,10 @@ dependencies = ["homeassistant"]
 testpaths = "tests"
 norecursedirs = ".git"
 asyncio_mode = "auto"
+markers = [
+    "skip_remote_loader_mocking: Do not mock globally registered remote loader mock",
+]
+log_level = "DEBUG"
 
 [tool.isort]
 profile = "black"
@@ -86,7 +90,7 @@ mypy = "1.8.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
 freezegun = "1.4.0"
-pytest-homeassistant-custom-component = "^0.13"
+pytest-homeassistant-custom-component = "0.13.115"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^2.0"
@@ -97,6 +101,7 @@ fnv_hash_fast = "*"
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
+aioresponses = "^0.7.6"
 
 [build-system]
 requires = ["poetry-core"]

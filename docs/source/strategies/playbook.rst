@@ -32,7 +32,8 @@ Configuration options
 +---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
 | repeat        | bool   | **Optional** | false    | Set to ``true`` when you want to restart the playbook after it completes                 |
 +---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
-| state_trigger | dict   | **Optional** |          | Activate a playbook when the entity has a certain state. Mapping of state -> playbook_id |                                                      |
+| state_trigger | dict   | **Optional** |          | Activate a playbook when the entity has a certain state. Mapping of state -> playbook_id |
++---------------+--------+--------------+----------+------------------------------------------------------------------------------------------+
 
 Setup a power sensor with playbook support.
 The example below will create entity ``sensor.washing_machine_power``

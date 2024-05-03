@@ -53,5 +53,4 @@ Blog posts
 - https://indomus.it/progetti/stimare-assorbimenti-e-consumi-elettrici-sulla-domotica-home-assistant-con-powercalc/ (Italian)
 
 .. note::
-
-Did you also make a Youtube video or textual tutorial please let me in discussions section and I'll happily include it here.
+    Did you also make a Youtube video or textual tutorial please let me in discussions section and I'll happily include it here.

@@ -344,7 +344,7 @@
 |amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |A2U21SRK4QGSE1<br />B7W644                    |0.90|
 |amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |A32DOYMUN6DTXA<br />A1RABVCI4QCIKC<br />C78MP8|1.75|
 |apple        |HomePod Mini                     |Apple HomePod Mini                      |                                              |0.65|
-|apple        |MQJ83                            |Apple HomePod Gen 2                     |                                              |1.01|
+|apple        |MQJ83                            |Apple HomePod Gen 2                     |HomePod (gen 2)                               |1.01|
 |bose         |416776                           |Bose SoundTouch 10                      |                                              |1.50|
 |bose         |767520-2100                      |Bose SoundTouch 300                     |                                              |1.50|
 |denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                        |3.99|

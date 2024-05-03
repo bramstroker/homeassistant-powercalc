@@ -1,8 +1,0 @@
-{
-    "name": "Hue White and Color Ambiance Candle E12",
-    "calculation_strategy": "lut",
-    "measure_method": "script",
-    "measure_device": "Shelly Plug S",
-    "measure_description": "Used script utils/measure_shelly.py from repository",
-    "standby_power": 0.35
-}

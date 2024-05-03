@@ -1,8 +1,0 @@
-{
-    "measure_device": "Sonoff DualR3",
-    "measure_description": "Took several readings on every 10% of the lamp and did a linear regression to estimate the correct consumptions. Standby power is assumed",
-    "measure_method": "script",
-    "name": "Sonoff B02 Light with dimmer and temperature",
-    "standby_power": 0.4,
-    "calculation_strategy": "lut"
-}

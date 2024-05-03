@@ -1,9 +1,0 @@
-{
-    "measure_device": "Shelly Plug S",
-    "measure_method": "script",
-    "name": "Hue Bloom Table Lamp",
-    "standby_power": 0.3,
-    "calculation_strategy": "lut",
-    "aliases": []
-}
-

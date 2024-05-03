@@ -158,7 +158,7 @@ async def create_virtual_power_sensor(
             except ModelNotSupportedError as err:
                 if not is_fully_configured(sensor_config):
                     _LOGGER.error(
-                        "%s: Skipping sensor setup %s",
+                        "%s: Skipping sensor setup: %s",
                         source_entity.entity_id,
                         err,
                     )

@@ -30,7 +30,7 @@ from .const import (
 from .errors import ModelNotSupportedError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo
-from .power_profile.power_profile import DEVICE_DOMAINS, PowerProfile
+from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -203,7 +203,7 @@ class DiscoveryManager:
         if entity_entry.disabled:
             return False
 
-        if entity_entry.domain not in DEVICE_DOMAINS.values():
+        if entity_entry.domain not in DOMAIN_DEVICE_TYPE:
             return False
 
         if entity_entry.entity_category in [

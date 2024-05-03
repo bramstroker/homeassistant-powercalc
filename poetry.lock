@@ -178,6 +178,20 @@ files = [
 ]
 
 [[package]]
+name = "aioresponses"
+version = "0.7.6"
+description = "Mock out requests made by ClientSession from aiohttp package"
+optional = false
+python-versions = "*"
+files = [
+    {file = "aioresponses-0.7.6-py2.py3-none-any.whl", hash = "sha256:d2c26defbb9b440ea2685ec132e90700907fd10bcca3e85ec2f157219f0d26f7"},
+    {file = "aioresponses-0.7.6.tar.gz", hash = "sha256:f795d9dbda2d61774840e7e32f5366f45752d1adc1b74c9362afd017296c7ee1"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.3.0,<4.0.0"
+
+[[package]]
 name = "aiosignal"
 version = "1.3.1"
 description = "aiosignal: a list of registered asynchronous callbacks"
@@ -370,13 +384,13 @@ dbus-fast = {version = ">=1.14.0", markers = "platform_system == \"Linux\""}
 
 [[package]]
 name = "bluetooth-adapters"
-version = "0.19.0"
+version = "0.19.1"
 description = "Tools to enumerate and find Bluetooth Adapters"
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "bluetooth_adapters-0.19.0-py3-none-any.whl", hash = "sha256:a40acddcdf740e2774b2581c7a42cb63b0b5a6aa5c4cb3e86d358ebc53b061d7"},
-    {file = "bluetooth_adapters-0.19.0.tar.gz", hash = "sha256:0e6a502470d366f19db94870a217438db413c129049735c2dd97f8aafc3a91af"},
+    {file = "bluetooth_adapters-0.19.1-py3-none-any.whl", hash = "sha256:f14efaa916f31d6324697e77eca1b986c4d784ca47b234dc7b66e86ffa2cf2c0"},
+    {file = "bluetooth_adapters-0.19.1.tar.gz", hash = "sha256:0ca29a1b310b2a881462b97965873f1c2802bc1d70528f2820b0f85d71d933b0"},
 ]
 
 [package.dependencies]
@@ -453,17 +467,17 @@ docs = ["Sphinx (>=5.0,<6.0)", "myst-parser (>=0.18,<0.19)", "sphinx-rtd-theme (
 
 [[package]]
 name = "boto3"
-version = "1.34.93"
+version = "1.34.97"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.93-py3-none-any.whl", hash = "sha256:b59355bf4a1408563969526f314611dbeacc151cf90ecb22af295dcc4fe18def"},
-    {file = "boto3-1.34.93.tar.gz", hash = "sha256:e39516e4ca21612932599819662759c04485d53ca457996a913163da11f052a4"},
+    {file = "boto3-1.34.97-py3-none-any.whl", hash = "sha256:6c8125310005255ea998bccc3e8353b4df81a96ab105c89c118461f6c54c07c8"},
+    {file = "boto3-1.34.97.tar.gz", hash = "sha256:60e5dda0b29805fb410bfda1d98e898edaebedac0e6983e9c57cb88e44dfa64e"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.93,<1.35.0"
+botocore = ">=1.34.97,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -472,13 +486,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.93"
+version = "1.34.97"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.93-py3-none-any.whl", hash = "sha256:6fbd5a53a2adc9b3d4ebd90ae0ede83a91a41d96231f8a5984051f75495f246d"},
-    {file = "botocore-1.34.93.tar.gz", hash = "sha256:79d39b0b87e962991c6dd55e78ce15155099f6fb741be88b1b8a456a702cc150"},
+    {file = "botocore-1.34.97-py3-none-any.whl", hash = "sha256:c98b1272e377c69e167cc68c0f2c9c79bc7a6098775eecdad41ee5a28de69324"},
+    {file = "botocore-1.34.97.tar.gz", hash = "sha256:e421b592add68547ed141643c8a8b4aa819a07059b85efd72e89b6758c956420"},
 ]
 
 [package.dependencies]
@@ -1000,13 +1014,13 @@ testing = ["hatch", "pre-commit", "pytest", "tox"]
 
 [[package]]
 name = "filelock"
-version = "3.13.4"
+version = "3.14.0"
 description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "filelock-3.13.4-py3-none-any.whl", hash = "sha256:404e5e9253aa60ad457cae1be07c0f0ca90a63931200a47d9b6a6af84fd7b45f"},
-    {file = "filelock-3.13.4.tar.gz", hash = "sha256:d13f466618bfde72bd2c18255e269f72542c6e70e7bac83a0232d6b1cc5c8cf4"},
+    {file = "filelock-3.14.0-py3-none-any.whl", hash = "sha256:43339835842f110ca7ae60f1e1c160714c5a6afd15a2873419ab185334975c0f"},
+    {file = "filelock-3.14.0.tar.gz", hash = "sha256:6ea72da3be9b8c82afd3edcf99f2fffbb5076335a5ae4d03248bb5b6c3eae78a"},
 ]
 
 [package.extras]
@@ -1247,27 +1261,27 @@ files = [
 
 [[package]]
 name = "habluetooth"
-version = "2.8.0"
+version = "3.0.1"
 description = "High availability Bluetooth"
 optional = false
 python-versions = "<3.13,>=3.11"
 files = [
-    {file = "habluetooth-2.8.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:d200bed6fad4109b7e9623aa795b1d184c07cfa31efe9e4cd4ea23b5f6693a70"},
-    {file = "habluetooth-2.8.0-cp311-cp311-manylinux_2_17_i686.manylinux_2_5_i686.manylinux1_i686.manylinux2014_i686.whl", hash = "sha256:06bb069771e76d0e2d8d630c9b47ff7453939edeb3d956c002c78a82d7983c3f"},
-    {file = "habluetooth-2.8.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:560b4c37d50f8158c2ef0c06cf2a38bd962e7491b9acc95e2a9d5b8a08d833ad"},
-    {file = "habluetooth-2.8.0-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:0ea6b7693db83728bb84ebb86de6e7bc3c03099f7793a8d7b22fa829dc0d65b5"},
-    {file = "habluetooth-2.8.0-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:c046fb715bdb90dae036c0d17a24960fc62b6b129909ae3a363f3c43b8192fa2"},
-    {file = "habluetooth-2.8.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:38e7a22e75ea507e5da9c1ea9c7d2f99f4799b1897bc3b904eff1abcdca7112b"},
-    {file = "habluetooth-2.8.0-cp311-cp311-win32.whl", hash = "sha256:60bf6e65b2ba29f2936ba089203e3dcd5da99890566b6988a71f112dbdd1ea23"},
-    {file = "habluetooth-2.8.0-cp311-cp311-win_amd64.whl", hash = "sha256:fc068314588e061788674369cc90d5183748c8f22aac897c7f4e87664c5f07f0"},
-    {file = "habluetooth-2.8.0-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:3c6076592489f04e3330dd460086be8ae1807d5c15b920309585cccd0d4897af"},
-    {file = "habluetooth-2.8.0-cp312-cp312-manylinux_2_17_i686.manylinux_2_5_i686.manylinux1_i686.manylinux2014_i686.whl", hash = "sha256:3513dea48cb0b7469992bd01dbd6b0afb215a3d098fdf3fa21eab3a252c3c8bf"},
-    {file = "habluetooth-2.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:85f8643dc97693c7a8a4b32844308e7e245664c3b2254f93b6c5e52e8e92df3c"},
-    {file = "habluetooth-2.8.0-cp312-cp312-musllinux_1_1_i686.whl", hash = "sha256:de6124a049d38c589513b62f6a0e0767db6404bee5e1df61d8c67d4d4faea021"},
-    {file = "habluetooth-2.8.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:c76569931f7402a4377e6a078ef7cfc022c05f37fb73c42805c7ac09951e032f"},
-    {file = "habluetooth-2.8.0-cp312-cp312-win32.whl", hash = "sha256:5ef4f2ca8b49a72db2e0bd778eb18678a03afb120ad269b16dd223679a397ada"},
-    {file = "habluetooth-2.8.0-cp312-cp312-win_amd64.whl", hash = "sha256:392c7102d07f4aad7a96d5e01ec1f841f977e06c936d4e12d25c4b3cf9250e9b"},
-    {file = "habluetooth-2.8.0.tar.gz", hash = "sha256:253c46d11f45c229a7d6ae9ded3006a72cd80aaea05f951d249d51233c8e2067"},
+    {file = "habluetooth-3.0.1-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:8ecbdb3dddb396afce0abb368aa75a3b0bcb755cd269ba0ffba08d3363031579"},
+    {file = "habluetooth-3.0.1-cp311-cp311-manylinux_2_17_i686.manylinux_2_5_i686.manylinux1_i686.manylinux2014_i686.whl", hash = "sha256:78e809dc2048677bbab6ce9e918ab902535ee842593173eed12546e1cf887ea2"},
+    {file = "habluetooth-3.0.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c0b6f8295656cdf7f4d050e4addddb1229c82be9f15257599e81dc060faa7582"},
+    {file = "habluetooth-3.0.1-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:a77ce89025048b80272b61d29714ef70bc49077ca60206a18afd3a99dc0d92a4"},
+    {file = "habluetooth-3.0.1-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:98b2ce5f553741e6a6700999bf1a5c98ab541b569c51c7405a04d32de489ec59"},
+    {file = "habluetooth-3.0.1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:73c48b7a67d7ac61968e5be0981feb3602837c6b1b892e8c3721446de8f086b2"},
+    {file = "habluetooth-3.0.1-cp311-cp311-win32.whl", hash = "sha256:c594b13cef85f707b0f8928a931c4c16e3dc52054f1d66146acc4c1349453a50"},
+    {file = "habluetooth-3.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:7d71466481617d1551ae500b41349568f07bcdf86e6ceb936a3bff1e7aa33248"},
+    {file = "habluetooth-3.0.1-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:9d80664d2f5b88e57e62447e92ee110dc6d367c7f749b12fba1667f13b8f7ea1"},
+    {file = "habluetooth-3.0.1-cp312-cp312-manylinux_2_17_i686.manylinux_2_5_i686.manylinux1_i686.manylinux2014_i686.whl", hash = "sha256:7b9767d3998236153e6e5ed5d0cefffb08c4a406c00c9f33407faefd94b5adcb"},
+    {file = "habluetooth-3.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:82bd9c80ac599909facbbb127b5bbe70d72de81f35e97ab653b0bda249fe643c"},
+    {file = "habluetooth-3.0.1-cp312-cp312-musllinux_1_1_i686.whl", hash = "sha256:fb02d36b70dd08d72a6586ea0ac67e8325df6d8e49c6a0e1731389f82486557e"},
+    {file = "habluetooth-3.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:a0f2c0c13afef40b43626801f3bc5204926488c8b3a417f260917dd60eaa0173"},
+    {file = "habluetooth-3.0.1-cp312-cp312-win32.whl", hash = "sha256:2c493f31d677eb2aefde2b03e4898dcc0e2bb81cf8d4761b893e17998e28c0aa"},
+    {file = "habluetooth-3.0.1-cp312-cp312-win_amd64.whl", hash = "sha256:15934a97eae4a1126d85d484a98993f0ef2c47507ef741a68f0b1b3461b6fc9b"},
+    {file = "habluetooth-3.0.1.tar.gz", hash = "sha256:5e2ea9cb3650b3d1000b32a023eaf56b0aa26d1b7dce506aa648f7e57089cd15"},
 ]
 
 [package.dependencies]
@@ -3273,13 +3287,13 @@ files = [
 
 [[package]]
 name = "virtualenv"
-version = "20.26.0"
+version = "20.26.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.26.0-py3-none-any.whl", hash = "sha256:0846377ea76e818daaa3e00a4365c018bc3ac9760cbb3544de542885aad61fb3"},
-    {file = "virtualenv-20.26.0.tar.gz", hash = "sha256:ec25a9671a5102c8d2657f62792a27b48f016664c6873f6beed3800008577210"},
+    {file = "virtualenv-20.26.1-py3-none-any.whl", hash = "sha256:7aa9982a728ae5892558bff6a2839c00b9ed145523ece2274fad6f414690ae75"},
+    {file = "virtualenv-20.26.1.tar.gz", hash = "sha256:604bfdceaeece392802e6ae48e69cec49168b9c5f4a44e483963f9242eb0e78b"},
 ]
 
 [package.dependencies]
@@ -3707,4 +3721,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "5aba9021c7467ab671c9b813fa1a1f9b66f377172390632529bb6b96cb4dd59d"
+content-hash = "6619eef96aac847e5840b2a4f85e0200dba049683cc8df0ff6d9968999eea4f8"
