@@ -189,14 +189,14 @@ async def create_utility_meter(
     if "sensor_always_available" in signature.parameters:
         params["sensor_always_available"] = sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) or False
 
-    utility_meter = VirtualUtilityMeter(**params)
+    utility_meter = VirtualUtilityMeter(**params)  # type: ignore[no-untyped-call]
     utility_meter.rounding_digits = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)  # type: ignore
     utility_meter.entity_id = entity_id
 
     return utility_meter
 
 
-class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):  # type: ignore
+class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
 
     @property

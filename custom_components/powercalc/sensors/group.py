@@ -726,13 +726,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
                 entity_state.entity_id,
             )
             cur_state_value = self._get_state_value_in_native_unit(entity_state)
-
-            if prev_state:
-                prev_state_value = self._get_state_value_in_native_unit(prev_state)
-            else:
-                prev_state_value = (
-                    cur_state_value if self._attr_native_value else Decimal(0)
-                )
+            prev_state_value = self._get_state_value_in_native_unit(prev_state) if prev_state else Decimal(0)
             self._prev_state_store.set_entity_state(
                 self.entity_id,
                 entity_state.entity_id,

@@ -12,7 +12,7 @@ inputs:
   poetry_version:
     description: 'Poetry version to use'
     required: false
-    default: '1.7.1'
+    default: '1.8.2'
   cache_dependencies:
     description: 'Whether the dependencies must be cached'
     required: false
