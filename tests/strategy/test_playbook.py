@@ -355,6 +355,16 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
 
     await elapse_and_assert_power(hass, 1, "0.10")
 
+    hass.states.async_set("media_player.sonos", STATE_IDLE)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 2, "5.00")
+
+    hass.states.async_set("media_player.sonos", STATE_OFF)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 1, "0.10")
+
 
 async def elapse_and_assert_power(
     hass: HomeAssistant,

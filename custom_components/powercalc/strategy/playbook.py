@@ -92,6 +92,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
 
         _LOGGER.debug("Activating playbook %s", playbook_id)
         playbook = await self._load_playbook(playbook_id=playbook_id)
+        playbook.queue.reset()
         self._active_playbook = playbook
         self._start_time = dt.utcnow()
 
