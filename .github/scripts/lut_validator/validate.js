@@ -62,7 +62,7 @@ const main = async () => {
         }
     }
 
-    if (errors) {
+    if (errors.length) {
         console.log('There were errors:')
         for (let i = 0; i < errors.length; i++) {
             const error = errors[i]
