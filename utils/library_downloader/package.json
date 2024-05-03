@@ -18,7 +18,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-prom-bundle": "^7.0.0",
-    "pino": "^8.19.0",
+    "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
     "prom-client": "^15.1.1"
   },
