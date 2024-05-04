@@ -1,4 +1,5 @@
 import logging
+import os.path
 from unittest.mock import AsyncMock
 
 import pytest
@@ -148,3 +149,13 @@ async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
     composite_loader: CompositeLoader = library.get_loader()
     has_remote_loader = any(isinstance(loader, RemoteLoader) for loader in composite_loader.loaders)
     assert not has_remote_loader
+
+
+async def test_linked_lut_loading(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    profile = await library.get_profile(ModelInfo("signify", "LCA007"))
+    assert profile.linked_lut == "signify/LCA006"
+
+    assert profile.get_model_directory().endswith("signify/LCA006")
+
+    assert os.path.exists(os.path.join(profile.get_model_directory(), "color_temp.csv.gz"))

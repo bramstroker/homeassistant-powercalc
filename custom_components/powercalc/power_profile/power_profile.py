@@ -23,7 +23,6 @@ from custom_components.powercalc.errors import (
     PowercalcSetupError,
     UnsupportedStrategyError,
 )
-from custom_components.powercalc.helpers import get_library_path
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,9 +70,6 @@ class PowerProfile:
 
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
-        if self.linked_lut:
-            return get_library_path(self.linked_lut)
-
         if root_only:
             return self._directory
 
