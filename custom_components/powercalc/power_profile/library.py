@@ -45,6 +45,13 @@ class ProfileLibrary:
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
             return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
+        library = ProfileLibrary(hass, ProfileLibrary.create_loader(hass))
+        await library.initialize()
+        hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
+        return library
+
+    @staticmethod
+    def create_loader(hass: HomeAssistant) -> Loader:
         loaders: list[Loader] = []
         for data_dir in [
             os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
@@ -59,11 +66,7 @@ class ProfileLibrary:
         if not disable_library_download:
             loaders.append(RemoteLoader(hass))
 
-        loader = CompositeLoader(loaders)
-        library = ProfileLibrary(hass, loader)
-        await library.initialize()
-        hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
-        return library
+        return CompositeLoader(loaders)
 
     async def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
         """Get listing of available manufacturers."""
@@ -134,6 +137,16 @@ class ProfileLibrary:
             result = await loader.load_model(manufacturer, resolved_model)
             if not result:
                 raise LibraryError(f"Model {manufacturer} {resolved_model} not found")
+
+            json_data, directory = result
+            linked_profile = json_data.get("linked_lut")
+            if linked_profile:
+                manufacturer, model = linked_profile.split("/")
+                result = await loader.load_model(manufacturer, model)
+                if not result:
+                    raise LibraryError(f"Linked model {manufacturer} {model} not found")
+                directory = result[1]
+
         except LibraryError as e:
             _LOGGER.error("Problem loading model: %s", e)
             return None
@@ -142,8 +155,8 @@ class ProfileLibrary:
             self._hass,
             manufacturer=manufacturer,
             model=resolved_model,
-            directory=result[1],
-            json_data=result[0],
+            directory=directory,
+            json_data=json_data,
         )
         # When the power profile supplies multiple sub profiles we select one by default
         if not profile.sub_profile and profile.sub_profile_select:
