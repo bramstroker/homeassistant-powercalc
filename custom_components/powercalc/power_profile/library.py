@@ -45,7 +45,7 @@ class ProfileLibrary:
         if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
             return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
 
-        library = ProfileLibrary(hass, ProfileLibrary.create_loader())
+        library = ProfileLibrary(hass, ProfileLibrary.create_loader(hass))
         await library.initialize()
         hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
         return library
