@@ -41,6 +41,7 @@ def mock_library_json_response(mock_aioresponse: aioresponses) -> None:
 @pytest.fixture
 async def remote_loader(hass: HomeAssistant, mock_library_json_response: None) -> RemoteLoader:
     loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
     await loader.initialize()
     return loader
 
@@ -135,6 +136,7 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
     mock_aioresponse.get(
         f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
         status=500,
+        repeat=True,
     )
 
     with pytest.raises(ProfileDownloadError):
@@ -151,24 +153,58 @@ async def test_exception_is_raised_on_connection_error(mock_aioresponse: aioresp
 
 
 async def test_exception_is_raised_on_github_resource_unavailable(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
+    manufacturer = "signify"
+    model = "LCA001"
+    storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(storage_path)
+
     remote_file = {
         "path": "color_temp.csv.gz",
         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz",
     }
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
         status=200,
         payload=[remote_file],
+        repeat=True,
     )
 
     mock_aioresponse.get(
         remote_file["url"],
         status=500,
+        repeat=True,
     )
 
+    remote_loader.retry_timeout = 0
     with pytest.raises(ProfileDownloadError):
-        await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))
+        await remote_loader.load_model(manufacturer, model)
+
+
+async def test_eventual_success_after_download_retry(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
+    manufacturer = "signify"
+    model = "LCA001"
+    storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(storage_path)
+
+    remote_file = {
+        "path": "color_temp.csv.gz",
+        "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz",
+    }
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
+        status=200,
+        payload=[remote_file],
+        repeat=True,
+    )
+
+    mock_aioresponse.get(remote_file["url"], status=500)
+    mock_aioresponse.get(remote_file["url"], status=200)
+
+    await remote_loader.download_with_retry(manufacturer, model, storage_path)
+
+    assert os.path.exists(storage_path)
 
 
 @pytest.mark.parametrize(
@@ -223,7 +259,7 @@ async def test_profile_redownloaded_when_newer_version_available(
     # Clean local directory first so we have consistent test results
     # When scenario exists_locally=True, we download the profile first, to fake the local existence
     local_storage_path = loader.get_storage_path("signify", "LCA001")
-    shutil.rmtree(local_storage_path, ignore_errors=True)
+    clear_storage_dir(local_storage_path)
 
     if exists_locally:
         loader.set_last_update_time(time.time())
@@ -256,21 +292,34 @@ async def test_fallback_to_local_profile(
     hass: HomeAssistant,
     mock_aioresponse: aioresponses,
     mock_library_json_response: None,
+    remote_loader: RemoteLoader,
 ) -> None:
-    loader = RemoteLoader(hass)
-    await loader.initialize()
-
-    local_storage_path = loader.get_storage_path("signify", "LCA001")
-    shutil.rmtree(local_storage_path, ignore_errors=True)
-    shutil.copytree(get_library_path("signify/LCA001"), local_storage_path)
+    manufacturer = "signify"
+    model = "LCA001"
+    local_storage_path = remote_loader.get_storage_path(manufacturer, model)
+    clear_storage_dir(local_storage_path)
+    shutil.copytree(get_library_path(f"{manufacturer}/{model}"), local_storage_path)
 
     mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
+        f"{ENDPOINT_DOWNLOAD}/{manufacturer}/{model}",
         status=500,
         repeat=True,
     )
 
-    await loader.load_model("signify", "LCA001")
+    await remote_loader.load_model(manufacturer, model, force_update=True)
+
+
+async def test_profile_redownloaded_when_model_json_missing(
+    hass: HomeAssistant,
+    remote_loader: RemoteLoader,
+    mock_download_profile_endpoints: list[dict],
+) -> None:
+    local_storage_path = remote_loader.get_storage_path("signify", "LCA001")
+    shutil.rmtree(local_storage_path, ignore_errors=True)
+    os.makedirs(local_storage_path)
+
+    (__, storage_path) = await remote_loader.load_model("signify", "LCA001")
+    assert storage_path == local_storage_path
 
 
 async def test_find_model(remote_loader: RemoteLoader) -> None:
@@ -278,7 +327,7 @@ async def test_find_model(remote_loader: RemoteLoader) -> None:
     assert model == "MQJ83"
 
 
-async def _create_loader(hass: HomeAssistant) -> RemoteLoader:
-    loader = RemoteLoader(hass)
-    await loader.initialize()
-    return loader
+def clear_storage_dir(storage_path: str) -> None:
+    if not os.path.exists(storage_path):
+        return
+    shutil.rmtree(storage_path, ignore_errors=True)

@@ -1,6 +1,6 @@
 import logging
 import os.path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant
@@ -159,3 +159,26 @@ async def test_linked_lut_loading(hass: HomeAssistant) -> None:
     assert profile.get_model_directory().endswith("signify/LCA006")
 
     assert os.path.exists(os.path.join(profile.get_model_directory(), "color_temp.csv.gz"))
+
+
+async def test_linked_profile_loading_failed(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    library = await ProfileLibrary.factory(hass)
+
+    remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
+    with patch(f"{remote_loader_class}.load_model") as mock_load_model:
+        async def async_load_model_patch(manufacturer: str, __: str) -> tuple[dict, str] | None:
+            if manufacturer == "foo":
+                return None
+
+            return {
+                "manufacturer": "signify",
+                "model": "LCA001",
+                "linked_lut": "foo/bar",
+            }, ""
+
+        mock_load_model.side_effect = async_load_model_patch
+
+        await library.get_profile(ModelInfo("signify", "LCA001"))
+
+        assert "Linked model foo bar not found" in caplog.text
