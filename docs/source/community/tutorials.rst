@@ -42,6 +42,14 @@ French:
         <iframe width="300" height="200" src="https://www.youtube.com/embed/WwaSbhdrsaM?si=0XoFTBEUYEkm0FGk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 
+Spanish:
+
+.. raw:: html
+
+    <div style="display: flex; gap: 10px;">
+        <iframe width="300" height="200" src="https://www.youtube.com/embed/TY5mLKSKsdA?si=mCE4YaVw2kuTOThD" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+
 
 Blog posts
 ----------
