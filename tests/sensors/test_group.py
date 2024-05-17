@@ -937,12 +937,12 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
-            CONF_GROUP: "non-existing-config-entry-id",
+            CONF_GROUP: "1l3b47ropjnksgkd1rh30e8opvqwnngt",
         },
     )
 
     assert (
-        "ConfigEntry Mock Title: Cannot add/remove to group non-existing-config-entry-id. It does not exist"
+        "ConfigEntry Mock Title: Cannot add/remove to group 1l3b47ropjnksgkd1rh30e8opvqwnngt. It does not exist"
         in caplog.text
     )
 

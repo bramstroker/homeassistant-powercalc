@@ -13,6 +13,8 @@ from custom_components.powercalc import SensorType
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_GROUP,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_ON_TIME,
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
@@ -160,3 +162,32 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert config_entry.data[CONF_UTILITY_METER_TARIFFS] == ["peak"]
+
+
+async def test_add_to_group(hass: HomeAssistant) -> None:
+    group_entry = create_mock_entry(
+        hass,
+        {
+            CONF_NAME: "My group",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+        },
+    )
+
+    result = await select_sensor_type(hass, SensorType.DAILY_ENERGY)
+
+    user_input = {
+        CONF_NAME: "My daily energy sensor",
+        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+        CONF_VALUE: 10,
+        CONF_GROUP: group_entry.entry_id,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_GROUP] == group_entry.entry_id
+    config_entry: ConfigEntry = result["result"]
+
+    group_entry = hass.config_entries.async_get_entry(group_entry.entry_id)
+    assert config_entry.entry_id in group_entry.data[CONF_GROUP_MEMBER_SENSORS]
