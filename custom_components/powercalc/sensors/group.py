@@ -52,6 +52,7 @@ from homeassistant.util.unit_conversion import (
     PowerConverter,
 )
 
+from custom_components.powercalc.config_flow import ConfigFlow
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -287,10 +288,13 @@ async def add_to_associated_group(
 
     group_entry_id = str(config_entry.data.get(CONF_GROUP))
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
-    if not group_entry:
+
+    # When we are not dealing with a uuid, the user has set a group name manually
+    # Create a new group entry for this group
+    if not group_entry and len(group_entry_id) != 32:
         group_entry = ConfigEntry(
-            version=config_entry.version,
-            minor_version=config_entry.minor_version,
+            version=ConfigFlow.VERSION,
+            minor_version=ConfigFlow.MINOR_VERSION,
             domain=DOMAIN,
             source=SOURCE_IMPORT,
             title=group_entry_id,

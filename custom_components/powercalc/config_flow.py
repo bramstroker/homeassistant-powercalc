@@ -857,7 +857,7 @@ class OptionsFlowHandler(OptionsFlow):
             self._process_user_input(user_input, schema)
 
         if self.sensor_type == SensorType.DAILY_ENERGY:
-            self.current_config.update(_build_daily_energy_config(user_input))
+            self.current_config.update(_build_daily_energy_config(user_input, _create_daily_energy_schema(self.hass)))
 
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             generic_option_schema = SCHEMA_POWER_OPTIONS.extend(
@@ -1030,7 +1030,7 @@ def _create_virtual_power_schema(
 
 
 def _create_daily_energy_schema(hass: HomeAssistant) -> vol.Schema:
-    return SCHEMA_DAILY_ENERGY.extend(
+    return SCHEMA_DAILY_ENERGY.extend(  # type: ignore
         {
             vol.Optional(CONF_GROUP): _create_group_selector(hass),
         },
@@ -1271,7 +1271,7 @@ def _build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) -
         val = user_input.get(key)
         if val is None:
             continue
-        if key in [CONF_CREATE_UTILITY_METERS, CONF_GROUP]:
+        if key in [CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID]:
             config[key] = val
             continue
 
