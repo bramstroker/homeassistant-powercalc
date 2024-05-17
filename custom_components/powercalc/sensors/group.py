@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -279,7 +279,7 @@ async def add_to_associated_group(
     we need to add this config entry to the group members sensors and update the group.
     """
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
-    if sensor_type != SensorType.VIRTUAL_POWER:
+    if sensor_type not in [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY]:
         return None
 
     if CONF_GROUP not in config_entry.data:
@@ -287,6 +287,19 @@ async def add_to_associated_group(
 
     group_entry_id = str(config_entry.data.get(CONF_GROUP))
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
+    if not group_entry:
+        group_entry = ConfigEntry(
+            version=config_entry.version,
+            minor_version=config_entry.minor_version,
+            domain=DOMAIN,
+            source=SOURCE_IMPORT,
+            title=group_entry_id,
+            data={
+                CONF_SENSOR_TYPE: SensorType.GROUP,
+                CONF_NAME: group_entry_id,
+            },
+        )
+        await hass.config_entries.async_add(group_entry)
 
     if not group_entry:
         _LOGGER.warning(

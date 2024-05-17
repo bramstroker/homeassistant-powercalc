@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_FIXED,
+    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -512,3 +513,25 @@ async def test_migrate_entity_to_version_3(hass: HomeAssistant) -> None:
     hass.config_entries.async_get_entry(mock_entry.entry_id)
     assert mock_entry.version == 3
     assert mock_entry.data.get(CONF_CREATE_ENERGY_SENSOR)
+
+
+async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistant) -> None:
+    result = await goto_virtual_power_strategy_step(
+        hass,
+        CalculationStrategy.FIXED,
+        user_input={
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_NAME: "My power sensor",
+            CONF_GROUP: "New group",
+        },
+    )
+    result = await set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_POWER: 20},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+    assert hass.states.get("sensor.new_group_power")
+    assert hass.states.get("sensor.new_group_energy")
