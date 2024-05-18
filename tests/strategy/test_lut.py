@@ -10,17 +10,18 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CalculationStrategy
+from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
+from tests.common import run_powercalc_setup
 
 from .common import create_source_entity
 
@@ -178,23 +179,28 @@ async def test_validation_fails_for_non_light_entities(hass: HomeAssistant) -> N
         await strategy.validate_config()
 
 
-async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant) -> None:
-    with pytest.raises(StrategyConfigurationError):
-        source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
-        strategy_factory = PowerCalculatorStrategyFactory(hass)
+async def test_sensor_unavailable_for_unsupported_color_mode(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.at_level(logging.ERROR)
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LWA009",
+        },
+    )
 
-        library = await ProfileLibrary.factory(hass)
-        power_profile = await library.get_profile(
-            # This model only supports brightness
-            ModelInfo("signify", "LWA017"),
-        )
-        strategy = await strategy_factory.create(
-            config={},
-            strategy=CalculationStrategy.LUT,
-            power_profile=power_profile,
-            source_entity=source_entity,
-        )
-        await strategy.validate_config()
+    hass.states.async_set("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.BRIGHTNESS, ATTR_BRIGHTNESS: 100})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "3.48"
+
+    hass.states.async_set("light.test", STATE_ON, {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+    assert "Lookup table not found for color mode" in caplog.text
 
 
 async def _create_lut_strategy(

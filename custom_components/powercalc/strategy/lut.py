@@ -19,14 +19,12 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     COLOR_MODES_COLOR,
     ColorMode,
-    filter_supported_color_modes,
 )
 from homeassistant.core import State
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.errors import (
     LutFileNotFoundError,
-    ModelNotSupportedError,
     StrategyConfigurationError,
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
@@ -134,8 +132,8 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 color_mode,
             )
         except LutFileNotFoundError:
-            _LOGGER.warning(
-                "%s: Lookup table not found (model: %s, color_mode: %s)",
+            _LOGGER.error(
+                "%s: Lookup table not found for color mode (model: %s, color_mode: %s)",
                 entity_state.entity_id,
                 self._profile.model,
                 color_mode,
@@ -267,24 +265,6 @@ class LutStrategy(PowerCalculationStrategyInterface):
                 "Only light entities can use the LUT mode",
                 "lut_unsupported_color_mode",
             )
-
-        color_modes = self._source_entity.supported_color_modes
-        if not color_modes:
-            return
-        for color_mode in filter_supported_color_modes(color_modes):
-            if color_mode in COLOR_MODES_COLOR:
-                color_mode = ColorMode.HS
-            if color_mode in LUT_COLOR_MODES:
-                try:
-                    await self._lut_registry.get_lookup_dictionary(
-                        self._profile,
-                        color_mode,
-                    )
-                except LutFileNotFoundError:
-                    raise ModelNotSupportedError(  # noqa: B904
-                        f"No lookup file found for mode: {color_mode}",
-                        "lut_unsupported_color_mode",
-                    )
 
 
 @dataclass
