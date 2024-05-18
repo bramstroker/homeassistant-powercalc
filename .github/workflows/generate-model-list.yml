@@ -35,10 +35,15 @@ jobs:
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/master'
         with:
-          add: 'docs/supported_models.md'
-          message: 'Update support model list'
-      - uses: EndBug/add-and-commit@v9
-        if: github.ref == 'refs/heads/master'
-        with:
-          add: 'custom_components/powercalc/data/manufacturer_device_types.json'
-          message: 'Update manufacturer_device_types.json'
+          add: 'docs/supported_models.md profile_library/library.json'
+          message: 'Update profile library'
+      - name: Purge powercalc API memory cache
+        run: |
+          curl -X GET "https://powercalc.lauwbier.nl/api/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
+      - name: Purge cloudflare cache
+        uses: jakejarvis/cloudflare-purge-action@master
+        env:
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
+          PURGE_URLS: '["https://powercalc.lauwbier.nl/api/library"]'

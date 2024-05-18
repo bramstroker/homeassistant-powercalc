@@ -17,7 +17,7 @@ def plot_data(df: pd.DataFrame, color: str) -> None:
 def get_library_file(path: str) -> str:
     return os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        "../../custom_components/powercalc/data/",
+        "../../profile_library/",
         path,
     )
 

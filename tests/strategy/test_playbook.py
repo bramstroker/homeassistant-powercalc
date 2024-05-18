@@ -150,7 +150,7 @@ async def test_turn_off_stops_running_playbook(hass: HomeAssistant) -> None:
     await elapse_and_assert_power(hass, 3, "0.50")
 
 
-async def test_activate_service_raises_error_on_non_playbook_sensor(
+async def test_services_raises_error_on_non_playbook_sensor(
     hass: HomeAssistant,
 ) -> None:
     await run_powercalc_setup(
@@ -176,6 +176,20 @@ async def test_stop_service_raises_error_on_non_playbook_sensor(
 
     with pytest.raises(HomeAssistantError):
         await _stop_playbook(hass)
+
+
+async def test_get_active_playbook_raises_error_on_non_playbook_sensor(
+    hass: HomeAssistant,
+) -> None:
+    await run_powercalc_setup(
+        hass,
+        get_simple_fixed_config("switch.test"),
+    )
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    with pytest.raises(HomeAssistantError):
+        await _get_active_playbook(hass)
 
 
 async def test_repeat(hass: HomeAssistant) -> None:
@@ -330,6 +344,16 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     await elapse_and_assert_power(hass, 2, "2.00")
+
+    hass.states.async_set("media_player.sonos", STATE_IDLE)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 2, "5.00")
+
+    hass.states.async_set("media_player.sonos", STATE_OFF)
+    await hass.async_block_till_done()
+
+    await elapse_and_assert_power(hass, 1, "0.10")
 
     hass.states.async_set("media_player.sonos", STATE_IDLE)
     await hass.async_block_till_done()

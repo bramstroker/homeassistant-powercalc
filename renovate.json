@@ -4,6 +4,7 @@
     "config:recommended"
   ],
   "labels": ["dependencies"],
+  "ignoreDeps": ["mypy"],
   "dependencyDashboard": false,
   "packageRules": [
     {

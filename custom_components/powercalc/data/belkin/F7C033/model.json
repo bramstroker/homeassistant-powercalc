@@ -1,8 +1,0 @@
-{
-    "name": "WeMo smart LED bulb",
-    "standby_power": 0.4,
-    "calculation_strategy": "lut",
-    "measure_method": "manual",
-    "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
-    "measure_description": "Was not able to measure the standby power, the value is assumed"
-}

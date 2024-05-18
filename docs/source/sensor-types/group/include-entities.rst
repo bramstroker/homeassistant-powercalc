@@ -158,7 +158,7 @@ You can also chain nested filter using and / or construction:
                 - wildcard: switch.pond
                 - and:
                   - domain: binary_sensor
-                  - wildcard: *swimming_pool*
+                  - wildcard: "*swimming_pool*"
 
 Exclude non powercalc sensors
 =============================

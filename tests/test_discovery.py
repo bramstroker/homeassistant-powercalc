@@ -318,6 +318,7 @@ async def test_load_model_with_slashes(
         ),
         ("MLI", 45317, "mueller-licht", "45317"),
         ("TP-Link", "KP115(AU)", "tp-link", "KP115"),
+        ("Apple", "HomePod (gen 2)", "apple", "MQJ83"),
     ],
 )
 async def test_autodiscover_model_from_entity_entry(

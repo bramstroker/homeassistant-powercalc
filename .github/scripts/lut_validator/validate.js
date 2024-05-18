@@ -24,7 +24,7 @@ const validColorModeCombinations = [
 ]
 
 const main = async () => {
-    const dataDirectory = path.join(__dirname, '../../../custom_components/powercalc/data')
+    const dataDirectory = path.join(__dirname, '../../../profile_library')
     let errors = []
     for await (const model_dir of readdirp(dataDirectory, {depth: 2, type: 'directories'})) {
         if (!model_dir.path.includes('/')) {
@@ -62,7 +62,7 @@ const main = async () => {
         }
     }
 
-    if (errors) {
+    if (errors.length) {
         console.log('There were errors:')
         for (let i = 0; i < errors.length; i++) {
             const error = errors[i]

@@ -4,21 +4,15 @@ import json
 import logging
 import os
 import re
+from enum import StrEnum
 from typing import NamedTuple, Protocol
-
-from awesomeversion.awesomeversion import AwesomeVersion
-from homeassistant.const import __version__ as HA_VERSION  # noqa
-
-if AwesomeVersion(HA_VERSION) >= AwesomeVersion("2023.8.0"):
-    from enum import StrEnum
-else:
-    from homeassistant.backports.enum import StrEnum  # pragma: no cover
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
+from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
@@ -48,12 +42,12 @@ class SubProfileMatcherType(StrEnum):
     INTEGRATION = "integration"
 
 
-DEVICE_DOMAINS = {
-    DeviceType.CAMERA: CAMERA_DOMAIN,
-    DeviceType.LIGHT: LIGHT_DOMAIN,
-    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
-    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
-    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
+DOMAIN_DEVICE_TYPE = {
+    CAMERA_DOMAIN: DeviceType.CAMERA,
+    LIGHT_DOMAIN: DeviceType.LIGHT,
+    SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
+    MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
+    BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
 }
 
 
@@ -76,33 +70,10 @@ class PowerProfile:
 
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
-        if self.linked_lut:
-            return os.path.join(os.path.dirname(__file__), "../data", self.linked_lut)
-
         if root_only:
             return self._directory
 
         return self._sub_profile_dir or self._directory
-
-    def supports(self, model: str) -> bool:
-        """Check whether this power profile supports a given model ID.
-        Also looks at possible aliases.
-        """
-        model = model.lower().replace("#slash#", "/")
-
-        if self._model.lower() == model:
-            return True
-
-        # @todo implement Regex/Json path
-        for alias in self.aliases:
-            if alias.lower() == model:
-                return True
-
-        # Also try to match model ID between parentheses.
-        if match := re.search(r"\(([^\(\)]+)\)$", model):
-            return self.supports(match.group(1))
-
-        return False
 
     @property
     def manufacturer(self) -> str:
@@ -247,7 +218,9 @@ class PowerProfile:
             and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
-        return DEVICE_DOMAINS[self.device_type] == source_entity.domain
+
+        entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
+        return entity_domain == source_entity.domain
 
 
 class SubProfileSelector:

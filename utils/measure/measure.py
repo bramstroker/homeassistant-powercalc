@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import sys
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -167,6 +168,7 @@ class Measure:
     ) -> None:
         """Write model.json manifest file"""
         json_data = {
+            "created_at": datetime.now().isoformat(),
             "measure_device": measure_device,
             "measure_method": "script",
             "measure_description": "Measured with utils/measure script",

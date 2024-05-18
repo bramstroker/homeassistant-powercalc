@@ -183,7 +183,8 @@ async def test_validation_fails_unsupported_color_mode(hass: HomeAssistant) -> N
         source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.COLOR_TEMP])
         strategy_factory = PowerCalculatorStrategyFactory(hass)
 
-        power_profile = await ProfileLibrary.factory(hass).get_profile(
+        library = await ProfileLibrary.factory(hass)
+        power_profile = await library.get_profile(
             # This model only supports brightness
             ModelInfo("signify", "LWA017"),
         )
@@ -205,7 +206,8 @@ async def _create_lut_strategy(
     if not source_entity:
         source_entity = create_source_entity(LIGHT_DOMAIN)
     strategy_factory = PowerCalculatorStrategyFactory(hass)
-    power_profile = await ProfileLibrary.factory(hass).get_profile(
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
         ModelInfo(manufacturer, model),
     )
     return await strategy_factory.create(
