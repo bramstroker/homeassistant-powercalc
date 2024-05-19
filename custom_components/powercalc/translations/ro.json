@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Creați contoare",
+                    "group": "Add to group",
                     "name": "Nume",
                     "on_time": "Timp pornit",
                     "start_time": "Timpul de pornire",
@@ -32,6 +33,7 @@
                     "value_template": "Șablon de valoare"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
                     "update_frequency": "timpul în secunde între actualizările stării senzorului"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
                     "create_utility_meters": "Lăsați powercalc să creeze contoare, cu ciclu zilnic, pe oră etc.",
                     "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
                     "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
                     "unique_id": "Specificați un ID unic. Acest lucru va permite configurarea mai multor senzori de putere pentru aceeași entitate. Când nu este specificat, va lua ID-ul unic al entității sursă"

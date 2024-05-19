@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Vytvorenie meracích prístrojov",
+                    "group": "Add to group",
                     "name": "Názov",
                     "on_time": "V čase",
                     "start_time": "Štart čas",
@@ -32,6 +33,7 @@
                     "value_template": "Šablóna hodnoty"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Keď ponecháte prázdne, predvolene je 1 deň. vždy zapnutý",
                     "update_frequency": "čas v sekundách medzi aktualizáciami stavu snímača"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
                     "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
                     "entity_id": "entita, na ktorej je založená virtuálna sila, bude snímač výkonu počúvať zmeny stavu tejto entity, aby sa aktualizoval",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Ak ponecháte prázdne, názov sa prevezme zo zdrojovej entity",
                     "standby_power": "Definujte množstvo energie, ktoré zariadenie spotrebuje, keď je vo vypnutom stave",
                     "unique_id": "Zadajte jedinečný_id. To umožní nastaviť viacero výkonových senzorov pre tú istú entitu. Ak nie je zadaný, použije sa jedinečný_id zdrojovej entity"

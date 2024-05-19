@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Create utility meters",
+                    "group": "Add to group",
                     "name": "Název",
                     "on_time": "On time",
                     "start_time": "Start time",
@@ -32,6 +33,7 @@
                     "value_template": "Šablona hodnoty"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "When left empty defaults to 1 day. always on",
                     "update_frequency": "time in seconds between state updates of the sensor"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
                     "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
                     "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Leaving blank will take the name from the source entity",
                     "standby_power": "Define the amount of power the device is consuming when in an OFF state",
                     "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
