@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+                    "group": "Add to group",
                     "name": "Nazwa",
                     "on_time": "Sumaryczny czas włączenia",
                     "start_time": "Moment uruchomienia",
@@ -32,6 +33,7 @@
                     "value_template": "Szablon wartości"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień = zawsze włączone",
                     "update_frequency": "Czas w sekundach między aktualizacjami stanu sensora"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
                     "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp.",
                     "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
                     "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)",
                     "unique_id": "Określ Unikatowy identyfikator. Umożliwi to skonfigurowanie wielu sensorów mocy dla tej samej encji. Jeśli nie zostanie określony, przyjmie Unikatowy identyfikator encji źródłowej"

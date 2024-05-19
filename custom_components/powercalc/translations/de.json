@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Utilitymeter erstellen",
+                    "group": "Add to group",
                     "name": "Name",
                     "on_time": "Dauer",
                     "start_time": "Startzeit",
@@ -32,6 +33,7 @@
                     "value_template": "Wert-Template"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Wenn leer, ist der Standardwert 1 Tag, d.h. immer an",
                     "update_frequency": "Zeit in Sekunden zwischen den Zustandsaktualisierungen des Sensors"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Ob powercalc einen kWh-Sensor erstellen soll",
                     "create_utility_meters": "Powercalc soll utility-Meter erstellen, die täglich, stündlich usw. zyklisch sind",
                     "entity_id": "Entität, auf der die virtuelle Leistung basiert; der Leistungssensore wird auf Zustandsänderungen dieser Entität reagieren, um aktualisiert zu werden",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Leer lassen wird den Namen von der Quell-Entität übernehmen",
                     "standby_power": "Definieren Sie die Leistung, die das Gerät im ausgeschalteten Zustand verbraucht",
                     "unique_id": "Geben Sie eine eindeutige ID an. Dies ermöglicht die Einrichtung mehrerer Leistungssensoren für dieselbe Entität. Wenn nicht angegeben, wird die unique_id der Quell-Entität verwendet."
@@ -264,7 +267,7 @@
                     "group_power_entities": "Leistungs-Entitäten der Gruppe",
                     "hide_members": "Mitglieder ausblenden",
                     "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors",
+                    "include_non_powercalc_sensors": "Nicht powercalc Sensoren einschließen",
                     "max_power": "Maximale Leistung",
                     "min_power": "Minimale Leistung",
                     "multiply_factor": "Multiplikationsfaktor",

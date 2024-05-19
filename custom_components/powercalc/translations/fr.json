@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Créer des compteurs de services publics",
+                    "group": "Add to group",
                     "name": "Nom",
                     "on_time": "Temps de fonctionnement",
                     "start_time": "Heure de début",
@@ -32,6 +33,7 @@
                     "value_template": "Modèle de valeur"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Lorsqu'il est laissé vide, la valeur par défaut est 1 jour. Toujours allumé",
                     "update_frequency": "Temps en secondes entre les mises à jour d'état du capteur"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Si powercalc doit créer un capteur kWh",
                     "create_utility_meters": "Laissez powercalc créer des compteurs de services publics, qui effectuent un cycle quotidien, horaire, etc.",
                     "entity_id": "Entité sur laquelle la puissance virtuelle est basée, le capteur de puissance écoutera les changements d'état de cette entité à mettre à jour",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Laisser vide prendra le nom de l'entité source",
                     "standby_power": "Définir la quantité d'énergie que l'appareil consomme lorsqu'il est à l'état OFF",
                     "unique_id": "Spécifiez un identifiant unique. Cela permettra de configurer plusieurs capteurs de puissance pour la même entité. Lorsqu'il n'est pas spécifié, il prendra l'identifiant unique de l'entité source"

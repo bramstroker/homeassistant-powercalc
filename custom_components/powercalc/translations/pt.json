@@ -22,6 +22,7 @@
             "daily_energy": {
                 "data": {
                     "create_utility_meters": "Create utility meters",
+                    "group": "Add to group",
                     "name": "Nome",
                     "on_time": "Na hora",
                     "start_time": "Hora de início",
@@ -32,6 +33,7 @@
                     "value_template": "Modelo de valor"
                 },
                 "data_description": {
+                    "group": "Fill in a custom group name to create a new group",
                     "on_time": "Quando deixado vazio, o padrão é 1 dia. Sempre ligado",
                     "update_frequency": "tempo em segundos entre as atualizações de estado do sensor"
                 },
@@ -214,6 +216,7 @@
                     "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
                     "create_utility_meters": "Deixe o powercalc criar medidores de utilidade, que circulam diariamente, de hora em hora, etc.",
                     "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
+                    "group": "Fill in a custom group name to create a new group",
                     "name": "Deixar em branco levará o nome da entidade de origem",
                     "standby_power": "Defina a quantidade de energia que o dispositivo está consumindo quando em estado desligado",
                     "unique_id": "Especifique um unique_id. Isso permitirá configurar vários sensores de potência para a mesma entidade. Quando não especificado, levará o unique_id da entidade de origem"
