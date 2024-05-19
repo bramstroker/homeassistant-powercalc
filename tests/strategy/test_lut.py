@@ -22,8 +22,7 @@ from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
 from tests.common import run_powercalc_setup
-
-from .common import create_source_entity
+from tests.strategy.common import create_source_entity
 
 
 async def test_colortemp_lut(hass: HomeAssistant) -> None:
@@ -201,6 +200,32 @@ async def test_sensor_unavailable_for_unsupported_color_mode(hass: HomeAssistant
     assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
 
     assert "Lookup table not found for color mode" in caplog.text
+
+
+async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
+    """
+    Test fallback is done when no color_temp.csv is available, but a hs.csv is.
+    Fixes issue where HUE bridge is falsly reporting color_temp as color_mode.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2247
+    """
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LLC011",
+        },
+    )
+
+    hass.states.async_set(
+        "light.test",
+        STATE_ON,
+        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP: 500},
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "1.42"
 
 
 async def _create_lut_strategy(
