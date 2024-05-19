@@ -99,7 +99,7 @@ class LutRegistry:
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_supported_color_modes"
         supported_color_modes = self._supported_color_modes.get(cache_key)
         if supported_color_modes is None:
-            supported_color_modes: set[ColorMode] = set()
+            supported_color_modes = set()
             for file in os.listdir(power_profile.get_model_directory()):
                 if file.endswith(".csv.gz"):
                     color_mode = ColorMode(file.removesuffix(".csv.gz"))
@@ -191,7 +191,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     async def get_selected_color_mode(self, attrs: Mapping[str, Any]) -> ColorMode:
         """Get the selected color mode for the entity."""
-        color_mode = attrs.get(ATTR_COLOR_MODE)
+        color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE)))
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
         profile_color_modes = self._lut_registry.get_supported_color_modes(self._profile)
@@ -287,11 +287,6 @@ class LutStrategy(PowerCalculationStrategyInterface):
             return int(first_key)
 
         return min((k for k in keys if int(k) >= int(search_key)), default=[*keys][-1])
-
-    def get_supported_color_modes(self) -> set[ColorMode]:
-        if self._strategy_color_modes is None:
-            self._strategy_color_modes = self._get_supported_color_modes()
-        return self._strategy_color_modes
 
     async def validate_config(self) -> None:
         if self._source_entity.domain != light.DOMAIN:
