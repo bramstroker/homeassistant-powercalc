@@ -8,6 +8,9 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.11.7:docker"
     },
+    "aliases": [
+		"929002422702"
+    ],
     "name": "Hue Gradient Lightstrip",
     "standby_power": 0.13
 }
