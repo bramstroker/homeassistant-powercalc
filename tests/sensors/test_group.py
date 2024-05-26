@@ -306,7 +306,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         )
         await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "0"
+    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
     assert hass.states.get("sensor.test1_energy").state == "0"
     assert hass.states.get("sensor.test2_energy").state == "0"
 
@@ -352,7 +352,7 @@ async def test_calibrate_service(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.testgroup_energy").state == "100"
+    assert hass.states.get("sensor.testgroup_energy").state == "100.0000"
 
 
 async def test_restore_state(hass: HomeAssistant) -> None:
@@ -1128,6 +1128,36 @@ async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> No
         assert hass.states.get("sensor.testgroup_energy").state == "5.3000"
 
 
+async def test_delta_calculation_precision(hass: HomeAssistant) -> None:
+    """
+    Make sure delta calculation is done on exact decimal value, not the rounded value.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2254
+    """
+    await _create_energy_group(
+        hass,
+        "TestGroup",
+        ["sensor.a_energy"],
+    )
+
+    test_values = [
+        ("1197.865543", "1197.8655"),
+        ("1197.868021", "1197.8680"),
+        ("1197.868628", "1197.8686"),
+        ("1197.871022", "1197.8710"),
+        ("1197.871629", "1197.8716"),
+        ("1197.873903", "1197.8739"),
+        ("1197.874396", "1197.8744"),
+        ("1197.876372", "1197.8764"),
+        ("1197.876868", "1197.8769"),
+        ("1197.878879", "1197.8789"),
+        ("1197.879332", "1197.8793"),
+    ]
+
+    for energy_state, expected_group_state in test_values:
+        hass.states.async_set("sensor.a_energy", energy_state, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
+        await hass.async_block_till_done()
+        assert hass.states.get("sensor.testgroup_energy").state == expected_group_state
+
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
     await _create_energy_group(
         hass,
@@ -1428,7 +1458,7 @@ async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
 
     group_state = hass.states.get("sensor.testgroup_power")
     assert group_state
-    assert group_state.state == "0"
+    assert group_state.state == "0.00"
 
 
 async def test_additional_energy_sensors(hass: HomeAssistant) -> None:
