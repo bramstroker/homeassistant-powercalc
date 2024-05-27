@@ -343,38 +343,38 @@
 ## Smart speakers
 #### 30 total
 
-|      A      |                B                |                   C                    |                                   D                                   | E  |
-|-------------|---------------------------------|----------------------------------------|-----------------------------------------------------------------------|---:|
-|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |A2U21SRK4QGSE1<br />B7W644<br />ECHO A2U21SRK4QGSE1                    |0.90|
-|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |A32DOYMUN6DTXA<br />A1RABVCI4QCIKC<br />C78MP8<br />ECHO A32DOYMUN6DTXA|1.75|
-|apple        |HomePod Mini                     |Apple HomePod Mini                      |                                                                       |0.65|
-|apple        |MQJ83                            |Apple HomePod Gen 2                     |HomePod (gen 2)                                                        |1.01|
-|bose         |416776                           |Bose SoundTouch 10                      |                                                                       |1.50|
-|bose         |767520-2100                      |Bose SoundTouch 300                     |                                                                       |1.50|
-|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                                                 |3.99|
-|google       |Home                             |Google Home                             |                                                                       |2.40|
-|google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini                                                       |1.65|
-|google       |Nest Audio                       |Nest Audio                              |                                                                       |1.80|
-|google       |Nest Hub 2gen                    |Google Nest Hub (2nd Gen)               |                                                                       |0.39|
-|google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini                                                       |1.65|
-|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                                                                       |7.58|
-|harman kardon|HK Citation One MKII             |Harman Kardon Citation One              |HK Citation One                                                        |2.01|
-|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|Lenovo Smart Clock                                                     |2.51|
-|sonos        |amp                              |Sonos Amp                               |                                                                       |6.42|
-|sonos        |arc                              |Sonos Arc                               |                                                                       |4.40|
-|sonos        |connect                          |Sonos Connect                           |                                                                       |5.00|
-|sonos        |one                              |Sonos One                               |Sonos ONE                                                              |2.92|
-|sonos        |one sl                           |Sonos One SL                            |                                                                       |2.83|
-|sonos        |play 1                           |Sonos Play:1                            |Play:1                                                                 |2.10|
-|sonos        |play 3                           |Sonos Play:3                            |Play:3                                                                 |4.17|
-|sonos        |play 5                           |Sonos Play:5                            |Play:5<br />Five                                                       |2.15|
-|sonos        |playbar                          |Sonos Playbar                           |Playbar                                                                |5.20|
-|sonos        |playbase                         |Sonos Playbase                          |Playbase                                                               |2.90|
-|sonos        |sub                              |Sonos Sub (Gen1)                        |                                                                       |5.23|
-|sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |IKEA SYMFONISK Bookshelf                                               |2.56|
-|sonos        |symfonisk floor lamp             |SYMFONISK Floor lamp                    |                                                                       |2.75|
-|sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame                                                |2.40|
-|sonos        |symfonisk table lamp             |SYMFONISK Table lamp                    |                                                                       |2.60|
+|      A      |                B                |                   C                    |                                   D                                                            | E  |
+|-------------|---------------------------------|----------------------------------------|------------------------------------------------------------------------------------------------|---:|
+|amazon       |B7W64E                           |Amazon Alexa Echo Dot Gen 4             |A2U21SRK4QGSE1<br />B7W644<br />ECHO A2U21SRK4QGSE1                                             |0.90|
+|amazon       |D91029T                          |Amazon Alexa Echo Dot Gen 3             |A32DOYMUN6DTXA<br />A1RABVCI4QCIKC<br />C78MP8<br />ECHO A32DOYMUN6DTXA<br />ECHO A1RABVCI4QCIKC|1.75|
+|apple        |HomePod Mini                     |Apple HomePod Mini                      |                                                                                                |0.65|
+|apple        |MQJ83                            |Apple HomePod Gen 2                     |HomePod (gen 2)                                                                                 |1.01|
+|bose         |416776                           |Bose SoundTouch 10                      |                                                                                                |1.50|
+|bose         |767520-2100                      |Bose SoundTouch 300                     |                                                                                                |1.50|
+|denon        |HEOS 1 HS2                       |HEOS 1 HS2                              |HEOS 1                                                                                          |3.99|
+|google       |Home                             |Google Home                             |                                                                                                |2.40|
+|google       |Home Mini (HOA)                  |Google Home Mini                        |Google Home Mini                                                                                |1.65|
+|google       |Nest Audio                       |Nest Audio                              |                                                                                                |1.80|
+|google       |Nest Hub 2gen                    |Google Nest Hub (2nd Gen)               |                                                                                                |0.39|
+|google       |Nest Mini (H2C)                  |Google Nest Mini                        |Google Nest Mini                                                                                |1.65|
+|harman kardon|HK Citation MultiBeam 700        |HK Citation MultiBeam 700               |                                                                                                |7.58|
+|harman kardon|HK Citation One MKII             |Harman Kardon Citation One              |HK Citation One                                                                                 |2.01|
+|lenovo       |Smart Clock with Google Assistant|Lenovo Smart Clock with Google Assistant|Lenovo Smart Clock                                                                              |2.51|
+|sonos        |amp                              |Sonos Amp                               |                                                                                                |6.42|
+|sonos        |arc                              |Sonos Arc                               |                                                                                                |4.40|
+|sonos        |connect                          |Sonos Connect                           |                                                                                                |5.00|
+|sonos        |one                              |Sonos One                               |Sonos ONE                                                                                       |2.92|
+|sonos        |one sl                           |Sonos One SL                            |                                                                                                |2.83|
+|sonos        |play 1                           |Sonos Play:1                            |Play:1                                                                                          |2.10|
+|sonos        |play 3                           |Sonos Play:3                            |Play:3                                                                                          |4.17|
+|sonos        |play 5                           |Sonos Play:5                            |Play:5<br />Five                                                                                |2.15|
+|sonos        |playbar                          |Sonos Playbar                           |Playbar                                                                                         |5.20|
+|sonos        |playbase                         |Sonos Playbase                          |Playbase                                                                                        |2.90|
+|sonos        |sub                              |Sonos Sub (Gen1)                        |                                                                                                |5.23|
+|sonos        |symfonisk bookshelf              |SYMFONISK Bookshelf                     |IKEA SYMFONISK Bookshelf                                                                        |2.56|
+|sonos        |symfonisk floor lamp             |SYMFONISK Floor lamp                    |                                                                                                |2.75|
+|sonos        |symfonisk picture frame          |SYMFONISK Picture Frame                 |SYMFONISK Picture frame                                                                         |2.40|
+|sonos        |symfonisk table lamp             |SYMFONISK Table lamp                    |                                                                                                |2.60|
 
 ## Smart switches / plugs
 #### 42 total
