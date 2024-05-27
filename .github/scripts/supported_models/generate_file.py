@@ -45,7 +45,7 @@ def generate_supported_model_list(model_listing: list[dict]):
         ]
         num_devices = len(relevant_models)
 
-        anchor = device_type[1].replace(" ", "-")
+        anchor = device_type[1].lower().replace("/", "").replace(" ", "-")
         toc_links.append(f"- [{device_type[1]}](#{anchor}) ({num_devices})\n")
 
         writer = MarkdownTableWriter()
