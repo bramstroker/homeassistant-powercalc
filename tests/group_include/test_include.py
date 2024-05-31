@@ -12,6 +12,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    EVENT_HOMEASSISTANT_STARTED,
     STATE_OFF,
 )
 from homeassistant.core import HomeAssistant, split_entity_id
@@ -537,6 +538,9 @@ async def test_include_yaml_configured_entity(
             },
         ],
     )
+
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
+    await hass.async_block_till_done()
 
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
