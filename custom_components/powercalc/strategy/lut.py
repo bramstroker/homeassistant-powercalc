@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gzip
+import io
 import logging
 import os
 from collections import defaultdict
@@ -9,7 +10,6 @@ from csv import reader
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
-from gzip import GzipFile
 from typing import Any
 
 import numpy as np
@@ -86,7 +86,7 @@ class LutRegistry:
         return lookup_dict
 
     @staticmethod
-    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> GzipFile:
+    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> io.TextIOWrapper:
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
