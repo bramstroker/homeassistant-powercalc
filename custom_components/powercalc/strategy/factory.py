@@ -38,7 +38,7 @@ from .wled import WledStrategy
 class PowerCalculatorStrategyFactory:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
-        self._lut_registry = LutRegistry()
+        self._lut_registry = LutRegistry(hass)
 
     async def create(
         self,

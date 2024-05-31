@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import gzip
+import io
 import logging
 import os
 from collections import defaultdict
@@ -9,7 +10,6 @@ from csv import reader
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
-from gzip import GzipFile
 from typing import Any
 
 import numpy as np
@@ -22,7 +22,7 @@ from homeassistant.components.light import (
     COLOR_MODES_COLOR,
     ColorMode,
 )
-from homeassistant.core import State
+from homeassistant.core import HomeAssistant, State
 from homeassistant.util.color import color_temperature_to_hs
 
 from custom_components.powercalc.common import SourceEntity
@@ -45,7 +45,8 @@ LookupDictType = BrightnessLutType | ColorTempLutType | HsLutType
 
 
 class LutRegistry:
-    def __init__(self) -> None:
+    def __init__(self, hass: HomeAssistant) -> None:
+        self._hass = hass
         self._lookup_dictionaries: dict[str, dict] = {}
         self._supported_color_modes: dict[str, set[ColorMode]] = {}
 
@@ -60,8 +61,9 @@ class LutRegistry:
             defaultdict_of_dict = partial(defaultdict, dict)  # type: ignore[var-annotated]
             lookup_dict = defaultdict(defaultdict_of_dict)
 
-            with self.get_lut_file(power_profile, color_mode) as csv_file:
-                csv_reader = reader(csv_file)  # type: ignore
+            csv_file = await self._hass.async_add_executor_job(partial(self.get_lut_file, power_profile, color_mode))
+            with csv_file:
+                csv_reader = reader(csv_file)
                 next(csv_reader)  # skip header row
 
                 line_count = 0
@@ -84,7 +86,7 @@ class LutRegistry:
         return lookup_dict
 
     @staticmethod
-    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> GzipFile:
+    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> io.TextIOWrapper:
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
