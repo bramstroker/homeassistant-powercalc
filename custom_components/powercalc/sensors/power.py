@@ -150,7 +150,7 @@ async def create_virtual_power_sensor(
                         power_profile.sub_profile_select,
                         source_entity,
                     )
-                    power_profile.select_sub_profile(
+                    await power_profile.select_sub_profile(
                         sub_profile_selector.select_sub_profile(
                             State(source_entity.entity_id, STATE_UNKNOWN),
                         ),
@@ -598,7 +598,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if not self._power_profile or self._power_profile.sub_profile == profile:
             return
 
-        self._power_profile.select_sub_profile(profile)
+        await self._power_profile.select_sub_profile(profile)
         self._standby_power = Decimal(self._power_profile.standby_power)
         self._standby_power_on = Decimal(self._power_profile.standby_power_on)
         await self.ensure_strategy_instance(True)

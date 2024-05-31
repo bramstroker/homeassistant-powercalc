@@ -34,7 +34,7 @@ class RemoteLoader(Loader):
 
     async def initialize(self) -> None:
         self.library_contents = await self.load_library_json()
-        self.last_update_time = self.get_last_update_time()
+        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -48,16 +48,19 @@ class RemoteLoader(Loader):
                     self.manufacturer_models[manufacturer_name] = []
                 self.manufacturer_models[manufacturer_name].append(model)
 
-    @staticmethod
-    async def load_library_json() -> dict[str, Any]:
+    async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
+
+        def _load_local_library_json() -> dict[str, Any]:
+            """Load library.json file from local storage"""
+            with open(get_library_json_path()) as f:
+                return cast(dict[str, Any], json.load(f))
 
         _LOGGER.debug("Loading library.json from github")
         async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
             if resp.status != 200:
                 _LOGGER.error("Failed to download library.json from github, falling back to local copy")
-                with open(get_library_json_path()) as f:
-                    return cast(dict[str, Any], json.load(f))
+                return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
             return cast(dict[str, Any], await resp.json())
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
@@ -105,9 +108,12 @@ class RemoteLoader(Loader):
                     raise e
                 _LOGGER.debug("Failed to download profile, falling back to local profile")
 
-        with open(model_path) as f:
-            json_data = json.load(f)
+        def _load_json() -> dict[str, Any]:
+            """Load model.json file for a given model."""
+            with open(model_path) as f:
+                return cast(dict[str, Any], json.load(f))
 
+        json_data = await self.hass.async_add_executor_job(_load_json)  # type: ignore
         return json_data, storage_path
 
     def get_storage_path(self, manufacturer: str, model: str) -> str:
@@ -122,12 +128,17 @@ class RemoteLoader(Loader):
         with open(path) as f:
             return float(f.read())
 
-    def set_last_update_time(self, time: float) -> None:
+    async def set_last_update_time(self, time: float) -> None:
         """Set the last update time of the local library"""
         self.last_update_time = time
         path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
-        with open(path, "w") as f:
-            f.write(str(time))
+
+        def _write() -> None:
+            """Write last update time to file"""
+            with open(path, "w") as f:
+                f.write(str(time))
+
+        return await self.hass.async_add_executor_job(_write)  # type: ignore
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
         """Find the model in the library."""

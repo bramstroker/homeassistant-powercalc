@@ -186,6 +186,13 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
         ],
     }
 
+    # set states to unavailable, so entities are there when setting up powercalc
+    hass.states.async_set("light.test", STATE_UNAVAILABLE)
+    hass.states.async_set("binary_sensor.test1", STATE_UNAVAILABLE)
+    hass.states.async_set("binary_sensor.test2", STATE_UNAVAILABLE)
+    hass.states.async_set("binary_sensor.test3", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
+
     await run_powercalc_setup(hass, sensor_config, {})
 
     hass.states.async_set("light.test", STATE_ON)

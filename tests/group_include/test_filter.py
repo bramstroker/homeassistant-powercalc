@@ -109,8 +109,8 @@ async def test_create_composite_filter(hass: HomeAssistant) -> None:
     assert not entity_filter.is_valid(_create_registry_entry("switch.some1"))
 
 
-async def test_create_composite_filter2(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
-    area_reg.async_get_or_create("kitchen")
+async def test_create_composite_filter2(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+    area_registry.async_get_or_create("kitchen")
     entity_filter = create_composite_filter(
         {
             CONF_AREA: "kitchen",

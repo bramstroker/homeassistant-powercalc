@@ -107,7 +107,7 @@ class ProfileLibrary:
             return None
 
         if sub_profile:
-            profile.select_sub_profile(sub_profile)
+            await profile.select_sub_profile(sub_profile)
 
         return profile
 
@@ -160,7 +160,7 @@ class ProfileLibrary:
         )
         # When the power profile supplies multiple sub profiles we select one by default
         if not profile.sub_profile and profile.sub_profile_select:
-            profile.select_sub_profile(profile.sub_profile_select.default)
+            await profile.select_sub_profile(profile.sub_profile_select.default)
 
         return profile
 
