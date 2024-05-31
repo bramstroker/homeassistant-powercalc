@@ -61,7 +61,7 @@ class LutRegistry:
             defaultdict_of_dict = partial(defaultdict, dict)  # type: ignore[var-annotated]
             lookup_dict = defaultdict(defaultdict_of_dict)
 
-            csv_file = await self._hass.async_add_executor_job(self.get_lut_file, power_profile, color_mode)
+            csv_file = await self._hass.async_add_executor_job(partial(self.get_lut_file, power_profile, color_mode))
             with csv_file:
                 csv_reader = reader(csv_file)  # type: ignore
                 next(csv_reader)  # skip header row
