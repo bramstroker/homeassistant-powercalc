@@ -171,21 +171,26 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
                 f"Playbook file '{file_path}' does not exist",
             )
 
-        with open(file_path) as csv_file:
-            csv_reader = csv.reader(csv_file)
-            entries = []
-            for row in csv_reader:
-                if len(row) != 2:
-                    raise StrategyConfigurationError(
-                        f"Playbook file '{file_path}' has invalid structure, please see the documentation.",
-                    )
-                entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
+        def _load_playbook_entries() -> list[PlaybookEntry]:
+            """Load playbook entries from CSV file"""
+            with open(file_path) as csv_file:
+                csv_reader = csv.reader(csv_file)
+                entries = []
+                for row in csv_reader:
+                    if len(row) != 2:
+                        raise StrategyConfigurationError(
+                            f"Playbook file '{file_path}' has invalid structure, please see the documentation.",
+                        )
+                    entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
 
-            self._loaded_playbooks[playbook_id] = Playbook(
-                key=playbook_id,
-                queue=PlaybookQueue(entries),
-            )
+                return entries
 
+        playbook_entries = await self._hass.async_add_executor_job(_load_playbook_entries)  # type: ignore
+
+        self._loaded_playbooks[playbook_id] = Playbook(
+            key=playbook_id,
+            queue=PlaybookQueue(playbook_entries),
+        )
         return self._loaded_playbooks[playbook_id]
 
     def can_calculate_standby(self) -> bool:

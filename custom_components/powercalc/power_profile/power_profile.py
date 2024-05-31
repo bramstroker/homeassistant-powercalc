@@ -182,7 +182,7 @@ class PowerProfile:
             return None
         return SubProfileSelectConfig(**select_dict)
 
-    def select_sub_profile(self, sub_profile: str) -> None:
+    async def select_sub_profile(self, sub_profile: str) -> None:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
         if not self.has_sub_profiles:
             return
@@ -203,8 +203,12 @@ class PowerProfile:
         # merge this json into the main model.json data.
         file_path = os.path.join(self._sub_profile_dir, "model.json")
         if os.path.exists(file_path):
-            with open(file_path) as json_file:
-                self._json_data = {**self._json_data, **json.load(json_file)}
+            def _load_json() -> None:
+                """Load LUT profile json data."""
+                with open(file_path) as json_file:
+                    self._json_data = {**self._json_data, **json.load(json_file)}
+
+            await self._hass.async_add_executor_job(_load_json)  # type: ignore
 
         self.sub_profile = sub_profile
 
