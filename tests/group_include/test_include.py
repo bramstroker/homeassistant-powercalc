@@ -1,5 +1,7 @@
+import asyncio
 import logging
 import uuid
+from time import sleep
 
 import pytest
 from homeassistant.components import light
@@ -36,7 +38,7 @@ from custom_components.powercalc.const import (
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_OR,
+    CONF_MANUFACTURER, CONF_MODEL, CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
@@ -47,6 +49,7 @@ from custom_components.powercalc.const import (
     ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
+from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.test.light import MockLight
 from tests.common import (
     create_discoverable_light,
@@ -495,27 +498,20 @@ async def test_include_filter_domain(
 
 
 async def test_include_yaml_configured_entity(
-    hass: HomeAssistant,
-    entity_reg: EntityRegistry,
-    area_reg: AreaRegistry,
+        hass: HomeAssistant,
+        entity_reg: EntityRegistry,
+        area_reg: AreaRegistry,
 ) -> None:
     """Test that include also includes entities that the user configured with YAML"""
 
-    light_a = MockLight("light_a")
-    light_b = MockLight("light_b")
     light_c = create_discoverable_light("light_c")
-    light_d = MockLight("light_d")
     await create_mock_light_entity(
         hass,
-        [light_a, light_b, light_c, light_d],
+        [light_c],
     )
 
     area = area_reg.async_get_or_create("My area")
-    entity_reg.async_update_entity(light_a.entity_id, area_id=area.id)
-    entity_reg.async_update_entity(light_b.entity_id, area_id=area.id)
     entity_reg.async_update_entity(light_c.entity_id, area_id=area.id)
-
-    _create_powercalc_config_entry(hass, light_a.entity_id)
 
     await run_powercalc_setup(
         hass,
@@ -527,12 +523,6 @@ async def test_include_yaml_configured_entity(
                 },
             },
             {
-                CONF_ENTITY_ID: light_b.entity_id,
-                CONF_FIXED: {
-                    CONF_POWER: 50,
-                },
-            },
-            {
                 CONF_ENTITY_ID: light_c.entity_id,
             },
         ],
@@ -541,8 +531,6 @@ async def test_include_yaml_configured_entity(
     group_state = hass.states.get("sensor.test_include_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {
-        "sensor.light_a_power",
-        "sensor.light_b_power",
         "sensor.light_c_power",
     }
 

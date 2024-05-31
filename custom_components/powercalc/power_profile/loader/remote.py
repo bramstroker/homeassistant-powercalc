@@ -34,7 +34,7 @@ class RemoteLoader(Loader):
 
     async def initialize(self) -> None:
         self.library_contents = await self.load_library_json()
-        self.last_update_time = self.get_last_update_time()
+        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -105,10 +105,17 @@ class RemoteLoader(Loader):
                     raise e
                 _LOGGER.debug("Failed to download profile, falling back to local profile")
 
-        with open(model_path) as f:
-            json_data = json.load(f)
+        _LOGGER.info("Before load model JSON")
+        json_data = await self.hass.async_add_executor_job(self.load_json, model_path)
+        #json_data = self.load_json(model_path)
+        _LOGGER.info("After load model JSON")
 
         return json_data, storage_path
+
+    @staticmethod
+    def load_json(path: str) -> dict:
+        with open(path) as f:
+            return json.load(f)
 
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))

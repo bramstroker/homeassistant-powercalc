@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
+from typing import Any, Coroutine
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -22,6 +24,7 @@ from homeassistant.const import __version__ as HA_VERSION  # noqa: N812
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util.async_ import create_eager_task
 
 from .common import validate_name_pattern
 from .const import (
@@ -321,21 +324,26 @@ async def setup_yaml_sensors(
     domain_config: ConfigType,
 ) -> None:
     sensors: list = domain_config.get(CONF_SENSORS, [])
-    sorted_sensors = sorted(
-        sensors,
-        key=lambda item: 1 if CONF_INCLUDE in item else 0,
-    )
-    for sensor_config in sorted_sensors:
+    primary_coros = []
+    secondary_coros = []
+
+    for sensor_config in sensors:
         sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
-        hass.async_create_task(
-            async_load_platform(
-                hass,
-                Platform.SENSOR,
-                DOMAIN,
-                sensor_config,
-                config,
-            ),
+        coro = async_load_platform(
+            hass,
+            Platform.SENSOR,
+            DOMAIN,
+            sensor_config,
+            config,
         )
+
+        if CONF_INCLUDE in sensor_config:
+            secondary_coros.append(coro)
+        else:
+            primary_coros.append(coro)
+
+    await asyncio.gather(*(create_eager_task(coro) for coro in primary_coros))
+    await asyncio.gather(*(create_eager_task(coro) for coro in secondary_coros))
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
