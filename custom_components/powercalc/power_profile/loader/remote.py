@@ -34,7 +34,7 @@ class RemoteLoader(Loader):
 
     async def initialize(self) -> None:
         self.library_contents = await self.load_library_json()
-        self.last_update_time = await self.get_last_update_time()
+        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
 
         # Load contents of library JSON into memory
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
@@ -119,18 +119,14 @@ class RemoteLoader(Loader):
     def get_storage_path(self, manufacturer: str, model: str) -> str:
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
 
-    async def get_last_update_time(self) -> float | None:
+    def get_last_update_time(self) -> float | None:
         """Get the last update time of the local library"""
         path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", ".last_update")
         if not os.path.exists(path):
             return None
 
-        def _load_json() -> float:
-            """Load last update time from file"""
-            with open(path) as f:
-                return float(json.load(f))
-
-        return await self.hass.async_add_executor_job(_load_json)  # type: ignore
+        with open(path) as f:
+            return float(f.read())
 
     async def set_last_update_time(self, time: float) -> None:
         """Set the last update time of the local library"""
