@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.core import HomeAssistant
 
@@ -44,9 +44,9 @@ class LocalLoader(Loader):
             def _load_model_json(model_name: str) -> dict[str, Any]:
                 """Load model.json file for a given model."""
                 with open(os.path.join(manufacturer_dir, model_name, "model.json")) as f:
-                    return json.load(f)
+                    return cast(dict[str, Any], json.load(f))
 
-            model_json = await self._hass.async_add_executor_job(_load_model_json, model)  # type: ignore
+            model_json = await self._hass.async_add_executor_job(_load_model_json, model)
 
             supported_device_type = DeviceType(model_json.get("device_type", DeviceType.LIGHT))
             if device_type and device_type != supported_device_type:
@@ -72,7 +72,7 @@ class LocalLoader(Loader):
         def _load_json() -> dict[str, Any]:
             """Load model.json file for a given model."""
             with open(model_json_path) as file:
-                return json.load(file)
+                return cast(dict[str, Any], json.load(file))
 
         model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
         return model_json, base_dir

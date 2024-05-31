@@ -111,7 +111,7 @@ class RemoteLoader(Loader):
         def _load_json() -> dict[str, Any]:
             """Load model.json file for a given model."""
             with open(model_path) as f:
-                return json.load(f)
+                return cast(dict[str, Any], json.load(f))
 
         json_data = await self.hass.async_add_executor_job(_load_json)  # type: ignore
         return json_data, storage_path
