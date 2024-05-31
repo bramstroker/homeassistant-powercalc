@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 
 import homeassistant.helpers.config_validation as cv
@@ -322,30 +321,21 @@ async def setup_yaml_sensors(
     domain_config: ConfigType,
 ) -> None:
     sensors: list = domain_config.get(CONF_SENSORS, [])
-    primary_tasks = []
-    secondary_tasks = []
-
-    for sensor_config in sensors:
+    sorted_sensors = sorted(
+        sensors,
+        key=lambda item: 1 if CONF_INCLUDE in item else 0,
+    )
+    for sensor_config in sorted_sensors:
         sensor_config.update({DISCOVERY_TYPE: PowercalcDiscoveryType.USER_YAML})
-        task = hass.async_create_task(async_load_platform(
-            hass,
-            Platform.SENSOR,
-            DOMAIN,
-            sensor_config,
-            config,
-        ))
-
-        if CONF_INCLUDE in sensor_config:
-            secondary_tasks.append(task)
-        else:
-            primary_tasks.append(task)
-
-    async def _done_cb(_: asyncio.Future) -> None:
-        await asyncio.gather(*(task for task in secondary_tasks))
-
-    task = asyncio.gather(*(task for task in primary_tasks))
-    task.add_done_callback(_done_cb)
-    await task
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                Platform.SENSOR,
+                DOMAIN,
+                sensor_config,
+                config,
+            ),
+        )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
