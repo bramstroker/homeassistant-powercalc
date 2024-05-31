@@ -9,6 +9,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PLATFORM,
     CONF_UNIQUE_ID,
+    EVENT_HOMEASSISTANT_STARTED,
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant
@@ -99,6 +100,9 @@ async def run_powercalc_setup(
         config[DOMAIN][CONF_SENSORS] = sensor_config
 
     assert await async_setup_component(hass, DOMAIN, config)
+    await hass.async_block_till_done()
+
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
     await hass.async_block_till_done()
 
 

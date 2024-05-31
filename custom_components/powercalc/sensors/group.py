@@ -302,6 +302,8 @@ async def add_to_associated_group(
                 CONF_SENSOR_TYPE: SensorType.GROUP,
                 CONF_NAME: group_entry_id,
             },
+            options={},
+            unique_id=group_entry_id,
         )
         await hass.config_entries.async_add(group_entry)
 

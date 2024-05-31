@@ -134,12 +134,12 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
 async def test_group_include_area(
     hass: HomeAssistant,
     entity_reg: EntityRegistry,
-    area_reg: AreaRegistry,
+    area_registry: AreaRegistry,
 ) -> None:
     # Create light entity and add to group My area
     light = MockLight("test")
     await create_mock_light_entity(hass, light)
-    area = area_reg.async_get_or_create("My area")
+    area = area_registry.async_get_or_create("My area")
     entity_reg.async_update_entity(light.entity_id, area_id=area.id)
 
     result = await goto_virtual_power_strategy_step(
@@ -197,8 +197,8 @@ async def test_group_include_area(
     assert hass.states.get("sensor.my_group_sensor_energy_daily")
 
 
-async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> None:
-    area_reg.async_get_or_create("My area")
+async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+    area_registry.async_get_or_create("My area")
     config_entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="abcdefg",
@@ -235,9 +235,9 @@ async def test_can_unset_area(hass: HomeAssistant, area_reg: AreaRegistry) -> No
 
 async def test_include_area_powercalc_only(
     hass: HomeAssistant,
-    area_reg: AreaRegistry,
+    area_registry: AreaRegistry,
 ) -> None:
-    area = area_reg.async_get_or_create("My area")
+    area = area_registry.async_get_or_create("My area")
     mock_registry(
         hass,
         {
