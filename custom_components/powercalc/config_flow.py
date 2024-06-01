@@ -1266,13 +1266,14 @@ def _build_daily_energy_config(user_input: dict[str, Any], schema: vol.Schema) -
     """Build the config under daily_energy: key."""
     config: dict[str, Any] = {
         CONF_DAILY_FIXED_ENERGY: {},
+        CONF_CREATE_UTILITY_METERS: False,
     }
     for key in schema.schema:
         val = user_input.get(key)
         if val is None:
             continue
         if key in [CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID]:
-            config[key] = val
+            config[str(key)] = val
             continue
 
         config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
