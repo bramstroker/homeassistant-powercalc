@@ -1158,6 +1158,7 @@ async def test_delta_calculation_precision(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
         assert hass.states.get("sensor.testgroup_energy").state == expected_group_state
 
+
 async def test_energy_sensor_delta_updates_existing_sensor(hass: HomeAssistant) -> None:
     await _create_energy_group(
         hass,
