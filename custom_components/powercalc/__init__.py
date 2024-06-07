@@ -6,6 +6,7 @@ import asyncio
 import logging
 
 import homeassistant.helpers.config_validation as cv
+import homeassistant.helpers.entity_registry as er
 import voluptuous as vol
 from awesomeversion.awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
@@ -243,6 +244,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     setup_domain_groups(hass, domain_config)
     setup_standby_group(hass, domain_config)
 
+    await repair_none_config_entries_issue(hass)
+
     return True
 
 
@@ -359,6 +362,7 @@ async def setup_yaml_sensors(
         for sensor_config in primary_sensors
     ))
 
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -432,6 +436,18 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         hass.config_entries.async_update_entry(config_entry, data=data, version=3)
 
     return True
+
+
+async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
+    """Repair issue with config entries having None as data."""
+    entity_registry = er.async_get(hass)
+    entries = [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.title == "None"]
+    for entry in entries:
+        _LOGGER.debug("Removing entry %s with None data", entry.entry_id)
+        entities = entity_registry.entities.get_entries_for_config_entry_id(entry.entry_id)
+        for entity in entities:
+            entity_registry.async_remove(entity.entity_id)
+        await hass.config_entries.async_remove(entry.entry_id)
 
 
 def _notify_message(
