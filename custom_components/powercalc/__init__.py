@@ -244,7 +244,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     setup_domain_groups(hass, domain_config)
     setup_standby_group(hass, domain_config)
 
-    await repair_none_config_entries_issue(hass)
+    try:
+        await repair_none_config_entries_issue(hass)
+    except Exception as e:  # noqa: BLE001
+        _LOGGER.error("problem while cleaning up None entities", exc_info=e)
 
     return True
 
@@ -448,6 +451,7 @@ async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
         for entity in entities:
             entity_registry.async_remove(entity.entity_id)
         await hass.config_entries.async_remove(entry.entry_id)
+
 
 
 def _notify_message(
