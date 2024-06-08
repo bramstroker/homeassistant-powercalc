@@ -16,12 +16,10 @@ _LOGGER = logging.getLogger("measure")
 class ShellyApi(ABC):
     @property
     @abstractmethod
-    def endpoint(self) -> str:
-        ...
+    def endpoint(self) -> str: ...
 
     @abstractmethod
-    def parse_json(self, json: dict) -> PowerMeasurementResult:
-        ...
+    def parse_json(self, json: dict) -> PowerMeasurementResult: ...
 
 
 class ShellyApiGen1(ShellyApi):

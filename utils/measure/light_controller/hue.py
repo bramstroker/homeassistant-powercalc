@@ -92,14 +92,8 @@ class HueLightController(LightController):
 
         def get_light_list(answers: dict[str, Any]) -> list:
             if answers.get("multiple_lights"):
-                return [
-                    (name, f"{TYPE_GROUP}:{group_id}")
-                    for group_id, name in self.groups.items()
-                ]
-            return [
-                (name, f"{TYPE_LIGHT}:{light_id}")
-                for light_id, name in self.lights.items()
-            ]
+                return [(name, f"{TYPE_GROUP}:{group_id}") for group_id, name in self.groups.items()]
+            return [(name, f"{TYPE_LIGHT}:{light_id}") for light_id, name in self.lights.items()]
 
         return [
             inquirer.List(name="light", message=get_message, choices=get_light_list),

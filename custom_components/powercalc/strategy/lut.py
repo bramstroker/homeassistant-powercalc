@@ -256,12 +256,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         lookup_dict: LookupDictType,
         search_key: int,
     ) -> float | LookupDictType:
-        return (
-            lookup_dict.get(search_key)
-            or lookup_dict[
-                min(lookup_dict.keys(), key=lambda key: abs(key - search_key))
-            ]
-        )
+        return lookup_dict.get(search_key) or lookup_dict[min(lookup_dict.keys(), key=lambda key: abs(key - search_key))]
 
     @staticmethod
     def get_nearest_lower_brightness(

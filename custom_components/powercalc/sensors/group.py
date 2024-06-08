@@ -216,9 +216,7 @@ async def create_domain_group_sensor(
 ) -> list[Entity]:
     domain = discovery_info[CONF_DOMAIN]
     sensor_config = config.copy()
-    sensor_config[
-        CONF_UNIQUE_ID
-    ] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
+    sensor_config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{discovery_info[CONF_DOMAIN]}"
     return await create_group_sensors_yaml(
         f"All {domain}",
         sensor_config,
@@ -235,8 +233,7 @@ async def remove_power_sensor_from_associated_groups(
     group_entries = [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-        and config_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and config_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
     ]
 
     for group_entry in group_entries:
@@ -259,8 +256,7 @@ async def remove_group_from_power_sensor_entry(
     entries_to_update = [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER
-        and entry.data.get(CONF_GROUP) == config_entry.entry_id
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER and entry.data.get(CONF_GROUP) == config_entry.entry_id
     ]
 
     for group_entry in entries_to_update:
@@ -355,11 +351,7 @@ async def resolve_entity_ids_recursively(
         resolved_ids.update([str(member_entry.data.get(key))])
 
     # Include the additional power/energy sensors the user specified
-    conf_key = (
-        CONF_GROUP_POWER_ENTITIES
-        if device_class == SensorDeviceClass.POWER
-        else CONF_GROUP_ENERGY_ENTITIES
-    )
+    conf_key = CONF_GROUP_POWER_ENTITIES if device_class == SensorDeviceClass.POWER else CONF_GROUP_ENERGY_ENTITIES
     resolved_ids.update(entry.data.get(conf_key) or [])
 
     # Include entities from defined areas
@@ -376,9 +368,7 @@ async def resolve_entity_ids_recursively(
             for entity in resolved_area_entities
             if isinstance(
                 entity,
-                PowerSensor
-                if device_class == SensorDeviceClass.POWER
-                else EnergySensor,
+                PowerSensor if device_class == SensorDeviceClass.POWER else EnergySensor,
             )
         ]
         resolved_ids.update(area_entities)
@@ -394,7 +384,10 @@ async def resolve_entity_ids_recursively(
             _LOGGER.error("Subgroup config entry not found: %s", subgroup_entry_id)
             continue
         await resolve_entity_ids_recursively(
-            hass, subgroup_entry, device_class, resolved_ids,
+            hass,
+            subgroup_entry,
+            device_class,
+            resolved_ids,
         )
 
     return resolved_ids
@@ -404,8 +397,7 @@ async def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: Confi
     return [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-           and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
     ]
 
 
@@ -433,8 +425,7 @@ def create_grouped_power_sensor(
         entities=power_sensor_ids,
         unique_id=unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION)
-        or DEFAULT_POWER_SENSOR_PRECISION,
+        rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION) or DEFAULT_POWER_SENSOR_PRECISION,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
     )
@@ -479,8 +470,7 @@ def create_grouped_energy_sensor(
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
         sensor_config=sensor_config,
-        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION)
-        or DEFAULT_ENERGY_SENSOR_PRECISION,
+        rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION) or DEFAULT_ENERGY_SENSOR_PRECISION,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
     )
@@ -530,7 +520,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             last_sensor_state = await self.async_get_last_sensor_data()
             try:
                 if last_sensor_state and last_sensor_state.native_value:
-                    self._set_native_value(Decimal(last_sensor_state.native_value))  #type: ignore
+                    self._set_native_value(Decimal(last_sensor_state.native_value))  # type: ignore
                 elif last_state:
                     self._set_native_value(Decimal(last_state.state))
                 _LOGGER.debug(
@@ -589,11 +579,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
-        available_states = [
-            state
-            for state in states
-            if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]
-        ]
+        available_states = [state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]]
         if not available_states:
             if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE):
                 if isinstance(self, GroupedPowerSensor):
@@ -613,15 +599,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         """Convert value of member entity state to match the unit of measurement of the group sensor."""
         value = state.state
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-        if (
-            unit_of_measurement
-            and self._attr_native_unit_of_measurement != unit_of_measurement
-        ):
-            unit_converter = (
-                EnergyConverter
-                if isinstance(self, GroupedEnergySensor)
-                else PowerConverter
-            )
+        if unit_of_measurement and self._attr_native_unit_of_measurement != unit_of_measurement:
+            unit_converter = EnergyConverter if isinstance(self, GroupedEnergySensor) else PowerConverter
             value = unit_converter.convert(
                 float(value),
                 unit_of_measurement,
@@ -655,10 +634,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
         member_available_states: list[State],
         member_states: list[State],
     ) -> Decimal:
-        values = [
-            self._get_state_value_in_native_unit(state)
-            for state in member_available_states
-        ]
+        values = [self._get_state_value_in_native_unit(state) for state in member_available_states]
         return Decimal(sum([value for value in values if value is not None]))
 
 
@@ -793,10 +769,7 @@ class PreviousStateStore:
             _LOGGER.debug("Load previous energy sensor states from store")
             stored_states = await instance.store.async_load() or {}
             for group, entities in stored_states.items():
-                instance.states[group] = {
-                    entity_id: State.from_dict(json_state)
-                    for (entity_id, json_state) in entities.items()
-                }
+                instance.states[group] = {entity_id: State.from_dict(json_state) for (entity_id, json_state) in entities.items()}
         except HomeAssistantError as exc:  # pragma: no cover
             _LOGGER.error("Error loading previous energy sensor states", exc_info=exc)
 

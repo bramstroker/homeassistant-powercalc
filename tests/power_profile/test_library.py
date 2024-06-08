@@ -167,6 +167,7 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant, caplog: pytest
 
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
     with patch(f"{remote_loader_class}.load_model") as mock_load_model:
+
         async def async_load_model_patch(manufacturer: str, __: str) -> tuple[dict, str] | None:
             if manufacturer == "foo":
                 return None

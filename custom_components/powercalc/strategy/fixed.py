@@ -70,10 +70,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
                 "fixed_mandatory",
             )
 
-        if (
-            self._source_entity.domain in STATE_BASED_ENTITY_DOMAINS
-            and self._per_state_power is None
-        ):
+        if self._source_entity.domain in STATE_BASED_ENTITY_DOMAINS and self._per_state_power is None:
             raise StrategyConfigurationError(
                 "This entity can only work with 'states_power' not 'power'",
                 "fixed_states_power_only",

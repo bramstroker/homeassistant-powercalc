@@ -80,6 +80,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
     general_sensor_hourly = hass.states.get("sensor.test_energy_hourly")
     assert general_sensor_hourly
 
+
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,

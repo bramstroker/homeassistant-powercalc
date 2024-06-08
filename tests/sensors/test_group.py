@@ -129,10 +129,7 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     assert energy_state
     assert energy_state.attributes.get("state_class") == SensorStateClass.TOTAL
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-        == UnitOfEnergy.KILO_WATT_HOUR
-    )
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
     assert energy_state.attributes.get(ATTR_ENTITIES) == {
         "sensor.test1_energy",
         "sensor.test2_energy",
@@ -517,14 +514,8 @@ async def test_hide_members(hass: HomeAssistant) -> None:
         },
     )
 
-    assert (
-        entity_reg.async_get("sensor.one_power").hidden_by
-        == er.RegistryEntryHider.INTEGRATION
-    )
-    assert (
-        entity_reg.async_get("sensor.two_power").hidden_by
-        == er.RegistryEntryHider.INTEGRATION
-    )
+    assert entity_reg.async_get("sensor.one_power").hidden_by == er.RegistryEntryHider.INTEGRATION
+    assert entity_reg.async_get("sensor.two_power").hidden_by == er.RegistryEntryHider.INTEGRATION
 
 
 async def test_unhide_members(hass: HomeAssistant) -> None:
@@ -580,10 +571,7 @@ async def test_user_hidden_entities_remain_hidden(hass: HomeAssistant) -> None:
         },
     )
 
-    assert (
-        entity_reg.async_get("sensor.test_power").hidden_by
-        is er.RegistryEntryHider.USER
-    )
+    assert entity_reg.async_get("sensor.test_power").hidden_by is er.RegistryEntryHider.USER
 
 
 async def test_members_are_unhiden_after_group_removed(
@@ -608,10 +596,7 @@ async def test_members_are_unhiden_after_group_removed(
     )
 
     assert hass.states.get("sensor.mygroup_power")
-    assert (
-        entity_reg.async_get("sensor.test_power").hidden_by
-        == er.RegistryEntryHider.INTEGRATION
-    )
+    assert entity_reg.async_get("sensor.test_power").hidden_by == er.RegistryEntryHider.INTEGRATION
 
     # Remove the config entry
     assert await hass.config_entries.async_remove(config_entry.entry_id)
@@ -941,10 +926,7 @@ async def test_error_is_logged_when_config_entry_associated_to_non_existing_grou
         },
     )
 
-    assert (
-        "ConfigEntry Mock Title: Cannot add/remove to group 1l3b47ropjnksgkd1rh30e8opvqwnngt. It does not exist"
-        in caplog.text
-    )
+    assert "ConfigEntry Mock Title: Cannot add/remove to group 1l3b47ropjnksgkd1rh30e8opvqwnngt. It does not exist" in caplog.text
 
 
 async def test_energy_unit_conversions(hass: HomeAssistant) -> None:
@@ -1013,9 +995,7 @@ async def test_power_unit_conversions(hass: HomeAssistant) -> None:
     assert power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfPower.WATT
 
     energy_state = hass.states.get("sensor.testgroup_energy")
-    assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
-    )
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.WATT_HOUR
 
 
 async def test_gui_discovered_entity_in_yaml_group(

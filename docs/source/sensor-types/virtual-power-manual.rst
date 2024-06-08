@@ -80,4 +80,3 @@ Now in `powercalc.yaml` add all the global configuration and sensors. You need t
           power: 40
 
 A third way would be to use the `packages <https://www.home-assistant.io/docs/configuration/packages/>`_ system which Home Assistant provides.
-

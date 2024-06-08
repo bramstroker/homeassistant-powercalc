@@ -195,9 +195,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
 
     def set_native_unit_of_measurement(self) -> None:
         """Set the native unit of measurement."""
-        unit_prefix = (
-            self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
-        )
+        unit_prefix = self._sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX) or UnitPrefix.KILO
         if unit_prefix == UnitPrefix.KILO:
             self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
         elif unit_prefix == UnitPrefix.NONE:
@@ -249,9 +247,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
         if self._last_delta_calculate is None:
             self._last_delta_calculate = self._last_updated
 
-        elapsed_seconds = (
-            int(self._last_delta_calculate) - int(self._last_updated)
-        ) + elapsed_seconds
+        elapsed_seconds = (int(self._last_delta_calculate) - int(self._last_updated)) + elapsed_seconds
         self._last_delta_calculate = dt_util.utcnow().timestamp()
 
         value = self._value
@@ -259,11 +255,7 @@ class DailyEnergySensor(RestoreEntity, SensorEntity, EnergySensor):
             value.hass = self.hass
             value = float(value.async_render())
 
-        wh_per_day = (
-            value * (self._on_time.total_seconds() / 3600)
-            if self._user_unit_of_measurement == UnitOfPower.WATT
-            else value * 1000
-        )
+        wh_per_day = value * (self._on_time.total_seconds() / 3600) if self._user_unit_of_measurement == UnitOfPower.WATT else value * 1000
 
         # Convert Wh to the native measurement unit
         energy_per_day = wh_per_day

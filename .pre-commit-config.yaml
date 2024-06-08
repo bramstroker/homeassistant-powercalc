@@ -1,5 +1,33 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-json
+        exclude: ^.*/?tsconfig\.json$
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-submodules
+      - id: mixed-line-ending
+      - id: pretty-format-json
+        args: [ --autofix, --no-sort-keys, --no-ensure-ascii ]
+        exclude: ^.*/?tsconfig\.json$
+      - id: trailing-whitespace
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.2.2'
+    rev: v0.4.8
     hooks:
       - id: ruff
+        args: [ --fix ]
+      - id: ruff-format

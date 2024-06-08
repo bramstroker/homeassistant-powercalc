@@ -99,11 +99,7 @@ class DomainFilter(IncludeEntityFilter):
 class GroupFilter(IncludeEntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         domain = split_entity_id(group_id)[0]
-        self.filter = (
-            LightGroupFilter(hass, group_id)
-            if domain == LIGHT_DOMAIN
-            else StandardGroupFilter(hass, group_id)
-        )
+        self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, group_id)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return self.filter.is_valid(entity)
@@ -217,10 +213,7 @@ class AreaFilter(IncludeEntityFilter):
         self.area: AreaEntry = area
 
         device_reg = device_registry.async_get(hass)
-        self.area_devices = [
-            device.id
-            for device in device_registry.async_entries_for_area(device_reg, area.id)
-        ]
+        self.area_devices = [device.id for device in device_registry.async_entries_for_area(device_reg, area.id)]
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.area_id == self.area.id or entity.device_id in self.area_devices

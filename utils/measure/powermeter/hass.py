@@ -48,11 +48,7 @@ class HassPowerMeter(PowerMeter):
     def get_power_sensors(self) -> list[str]:
         entities = self.client.get_entities()
         sensors = entities["sensor"].entities.values()
-        power_sensors = [
-            entity.entity_id
-            for entity in sensors
-            if entity.state.attributes.get("unit_of_measurement") == "W"
-        ]
+        power_sensors = [entity.entity_id for entity in sensors if entity.state.attributes.get("unit_of_measurement") == "W"]
         return sorted(power_sensors)
 
     def process_answers(self, answers: dict[str, Any]) -> None:

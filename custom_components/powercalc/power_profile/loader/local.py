@@ -61,10 +61,14 @@ class LocalLoader(Loader):
         return models
 
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
-        base_dir = self._data_directory if self._is_custom_directory else os.path.join(
-            self._data_directory,
-            manufacturer.lower(),
-            model,
+        base_dir = (
+            self._data_directory
+            if self._is_custom_directory
+            else os.path.join(
+                self._data_directory,
+                manufacturer.lower(),
+                model,
+            )
         )
 
         if not os.path.exists(base_dir):

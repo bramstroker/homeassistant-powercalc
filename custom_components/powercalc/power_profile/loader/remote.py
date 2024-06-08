@@ -67,8 +67,8 @@ class RemoteLoader(Loader):
         """Get listing of available manufacturers."""
 
         return {
-            manufacturer["name"] for manufacturer
-            in self.library_contents.get("manufacturers", [])
+            manufacturer["name"]
+            for manufacturer in self.library_contents.get("manufacturers", [])
             if not device_type or device_type in manufacturer.get("device_types", [])
         }
 
@@ -76,8 +76,8 @@ class RemoteLoader(Loader):
         """Get listing of available models for a given manufacturer."""
 
         return {
-            model["id"] for model
-            in self.manufacturer_models.get(manufacturer, [])
+            model["id"]
+            for model in self.manufacturer_models.get(manufacturer, [])
             if not device_type or device_type in model.get("device_type", DeviceType.LIGHT)
         }
 
@@ -147,8 +147,10 @@ class RemoteLoader(Loader):
         if not models:
             return None
 
-        return next((model.get("id") for model in models for string in search
-                     if string == model.get("id") or string in model.get("aliases", [])), None)
+        return next(
+            (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
+            None,
+        )
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
@@ -212,4 +214,3 @@ class RemoteLoader(Loader):
                         await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))  # type: ignore
             except aiohttp.ClientError as e:
                 raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
-

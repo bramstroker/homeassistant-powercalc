@@ -53,8 +53,7 @@ class HassMediaController(MediaController):
             )
         except InternalServerError:
             _LOGGER.debug(
-                "Internal server error on media_player.turn_off service, "
-                "probably because not supported by device, Trying media_player.media_stop",
+                "Internal server error on media_player.turn_off service, probably because not supported by device, Trying media_player.media_stop",
             )
             self.client.trigger_service(
                 "media_player",

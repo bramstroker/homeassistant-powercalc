@@ -38,10 +38,7 @@ async def change_gui_configuration(hass: HomeAssistant, call: ServiceCall) -> No
     ]:
         value = cv.boolean(value)
 
-    if (
-        field == CONF_ENERGY_INTEGRATION_METHOD
-        and value not in ENERGY_INTEGRATION_METHODS
-    ):
+    if field == CONF_ENERGY_INTEGRATION_METHOD and value not in ENERGY_INTEGRATION_METHODS:
         raise HomeAssistantError(f"Invalid integration method {value}")
 
     for entry in hass.config_entries.async_entries(DOMAIN):
