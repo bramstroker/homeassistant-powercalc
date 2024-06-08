@@ -44,7 +44,8 @@ jobs:
             const { commits } = context.payload.pull_request
             const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits}`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
-            core.setOutput('changedFiles', files.join(" "))
+            const list = files.map(item => item.split(" ").join("\\ ")).join(" ")
+            core.setOutput('changedFiles', list)
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
