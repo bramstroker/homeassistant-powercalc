@@ -18,20 +18,20 @@ import pandas as pd
 
 
 class ColorMode(StrEnum):
-    BRIGHTNESS = 'brightness'
-    COLOR_TEMP = 'color_temp'
-    HS = 'hs'
+    BRIGHTNESS = "brightness"
+    COLOR_TEMP = "color_temp"
+    HS = "hs"
 
 
 def create_scatter_plot(df: pandas.DataFrame, color_mode: ColorMode) -> None:
-    bri = df['bri']
-    watt = df['watt']
+    bri = df["bri"]
+    watt = df["watt"]
     if color_mode == ColorMode.BRIGHTNESS:
-        df['color'] = '#1f77b4'
+        df["color"] = "#1f77b4"
     elif color_mode == ColorMode.COLOR_TEMP:
-        df['color'] = df['mired'].apply(convert_mired_to_rgb)
+        df["color"] = df["mired"].apply(convert_mired_to_rgb)
     else:
-        df['color'] = df.apply(
+        df["color"] = df.apply(
             lambda row: colorsys.hls_to_rgb(
                 row.hue / 65535,
                 row.bri / 255,
@@ -40,12 +40,12 @@ def create_scatter_plot(df: pandas.DataFrame, color_mode: ColorMode) -> None:
             axis=1,
         )
 
-    plt.scatter(bri, watt, color=df['color'], marker='.', s=10)
+    plt.scatter(bri, watt, color=df["color"], marker=".", s=10)
 
 
 def mired_to_rgb(mired):
     kelvin = 1000000 / mired
-    xy = colour.CCT_to_xy(kelvin, method='Kang 2002')
+    xy = colour.CCT_to_xy(kelvin, method="Kang 2002")
     xys = colour.xy_to_XYZ(xy)
     rgb = colour.XYZ_to_sRGB(xys)
     # Note that the colours are overflowing 8-bit, thus a normalisation
@@ -119,32 +119,32 @@ def convert_mired_to_rgb(mired):
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description='CLI script to output powercalc LUT file as a plot',
+        description="CLI script to output powercalc LUT file as a plot",
     )
-    parser.add_argument('file')
-    parser.add_argument('--output', required=False)
+    parser.add_argument("file")
+    parser.add_argument("--output", required=False)
     args = parser.parse_args()
 
     file_path = resolve_absolute_file_path(args.file)
-    color_mode = ColorMode(Path(file_path).stem.removesuffix('.csv'))
+    color_mode = ColorMode(Path(file_path).stem.removesuffix(".csv"))
 
-    if file_path.endswith('.gz'):
-        csv_file = gzip.open(file_path, 'rt')
+    if file_path.endswith(".gz"):
+        csv_file = gzip.open(file_path, "rt")
     else:
-        csv_file = open(file_path, 'rt')
+        csv_file = open(file_path, "rt")
 
     dataframe = pd.read_csv(csv_file)
 
     plt.figure(figsize=(10, 6))
     create_scatter_plot(dataframe, color_mode)
-    plt.xlabel('brightness')
-    plt.ylabel('watt')
+    plt.xlabel("brightness")
+    plt.ylabel("watt")
     if args.output:
         output = args.output
-        if output == 'auto':
-            output = f'{color_mode}.png'
+        if output == "auto":
+            output = f"{color_mode}.png"
         plt.savefig(output)
-        print(f'Save plot to {output}')
+        print(f"Save plot to {output}")
         return
 
     plt.show()
@@ -156,14 +156,14 @@ def resolve_absolute_file_path(file_path: str) -> str:
 
     library_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        '../../profile_library',
+        "../../profile_library",
         file_path
     )
     if os.path.exists(file_path):
         return library_path
 
-    raise FileNotFoundError(f'File not found: {file_path}')
+    raise FileNotFoundError(f"File not found: {file_path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
