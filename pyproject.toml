@@ -86,7 +86,7 @@ readme = "README.md"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3"
 ruff = "^0.4.0"
-mypy = "1.10.0"
+mypy = "1.9.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
 pytest-homeassistant-custom-component = "^0.13"
