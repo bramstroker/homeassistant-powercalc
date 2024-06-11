@@ -183,7 +183,7 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
     power_entry = await create_mocked_virtual_power_sensor_entry(hass, "Power")
 
     none_entries = []
-    for i in range(10):
+    for i in range(10): # noqa
         none_entries.append(await setup_config_entry(
             hass,
             {
