@@ -91,7 +91,7 @@ async def create_energy_sensor(
                     real_energy_sensor.entity_id,
                     power_sensor.entity_id,
                 )
-                return real_energy_sensor
+                return real_energy_sensor  # type: ignore
             _LOGGER.debug(
                 "No existing energy sensor found for the power sensor '%s'",
                 power_sensor.entity_id,
