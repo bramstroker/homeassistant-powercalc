@@ -450,7 +450,10 @@ async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
         entities = entity_registry.entities.get_entries_for_config_entry_id(entry.entry_id)
         for entity in entities:
             entity_registry.async_remove(entity.entity_id)
-        await hass.config_entries.async_remove(entry.entry_id)
+        try:
+            await hass.config_entries.async_remove(entry.entry_id)
+        except Exception as e:  # noqa: BLE001
+            _LOGGER.error("problem while cleaning up None entities", exc_info=e)
 
 
 
