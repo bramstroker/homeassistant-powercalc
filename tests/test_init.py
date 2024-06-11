@@ -182,23 +182,27 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
     """
     power_entry = await create_mocked_virtual_power_sensor_entry(hass, "Power")
 
-    none_entry = await setup_config_entry(
-        hass,
-        {
-            CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_NAME: "None",
-            CONF_GROUP_MEMBER_SENSORS: [power_entry.entry_id],
-        },
-        "None",
-        "None",
-    )
+    none_entries = []
+    for i in range(10): # noqa
+        none_entries.append(await setup_config_entry(
+            hass,
+            {
+                CONF_SENSOR_TYPE: SensorType.GROUP,
+                CONF_NAME: "None",
+                CONF_GROUP_MEMBER_SENSORS: [power_entry.entry_id],
+            },
+            "None",
+            "None",
+        ))
 
-    assert hass.config_entries.async_get_entry(none_entry.entry_id)
+    for entry in none_entries:
+        assert hass.config_entries.async_get_entry(entry.entry_id)
     assert hass.states.get("sensor.none_power")
     assert hass.states.get("sensor.none_energy")
 
     await repair_none_config_entries_issue(hass)
 
-    assert not hass.config_entries.async_get_entry(none_entry.entry_id)
+    for entry in none_entries:
+        assert not hass.config_entries.async_get_entry(entry.entry_id)
     assert not hass.states.get("sensor.none_power")
     assert not hass.states.get("sensor.none_energy")
