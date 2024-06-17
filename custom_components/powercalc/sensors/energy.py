@@ -237,7 +237,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         if "max_sub_interval" in signature.parameters:
             params["max_sub_interval"] = None
 
-        super().__init__(**params)
+        super().__init__(**params)  # type: ignore[arg-type]
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain

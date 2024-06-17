@@ -25,7 +25,7 @@ class LocalLoader(Loader):
         def _find_manufacturer_directories() -> set[str]:
             return set(next(os.walk(self._data_directory))[1])
 
-        manufacturer_dirs = await self._hass.async_add_executor_job(_find_manufacturer_directories)
+        manufacturer_dirs = await self._hass.async_add_executor_job(_find_manufacturer_directories)  # type: ignore[arg-type]
 
         manufacturers: set[str] = set()
         for manufacturer in manufacturer_dirs:
