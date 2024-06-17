@@ -96,13 +96,13 @@ class LutRegistry:
 
         raise LutFileNotFoundError("Data file not found: %s")
 
-    def get_supported_color_modes(self, power_profile: PowerProfile) -> set[ColorMode]:
+    async def get_supported_color_modes(self, power_profile: PowerProfile) -> set[ColorMode]:
         """Return the color modes supported by the Profile."""
         cache_key = f"{power_profile.manufacturer}_{power_profile.model}_supported_color_modes"
         supported_color_modes = self._supported_color_modes.get(cache_key)
         if supported_color_modes is None:
             supported_color_modes = set()
-            for file in os.listdir(power_profile.get_model_directory()):
+            for file in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
                 if file.endswith(".csv.gz"):
                     color_mode = ColorMode(file.removesuffix(".csv.gz"))
                     if color_mode in LUT_COLOR_MODES:
@@ -196,7 +196,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE)))
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
-        profile_color_modes = self._lut_registry.get_supported_color_modes(self._profile)
+        profile_color_modes = await self._lut_registry.get_supported_color_modes(self._profile)
         if color_mode not in profile_color_modes and color_mode == ColorMode.COLOR_TEMP:
             _LOGGER.debug("Color mode not natively supported, falling back to HS")
             color_mode = ColorMode.HS

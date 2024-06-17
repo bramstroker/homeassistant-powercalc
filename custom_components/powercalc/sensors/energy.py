@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import logging
 from decimal import Decimal
 
@@ -221,16 +222,22 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         round_digits: int = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, 2)
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
 
-        super().__init__(
-            source_entity=source_entity,
-            name=name,
-            round_digits=round_digits,
-            unit_prefix=unit_prefix,
-            unit_time=UnitOfTime.HOURS,
-            integration_method=integration_method,
-            unique_id=unique_id,
-            device_info=device_info,
-        )
+        params = {
+            "source_entity": source_entity,
+            "name": name,
+            "round_digits": round_digits,
+            "unit_prefix": unit_prefix,
+            "unit_time": UnitOfTime.HOURS,
+            "integration_method": integration_method,
+            "unique_id": unique_id,
+            "device_info": device_info,
+        }
+
+        signature = inspect.signature(IntegrationSensor.__init__)
+        if "max_sub_interval" in signature.parameters:
+            params["max_sub_interval"] = None
+
+        super().__init__(**params)  # type: ignore[arg-type]
 
         self._powercalc_source_entity = powercalc_source_entity
         self._powercalc_source_domain = powercalc_source_domain
