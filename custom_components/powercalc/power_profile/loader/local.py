@@ -22,8 +22,13 @@ class LocalLoader(Loader):
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
 
+        def _find_manufacturer_directories() -> set[str]:
+            return set(next(os.walk(self._data_directory))[1])
+
+        manufacturer_dirs = await self._hass.async_add_executor_job(_find_manufacturer_directories)  # type: ignore[arg-type]
+
         manufacturers: set[str] = set()
-        for manufacturer in next(os.walk(self._data_directory))[1]:
+        for manufacturer in manufacturer_dirs:
             models = await self.get_model_listing(manufacturer, device_type)
             if not models:
                 continue
@@ -37,7 +42,7 @@ class LocalLoader(Loader):
         manufacturer_dir = os.path.join(self._data_directory, manufacturer)
         if not os.path.exists(manufacturer_dir):
             return models
-        for model in os.listdir(manufacturer_dir):
+        for model in await self._hass.async_add_executor_job(os.listdir, manufacturer_dir):
             if model[0] in [".", "@"]:
                 continue
 
@@ -81,7 +86,8 @@ class LocalLoader(Loader):
         manufacturer_dir = os.path.join(self._data_directory, manufacturer)
         if not os.path.exists(manufacturer_dir):
             return None
-        model_dirs = os.listdir(manufacturer_dir)
+
+        model_dirs = await self._hass.async_add_executor_job(os.listdir, manufacturer_dir)
         for model in search:
             if model in model_dirs:
                 return model

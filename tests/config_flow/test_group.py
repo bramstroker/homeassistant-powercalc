@@ -535,3 +535,28 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
 
     assert hass.states.get("sensor.new_group_power")
     assert hass.states.get("sensor.new_group_energy")
+
+
+async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
+    """
+    Previously a group was created with the name "None" when the group field was set to null.
+    Prevent regression by checking if the group field is null and not creating a group in that case.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/2281
+    """
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "abc",
+            CONF_ENTITY_ID: "light.my_light",
+            CONF_NAME: "Some light",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_GROUP: None,
+        },
+        "abc",
+        "Some light",
+    )
+
+    assert not hass.states.get("sensor.none_power")
+

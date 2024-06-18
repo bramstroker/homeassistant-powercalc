@@ -283,7 +283,7 @@ async def add_to_associated_group(
     if sensor_type not in [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY]:
         return None
 
-    if CONF_GROUP not in config_entry.data:
+    if CONF_GROUP not in config_entry.data or not config_entry.data.get(CONF_GROUP):
         return None
 
     group_entry_id = str(config_entry.data.get(CONF_GROUP))
