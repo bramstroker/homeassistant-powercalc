@@ -10,12 +10,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.powercalc import repair_none_config_entries_issue
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
+    CONF_GROUP_MEMBER_SENSORS,
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_POWER,
@@ -31,8 +33,10 @@ from custom_components.powercalc.const import (
 
 from .common import (
     create_input_boolean,
+    create_mocked_virtual_power_sensor_entry,
     get_simple_fixed_config,
     run_powercalc_setup,
+    setup_config_entry,
 )
 from .conftest import MockEntityWithModel
 
@@ -169,3 +173,36 @@ async def test_create_config_entry_without_energy_sensor(
         },
     }
     assert new_entry.version == 2
+
+
+async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
+    """
+    Test that none named sensors that were created because of a bug are removed on start up.
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/2281
+    """
+    power_entry = await create_mocked_virtual_power_sensor_entry(hass, "Power")
+
+    none_entries = []
+    for i in range(10): # noqa
+        none_entries.append(await setup_config_entry(
+            hass,
+            {
+                CONF_SENSOR_TYPE: SensorType.GROUP,
+                CONF_NAME: "None",
+                CONF_GROUP_MEMBER_SENSORS: [power_entry.entry_id],
+            },
+            "None",
+            "None",
+        ))
+
+    for entry in none_entries:
+        assert hass.config_entries.async_get_entry(entry.entry_id)
+    assert hass.states.get("sensor.none_power")
+    assert hass.states.get("sensor.none_energy")
+
+    await repair_none_config_entries_issue(hass)
+
+    for entry in none_entries:
+        assert not hass.config_entries.async_get_entry(entry.entry_id)
+    assert not hass.states.get("sensor.none_power")
+    assert not hass.states.get("sensor.none_energy")

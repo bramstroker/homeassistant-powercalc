@@ -442,7 +442,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(_build_daily_energy_config(user_input, schema))
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.create_config_entry()
+            return self.create_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id="daily_energy",
@@ -467,7 +467,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not errors:
                 if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                     return await self.async_step_utility_meter_options()
-                return self.create_config_entry()
+                return self.create_config_entry()  # type: ignore
 
         group_schema = SCHEMA_GROUP.extend(
             _create_group_options_schema(self.hass).schema,
@@ -622,7 +622,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(user_input)
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.create_config_entry()
+            return self.create_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id="real_power",
@@ -728,7 +728,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
-            return self.create_config_entry()
+            return self.create_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id="power_advanced",
@@ -745,7 +745,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         if user_input is not None:
             self.sensor_config.update(user_input or {})
-            return self.create_config_entry()
+            return self.create_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id="utility_meter_options",
@@ -787,7 +787,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if self.source_entity_id:
             self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
 
-        return self.async_create_entry(title=self.name, data=self.sensor_config)  # type: ignore
+        return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
 
 class OptionsFlowHandler(OptionsFlow):
