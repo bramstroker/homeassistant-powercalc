@@ -464,6 +464,7 @@ async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
         except Exception as e:  # noqa: BLE001
             _LOGGER.error("problem while cleaning up None entities", exc_info=e)
 
+
 def _notify_message(
     hass: HomeAssistant,
     notification_id: str,
