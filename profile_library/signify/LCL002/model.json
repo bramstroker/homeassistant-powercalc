@@ -10,6 +10,6 @@
         "VERSION": "v1.12.6:docker"
     },
     "name": "Hue lightstrip outdoor",
-    "standby_power": 0.25
+    "standby_power": 0.25,
     "config_flow_discovery_remarks": "This profile was measured with the default included PSU. If you run this with a PSU that is different from the included PSU this can skew the readings."
 }
