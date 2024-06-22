@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^20.0.2",
+    "@octokit/rest": "^21.0.0",
     "apicache": "^1.6.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
