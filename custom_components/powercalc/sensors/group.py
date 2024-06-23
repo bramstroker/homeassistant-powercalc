@@ -480,6 +480,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     """Base class for grouped sensors."""
 
     _attr_should_poll = False
+    _unrecorded_attributes = frozenset({ATTR_ENTITIES, ATTR_IS_GROUP})
 
     def __init__(
         self,
