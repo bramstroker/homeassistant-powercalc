@@ -135,27 +135,15 @@ class LightRunner(MeasurementRunner):
                     **asdict(variation),
                 )
 
-                if (
-                    previous_variation
-                    and isinstance(variation, ColorTempVariation)
-                    and variation.ct < previous_variation.ct
-                ):
+                if previous_variation and isinstance(variation, ColorTempVariation) and variation.ct < previous_variation.ct:
                     _LOGGER.info("Extra waiting for significant CT change...")
                     time.sleep(config.SLEEP_TIME_CT)
 
-                if (
-                    previous_variation
-                    and isinstance(variation, HsVariation)
-                    and variation.sat < previous_variation.sat
-                ):
+                if previous_variation and isinstance(variation, HsVariation) and variation.sat < previous_variation.sat:
                     _LOGGER.info("Extra waiting for significant SAT change...")
                     time.sleep(config.SLEEP_TIME_SAT)
 
-                if (
-                    previous_variation
-                    and isinstance(variation, HsVariation)
-                    and variation.hue < previous_variation.hue
-                ):
+                if previous_variation and isinstance(variation, HsVariation) and variation.hue < previous_variation.hue:
                     _LOGGER.info("Extra waiting for significant HUE change...")
                     time.sleep(config.SLEEP_TIME_HUE)
 
@@ -317,17 +305,12 @@ class LightRunner(MeasurementRunner):
             time_left += config.SLEEP_STANDBY + config.SLEEP_INITIAL
         time_left += num_variations_left * (config.SLEEP_TIME + estimated_step_delay)
         if config.SAMPLE_COUNT > 1:
-            time_left += (
-                num_variations_left
-                * config.SAMPLE_COUNT
-                * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
-            )
+            time_left += num_variations_left * config.SAMPLE_COUNT * (config.SLEEP_TIME_SAMPLE + estimated_step_delay)
 
         if isinstance(current_variation, HsVariation):
             sat_steps_left = (
                 round(
-                    (config.MAX_BRIGHTNESS - current_variation.bri)
-                    / config.HS_BRI_STEPS,
+                    (config.MAX_BRIGHTNESS - current_variation.bri) / config.HS_BRI_STEPS,
                 )
                 - 1
             )
@@ -340,8 +323,7 @@ class LightRunner(MeasurementRunner):
         if isinstance(current_variation, ColorTempVariation):
             ct_steps_left = (
                 round(
-                    (config.MAX_BRIGHTNESS - current_variation.bri)
-                    / config.CT_BRI_STEPS,
+                    (config.MAX_BRIGHTNESS - current_variation.bri) / config.CT_BRI_STEPS,
                 )
                 - 1
             )
@@ -517,10 +499,13 @@ class LightRunner(MeasurementRunner):
     @staticmethod
     def gzip_csv(csv_file_path: str) -> None:
         """Gzip the CSV file"""
-        with open(csv_file_path, "rb") as csv_file, gzip.open(
-            f"{csv_file_path}.gz",
-            "wb",
-        ) as gzip_file:
+        with (
+            open(csv_file_path, "rb") as csv_file,
+            gzip.open(
+                f"{csv_file_path}.gz",
+                "wb",
+            ) as gzip_file,
+        ):
             shutil.copyfileobj(csv_file, gzip_file)
 
     def measure_standby_power(self) -> float:
@@ -560,8 +545,7 @@ class LightRunner(MeasurementRunner):
             ),
             inquirer.Confirm(
                 name="dummy_load",
-                message="Did you connect a dummy load? This can help to be able to measure standby power and low "
-                "brightness levels correctly",
+                message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
                 default=False,
             ),
             inquirer.Confirm(

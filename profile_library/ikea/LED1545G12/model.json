@@ -1,11 +1,11 @@
 {
-    "measure_device": "unknown",
-    "measure_method": "script",
-    "name": "TRADFRI bulb E27 WS opal 980lm",
-    "standby_power": 0.4,
-    "calculation_strategy": "lut",
-    "aliases": [
-        "TRADFRI bulb E27 WS opal 980lm"
-    ],
-    "created_at": "2021-08-13T14:31:12"
+  "measure_device": "unknown",
+  "measure_method": "script",
+  "name": "TRADFRI bulb E27 WS opal 980lm",
+  "standby_power": 0.4,
+  "calculation_strategy": "lut",
+  "aliases": [
+    "TRADFRI bulb E27 WS opal 980lm"
+  ],
+  "created_at": "2021-08-13T14:31:12"
 }

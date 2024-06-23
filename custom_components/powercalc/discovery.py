@@ -84,11 +84,7 @@ async def get_model_information(
         return None
     device_registry = dr.async_get(hass)
     device_entry = device_registry.async_get(entity_entry.device_id)
-    if (
-        device_entry is None
-        or device_entry.manufacturer is None
-        or device_entry.model is None
-    ):
+    if device_entry is None or device_entry.manufacturer is None or device_entry.model is None:
         return None
 
     manufacturer = str(device_entry.manufacturer)
@@ -121,7 +117,8 @@ class DiscoveryManager:
             if not model_info:
                 continue
             power_profile = await self.get_power_profile(
-                entity_entry.entity_id, model_info,
+                entity_entry.entity_id,
+                model_info,
             )
             source_entity = await create_source_entity(
                 entity_entry.entity_id,
@@ -135,7 +132,9 @@ class DiscoveryManager:
         _LOGGER.debug("Done auto discovering entities")
 
     async def get_power_profile(
-        self, entity_id: str, model_info: ModelInfo,
+        self,
+        entity_id: str,
+        model_info: ModelInfo,
     ) -> PowerProfile | None:
         if entity_id in self.power_profiles:
             return self.power_profiles[entity_id]
@@ -233,8 +232,7 @@ class DiscoveryManager:
         existing_entries = [
             entry
             for entry in self.hass.config_entries.async_entries(DOMAIN)
-            if entry.unique_id
-            in [source_entity.unique_id, f"pc_{source_entity.unique_id}"]
+            if entry.unique_id in [source_entity.unique_id, f"pc_{source_entity.unique_id}"]
         ]
         if existing_entries:
             _LOGGER.debug(
@@ -268,9 +266,7 @@ class DiscoveryManager:
         Either with the YAML or GUI method.
         """
         if not self.manually_configured_entities:
-            self.manually_configured_entities = (
-                self._load_manually_configured_entities()
-            )
+            self.manually_configured_entities = self._load_manually_configured_entities()
 
         return entity_id in self.manually_configured_entities
 
@@ -281,11 +277,7 @@ class DiscoveryManager:
         # Find entity ids in yaml config (Legacy)
         if SENSOR_DOMAIN in self.ha_config:  # pragma: no cover
             sensor_config = self.ha_config.get(SENSOR_DOMAIN)
-            platform_entries = [
-                item
-                for item in sensor_config or {}
-                if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN
-            ]
+            platform_entries = [item for item in sensor_config or {} if isinstance(item, dict) and item.get(CONF_PLATFORM) == DOMAIN]
             for entry in platform_entries:
                 entities.extend(self._find_entity_ids_in_yaml_config(entry))
 
@@ -298,11 +290,7 @@ class DiscoveryManager:
 
         # Add entities from existing config entries
         entities.extend(
-            [
-                str(entry.data.get(CONF_ENTITY_ID))
-                for entry in self.hass.config_entries.async_entries(DOMAIN)
-                if entry.source == SOURCE_USER
-            ],
+            [str(entry.data.get(CONF_ENTITY_ID)) for entry in self.hass.config_entries.async_entries(DOMAIN) if entry.source == SOURCE_USER],
         )
 
         return entities

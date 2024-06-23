@@ -1,396 +1,396 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Senzorul este deja configurat, specificați un ID unic"
-        },
-        "error": {
-            "daily_energy_mandatory": "Trebuie să furnizați cel puțin o Valoare sau șablonul Valoare",
-            "entity_mandatory": "Selectarea unei entități este necesară pentru orice altă strategie decât playbook",
-            "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
-            "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
-            "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
-            "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
-            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
-            "linear_unsupported_domain": "Domeniul entității nu este acceptat pentru modul liniar. Trebuie să fie unul dintre: fan, light sau mediaplayer. Cu toate acestea, puteți utiliza opțiunea de calibrare",
-            "lut_unsupported_color_mode": "Profilul LUT nu acceptă unul dintre modurile de culoare ale luminii dumneavoastră. Consultați jurnalele pentru mai multe informații",
-            "lut_wrong_domain": "Numai entitățile luminoase pot folosi modul LUT",
-            "playbook_mandatory": "Trebuie să specificați cel puțin un playbook",
-            "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
-        },
-        "flow_title": "{name} ({manufacturer} {model})",
-        "step": {
-            "daily_energy": {
-                "data": {
-                    "create_utility_meters": "Creați contoare",
-                    "group": "Add to group",
-                    "name": "Nume",
-                    "on_time": "Timp pornit",
-                    "start_time": "Timpul de pornire",
-                    "unique_id": "ID unic",
-                    "unit_of_measurement": "Unitate de măsură",
-                    "update_frequency": "Frecvență actualizare",
-                    "value": "Valoare",
-                    "value_template": "Șablon de valoare"
-                },
-                "data_description": {
-                    "group": "Fill in a custom group name to create a new group",
-                    "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
-                    "update_frequency": "timpul în secunde între actualizările stării senzorului"
-                },
-                "title": "Creați un senzor fix zilnic"
-            },
-            "fixed": {
-                "data": {
-                    "power": "Putere",
-                    "power_template": "Sablon de putere",
-                    "states_power": "Puterea starilor"
-                },
-                "data_description": {
-                    "power": "O valoare fixă a puterii în wați când entitatea este PORNITĂ",
-                    "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
-                    "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus"
-                },
-                "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
-                "title": "Configurație fixă"
-            },
-            "group": {
-                "data": {
-                    "area": "Zonă",
-                    "create_energy_sensor": "Create energy sensor",
-                    "create_utility_meters": "Creați contoare",
-                    "device": "Dispozitiv",
-                    "group_energy_entities": "Entități energetice suplimentare",
-                    "group_member_sensors": "Senzori powercalc membri",
-                    "group_power_entities": "Entități de putere suplimentare",
-                    "hide_members": "Ascunde members",
-                    "include_non_powercalc_sensors": "Include senzori non-powercalc",
-                    "name": "Nume",
-                    "sub_groups": "Subgrupuri",
-                    "unique_id": "ID unic"
-                },
-                "data_description": {
-                    "area": "Adaugă toți senzorii de putere din zona specificată",
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-                    "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
-                    "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
-                    "group_member_sensors": "Senzori Powercalc de inclus în grup",
-                    "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
-                    "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
-                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
-                },
-                "title": "Creați un senzor de grup"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Confirmați modelul"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
-                },
-                "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru dispozitivul dvs.{remarks}",
-                "title": "Bibliotecă"
-            },
-            "linear": {
-                "data": {
-                    "attribute": "Atribut",
-                    "calibrate": "Valori de calibrare",
-                    "gamma_curve": "Curba gamma",
-                    "max_power": "Putere maxima",
-                    "min_power": "Putere minimă"
-                },
-                "data_description": {
-                    "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
-                    "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
-                },
-                "title": "Configurație liniară"
-            },
-            "manufacturer": {
-                "data": {
-                    "manufacturer": "Producător"
-                },
-                "description": "Selectați producătorul dispozitivului",
-                "title": "Configurare Producător"
-            },
-            "model": {
-                "data": {
-                    "model": "ID Model"
-                },
-                "description": "Selectați modelul dispozitivului. Consultați [list]({supported_models_link}) modelelor acceptate pentru mai multe informații",
-                "title": "Configurare Model"
-            },
-            "playbook": {
-                "data": {
-                    "autostart": "Pornire automată",
-                    "playbooks": "Playbooks",
-                    "repeat": "Repeta",
-                    "states_trigger": "State trigger"
-                },
-                "data_description": {
-                    "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
-                    "playbooks": "Introduceți un manual pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
-                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
-                },
-                "title": "Configurare Playbook"
-            },
-            "power_advanced": {
-                "data": {
-                    "calculation_enabled_condition": "Condiție de calcul activat",
-                    "energy_integration_method": "Metoda de integrare energetică",
-                    "ignore_unavailable_state": "Ignorați starea indisponibilă",
-                    "multiply_factor": "Factorul de multiplicare",
-                    "multiply_factor_standby": "Factor de multiplicare standby",
-                    "unavailable_power": "Putere indisponibilă",
-                    "utility_meter_tariffs": "Tarifele contoarelor"
-                },
-                "data_description": {
-                    "calculation_enabled_condition": "Strategia configurată de calcul al puterii va fi executată numai atunci când acest șablon este evaluat la adevărat sau la 1, altfel senzorul de putere va afișa 0",
-                    "ignore_unavailable_state": "Comutați această setare atunci când doriți ca senzorul de putere să rămână disponibil chiar dacă entitatea sursă nu este disponibilă",
-                    "multiply_factor": "Înmulțiți puterea calculată cu acest raport. Poate fi util pentru grupuri de lumina",
-                    "multiply_factor_standby": "Dacă se aplică și factorul de multiplicare la puterea standby",
-                    "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
-                    "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
-                },
-                "description": "Opțiunile de mai jos sunt pentru configurarea avansată powercalc. Majoritatea utilizatorilor nu vor folosi acest lucru, așa că le puteți sări peste acestea",
-                "title": "Opțiuni avansate"
-            },
-            "real_power": {
-                "data": {
-                    "create_utility_meters": "Creați contoare",
-                    "entity_id": "ID senzor de putere",
-                    "name": "Nume",
-                    "device": "Dispozitiv"
-                },
-                "data_description": {
-                    "create_utility_meters": "Lăsați powercalc să creeze contoare de utilitate, cicluri zilnice, pe oră etc.",
-                    "name": "Numele de bază pentru contorul de energie și utilități. Numele complet al entității va fi setat în consecință cu setarea energy_sensor_naming",
-                    "device": "Adăugați senzorul de energie creat la un anumit dispozitiv"
-                },
-                "description": "În prezent, setările specifice pot fi configurate numai global",
-                "title": "Creați un senzor de energie pentru un senzor de putere existent"
-            },
-            "sub_profile": {
-                "data": {
-                    "sub_profile": "Subprofil"
-                },
-                "description": "Acest model are mai multe subprofiluri. Selectați unul care se potrivește dispozitivului dvs",
-                "title": "Configurare subprofil"
-            },
-            "user": {
-                "data": {
-                    "sensor_type": "Tip senzor"
-                },
-                "menu_options": {
-                    "daily_energy": "Energie zilnică",
-                    "group": "Grup",
-                    "menu_library": "Putere virtuală (biblioteca)",
-                    "real_power": "Energie de la senzorul de putere reală",
-                    "virtual_power": "Putere virtuală (manual)"
-                },
-                "title": "Alegeți tipul dvs. de senzor"
-            },
-            "utility_meter_options": {
-                "title": "Opțiuni de contor",
-                "description": "Definiți aici setările pentru crearea contorului",
-                "data": {
-                    "utility_meter_types": "Cicluri",
-                    "utility_meter_tariffs": "Tarife"
-                },
-                "data_description": {
-                    "utility_meter_types": "Creați contoare pentru ciclurile specificate",
-                    "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
-                }
-            },
-            "virtual_power": {
-                "data": {
-                    "create_energy_sensor": "Creați un senzor de energie",
-                    "create_utility_meters": "Creați contoare",
-                    "entity_id": "Entitatea sursă",
-                    "group": "Adăugați la grup",
-                    "mode": "Strategia de calcul",
-                    "name": "Nume",
-                    "standby_power": "Putere in Standby",
-                    "unique_id": "ID unic"
-                },
-                "data_description": {
-                    "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
-                    "create_utility_meters": "Lăsați powercalc să creeze contoare, cu ciclu zilnic, pe oră etc.",
-                    "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
-                    "group": "Fill in a custom group name to create a new group",
-                    "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
-                    "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
-                    "unique_id": "Specificați un ID unic. Acest lucru va permite configurarea mai multor senzori de putere pentru aceeași entitate. Când nu este specificat, va lua ID-ul unic al entității sursă"
-                },
-                "description": "Consultați manualul pentru mai multe informații despre posibilele strategii și opțiuni de configurare",
-                "title": "Creați un senzor de putere virtual"
-            },
-            "wled": {
-                "data": {
-                    "power_factor": "Factor de putere",
-                    "voltage": "Voltaj"
-                },
-                "title": "Configurare WLED"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Senzorul este deja configurat, specificați un ID unic"
     },
-    "issues": {
-        "deprecated_platform_yaml": {
-            "description": "Configurarea senzorilor folosind `senzor->platform` a fost retrasă. Trebuie să vă schimbați configurația la `powercalc->senzori`. Faceți clic pe 'Aflați mai multe' pentru instrucțiuni suplimentare.",
-            "title": "Configurația Powercalc YAML a fost mutată"
-        }
+    "error": {
+      "daily_energy_mandatory": "Trebuie să furnizați cel puțin o Valoare sau șablonul Valoare",
+      "entity_mandatory": "Selectarea unei entități este necesară pentru orice altă strategie decât playbook",
+      "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
+      "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
+      "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
+      "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
+      "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
+      "linear_unsupported_domain": "Domeniul entității nu este acceptat pentru modul liniar. Trebuie să fie unul dintre: fan, light sau mediaplayer. Cu toate acestea, puteți utiliza opțiunea de calibrare",
+      "lut_unsupported_color_mode": "Profilul LUT nu acceptă unul dintre modurile de culoare ale luminii dumneavoastră. Consultați jurnalele pentru mai multe informații",
+      "lut_wrong_domain": "Numai entitățile luminoase pot folosi modul LUT",
+      "playbook_mandatory": "Trebuie să specificați cel puțin un playbook",
+      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
     },
-    "options": {
-        "error": {
-            "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
-            "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
-            "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
-            "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
-            "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
-            "linear_unsupported_domain": "Domeniul entității nu este acceptat pentru modul liniar. Trebuie să fie unul dintre: fan, light sau mediaplayer. Cu toate acestea, puteți utiliza opțiunea de calibrare",
-            "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
+    "flow_title": "{name} ({manufacturer} {model})",
+    "step": {
+      "daily_energy": {
+        "data": {
+          "create_utility_meters": "Creați contoare",
+          "group": "Add to group",
+          "name": "Nume",
+          "on_time": "Timp pornit",
+          "start_time": "Timpul de pornire",
+          "unique_id": "ID unic",
+          "unit_of_measurement": "Unitate de măsură",
+          "update_frequency": "Frecvență actualizare",
+          "value": "Valoare",
+          "value_template": "Șablon de valoare"
         },
-        "step": {
-            "init": {
-                "data": {
-                    "area": "Zona",
-                    "attribute": "Atribut",
-                    "autostart": "Pornire automată",
-                    "calculation_enabled_condition": "Condiție de calcul activat",
-                    "calibrate": "Valori de calibrare",
-                    "create_energy_sensor": "Creați un senzor de energie",
-                    "create_utility_meters": "Creați contoare",
-                    "device": "Dispozitiv",
-                    "energy_integration_method": "Metoda de integrare energetică",
-                    "gamma_curve": "Curba gamma",
-                    "group_energy_entities": "Entități energetice suplimentare",
-                    "group_member_sensors": "Senzori powercalc membri",
-                    "group_power_entities": "Entități de putere suplimentare",
-                    "hide_members": "Ascunde membrii",
-                    "ignore_unavailable_state": "Ignorați starea indisponibilă",
-                    "include_non_powercalc_sensors": "Includeți senzori non-powercalc",
-                    "max_power": "Putere maxima",
-                    "min_power": "Putere minimă",
-                    "multiply_factor": "Factorul de multiplicare",
-                    "multiply_factor_standby": "Factor de multiplicare in standby",
-                    "name": "Nume",
-                    "on_time": "Timp pornit",
-                    "playbooks": "Playbooks",
-                    "power": "Putere",
-                    "power_template": "Șablon de putere",
-                    "repeat": "Repeta",
-                    "standby_power": "Putere in Standby",
-                    "states_power": "Putere de stare",
-                    "states_trigger": "State trigger",
-                    "sub_groups": "Subgrupuri",
-                    "unavailable_power": "Putere indisponibilă",
-                    "unit_of_measurement": "Unitate de măsură",
-                    "update_frequency": "Frecvență de actualizare",
-                    "utility_meter_tariffs": "Tarifele contoarelor",
-                    "value": "Valoare",
-                    "value_template": "șablon valoare"
-                },
-                "data_description": {
-                    "area": "Adaugă toți senzorii powercalc din zona specificată",
-                    "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
-                    "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
-                    "calculation_enabled_condition": "Strategia configurată de calcul al puterii va fi executată numai când acest șablon este evaluat la adevărat sau la 1, altfel senzorul de putere va afișa 0",
-                    "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20",
-                    "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
-                    "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
-                    "group_member_sensors": "Senzori Powercalc de incluși în grup",
-                    "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
-                    "ignore_unavailable_state": "Comutați această setare atunci când doriți ca senzorul de putere să rămână disponibil chiar dacă entitatea sursă nu este disponibilă",
-                    "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
-                    "multiply_factor": "Înmulțiți puterea calculată cu acest raport. Poate fi util pentru grupuri luminoase",
-                    "multiply_factor_standby": "Dacă se aplică și factorul de multiplicare la puterea de așteptare",
-                    "playbooks": "Introduceți un playbook pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
-                    "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
-                    "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
-                    "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus",
-                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-                    "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
-                    "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
-                    "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
-                }
-            }
+        "data_description": {
+          "group": "Fill in a custom group name to create a new group",
+          "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
+          "update_frequency": "timpul în secunde între actualizările stării senzorului"
+        },
+        "title": "Creați un senzor fix zilnic"
+      },
+      "fixed": {
+        "data": {
+          "power": "Putere",
+          "power_template": "Sablon de putere",
+          "states_power": "Puterea starilor"
+        },
+        "data_description": {
+          "power": "O valoare fixă a puterii în wați când entitatea este PORNITĂ",
+          "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
+          "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus"
+        },
+        "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
+        "title": "Configurație fixă"
+      },
+      "group": {
+        "data": {
+          "area": "Zonă",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Creați contoare",
+          "device": "Dispozitiv",
+          "group_energy_entities": "Entități energetice suplimentare",
+          "group_member_sensors": "Senzori powercalc membri",
+          "group_power_entities": "Entități de putere suplimentare",
+          "hide_members": "Ascunde members",
+          "include_non_powercalc_sensors": "Include senzori non-powercalc",
+          "name": "Nume",
+          "sub_groups": "Subgrupuri",
+          "unique_id": "ID unic"
+        },
+        "data_description": {
+          "area": "Adaugă toți senzorii de putere din zona specificată",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
+          "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
+          "group_member_sensors": "Senzori Powercalc de inclus în grup",
+          "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
+          "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
+          "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup"
+        },
+        "title": "Creați un senzor de grup"
+      },
+      "library": {
+        "data": {
+          "confirm_autodisovered_model": "Confirmați modelul"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "Dacă alegeți să nu confirmați, puteți introduce singur producătorul și modelul"
+        },
+        "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru dispozitivul dvs.{remarks}",
+        "title": "Bibliotecă"
+      },
+      "linear": {
+        "data": {
+          "attribute": "Atribut",
+          "calibrate": "Valori de calibrare",
+          "gamma_curve": "Curba gamma",
+          "max_power": "Putere maxima",
+          "min_power": "Putere minimă"
+        },
+        "data_description": {
+          "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
+          "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20"
+        },
+        "title": "Configurație liniară"
+      },
+      "manufacturer": {
+        "data": {
+          "manufacturer": "Producător"
+        },
+        "description": "Selectați producătorul dispozitivului",
+        "title": "Configurare Producător"
+      },
+      "model": {
+        "data": {
+          "model": "ID Model"
+        },
+        "description": "Selectați modelul dispozitivului. Consultați [list]({supported_models_link}) modelelor acceptate pentru mai multe informații",
+        "title": "Configurare Model"
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Pornire automată",
+          "playbooks": "Playbooks",
+          "repeat": "Repeta",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
+          "playbooks": "Introduceți un manual pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        },
+        "title": "Configurare Playbook"
+      },
+      "power_advanced": {
+        "data": {
+          "calculation_enabled_condition": "Condiție de calcul activat",
+          "energy_integration_method": "Metoda de integrare energetică",
+          "ignore_unavailable_state": "Ignorați starea indisponibilă",
+          "multiply_factor": "Factorul de multiplicare",
+          "multiply_factor_standby": "Factor de multiplicare standby",
+          "unavailable_power": "Putere indisponibilă",
+          "utility_meter_tariffs": "Tarifele contoarelor"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Strategia configurată de calcul al puterii va fi executată numai atunci când acest șablon este evaluat la adevărat sau la 1, altfel senzorul de putere va afișa 0",
+          "ignore_unavailable_state": "Comutați această setare atunci când doriți ca senzorul de putere să rămână disponibil chiar dacă entitatea sursă nu este disponibilă",
+          "multiply_factor": "Înmulțiți puterea calculată cu acest raport. Poate fi util pentru grupuri de lumina",
+          "multiply_factor_standby": "Dacă se aplică și factorul de multiplicare la puterea standby",
+          "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
+          "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
+        },
+        "description": "Opțiunile de mai jos sunt pentru configurarea avansată powercalc. Majoritatea utilizatorilor nu vor folosi acest lucru, așa că le puteți sări peste acestea",
+        "title": "Opțiuni avansate"
+      },
+      "real_power": {
+        "data": {
+          "create_utility_meters": "Creați contoare",
+          "entity_id": "ID senzor de putere",
+          "name": "Nume",
+          "device": "Dispozitiv"
+        },
+        "data_description": {
+          "create_utility_meters": "Lăsați powercalc să creeze contoare de utilitate, cicluri zilnice, pe oră etc.",
+          "name": "Numele de bază pentru contorul de energie și utilități. Numele complet al entității va fi setat în consecință cu setarea energy_sensor_naming",
+          "device": "Adăugați senzorul de energie creat la un anumit dispozitiv"
+        },
+        "description": "În prezent, setările specifice pot fi configurate numai global",
+        "title": "Creați un senzor de energie pentru un senzor de putere existent"
+      },
+      "sub_profile": {
+        "data": {
+          "sub_profile": "Subprofil"
+        },
+        "description": "Acest model are mai multe subprofiluri. Selectați unul care se potrivește dispozitivului dvs",
+        "title": "Configurare subprofil"
+      },
+      "user": {
+        "data": {
+          "sensor_type": "Tip senzor"
+        },
+        "menu_options": {
+          "daily_energy": "Energie zilnică",
+          "group": "Grup",
+          "menu_library": "Putere virtuală (biblioteca)",
+          "real_power": "Energie de la senzorul de putere reală",
+          "virtual_power": "Putere virtuală (manual)"
+        },
+        "title": "Alegeți tipul dvs. de senzor"
+      },
+      "utility_meter_options": {
+        "title": "Opțiuni de contor",
+        "description": "Definiți aici setările pentru crearea contorului",
+        "data": {
+          "utility_meter_types": "Cicluri",
+          "utility_meter_tariffs": "Tarife"
+        },
+        "data_description": {
+          "utility_meter_types": "Creați contoare pentru ciclurile specificate",
+          "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
         }
-    },
-    "services": {
-        "activate_playbook": {
-            "description": "Începeți execuția unui playbook.",
-            "fields": {
-                "playbook_id": {
-                    "description": "Identificator Playbook",
-                    "name": "Playbook"
-                }
-            },
-            "name": "Activeaza playbook"
+      },
+      "virtual_power": {
+        "data": {
+          "create_energy_sensor": "Creați un senzor de energie",
+          "create_utility_meters": "Creați contoare",
+          "entity_id": "Entitatea sursă",
+          "group": "Adăugați la grup",
+          "mode": "Strategia de calcul",
+          "name": "Nume",
+          "standby_power": "Putere in Standby",
+          "unique_id": "ID unic"
         },
-        "calibrate_energy": {
-            "description": "Setează senzorul de energie la o anumită valoare kWh.",
-            "fields": {
-                "value": {
-                    "description": "Valoarea de setat.",
-                    "name": "Valoare"
-                }
-            },
-            "name": "Calibrați senzorul de energie"
+        "data_description": {
+          "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
+          "create_utility_meters": "Lăsați powercalc să creeze contoare, cu ciclu zilnic, pe oră etc.",
+          "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
+          "group": "Fill in a custom group name to create a new group",
+          "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
+          "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
+          "unique_id": "Specificați un ID unic. Acest lucru va permite configurarea mai multor senzori de putere pentru aceeași entitate. Când nu este specificat, va lua ID-ul unic al entității sursă"
         },
-        "calibrate_utility_meter": {
-            "description": "Calibrează un senzor de contor.",
-            "fields": {
-                "value": {
-                    "description": "Valoarea de setat.",
-                    "name": "Valoare"
-                }
-            },
-            "name": "Calibrați contorul"
+        "description": "Consultați manualul pentru mai multe informații despre posibilele strategii și opțiuni de configurare",
+        "title": "Creați un senzor de putere virtual"
+      },
+      "wled": {
+        "data": {
+          "power_factor": "Factor de putere",
+          "voltage": "Voltaj"
         },
-        "change_gui_config": {
-            "description": "Configurația de schimbare în lot a tuturor intrărilor de configurare Powercalc",
-            "fields": {
-                "field": {
-                    "description": "Randul pe care doriți să îl schimbați",
-                    "name": "Valoare"
-                },
-                "value": {
-                    "description": "Valoarea de setat.",
-                    "name": "Valoare"
-                }
-            },
-            "name": "Schimbați configurația GUI"
-        },
-        "get_active_playbook": {
-            "description": "Get current running playbook",
-            "name": "Get active playbook"
-        },
-        "increase_daily_energy": {
-            "description": "Mărește senzorul cu o anumită cantitate.",
-            "fields": {
-                "value": {
-                    "description": "Valoare de adăugat la senzor.",
-                    "name": "Valoare"
-                }
-            },
-            "name": "Creșteți senzorul de energie zilnic"
-        },
-        "reset_energy": {
-            "description": "Resetați un senzor de energie la zero kWh.",
-            "name": "Resetați senzorul de energie"
-        },
-        "stop_playbook": {
-            "description": "Opriți playbook activ în prezent.",
-            "name": "Oprire playbook"
-        },
-        "switch_sub_profile": {
-            "description": "Unele profiluri din bibliotecă au subprofiluri diferite. Acest serviciu vă permite să treceți la altul.",
-            "fields": {
-                "profile": {
-                    "name": "Subprofil",
-                    "description": "Definiți unul dintre subprofilurile posibile"
-                }
-            },
-            "name": "Comutați la alt profil secundar"
-        }
+        "title": "Configurare WLED"
+      }
     }
+  },
+  "issues": {
+    "deprecated_platform_yaml": {
+      "description": "Configurarea senzorilor folosind `senzor->platform` a fost retrasă. Trebuie să vă schimbați configurația la `powercalc->senzori`. Faceți clic pe 'Aflați mai multe' pentru instrucțiuni suplimentare.",
+      "title": "Configurația Powercalc YAML a fost mutată"
+    }
+  },
+  "options": {
+    "error": {
+      "fixed_mandatory": "Trebuie să furnizați cel puțin o putere, șablon putere sau State power",
+      "fixed_states_power_only": "Această entitate poate funcționa numai cu 'states_power' nu cu 'power'",
+      "group_mandatory": "Trebuie să definiți cel puțin subgrupuri sau entități de putere și energie",
+      "linear_mandatory": "Trebuie să furnizați cel puțin unul dintre max_power sau să calibrați",
+      "linear_min_higher_as_max": "Puterea maximă nu poate fi mai mică decât puterea minimă",
+      "linear_unsupported_domain": "Domeniul entității nu este acceptat pentru modul liniar. Trebuie să fie unul dintre: fan, light sau mediaplayer. Cu toate acestea, puteți utiliza opțiunea de calibrare",
+      "unknown": "A apărut o eroare necunoscută, vă rugăm să consultați jurnalele pentru informații suplimentare"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "area": "Zona",
+          "attribute": "Atribut",
+          "autostart": "Pornire automată",
+          "calculation_enabled_condition": "Condiție de calcul activat",
+          "calibrate": "Valori de calibrare",
+          "create_energy_sensor": "Creați un senzor de energie",
+          "create_utility_meters": "Creați contoare",
+          "device": "Dispozitiv",
+          "energy_integration_method": "Metoda de integrare energetică",
+          "gamma_curve": "Curba gamma",
+          "group_energy_entities": "Entități energetice suplimentare",
+          "group_member_sensors": "Senzori powercalc membri",
+          "group_power_entities": "Entități de putere suplimentare",
+          "hide_members": "Ascunde membrii",
+          "ignore_unavailable_state": "Ignorați starea indisponibilă",
+          "include_non_powercalc_sensors": "Includeți senzori non-powercalc",
+          "max_power": "Putere maxima",
+          "min_power": "Putere minimă",
+          "multiply_factor": "Factorul de multiplicare",
+          "multiply_factor_standby": "Factor de multiplicare in standby",
+          "name": "Nume",
+          "on_time": "Timp pornit",
+          "playbooks": "Playbooks",
+          "power": "Putere",
+          "power_template": "Șablon de putere",
+          "repeat": "Repeta",
+          "standby_power": "Putere in Standby",
+          "states_power": "Putere de stare",
+          "states_trigger": "State trigger",
+          "sub_groups": "Subgrupuri",
+          "unavailable_power": "Putere indisponibilă",
+          "unit_of_measurement": "Unitate de măsură",
+          "update_frequency": "Frecvență de actualizare",
+          "utility_meter_tariffs": "Tarifele contoarelor",
+          "value": "Valoare",
+          "value_template": "șablon valoare"
+        },
+        "data_description": {
+          "area": "Adaugă toți senzorii powercalc din zona specificată",
+          "attribute": "Specificați atributul. Când este lăsat gol, va fi luminozitate pentru lumini și procent pentru ventilatoare",
+          "autostart": "Indicați începerea unui anumit manual de joc când începe HA. adică 'program1'",
+          "calculation_enabled_condition": "Strategia configurată de calcul al puterii va fi executată numai când acest șablon este evaluat la adevărat sau la 1, altfel senzorul de putere va afișa 0",
+          "calibrate": "Pune o valoare de calibrare pe fiecare linie. Exemplu\n\n1: 20",
+          "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
+          "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
+          "group_member_sensors": "Senzori Powercalc de incluși în grup",
+          "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
+          "ignore_unavailable_state": "Comutați această setare atunci când doriți ca senzorul de putere să rămână disponibil chiar dacă entitatea sursă nu este disponibilă",
+          "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
+          "multiply_factor": "Înmulțiți puterea calculată cu acest raport. Poate fi util pentru grupuri luminoase",
+          "multiply_factor_standby": "Dacă se aplică și factorul de multiplicare la puterea de așteptare",
+          "playbooks": "Introduceți un playbook pe fiecare linie. Exemplu\n\nprogram1: washing_machine/program1.csv",
+          "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
+          "repeat": "Comutați când doriți să continuați să repetați manualul după finalizarea acestuia",
+          "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
+          "sub_groups": "Toți senzorii care conțin din subgrupurile selectate vor fi adăugați și la acest grup",
+          "unavailable_power": "Putere în W pentru a înregistra atunci când entitatea sursă are o stare indisponibilă",
+          "utility_meter_tariffs": "O listă de tarife acceptate, lăsați necompletat dacă este necesar doar un singur tarif."
+        }
+      }
+    }
+  },
+  "services": {
+    "activate_playbook": {
+      "description": "Începeți execuția unui playbook.",
+      "fields": {
+        "playbook_id": {
+          "description": "Identificator Playbook",
+          "name": "Playbook"
+        }
+      },
+      "name": "Activeaza playbook"
+    },
+    "calibrate_energy": {
+      "description": "Setează senzorul de energie la o anumită valoare kWh.",
+      "fields": {
+        "value": {
+          "description": "Valoarea de setat.",
+          "name": "Valoare"
+        }
+      },
+      "name": "Calibrați senzorul de energie"
+    },
+    "calibrate_utility_meter": {
+      "description": "Calibrează un senzor de contor.",
+      "fields": {
+        "value": {
+          "description": "Valoarea de setat.",
+          "name": "Valoare"
+        }
+      },
+      "name": "Calibrați contorul"
+    },
+    "change_gui_config": {
+      "description": "Configurația de schimbare în lot a tuturor intrărilor de configurare Powercalc",
+      "fields": {
+        "field": {
+          "description": "Randul pe care doriți să îl schimbați",
+          "name": "Valoare"
+        },
+        "value": {
+          "description": "Valoarea de setat.",
+          "name": "Valoare"
+        }
+      },
+      "name": "Schimbați configurația GUI"
+    },
+    "get_active_playbook": {
+      "description": "Get current running playbook",
+      "name": "Get active playbook"
+    },
+    "increase_daily_energy": {
+      "description": "Mărește senzorul cu o anumită cantitate.",
+      "fields": {
+        "value": {
+          "description": "Valoare de adăugat la senzor.",
+          "name": "Valoare"
+        }
+      },
+      "name": "Creșteți senzorul de energie zilnic"
+    },
+    "reset_energy": {
+      "description": "Resetați un senzor de energie la zero kWh.",
+      "name": "Resetați senzorul de energie"
+    },
+    "stop_playbook": {
+      "description": "Opriți playbook activ în prezent.",
+      "name": "Oprire playbook"
+    },
+    "switch_sub_profile": {
+      "description": "Unele profiluri din bibliotecă au subprofiluri diferite. Acest serviciu vă permite să treceți la altul.",
+      "fields": {
+        "profile": {
+          "name": "Subprofil",
+          "description": "Definiți unul dintre subprofilurile posibile"
+        }
+      },
+      "name": "Comutați la alt profil secundar"
+    }
+  }
 }

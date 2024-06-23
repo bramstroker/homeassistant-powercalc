@@ -1,2 +1,2 @@
-pytablewriter==1.2.0
 gitpython==3.1.43
+pytablewriter==1.2.0

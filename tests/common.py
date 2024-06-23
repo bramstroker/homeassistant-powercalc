@@ -162,10 +162,10 @@ def get_test_config_dir() -> str:
 
 
 async def setup_config_entry(
-        hass: HomeAssistant,
-        entry_data: dict,
-        unique_id: str | None = None,
-        title: str = "Mock Title",
+    hass: HomeAssistant,
+    entry_data: dict,
+    unique_id: str | None = None,
+    title: str = "Mock Title",
 ) -> MockConfigEntry:
     """Setup and add a Powercalc config entry"""
     config_entry = MockConfigEntry(
@@ -201,7 +201,8 @@ async def create_mocked_virtual_power_sensor_entry(
 
 
 def mock_area_registry(
-    hass: HomeAssistant, mock_entries: dict[str, ar.AreaEntry] | None = None,
+    hass: HomeAssistant,
+    mock_entries: dict[str, ar.AreaEntry] | None = None,
 ) -> ar.AreaRegistry:
     """Mock the Area Registry.
 

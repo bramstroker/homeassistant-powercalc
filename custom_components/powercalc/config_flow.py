@@ -273,7 +273,9 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
         ),
         vol.Optional(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=METER_TYPES, translation_key=CONF_METER_TYPE, multiple=True,
+                options=METER_TYPES,
+                translation_key=CONF_METER_TYPE,
+                multiple=True,
             ),
         ),
     },
@@ -309,9 +311,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle integration discovery."""
         _LOGGER.debug("Starting discovery flow: %s", discovery_info)
 
-        self.skip_advanced_step = (
-            True  # We don't want to ask advanced option when discovered
-        )
+        self.skip_advanced_step = True  # We don't want to ask advanced option when discovered
 
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
@@ -371,11 +371,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 user_input.get(CONF_MODE) or CalculationStrategy.LUT,
             )
             entity_id = user_input.get(CONF_ENTITY_ID)
-            if (
-                selected_strategy is not CalculationStrategy.PLAYBOOK
-                and user_input.get(CONF_NAME) is None
-                and entity_id is None
-            ):
+            if selected_strategy is not CalculationStrategy.PLAYBOOK and user_input.get(CONF_NAME) is None and entity_id is None:
                 errors[CONF_ENTITY_ID] = "entity_mandatory"
 
             if not errors:
@@ -386,9 +382,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 unique_id = user_input.get(CONF_UNIQUE_ID)
                 if not unique_id and self.source_entity_id != DUMMY_ENTITY_ID:
-                    source_unique_id = (
-                        self.source_entity.unique_id or self.source_entity_id
-                    )
+                    source_unique_id = self.source_entity.unique_id or self.source_entity_id
                     unique_id = f"pc_{source_unique_id}"
 
                 await self.async_set_unique_id(unique_id)
@@ -576,11 +570,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_manufacturer()
 
-        if (
-            self.source_entity
-            and self.source_entity.entity_entry
-            and self.power_profile is None
-        ):
+        if self.source_entity and self.source_entity.entity_entry and self.power_profile is None:
             try:
                 self.power_profile = await get_power_profile(
                     self.hass,
@@ -689,11 +679,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered."""
-        if (
-            self.power_profile
-            and self.power_profile.has_sub_profiles
-            and not self.power_profile.sub_profile_select
-        ):
+        if self.power_profile and self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
             return await self.async_step_sub_profile()
 
         if self.power_profile and self.power_profile.needs_fixed_config:
@@ -797,9 +783,7 @@ class OptionsFlowHandler(OptionsFlow):
         """Initialize options flow."""
         self.config_entry = config_entry
         self.current_config: dict = dict(config_entry.data)
-        self.sensor_type: SensorType = (
-            self.current_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
-        )
+        self.sensor_type: SensorType = self.current_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         self.source_entity_id: str = self.current_config.get(CONF_ENTITY_ID)  # type: ignore
         self.source_entity: SourceEntity | None = None
         self.power_profile: PowerProfile | None = None
@@ -917,11 +901,7 @@ class OptionsFlowHandler(OptionsFlow):
         strategy_options: dict[str, Any] = {}
         data_schema: vol.Schema = vol.Schema({})
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            strategy_schema = (
-                _get_strategy_schema(self.strategy, self.source_entity_id)
-                if self.strategy
-                else vol.Schema({})
-            )
+            strategy_schema = _get_strategy_schema(self.strategy, self.source_entity_id) if self.strategy else vol.Schema({})
 
             data_schema = (
                 vol.Schema(
@@ -1136,8 +1116,7 @@ def _create_group_selector(
             label=str(config_entry.data.get(CONF_NAME)),
         )
         for config_entry in hass.config_entries.async_entries(DOMAIN)
-        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-        and (current_entry is None or config_entry.entry_id != current_entry.entry_id)
+        if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and (current_entry is None or config_entry.entry_id != current_entry.entry_id)
     ]
 
     return selector.SelectSelector(
@@ -1186,8 +1165,7 @@ async def _create_schema_manufacturer(hass: HomeAssistant, entity_domain: str) -
     """Create manufacturer schema."""
     library = await ProfileLibrary.factory(hass)
     manufacturers = [
-        selector.SelectOptionDict(value=manufacturer, label=manufacturer)
-        for manufacturer in await library.get_manufacturer_listing(entity_domain)
+        selector.SelectOptionDict(value=manufacturer, label=manufacturer) for manufacturer in await library.get_manufacturer_listing(entity_domain)
     ]
     return vol.Schema(
         {
@@ -1208,10 +1186,7 @@ async def _create_schema_model(
 ) -> vol.Schema:
     """Create model schema."""
     library = await ProfileLibrary.factory(hass)
-    models = [
-        selector.SelectOptionDict(value=model, label=model)
-        for model in await library.get_model_listing(manufacturer, source_entity.domain)
-    ]
+    models = [selector.SelectOptionDict(value=model, label=model) for model in await library.get_model_listing(manufacturer, source_entity.domain)]
     return vol.Schema(
         {
             vol.Required(CONF_MODEL): selector.SelectSelector(
@@ -1301,11 +1276,7 @@ def _fill_schema_defaults(
     for key, val in data_schema.schema.items():
         new_key = key
         if key in options and isinstance(key, vol.Marker):
-            if (
-                isinstance(key, vol.Optional)
-                and callable(key.default)
-                and key.default()
-            ):
+            if isinstance(key, vol.Optional) and callable(key.default) and key.default():
                 new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
             else:
                 new_key = copy.copy(key)

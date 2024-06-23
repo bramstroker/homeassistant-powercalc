@@ -175,15 +175,7 @@ class VideoStream:
 
         now = datetime.now()
         # Example: "OCR 2021-04-8 at 12:26:21-1.jpg"  ...Handles multiple captures taken in the same second
-        name = (
-            "OCR "
-            + now.strftime("%Y-%m-%d")
-            + " at "
-            + now.strftime("%H:%M:%S")
-            + "-"
-            + str(captures + 1)
-            + ".jpg"
-        )
+        name = "OCR " + now.strftime("%Y-%m-%d") + " at " + now.strftime("%H:%M:%S") + "-" + str(captures + 1) + ".jpg"
         path = "images/" + name
         cv2.imwrite(path, frame)
         captures += 1

@@ -28,7 +28,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def resolve_include_entities(
-    hass: HomeAssistant, include_config: dict,
+    hass: HomeAssistant,
+    include_config: dict,
 ) -> tuple[list[Entity], list[str]]:
     """ "
     For a given include configuration fetch all power and energy sensors from the HA instance
@@ -52,9 +53,7 @@ async def resolve_include_entities(
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
         # we can include that in the group
         if include_non_powercalc and source_entity and source_entity.domain == sensor.DOMAIN:
-            device_class = (
-                source_entity.device_class or source_entity.original_device_class
-            )
+            device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
             elif device_class == SensorDeviceClass.ENERGY:
@@ -95,8 +94,4 @@ def resolve_include_source_entities(
     entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
 
     entity_reg = entity_registry.async_get(hass)
-    return {
-        entry.entity_id: entry
-        for entry in entity_reg.entities.values()
-        if entity_filter.is_valid(entry)
-    }
+    return {entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry)}

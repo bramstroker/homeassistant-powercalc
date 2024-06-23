@@ -3,8 +3,12 @@
   "extends": [
     "config:recommended"
   ],
-  "labels": ["dependencies"],
-  "ignoreDeps": ["mypy"],
+  "labels": [
+    "dependencies"
+  ],
+  "ignoreDeps": [
+    "mypy"
+  ],
   "dependencyDashboard": false,
   "packageRules": [
     {
@@ -25,12 +29,18 @@
       ]
     },
     {
-      "matchManagers": ["poetry"],
+      "matchManagers": [
+        "poetry"
+      ],
       "enabled": false
     },
     {
-      "matchManagers": ["poetry"],
-      "matchFileNames": ["pyproject.toml"],
+      "matchManagers": [
+        "poetry"
+      ],
+      "matchFileNames": [
+        "pyproject.toml"
+      ],
       "enabled": true
     }
   ]

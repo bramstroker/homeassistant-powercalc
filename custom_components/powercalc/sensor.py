@@ -303,10 +303,7 @@ async def async_setup_platform(
         )
 
     # Support new YAML configuration structure. powercalc -> sensors.
-    if (
-        discovery_info
-        and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML
-    ):
+    if discovery_info and discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML:
         config = discovery_info
         discovery_info = None
 
@@ -382,9 +379,7 @@ async def _async_setup_entities(
         _LOGGER.error(err)
         return
 
-    entities_to_add = [
-        entity for entity in entities.new if isinstance(entity, SensorEntity)
-    ]
+    entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
@@ -394,10 +389,7 @@ async def _async_setup_entities(
     entity_reg = er.async_get(hass)
     for entity in entities_to_add:
         existing_entry = entity_reg.async_get(entity.entity_id)
-        if (
-            existing_entry
-            and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE
-        ):
+        if existing_entry and existing_entry.disabled_by == RegistryEntryDisabler.DEVICE:
             entities_to_add.remove(entity)
 
     async_add_entities(entities_to_add)
@@ -458,9 +450,7 @@ def save_entity_ids_on_config_entry(
     """Save the power and energy sensor entity_id's on the config entry
     We need this in group sensor logic to differentiate between energy sensor and utility meters.
     """
-    power_entities = [
-        e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)
-    ]
+    power_entities = [e.entity_id for e in entities.all() if isinstance(e, VirtualPowerSensor)]
     new_data = config_entry.data.copy()
     if power_entities:
         new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
@@ -468,9 +458,7 @@ def save_entity_ids_on_config_entry(
     if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
         CONF_CREATE_ENERGY_SENSOR,
     ):
-        energy_entities = [
-            e.entity_id for e in entities.all() if isinstance(e, EnergySensor)
-        ]
+        energy_entities = [e.entity_id for e in entities.all() if isinstance(e, EnergySensor)]
         if not energy_entities:
             raise SensorConfigurationError(
                 f"No energy sensor created for config_entry {config_entry.entry_id}",
@@ -730,9 +718,7 @@ async def create_individual_sensors(
     source_entity = await create_source_entity(sensor_config[CONF_ENTITY_ID], hass)
 
     if (used_unique_ids := hass.data[DOMAIN].get(DATA_USED_UNIQUE_IDS)) is None:
-        used_unique_ids = hass.data[DOMAIN][
-            DATA_USED_UNIQUE_IDS
-        ] = []  # pragma: no cover
+        used_unique_ids = hass.data[DOMAIN][DATA_USED_UNIQUE_IDS] = []  # pragma: no cover
     try:
         await check_entity_not_already_configured(
             sensor_config,
@@ -779,9 +765,9 @@ async def create_individual_sensors(
 
         # Create energy sensor which integrates the power sensor
         if (
-            sensor_config.get(CONF_CREATE_ENERGY_SENSOR) or
-            sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION) or
-            CONF_ENERGY_SENSOR_ID in sensor_config
+            sensor_config.get(CONF_CREATE_ENERGY_SENSOR)
+            or sensor_config.get(CONF_FORCE_ENERGY_SENSOR_CREATION)
+            or CONF_ENERGY_SENSOR_ID in sensor_config
         ):
             energy_sensor = await create_energy_sensor(
                 hass,
@@ -806,9 +792,7 @@ async def create_individual_sensors(
     )
 
     # Update several registries
-    hass.data[DOMAIN][
-        DATA_DISCOVERED_ENTITIES if discovery_info else DATA_CONFIGURED_ENTITIES
-    ].update(
+    hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES if discovery_info else DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: entities_to_add},
     )
 
@@ -836,9 +820,7 @@ async def check_entity_not_already_configured(
     if source_entity.entity_id == DUMMY_ENTITY_ID:
         return
 
-    configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][
-        DATA_CONFIGURED_ENTITIES
-    ]
+    configured_entities: dict[str, list[SensorEntity]] = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
 
     existing_entities = configured_entities.get(source_entity.entity_id) or []
 

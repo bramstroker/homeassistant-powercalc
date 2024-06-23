@@ -91,17 +91,12 @@ async def test_fixed_power_sensor_from_yaml(hass: HomeAssistant) -> None:
 
     power_state = hass.states.get("sensor.test_power")
     assert power_state.state == "50.00"
-    assert (
-        power_state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
-    )
+    assert power_state.attributes.get(ATTR_CALCULATION_MODE) == CalculationStrategy.FIXED
     assert power_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.POWER
 
     energy_state = hass.states.get("sensor.test_energy")
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
-    assert (
-        energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
-        == UnitOfEnergy.KILO_WATT_HOUR
-    )
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
     assert energy_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_power"
     assert energy_state.attributes.get(ATTR_SOURCE_ENTITY) == "input_boolean.test"
 
@@ -625,10 +620,7 @@ async def test_change_options_of_renamed_sensor(
     )
     await hass.async_block_till_done()
 
-    assert (
-        hass.states.get("sensor.test_energy_daily").name
-        == "Renamed daily utility meter"
-    )
+    assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
     result = await hass.config_entries.options.async_init(
         entry.entry_id,
@@ -640,10 +632,7 @@ async def test_change_options_of_renamed_sensor(
     )
     await hass.async_block_till_done()
 
-    assert (
-        hass.states.get("sensor.test_energy_daily").name
-        == "Renamed daily utility meter"
-    )
+    assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
 
 async def test_renaming_sensor_is_retained_after_startup(

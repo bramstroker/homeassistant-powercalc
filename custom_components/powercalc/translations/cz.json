@@ -1,396 +1,396 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Sensor is already configured, specify a unique_id"
-        },
-        "error": {
-            "daily_energy_mandatory": "You must supply at least one of Value or Value template",
-            "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
-            "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-            "group_mandatory": "You must define at least subgroups or power and energy-entities",
-            "linear_mandatory": "You must supply at least one of max_power or calibrate",
-            "linear_min_higher_as_max": "Max power cannot be lower than min power",
-            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-            "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
-            "lut_wrong_domain": "Only light entities can use the LUT mode",
-            "playbook_mandatory": "You need to specify at least one playbook",
-            "unknown": "Unknown error occured, please see the logs for additional information"
-        },
-        "flow_title": "{name} ({manufacturer} {model})",
-        "step": {
-            "daily_energy": {
-                "data": {
-                    "create_utility_meters": "Create utility meters",
-                    "group": "Add to group",
-                    "name": "Název",
-                    "on_time": "On time",
-                    "start_time": "Start time",
-                    "unique_id": "Unikátní id",
-                    "unit_of_measurement": "Jednotka měření",
-                    "update_frequency": "Update frequency",
-                    "value": "Hodnota",
-                    "value_template": "Šablona hodnoty"
-                },
-                "data_description": {
-                    "group": "Fill in a custom group name to create a new group",
-                    "on_time": "When left empty defaults to 1 day. always on",
-                    "update_frequency": "time in seconds between state updates of the sensor"
-                },
-                "title": "Create a daily fixed sensor"
-            },
-            "fixed": {
-                "data": {
-                    "power": "Power",
-                    "power_template": "Power template",
-                    "states_power": "States power"
-                },
-                "data_description": {
-                    "power": "A fixed power value in Watts when the entity is ON",
-                    "power_template": "Template will be evaluated to get the power value in W",
-                    "states_power": "One 'state: power' pair on each row, see example above"
-                },
-                "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
-                "title": "Fixed config"
-            },
-            "group": {
-                "data": {
-                    "area": "Oblast",
-                    "create_energy_sensor": "Create energy sensor",
-                    "create_utility_meters": "Create utility meters",
-                    "device": "Zařízení",
-                    "group_energy_entities": "Additional energy entities",
-                    "group_member_sensors": "Member powercalc sensors",
-                    "group_power_entities": "Additional power entities",
-                    "hide_members": "Hide members",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors",
-                    "name": "Název",
-                    "sub_groups": "Podskupiny",
-                    "unique_id": "Unikátní id"
-                },
-                "data_description": {
-                    "area": "Přidá všechny energetické senzory z určené oblasti",
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-                    "device": "Add the group entities powercalc creates to an existing device",
-                    "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
-                    "group_member_sensors": "Powercalc sensors to include in the group",
-                    "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
-                },
-                "title": "Create a group sensor"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Potvrdit model"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Pokud se rozhodnete nepotvrzovat, pak můžete zadat výrobce a model manuálně"
-                },
-                "description": "Výrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
-                "title": "Knihovna"
-            },
-            "linear": {
-                "data": {
-                    "attribute": "Atribut",
-                    "calibrate": "Kalibrační hodnoty",
-                    "gamma_curve": "Gamma curve",
-                    "max_power": "Maximální spotřeba",
-                    "min_power": "Minimální spotřeba"
-                },
-                "data_description": {
-                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
-                    "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
-                },
-                "title": "Lineární konfigurace"
-            },
-            "manufacturer": {
-                "data": {
-                    "manufacturer": "Výrobce"
-                },
-                "description": "Vyberte výrobce zařízení",
-                "title": "Nastavení výrobce"
-            },
-            "model": {
-                "data": {
-                    "model": "ID modelu"
-                },
-                "description": "Vyberte model zařízení. Viz [list]({supported_models_link}) podporovaných modelů pro více informací",
-                "title": "Nastavení modelu"
-            },
-            "playbook": {
-                "data": {
-                    "autostart": "Autostart",
-                    "playbooks": "Playbooks",
-                    "repeat": "Opakovat",
-                    "states_trigger": "State trigger"
-                },
-                "data_description": {
-                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
-                },
-                "title": "Playbook config"
-            },
-            "power_advanced": {
-                "data": {
-                    "calculation_enabled_condition": "Podmínka povolení výpočtu",
-                    "energy_integration_method": "Metoda energetické integrace",
-                    "ignore_unavailable_state": "Ignorovat nedostupný stav",
-                    "multiply_factor": "Koeficient násobení",
-                    "multiply_factor_standby": "Pohotovostní koeficient násobení",
-                    "unavailable_power": "Napájení není k dispozici",
-                    "utility_meter_tariffs": "Utility meter tariffs"
-                },
-                "data_description": {
-                    "calculation_enabled_condition": "Konfigurovaná strategie výpočtu spotřeby bude aplikováná, pouze pokud se tato šablona vyhodnotí jako true nebo 1. Jinak bude senzor zobrazovat 0",
-                    "ignore_unavailable_state": "Přepněte toto nastavení, pokud chcete, aby byl senzor energie k dispozici i v případě, že zdrojová entita není dostupná",
-                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-                    "multiply_factor_standby": "Použít multiplikační faktor na pohotovostní režim",
-                    "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
-                },
-                "description": "Níže uvedené možnosti jsou pro pokročilou konfiguraci powercalc. Většina uživatelů je nebude používat, takže je můžete přeskočit",
-                "title": "Pokročilá nastavení"
-            },
-            "real_power": {
-                "data": {
-                    "create_utility_meters": "Create utility meters",
-                    "entity_id": "Power sensor id",
-                    "name": "Název",
-                    "device": "Zařízení"
-                },
-                "data_description": {
-                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-                    "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
-                    "device": "Add the created energy sensor to an specific device"
-                },
-                "description": "Currently specific settings can only be configured globally",
-                "title": "Create an energy sensor for an existing power sensor"
-            },
-            "sub_profile": {
-                "data": {
-                    "sub_profile": "Sub profile"
-                },
-                "description": "This model has multiple sub profiles. Select one that suites your device",
-                "title": "Sub profile config"
-            },
-            "user": {
-                "data": {
-                    "sensor_type": "Typ senzoru"
-                },
-                "menu_options": {
-                    "daily_energy": "Denní energie",
-                    "group": "Skupina",
-                    "menu_library": "Virtual power (library)",
-                    "real_power": "Energy from real power sensor",
-                    "virtual_power": "Virtual power (manual)"
-                },
-                "title": "Zvolte typ senzoru"
-            },
-            "utility_meter_options": {
-                "title": "Utility meter options",
-                "description": "Define the settings for utility meter creation here",
-                "data": {
-                    "utility_meter_types": "Cycles",
-                    "utility_meter_tariffs": "Tariffs"
-                },
-                "data_description": {
-                    "utility_meter_types": "Create utility meters for specified cycles",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
-                }
-            },
-            "virtual_power": {
-                "data": {
-                    "create_energy_sensor": "Create energy sensor",
-                    "create_utility_meters": "Create utility meters",
-                    "entity_id": "Source entity",
-                    "group": "Přidat do skupiny",
-                    "mode": "Výpočetní strategie",
-                    "name": "Název",
-                    "standby_power": "Standby power",
-                    "unique_id": "Unikátní id"
-                },
-                "data_description": {
-                    "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-                    "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-                    "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-                    "group": "Fill in a custom group name to create a new group",
-                    "name": "Leaving blank will take the name from the source entity",
-                    "standby_power": "Define the amount of power the device is consuming when in an OFF state",
-                    "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
-                },
-                "description": "See the readme for more information about the possible strategies and configuration options",
-                "title": "Create a virtual power sensor"
-            },
-            "wled": {
-                "data": {
-                    "power_factor": "Power factor",
-                    "voltage": "Napětí"
-                },
-                "title": "Konfigurace WLED"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Sensor is already configured, specify a unique_id"
     },
-    "issues": {
-        "deprecated_platform_yaml": {
-            "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
-            "title": "Nastavení Powercalc YAML bylo přesunuto"
-        }
+    "error": {
+      "daily_energy_mandatory": "You must supply at least one of Value or Value template",
+      "entity_mandatory": "Selecting an entity is required for any strategy other than playbook",
+      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
+      "group_mandatory": "You must define at least subgroups or power and energy-entities",
+      "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_min_higher_as_max": "Max power cannot be lower than min power",
+      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
+      "lut_unsupported_color_mode": "The LUT profile does not support one of the color modes of your light. See the logs for more info",
+      "lut_wrong_domain": "Only light entities can use the LUT mode",
+      "playbook_mandatory": "You need to specify at least one playbook",
+      "unknown": "Unknown error occured, please see the logs for additional information"
     },
-    "options": {
-        "error": {
-            "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
-            "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
-            "group_mandatory": "You must define at least subgroups or power and energy-entities",
-            "linear_mandatory": "You must supply at least one of max_power or calibrate",
-            "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
-            "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-            "unknown": "Došlo k neznámé chybě. Více informací najdete v logu"
+    "flow_title": "{name} ({manufacturer} {model})",
+    "step": {
+      "daily_energy": {
+        "data": {
+          "create_utility_meters": "Create utility meters",
+          "group": "Add to group",
+          "name": "Název",
+          "on_time": "On time",
+          "start_time": "Start time",
+          "unique_id": "Unikátní id",
+          "unit_of_measurement": "Jednotka měření",
+          "update_frequency": "Update frequency",
+          "value": "Hodnota",
+          "value_template": "Šablona hodnoty"
         },
-        "step": {
-            "init": {
-                "data": {
-                    "area": "Oblast",
-                    "attribute": "Atribut",
-                    "autostart": "Autostart",
-                    "calculation_enabled_condition": "Podmínka povolení výpočtu",
-                    "calibrate": "Kalibrační hodnoty",
-                    "create_energy_sensor": "Create energy sensor",
-                    "create_utility_meters": "Create utility meters",
-                    "device": "Zařízení",
-                    "energy_integration_method": "Energy integration method",
-                    "gamma_curve": "Gamma curve",
-                    "group_energy_entities": "Additional energy entities",
-                    "group_member_sensors": "Member powercalc sensors",
-                    "group_power_entities": "Additional power entities",
-                    "hide_members": "Hide members",
-                    "ignore_unavailable_state": "Ignore unavailable state",
-                    "include_non_powercalc_sensors": "Include non powercalc sensors",
-                    "max_power": "Maximální spotřeba",
-                    "min_power": "Minimální spotřeba",
-                    "multiply_factor": "Koeficient násobení",
-                    "multiply_factor_standby": "Multiply factor standby",
-                    "name": "Name",
-                    "on_time": "On time",
-                    "playbooks": "Playbooks",
-                    "power": "Power",
-                    "power_template": "Power template",
-                    "repeat": "Opakovat",
-                    "standby_power": "Standby power",
-                    "states_power": "States power",
-                    "states_trigger": "State trigger",
-                    "sub_groups": "Podskupiny",
-                    "unavailable_power": "Unavailable power",
-                    "unit_of_measurement": "Jednotka měření",
-                    "update_frequency": "Frekvence aktualizace",
-                    "utility_meter_tariffs": "Utility meter tariffs",
-                    "value": "Hodnota",
-                    "value_template": "Šablona hodnoty"
-                },
-                "data_description": {
-                    "area": "Přidá všechny powercalc senzory z určené oblasti",
-                    "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
-                    "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
-                    "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-                    "calibrate": "Kalibrační hodnoty uveďte na samostatné řádky. Příklad\n\n1: 20",
-                    "device": "Add the group entities powercalc creates to an existing device",
-                    "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-                    "group_member_sensors": "Powercalc sensors to include in the group",
-                    "group_power_entities": "Additional power sensors (W) from your HA installation to include",
-                    "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
-                    "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-                    "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
-                    "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-                    "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
-                    "power_template": "Template will be evaluated to get the power value in W",
-                    "repeat": "Toggle when you want to keep repeating the playbook after it completes",
-                    "states_power": "One 'state: power' pair on each row, see example above",
-                    "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-                    "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
-                    "unavailable_power": "Power in W to record when the source entity has an unavailable state",
-                    "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
-                }
-            }
+        "data_description": {
+          "group": "Fill in a custom group name to create a new group",
+          "on_time": "When left empty defaults to 1 day. always on",
+          "update_frequency": "time in seconds between state updates of the sensor"
+        },
+        "title": "Create a daily fixed sensor"
+      },
+      "fixed": {
+        "data": {
+          "power": "Power",
+          "power_template": "Power template",
+          "states_power": "States power"
+        },
+        "data_description": {
+          "power": "A fixed power value in Watts when the entity is ON",
+          "power_template": "Template will be evaluated to get the power value in W",
+          "states_power": "One 'state: power' pair on each row, see example above"
+        },
+        "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
+        "title": "Fixed config"
+      },
+      "group": {
+        "data": {
+          "area": "Oblast",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "device": "Zařízení",
+          "group_energy_entities": "Additional energy entities",
+          "group_member_sensors": "Member powercalc sensors",
+          "group_power_entities": "Additional power entities",
+          "hide_members": "Hide members",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "name": "Název",
+          "sub_groups": "Podskupiny",
+          "unique_id": "Unikátní id"
+        },
+        "data_description": {
+          "area": "Přidá všechny energetické senzory z určené oblasti",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "device": "Add the group entities powercalc creates to an existing device",
+          "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
+          "group_member_sensors": "Powercalc sensors to include in the group",
+          "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
+          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+        },
+        "title": "Create a group sensor"
+      },
+      "library": {
+        "data": {
+          "confirm_autodisovered_model": "Potvrdit model"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "Pokud se rozhodnete nepotvrzovat, pak můžete zadat výrobce a model manuálně"
+        },
+        "description": "Výrobce \"{manufacturer}\" a model \"{model}\" byl automaticky detekován pro vaše zařízení.{remarks}",
+        "title": "Knihovna"
+      },
+      "linear": {
+        "data": {
+          "attribute": "Atribut",
+          "calibrate": "Kalibrační hodnoty",
+          "gamma_curve": "Gamma curve",
+          "max_power": "Maximální spotřeba",
+          "min_power": "Minimální spotřeba"
+        },
+        "data_description": {
+          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+          "calibrate": "Put a calibration value on each line. Example\n\n1: 20"
+        },
+        "title": "Lineární konfigurace"
+      },
+      "manufacturer": {
+        "data": {
+          "manufacturer": "Výrobce"
+        },
+        "description": "Vyberte výrobce zařízení",
+        "title": "Nastavení výrobce"
+      },
+      "model": {
+        "data": {
+          "model": "ID modelu"
+        },
+        "description": "Vyberte model zařízení. Viz [list]({supported_models_link}) podporovaných modelů pro více informací",
+        "title": "Nastavení modelu"
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Autostart",
+          "playbooks": "Playbooks",
+          "repeat": "Opakovat",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        },
+        "title": "Playbook config"
+      },
+      "power_advanced": {
+        "data": {
+          "calculation_enabled_condition": "Podmínka povolení výpočtu",
+          "energy_integration_method": "Metoda energetické integrace",
+          "ignore_unavailable_state": "Ignorovat nedostupný stav",
+          "multiply_factor": "Koeficient násobení",
+          "multiply_factor_standby": "Pohotovostní koeficient násobení",
+          "unavailable_power": "Napájení není k dispozici",
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Konfigurovaná strategie výpočtu spotřeby bude aplikováná, pouze pokud se tato šablona vyhodnotí jako true nebo 1. Jinak bude senzor zobrazovat 0",
+          "ignore_unavailable_state": "Přepněte toto nastavení, pokud chcete, aby byl senzor energie k dispozici i v případě, že zdrojová entita není dostupná",
+          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+          "multiply_factor_standby": "Použít multiplikační faktor na pohotovostní režim",
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
+          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+        },
+        "description": "Níže uvedené možnosti jsou pro pokročilou konfiguraci powercalc. Většina uživatelů je nebude používat, takže je můžete přeskočit",
+        "title": "Pokročilá nastavení"
+      },
+      "real_power": {
+        "data": {
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Power sensor id",
+          "name": "Název",
+          "device": "Zařízení"
+        },
+        "data_description": {
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
+          "device": "Add the created energy sensor to an specific device"
+        },
+        "description": "Currently specific settings can only be configured globally",
+        "title": "Create an energy sensor for an existing power sensor"
+      },
+      "sub_profile": {
+        "data": {
+          "sub_profile": "Sub profile"
+        },
+        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "title": "Sub profile config"
+      },
+      "user": {
+        "data": {
+          "sensor_type": "Typ senzoru"
+        },
+        "menu_options": {
+          "daily_energy": "Denní energie",
+          "group": "Skupina",
+          "menu_library": "Virtual power (library)",
+          "real_power": "Energy from real power sensor",
+          "virtual_power": "Virtual power (manual)"
+        },
+        "title": "Zvolte typ senzoru"
+      },
+      "utility_meter_options": {
+        "title": "Utility meter options",
+        "description": "Define the settings for utility meter creation here",
+        "data": {
+          "utility_meter_types": "Cycles",
+          "utility_meter_tariffs": "Tariffs"
+        },
+        "data_description": {
+          "utility_meter_types": "Create utility meters for specified cycles",
+          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
-    },
-    "services": {
-        "activate_playbook": {
-            "description": "Start execution of a playbook.",
-            "fields": {
-                "playbook_id": {
-                    "description": "Playbook identifier.",
-                    "name": "Playbook"
-                }
-            },
-            "name": "Activate playbook"
+      },
+      "virtual_power": {
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Source entity",
+          "group": "Přidat do skupiny",
+          "mode": "Výpočetní strategie",
+          "name": "Název",
+          "standby_power": "Standby power",
+          "unique_id": "Unikátní id"
         },
-        "calibrate_energy": {
-            "description": "Sets the energy sensor to a given kWh value.",
-            "fields": {
-                "value": {
-                    "description": "The value to set.",
-                    "name": "Hodnota"
-                }
-            },
-            "name": "Kalibrovat senzor energie"
+        "data_description": {
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+          "group": "Fill in a custom group name to create a new group",
+          "name": "Leaving blank will take the name from the source entity",
+          "standby_power": "Define the amount of power the device is consuming when in an OFF state",
+          "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
         },
-        "calibrate_utility_meter": {
-            "description": "Calibrates a utility meter sensor.",
-            "fields": {
-                "value": {
-                    "description": "The value to set.",
-                    "name": "Hodnota"
-                }
-            },
-            "name": "Calibrate utility meter"
+        "description": "See the readme for more information about the possible strategies and configuration options",
+        "title": "Create a virtual power sensor"
+      },
+      "wled": {
+        "data": {
+          "power_factor": "Power factor",
+          "voltage": "Napětí"
         },
-        "change_gui_config": {
-            "description": "Batch change configuration of all Powercalc config entries",
-            "fields": {
-                "field": {
-                    "description": "Pole, které chcete změnit",
-                    "name": "Hodnota"
-                },
-                "value": {
-                    "description": "The value to set.",
-                    "name": "Hodnota"
-                }
-            },
-            "name": "Change GUI config"
-        },
-        "get_active_playbook": {
-            "description": "Get current running playbook",
-            "name": "Get active playbook"
-        },
-        "increase_daily_energy": {
-            "description": "Increases the sensor with a given amount.",
-            "fields": {
-                "value": {
-                    "description": "Hodnota, která se připočítá k senzoru.",
-                    "name": "Value"
-                }
-            },
-            "name": "Increase daily energy sensor"
-        },
-        "reset_energy": {
-            "description": "Reset an energy sensor to zero kWh.",
-            "name": "Reset energy sensor"
-        },
-        "stop_playbook": {
-            "description": "Stop currently active playbook.",
-            "name": "Stop playbook"
-        },
-        "switch_sub_profile": {
-            "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
-            "fields": {
-                "profile": {
-                    "name": "Sub profile",
-                    "description": "Define one of the possible sub profiles"
-                }
-            },
-            "name": "Switch to another sub profile"
-        }
+        "title": "Konfigurace WLED"
+      }
     }
+  },
+  "issues": {
+    "deprecated_platform_yaml": {
+      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
+      "title": "Nastavení Powercalc YAML bylo přesunuto"
+    }
+  },
+  "options": {
+    "error": {
+      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+      "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
+      "group_mandatory": "You must define at least subgroups or power and energy-entities",
+      "linear_mandatory": "You must supply at least one of max_power or calibrate",
+      "linear_min_higher_as_max": "Maximální spotřeba nebůže být nižší, nežli minimální spotřeba",
+      "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
+      "unknown": "Došlo k neznámé chybě. Více informací najdete v logu"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "area": "Oblast",
+          "attribute": "Atribut",
+          "autostart": "Autostart",
+          "calculation_enabled_condition": "Podmínka povolení výpočtu",
+          "calibrate": "Kalibrační hodnoty",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "device": "Zařízení",
+          "energy_integration_method": "Energy integration method",
+          "gamma_curve": "Gamma curve",
+          "group_energy_entities": "Additional energy entities",
+          "group_member_sensors": "Member powercalc sensors",
+          "group_power_entities": "Additional power entities",
+          "hide_members": "Hide members",
+          "ignore_unavailable_state": "Ignore unavailable state",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "max_power": "Maximální spotřeba",
+          "min_power": "Minimální spotřeba",
+          "multiply_factor": "Koeficient násobení",
+          "multiply_factor_standby": "Multiply factor standby",
+          "name": "Name",
+          "on_time": "On time",
+          "playbooks": "Playbooks",
+          "power": "Power",
+          "power_template": "Power template",
+          "repeat": "Opakovat",
+          "standby_power": "Standby power",
+          "states_power": "States power",
+          "states_trigger": "State trigger",
+          "sub_groups": "Podskupiny",
+          "unavailable_power": "Unavailable power",
+          "unit_of_measurement": "Jednotka měření",
+          "update_frequency": "Frekvence aktualizace",
+          "utility_meter_tariffs": "Utility meter tariffs",
+          "value": "Hodnota",
+          "value_template": "Šablona hodnoty"
+        },
+        "data_description": {
+          "area": "Přidá všechny powercalc senzory z určené oblasti",
+          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+          "autostart": "Indicate to start a certain playbook when HA starts. i.e. 'program1'",
+          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
+          "calibrate": "Kalibrační hodnoty uveďte na samostatné řádky. Příklad\n\n1: 20",
+          "device": "Add the group entities powercalc creates to an existing device",
+          "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+          "group_member_sensors": "Powercalc sensors to include in the group",
+          "group_power_entities": "Additional power sensors (W) from your HA installation to include",
+          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "multiply_factor": "Multiplies the calculated power by this ratio. Can be useful for light groups",
+          "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
+          "playbooks": "Enter a playbook on each line. Example\n\nprogram1: washing_machine/program1.csv",
+          "power_template": "Template will be evaluated to get the power value in W",
+          "repeat": "Toggle when you want to keep repeating the playbook after it completes",
+          "states_power": "One 'state: power' pair on each row, see example above",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
+          "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well",
+          "unavailable_power": "Power in W to record when the source entity has an unavailable state",
+          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+        }
+      }
+    }
+  },
+  "services": {
+    "activate_playbook": {
+      "description": "Start execution of a playbook.",
+      "fields": {
+        "playbook_id": {
+          "description": "Playbook identifier.",
+          "name": "Playbook"
+        }
+      },
+      "name": "Activate playbook"
+    },
+    "calibrate_energy": {
+      "description": "Sets the energy sensor to a given kWh value.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Hodnota"
+        }
+      },
+      "name": "Kalibrovat senzor energie"
+    },
+    "calibrate_utility_meter": {
+      "description": "Calibrates a utility meter sensor.",
+      "fields": {
+        "value": {
+          "description": "The value to set.",
+          "name": "Hodnota"
+        }
+      },
+      "name": "Calibrate utility meter"
+    },
+    "change_gui_config": {
+      "description": "Batch change configuration of all Powercalc config entries",
+      "fields": {
+        "field": {
+          "description": "Pole, které chcete změnit",
+          "name": "Hodnota"
+        },
+        "value": {
+          "description": "The value to set.",
+          "name": "Hodnota"
+        }
+      },
+      "name": "Change GUI config"
+    },
+    "get_active_playbook": {
+      "description": "Get current running playbook",
+      "name": "Get active playbook"
+    },
+    "increase_daily_energy": {
+      "description": "Increases the sensor with a given amount.",
+      "fields": {
+        "value": {
+          "description": "Hodnota, která se připočítá k senzoru.",
+          "name": "Value"
+        }
+      },
+      "name": "Increase daily energy sensor"
+    },
+    "reset_energy": {
+      "description": "Reset an energy sensor to zero kWh.",
+      "name": "Reset energy sensor"
+    },
+    "stop_playbook": {
+      "description": "Stop currently active playbook.",
+      "name": "Stop playbook"
+    },
+    "switch_sub_profile": {
+      "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
+      "fields": {
+        "profile": {
+          "name": "Sub profile",
+          "description": "Define one of the possible sub profiles"
+        }
+      },
+      "name": "Switch to another sub profile"
+    }
+  }
 }

@@ -24,9 +24,7 @@ async def attach_entities_to_source_device(
     if not source_entity.entity_entry or not source_entity.device_entry:
         return
 
-    for entity in (
-        entity for entity in entities_to_add if isinstance(entity, BaseEntity)
-    ):
+    for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
         try:
             entity.source_device_id = source_entity.device_entry.id  # type: ignore
         except AttributeError:  # pragma: no cover

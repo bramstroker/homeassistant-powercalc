@@ -49,12 +49,18 @@ async def remote_loader(hass: HomeAssistant, mock_library_json_response: None) -
 @pytest.fixture
 async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> list[dict]:
     remote_files = [
-        {"path": "color_temp.csv.gz",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz"},
-        {"path": "hs.csv.gz",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/hs.csv.gz"},
-        {"path": "model.json",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/model.json"},
+        {
+            "path": "color_temp.csv.gz",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/color_temp.csv.gz",
+        },
+        {
+            "path": "hs.csv.gz",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/hs.csv.gz",
+        },
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/signify/LCA001/model.json",
+        },
     ]
 
     mock_aioresponse.get(
@@ -88,8 +94,10 @@ async def test_download(mock_aioresponse: aioresponses, remote_loader: RemoteLoa
 
 async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aioresponse: aioresponses) -> None:
     remote_files = [
-        {"path": "model.json",
-         "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/google/Home Mini (HOA)/model.json"},
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/google/Home Mini (HOA)/model.json",
+        },
     ]
 
     mock_aioresponse.get(
@@ -144,9 +152,7 @@ async def test_download_profile_exception_unexpected_status_code(mock_aiorespons
 
 
 async def test_exception_is_raised_on_connection_error(mock_aioresponse: aioresponses, remote_loader: RemoteLoader) -> None:
-    mock_aioresponse.get(
-        f"{ENDPOINT_DOWNLOAD}/signify/LCA001",
-        exception=ClientError("test"))
+    mock_aioresponse.get(f"{ENDPOINT_DOWNLOAD}/signify/LCA001", exception=ClientError("test"))
 
     with pytest.raises(ProfileDownloadError):
         await remote_loader.download_profile("signify", "LCA001", get_test_profile_dir("download"))

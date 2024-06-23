@@ -1,13 +1,13 @@
 {
-    "measure_device": "Nous A1 with TASMOTA 9.5.0",
-    "measure_method": "script",
-    "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
-    "name": "Hue White and Color Ambiance A19 E26 1100lm",
-    "standby_power": 0.4,
-    "calculation_strategy": "lut",
-    "linked_lut": "signify/LCA006",
-    "aliases": [
-        "9290024687"
-    ],
-    "created_at": "2022-05-29T15:18:24"
+  "measure_device": "Nous A1 with TASMOTA 9.5.0",
+  "measure_method": "script",
+  "measure_description": "Used script in utils/measure from repository with SAMPLE_COUNT=10",
+  "name": "Hue White and Color Ambiance A19 E26 1100lm",
+  "standby_power": 0.4,
+  "calculation_strategy": "lut",
+  "linked_lut": "signify/LCA006",
+  "aliases": [
+    "9290024687"
+  ],
+  "created_at": "2022-05-29T15:18:24"
 }

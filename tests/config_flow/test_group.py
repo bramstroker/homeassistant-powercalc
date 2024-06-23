@@ -559,4 +559,3 @@ async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
     )
 
     assert not hass.states.get("sensor.none_power")
-

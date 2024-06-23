@@ -1,6 +1,6 @@
 {
-    "name": "Linked profile",
-    "standby_power": 0.4,
-    "calculation_strategy": "lut",
-    "linked_lut": "foo/bar"
+  "name": "Linked profile",
+  "standby_power": 0.4,
+  "calculation_strategy": "lut",
+  "linked_lut": "foo/bar"
 }

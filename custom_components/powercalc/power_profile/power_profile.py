@@ -195,14 +195,14 @@ class PowerProfile:
         _LOGGER.debug("Loading sub profile directory %s", sub_profile)
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupportedError(
-                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
-                f"sub_profile: {sub_profile})",
+                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})",
             )
 
         # When the sub LUT directory also has a model.json (not required),
         # merge this json into the main model.json data.
         file_path = os.path.join(self._sub_profile_dir, "model.json")
         if os.path.exists(file_path):
+
             def _load_json() -> None:
                 """Load LUT profile json data."""
                 with open(file_path) as json_file:
@@ -216,10 +216,7 @@ class PowerProfile:
         """Check whether this power profile supports a given entity domain."""
         entity_entry = source_entity.entity_entry
         if (
-            self.device_type == DeviceType.SMART_SWITCH
-            and entity_entry
-            and entity_entry.platform in ["hue"]
-            and source_entity.domain == LIGHT_DOMAIN
+            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
 
@@ -258,11 +255,7 @@ class SubProfileSelector:
 
     def get_tracking_entities(self) -> list[str]:
         """Get additional list of entities to track for state changes."""
-        return [
-            entity_id
-            for matcher in self._matchers
-            for entity_id in matcher.get_tracking_entities()
-        ]
+        return [entity_id for matcher in self._matchers for entity_id in matcher.get_tracking_entities()]
 
     def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
         """Create a matcher from json config. Can be extended for more matchers in the future."""
