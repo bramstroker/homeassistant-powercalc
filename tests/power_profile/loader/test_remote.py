@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 import time
+from functools import partial
 
 import pytest
 from aiohttp import ClientError
@@ -208,7 +209,8 @@ async def test_eventual_success_after_download_retry(mock_aioresponse: aiorespon
     mock_aioresponse.get(remote_file["url"], status=500)
     mock_aioresponse.get(remote_file["url"], status=200)
 
-    await remote_loader.download_with_retry(manufacturer, model, storage_path)
+    callback = partial(remote_loader.download_profile, manufacturer, model, storage_path)
+    await remote_loader.download_with_retry(callback)
 
     assert os.path.exists(storage_path)
 
@@ -280,6 +282,10 @@ async def test_profile_redownloaded_when_newer_version_available(
 
 
 async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
+    """
+    Test that the local library is used when the remote library is not available.
+    When unavailable, it should retry 3 times before falling back to the local library.
+    """
     caplog.set_level(logging.ERROR)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
@@ -288,10 +294,36 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     )
 
     loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
     await loader.initialize()
 
     assert "signify" in loader.manufacturer_models
-    assert len(caplog.records) == 1
+    assert len(caplog.records) == 3
+
+
+async def test_fallback_to_local_library_on_client_connection_error(
+    hass: HomeAssistant,
+    mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    Test that the local library is used when powercalc.lauwbier.nl is not available.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2277
+    """
+    caplog.set_level(logging.ERROR)
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        repeat=True,
+        exception=ClientError("test"),
+    )
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    await loader.initialize()
+
+    assert "signify" in loader.manufacturer_models
+    assert len(caplog.records) == 3
 
 
 async def test_fallback_to_local_profile(
