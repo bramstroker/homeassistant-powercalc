@@ -44,7 +44,7 @@ jobs:
             const { commits } = context.payload.pull_request
             const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep '\.csv\.gz$'`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
-            core.setOutput('changedFiles', files.join(" "))
+            core.setOutput('changedFiles', "\"" + files.join("\" \"") + "\"")
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
