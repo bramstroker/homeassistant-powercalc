@@ -68,10 +68,10 @@ class RemoteLoader(Loader):
                 return cast(dict[str, Any], await resp.json())
 
         try:
-            return await self.download_with_retry(_download_remote_library_json)
+            return cast(dict[str, Any], await self.download_with_retry(_download_remote_library_json))
         except ProfileDownloadError:
             _LOGGER.debug("Failed to download library.json, falling back to local copy")
-            return await self.hass.async_add_executor_job(_load_local_library_json)
+            return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
