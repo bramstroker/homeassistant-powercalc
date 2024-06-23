@@ -4,9 +4,12 @@ import json
 import logging
 import os
 import time
+from collections.abc import Callable, Coroutine
+from functools import partial
 from typing import Any, cast
 
 import aiohttp
+from aiohttp import ClientError
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
@@ -56,12 +59,19 @@ class RemoteLoader(Loader):
             with open(get_library_json_path()) as f:
                 return cast(dict[str, Any], json.load(f))
 
-        _LOGGER.debug("Loading library.json from github")
-        async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
-            if resp.status != 200:
-                _LOGGER.error("Failed to download library.json from github, falling back to local copy")
-                return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
-            return cast(dict[str, Any], await resp.json())
+        async def _download_remote_library_json() -> dict[str, Any] | None:
+            """Download library.json from github"""
+            _LOGGER.debug("Loading library.json from github")
+            async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
+                if resp.status != 200:
+                    raise ProfileDownloadError("Failed to download library.json, unexpected status code")
+                return cast(dict[str, Any], await resp.json())
+
+        try:
+            return await self.download_with_retry(_download_remote_library_json)
+        except ProfileDownloadError:
+            _LOGGER.debug("Failed to download library.json, falling back to local copy")
+            return await self.hass.async_add_executor_job(_load_local_library_json)
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
@@ -102,7 +112,8 @@ class RemoteLoader(Loader):
 
         if needs_update or force_update:
             try:
-                await self.download_with_retry(manufacturer, model, storage_path)
+                callback = partial(self.download_profile, manufacturer, model, storage_path)
+                await self.download_with_retry(callback)
             except ProfileDownloadError as e:
                 if not path_exists:
                     raise e
@@ -159,23 +170,23 @@ class RemoteLoader(Loader):
             remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
         return remote_modification_time  # type: ignore
 
-    async def download_with_retry(self, manufacturer: str, model: str, storage_path: str) -> None:
+    async def download_with_retry(self, callback: Callable[[], Coroutine[Any, Any, None | dict[str, Any]]]) -> None | dict[str, Any]:
         """Download a file from a remote endpoint with retries"""
         max_retries = 3
         retry_count = 0
 
         while retry_count < max_retries:
             try:
-                await self.download_profile(manufacturer, model, storage_path)
-                break  # Break out of the loop if download is successful
-            except ProfileDownloadError as e:
+                return await callback()
+            except (ClientError, ProfileDownloadError) as e:
                 _LOGGER.error(e, exc_info=e)
                 retry_count += 1
                 if retry_count == max_retries:
-                    raise ProfileDownloadError(f"Failed to download profile even after {max_retries} retries, falling back to local profile") from e
+                    raise ProfileDownloadError(f"Failed to download even after {max_retries} retries, falling back to local copy") from e
 
                 await asyncio.sleep(self.retry_timeout)
-                _LOGGER.warning("Failed to download profile, retrying... (Attempt %d of %d)", retry_count, max_retries)
+                _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count, max_retries)
+        return None
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """
