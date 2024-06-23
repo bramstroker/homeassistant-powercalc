@@ -33,6 +33,11 @@ repos:
         args: [ --fix ]
       - id: ruff-format
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+
 ci:
     autofix_commit_msg: |
         chore(lint): [pre-commit.ci] auto fixes from pre-commit.com hooks
