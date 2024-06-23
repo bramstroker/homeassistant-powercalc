@@ -230,7 +230,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         signature = inspect.signature(IntegrationSensor.__init__)
         if "max_sub_interval" in signature.parameters:
-            params["max_sub_interval"] = None
+            params["max_sub_interval"] = None  # pragma: no cover
 
         super().__init__(**params)  # type: ignore[arg-type]
 
