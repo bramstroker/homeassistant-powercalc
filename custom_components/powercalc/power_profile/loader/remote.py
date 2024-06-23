@@ -186,7 +186,7 @@ class RemoteLoader(Loader):
 
                 await asyncio.sleep(self.retry_timeout)
                 _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count, max_retries)
-        return None
+        return None  # pragma: no cover
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
         """

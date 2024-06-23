@@ -15,6 +15,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
     CONF_UNIQUE_ID,
+    MATCH_ALL,
     STATE_ON,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
@@ -290,6 +291,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_should_poll: bool = False
+    _unrecorded_attributes = frozenset({MATCH_ALL})
 
     def __init__(
         self,

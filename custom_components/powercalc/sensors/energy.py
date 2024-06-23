@@ -199,6 +199,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
     """Virtual energy sensor, totalling kWh."""
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _unrecorded_attributes = frozenset({ATTR_SOURCE_DOMAIN, ATTR_SOURCE_ENTITY})
 
     def __init__(
         self,
@@ -229,7 +230,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         signature = inspect.signature(IntegrationSensor.__init__)
         if "max_sub_interval" in signature.parameters:
-            params["max_sub_interval"] = None
+            params["max_sub_interval"] = None  # pragma: no cover
 
         super().__init__(**params)  # type: ignore[arg-type]
 
