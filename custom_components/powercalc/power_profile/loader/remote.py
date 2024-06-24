@@ -114,6 +114,7 @@ class RemoteLoader(Loader):
             try:
                 callback = partial(self.download_profile, manufacturer, model, storage_path)
                 await self.download_with_retry(callback)
+                await self.set_last_update_time(time.time())
             except ProfileDownloadError as e:
                 if not path_exists:
                     raise e
