@@ -361,8 +361,8 @@
       "name": "Zmeniť GUI nastavenie"
     },
     "get_active_playbook": {
-      "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "description": "Získajte aktuálny playbook",
+      "name": "Získať aktuálny playbook"
     },
     "increase_daily_energy": {
       "description": "Zväčší snímač o danú hodnotu.",
