@@ -12,7 +12,7 @@ Powercalc asks to input the voltage on which the lightstrip is running and optio
     The brightness limiter must be turned on in WLED for this to work! Otherwise WLED will not provide an estimated current.
 
 You can setup sensors both with YAML or GUI.
-When you use the GUI, select the "Virtual power (manual)" sensor type, and :guilabel:`wled` in the "Calculation strategy" dropdown.
+When you use the GUI, select the :guilabel:`Virtual power (manual)` sensor type, and :guilabel:`wled` in the "Calculation strategy" dropdown.
 If you have multiple segments, select any of them as the source entity; selecting a helper group with all segments will cause a failure to find the current sensor, even if entity IDs match perfectly.
 
 Configuration options
