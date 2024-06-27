@@ -190,7 +190,7 @@ class DiscoveryManager:
         if not power_profile:
             return False
 
-        return power_profile and power_profile.is_entity_domain_supported(source_entity)
+        return power_profile.is_entity_domain_supported(source_entity)
 
     def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
         """Do some validations on the registry entry to see if it qualifies for discovery."""
