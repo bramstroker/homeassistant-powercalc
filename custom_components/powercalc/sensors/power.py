@@ -515,10 +515,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self.source_entity == DUMMY_ENTITY_ID:
             return True
 
-        if not self._ignore_unavailable_state and state.state in [STATE_UNAVAILABLE, STATE_UNKNOWN]:
-            return False
-
-        return True
+        return self._ignore_unavailable_state or state.state not in [STATE_UNAVAILABLE, STATE_UNKNOWN]
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
