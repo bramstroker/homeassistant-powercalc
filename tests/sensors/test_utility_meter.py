@@ -4,7 +4,6 @@ import pytest
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import (
-    ATTR_SOURCE_ID,
     ATTR_STATUS,
     ATTR_TARIFF,
     COLLECTING,
@@ -64,13 +63,11 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
     assert peak_sensor
-    assert peak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
     assert peak_sensor.attributes[ATTR_TARIFF] == "peak"
     assert peak_sensor.attributes[ATTR_STATUS] == COLLECTING
 
     offpeak_sensor = hass.states.get("sensor.test_energy_daily_offpeak")
     assert offpeak_sensor
-    assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
     assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
 

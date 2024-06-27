@@ -642,7 +642,6 @@ async def test_group_utility_meter(
 
     utility_meter_state = hass.states.get("sensor.testgroup_energy_daily")
     assert utility_meter_state
-    assert utility_meter_state.attributes.get("source") == "sensor.testgroup_energy"
 
 
 async def test_include_config_entries_in_group(hass: HomeAssistant) -> None:

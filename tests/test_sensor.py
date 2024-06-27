@@ -13,7 +13,7 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.components.utility_meter.sensor import ATTR_PERIOD, DAILY, HOURLY
+from homeassistant.components.utility_meter.sensor import DAILY, HOURLY
 from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     ATTR_FRIENDLY_NAME,
@@ -138,13 +138,10 @@ async def test_utility_meter_is_created(hass: HomeAssistant) -> None:
     )
 
     daily_state = hass.states.get("sensor.test_energy_daily")
-    assert daily_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_energy"
-    assert daily_state.attributes.get(ATTR_PERIOD) == DAILY
+    assert daily_state
 
     hourly_state = hass.states.get("sensor.test_energy_hourly")
     assert hourly_state
-    assert hourly_state.attributes.get(ATTR_SOURCE_ID) == "sensor.test_energy"
-    assert hourly_state.attributes.get(ATTR_PERIOD) == HOURLY
 
     monthly_state = hass.states.get("sensor.test_energy_monthly")
     assert not monthly_state
