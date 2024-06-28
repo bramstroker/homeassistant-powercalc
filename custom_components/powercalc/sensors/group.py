@@ -510,6 +510,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.source_device_id = device_id
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
         self._native_value_exact = Decimal(0)
+        self._states: dict[str, Decimal] = {}
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -539,7 +540,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
         if isinstance(self, GroupedPowerSensor):
-            self.async_on_remove(start.async_at_start(self.hass, state_listener))
+            self.async_on_remove(start.async_at_start(self.hass, self.initial_update))
 
         self.async_on_remove(
             async_track_state_change_event(
@@ -575,24 +576,27 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, _: Any) -> None:  # noqa
+    def on_state_change(self, event: Event[EventStateChangedData]) -> None:  # noqa
         """Triggered when one of the group entities changes state."""
 
+        new_state = self.calculate_new_state(event.data.get("new_state"))
+        self.set_new_state(new_state)
+
+    async def initial_update(self, _: Any) -> None:  # noqa
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]]
-        if not available_states:
-            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE):
-                if isinstance(self, GroupedPowerSensor):
-                    self._set_native_value(Decimal(0))
-                self._attr_available = True
-            else:
-                self._attr_available = False
+        new_state = self.calculate_initial_state(available_states, states)
+        self.set_new_state(new_state)
+
+    @callback
+    def set_new_state(self, state: Decimal | str) -> None:
+        if state == STATE_UNAVAILABLE:
+            self._attr_available = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
             self.async_write_ha_state()
             return
 
-        summed = self.calculate_new_state(available_states, states)
-        self._set_native_value(summed)
+        self._set_native_value(state)
         self._attr_available = True
         self.async_write_ha_state()
 
@@ -615,12 +619,19 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.async_write_ha_state()
 
     @abstractmethod
-    def calculate_new_state(
+    def calculate_initial_state(
         self,
         member_available_states: list[State],
         member_states: list[State],
-    ) -> Decimal:
-        """Logic for the state calculation"""
+    ) -> Decimal | str:
+        """Implementation for the initial state calculation"""
+
+    @abstractmethod
+    def calculate_new_state(
+        self,
+        state: State,
+    ) -> Decimal | str:
+        """Implementation for the state calculation whenever a member entity changes state"""
 
 
 class GroupedPowerSensor(GroupedSensor, PowerSensor):
@@ -630,13 +641,28 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
 
-    def calculate_new_state(
+    def calculate_initial_state(
         self,
         member_available_states: list[State],
         member_states: list[State],
-    ) -> Decimal:
-        values = [self._get_state_value_in_native_unit(state) for state in member_available_states]
-        return Decimal(sum([value for value in values if value is not None]))
+    ) -> Decimal | str:
+        self._states = {state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states}
+        return self.get_summed_state()
+
+    def calculate_new_state(self, state: State) -> Decimal | str:
+        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+            del self._states[state.entity_id]
+        else:
+            self._states[state.entity_id] = self._get_state_value_in_native_unit(state)
+        return self.get_summed_state()
+
+    def get_summed_state(self) -> Decimal | str:
+        if not self._states:
+            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE):
+                return Decimal(0)
+            return STATE_UNAVAILABLE
+
+        return Decimal(sum(self._states.values()))
 
 
 class GroupedEnergySensor(GroupedSensor, EnergySensor):
@@ -700,7 +726,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         self._set_native_value(Decimal(value))
         self.async_write_ha_state()
 
-    def calculate_new_state(
+    def calculate_initial_state(
         self,
         member_available_states: list[State],
         member_states: list[State],
@@ -710,45 +736,10 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         """
         group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
         _LOGGER.debug("%s: Recalculate, current value: %s", self.entity_id, group_sum)
-        for entity_state in member_states:
-            if entity_state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-                _LOGGER.debug(
-                    "skipping state for %s, sensor unavailable or unknown",
-                    entity_state.entity_id,
-                )
+        for state in member_states:
+            if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
                 continue
-            prev_state = self._prev_state_store.get_entity_state(
-                self.entity_id,
-                entity_state.entity_id,
-            )
-            cur_state_value = self._get_state_value_in_native_unit(entity_state)
-            prev_state_value = self._get_state_value_in_native_unit(prev_state) if prev_state else Decimal(0)
-            self._prev_state_store.set_entity_state(
-                self.entity_id,
-                entity_state.entity_id,
-                entity_state,
-            )
-
-            delta = cur_state_value - prev_state_value
-            if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
-                rounded_delta = round(delta, self._rounding_digits)
-                rounded_prev = round(prev_state_value, self._rounding_digits)
-                rounded_cur = round(cur_state_value, self._rounding_digits)
-                _LOGGER.debug(
-                    "delta for entity %s: %s, prev=%s, cur=%s",
-                    entity_state.entity_id,
-                    rounded_delta,
-                    rounded_prev,
-                    rounded_cur,
-                )
-            if delta < 0:
-                _LOGGER.warning(
-                    "skipping state for %s, probably erroneous value or sensor was reset",
-                    entity_state.entity_id,
-                )
-                continue
-
-            group_sum += delta
+            group_sum += self.calculate_delta(state)
 
         _LOGGER.debug(
             "%s: New value: %s",
@@ -756,6 +747,63 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             round(group_sum, self._rounding_digits),
         )
         return group_sum
+
+    def calculate_new_state(self, state: State) -> Decimal | str:
+        group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
+        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
+            if group_sum == 0:
+                return STATE_UNAVAILABLE
+            _LOGGER.debug(
+                "skipping state for %s, sensor unavailable or unknown",
+                state.entity_id,
+            )
+            return group_sum
+
+        _LOGGER.debug("%s: Recalculate, current value: %s", self.entity_id, group_sum)
+
+        group_sum += self.calculate_delta(state)
+        _LOGGER.debug(
+            "%s: New value: %s",
+            self.entity_id,
+            round(group_sum, self._rounding_digits),
+        )
+        return group_sum
+
+    def calculate_delta(self, state: State) -> Decimal:
+        """Calculate the delta between the current and previous state."""
+        prev_state = self._prev_state_store.get_entity_state(
+            self.entity_id,
+            state.entity_id,
+        )
+        cur_state_value = self._get_state_value_in_native_unit(state)
+        prev_state_value = self._get_state_value_in_native_unit(prev_state) if prev_state else Decimal(0)
+        self._prev_state_store.set_entity_state(
+            self.entity_id,
+            state.entity_id,
+            state,
+        )
+
+        delta = cur_state_value - prev_state_value
+        if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
+            rounded_delta = round(delta, self._rounding_digits)
+            rounded_prev = round(prev_state_value, self._rounding_digits)
+            rounded_cur = round(cur_state_value, self._rounding_digits)
+            _LOGGER.debug(
+                "delta for entity %s: %s, prev=%s, cur=%s",
+                state.entity_id,
+                rounded_delta,
+                rounded_prev,
+                rounded_cur,
+            )
+
+        if delta < 0:
+            _LOGGER.warning(
+                "skipping state for %s, probably erroneous value or sensor was reset",
+                state.entity_id,
+            )
+            delta = Decimal(0)
+
+        return delta
 
 
 class PreviousStateStore:
