@@ -31,6 +31,7 @@ from homeassistant.const import (
     UnitOfPower,
 )
 from homeassistant.core import (
+    Event,
     HomeAssistant,
     State,
     callback,
@@ -40,6 +41,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import start
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import (
+    EventStateChangedData,
     async_track_state_change_event,
     async_track_time_interval,
 )
@@ -576,7 +578,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             registry.async_update_entity(entity_id, hidden_by=hidden_by)
 
     @callback
-    def on_state_change(self, event: Event[EventStateChangedData]) -> None:  # noqa
+    def on_state_change(self, event: Event[EventStateChangedData]) -> None:
         """Triggered when one of the group entities changes state."""
 
         new_state = self.calculate_new_state(event.data.get("new_state"))
@@ -591,7 +593,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     @callback
     def set_new_state(self, state: Decimal | str) -> None:
-        if state == STATE_UNAVAILABLE:
+        if state == STATE_UNAVAILABLE or not isinstance(state, Decimal):
             self._attr_available = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
             self.async_write_ha_state()
             return
