@@ -593,7 +593,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     def on_state_change(self, event: Event[EventStateChangedData]) -> None:
         """Triggered when one of the group entities changes state."""
 
-        new_state = self.calculate_new_state(event.data.get("new_state"))
+        new_state = self.calculate_new_state(event.data["new_state"])
         self.set_new_state(new_state)
 
     async def initial_update(self, _: Any) -> None:  # noqa
