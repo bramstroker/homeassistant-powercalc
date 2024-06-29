@@ -530,37 +530,18 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         """Register state listeners."""
         await super().async_added_to_hass()
 
-        state_listener = self.on_state_change
         if isinstance(self, GroupedEnergySensor):
-            last_state = await self.async_get_last_state()
-            last_sensor_state = await self.async_get_last_sensor_data()
-            try:
-                if last_sensor_state and last_sensor_state.native_value:
-                    self._set_native_value(Decimal(last_sensor_state.native_value))  # type: ignore
-                elif last_state:
-                    self._set_native_value(Decimal(last_state.state))
-                _LOGGER.debug(
-                    "%s: Restoring state: %s",
-                    self.entity_id,
-                    self._attr_native_value,
-                )
-            except DecimalException as err:
-                _LOGGER.warning(
-                    "%s: Could not restore last state: %s",
-                    self.entity_id,
-                    err,
-                )
+            await self.restore_last_state()
 
         self._prev_state_store = await PreviousStateStore.async_get_instance(self.hass)
 
-        if isinstance(self, GroupedPowerSensor):
-            self.async_on_remove(start.async_at_start(self.hass, self.initial_update))
+        self.async_on_remove(start.async_at_start(self.hass, self.initial_update))
 
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
                 self._entities,
-                state_listener,
+                self.on_state_change,
             ),
         )
 
@@ -816,6 +797,27 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             delta = Decimal(0)
 
         return delta
+
+    async def restore_last_state(self) -> None:
+        """Restore the last known state of the group sensor."""
+        last_state = await self.async_get_last_state()
+        last_sensor_state = await self.async_get_last_sensor_data()
+        try:
+            if last_sensor_state and last_sensor_state.native_value:
+                self._set_native_value(Decimal(last_sensor_state.native_value))  # type: ignore
+            elif last_state:
+                self._set_native_value(Decimal(last_state.state))
+            _LOGGER.debug(
+                "%s: Restoring state: %s",
+                self.entity_id,
+                self._attr_native_value,
+            )
+        except DecimalException as err:
+            _LOGGER.warning(
+                "%s: Could not restore last state: %s",
+                self.entity_id,
+                err,
+            )
 
 
 class PreviousStateStore:
