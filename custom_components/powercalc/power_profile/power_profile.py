@@ -176,7 +176,7 @@ class PowerProfile:
         def _get_sub_dirs() -> list[str]:
             return next(os.walk(self.get_model_directory(True)))[1]
 
-        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))
+        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))  # type: ignore
         return self._sub_profiles
 
     @property
