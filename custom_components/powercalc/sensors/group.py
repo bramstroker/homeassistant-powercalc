@@ -50,6 +50,7 @@ from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.unit_conversion import (
+    BaseUnitConverter,
     EnergyConverter,
     PowerConverter,
 )
@@ -104,6 +105,17 @@ STORAGE_KEY = "powercalc_group"
 STORAGE_VERSION = 2
 # How long between periodically saving the current states to disk
 STATE_DUMP_INTERVAL = timedelta(minutes=10)
+
+ENERGY_UNIT_PREFIX_MAPPING = {
+    UnitPrefix.KILO: UnitOfEnergy.KILO_WATT_HOUR,
+    UnitPrefix.MEGA: UnitOfEnergy.MEGA_WATT_HOUR,
+    UnitPrefix.NONE: UnitOfEnergy.WATT_HOUR,
+}
+
+UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
+    **{unit: EnergyConverter for unit in EnergyConverter.VALID_UNITS},
+    **{unit: PowerConverter for unit in PowerConverter.VALID_UNITS},
+}
 
 
 async def create_group_sensors_yaml(
@@ -585,6 +597,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self.set_new_state(new_state)
 
     async def initial_update(self, _: Any) -> None:  # noqa
+        """Initial update for the group sensor."""
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]]
@@ -593,12 +606,13 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
 
     @callback
     def set_new_state(self, state: Decimal | str) -> None:
+        """Set the new state and update the entity."""
         if state == STATE_UNAVAILABLE or not isinstance(state, Decimal):
             self._attr_available = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
             self.async_write_ha_state()
             return
 
-        self._set_native_value(state)
+        self._set_native_value(state, write_state=False)
         self._attr_available = True
         self.async_write_ha_state()
 
@@ -607,18 +621,16 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         value = state.state
         unit_of_measurement = state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
         if unit_of_measurement and self._attr_native_unit_of_measurement != unit_of_measurement:
-            unit_converter = EnergyConverter if isinstance(self, GroupedEnergySensor) else PowerConverter
-            value = unit_converter.convert(
-                float(value),
-                unit_of_measurement,
-                self._attr_native_unit_of_measurement,
-            )
+            converter = UNIT_CONVERTERS[unit_of_measurement]
+            convert = converter.converter_factory(unit_of_measurement, self._attr_native_unit_of_measurement)
+            value = convert(float(value))
         return Decimal(value)
 
-    def _set_native_value(self, value: Decimal) -> None:
+    def _set_native_value(self, value: Decimal, write_state: bool = True) -> None:
         self._native_value_exact = value
         self._attr_native_value = round(value, self._rounding_digits)
-        self.async_write_ha_state()
+        if write_state:
+            self.async_write_ha_state()
 
     @abstractmethod
     def calculate_initial_state(
@@ -694,13 +706,11 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             unique_id,
             device_id,
         )
-        unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
-        if unit_prefix == UnitPrefix.KILO:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
-        elif unit_prefix == UnitPrefix.NONE:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.WATT_HOUR
-        elif unit_prefix == UnitPrefix.MEGA:
-            self._attr_native_unit_of_measurement = UnitOfEnergy.MEGA_WATT_HOUR
+
+        self._attr_native_unit_of_measurement = ENERGY_UNIT_PREFIX_MAPPING.get(
+            sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
+            UnitOfEnergy.WATT_HOUR,
+        )
 
     async def async_reset(self) -> None:
         """Reset the group sensor and underlying member sensor when supported."""
