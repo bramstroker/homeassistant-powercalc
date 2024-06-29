@@ -229,7 +229,10 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
 
 
 async def test_warning_is_logged_when_color_mode_is_missing(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    """Test that a warning is logged when the color_mode attribute is missing."""
+    """
+    Test that a warning is logged when the color_mode attribute is missing.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2323
+    """
     caplog.set_level(logging.WARNING)
     strategy = await _create_lut_strategy(hass, "signify", "LCT010")
 
