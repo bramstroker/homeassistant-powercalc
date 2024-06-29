@@ -646,7 +646,8 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     def calculate_new_state(self, state: State) -> Decimal | str:
         if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            del self._states[state.entity_id]
+            if state.entity_id in self._states:
+                del self._states[state.entity_id]
         else:
             self._states[state.entity_id] = self._get_state_value_in_native_unit(state)
         return self.get_summed_state()
