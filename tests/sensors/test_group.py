@@ -1544,6 +1544,28 @@ async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
 
 
+async def test_decimal_conversion_error_is_logged(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.WARNING)
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_POWER_SENSOR_ID: "sensor.test",
+                    },
+                ],
+            },
+        ],
+    )
+    hass.states.async_set("sensor.test", "invalid")
+
+    assert "Error converting state value" in caplog.text
+    assert hass.states.get("sensor.testgroup_power").state == "0.00"
+
+
 async def _create_energy_group(
     hass: HomeAssistant,
     name: str,
