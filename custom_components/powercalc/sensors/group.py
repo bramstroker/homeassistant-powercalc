@@ -605,7 +605,16 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
             converter = UNIT_CONVERTERS[unit_of_measurement]
             convert = converter.converter_factory(unit_of_measurement, self._attr_native_unit_of_measurement)
             value = convert(float(value))
-        return Decimal(value)
+        try:
+            return Decimal(value)
+        except DecimalException as err:
+            _LOGGER.warning(
+                "Error converting state value %s to Decimal for %s: %s",
+                value,
+                state.entity_id,
+                err,
+            )
+            return Decimal(0)
 
     def _set_native_value(self, value: Decimal, write_state: bool = True) -> None:
         self._native_value_exact = value
