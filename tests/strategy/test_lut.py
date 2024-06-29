@@ -228,6 +228,16 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "1.42"
 
 
+async def test_warning_is_logged_when_color_mode_is_missing(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test that a warning is logged when the color_mode attribute is missing."""
+    caplog.set_level(logging.WARNING)
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010")
+
+    state = State("light.test", STATE_ON, {ATTR_BRIGHTNESS: 100})
+    assert not await strategy.calculate(state)
+    assert "color mode unknown" in caplog.text
+
+
 async def _create_lut_strategy(
     hass: HomeAssistant,
     manufacturer: str,
