@@ -360,6 +360,48 @@ async def test_profile_redownloaded_when_model_json_missing(
     assert storage_path == local_storage_path
 
 
+async def test_profile_redownloaded_when_model_json_corrupt(
+    hass: HomeAssistant,
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    local_storage_path = remote_loader.get_storage_path("apple", "HomePod Mini")
+    shutil.rmtree(local_storage_path, ignore_errors=True)
+    os.makedirs(local_storage_path)
+
+    remote_files = [
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/HomePod Mini/model.json",
+        },
+    ]
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini",
+        status=200,
+        payload=remote_files,
+        repeat=True,
+    )
+
+    mock_aioresponse.get(
+        remote_files[0]["url"],
+        status=200,
+        body="invalid json",
+    )
+    with open(get_library_path("apple/HomePod Mini/model.json"), "rb") as f:
+        mock_aioresponse.get(
+            remote_files[0]["url"],
+            status=200,
+            body=f.read(),
+        )
+
+    await remote_loader.load_model("apple", "HomePod Mini")
+
+    assert "model.json file is not valid JSON" in caplog.text
+    assert "Retrying to load model.json file" in caplog.text
+
+
 async def test_find_model(remote_loader: RemoteLoader) -> None:
     model = await remote_loader.find_model("apple", {"HomePod (gen 2)"})
     assert model == "MQJ83"

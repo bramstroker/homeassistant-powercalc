@@ -3,9 +3,11 @@ import datetime
 import json
 import logging
 import os
+import shutil
 import time
 from collections.abc import Callable, Coroutine
 from functools import partial
+from json import JSONDecodeError
 from typing import Any, cast
 
 import aiohttp
@@ -91,7 +93,13 @@ class RemoteLoader(Loader):
             if not device_type or device_type in model.get("device_type", DeviceType.LIGHT)
         }
 
-    async def load_model(self, manufacturer: str, model: str, force_update: bool = False) -> tuple[dict, str] | None:
+    async def load_model(
+        self,
+        manufacturer: str,
+        model: str,
+        force_update: bool = False,
+        retry_count: int = 0,
+    ) -> tuple[dict, str] | None:
         model_info = self.model_infos.get(f"{manufacturer}/{model}")
         if not model_info:
             raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
@@ -117,6 +125,7 @@ class RemoteLoader(Loader):
                 await self.set_last_update_time(time.time())
             except ProfileDownloadError as e:
                 if not path_exists:
+                    await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
                     raise e
                 _LOGGER.debug("Failed to download profile, falling back to local profile")
 
@@ -125,7 +134,15 @@ class RemoteLoader(Loader):
             with open(model_path) as f:
                 return cast(dict[str, Any], json.load(f))
 
-        json_data = await self.hass.async_add_executor_job(_load_json)  # type: ignore
+        try:
+            json_data = await self.hass.async_add_executor_job(_load_json)  # type: ignore
+        except JSONDecodeError as e:
+            _LOGGER.error("model.json file is not valid JSON")
+            if retry_count < 2:
+                _LOGGER.debug("Retrying to load model.json file")
+                return await self.load_model(manufacturer, model, True, retry_count + 1)
+            raise LibraryLoadingError("Failed to load model.json file") from e
+
         return json_data, storage_path
 
     def get_storage_path(self, manufacturer: str, model: str) -> str:
