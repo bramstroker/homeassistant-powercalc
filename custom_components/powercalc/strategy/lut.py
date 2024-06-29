@@ -193,7 +193,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     async def get_selected_color_mode(self, attrs: Mapping[str, Any]) -> ColorMode:
         """Get the selected color mode for the entity."""
-        color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
+        try:
+            color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
+        except ValueError:
+            color_mode = ColorMode.UNKNOWN
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
         profile_color_modes = await self._lut_registry.get_supported_color_modes(self._profile)
