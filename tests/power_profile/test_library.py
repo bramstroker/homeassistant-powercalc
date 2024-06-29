@@ -39,14 +39,14 @@ async def test_model_listing_full_manufacturer_name(hass: HomeAssistant) -> None
 async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("yeelight", "YLDL01YL"))
-    sub_profiles = profile.get_sub_profiles()
+    sub_profiles = await profile.get_sub_profiles()
     assert sub_profiles == ["ambilight", "downlight"]
 
 
 async def test_get_subprofile_listing_empty_list(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("signify", "LCT010"))
-    sub_profiles = profile.get_sub_profiles()
+    sub_profiles = await profile.get_sub_profiles()
     assert sub_profiles == []
 
 

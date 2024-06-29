@@ -665,12 +665,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
-        if not self._power_profile or not self._power_profile.has_sub_profiles or self._power_profile.sub_profile_select:
+        if not self._power_profile or not await self._power_profile.has_sub_profiles or self._power_profile.sub_profile_select:
             raise HomeAssistantError(
                 "This is only supported for sensors having sub profiles, and no automatic profile selection",
             )
 
-        if profile not in self._power_profile.get_sub_profiles():
+        if profile not in await self._power_profile.get_sub_profiles():
             raise HomeAssistantError(f"{profile} is not a possible sub profile")
 
         await self._select_new_sub_profile(profile)

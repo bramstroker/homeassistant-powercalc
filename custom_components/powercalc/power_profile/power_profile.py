@@ -67,6 +67,7 @@ class PowerProfile:
         self._json_data = json_data
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
+        self._sub_profiles: list[str] | None = None
 
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
@@ -166,13 +167,21 @@ class PowerProfile:
     def config_flow_discovery_remarks(self) -> str | None:
         return self._json_data.get("config_flow_discovery_remarks")
 
-    def get_sub_profiles(self) -> list[str]:
+    async def get_sub_profiles(self) -> list[str]:
         """Get listing of possible sub profiles."""
-        return sorted(next(os.walk(self.get_model_directory(True)))[1])
+
+        if self._sub_profiles:
+            return self._sub_profiles
+
+        def _get_sub_dirs() -> list[str]:
+            return next(os.walk(self.get_model_directory(True)))[1]
+
+        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))  # type: ignore
+        return self._sub_profiles
 
     @property
-    def has_sub_profiles(self) -> bool:
-        return len(self.get_sub_profiles()) > 0
+    async def has_sub_profiles(self) -> bool:
+        return len(await self.get_sub_profiles()) > 0
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
@@ -184,7 +193,7 @@ class PowerProfile:
 
     async def select_sub_profile(self, sub_profile: str) -> None:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
-        if not self.has_sub_profiles:
+        if not await self.has_sub_profiles:
             return
 
         # Sub profile already selected, no need to load it again
