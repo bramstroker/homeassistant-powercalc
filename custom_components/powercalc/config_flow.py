@@ -655,7 +655,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
             )
             self.power_profile = profile
-            if self.power_profile and not self.power_profile.has_sub_profiles:
+            if self.power_profile and not await self.power_profile.has_sub_profiles:
                 errors = await self.validate_strategy_config()
             if not errors:
                 return await self.async_step_post_library()
@@ -679,7 +679,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered."""
-        if self.power_profile and self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
+        if self.power_profile and await self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
             return await self.async_step_sub_profile()
 
         if self.power_profile and self.power_profile.needs_fixed_config:
@@ -1208,7 +1208,7 @@ async def _create_schema_sub_profile(
     profile = await library.get_profile(model_info)
     sub_profiles = [
         selector.SelectOptionDict(value=sub_profile, label=sub_profile)
-        for sub_profile in profile.get_sub_profiles()  # type: ignore
+        for sub_profile in await profile.get_sub_profiles()  # type: ignore
     ]
     return vol.Schema(
         {
