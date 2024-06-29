@@ -67,11 +67,12 @@ target-version = "py312"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
+select = ["E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "ASYNC", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF"]
 ignore = ["ANN101"]
 
 [tool.ruff.lint.per-file-ignores]
 "utils/measure/**.py" = ["T201"]
+"tests/**.py" = ["ASYNC230"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 15
@@ -94,6 +95,7 @@ types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^2.0"
 pytest-cov = "^5.0"
+pytest-profiling = "^1.7"
 # Requirements below are needed since HA 2023.9.3, not sure why
 psutil_home_assistant = "*"
 fnv_hash_fast = "*"
