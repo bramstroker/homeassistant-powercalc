@@ -33,6 +33,16 @@ repos:
         args: [ --fix ]
       - id: ruff-format
 
+  - repo: local
+    hooks:
+        - id: mypy
+          name: mypy
+          entry: script/run-mypy.sh
+          language: script
+          types: [ python ]
+          require_serial: true
+          files: ^custom_components/powercalc
+
 ci:
     autofix_commit_msg: |
         chore(lint): [pre-commit.ci] auto fixes from pre-commit.com hooks
