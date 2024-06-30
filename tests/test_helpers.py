@@ -15,6 +15,7 @@ from custom_components.powercalc.helpers import evaluate_power
         (20.5, Decimal(20.5)),
         ("foo", None),
         (Decimal(40.65), Decimal(40.65)),
+        ((1, 2), None),
     ],
 )
 async def test_evaluate_power(
