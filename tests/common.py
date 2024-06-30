@@ -182,8 +182,9 @@ async def setup_config_entry(
 
 async def create_mocked_virtual_power_sensor_entry(
     hass: HomeAssistant,
-    name: str,
+    name: str = "Test",
     unique_id: str | None = None,
+    extra_config: dict | None = None,
 ) -> config_entries.ConfigEntry:
     return await setup_config_entry(
         hass,
@@ -194,6 +195,7 @@ async def create_mocked_virtual_power_sensor_entry(
             CONF_NAME: name,
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
+            **(extra_config or {}),
         },
         unique_id,
         name,

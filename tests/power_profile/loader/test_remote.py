@@ -352,6 +352,7 @@ async def test_profile_redownloaded_when_model_json_missing(
     remote_loader: RemoteLoader,
     mock_download_profile_endpoints: list[dict],
 ) -> None:
+    """Test profile is redownloaded when model.json is missing."""
     local_storage_path = remote_loader.get_storage_path("signify", "LCA001")
     shutil.rmtree(local_storage_path, ignore_errors=True)
     os.makedirs(local_storage_path)
@@ -366,6 +367,7 @@ async def test_profile_redownloaded_when_model_json_corrupt(
     mock_aioresponse: aioresponses,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
+    """Corrupt the model.json file and check if it is redownloaded."""
     local_storage_path = remote_loader.get_storage_path("apple", "HomePod Mini")
     shutil.rmtree(local_storage_path, ignore_errors=True)
     os.makedirs(local_storage_path)
@@ -400,6 +402,45 @@ async def test_profile_redownloaded_when_model_json_corrupt(
 
     assert "model.json file is not valid JSON" in caplog.text
     assert "Retrying to load model.json file" in caplog.text
+
+
+async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
+    hass: HomeAssistant,
+    remote_loader: RemoteLoader,
+    mock_aioresponse: aioresponses,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """
+    When model.json is corrupt, retry 3 times before giving up.
+    After 3 times it should raise a LibraryLoadingError.
+    """
+    local_storage_path = remote_loader.get_storage_path("apple", "HomePod Mini")
+    shutil.rmtree(local_storage_path, ignore_errors=True)
+    os.makedirs(local_storage_path)
+
+    remote_files = [
+        {
+            "path": "model.json",
+            "url": "https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/profile_library/apple/HomePod Mini/model.json",
+        },
+    ]
+
+    mock_aioresponse.get(
+        f"{ENDPOINT_DOWNLOAD}/apple/HomePod Mini",
+        status=200,
+        payload=remote_files,
+        repeat=True,
+    )
+
+    mock_aioresponse.get(
+        remote_files[0]["url"],
+        status=200,
+        body="invalid json",
+        repeat=True,
+    )
+
+    with pytest.raises(LibraryLoadingError):
+        await remote_loader.load_model("apple", "HomePod Mini")
 
 
 async def test_find_model(remote_loader: RemoteLoader) -> None:
