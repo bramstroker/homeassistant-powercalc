@@ -1,21 +1,21 @@
 {
-	"measure_description": "Manually measured",
-	"measure_method": "manual",
-	"measure_device": "Eve Energy Matter 20EBU4101",
-	"name": "TP-Link KP125M",
-	"standby_power": 0.475,
-	"sensor_config": {
-		"power_sensor_naming": "{} Device Power",
-		"energy_sensor_naming": "{} Device Energy"
-  	},
-	"device_type": "smart_switch",
-	"supported_modes": [
-		"fixed"
-	],
-	"fixed_config": {
-		"power": 0.92
-	},
-	"aliases": [
-		"KP125M"
-	]
+  "measure_description": "Manually measured",
+  "measure_method": "manual",
+  "measure_device": "Eve Energy Matter 20EBU4101",
+  "name": "TP-Link KP125M",
+  "standby_power": 0.475,
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "device_type": "smart_switch",
+  "supported_modes": [
+    "fixed"
+  ],
+  "fixed_config": {
+    "power": 0.92
+  },
+  "aliases": [
+    "KP125M"
+  ]
 }
