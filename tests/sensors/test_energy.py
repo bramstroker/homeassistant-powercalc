@@ -410,7 +410,6 @@ async def test_real_power_sensor_kw(hass: HomeAssistant) -> None:
                 unit_of_measurement=UnitOfPower.KILO_WATT,
             ),
         },
-
     )
 
     await run_powercalc_setup(

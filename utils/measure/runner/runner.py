@@ -9,16 +9,14 @@ from inquirer.questions import Question
 
 class MeasurementRunner(ABC):
     @abstractmethod
-    def prepare(self, answers: dict[str, Any]) -> None:
-        ...
+    def prepare(self, answers: dict[str, Any]) -> None: ...
 
     @abstractmethod
     def run(
         self,
         answers: dict[str, Any],
         export_directory: str,
-    ) -> RunnerResult | None:
-        ...
+    ) -> RunnerResult | None: ...
 
     def get_questions(self) -> list[Question]:
         return []

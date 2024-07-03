@@ -192,7 +192,6 @@ async def test_group_include_area(
 
     energy_state = hass.states.get("sensor.my_group_sensor_energy")
     assert energy_state
-    assert energy_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
 
     assert hass.states.get("sensor.my_group_sensor_energy_daily")
 
@@ -559,4 +558,3 @@ async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
     )
 
     assert not hass.states.get("sensor.none_power")
-

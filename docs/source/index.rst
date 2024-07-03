@@ -65,4 +65,3 @@ Community
    :maxdepth: 1
 
    community/tutorials
-

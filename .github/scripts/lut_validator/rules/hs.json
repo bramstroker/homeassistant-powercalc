@@ -1,24 +1,29 @@
 {
-    "properties": {
-      "bri": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "hue": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 65535
-      },
-      "sat": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "watt": {
-          "type": "number",
-          "minimum": 0.01
-      }
+  "properties": {
+    "bri": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
     },
-    "required": ["bri", "hue", "sat", "watt"]
-  }
+    "hue": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "sat": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "watt": {
+      "type": "number",
+      "minimum": 0.01
+    }
+  },
+  "required": [
+    "bri",
+    "hue",
+    "sat",
+    "watt"
+  ]
+}

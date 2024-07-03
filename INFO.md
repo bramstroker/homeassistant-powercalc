@@ -18,7 +18,7 @@ powercalc:
 
 ## Setup power sensors
 
-After restarting power and energy sensors should appear for the lights found in your HA installation which are supported by powercalc. 
+After restarting power and energy sensors should appear for the lights found in your HA installation which are supported by powercalc.
 Please see the list of [supported models](https://powercalc.lauwbier.nl).
 When no power sensor is appearing please check the logs for any errors.
 Powercalc also provides extensive configuation to setup your own power sensors using different strategies. Please see the main [Documentation](https://github.com/bramstroker/homeassistant-powercalc/blob/master/README.md) on github for all the options and examples.

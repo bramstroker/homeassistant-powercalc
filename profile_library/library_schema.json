@@ -1,98 +1,98 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "library.json defines the available models and manufacturers for the powercalc integration",
-    "type": "object",
-    "required": [
-        "manufacturers"
-    ],
-    "properties": {
-        "manufacturers": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "library.json defines the available models and manufacturers for the powercalc integration",
+  "type": "object",
+  "required": [
+    "manufacturers"
+  ],
+  "properties": {
+    "manufacturers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "description": "Manufacturer information",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the manufacturer",
+            "minLength": 1
+          },
+          "device_types": {
             "type": "array",
+            "description": "List of possible device types",
             "items": {
-                "type": "object",
-                "description": "Manufacturer information",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Name of the manufacturer",
-                        "minLength": 1
-                    },
-                    "device_types": {
-                        "type": "array",
-                        "description": "List of possible device types",
-                        "items": {
-                            "$ref": "#/$defs/device_type"
-                        }
-                    },
-                    "models": {
-                        "type": "array",
-                        "description": "List of models",
-                        "items": {
-                            "$ref": "#/$defs/model"
-                        }
-                    },
-                    "aliases": {
-                        "type": "array",
-                        "description": "List of aliases for the manufacturer",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "name",
-                    "models"
-                ]
+              "$ref": "#/$defs/device_type"
             }
-        }
-    },
-    "$defs": {
-        "model": {
-            "type": "object",
-            "required": [
-                "id",
-                "device_type",
-                "update_timestamp"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "Identifier of the model"
-                },
-                "device_type": {
-                    "$ref": "#/$defs/device_type"
-                },
-                "color_modes": {
-                    "type": "array",
-                    "description": "List of color modes supported by the model",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "aliases": {
-                    "type": "array",
-                    "description": "List of aliases for the model",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "updated_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Last update of the model"
-                }
+          },
+          "models": {
+            "type": "array",
+            "description": "List of models",
+            "items": {
+              "$ref": "#/$defs/model"
             }
+          },
+          "aliases": {
+            "type": "array",
+            "description": "List of aliases for the manufacturer",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "models"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "model": {
+      "type": "object",
+      "required": [
+        "id",
+        "device_type",
+        "update_timestamp"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifier of the model"
         },
         "device_type": {
-            "type": "string",
-            "enum": [
-                "camera",
-                "light",
-                "smart_switch",
-                "smart_speaker",
-                "network"
-            ],
-            "description": "Type of device"
+          "$ref": "#/$defs/device_type"
+        },
+        "color_modes": {
+          "type": "array",
+          "description": "List of color modes supported by the model",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "description": "List of aliases for the model",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update of the model"
         }
+      }
+    },
+    "device_type": {
+      "type": "string",
+      "enum": [
+        "camera",
+        "light",
+        "smart_switch",
+        "smart_speaker",
+        "network"
+      ],
+      "description": "Type of device"
     }
+  }
 }

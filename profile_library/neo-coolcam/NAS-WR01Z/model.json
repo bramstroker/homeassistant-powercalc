@@ -1,17 +1,17 @@
 {
-    "measure_description": "Manually measured",
-    "measure_method": "manual",
-    "measure_device": "Zhurui PR10-D",
-    "name": "Smart Power Plug",
-    "standby_power": 0.31,
-    "sensor_config": {
-        "power_sensor_naming": "{} Device Power",
-        "energy_sensor_naming": "{} Device Energy"
-    },
-    "device_type": "smart_switch",
-    "calculation_strategy": "fixed",
-    "fixed_config": {
-        "power": 0.58
-    },
-    "created_at": "2022-10-04T20:16:59"
+  "measure_description": "Manually measured",
+  "measure_method": "manual",
+  "measure_device": "Zhurui PR10-D",
+  "name": "Smart Power Plug",
+  "standby_power": 0.31,
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "device_type": "smart_switch",
+  "calculation_strategy": "fixed",
+  "fixed_config": {
+    "power": 0.58
+  },
+  "created_at": "2022-10-04T20:16:59"
 }

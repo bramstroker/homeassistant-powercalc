@@ -76,4 +76,3 @@ You can omit ``condition`` on the last register strategy so that will always be 
 
 .. warning::
     Don't omit ``condition`` field on any strategy other than the last as that will cause the strategy chain to stop at that one.
-

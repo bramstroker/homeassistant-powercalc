@@ -1,5 +1,5 @@
 {
-    "name": "Test",
-    "standby_power": 0.47,
-    "calculation_strategy": "lut"
+  "name": "Test",
+  "standby_power": 0.47,
+  "calculation_strategy": "lut"
 }

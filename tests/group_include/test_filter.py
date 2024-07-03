@@ -41,10 +41,7 @@ async def test_composite_filter(
         filter_mocks.append(entity_filter)
 
     registry_entry = _create_registry_entry()
-    assert (
-        CompositeFilter(filter_mocks, operator).is_valid(registry_entry)
-        == expected_result
-    )
+    assert CompositeFilter(filter_mocks, operator).is_valid(registry_entry) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -75,6 +72,7 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
 
+
 @pytest.mark.parametrize(
     "filter_type,filter_config,expected_type",
     [
@@ -85,6 +83,7 @@ async def test_null_filter() -> None:
 async def test_create_filter(hass: HomeAssistant, filter_type: str, filter_config: dict, expected_type: type) -> None:
     filter_instance = create_filter(filter_type, filter_config, hass)
     assert isinstance(filter_instance, expected_type)
+
 
 async def test_create_composite_filter(hass: HomeAssistant) -> None:
     entity_filter = create_composite_filter(
@@ -125,6 +124,7 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_registry: Area
     assert len(entity_filter.filters) == 2
     assert isinstance(entity_filter.filters[0], AreaFilter)
     assert isinstance(entity_filter.filters[1], DomainFilter)
+
 
 def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
     return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test")

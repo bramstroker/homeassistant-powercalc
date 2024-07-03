@@ -3,6 +3,7 @@ Provide a mock light platform.
 
 Call init before using it in your tests to ensure clean test data.
 """
+
 import uuid
 from typing import ClassVar
 

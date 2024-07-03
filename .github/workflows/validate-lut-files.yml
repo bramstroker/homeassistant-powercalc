@@ -42,19 +42,16 @@ jobs:
           script: |
             const { execSync } = require('child_process')
             const { commits } = context.payload.pull_request
-            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits}`).toString()
+            const rawFiles = execSync(`git diff --name-only HEAD HEAD~${commits} | grep '\.csv\.gz$'`).toString()
             const files = rawFiles.split('\n').filter(Boolean)
-            core.setOutput('changedFiles', files.join(" "))
+            core.setOutput('changedFiles', "\"" + files.join("\" \"") + "\"")
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
           for file in ${{ steps.list-files.outputs.changedFiles }}; do
-            if [[ ${file} =~ \.csv\.gz$ ]];
-            then
-              echo "Generating plot for - ${file}."
-              if [ -f "${{ github.workspace }}/${file}" ]; then
-                poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
-              fi
+            echo "Generating plot for - ${file}."
+            if [ -f "${{ github.workspace }}/${file}" ]; then
+              poetry run python plot.py "${{ github.workspace }}/${file}" --output=auto
             fi
           done
       - name: Upload the plots to Imgur

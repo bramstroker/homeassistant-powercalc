@@ -140,7 +140,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
             brightness = 255
 
         if color_mode == ColorMode.UNKNOWN:
-            _LOGGER.debug(
+            _LOGGER.warning(
                 "%s: Could not calculate power. color mode unknown",
                 entity_state.entity_id,
             )
@@ -193,7 +193,10 @@ class LutStrategy(PowerCalculationStrategyInterface):
 
     async def get_selected_color_mode(self, attrs: Mapping[str, Any]) -> ColorMode:
         """Get the selected color mode for the entity."""
-        color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE)))
+        try:
+            color_mode = ColorMode(str(attrs.get(ATTR_COLOR_MODE, ColorMode.UNKNOWN)))
+        except ValueError:
+            color_mode = ColorMode.UNKNOWN
         if color_mode in COLOR_MODES_COLOR:
             color_mode = ColorMode.HS
         profile_color_modes = await self._lut_registry.get_supported_color_modes(self._profile)
@@ -256,12 +259,7 @@ class LutStrategy(PowerCalculationStrategyInterface):
         lookup_dict: LookupDictType,
         search_key: int,
     ) -> float | LookupDictType:
-        return (
-            lookup_dict.get(search_key)
-            or lookup_dict[
-                min(lookup_dict.keys(), key=lambda key: abs(key - search_key))
-            ]
-        )
+        return lookup_dict.get(search_key) or lookup_dict[min(lookup_dict.keys(), key=lambda key: abs(key - search_key))]
 
     @staticmethod
     def get_nearest_lower_brightness(

@@ -67,9 +67,7 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
         return "All standby power"
 
     def __init__(self, hass: HomeAssistant, rounding_digits: int = 2) -> None:
-        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][
-            DATA_STANDBY_POWER_SENSORS
-        ]
+        self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
         self._rounding_digits = rounding_digits
 
     async def async_added_to_hass(self) -> None:

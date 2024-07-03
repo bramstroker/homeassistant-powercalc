@@ -1,0 +1,11 @@
+{
+  "measure_description": "Used measure tool - used average for 2 hours for each state",
+  "measure_method": "manual",
+  "measure_device": "KP125M",
+  "name": "Indoor Cam C120",
+  "device_type": "camera",
+  "calculation_strategy": "fixed",
+  "aliases": [
+    "T8400"
+  ]
+}

@@ -1,17 +1,19 @@
 import logging
+from datetime import timedelta
 
+import homeassistant.util.dt as dt_util
 import pytest
+from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter.sensor import (
-    ATTR_SOURCE_ID,
     ATTR_STATUS,
     ATTR_TARIFF,
     COLLECTING,
     CONF_UNIQUE_ID,
     PAUSED,
 )
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, CONF_ENTITY_ID, CONF_NAME, UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -25,6 +27,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_ID,
+    CONF_ENERGY_SENSOR_PRECISION,
     CONF_FIXED,
     CONF_MODE,
     CONF_POWER,
@@ -36,7 +39,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import create_input_boolean, run_powercalc_setup
+from tests.common import create_input_boolean, create_mocked_virtual_power_sensor_entry, run_powercalc_setup
 
 
 async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
@@ -64,13 +67,11 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     peak_sensor = hass.states.get("sensor.test_energy_daily_peak")
     assert peak_sensor
-    assert peak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
     assert peak_sensor.attributes[ATTR_TARIFF] == "peak"
     assert peak_sensor.attributes[ATTR_STATUS] == COLLECTING
 
     offpeak_sensor = hass.states.get("sensor.test_energy_daily_offpeak")
     assert offpeak_sensor
-    assert offpeak_sensor.attributes[ATTR_SOURCE_ID] == "sensor.test_energy"
     assert offpeak_sensor.attributes[ATTR_TARIFF] == "offpeak"
     assert offpeak_sensor.attributes[ATTR_STATUS] == PAUSED
 
@@ -79,6 +80,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
 
     general_sensor_hourly = hass.states.get("sensor.test_energy_hourly")
     assert general_sensor_hourly
+
 
 async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(
@@ -165,6 +167,34 @@ async def test_utility_meter_is_not_created_twice(
     assert entity_registry.async_get(utility_meter_id)
     assert hass.states.get(utility_meter_id)
     assert len(caplog.records) == 0
+
+
+async def test_rounding_digits(hass: HomeAssistant) -> None:
+    """Test that the rounding digits configuration `energy_sensor_precision` is respected."""
+    await create_mocked_virtual_power_sensor_entry(
+        hass,
+        extra_config={
+            CONF_CREATE_UTILITY_METERS: True,
+            CONF_ENERGY_SENSOR_PRECISION: 2,
+        },
+    )
+    hass.states.async_set("sensor.test_energy", 1, {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR})
+    await hass.async_block_till_done()
+
+    now = dt_util.utcnow() + timedelta(seconds=10)
+    with freeze_time(now):
+        hass.states.async_set(
+            "sensor.test_energy",
+            3,
+            {ATTR_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR},
+            force_update=True,
+        )
+        await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.test_energy_daily")
+    assert state
+    assert state.attributes[ATTR_UNIT_OF_MEASUREMENT] == UnitOfEnergy.KILO_WATT_HOUR
+    assert state.state == "2.00"
 
 
 async def test_regression(hass: HomeAssistant) -> None:

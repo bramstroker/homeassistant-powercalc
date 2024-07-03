@@ -1,396 +1,396 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
-        },
-        "error": {
-            "daily_energy_mandatory": "Je moet mimimaal waarde of waarde template opgeven",
-            "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
-            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
-            "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
-            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren: sub groepen, vermogen entiteiten of energie entiteiten",
-            "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
-            "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
-            "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
-            "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
-            "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
-            "playbook_mandatory": "Je moet minimaal 1 playbook definieren",
-            "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
-        },
-        "flow_title": "{name} ({manufacturer} {model})",
-        "step": {
-            "daily_energy": {
-                "data": {
-                    "create_utility_meters": "Creëer utiliteit meters",
-                    "group": "Aan groep toevoegen",
-                    "name": "Naam",
-                    "on_time": "Tijd aan per dag",
-                    "start_time": "Begintijd",
-                    "unique_id": "Uniek id",
-                    "unit_of_measurement": "Eenheid",
-                    "update_frequency": "Update frequentie",
-                    "value": "Waarde",
-                    "value_template": "Waarde template"
-                },
-                "data_description": {
-                    "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
-                    "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
-                    "update_frequency": "tijd in seconden tussen status updates van de sensor"
-                },
-                "title": "Maak een dagelijkse energieverbruik sensor"
-            },
-            "fixed": {
-                "data": {
-                    "power": "Vermogen",
-                    "power_template": "Vermogen template",
-                    "states_power": "Vermogen per status"
-                },
-                "data_description": {
-                    "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
-                    "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
-                    "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
-                },
-                "description": "Definieer een vaste vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
-                "title": "Gefixeerde configuratie"
-            },
-            "group": {
-                "data": {
-                    "area": "Ruimte",
-                    "create_energy_sensor": "Creëer energie sensoren",
-                    "create_utility_meters": "Creëer utiliteit meters",
-                    "device": "Apparaat",
-                    "group_energy_entities": "Additionele energie entiteiten",
-                    "group_member_sensors": "Individuele Powercalc sensoren",
-                    "group_power_entities": "Additionele vermogen entiteiten",
-                    "hide_members": "Verberg onderliggende sensoren",
-                    "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-                    "name": "Naam",
-                    "sub_groups": "Sub groepen",
-                    "unique_id": "Uniek id"
-                },
-                "data_description": {
-                    "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-                    "create_energy_sensor": "Laat powercalc een kWh meter maken",
-                    "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-                    "group_energy_entities": "Additionele energie entiteiten (kWh)",
-                    "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-                    "group_power_entities": "Additionele vermogen entiteiten (W)",
-                    "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
-                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
-                },
-                "title": "Creëer een groep sensor"
-            },
-            "library": {
-                "data": {
-                    "confirm_autodisovered_model": "Bevestig model ID"
-                },
-                "data_description": {
-                    "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
-                },
-                "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
-                "title": "Bibliotheek"
-            },
-            "linear": {
-                "data": {
-                    "attribute": "Attribuut",
-                    "calibrate": "Kalibratie waardes",
-                    "gamma_curve": "Gamma curve",
-                    "max_power": "Max vermogen",
-                    "min_power": "Min vermogen"
-                },
-                "data_description": {
-                    "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
-                    "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20"
-                },
-                "title": "Lineaire configuratie"
-            },
-            "manufacturer": {
-                "data": {
-                    "manufacturer": "Fabrikant"
-                },
-                "description": "Selecteer de fabrikant",
-                "title": "Fabrikant configuratie"
-            },
-            "model": {
-                "data": {
-                    "model": "Model ID"
-                },
-                "description": "Selecteer het model. Zie de [lijst]({supported_models_link}) van ondersteunde apparaten voor meer informatie",
-                "title": "Model configuratie"
-            },
-            "playbook": {
-                "data": {
-                    "autostart": "Automatisch starten",
-                    "playbooks": "Playbooks",
-                    "repeat": "Herhalen",
-                    "states_trigger": "Status trigger"
-                },
-                "data_description": {
-                    "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
-                    "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
-                    "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beëindigd",
-                    "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1"
-                },
-                "title": "Playbook configuratie"
-            },
-            "power_advanced": {
-                "data": {
-                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
-                    "energy_integration_method": "Energie integratie methode",
-                    "ignore_unavailable_state": "Negeer onbeschikbaar status",
-                    "multiply_factor": "Vermenigvuldigingsfactor",
-                    "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
-                    "unavailable_power": "Vermogen indien onbeschikbaar",
-                    "utility_meter_tariffs": "Nutsmeter tarieven"
-                },
-                "data_description": {
-                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
-                    "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
-                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
-                    "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
-                    "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
-                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven; laat leeg als er maar één tarief nodig is."
-                },
-                "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
-                "title": "Geavanceerde opties"
-            },
-            "real_power": {
-                "data": {
-                    "create_utility_meters": "Creëer utiliteit meters",
-                    "entity_id": "Vermogensensor id",
-                    "name": "Naam",
-                    "device": "Apparaat"
-                },
-                "data_description": {
-                    "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
-                    "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
-                    "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
-                },
-                "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
-                "title": "Maak een energiesensor voor een bestaande stroomsensor"
-            },
-            "sub_profile": {
-                "data": {
-                    "sub_profile": "Sub profiel"
-                },
-                "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
-                "title": "Sub profiel configuratie"
-            },
-            "user": {
-                "data": {
-                    "sensor_type": "Type sensor"
-                },
-                "menu_options": {
-                    "daily_energy": "Dagelijkse energie",
-                    "group": "Groep",
-                    "menu_library": "Virtueel vermogen (bibliotheek)",
-                    "real_power": "Energie bebaseerd op bestaande vermogensensor",
-                    "virtual_power": "Virtueel vermogen (handmatig)"
-                },
-                "title": "Kies het gewenste sensor type"
-            },
-            "utility_meter_options": {
-                "title": "Nutsmeter opties",
-                "description": "Definieer de instellingen voor de aanmaak van nutsmeters",
-                "data": {
-                    "utility_meter_types": "Cycli",
-                    "utility_meter_tariffs": "Tarieven"
-                },
-                "data_description": {
-                    "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
-                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven, laat leeg als er maar één tarief nodig is."
-                }
-            },
-            "virtual_power": {
-                "data": {
-                    "create_energy_sensor": "Creëer energie sensoren",
-                    "create_utility_meters": "Creëer utiliteit meters",
-                    "entity_id": "Bron entiteit",
-                    "group": "Aan groep toevoegen",
-                    "mode": "Calculatie strategie",
-                    "name": "Naam",
-                    "standby_power": "Standby vermogen",
-                    "unique_id": "Uniek id"
-                },
-                "data_description": {
-                    "create_energy_sensor": "Laat powercalc een kWh meter maken",
-                    "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
-                    "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
-                    "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
-                    "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
-                    "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)",
-                    "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele energiemeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
-                },
-                "description": "Zie de readme voor meer information over de mogelijke strategieen en configuratie opties.",
-                "title": "Creëer een virtuele energie meter"
-            },
-            "wled": {
-                "data": {
-                    "power_factor": "Vermogensfactor",
-                    "voltage": "Spanning"
-                },
-                "title": "WLED configuratie"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
     },
-    "issues": {
-        "deprecated_platform_yaml": {
-            "description": "Configuratie middels `sensor->platform` is verouderd. Verander je configratie naar `powercalc->sensors`. Klik op 'Meer informatie' voor verder uitleg.",
-            "title": "Powercalc YAML configuratie is verplaatst"
-        }
+    "error": {
+      "daily_energy_mandatory": "Je moet mimimaal waarde of waarde template opgeven",
+      "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
+      "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
+      "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
+      "group_mandatory": "Je dient minimaal een van de volgende velden te definieren: sub groepen, vermogen entiteiten of energie entiteiten",
+      "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
+      "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
+      "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
+      "lut_unsupported_color_mode": "Het LUT profiel ondersteund 1 van de kleur modes van je lamp niet. Bekijk de logs voor uitgebreide informatie",
+      "lut_wrong_domain": "Alleen lamp entiteiten kunnen de LUT mode gebruiken",
+      "playbook_mandatory": "Je moet minimaal 1 playbook definieren",
+      "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
     },
-    "options": {
-        "error": {
-            "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
-            "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
-            "group_mandatory": "Je dient minimaal een van de volgende velden te definieren: sub groepen, vermogen entiteiten of energie entiteiten",
-            "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
-            "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
-            "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
-            "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+    "flow_title": "{name} ({manufacturer} {model})",
+    "step": {
+      "daily_energy": {
+        "data": {
+          "create_utility_meters": "Creëer utiliteit meters",
+          "group": "Aan groep toevoegen",
+          "name": "Naam",
+          "on_time": "Tijd aan per dag",
+          "start_time": "Begintijd",
+          "unique_id": "Uniek id",
+          "unit_of_measurement": "Eenheid",
+          "update_frequency": "Update frequentie",
+          "value": "Waarde",
+          "value_template": "Waarde template"
         },
-        "step": {
-            "init": {
-                "data": {
-                    "area": "Ruimte",
-                    "attribute": "Attribuut",
-                    "autostart": "Automatisch starten",
-                    "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
-                    "calibrate": "Kalibratie waardes",
-                    "create_energy_sensor": "Creëer energie sensoren",
-                    "create_utility_meters": "Creëer utiliteit meters",
-                    "device": "Apparaat",
-                    "energy_integration_method": "Energie integratie methode",
-                    "gamma_curve": "Gamma curve",
-                    "group_energy_entities": "Additionele energie entiteiten",
-                    "group_member_sensors": "Individuele Powercalc sensoren",
-                    "group_power_entities": "Additionele vermogen entiteiten",
-                    "hide_members": "Verberg onderliggende sensoren",
-                    "ignore_unavailable_state": "Negeer unavailable status",
-                    "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-                    "max_power": "Max vermogen",
-                    "min_power": "Min vermogen",
-                    "multiply_factor": "Vermenigvuldigingsfactor",
-                    "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
-                    "name": "Naam",
-                    "on_time": "Tijd aan per dag",
-                    "playbooks": "Playbooks",
-                    "power": "Vermogen",
-                    "power_template": "Vermogen template",
-                    "repeat": "Herhalen",
-                    "standby_power": "Standby vermogen",
-                    "states_power": "Vermogen per status",
-                    "states_trigger": "Status trigger",
-                    "sub_groups": "Sub groepen",
-                    "unavailable_power": "Vermogen indien onbeschikbaar",
-                    "unit_of_measurement": "Eenheid",
-                    "update_frequency": "Update frequentie",
-                    "utility_meter_tariffs": "Nutsmeter tarieven",
-                    "value": "Waarde",
-                    "value_template": "Waarde template"
-                },
-                "data_description": {
-                    "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-                    "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
-                    "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
-                    "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
-                    "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
-                    "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-                    "group_energy_entities": "Additionele energie entiteiten (kWh)",
-                    "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
-                    "group_power_entities": "Additionele vermogen entiteiten (W)",
-                    "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
-                    "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
-                    "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
-                    "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
-                    "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
-                    "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
-                    "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
-                    "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven",
-                    "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1",
-                    "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
-                    "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
-                    "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
-                }
-            }
+        "data_description": {
+          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
+          "update_frequency": "tijd in seconden tussen status updates van de sensor"
+        },
+        "title": "Maak een dagelijkse energieverbruik sensor"
+      },
+      "fixed": {
+        "data": {
+          "power": "Vermogen",
+          "power_template": "Vermogen template",
+          "states_power": "Vermogen per status"
+        },
+        "data_description": {
+          "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
+          "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
+          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
+        },
+        "description": "Definieer een vaste vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
+        "title": "Gefixeerde configuratie"
+      },
+      "group": {
+        "data": {
+          "area": "Ruimte",
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "device": "Apparaat",
+          "group_energy_entities": "Additionele energie entiteiten",
+          "group_member_sensors": "Individuele Powercalc sensoren",
+          "group_power_entities": "Additionele vermogen entiteiten",
+          "hide_members": "Verberg onderliggende sensoren",
+          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+          "name": "Naam",
+          "sub_groups": "Sub groepen",
+          "unique_id": "Uniek id"
+        },
+        "data_description": {
+          "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+          "create_energy_sensor": "Laat powercalc een kWh meter maken",
+          "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
+          "group_energy_entities": "Additionele energie entiteiten (kWh)",
+          "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
+          "group_power_entities": "Additionele vermogen entiteiten (W)",
+          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
+          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+        },
+        "title": "Creëer een groep sensor"
+      },
+      "library": {
+        "data": {
+          "confirm_autodisovered_model": "Bevestig model ID"
+        },
+        "data_description": {
+          "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
+        },
+        "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
+        "title": "Bibliotheek"
+      },
+      "linear": {
+        "data": {
+          "attribute": "Attribuut",
+          "calibrate": "Kalibratie waardes",
+          "gamma_curve": "Gamma curve",
+          "max_power": "Max vermogen",
+          "min_power": "Min vermogen"
+        },
+        "data_description": {
+          "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+          "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20"
+        },
+        "title": "Lineaire configuratie"
+      },
+      "manufacturer": {
+        "data": {
+          "manufacturer": "Fabrikant"
+        },
+        "description": "Selecteer de fabrikant",
+        "title": "Fabrikant configuratie"
+      },
+      "model": {
+        "data": {
+          "model": "Model ID"
+        },
+        "description": "Selecteer het model. Zie de [lijst]({supported_models_link}) van ondersteunde apparaten voor meer informatie",
+        "title": "Model configuratie"
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Automatisch starten",
+          "playbooks": "Playbooks",
+          "repeat": "Herhalen",
+          "states_trigger": "Status trigger"
+        },
+        "data_description": {
+          "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
+          "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beëindigd",
+          "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1"
+        },
+        "title": "Playbook configuratie"
+      },
+      "power_advanced": {
+        "data": {
+          "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
+          "energy_integration_method": "Energie integratie methode",
+          "ignore_unavailable_state": "Negeer onbeschikbaar status",
+          "multiply_factor": "Vermenigvuldigingsfactor",
+          "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
+          "unavailable_power": "Vermogen indien onbeschikbaar",
+          "utility_meter_tariffs": "Nutsmeter tarieven"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de sensor 0 tonen",
+          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+          "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+          "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
+          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
+          "utility_meter_tariffs": "Een lijst met ondersteunde tarieven; laat leeg als er maar één tarief nodig is."
+        },
+        "description": "De volgende opties zijn voor advanceerde gebruikers. In de meeste gevallen kan je dit overslaan",
+        "title": "Geavanceerde opties"
+      },
+      "real_power": {
+        "data": {
+          "create_utility_meters": "Creëer utiliteit meters",
+          "entity_id": "Vermogensensor id",
+          "name": "Naam",
+          "device": "Apparaat"
+        },
+        "data_description": {
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
+          "name": "Basisnaam voor de gegenereerde vermogen- en utiliteitsmeter. Volledige entiteit naam zal worden ingesteld afhankelijk van de energy_sensor_naming instelling",
+          "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
+        },
+        "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
+        "title": "Maak een energiesensor voor een bestaande stroomsensor"
+      },
+      "sub_profile": {
+        "data": {
+          "sub_profile": "Sub profiel"
+        },
+        "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
+        "title": "Sub profiel configuratie"
+      },
+      "user": {
+        "data": {
+          "sensor_type": "Type sensor"
+        },
+        "menu_options": {
+          "daily_energy": "Dagelijkse energie",
+          "group": "Groep",
+          "menu_library": "Virtueel vermogen (bibliotheek)",
+          "real_power": "Energie bebaseerd op bestaande vermogensensor",
+          "virtual_power": "Virtueel vermogen (handmatig)"
+        },
+        "title": "Kies het gewenste sensor type"
+      },
+      "utility_meter_options": {
+        "title": "Nutsmeter opties",
+        "description": "Definieer de instellingen voor de aanmaak van nutsmeters",
+        "data": {
+          "utility_meter_types": "Cycli",
+          "utility_meter_tariffs": "Tarieven"
+        },
+        "data_description": {
+          "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
+          "utility_meter_tariffs": "Een lijst met ondersteunde tarieven, laat leeg als er maar één tarief nodig is."
         }
-    },
-    "services": {
-        "activate_playbook": {
-            "description": "Start verwerking van een playbook.",
-            "fields": {
-                "playbook_id": {
-                    "description": "Playbook identificatie.",
-                    "name": "Playbook"
-                }
-            },
-            "name": "Activeer playbook"
+      },
+      "virtual_power": {
+        "data": {
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "entity_id": "Bron entiteit",
+          "group": "Aan groep toevoegen",
+          "mode": "Calculatie strategie",
+          "name": "Naam",
+          "standby_power": "Standby vermogen",
+          "unique_id": "Uniek id"
         },
-        "calibrate_energy": {
-            "description": "Stel de energiesensor in op een nieuwe kWh waarde.",
-            "fields": {
-                "value": {
-                    "description": "kWh die je wil instellen.",
-                    "name": "Waarde"
-                }
-            },
-            "name": "Kalibreer energiesensor"
+        "data_description": {
+          "create_energy_sensor": "Laat powercalc een kWh meter maken",
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
+          "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
+          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
+          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)",
+          "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele energiemeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
         },
-        "calibrate_utility_meter": {
-            "description": "Kalibreert een utiliteitsmeter.",
-            "fields": {
-                "value": {
-                    "description": "kWh die je wil instellen.",
-                    "name": "Waarde"
-                }
-            },
-            "name": "Kalibreer utiliteitsmeter"
+        "description": "Zie de readme voor meer information over de mogelijke strategieen en configuratie opties.",
+        "title": "Creëer een virtuele energie meter"
+      },
+      "wled": {
+        "data": {
+          "power_factor": "Vermogensfactor",
+          "voltage": "Spanning"
         },
-        "change_gui_config": {
-            "description": "Pas configuratie setting in één keer aan voor alle Powercalc GUI configuraties",
-            "fields": {
-                "field": {
-                    "description": "De optie die je aan wil passen",
-                    "name": "Optie"
-                },
-                "value": {
-                    "description": "De nieuwe waarde",
-                    "name": "Waarde"
-                }
-            },
-            "name": "GUI configuratie wijzigen"
-        },
-        "get_active_playbook": {
-            "description": "Laad huidige actieve playbook",
-            "name": "Laad actieve playbook"
-        },
-        "increase_daily_energy": {
-            "description": "Verhoog de sensor.",
-            "fields": {
-                "value": {
-                    "description": "kWh die je wil toevoegen.",
-                    "name": "Waarde"
-                }
-            },
-            "name": "Verhoog dagelijkste energiesensor"
-        },
-        "reset_energy": {
-            "description": "Herstel een energiesensor naar 0 kWh.",
-            "name": "Herstel energiesensor"
-        },
-        "stop_playbook": {
-            "description": "Stop huidige actieve playbook.",
-            "name": "Stop actieve playbook"
-        },
-        "switch_sub_profile": {
-            "description": "Een aantal profielen in de bibliotheek ondersteunen verschillende sub profielen. Deze service maakt het mogelijk om een andere te kiezen.",
-            "fields": {
-                "profile": {
-                    "name": "Subprofiel",
-                    "description": "Specificeer een van de mogelijke sub profielen"
-                }
-            },
-            "name": "Schakel over naar ander subprofiel"
-        }
+        "title": "WLED configuratie"
+      }
     }
+  },
+  "issues": {
+    "deprecated_platform_yaml": {
+      "description": "Configuratie middels `sensor->platform` is verouderd. Verander je configratie naar `powercalc->sensors`. Klik op 'Meer informatie' voor verder uitleg.",
+      "title": "Powercalc YAML configuratie is verplaatst"
+    }
+  },
+  "options": {
+    "error": {
+      "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
+      "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
+      "group_mandatory": "Je dient minimaal een van de volgende velden te definieren: sub groepen, vermogen entiteiten of energie entiteiten",
+      "linear_mandatory": "Je moet mimimaal max vermogen of kalibratie waardes instellen",
+      "linear_min_higher_as_max": "Maximale vermogen kan niet lager zijn dan mimimale vermogen",
+      "linear_unsupported_domain": "Entity domein is niet ondersteund. Moet een van de volgende zijn: fan, light of mediaplayer. Je kan de calibratie optie gebruiken",
+      "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
+    },
+    "step": {
+      "init": {
+        "data": {
+          "area": "Ruimte",
+          "attribute": "Attribuut",
+          "autostart": "Automatisch starten",
+          "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
+          "calibrate": "Kalibratie waardes",
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "device": "Apparaat",
+          "energy_integration_method": "Energie integratie methode",
+          "gamma_curve": "Gamma curve",
+          "group_energy_entities": "Additionele energie entiteiten",
+          "group_member_sensors": "Individuele Powercalc sensoren",
+          "group_power_entities": "Additionele vermogen entiteiten",
+          "hide_members": "Verberg onderliggende sensoren",
+          "ignore_unavailable_state": "Negeer unavailable status",
+          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+          "max_power": "Max vermogen",
+          "min_power": "Min vermogen",
+          "multiply_factor": "Vermenigvuldigingsfactor",
+          "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
+          "name": "Naam",
+          "on_time": "Tijd aan per dag",
+          "playbooks": "Playbooks",
+          "power": "Vermogen",
+          "power_template": "Vermogen template",
+          "repeat": "Herhalen",
+          "standby_power": "Standby vermogen",
+          "states_power": "Vermogen per status",
+          "states_trigger": "Status trigger",
+          "sub_groups": "Sub groepen",
+          "unavailable_power": "Vermogen indien onbeschikbaar",
+          "unit_of_measurement": "Eenheid",
+          "update_frequency": "Update frequentie",
+          "utility_meter_tariffs": "Nutsmeter tarieven",
+          "value": "Waarde",
+          "value_template": "Waarde template"
+        },
+        "data_description": {
+          "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
+          "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+          "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
+          "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
+          "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
+          "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
+          "group_energy_entities": "Additionele energie entiteiten (kWh)",
+          "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
+          "group_power_entities": "Additionele vermogen entiteiten (W)",
+          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+          "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
+          "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+          "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
+          "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
+          "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
+          "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
+          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven",
+          "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1",
+          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
+          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
+          "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
+        }
+      }
+    }
+  },
+  "services": {
+    "activate_playbook": {
+      "description": "Start verwerking van een playbook.",
+      "fields": {
+        "playbook_id": {
+          "description": "Playbook identificatie.",
+          "name": "Playbook"
+        }
+      },
+      "name": "Activeer playbook"
+    },
+    "calibrate_energy": {
+      "description": "Stel de energiesensor in op een nieuwe kWh waarde.",
+      "fields": {
+        "value": {
+          "description": "kWh die je wil instellen.",
+          "name": "Waarde"
+        }
+      },
+      "name": "Kalibreer energiesensor"
+    },
+    "calibrate_utility_meter": {
+      "description": "Kalibreert een utiliteitsmeter.",
+      "fields": {
+        "value": {
+          "description": "kWh die je wil instellen.",
+          "name": "Waarde"
+        }
+      },
+      "name": "Kalibreer utiliteitsmeter"
+    },
+    "change_gui_config": {
+      "description": "Pas configuratie setting in één keer aan voor alle Powercalc GUI configuraties",
+      "fields": {
+        "field": {
+          "description": "De optie die je aan wil passen",
+          "name": "Optie"
+        },
+        "value": {
+          "description": "De nieuwe waarde",
+          "name": "Waarde"
+        }
+      },
+      "name": "GUI configuratie wijzigen"
+    },
+    "get_active_playbook": {
+      "description": "Laad huidige actieve playbook",
+      "name": "Laad actieve playbook"
+    },
+    "increase_daily_energy": {
+      "description": "Verhoog de sensor.",
+      "fields": {
+        "value": {
+          "description": "kWh die je wil toevoegen.",
+          "name": "Waarde"
+        }
+      },
+      "name": "Verhoog dagelijkste energiesensor"
+    },
+    "reset_energy": {
+      "description": "Herstel een energiesensor naar 0 kWh.",
+      "name": "Herstel energiesensor"
+    },
+    "stop_playbook": {
+      "description": "Stop huidige actieve playbook.",
+      "name": "Stop actieve playbook"
+    },
+    "switch_sub_profile": {
+      "description": "Een aantal profielen in de bibliotheek ondersteunen verschillende sub profielen. Deze service maakt het mogelijk om een andere te kiezen.",
+      "fields": {
+        "profile": {
+          "name": "Subprofiel",
+          "description": "Specificeer een van de mogelijke sub profielen"
+        }
+      },
+      "name": "Schakel over naar ander subprofiel"
+    }
+  }
 }

@@ -105,13 +105,9 @@ async def test_states_power_with_template(hass: HomeAssistant) -> None:
 
     track_entity = strategy.get_entities_to_track()
     assert isinstance(track_entity[0], TrackTemplate)
-    assert (
-        track_entity[0].template.template == "{{states('input_number.test_number42')}}"
-    )
+    assert track_entity[0].template.template == "{{states('input_number.test_number42')}}"
     assert isinstance(track_entity[1], TrackTemplate)
-    assert (
-        track_entity[1].template.template == "{{states('input_number.test_number60')}}"
-    )
+    assert track_entity[1].template.template == "{{states('input_number.test_number60')}}"
 
 
 async def test_states_power_with_attributes(hass: HomeAssistant) -> None:

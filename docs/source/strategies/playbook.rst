@@ -136,5 +136,3 @@ A playbook file must be a CSV file with 2 columns.
 
 When running this playbook the power sensor state will go to 70W after 0.5 seconds, 90W after 2 seconds and 25.5W after 4 seconds.
 All these timing are relative to the start of the playbook. So when the playbook starts at 18:00:00 the final step will be executed at 18:00:04
-
-

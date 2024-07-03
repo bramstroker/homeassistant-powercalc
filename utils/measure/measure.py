@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from __future__ import annotations
 
 import json
@@ -131,9 +133,7 @@ class Measure:
         if not runner_result:
             _LOGGER.error("Some error occurred during the measurement session")
 
-        generate_model_json: bool = (
-            answers.get("generate_model_json", False) and export_directory
-        )
+        generate_model_json: bool = answers.get("generate_model_json", False) and export_directory
 
         if generate_model_json:
             try:
@@ -150,9 +150,7 @@ class Measure:
                 extra_json_data=runner_result.model_json_data,
             )
 
-        if export_directory and (
-            generate_model_json or isinstance(self.runner, LightRunner)
-        ):
+        if export_directory and (generate_model_json or isinstance(self.runner, LightRunner)):
             _LOGGER.info(
                 "Measurement session finished. Files exported to %s",
                 export_directory,
@@ -233,11 +231,7 @@ class Measure:
         """
 
         # Only ask questions which answers are not predefined in .env file
-        questions_to_ask = [
-            question
-            for question in questions
-            if not config_key_exists(str(question.name).upper())
-        ]
+        questions_to_ask = [question for question in questions if not config_key_exists(str(question.name).upper())]
 
         predefined_answers = {}
         for question in questions:

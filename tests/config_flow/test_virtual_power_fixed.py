@@ -201,13 +201,8 @@ async def test_global_configuration_is_applied_to_field_default(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == "power_advanced"
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
-    assert (
-        schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default()
-        == ENERGY_INTEGRATION_METHOD_RIGHT
-    )
-    assert schema_keys[
-        schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)
-    ].description == {"suggested_value": True}
+    assert schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default() == ENERGY_INTEGRATION_METHOD_RIGHT
+    assert schema_keys[schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)].description == {"suggested_value": True}
 
 
 async def test_sensor_is_created_without_providing_source_entity(hass: HomeAssistant) -> None:

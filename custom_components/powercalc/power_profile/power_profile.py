@@ -67,6 +67,7 @@ class PowerProfile:
         self._json_data = json_data
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
+        self._sub_profiles: list[str] | None = None
 
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
@@ -166,13 +167,21 @@ class PowerProfile:
     def config_flow_discovery_remarks(self) -> str | None:
         return self._json_data.get("config_flow_discovery_remarks")
 
-    def get_sub_profiles(self) -> list[str]:
+    async def get_sub_profiles(self) -> list[str]:
         """Get listing of possible sub profiles."""
-        return sorted(next(os.walk(self.get_model_directory(True)))[1])
+
+        if self._sub_profiles:
+            return self._sub_profiles
+
+        def _get_sub_dirs() -> list[str]:
+            return next(os.walk(self.get_model_directory(True)))[1]
+
+        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))  # type: ignore
+        return self._sub_profiles
 
     @property
-    def has_sub_profiles(self) -> bool:
-        return len(self.get_sub_profiles()) > 0
+    async def has_sub_profiles(self) -> bool:
+        return len(await self.get_sub_profiles()) > 0
 
     @property
     def sub_profile_select(self) -> SubProfileSelectConfig | None:
@@ -184,7 +193,7 @@ class PowerProfile:
 
     async def select_sub_profile(self, sub_profile: str) -> None:
         """Select a sub profile. Only applicable when to profile actually supports sub profiles."""
-        if not self.has_sub_profiles:
+        if not await self.has_sub_profiles:
             return
 
         # Sub profile already selected, no need to load it again
@@ -195,14 +204,14 @@ class PowerProfile:
         _LOGGER.debug("Loading sub profile directory %s", sub_profile)
         if not os.path.exists(self._sub_profile_dir):
             raise ModelNotSupportedError(
-                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, "
-                f"sub_profile: {sub_profile})",
+                f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})",
             )
 
         # When the sub LUT directory also has a model.json (not required),
         # merge this json into the main model.json data.
         file_path = os.path.join(self._sub_profile_dir, "model.json")
         if os.path.exists(file_path):
+
             def _load_json() -> None:
                 """Load LUT profile json data."""
                 with open(file_path) as json_file:
@@ -216,10 +225,7 @@ class PowerProfile:
         """Check whether this power profile supports a given entity domain."""
         entity_entry = source_entity.entity_entry
         if (
-            self.device_type == DeviceType.SMART_SWITCH
-            and entity_entry
-            and entity_entry.platform in ["hue"]
-            and source_entity.domain == LIGHT_DOMAIN
+            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
 
@@ -258,11 +264,7 @@ class SubProfileSelector:
 
     def get_tracking_entities(self) -> list[str]:
         """Get additional list of entities to track for state changes."""
-        return [
-            entity_id
-            for matcher in self._matchers
-            for entity_id in matcher.get_tracking_entities()
-        ]
+        return [entity_id for matcher in self._matchers for entity_id in matcher.get_tracking_entities()]
 
     def _create_matcher(self, matcher_config: dict) -> SubProfileMatcher:
         """Create a matcher from json config. Can be extended for more matchers in the future."""
