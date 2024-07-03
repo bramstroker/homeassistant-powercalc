@@ -1,7 +1,7 @@
 - [Lights](#lights) (340)
 - [Smart speakers](#smart-speakers) (32)
 - [Smart switches / plugs](#smart-switches--plugs) (44)
-- [Cameras](#cameras) (1)
+- [Cameras](#cameras) (2)
 - [Networking](#networking) (4)
 
 ## Lights
@@ -43,7 +43,7 @@
 |gledopto       |GL-S-005Z                        |Gledopto 4W MR16 Dual White and Color 120°                                                   |                                                                                                                                                                                                                                                                                                      |0.490|color_temp,hs           |
 |gledopto       |GL-S-007Z                        |Gledopto 5W GU10 Dual White And Color Spotlight                                              |                                                                                                                                                                                                                                                                                                      |0.700|color_temp,hs           |
 |govee          |H6072                            |Govee Lyra RGBICWW Corner Floor Lamp                                                         |                                                                                                                                                                                                                                                                                                      |1.780|color_temp,hs           |
-|govee          |H6076                            |Govee RGBICW Smart Corner Floor Lamp                                                         |                                                                                                                                                                                                                                                                                                      |2.140|hs,color_temp,brightness|
+|govee          |H6076                            |Govee RGBICW Smart Corner Floor Lamp                                                         |                                                                                                                                                                                                                                                                                                      |2.140|color_temp,hs,brightness|
 |govee          |h6061                            |Govee Glide Hexa Light Panels (10 panels)                                                    |                                                                                                                                                                                                                                                                                                      |0.850|color_temp,hs           |
 |ikea           |L1527                            |FLOALT panel WS 30x30                                                                        |FLOALT panel WS 30x30                                                                                                                                                                                                                                                                                 |0.080|color_temp              |
 |ikea           |L1528                            |FLOALT panel WS 30x90                                                                        |FLOALT panel WS 30x90                                                                                                                                                                                                                                                                                 |0.450|color_temp              |
@@ -310,7 +310,7 @@
 |sylvania       |40A19FILCCLWIFI                  |SYLVANIA Wifi LED Smart A19 RGBW Color (2000K)                                               |k2nagch3coapc6yd                                                                                                                                                                                                                                                                                      |0.500|color_temp,hs           |
 |sylvania       |A19CCECWF                        |SYLVANIA Wifi LED Smart Light Bulb, 60W=8.5W, Full Color A19 (2700K - 6500K)                 |1ijupffokexbz0cl                                                                                                                                                                                                                                                                                      |0.520|color_temp,hs           |
 |teckin         |SB50                             |Teckin SB50                                                                                  |                                                                                                                                                                                                                                                                                                      |0.810|color_temp,hs           |
-|tp-link        |KL135                            |TP-Link Kasa KL135(US)                                                                       |KL135(US)                                                                                                                                                                                                                                                                                             |0.200|hs,color_temp,brightness|
+|tp-link        |KL135                            |TP-Link Kasa KL135(US)                                                                       |KL135(US)                                                                                                                                                                                                                                                                                             |0.200|color_temp,hs,brightness|
 |tp-link        |L530                             |Tapo L530E                                                                                   |                                                                                                                                                                                                                                                                                                      |0.400|color_temp,hs           |
 |tp-link        |L900                             |TP-Link Tapo L900-5                                                                          |                                                                                                                                                                                                                                                                                                      |0.240|hs,brightness           |
 |trust          |ZLED-G2705                       |Trust ZLED-G2705                                                                             |                                                                                                                                                                                                                                                                                                      |0.650|brightness              |
@@ -439,11 +439,12 @@
 |tuya       |TS011F                |Smart plug (with power monitoring)                                                 |TS011F_plug_1<br />TS011F_plug_3<br />TS011F<br />BSD29|0.130|
 
 ## Cameras
-#### 1 total
+#### 2 total
 
-| A  |  B  |         C         | D | E |
-|----|-----|-------------------|---|--:|
-|eufy|T8410|Indoor Cam Pan&Tilt|   |  0|
+| A  |  B  |         C         |  D  | E |
+|----|-----|-------------------|-----|--:|
+|eufy|T8400|Indoor Cam C120    |T8400|  0|
+|eufy|T8410|Indoor Cam Pan&Tilt|     |  0|
 
 ## Networking
 #### 4 total
