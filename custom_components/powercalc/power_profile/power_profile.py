@@ -171,10 +171,10 @@ class PowerProfile:
             translations = translation.async_get_cached_translations(
                 self._hass,
                 self._hass.config.language,
-                "config",
+                "common",
                 DOMAIN,
             )
-            translation_key = f"component.{DOMAIN}.config.step.library.data_description.remarks_smart_switch"
+            translation_key = f"component.{DOMAIN}.common.remarks_smart_switch"
             return translations.get(translation_key)
 
         return remarks

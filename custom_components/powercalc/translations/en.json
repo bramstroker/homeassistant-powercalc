@@ -1,4 +1,7 @@
 {
+  "common": {
+    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+  },
   "config": {
     "abort": {
       "already_configured": "Sensor is already configured, specify a unique_id"
@@ -85,8 +88,7 @@
           "confirm_autodisovered_model": "Confirm model"
         },
         "data_description": {
-          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself",
-          "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
         "title": "Library"
