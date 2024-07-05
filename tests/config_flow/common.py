@@ -12,6 +12,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.powercalc.config_flow import (
     DOMAIN,
+    Steps,
 )
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -28,9 +29,9 @@ DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 
-async def select_sensor_type(
+async def select_menu_item(
     hass: HomeAssistant,
-    sensor_type: SensorType,
+    menu_item: SensorType | str,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
     result = await hass.config_entries.flow.async_init(
@@ -40,11 +41,12 @@ async def select_sensor_type(
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {"next_step_id": sensor_type},
+        {"next_step_id": menu_item},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == sensor_type
+    if isinstance(menu_item, SensorType):
+        assert result["step_id"] == menu_item
 
     return result
 
@@ -61,7 +63,7 @@ async def initialize_options_flow(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "init"
+    assert result["step_id"] == Steps.INIT
     return result
 
 
@@ -84,7 +86,7 @@ async def goto_virtual_power_strategy_step(
     elif CONF_MODE not in user_input:
         user_input[CONF_MODE] = strategy
 
-    result = await select_sensor_type(hass, SensorType.VIRTUAL_POWER)
+    result = await select_menu_item(hass, SensorType.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,

@@ -5,7 +5,7 @@ from homeassistant.data_entry_flow import FlowResult
 
 from custom_components.powercalc import DOMAIN
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
+from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_MANUFACTURER,
@@ -138,7 +138,7 @@ async def test_discovery_flow_with_subprofile_selection(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == "sub_profile"
+    assert result["step_id"] == Steps.SUB_PROFILE
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {CONF_SUB_PROFILE: "length_6"},
