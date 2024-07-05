@@ -14,10 +14,11 @@ from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers import translation
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import CONF_POWER, CalculationStrategy
+from custom_components.powercalc.const import CONF_POWER, DOMAIN, CalculationStrategy
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
     PowercalcSetupError,
@@ -165,7 +166,18 @@ class PowerProfile:
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:
-        return self._json_data.get("config_flow_discovery_remarks")
+        remarks = self._json_data.get("config_flow_discovery_remarks")
+        if not remarks and self.device_type == DeviceType.SMART_SWITCH:
+            translations = translation.async_get_cached_translations(
+                self._hass,
+                self._hass.config.language,
+                "config",
+                DOMAIN,
+            )
+            translation_key = f"component.{DOMAIN}.config.step.library.remarks_smart_switch"
+            return translations.get(translation_key)
+
+        return remarks
 
     async def get_sub_profiles(self) -> list[str]:
         """Get listing of possible sub profiles."""

@@ -5,7 +5,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL
+from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_FIXED,
@@ -136,14 +136,14 @@ async def test_smart_switch_power_input_gui_config_flow(
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     flow = flows[0]
 
-    assert flow["step_id"] == "library"
+    assert flow["step_id"] == Steps.LIBRARY
     result = await hass.config_entries.flow.async_configure(
         flow["flow_id"],
         {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
-    assert result["step_id"] == "fixed"
+    assert result["step_id"] == Steps.FIXED
     result = await hass.config_entries.flow.async_configure(
         flow["flow_id"],
         {CONF_POWER: 50},
