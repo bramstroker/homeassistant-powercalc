@@ -22,7 +22,7 @@ repos:
       - id: mixed-line-ending
       - id: pretty-format-json
         args: [--autofix, --no-sort-keys, --no-ensure-ascii]
-        exclude: ^.*(tsconfig|library)\.json$
+        exclude: ^(tsconfig|library)\.json$
       - id: requirements-txt-fixer
       - id: trailing-whitespace
 
