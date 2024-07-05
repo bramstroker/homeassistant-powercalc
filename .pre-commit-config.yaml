@@ -17,12 +17,13 @@ repos:
       - id: debug-statements
       - id: destroyed-symlinks
       - id: end-of-file-fixer
+        exclude: library\.json$
       - id: fix-byte-order-marker
       - id: forbid-submodules
       - id: mixed-line-ending
       - id: pretty-format-json
         args: [--autofix, --no-sort-keys, --no-ensure-ascii]
-        exclude: ^.*(tsconfig|library)\.json$
+        exclude: (tsconfig|library)\.json$
       - id: requirements-txt-fixer
       - id: trailing-whitespace
 
