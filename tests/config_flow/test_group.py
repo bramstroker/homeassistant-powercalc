@@ -49,13 +49,13 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
-    select_sensor_type,
+    select_menu_item,
     set_virtual_power_configuration,
 )
 
 
 async def test_create_group_entry(hass: HomeAssistant) -> None:
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
@@ -82,7 +82,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None:
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
@@ -114,7 +114,7 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
     """
     await run_powercalc_setup(hass, {}, {CONF_CREATE_ENERGY_SENSORS: False})
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
@@ -153,7 +153,7 @@ async def test_group_include_area(
         {CONF_STATES_POWER: {"playing": 1.8}},
     )
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_AREA: area.id,
@@ -258,7 +258,7 @@ async def test_include_area_powercalc_only(
 
     await setup_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_AREA: area.id,
@@ -314,7 +314,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
     assert await hass.config_entries.async_setup(config_entry_3.entry_id)
     await hass.async_block_till_done()
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     data_schema: vol.Schema = result["data_schema"]
     select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
@@ -373,7 +373,7 @@ async def test_real_power_entry_selectable_as_group_member(
     assert await hass.config_entries.async_setup(config_entry_2.entry_id)
     await hass.async_block_till_done()
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     data_schema: vol.Schema = result["data_schema"]
     select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
@@ -402,7 +402,7 @@ async def test_real_power_entry_selectable_as_group_member(
 
 
 async def test_group_error_mandatory(hass: HomeAssistant) -> None:
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
     user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -431,7 +431,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
     )
 
     # Initialize a new config flow
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
 
     # Assert the two existing groups can be selected as subgroup
     data_schema: vol.Schema = result["data_schema"]
@@ -497,7 +497,7 @@ async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) 
     """Check that the toggle is default disabled when we set include_non_powercalc_sensors globally to false"""
     await run_powercalc_setup(hass, {}, {CONF_INCLUDE_NON_POWERCALC_SENSORS: False})
 
-    result = await select_sensor_type(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, SensorType.GROUP)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
