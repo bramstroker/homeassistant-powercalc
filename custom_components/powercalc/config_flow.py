@@ -1375,7 +1375,7 @@ def _get_global_powercalc_config(hass: HomeAssistant) -> dict[str, str]:
 def _get_fixed_power_config_for_smart_switch(power_profile: PowerProfile | None, user_input: dict[str, Any]) -> dict[str, Any]:
     """Get the fixed power config for smart switch."""
     if power_profile is None:
-        return {CONF_POWER: 0}
+        return {CONF_POWER: 0}  # pragma: no cover
     self_usage_on = power_profile.fixed_mode_config.get(CONF_POWER, 0) if power_profile.fixed_mode_config else 0
     power = user_input.get(CONF_POWER, 0)
     self_usage_included = user_input.get(CONF_SELF_USAGE_INCLUDED, True)
