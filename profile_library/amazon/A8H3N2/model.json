@@ -1,0 +1,31 @@
+{
+    "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+    "calculation_strategy": "linear",
+    "created_at": "2024-07-05T16:34:44.695639",
+    "device_type": "smart_speaker",
+    "linear_config": {
+        "calibrate": [
+            "10 -> 5.11",
+            "20 -> 5.17",
+            "30 -> 5.18",
+            "40 -> 5.26",
+            "50 -> 5.79",
+            "60 -> 6.58",
+            "70 -> 8.03",
+            "80 -> 8.41",
+            "90 -> 9.36",
+            "100 -> 9.82",
+            "0 -> 4.60"
+        ]
+    },
+    "measure_description": "Measured by playing pink noise and increasing volume in 10% steps.",
+    "measure_device": "Shelly Plus Plug S",
+    "measure_method": "manual",
+    "name": "Amazon Echo Show 8 (2nd Generation)",
+    "aliases": [
+        "A15996VY63BQ2D",
+        "A8H3N2",
+        "KNIGHT A15996VY63BQ2D"
+    ],
+    "standby_power": 4.28
+}
