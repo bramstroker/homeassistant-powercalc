@@ -174,7 +174,7 @@ class PowerProfile:
                 "config",
                 DOMAIN,
             )
-            translation_key = f"component.{DOMAIN}.config.step.library.remarks_smart_switch"
+            translation_key = f"component.{DOMAIN}.config.step.library.data_description.remarks_smart_switch"
             return translations.get(translation_key)
 
         return remarks

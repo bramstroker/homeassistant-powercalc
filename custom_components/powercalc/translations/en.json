@@ -85,10 +85,10 @@
           "confirm_autodisovered_model": "Confirm model"
         },
         "data_description": {
-          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself"
+          "confirm_autodisovered_model": "If you choose not to confirm, you can input the manufacturer and model yourself",
+          "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device.{remarks}",
-        "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
         "title": "Library"
       },
       "linear": {
