@@ -31,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
+    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     UnitPrefix,
@@ -230,7 +231,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
 
         signature = inspect.signature(IntegrationSensor.__init__)
         if "max_sub_interval" in signature.parameters:
-            params["max_sub_interval"] = None  # pragma: no cover
+            params["max_sub_interval"] = sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY)
 
         super().__init__(**params)  # type: ignore[arg-type]
 
