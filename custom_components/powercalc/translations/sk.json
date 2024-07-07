@@ -1,4 +1,7 @@
 {
+  "common": {
+    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+  },
   "config": {
     "abort": {
       "already_configured": "Senzor je už nakonfigurovaný, zadajte jedinečné_id"
@@ -176,6 +179,18 @@
         "description": "Tento model má viacero podprofilov. Vyberte ten, ktorý vyhovuje vášmu zariadeniu",
         "title": "Konfigurácia podprofilu"
       },
+      "smart_switch": {
+        "data": {
+          "power": "Power",
+          "self_usage_included": "Self usage included"
+        },
+        "data_description": {
+          "power": "A fixed power value in Watts for the connected appliance",
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+        },
+        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
+        "title": "Smart switch config"
+      },
       "user": {
         "data": {
           "sensor_type": "Typ snímača"
@@ -278,6 +293,7 @@
           "power": "Výkon",
           "power_template": "Výkon šablóna",
           "repeat": "Opakovať",
+          "self_usage_included": "Self usage included",
           "standby_power": "Napájanie v pohotovostnom režime",
           "states_power": "Výkonové stavy",
           "states_trigger": "State trigger",
@@ -306,6 +322,7 @@
           "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
           "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
           "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
           "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
           "sub_groups": "Všetky obsahujúce snímače z vybraných podskupín budú tiež pridané do tejto skupiny",

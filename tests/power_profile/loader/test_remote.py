@@ -286,7 +286,7 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     Test that the local library is used when the remote library is not available.
     When unavailable, it should retry 3 times before falling back to the local library.
     """
-    caplog.set_level(logging.ERROR)
+    caplog.set_level(logging.WARNING)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
         status=404,
@@ -298,7 +298,7 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     await loader.initialize()
 
     assert "signify" in loader.manufacturer_models
-    assert len(caplog.records) == 3
+    assert len(caplog.records) == 2
 
 
 async def test_fallback_to_local_library_on_client_connection_error(
@@ -310,7 +310,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     Test that the local library is used when powercalc.lauwbier.nl is not available.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2277
     """
-    caplog.set_level(logging.ERROR)
+    caplog.set_level(logging.WARNING)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
         status=200,
@@ -323,7 +323,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     await loader.initialize()
 
     assert "signify" in loader.manufacturer_models
-    assert len(caplog.records) == 3
+    assert len(caplog.records) == 2
 
 
 async def test_fallback_to_local_profile(

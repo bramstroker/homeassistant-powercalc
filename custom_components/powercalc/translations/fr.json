@@ -1,4 +1,7 @@
 {
+  "common": {
+    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+  },
   "config": {
     "abort": {
       "already_configured": "Le capteur est déjà configuré, spécifiez un identifiant unique"
@@ -176,6 +179,18 @@
         "description": "Ce modèle a plusieurs sous-profils. Sélectionnez celui qui convient à votre appareil",
         "title": "Configuration du sous-profil"
       },
+      "smart_switch": {
+        "data": {
+          "power": "Power",
+          "self_usage_included": "Self usage included"
+        },
+        "data_description": {
+          "power": "A fixed power value in Watts for the connected appliance",
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+        },
+        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
+        "title": "Smart switch config"
+      },
       "user": {
         "data": {
           "sensor_type": "Type de capteur"
@@ -278,6 +293,7 @@
           "power": "Puissance",
           "power_template": "Modèle de puissance",
           "repeat": "Répéter",
+          "self_usage_included": "Self usage included",
           "standby_power": "Consommation en veille",
           "states_power": "Etats de puissance",
           "states_trigger": "State trigger",
@@ -306,6 +322,7 @@
           "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogramme1 : lave-linge/programme1.csv",
           "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",
           "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
           "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus",
           "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
           "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",

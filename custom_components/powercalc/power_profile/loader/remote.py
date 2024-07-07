@@ -197,13 +197,13 @@ class RemoteLoader(Loader):
             try:
                 return await callback()
             except (ClientError, ProfileDownloadError) as e:
-                _LOGGER.error(e, exc_info=e)
+                _LOGGER.debug(e)
                 retry_count += 1
                 if retry_count == max_retries:
                     raise ProfileDownloadError(f"Failed to download even after {max_retries} retries, falling back to local copy") from e
 
                 await asyncio.sleep(self.retry_timeout)
-                _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count, max_retries)
+                _LOGGER.warning("Failed to download, retrying... (Attempt %d of %d)", retry_count + 1, max_retries)
         return None  # pragma: no cover
 
     async def download_profile(self, manufacturer: str, model: str, storage_path: str) -> None:
