@@ -1538,12 +1538,14 @@ async def test_force_calculate_energy_sensor(hass: HomeAssistant) -> None:
         {
             CONF_CREATE_ENERGY_SENSORS: False,
             CONF_FORCE_UPDATE_FREQUENCY: 60,
+            CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
         },
     )
 
     energy_state = hass.states.get("sensor.testgroup_energy")
     assert energy_state
     assert energy_state.attributes.get(ATTR_DEVICE_CLASS) == SensorDeviceClass.ENERGY
+    assert energy_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT) == UnitOfEnergy.KILO_WATT_HOUR
 
 
 async def test_decimal_conversion_error_is_logged(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
