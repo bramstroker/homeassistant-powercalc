@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     CalculationStrategy,
 )
+from custom_components.powercalc.sensors.group import add_to_associated_group
 from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
@@ -534,6 +535,13 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
 
     assert hass.states.get("sensor.new_group_power")
     assert hass.states.get("sensor.new_group_energy")
+
+    config_entry = hass.config_entries.async_get_entry(result["result"].entry_id)
+
+    # Prevent regression by checking if group is not already created and added twice, see #2366
+    await add_to_associated_group(hass, config_entry)
+    entries = hass.config_entries.async_entries(DOMAIN)
+    assert len(entries) == 2
 
 
 async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
