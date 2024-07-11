@@ -478,6 +478,7 @@ def create_grouped_energy_sensor(
             unique_id=energy_unique_id,
             sensor_config=sensor_config,
             device_info=get_device_info(hass, sensor_config, None),
+            unit_prefix=sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
         )
 
     return GroupedEnergySensor(
