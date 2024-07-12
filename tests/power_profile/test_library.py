@@ -22,18 +22,21 @@ async def test_manufacturer_listing(hass: HomeAssistant) -> None:
     assert "bladiebla" not in manufacturers
 
 
-async def test_model_listing(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize(
+    "manufacturer,expected_models",
+    [
+        ("signify", ["LCT010", "LCA007"]),
+        ("Tasmota", ["A1T", "test"]),  # Test composite loader and case insensitivity
+        ("Signify Netherlands B.V.", ["LCT010"]),
+    ],
+)
+async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_models: list[str]) -> None:
+    hass.config.config_dir = get_test_config_dir()
     library = await ProfileLibrary.factory(hass)
-    await library.get_model_listing("signify")
-    models = await library.get_model_listing("signify")  # Trigger twice to test cache
-    assert "LCT010" in models
-    assert "LCA007" in models
-
-
-async def test_model_listing_full_manufacturer_name(hass: HomeAssistant) -> None:
-    library = await ProfileLibrary.factory(hass)
-    models = await library.get_model_listing("Signify Netherlands B.V.")
-    assert "LCT010" in models
+    await library.get_model_listing(manufacturer)
+    models = await library.get_model_listing(manufacturer)  # Trigger twice to test cache
+    for model in expected_models:
+        assert model in models
 
 
 async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
