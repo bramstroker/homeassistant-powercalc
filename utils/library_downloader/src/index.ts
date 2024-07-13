@@ -124,7 +124,7 @@ app.get(
 
     const fetchContents = async (
       path: string,
-      newPath: string | null = null
+      newPath: string | null = null,
     ): Promise<LibraryFile[]> => {
       if (newPath === null) {
         newPath = path;
@@ -169,9 +169,11 @@ app.get(
 
     try {
       const libraryPath = repository.path;
-      const files = await fetchContents(
+      const pattern = req.query.includePlots ? '.*' : '^(?!.*\.png$).*'
+      let files = await fetchContents(
         libraryPath + "/" + manufacturer + "/" + model
       );
+      files = files.filter((item) => new RegExp(pattern).test(item.path))
       if (files.length === 0) {
         logger.error("No data found for: %s/%s", manufacturer, model);
         res.status(404).json({ message: "No download url's found" });
