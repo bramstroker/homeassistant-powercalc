@@ -1,0 +1,32 @@
+name: Generate support model list
+
+on:
+  push:
+    paths:
+      - '**/*.csv.gz'
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  format:
+    name: Generate plots
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/workflows/poetry-composite-action
+        with:
+          directory: './utils/visualize'
+          python_version: '3.12'
+          cache_dependencies: 'false'
+      - name: Run visualization tool
+        run: |
+          cd ./utils/visualize
+          bash generate-all.sh
+      - uses: EndBug/add-and-commit@v9
+        if: github.ref == 'refs/heads/master'
+        with:
+          message: 'chore: generate plots'
