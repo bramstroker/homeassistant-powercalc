@@ -15,12 +15,16 @@ class LocalLoader(Loader):
         self._is_custom_directory = is_custom_directory
         self._data_directory = directory
         self._hass = hass
+        self._manufacturer_listing: dict[str, set[str]] = {}
 
     async def initialize(self) -> None:
         pass
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
+        cache_key = device_type or "all"
+        if self._manufacturer_listing.get(cache_key):
+            return self._manufacturer_listing[cache_key]
 
         def _find_manufacturer_directories() -> set[str]:
             return set(next(os.walk(self._data_directory))[1])
@@ -33,12 +37,14 @@ class LocalLoader(Loader):
             if not models:
                 continue
             manufacturers.add(manufacturer)
+
+        self._manufacturer_listing[cache_key] = manufacturers
         return manufacturers
 
     async def find_manufacturer(self, search: str) -> str | None:
         """Check if a manufacturer is available. Also must check aliases."""
         manufacturer_list = await self.get_manufacturer_listing(None)
-        if search in manufacturer_list:
+        if search in [m.lower() for m in manufacturer_list]:
             return search
 
         return None

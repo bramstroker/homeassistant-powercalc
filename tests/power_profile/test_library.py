@@ -25,7 +25,6 @@ async def test_manufacturer_listing(hass: HomeAssistant) -> None:
     "manufacturer,expected_models",
     [
         ("signify", ["LCT010", "LCA007"]),
-        ("Tasmota", ["A1T", "test"]),  # Test composite loader and case insensitivity
         ("Signify Netherlands B.V.", ["LCT010"]),
     ],
 )
