@@ -37,8 +37,6 @@ class LocalLoader(Loader):
 
     async def find_manufacturer(self, search: str) -> str | None:
         """Check if a manufacturer is available. Also must check aliases."""
-        if self._is_custom_directory:
-            return search
         manufacturer_list = await self.get_manufacturer_listing(None)
         if search in manufacturer_list:
             return search
