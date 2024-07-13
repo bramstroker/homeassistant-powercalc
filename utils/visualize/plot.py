@@ -117,15 +117,8 @@ def convert_mired_to_rgb(mired):
     return [*[div / 255.0 for div in rgb], 1]
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="CLI script to output powercalc LUT file as a plot",
-    )
-    parser.add_argument("file")
-    parser.add_argument("--output", required=False)
-    args = parser.parse_args()
-
-    file_path = resolve_absolute_file_path(args.file)
+def create_plot_for_csv_file(file_path: str, output: str) -> None:
+    """Create a scatter plot from a CSV file."""
     color_mode = ColorMode(Path(file_path).stem.removesuffix(".csv"))
 
     if file_path.endswith(".gz"):
@@ -139,15 +132,28 @@ def main() -> None:
     create_scatter_plot(dataframe, color_mode)
     plt.xlabel("brightness")
     plt.ylabel("watt")
-    if args.output:
-        output = args.output
+    if output:
         if output == "auto":
             output = f"{color_mode}.png"
-        plt.savefig(output)
+        output_path = Path(output)
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_path)
         print(f"Save plot to {output}")
         return
 
     plt.show()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="CLI script to output powercalc LUT file as a plot",
+    )
+    parser.add_argument("file")
+    parser.add_argument("--output", required=False)
+    args = parser.parse_args()
+
+    file_path = resolve_absolute_file_path(args.file)
+    create_plot_for_csv_file(file_path, args.output)
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
