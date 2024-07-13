@@ -448,6 +448,11 @@ async def test_find_model(remote_loader: RemoteLoader) -> None:
     assert model == "MQJ83"
 
 
+async def test_find_model_returns_none(remote_loader: RemoteLoader) -> None:
+    model = await remote_loader.find_model("apple", {"Non existing model"})
+    assert model is None
+
+
 def clear_storage_dir(storage_path: str) -> None:
     if not os.path.exists(storage_path):
         return

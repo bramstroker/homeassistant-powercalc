@@ -183,9 +183,6 @@ class RemoteLoader(Loader):
         """Find the model in the library."""
 
         models = self.manufacturer_models.get(manufacturer, [])
-        if not models:
-            return None
-
         return next(
             (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
             None,
