@@ -290,25 +290,25 @@ async def test_load_model_with_slashes(
 @pytest.mark.parametrize(
     "manufacturer,model,expected_manufacturer,expected_model",
     [
-        # (
-        #     "ikea",
-        #     "IKEA FLOALT LED light panel, dimmable, white spectrum (30x90 cm) (L1528)",
-        #     "ikea",
-        #     "L1528",
-        # ),
-        # ("IKEA", "LED1649C5", "ikea", "LED1649C5"),
-        # (
-        #     "IKEA",
-        #     "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)",
-        #     "ikea",
-        #     "LED1650R5",
-        # ),
-        # (
-        #     "ikea",
-        #     "TRADFRI bulb E14 W op/ch 400lm",
-        #     "ikea",
-        #     "LED1649C5",
-        # ),
+        (
+            "ikea",
+            "IKEA FLOALT LED light panel, dimmable, white spectrum (30x90 cm) (L1528)",
+            "ikea",
+            "L1528",
+        ),
+        ("IKEA", "LED1649C5", "ikea", "LED1649C5"),
+        (
+            "IKEA",
+            "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)",
+            "ikea",
+            "LED1650R5",
+        ),
+        (
+            "ikea",
+            "TRADFRI bulb E14 W op/ch 400lm",
+            "ikea",
+            "LED1649C5",
+        ),
         ("MLI", 45317, "mueller-licht", "45317"),
         ("TP-Link", "KP115(AU)", "tp-link", "KP115"),
         ("Apple", "HomePod (gen 2)", "apple", "MQJ83"),
