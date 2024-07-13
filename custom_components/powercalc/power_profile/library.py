@@ -7,7 +7,6 @@ from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.aliases import MANUFACTURER_DIRECTORY_MAPPING
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DATA_PROFILE_LIBRARY, DOMAIN, DOMAIN_CONFIG
 
 from .error import LibraryError
@@ -76,16 +75,16 @@ class ProfileLibrary:
 
     async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
         """Get listing of available models for a given manufacturer."""
-        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
-        manufacturer = manufacturer.lower()
 
+        resolved_manufacturer = await self._loader.find_manufacturer(manufacturer)
+        if not resolved_manufacturer:
+            return []
         device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
-        cache_key = f"{manufacturer}/{device_type}"
+        cache_key = f"{resolved_manufacturer}/{device_type}"
         cached_models = self._manufacturer_models.get(cache_key)
         if cached_models:
             return cached_models
-        models = await self._loader.get_model_listing(manufacturer, device_type)
+        models = await self._loader.get_model_listing(resolved_manufacturer, device_type)
         self._manufacturer_models[cache_key] = sorted(models)
         return self._manufacturer_models[cache_key]
 
@@ -118,15 +117,17 @@ class ProfileLibrary:
     ) -> PowerProfile | None:
         """Create a power profile object from the model JSON data."""
 
-        manufacturer = model_info.manufacturer
-        if manufacturer in MANUFACTURER_DIRECTORY_MAPPING:
-            manufacturer = str(MANUFACTURER_DIRECTORY_MAPPING.get(manufacturer))
-        manufacturer = manufacturer.lower()
-
         try:
+            resolved_manufacturer: str | None = model_info.manufacturer
+            if not custom_directory:
+                resolved_manufacturer = await self._loader.find_manufacturer(model_info.manufacturer)
+
+            if not resolved_manufacturer:
+                return None
+
             resolved_model: str | None = model_info.model
             if not custom_directory:
-                resolved_model = await self.find_model(manufacturer, model_info.model)
+                resolved_model = await self.find_model(resolved_manufacturer, model_info.model)
 
             if not resolved_model:
                 return None
@@ -134,9 +135,9 @@ class ProfileLibrary:
             loader = self._loader
             if custom_directory:
                 loader = LocalLoader(self._hass, custom_directory, is_custom_directory=True)
-            result = await loader.load_model(manufacturer, resolved_model)
+            result = await loader.load_model(resolved_manufacturer, resolved_model)
             if not result:
-                raise LibraryError(f"Model {manufacturer} {resolved_model} not found")
+                raise LibraryError(f"Model {resolved_manufacturer} {resolved_model} not found")
 
             json_data, directory = result
             linked_profile = json_data.get("linked_lut")
@@ -153,7 +154,7 @@ class ProfileLibrary:
 
         profile = PowerProfile(
             self._hass,
-            manufacturer=manufacturer,
+            manufacturer=resolved_manufacturer,
             model=resolved_model,
             directory=directory,
             json_data=json_data,

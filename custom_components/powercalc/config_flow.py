@@ -86,7 +86,7 @@ from .const import (
     CalculationStrategy,
     SensorType,
 )
-from .discovery import autodiscover_model
+from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -990,14 +990,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         if self.source_entity and self.source_entity.entity_entry and self.power_profile is None:
             try:
-                self.power_profile = await get_power_profile(
-                    self.hass,
-                    {},
-                    await autodiscover_model(
-                        self.hass,
-                        self.source_entity.entity_entry,
-                    ),
-                )
+                self.power_profile = await get_power_profile_by_source_entity(self.hass, self.source_entity)
             except ModelNotSupportedError:
                 self.power_profile = None
         if self.power_profile:

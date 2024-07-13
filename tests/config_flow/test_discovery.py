@@ -3,7 +3,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 
-from custom_components.powercalc import DOMAIN
+from custom_components.powercalc import DOMAIN, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     DISCOVERY_SOURCE_ENTITY,
     SensorType,
 )
-from custom_components.powercalc.discovery import autodiscover_model
+from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
 from tests.config_flow.common import (
@@ -40,10 +40,11 @@ async def test_discovery_flow(
     )
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
     power_profile = await get_power_profile(
         hass,
         {},
-        await autodiscover_model(hass, source_entity.entity_entry),
+        await discovery_manager.autodiscover_model(source_entity.entity_entry),
     )
 
     result: FlowResult = await hass.config_entries.flow.async_init(
@@ -111,11 +112,7 @@ async def test_discovery_flow_with_subprofile_selection(
     )
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    power_profile = await get_power_profile(
-        hass,
-        {},
-        await autodiscover_model(hass, source_entity.entity_entry),
-    )
+    power_profile = await get_power_profile_by_source_entity(hass, source_entity)
 
     result: FlowResult = await hass.config_entries.flow.async_init(
         DOMAIN,

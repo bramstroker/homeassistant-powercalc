@@ -72,6 +72,7 @@ from custom_components.powercalc.const import (
     CONF_UNAVAILABLE_POWER,
     CONF_WLED,
     DATA_CALCULATOR_FACTORY,
+    DATA_DISCOVERY_MANAGER,
     DATA_STANDBY_POWER_SENSORS,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -79,7 +80,7 @@ from custom_components.powercalc.const import (
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
     CalculationStrategy,
 )
-from custom_components.powercalc.discovery import autodiscover_model
+from custom_components.powercalc.discovery import DiscoveryManager
 from custom_components.powercalc.errors import (
     ModelNotSupportedError,
     StrategyConfigurationError,
@@ -133,11 +134,12 @@ async def create_virtual_power_sensor(
     config_entry: ConfigEntry | None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity."""
+    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
     power_profile = None
     try:
         if not is_manually_configured(sensor_config):
             try:
-                model_info = await autodiscover_model(hass, source_entity.entity_entry)
+                model_info = await discovery_manager.autodiscover_model(source_entity.entity_entry)
                 power_profile = await get_power_profile(
                     hass,
                     sensor_config,

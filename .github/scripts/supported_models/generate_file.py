@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import glob
 import json
-import math
 import os
 import git
 import sys
@@ -17,8 +16,6 @@ sys.path.insert(
         os.path.join(Path(__file__), "../../../../custom_components/powercalc"),
     ),
 )
-
-from aliases import MANUFACTURER_DIRECTORY_MAPPING  # noqa: E402
 
 DEVICE_TYPES = [
     ("light", "Lights"),
@@ -91,7 +88,10 @@ def generate_library_json(model_listing: list[dict]) -> None:
         manufacturer_name = model.get("manufacturer")
         manufacturer = manufacturers.get(manufacturer_name)
         if not manufacturer:
-            manufacturer = {"name": manufacturer_name, "models": [], "device_types": []}
+            manufacturer = {
+                **get_manufacturer_json(manufacturer_name),
+                **{"models": [], "device_types": []},
+            }
             manufacturers[manufacturer_name] = manufacturer
 
         device_type = model.get("device_type")
@@ -124,6 +124,11 @@ def generate_library_json(model_listing: list[dict]) -> None:
     print("Generated library.json")
 
 
+def get_manufacturer_json(manufacturer: str) -> dict:
+    with open(os.path.join(DATA_DIR, manufacturer, "manufacturer.json")) as json_file:
+        return json.load(json_file)
+
+
 def get_model_list() -> list[dict]:
     """Get a listing of all available powercalc models"""
     models = []
@@ -136,10 +141,12 @@ def get_model_list() -> list[dict]:
             model_data: dict = json.load(json_file)
             color_modes = get_color_modes(model_directory, DATA_DIR, model_data)
             updated_at = get_last_commit_time(model_directory).isoformat()
+            manufacturer = os.path.basename(os.path.dirname(model_directory))
+
             model_data.update(
                 {
                     "model": os.path.basename(model_directory),
-                    "manufacturer": os.path.basename(os.path.dirname(model_directory)),
+                    "manufacturer": manufacturer,
                     "directory": model_directory,
                     "updated_at": updated_at,
                 },
@@ -165,14 +172,6 @@ def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> se
         color_mode = filename[:index]
         color_modes.add(color_mode)
     return color_modes
-
-
-def get_manufacturer_by_directory_name(search_directory: str) -> str | None:
-    for manufacturer, directory in MANUFACTURER_DIRECTORY_MAPPING.items():
-        if search_directory == directory:
-            return manufacturer
-
-    return None
 
 
 def get_last_commit_time(directory: str) -> datetime:
