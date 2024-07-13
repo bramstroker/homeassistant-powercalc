@@ -37,3 +37,16 @@ async def test_load_model_returns_none_when_not_found(hass: HomeAssistant) -> No
 async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[str], expected: str | None) -> None:
     loader = LocalLoader(hass, get_library_path())
     assert expected == await loader.find_model(manufacturer, search)
+
+
+@pytest.mark.parametrize(
+    "manufacturer,expected",
+    [
+        ["signify", "signify"],
+        ["Signify", None],
+        ["foo", None],
+    ],
+)
+async def test_find_manufacturer(hass: HomeAssistant, manufacturer: str, expected: str | None) -> None:
+    loader = LocalLoader(hass, get_library_path())
+    assert expected == await loader.find_manufacturer(manufacturer)

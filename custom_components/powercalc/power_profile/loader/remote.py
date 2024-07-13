@@ -35,6 +35,7 @@ class RemoteLoader(Loader):
         self.library_contents: dict = {}
         self.model_infos: dict[str, dict] = {}
         self.manufacturer_models: dict[str, list[dict]] = {}
+        self.manufacturer_aliases: dict[str, str] = {}
         self.last_update_time: float | None = None
 
     async def initialize(self) -> None:
@@ -45,13 +46,17 @@ class RemoteLoader(Loader):
         manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
         for manufacturer in manufacturers:
             models: list[dict] = manufacturer.get("models", [])
+            manufacturer_name = str(manufacturer.get("name"))
             for model in models:
-                manufacturer_name = str(manufacturer.get("name"))
                 model_id = str(model.get("id"))
                 self.model_infos[f"{manufacturer_name}/{model_id}"] = model
                 if manufacturer_name not in self.manufacturer_models:
                     self.manufacturer_models[manufacturer_name] = []
                 self.manufacturer_models[manufacturer_name].append(model)
+
+            self.manufacturer_aliases[manufacturer_name.lower()] = manufacturer_name
+            for alias in manufacturer.get("aliases", []):
+                self.manufacturer_aliases[alias.lower()] = manufacturer_name
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
@@ -83,6 +88,11 @@ class RemoteLoader(Loader):
             for manufacturer in self.library_contents.get("manufacturers", [])
             if not device_type or device_type in manufacturer.get("device_types", [])
         }
+
+    async def find_manufacturer(self, search: str) -> str | None:
+        """Find the manufacturer in the library."""
+
+        return self.manufacturer_aliases.get(search, None)
 
     async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
@@ -173,9 +183,6 @@ class RemoteLoader(Loader):
         """Find the model in the library."""
 
         models = self.manufacturer_models.get(manufacturer, [])
-        if not models:
-            return None
-
         return next(
             (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
             None,

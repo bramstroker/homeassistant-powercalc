@@ -22,6 +22,8 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
+from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
@@ -32,11 +34,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
     SensorType,
 )
-from custom_components.powercalc.discovery import (
-    autodiscover_model,
-    get_model_information,
-)
-from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
@@ -281,14 +279,9 @@ async def test_load_model_with_slashes(
         "ikea",
         "TRADFRI bulb E14 W op/ch 400lm",
     )
-    entity_reg = er.async_get(hass)
-    entity_entry = entity_reg.async_get("light.testa")
 
-    profile = await get_power_profile(
-        hass,
-        {},
-        await autodiscover_model(hass, entity_entry),
-    )
+    source_entity = await create_source_entity("light.testa", hass)
+    profile = await get_power_profile_by_source_entity(hass, source_entity)
     assert profile
     assert profile.manufacturer == "ikea"
     assert profile.model == "LED1649C5"
@@ -335,14 +328,8 @@ async def test_autodiscover_model_from_entity_entry(
     """
     mock_entity_with_model_information("light.testa", manufacturer, model)
 
-    entity_registry = er.async_get(hass)
-    entity_entry = entity_registry.async_get("light.testa")
-
-    power_profile = await get_power_profile(
-        hass,
-        {},
-        await autodiscover_model(hass, entity_entry),
-    )
+    source_entity = await create_source_entity("light.testa", hass)
+    power_profile = await get_power_profile_by_source_entity(hass, source_entity)
 
     assert power_profile.manufacturer == expected_manufacturer
     assert power_profile.model == expected_model
@@ -357,14 +344,9 @@ async def test_get_power_profile_empty_manufacturer(
 
     mock_entity_with_model_information("light.test", "", "some model")
 
-    entity_reg = er.async_get(hass)
-    entity_entry = entity_reg.async_get("light.test")
+    source_entity = await create_source_entity("light.test", hass)
+    profile = await get_power_profile_by_source_entity(hass, source_entity)
 
-    profile = await get_power_profile(
-        hass,
-        {},
-        await autodiscover_model(hass, entity_entry),
-    )
     assert not profile
     assert not caplog.records
 
@@ -448,4 +430,5 @@ async def test_get_model_information(
     if device_entry:
         mock_device_registry(hass, {str(device_entry.id): device_entry})
     mock_registry(hass, {str(entity_entry.id): entity_entry})
-    assert await get_model_information(hass, entity_entry) == model_info
+    discovery_manager = DiscoveryManager(hass, {})
+    assert await discovery_manager.get_model_information(entity_entry) == model_info

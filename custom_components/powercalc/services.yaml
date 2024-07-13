@@ -86,7 +86,7 @@ switch_sub_profile:
     profile:
       name: Sub profile
       description: Define one of the possible sub profiles
-      example: "nigh_vision"
+      example: "night_vision"
       required: true
       selector:
         text:

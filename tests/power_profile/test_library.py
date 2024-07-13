@@ -6,7 +6,6 @@ import pytest
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
-from custom_components.powercalc.aliases import MANUFACTURER_IKEA, MANUFACTURER_SIGNIFY
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.composite import CompositeLoader
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
@@ -26,7 +25,6 @@ async def test_manufacturer_listing(hass: HomeAssistant) -> None:
     "manufacturer,expected_models",
     [
         ("signify", ["LCT010", "LCA007"]),
-        ("Tasmota", ["A1T", "test"]),  # Test composite loader and case insensitivity
         ("Signify Netherlands B.V.", ["LCT010"]),
     ],
 )
@@ -71,7 +69,7 @@ async def test_get_profile(hass: HomeAssistant) -> None:
 
 async def test_get_profile_with_full_model_name(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
-    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "LCA001"))
+    profile = await library.get_profile(ModelInfo("signify", "LCA001"))
     assert profile
     assert profile.manufacturer == "signify"
     assert profile.get_model_directory().endswith("signify/LCA001")
@@ -79,7 +77,7 @@ async def test_get_profile_with_full_model_name(hass: HomeAssistant) -> None:
 
 async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
-    profile = await library.get_profile(ModelInfo(MANUFACTURER_SIGNIFY, "Hue go (LLC020)"))
+    profile = await library.get_profile(ModelInfo("signify", "Hue go (LLC020)"))
     assert profile
     assert profile.manufacturer == "signify"
     assert profile.get_model_directory().endswith("signify/LLC020")
@@ -88,7 +86,7 @@ async def test_get_profile_with_full_manufacturer_name(hass: HomeAssistant) -> N
 async def test_get_profile_with_model_alias(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(
-        ModelInfo(MANUFACTURER_IKEA, "TRADFRI bulb E14 WS opal 400lm"),
+        ModelInfo("ikea", "TRADFRI bulb E14 WS opal 400lm"),
     )
     assert profile.get_model_directory().endswith("ikea/LED1536G5")
 
@@ -106,9 +104,7 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     hass.config.config_dir = get_test_config_dir()
     caplog.set_level(logging.ERROR)
     library = await ProfileLibrary.factory(hass)
-    models = await library.get_model_listing(
-        get_test_profile_dir("hidden-directories"),
-    )
+    models = await library.get_model_listing("hidden-directories")
     assert len(models) == 1
     assert len(caplog.records) == 0
 
@@ -131,6 +127,7 @@ async def test_create_power_profile_raises_library_error(hass: HomeAssistant, ca
     caplog.set_level(logging.ERROR)
     mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_manufacturer = AsyncMock(return_value="signify")
     mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()

@@ -15,12 +15,16 @@ class LocalLoader(Loader):
         self._is_custom_directory = is_custom_directory
         self._data_directory = directory
         self._hass = hass
+        self._manufacturer_listing: dict[str, set[str]] = {}
 
     async def initialize(self) -> None:
         pass
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
+        cache_key = device_type or "all"
+        if self._manufacturer_listing.get(cache_key):
+            return self._manufacturer_listing[cache_key]
 
         def _find_manufacturer_directories() -> set[str]:
             return set(next(os.walk(self._data_directory))[1])
@@ -33,7 +37,17 @@ class LocalLoader(Loader):
             if not models:
                 continue
             manufacturers.add(manufacturer)
+
+        self._manufacturer_listing[cache_key] = manufacturers
         return manufacturers
+
+    async def find_manufacturer(self, search: str) -> str | None:
+        """Check if a manufacturer is available. Also must check aliases."""
+        manufacturer_list = await self.get_manufacturer_listing(None)
+        if search in [m.lower() for m in manufacturer_list]:
+            return search
+
+        return None
 
     async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
@@ -43,7 +57,7 @@ class LocalLoader(Loader):
         if not os.path.exists(manufacturer_dir):
             return models
         for model in await self._hass.async_add_executor_job(os.listdir, manufacturer_dir):
-            if model[0] in [".", "@"]:
+            if model[0] in [".", "@"] or model == "manufacturer.json":
                 continue
 
             def _load_model_json(model_name: str) -> dict[str, Any]:
