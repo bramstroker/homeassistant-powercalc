@@ -95,6 +95,28 @@ async def test_hs_lut(hass: HomeAssistant) -> None:
     )
 
 
+async def test_hs_lut_attribute_none(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test error is logged when hs_color attribute is None"""
+
+    caplog.set_level(logging.ERROR)
+    source_entity = create_source_entity(LIGHT_DOMAIN, [ColorMode.HS])
+
+    strategy = await _create_lut_strategy(hass, "signify", "LCT010", source_entity)
+    await strategy.validate_config()
+
+    state = State(
+        "light.test",
+        STATE_ON,
+        {
+            ATTR_COLOR_MODE: ColorMode.HS,
+            ATTR_BRIGHTNESS: 122,
+            ATTR_HS_COLOR: None,
+        },
+    )
+    await strategy.calculate(state)
+    assert "Could not calculate power" in caplog.text
+
+
 async def test_sub_lut_loaded(hass: HomeAssistant) -> None:
     source_entity = create_source_entity(
         LIGHT_DOMAIN,
