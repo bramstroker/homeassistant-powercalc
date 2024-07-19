@@ -10,5 +10,6 @@
   "name": "LIFX A19 US",
   "standby_power": 0.2,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-19T22:34:27"
+  "created_at": "2022-07-19T22:34:27",
+  "author": "Chris <31055115+darthsebulba04@users.noreply.github.com>"
 }

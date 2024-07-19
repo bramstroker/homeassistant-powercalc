@@ -10,5 +10,6 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Hue color luster",
-  "standby_power": 0.22
+  "standby_power": 0.22,
+  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>"
 }

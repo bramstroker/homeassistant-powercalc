@@ -12,5 +12,6 @@
     "929002422702"
   ],
   "name": "Hue Gradient Lightstrip",
-  "standby_power": 0.13
+  "standby_power": 0.13,
+  "author": "Julien Honda\u00e2 <julien.hondaa@gmail.com>"
 }

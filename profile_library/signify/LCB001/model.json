@@ -10,5 +10,6 @@
   "name": "Hue White and Color Ambiance BR30 Bluetooth",
   "standby_power": 0.12,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-21T08:18:17"
+  "created_at": "2022-08-21T08:18:17",
+  "author": "Emory Penney <emory.j.penney@intel.com>"
 }

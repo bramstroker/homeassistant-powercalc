@@ -9,5 +9,6 @@
     "VERSION": "v1.11.8:docker"
   },
   "name": "TRADFRI bulb E27 CWS globe 806lm",
-  "standby_power": 0.17
+  "standby_power": 0.17,
+  "author": "marthubner <86839034+marthubner@users.noreply.github.com>"
 }

@@ -27,5 +27,6 @@
   },
   "name": "Nest Audio",
   "standby_power": 1.8,
-  "created_at": "2023-04-08T08:07:56"
+  "created_at": "2023-04-08T08:07:56",
+  "author": "sunjaxx <30780852+sunjaxx@users.noreply.github.com>"
 }

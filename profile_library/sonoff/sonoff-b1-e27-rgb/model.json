@@ -13,5 +13,6 @@
   ],
   "name": "Sonoff B1 Smart WiFi Light LED Bulb",
   "standby_power": 0.8,
-  "created_at": "2023-06-20T17:57:21"
+  "created_at": "2023-06-20T17:57:21",
+  "author": "TyzzyT <80623729+TyzzyT@users.noreply.github.com>"
 }

@@ -27,5 +27,6 @@
   },
   "name": "Bose SoundTouch 10",
   "standby_power": 1.5,
-  "created_at": "2023-03-10T17:14:51"
+  "created_at": "2023-03-10T17:14:51",
+  "author": "wranglatang <30660751+wranglatang@users.noreply.github.com>"
 }

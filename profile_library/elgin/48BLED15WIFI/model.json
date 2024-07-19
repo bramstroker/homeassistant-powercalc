@@ -13,5 +13,6 @@
     "VERSION": "v1.12.8:docker"
   },
   "name": "Elgin Smart Color 15W",
-  "standby_power": 0.7
+  "standby_power": 0.7,
+  "author": "Diefferson Koderer M\u00f4ro <diefferson.moro@gmail.com>"
 }

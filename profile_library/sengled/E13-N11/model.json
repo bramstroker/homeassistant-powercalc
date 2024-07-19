@@ -10,5 +10,6 @@
   },
   "name": "Sengled Motion Sensor Bulb PAR38 E13-N11 Zigbee ",
   "standby_power": 0.3,
-  "created_at": "2024-02-19T18:29:50"
+  "created_at": "2024-02-19T18:29:50",
+  "author": "DracoC77 <69522449+DracoC77@users.noreply.github.com>"
 }

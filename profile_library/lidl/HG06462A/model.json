@@ -10,5 +10,6 @@
   "name": "Livarno Lux E27 filament bulb",
   "standby_power": 0.2,
   "calculation_strategy": "lut",
-  "created_at": "2022-06-26T09:59:41"
+  "created_at": "2022-06-26T09:59:41",
+  "author": "Stefan Gries <10342151+stefangries@users.noreply.github.com>"
 }

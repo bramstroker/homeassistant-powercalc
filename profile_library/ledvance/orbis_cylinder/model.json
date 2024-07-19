@@ -10,5 +10,6 @@
   "name": "LEDVANCE SMART+ WIFI Orbis Cylinder 450 TW",
   "standby_power": 0.75,
   "calculation_strategy": "lut",
-  "created_at": "2022-11-30T17:57:54"
+  "created_at": "2022-11-30T17:57:54",
+  "author": "Kenneth Fribert <fribse@gmail.com>"
 }

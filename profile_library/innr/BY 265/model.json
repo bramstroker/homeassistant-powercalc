@@ -10,5 +10,6 @@
   "name": "BY 265 806lm B22 2700k",
   "standby_power": 0.44,
   "calculation_strategy": "lut",
-  "created_at": "2022-02-12T10:12:50"
+  "created_at": "2022-02-12T10:12:50",
+  "author": "Jamie De Vivo <jamiedevivoo@users.noreply.github.com>"
 }

@@ -11,5 +11,6 @@
   "standby_power": 0.35,
   "calculation_strategy": "lut",
   "linked_lut": "signify/3216331P6",
-  "created_at": "2022-12-25T09:44:08"
+  "created_at": "2022-12-25T09:44:08",
+  "author": "Jari Eskelinen <jari.eskelinen@iki.fi>"
 }

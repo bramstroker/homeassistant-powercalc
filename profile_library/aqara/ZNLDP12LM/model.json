@@ -10,5 +10,6 @@
   "name": "Aqara LED light bulb (tunable white)",
   "standby_power": 0.41,
   "calculation_strategy": "lut",
-  "created_at": "2021-11-20T19:46:07"
+  "created_at": "2021-11-20T19:46:07",
+  "author": "@RubenKelevra <cyrond@gmail.com>"
 }

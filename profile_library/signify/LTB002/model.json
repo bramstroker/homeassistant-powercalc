@@ -10,5 +10,6 @@
   },
   "name": "Signify Philips Hue White Ambiance BR30 (LTB002)",
   "standby_power": 0.25,
-  "created_at": "2023-04-01T17:53:59"
+  "created_at": "2023-04-01T17:53:59",
+  "author": "laplacacm <59663104+laplacacm@users.noreply.github.com>"
 }

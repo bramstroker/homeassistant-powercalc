@@ -10,5 +10,6 @@
   "name": "Gledopto 5W GU10 Dual White And Color Spotlight",
   "standby_power": 0.7,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-21T08:18:17"
+  "created_at": "2022-08-21T08:18:17",
+  "author": "Emory Penney <emory.j.penney@intel.com>"
 }

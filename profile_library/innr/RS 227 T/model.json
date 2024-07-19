@@ -10,5 +10,6 @@
   "name": "Smart spot comfort",
   "standby_power": 0.33,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-26T08:16:53"
+  "created_at": "2022-08-26T08:16:53",
+  "author": "Desaydrone <tarlak.Desaydrone@gmail.com>"
 }

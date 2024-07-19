@@ -10,5 +10,6 @@
   "name": "Elgato Key Light",
   "standby_power": 0.86,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-08T08:27:59"
+  "created_at": "2022-08-08T08:27:59",
+  "author": "Adam Jacques <ajacques@users.noreply.github.com>"
 }

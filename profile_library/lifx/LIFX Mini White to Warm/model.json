@@ -10,5 +10,6 @@
   "name": "Mini White to Warm",
   "standby_power": 0.54,
   "calculation_strategy": "lut",
-  "created_at": "2022-10-05T13:31:39"
+  "created_at": "2022-10-05T13:31:39",
+  "author": "Joshua Rich <joshua.rich@gmail.com>"
 }

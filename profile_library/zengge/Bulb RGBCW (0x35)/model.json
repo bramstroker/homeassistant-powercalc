@@ -10,5 +10,6 @@
   },
   "name": "Bulb RGBCW",
   "standby_power": 0.56,
-  "created_at": "2023-07-22T18:25:43"
+  "created_at": "2023-07-22T18:25:43",
+  "author": "Joseph Livecchi <joewashear007@gmail.com>"
 }

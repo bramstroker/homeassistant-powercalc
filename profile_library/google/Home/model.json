@@ -11,5 +11,6 @@
     "min_power": 2.4,
     "max_power": 3.87
   },
-  "created_at": "2022-10-05T10:14:54"
+  "created_at": "2022-10-05T10:14:54",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

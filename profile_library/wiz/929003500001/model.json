@@ -10,5 +10,6 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "WiZ A80.E27",
-  "standby_power": 0.4
+  "standby_power": 0.4,
+  "author": "Cam Murray <camurray@microsoft.com>"
 }

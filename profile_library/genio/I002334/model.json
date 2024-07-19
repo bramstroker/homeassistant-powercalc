@@ -10,5 +10,6 @@
   "name": "Genio A60 9w LED GLS BK",
   "standby_power": 0.7,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-22T11:23:06"
+  "created_at": "2022-07-22T11:23:06",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

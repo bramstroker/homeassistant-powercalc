@@ -31,5 +31,6 @@
   ],
   "name": "Sonos Play:5",
   "standby_power": 2.15,
-  "created_at": "2024-03-30T13:51:13"
+  "created_at": "2024-03-30T13:51:13",
+  "author": "bragra <bragragithub@gradussen.com>"
 }

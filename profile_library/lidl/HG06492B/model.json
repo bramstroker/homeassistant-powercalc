@@ -10,5 +10,6 @@
   "name": "Livarno Lux E14 candle CCT",
   "standby_power": 0.31,
   "calculation_strategy": "lut",
-  "created_at": "2022-04-13T17:59:05"
+  "created_at": "2022-04-13T17:59:05",
+  "author": "Paul Mc Auley <dev@roscarraig.com>"
 }

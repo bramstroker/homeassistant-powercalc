@@ -10,5 +10,6 @@
   "name": "Candlebra",
   "standby_power": 0.4,
   "calculation_strategy": "lut",
-  "created_at": "2022-09-20T10:04:24"
+  "created_at": "2022-09-20T10:04:24",
+  "author": "DellanX <31318348+DellanX@users.noreply.github.com>"
 }
