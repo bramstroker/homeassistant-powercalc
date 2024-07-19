@@ -14,7 +14,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
-from homeassistant.helpers.storage import STORAGE_DIR
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -178,10 +177,3 @@ def mock_remote_loader(request: SubRequest) -> Generator:
 
         mock_load_lib.side_effect = load_library_json
         yield
-
-
-@pytest.fixture(autouse=True)
-def clear_storage_dir(hass: HomeAssistant) -> None:
-    storage_dir = hass.config.path(STORAGE_DIR, "powercalc_profiles")
-    shutil.rmtree(storage_dir, ignore_errors=True)
-    os.makedirs(storage_dir, exist_ok=True)

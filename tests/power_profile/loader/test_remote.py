@@ -337,6 +337,8 @@ async def test_fallback_to_local_library_fails(hass: HomeAssistant, mock_aioresp
     After 3 retries, and the library.json is never downloaded before to .storage dir, it should raise a ProfileDownloadError.
     """
 
+    os.remove(hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
     caplog.set_level(logging.WARNING)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
