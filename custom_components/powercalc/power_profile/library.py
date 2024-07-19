@@ -98,7 +98,7 @@ class ProfileLibrary:
         sub_profile = None
         if "/" in model_info.model:
             (model, sub_profile) = model_info.model.split("/", 1)
-            model_info = ModelInfo(model_info.manufacturer, model)
+            model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
         profile = await self.create_power_profile(model_info, custom_directory)
 
@@ -125,9 +125,14 @@ class ProfileLibrary:
             if not resolved_manufacturer:
                 return None
 
-            resolved_model: str | None = model_info.model
+            resolved_model: str | None = model_info.model_id or model_info.model
             if not custom_directory:
-                resolved_model = await self.find_model(resolved_manufacturer, model_info.model)
+                for model_identifier in (model_info.model_id, model_info.model):
+                    if not model_identifier:
+                        continue
+                    resolved_model = await self.find_model(resolved_manufacturer, model_identifier)
+                    if resolved_model:
+                        break
 
             if not resolved_model:
                 return None
@@ -187,3 +192,5 @@ class ProfileLibrary:
 class ModelInfo(NamedTuple):
     manufacturer: str
     model: str
+    # Starting from HA 2024.8 we can use model_id to identify the model
+    model_id: str | None = None

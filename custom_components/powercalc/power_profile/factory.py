@@ -22,9 +22,11 @@ async def get_power_profile(
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
+    model_id = None
     if (manufacturer is None or model is None) and model_info:
         manufacturer = config.get(CONF_MANUFACTURER) or model_info.manufacturer
         model = config.get(CONF_MODEL) or model_info.model
+        model_id = model_info.model_id
 
     if not manufacturer or not model:
         return None
@@ -38,7 +40,7 @@ async def get_power_profile(
 
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(
-        ModelInfo(manufacturer, model),
+        ModelInfo(manufacturer, model, model_id),
         custom_model_directory,
     )
     if profile is None:
