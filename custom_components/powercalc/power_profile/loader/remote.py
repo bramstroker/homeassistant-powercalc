@@ -15,7 +15,6 @@ from aiohttp import ClientError
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
-from custom_components.powercalc.helpers import get_library_json_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
@@ -61,18 +60,36 @@ class RemoteLoader(Loader):
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
 
+        local_path = self.hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json")
+
         def _load_local_library_json() -> dict[str, Any]:
             """Load library.json file from local storage"""
-            with open(get_library_json_path()) as f:
+            if not os.path.exists(local_path):
+                raise ProfileDownloadError("Local library.json file not found")
+            with open(local_path) as f:
                 return cast(dict[str, Any], json.load(f))
 
         async def _download_remote_library_json() -> dict[str, Any] | None:
-            """Download library.json from github"""
+            """
+            Download library.json from Github.
+            If download is successful, save it to local storage to use as fallback in case of internet connection issues.
+            """
             _LOGGER.debug("Loading library.json from github")
             async with aiohttp.ClientSession() as session, session.get(ENDPOINT_LIBRARY) as resp:
                 if resp.status != 200:
                     raise ProfileDownloadError("Failed to download library.json, unexpected status code")
-                return cast(dict[str, Any], await resp.json())
+
+                def _save_to_local_storage(data: bytes) -> None:
+                    """Save library.json to local storage"""
+                    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                    with open(local_path, "wb") as f:
+                        f.write(data)
+
+                json_data = cast(dict[str, Any], await resp.json())
+
+                await self.hass.async_add_executor_job(_save_to_local_storage, await resp.read())
+
+                return json_data
 
         try:
             return cast(dict[str, Any], await self.download_with_retry(_download_remote_library_json))
