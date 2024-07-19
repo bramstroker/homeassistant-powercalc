@@ -10,6 +10,7 @@ import pytest
 from aiohttp import ClientError
 from aioresponses import aioresponses
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.storage import STORAGE_DIR
 
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
@@ -286,6 +287,9 @@ async def test_fallback_to_local_library(hass: HomeAssistant, mock_aioresponse: 
     Test that the local library is used when the remote library is not available.
     When unavailable, it should retry 3 times before falling back to the local library.
     """
+
+    shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
     caplog.set_level(logging.WARNING)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
@@ -310,6 +314,8 @@ async def test_fallback_to_local_library_on_client_connection_error(
     Test that the local library is used when powercalc.lauwbier.nl is not available.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2277
     """
+    shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))
+
     caplog.set_level(logging.WARNING)
     mock_aioresponse.get(
         ENDPOINT_LIBRARY,
@@ -324,6 +330,24 @@ async def test_fallback_to_local_library_on_client_connection_error(
 
     assert "signify" in loader.manufacturer_models
     assert len(caplog.records) == 2
+
+
+async def test_fallback_to_local_library_fails(hass: HomeAssistant, mock_aioresponse: aioresponses, caplog: pytest.LogCaptureFixture) -> None:
+    """
+    After 3 retries, and the library.json is never downloaded before to .storage dir, it should raise a ProfileDownloadError.
+    """
+
+    caplog.set_level(logging.WARNING)
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=404,
+        repeat=True,
+    )
+
+    loader = RemoteLoader(hass)
+    loader.retry_timeout = 0
+    with pytest.raises(ProfileDownloadError):
+        await loader.initialize()
 
 
 async def test_fallback_to_local_profile(
