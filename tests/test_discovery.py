@@ -288,36 +288,48 @@ async def test_load_model_with_slashes(
 
 
 @pytest.mark.parametrize(
-    "manufacturer,model,expected_manufacturer,expected_model",
+    "model_info,expected_manufacturer,expected_model",
     [
         (
-            "ikea",
-            "IKEA FLOALT LED light panel, dimmable, white spectrum (30x90 cm) (L1528)",
+            ModelInfo("ikea", "IKEA FLOALT LED light panel, dimmable, white spectrum (30x90 cm) (L1528)"),
             "ikea",
             "L1528",
         ),
-        ("IKEA", "LED1649C5", "ikea", "LED1649C5"),
         (
-            "IKEA",
-            "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)",
+            ModelInfo("IKEA", "LED1649C5"),
+            "ikea",
+            "LED1649C5",
+        ),
+        (
+            ModelInfo("IKEA", "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)"),
             "ikea",
             "LED1650R5",
         ),
         (
-            "ikea",
-            "TRADFRI bulb E14 W op/ch 400lm",
+            ModelInfo("ikea", "TRADFRI bulb E14 W op/ch 400lm"),
             "ikea",
             "LED1649C5",
         ),
-        ("MLI", 45317, "mueller-licht", "45317"),
-        ("TP-Link", "KP115(AU)", "tp-link", "KP115"),
-        ("Apple", "HomePod (gen 2)", "apple", "MQJ83"),
+        (
+            ModelInfo("MLI", "45317"),
+            "mueller-licht",
+            "45317",
+        ),
+        (
+            ModelInfo("TP-Link", "KP115(AU)"),
+            "tp-link",
+            "KP115",
+        ),
+        (
+            ModelInfo("Apple", "HomePod (gen 2)"),
+            "apple",
+            "MQJ83",
+        ),
     ],
 )
 async def test_autodiscover_model_from_entity_entry(
     hass: HomeAssistant,
-    manufacturer: str,
-    model: str,
+    model_info: ModelInfo,
     expected_manufacturer: str,
     expected_model: str,
     mock_entity_with_model_information: MockEntityWithModel,
@@ -326,7 +338,7 @@ async def test_autodiscover_model_from_entity_entry(
     Test the autodiscovery lookup from the library by manufacturer and model information
     A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
     """
-    mock_entity_with_model_information("light.testa", manufacturer, model)
+    mock_entity_with_model_information("light.testa", model_info.manufacturer, model_info.model)
 
     source_entity = await create_source_entity("light.testa", hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
