@@ -13,5 +13,6 @@
   "fixed_config": {
     "power": 0.58
   },
-  "created_at": "2022-10-04T20:16:59"
+  "created_at": "2022-10-04T20:16:59",
+  "author": "Bram Gerritsen <bgerritsen@emico.nl>"
 }

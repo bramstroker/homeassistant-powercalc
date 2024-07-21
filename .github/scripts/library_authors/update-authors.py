@@ -57,16 +57,13 @@ def process_model_json_files(root_dir):
 
         author = read_author_from_file(os.path.abspath(model_json_file))
         if author:
-            #print(f"Skipping {model_json_file}, author already set to {author}")
+            print(f"Skipping {model_json_file}, author already set to {author}")
             continue
 
         author = find_first_commit_author(model_json_file)
-        if author is None or author.find("Bram") != -1:
-            author = find_first_commit_author(model_json_file, False)
-            if author is None or author.find("Bram") != -1:
-                print(f"Skipping {model_json_file}, author is Bram, check manually")
-                print(f"https://github.com/bramstroker/homeassistant-powercalc/commits/master/{model_json_file}")
-                continue
+        if author is None:
+            print(f"Skipping {model_json_file}, author not found")
+            continue
 
         write_author_to_file(os.path.abspath(model_json_file), author)
         print(f"Updated {model_json_file} with author {author}")
@@ -90,7 +87,6 @@ def write_author_to_file(file_path: str, author: str) -> None:
 
     with open(file_path, "w") as file:
         json.dump(json_data, file, indent=2)
-
 
 
 def main():
