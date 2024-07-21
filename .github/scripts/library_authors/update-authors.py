@@ -26,11 +26,14 @@ def get_commit_author(commit_hash: str) -> str:
     return author
 
 
-def find_first_commit_author(file: str) -> str | None:
+def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
     """ Find the first commit that affected the directory and return the author's name. """
     commits = get_commits_affected_directory(file)
     for commit in reversed(commits):  # Process commits from the oldest to newest
         command = f"git diff-tree --no-commit-id --name-only -r {commit}"
+        if not check_paths:
+            return get_commit_author(commit)
+
         affected_files = run_git_command(command)
         paths = [
             file.replace("profile_library", "custom_components/powercalc/data"),
@@ -54,13 +57,16 @@ def process_model_json_files(root_dir):
 
         author = read_author_from_file(os.path.abspath(model_json_file))
         if author:
-            print(f"Skipping {model_json_file}, author already set to {author}")
+            #print(f"Skipping {model_json_file}, author already set to {author}")
             continue
 
         author = find_first_commit_author(model_json_file)
         if author is None or author.find("Bram") != -1:
-            print(f"Skipping {model_json_file}, author is Bram, check manually")
-            continue
+            author = find_first_commit_author(model_json_file, False)
+            if author is None or author.find("Bram") != -1:
+                print(f"Skipping {model_json_file}, author is Bram, check manually")
+                print(f"https://github.com/bramstroker/homeassistant-powercalc/commits/master/{model_json_file}")
+                continue
 
         write_author_to_file(os.path.abspath(model_json_file), author)
         print(f"Updated {model_json_file} with author {author}")
