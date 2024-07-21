@@ -10,5 +10,6 @@
   "name": "Livarno Lux E27 bulb RGB",
   "standby_power": 0.36,
   "calculation_strategy": "lut",
-  "created_at": "2022-04-07T20:44:43"
+  "created_at": "2022-04-07T20:44:43",
+  "author": "Paul Mc Auley <dev@roscarraig.com>"
 }

@@ -13,5 +13,6 @@
   ],
   "standby_power": 0.13,
   "calculation_strategy": "lut",
-  "created_at": "2022-10-24T18:43:24"
+  "created_at": "2022-10-24T18:43:24",
+  "author": "Niklas Ausborn <niklas@ausborn.de>"
 }

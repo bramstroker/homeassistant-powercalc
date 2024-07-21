@@ -5,5 +5,6 @@
   "measure_device": "Shelly Plug S",
   "measure_description": "Used script utils/measure_shelly.py from repository",
   "standby_power": 0.35,
-  "created_at": "2021-06-11T22:01:53"
+  "created_at": "2021-06-11T22:01:53",
+  "author": "Bram Gerritsen <bgerritsen@emico.nl>"
 }

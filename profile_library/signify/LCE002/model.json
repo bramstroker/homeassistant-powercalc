@@ -8,5 +8,6 @@
   "measure_method": "script",
   "measure_device": "AVM FRITZ!DECT 200",
   "measure_description": "Measured with own custom script",
-  "created_at": "2021-08-18T20:12:14"
+  "created_at": "2021-08-18T20:12:14",
+  "author": "Simon Hörrle <simon.hoerrle@gmail.com>"
 }

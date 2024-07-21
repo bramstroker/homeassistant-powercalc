@@ -10,5 +10,6 @@
     "VERSION": "v1.12.6:docker"
   },
   "name": "Hue G125 E27 Filament Globe Bulb",
-  "standby_power": 0.15
+  "standby_power": 0.15,
+  "author": "Pierre <397503+bemble@users.noreply.github.com>"
 }

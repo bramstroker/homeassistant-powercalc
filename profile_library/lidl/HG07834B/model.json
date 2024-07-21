@@ -10,5 +10,6 @@
   "name": "Livarno Lux E14 candle RGB",
   "standby_power": 0.38,
   "calculation_strategy": "lut",
-  "created_at": "2022-03-10T15:24:31"
+  "created_at": "2022-03-10T15:24:31",
+  "author": "Morten Trab <morten@trab.dk>"
 }

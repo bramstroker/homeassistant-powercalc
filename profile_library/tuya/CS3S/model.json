@@ -14,5 +14,6 @@
   ],
   "name": "LSC Smart Connect moodlight",
   "standby_power": 0.5,
-  "created_at": "2023-06-30T08:56:29"
+  "created_at": "2023-06-30T08:56:29",
+  "author": "TyzzyT <80623729+TyzzyT@users.noreply.github.com>"
 }

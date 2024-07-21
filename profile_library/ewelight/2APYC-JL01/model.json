@@ -10,5 +10,6 @@
   },
   "name": "Smart light JL01 (2APYC-JL01)",
   "standby_power": 0.4,
-  "created_at": "2024-02-24T21:34:35"
+  "created_at": "2024-02-24T21:34:35",
+  "author": "Nicolas Liaudat <nliaudat@users.noreply.github.com>"
 }

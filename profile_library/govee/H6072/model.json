@@ -10,5 +10,6 @@
   "name": "Govee Lyra RGBICWW Corner Floor Lamp",
   "standby_power": 1.78,
   "calculation_strategy": "lut",
-  "created_at": "2022-10-16T16:46:33"
+  "created_at": "2022-10-16T16:46:33",
+  "author": "sockmonkey0223 <joshua.oswald@gmail.com>"
 }

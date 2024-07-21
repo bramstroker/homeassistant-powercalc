@@ -27,5 +27,6 @@
     "VERSION": "v1.12.7:docker"
   },
   "name": "Sonos Era 100",
-  "standby_power": 2.0
+  "standby_power": 2.0,
+  "author": "Sam Dunne <sam@sam-dunne.com>"
 }

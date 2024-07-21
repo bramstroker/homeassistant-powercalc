@@ -10,5 +10,6 @@
   },
   "name": "LCA004",
   "standby_power": 0.33,
-  "created_at": "2023-02-09T19:19:56"
+  "created_at": "2023-02-09T19:19:56",
+  "author": "Mikael Ganehag Brorsson <mikael.brorsson@gmail.com>"
 }

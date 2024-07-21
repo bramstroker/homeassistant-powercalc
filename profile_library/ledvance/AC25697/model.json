@@ -10,5 +10,6 @@
   "name": "LEDVANCE SMART+ CLASSIC MULTICOLOUR 60 10W E27",
   "standby_power": 0.31,
   "calculation_strategy": "lut",
-  "created_at": "2022-11-10T19:42:22"
+  "created_at": "2022-11-10T19:42:22",
+  "author": "gary-oneill82 <57816996+gary-oneill82@users.noreply.github.com>"
 }

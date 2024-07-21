@@ -10,5 +10,6 @@
   "name": "Arlec 12W 1050lm RGB Colour Mode Grid Connect Smart LED B22 Globe",
   "standby_power": 0.7,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-15T22:44:20"
+  "created_at": "2022-08-15T22:44:20",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

@@ -10,5 +10,6 @@
   "name": "Arlec Smart R80 9.5W 806lm CCT Bulb",
   "standby_power": 0.58,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-26T20:23:22"
+  "created_at": "2022-07-26T20:23:22",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

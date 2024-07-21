@@ -10,5 +10,6 @@
   "name": "Wiz Filament ST19 E26 Transparent (type SHDW9, model 9290022662, 3.8W 120V)",
   "standby_power": 0.38,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-22T08:24:09"
+  "created_at": "2022-07-22T08:24:09",
+  "author": "dsolva <diego_10sv@hotmail.com>"
 }

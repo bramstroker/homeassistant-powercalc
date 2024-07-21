@@ -5,5 +5,6 @@
   "name": "Sonoff B02 Light with dimmer and temperature",
   "standby_power": 0.4,
   "calculation_strategy": "lut",
-  "created_at": "2021-08-13T18:12:48"
+  "created_at": "2021-08-13T18:12:48",
+  "author": "Francisco Bischoff <984592+franzbischoff@users.noreply.github.com>"
 }

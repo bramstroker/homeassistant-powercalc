@@ -10,5 +10,6 @@
   },
   "name": "RB 148 T - E14 candle tuneable white",
   "standby_power": 0.48,
-  "created_at": "2023-01-31T14:45:40"
+  "created_at": "2023-01-31T14:45:40",
+  "author": "Florian Mulatz <33655308+florianmulatz@users.noreply.github.com>"
 }

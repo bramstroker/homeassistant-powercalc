@@ -10,5 +10,6 @@
   "name": "Mirabella Genio Wi-Fi LED 3 metre Strip Light",
   "standby_power": 0.7,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-27T18:48:30"
+  "created_at": "2022-07-27T18:48:30",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

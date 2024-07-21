@@ -10,5 +10,6 @@
   },
   "name": "Nanoleaf - Essentials Matter A19 Smart LED Light Bulb",
   "standby_power": 0.13,
-  "created_at": "2024-04-10T20:05:34"
+  "created_at": "2024-04-10T20:05:34",
+  "author": "DawidPietrykowski <53954695+DawidPietrykowski@users.noreply.github.com>"
 }

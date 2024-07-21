@@ -10,5 +10,6 @@
   "name": "Wiz (Evoluziona) Spot PAR16 GU10 TW (type SHTW, model 7DGU10LEDCCTWVB-K, 7W 120V)",
   "standby_power": 0.63,
   "calculation_strategy": "lut",
-  "created_at": "2022-07-22T08:24:09"
+  "created_at": "2022-07-22T08:24:09",
+  "author": "dsolva <diego_10sv@hotmail.com>"
 }

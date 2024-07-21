@@ -10,5 +10,6 @@
   "name": "Anko Smart String Lights 42997610 ",
   "standby_power": 1.09,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-07T16:56:45"
+  "created_at": "2022-08-07T16:56:45",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>"
 }

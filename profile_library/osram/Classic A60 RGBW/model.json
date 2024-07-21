@@ -10,5 +10,6 @@
   },
   "name": "Lightify Classic A60 RGBW",
   "standby_power": 0.6,
-  "created_at": "2023-09-05T19:14:04"
+  "created_at": "2023-09-05T19:14:04",
+  "author": "PalminX <bkuemmer@gmx.net>"
 }
