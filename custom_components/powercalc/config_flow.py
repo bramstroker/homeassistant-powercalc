@@ -62,6 +62,7 @@ from .const import (
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
+    CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_SELF_USAGE_INCLUDED,
@@ -275,6 +276,7 @@ SCHEMA_POWER_MULTI_SWITCH = vol.Schema(
             selector.EntitySelectorConfig(domain=Platform.SWITCH, multiple=True),
         ),
         vol.Required(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_POWER_OFF): vol.Coerce(float),
     },
 )
 

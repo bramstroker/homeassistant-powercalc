@@ -8,7 +8,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 
-from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_STANDBY_POWER
+from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF
 from custom_components.powercalc.strategy.multi_switch import MultiSwitchStrategy
 from tests.common import run_powercalc_setup
 
@@ -36,9 +36,9 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_NAME: "Outlet self usage",
-            CONF_STANDBY_POWER: 0.25,
             CONF_MULTI_SWITCH: {
                 CONF_POWER: 0.5,
+                CONF_POWER_OFF: 0.25,
                 CONF_ENTITIES: [
                     "switch.test1",
                     "switch.test2",

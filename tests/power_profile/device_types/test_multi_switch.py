@@ -1,10 +1,11 @@
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_MULTI_SWITCH,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
@@ -38,6 +39,9 @@ async def test_multi_switch(
             CONF_MANUFACTURER: manufacturer,
             CONF_MODEL: model,
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("multi_switch"),
+            CONF_MULTI_SWITCH: {
+                CONF_ENTITIES: [switch1_id, switch2_id],
+            },
         },
     )
 
@@ -48,14 +52,14 @@ async def test_multi_switch(
     hass.states.async_set(switch1_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.19"
+    assert hass.states.get(power_sensor_id).state == "0.94"
 
     hass.states.async_set(switch2_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.62"
+    assert hass.states.get(power_sensor_id).state == "1.38"
 
     hass.states.async_set(switch2_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.19"
+    assert hass.states.get(power_sensor_id).state == "0.94"

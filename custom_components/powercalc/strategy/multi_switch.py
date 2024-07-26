@@ -10,13 +10,14 @@ from homeassistant.const import CONF_ENTITIES, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 
-from custom_components.powercalc.const import CONF_POWER
+from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_POWER): vol.Any(vol.Coerce(float), cv.template),
+        vol.Optional(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_POWER_OFF): vol.Coerce(float),
         vol.Required(CONF_ENTITIES): cv.entities_domain(SWITCH_DOMAIN),
     },
 )

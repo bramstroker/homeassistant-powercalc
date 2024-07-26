@@ -13,7 +13,9 @@ Configuration options
 +===============+=========+==============+==========+==========================================================================================+
 | entities      | dict    | **Required** |          | Provide a list of the individual switch entities                                         |
 +---------------+---------+--------------+----------+------------------------------------------------------------------------------------------+
-| power         | decimal | **Optional** |          | Power when switched on when one outlet is switched on                                    |
+| power         | decimal | **Optional** |          | Power for one outlet when it is switched on                                              |
++---------------+---------+--------------+----------+------------------------------------------------------------------------------------------+
+| power_off     | decimal | **Optional** |          | Power for one outlet when it is switched off                                             |
 +---------------+--------+---------------+----------+------------------------------------------------------------------------------------------+
 
 .. code-block:: yaml
@@ -21,12 +23,12 @@ Configuration options
     powercalc:
       sensors:
         - name: "My outlet self usage"
-          standby_power: 0.25
           multi_switch:
             entities:
               - switch.outlet_1
               - switch.outlet_2
               - switch.outlet_3
+            power_off: 0.25
             power: 0.5
 
 In this example, when all the switches are turned on, the power usage will be 0.5W * 3 = 1.5W

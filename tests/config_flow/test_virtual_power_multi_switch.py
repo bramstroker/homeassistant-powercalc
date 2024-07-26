@@ -1,5 +1,5 @@
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.common import create_source_entity
@@ -9,6 +9,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_MULTI_SWITCH,
     CONF_POWER,
+    CONF_POWER_OFF,
     CONF_SENSOR_TYPE,
     CalculationStrategy,
     SensorType,
@@ -29,14 +30,14 @@ async def test_create_multi_switch_sensor_entry(hass: HomeAssistant) -> None:
     result = await set_virtual_power_configuration(
         hass,
         result,
-        {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8},
+        {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert_default_virtual_power_entry_data(
         CalculationStrategy.MULTI_SWITCH,
         result["data"],
-        {CONF_MULTI_SWITCH: {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8}},
+        {CONF_MULTI_SWITCH: {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5}},
     )
 
     await hass.async_block_till_done()
@@ -82,3 +83,10 @@ async def test_discovery_flow(
             CONF_POWER: 0.8,
         },
     }
+
+    assert hass.states.get("sensor.test_device_power")
+
+    hass.states.async_set("switch.a", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_device_power").state == "0.8"
