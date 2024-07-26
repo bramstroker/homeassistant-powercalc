@@ -1,6 +1,6 @@
 - [Lights](#lights) (341)
 - [Smart speakers](#smart-speakers) (34)
-- [Smart switches / plugs](#smart-switches--plugs) (45)
+- [Smart switches / plugs](#smart-switches--plugs) (46)
 - [Cameras](#cameras) (2)
 - [Networking](#networking) (4)
 
@@ -392,7 +392,7 @@
 |sonos        |symfonisk table lamp             |SYMFONISK Table lamp                    |                                                                                                |2.60|
 
 ## Smart switches / plugs
-#### 45 total
+#### 46 total
 
 |     A     |          B           |                                         C                                         |                           D                           |  E  |
 |-----------|----------------------|-----------------------------------------------------------------------------------|-------------------------------------------------------|----:|
@@ -437,6 +437,7 @@
 |tasmota    |shelly plus plug s    |Shelly Plus Plug S                                                                 |                                                       |0.800|
 |tp-link    |HS100                 |HS100                                                                              |HS100(EU)                                              |0.890|
 |tp-link    |HS110                 |HS110                                                                              |HS110(EU)                                              |1.540|
+|tp-link    |HS300                 |Kasa Smart Wi-Fi Power Strip                                                       |HS300(US)                                              |0.000|
 |tp-link    |KP115                 |Kasa Smart WiFi Plug Slim with Energy Monitoring                                   |KP115(AU)<br />KP115(US)                               |0.500|
 |tp-link    |KP125M                |TP-Link KP125M                                                                     |KP125M                                                 |0.475|
 |tp-link    |P100                  |TP Link Tapo P100 Mini Smart Wi-Fi Socket                                          |                                                       |0.633|
