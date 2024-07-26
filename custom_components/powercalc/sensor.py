@@ -77,6 +77,7 @@ from .const import (
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_MULTI_SWITCH,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
@@ -149,6 +150,7 @@ from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from .strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
 from .strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
 from .strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
@@ -182,6 +184,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY): cv.boolean,
     vol.Optional(CONF_FIXED): FIXED_SCHEMA,
     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+    vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
@@ -242,6 +245,7 @@ SENSOR_CONFIG = {
                     vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
                     vol.Optional(CONF_WLED): WLED_SCHEMA,
                     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+                    vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
                 },
             ),
         ],

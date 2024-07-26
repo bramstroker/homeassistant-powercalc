@@ -8,6 +8,7 @@ Virtual power strategies
    fixed
    linear
    lut
+   multi_switch
    playbook
    wled
    composite
@@ -32,6 +33,11 @@ Use this when you want to set power on a linear scale. Useful for dimmable light
 Use a Lookup table to map a given light brighness and color to a power value in Watt. Most of powercalc built-in profiles use this.
 You'll need to use the measure utility to create these LUT files.
 
+:doc:`multi_switch`
+=========================================
+
+Use this when you have a device with multiple switches and you want to calculate the power usage based on the on/off state of each switch.
+
 :doc:`playbook`
 =========================================
 
@@ -46,4 +52,4 @@ Used for led strips controlled by WLED firmware. WLED integration provides estim
 :doc:`composite`
 =========================================================
 
-Combine different strategies
+Combine different strategies.
