@@ -67,7 +67,7 @@ async def test_discovery_flow(
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8},
+        {CONF_ENTITIES: ["switch.a", "switch.b"]},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -80,7 +80,6 @@ async def test_discovery_flow(
         CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
         CONF_MULTI_SWITCH: {
             CONF_ENTITIES: ["switch.a", "switch.b"],
-            CONF_POWER: 0.8,
         },
     }
 
@@ -89,4 +88,4 @@ async def test_discovery_flow(
     hass.states.async_set("switch.a", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "0.8"
+    assert hass.states.get("sensor.test_device_power").state == "2.16"

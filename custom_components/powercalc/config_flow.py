@@ -276,7 +276,7 @@ SCHEMA_POWER_MULTI_SWITCH = vol.Schema(
             selector.EntitySelectorConfig(domain=Platform.SWITCH, multiple=True),
         ),
         vol.Required(CONF_POWER): vol.Coerce(float),
-        vol.Optional(CONF_POWER_OFF): vol.Coerce(float),
+        vol.Required(CONF_POWER_OFF): vol.Coerce(float),
     },
 )
 
@@ -957,9 +957,16 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             if not errors:
                 return await self.async_step_power_advanced()
 
+        schema = SCHEMA_POWER_MULTI_SWITCH
+        # Remove power options if we are in library flow as they are defined in the power profile
+        if self.is_library_flow:
+            del schema.schema[CONF_POWER]
+            del schema.schema[CONF_POWER_OFF]
+            schema = vol.Schema(schema.schema)
+
         return self.async_show_form(
             step_id=Steps.MULTI_SWITCH,
-            data_schema=SCHEMA_POWER_MULTI_SWITCH,
+            data_schema=schema,
             errors=errors,
             last_step=False,
         )

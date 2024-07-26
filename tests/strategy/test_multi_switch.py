@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import pytest
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_NAME,
@@ -7,8 +8,12 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF
+from custom_components.powercalc import PowerCalculatorStrategyFactory
+from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF, CalculationStrategy
+from custom_components.powercalc.errors import StrategyConfigurationError
 from custom_components.powercalc.strategy.multi_switch import MultiSwitchStrategy
 from tests.common import run_powercalc_setup
 
@@ -54,3 +59,58 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
 
     power_sensor = hass.states.get("sensor.outlet_self_usage_power")
     assert power_sensor
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        {
+            CONF_NAME: "Outlet self usage",
+            CONF_MULTI_SWITCH: {
+                CONF_POWER: 0.5,
+                CONF_POWER_OFF: 1,
+            },
+        },
+        {
+            CONF_NAME: "Outlet self usage",
+            CONF_MULTI_SWITCH: {
+                CONF_POWER: 0.5,
+                CONF_ENTITIES: [
+                    "switch.test1",
+                    "switch.test2",
+                    "switch.test3",
+                ],
+            },
+        },
+        {
+            CONF_NAME: "Outlet self usage",
+            CONF_MULTI_SWITCH: {
+                CONF_POWER_OFF: 0.5,
+                CONF_ENTITIES: [
+                    "switch.test1",
+                    "switch.test2",
+                    "switch.test3",
+                ],
+            },
+        },
+    ],
+)
+async def test_strategy_configuration_error(hass: HomeAssistant, config: ConfigType) -> None:
+    with pytest.raises(StrategyConfigurationError):
+        factory = PowerCalculatorStrategyFactory(hass)
+        await factory.create(
+            {
+                CONF_NAME: "Outlet self usage",
+                CONF_MULTI_SWITCH: {
+                    CONF_POWER: 0.5,
+                    CONF_ENTITIES: [
+                        "switch.test1",
+                        "switch.test2",
+                        "switch.test3",
+                    ],
+                },
+            },
+            CalculationStrategy.MULTI_SWITCH,
+            None,
+            await create_source_entity("switch.test1", hass),
+        )

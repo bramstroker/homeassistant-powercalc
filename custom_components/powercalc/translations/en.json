@@ -121,6 +121,19 @@
         "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
         "title": "Model config"
       },
+      "multi_switch": {
+        "data": {
+          "entities": "Switch entities",
+          "power": "Power ON",
+          "power_off": "Power OFF"
+        },
+        "data_description": {
+          "entities": "Select all the individual switches that are part of the multi switch",
+          "power": "Power for a single switch when turned on",
+          "power_off": "Power for a single switch when turned off"
+        },
+        "title": "Multi switch config"
+      },
       "playbook": {
         "data": {
           "autostart": "Autostart",
