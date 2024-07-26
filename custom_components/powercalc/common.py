@@ -17,6 +17,7 @@ from .const import (
     CONF_CREATE_GROUP,
     CONF_DAILY_FIXED_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
+    CONF_MULTI_SWITCH,
     CONF_POWER_SENSOR_ID,
     DUMMY_ENTITY_ID,
 )
@@ -131,7 +132,9 @@ def get_merged_sensor_configuration(*configs: dict, validate: bool = True) -> di
             CONF_CREATE_ENERGY_SENSORS,
         )
 
-    if (CONF_DAILY_FIXED_ENERGY in merged_config or CONF_POWER_SENSOR_ID in merged_config) and CONF_ENTITY_ID not in merged_config:
+    is_entity_id_required = not any(key in merged_config for key in (CONF_DAILY_FIXED_ENERGY, CONF_POWER_SENSOR_ID, CONF_MULTI_SWITCH))
+
+    if not is_entity_id_required and CONF_ENTITY_ID not in merged_config:
         merged_config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
 
     if validate and CONF_CREATE_GROUP not in merged_config and CONF_ENTITY_ID not in merged_config:

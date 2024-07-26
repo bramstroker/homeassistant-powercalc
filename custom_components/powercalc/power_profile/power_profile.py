@@ -121,23 +121,27 @@ class PowerProfile:
     @property
     def linear_mode_config(self) -> ConfigType | None:
         """Get configuration to setup linear strategy."""
-        if not self.is_strategy_supported(CalculationStrategy.LINEAR):
-            raise UnsupportedStrategyError(
-                f"Strategy linear is not supported by model: {self._model}",
-            )
-        return self._json_data.get("linear_config")
+        return self.get_strategy_config(CalculationStrategy.LINEAR)
+
+    @property
+    def multi_switch_mode_config(self) -> ConfigType | None:
+        """Get configuration to setup linear strategy."""
+        return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property
     def fixed_mode_config(self) -> ConfigType | None:
         """Get configuration to setup fixed strategy."""
-        if not self.is_strategy_supported(CalculationStrategy.FIXED):
+        config = self.get_strategy_config(CalculationStrategy.FIXED)
+        if config is None and self.standby_power_on:
+            config = {CONF_POWER: 0}
+        return config
+
+    def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
+        if not self.is_strategy_supported(strategy):
             raise UnsupportedStrategyError(
-                f"Strategy fixed is not supported by model: {self._model}",
+                f"Strategy {strategy} is not supported by model: {self._model}",
             )
-        fixed_config = self._json_data.get("fixed_config")
-        if fixed_config is None and self.standby_power_on:
-            fixed_config = {CONF_POWER: 0}
-        return fixed_config
+        return self._json_data.get(f"{strategy}_config")
 
     @property
     def sensor_config(self) -> ConfigType:

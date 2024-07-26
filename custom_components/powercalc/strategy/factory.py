@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from homeassistant.const import CONF_CONDITION
+from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition
 from homeassistant.helpers.template import Template
@@ -11,6 +11,7 @@ from custom_components.powercalc.const import (
     CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
@@ -29,6 +30,7 @@ from .composite import CompositeStrategy, SubStrategy
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
 from .lut import LutRegistry, LutStrategy
+from .multi_switch import MultiSwitchStrategy
 from .playbook import PlaybookStrategy
 from .selector import detect_calculation_strategy
 from .strategy_interface import PowerCalculationStrategyInterface
@@ -56,6 +58,9 @@ class PowerCalculatorStrategyFactory:
 
         if strategy == CalculationStrategy.LUT:
             return self._create_lut(source_entity, power_profile)
+
+        if strategy == CalculationStrategy.MULTI_SWITCH:
+            return self._create_multi_switch(config, power_profile)
 
         if strategy == CalculationStrategy.PLAYBOOK:
             return self._create_playbook(config)
@@ -178,3 +183,20 @@ class PowerCalculatorStrategyFactory:
 
         strategies = [await _create_sub_strategy(config) for config in sub_strategies]
         return CompositeStrategy(self._hass, strategies)
+
+    def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
+        """Create instance of multi switch strategy."""
+        multi_switch_config = config.get(CONF_MULTI_SWITCH)
+        if multi_switch_config is None:
+            if power_profile and power_profile.get_strategy_config(CalculationStrategy.MULTI_SWITCH):
+                multi_switch_config = power_profile.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
+
+            if multi_switch_config is None:
+                raise StrategyConfigurationError("No multi_switch configuration supplied")
+
+        return MultiSwitchStrategy(
+            self._hass,
+            multi_switch_config.get(CONF_ENTITIES),  # type: ignore
+            on_power=multi_switch_config.get(CONF_POWER),  # type: ignore
+            off_power=config.get(CONF_STANDBY_POWER),  # type: ignore
+        )
