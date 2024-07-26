@@ -202,13 +202,7 @@ class PowerCalculatorStrategyFactory:
             raise StrategyConfigurationError("No switch entities supplied")
 
         on_power: Decimal | None = multi_switch_config.get(CONF_POWER)
-        if on_power is None and power_profile:
-            on_power = Decimal(power_profile.standby_power_on)
-
         off_power: Decimal | None = multi_switch_config.get(CONF_POWER_OFF)
-        if off_power is None and power_profile:
-            off_power = Decimal(power_profile.standby_power)
-
         if off_power is None or on_power is None:
             raise StrategyConfigurationError("No power configuration supplied")
 
