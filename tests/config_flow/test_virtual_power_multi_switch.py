@@ -1,11 +1,13 @@
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Steps
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
+    CONF_MODE,
     CONF_MODEL,
     CONF_MULTI_SWITCH,
     CONF_POWER,
@@ -17,7 +19,6 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
-    assert_default_virtual_power_entry_data,
     goto_virtual_power_strategy_step,
     initialize_discovery_flow,
     set_virtual_power_configuration,
@@ -26,7 +27,7 @@ from tests.conftest import MockEntityWithModel
 
 
 async def test_create_multi_switch_sensor_entry(hass: HomeAssistant) -> None:
-    result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.MULTI_SWITCH)
+    result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.MULTI_SWITCH, {CONF_NAME: "test"})
     result = await set_virtual_power_configuration(
         hass,
         result,
@@ -34,15 +35,18 @@ async def test_create_multi_switch_sensor_entry(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert_default_virtual_power_entry_data(
-        CalculationStrategy.MULTI_SWITCH,
-        result["data"],
-        {CONF_MULTI_SWITCH: {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5}},
-    )
+    entry_data = result["data"]
+    assert entry_data[CONF_SENSOR_TYPE] == SensorType.VIRTUAL_POWER
+    assert entry_data[CONF_MODE] == CalculationStrategy.MULTI_SWITCH
+    assert entry_data[CONF_MULTI_SWITCH] == {CONF_ENTITIES: ["switch.a", "switch.b"], CONF_POWER: 0.8, CONF_POWER_OFF: 0.5}
 
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_power")
     assert hass.states.get("sensor.test_energy")
+
+    entity_reg = er.async_get(hass)
+    entry = entity_reg.async_get("sensor.test_power")
+    assert entry
 
 
 async def test_discovery_flow(

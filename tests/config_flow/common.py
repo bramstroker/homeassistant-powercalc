@@ -94,7 +94,7 @@ async def initialize_discovery_flow(
         DOMAIN,
         context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
         data={
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            # CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
             CONF_NAME: "test",
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MANUFACTURER: power_profile.manufacturer,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import logging
+import uuid
 from abc import ABC
 from enum import StrEnum
 from typing import Any
@@ -720,7 +721,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
-        unique_id = f"pc_{self.source_entity.unique_id}"
+
+        unique_id = self.get_or_create_unique_id()
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
@@ -780,17 +782,14 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                     self.source_entity_id,
                     self.hass,
                 )
-                unique_id = user_input.get(CONF_UNIQUE_ID)
-                if not unique_id and self.source_entity_id != DUMMY_ENTITY_ID:
-                    source_unique_id = self.source_entity.unique_id or self.source_entity_id
-                    unique_id = f"pc_{source_unique_id}"
-
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
 
                 self.name = user_input.get(CONF_NAME) or self.source_entity.name
                 self.selected_sensor_type = SensorType.VIRTUAL_POWER
                 self.sensor_config.update(user_input)
+
+                unique_id = self.get_or_create_unique_id()
+                await self.async_set_unique_id(unique_id)
+                self._abort_if_unique_id_configured()
 
                 return await self.forward_to_strategy_step(selected_strategy)
 
@@ -800,6 +799,18 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
             last_step=False,
         )
+
+    def get_or_create_unique_id(self) -> str:
+        """Get or create the unique id."""
+        unique_id = self.sensor_config.get(CONF_UNIQUE_ID)
+        if unique_id:
+            return str(unique_id)
+
+        if self.source_entity and self.source_entity_id != DUMMY_ENTITY_ID:
+            source_unique_id = self.source_entity.unique_id or self.source_entity_id
+            return f"pc_{source_unique_id}"
+
+        return str(uuid.uuid4())
 
     async def forward_to_strategy_step(
         self,
