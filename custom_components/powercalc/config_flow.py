@@ -15,6 +15,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, Confi
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_DEVICE,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
@@ -54,6 +55,7 @@ from .const import (
     CONF_MIN_POWER,
     CONF_MODE,
     CONF_MODEL,
+    CONF_MULTI_SWITCH,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
@@ -117,6 +119,7 @@ class Steps(StrEnum):
     VIRTUAL_POWER = "virtual_power"
     FIXED = "fixed"
     LINEAR = "linear"
+    MULTI_SWITCH = "multi_switch"
     PLAYBOOK = "playbook"
     WLED = "wled"
     POWER_ADVANCED = "power_advanced"
@@ -233,6 +236,7 @@ STRATEGY_SELECTOR = selector.SelectSelector(
         options=[
             CalculationStrategy.FIXED,
             CalculationStrategy.LINEAR,
+            CalculationStrategy.MULTI_SWITCH,
             CalculationStrategy.PLAYBOOK,
             CalculationStrategy.WLED,
             CalculationStrategy.LUT,
@@ -262,6 +266,15 @@ SCHEMA_POWER_LINEAR = vol.Schema(
         vol.Optional(CONF_MAX_POWER): vol.Coerce(float),
         vol.Optional(CONF_GAMMA_CURVE): vol.Coerce(float),
         vol.Optional(CONF_CALIBRATE): selector.ObjectSelector(),
+    },
+)
+
+SCHEMA_POWER_MULTI_SWITCH = vol.Schema(
+    {
+        vol.Required(CONF_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(domain=Platform.SWITCH, multiple=True),
+        ),
+        vol.Required(CONF_POWER): vol.Coerce(float),
     },
 )
 
@@ -797,6 +810,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if strategy == CalculationStrategy.LINEAR:
             return await self.async_step_linear()
 
+        if strategy == CalculationStrategy.MULTI_SWITCH:
+            return await self.async_step_multi_switch()
+
         if strategy == CalculationStrategy.PLAYBOOK:
             return await self.async_step_playbook()
 
@@ -923,6 +939,25 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id=Steps.LINEAR,
             data_schema=self.create_schema_linear(self.source_entity_id),  # type: ignore
+            errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_multi_switch(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the flow for multi switch strategy."""
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_MULTI_SWITCH: user_input})
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return await self.async_step_power_advanced()
+
+        return self.async_show_form(
+            step_id=Steps.MULTI_SWITCH,
+            data_schema=SCHEMA_POWER_MULTI_SWITCH,
             errors=errors,
             last_step=False,
         )
@@ -1096,8 +1131,15 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if self.power_profile and self.power_profile.needs_fixed_config:
             return await self.async_step_fixed()
 
-        if self.power_profile and self.power_profile.device_type == DeviceType.SMART_SWITCH:
+        if (
+            self.power_profile
+            and self.power_profile.device_type == DeviceType.SMART_SWITCH
+            and self.power_profile.calculation_strategy == CalculationStrategy.FIXED
+        ):
             return await self.async_step_smart_switch()
+
+        if self.power_profile and self.power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return await self.async_step_multi_switch()
 
         return await self.async_step_power_advanced()
 
