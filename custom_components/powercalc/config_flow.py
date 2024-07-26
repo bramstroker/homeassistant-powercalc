@@ -414,6 +414,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return self.create_schema_linear(source_entity_id)
         if strategy == CalculationStrategy.PLAYBOOK:
             return SCHEMA_POWER_PLAYBOOK
+        if strategy == CalculationStrategy.MULTI_SWITCH:
+            return self.create_schema_multi_switch()
         if strategy == CalculationStrategy.WLED:
             return SCHEMA_POWER_WLED
         return vol.Schema({})
@@ -495,6 +497,16 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
             },
         )
+
+    def create_schema_multi_switch(self) -> vol.Schema:
+        """Create the config schema for multi switch strategy."""
+        schema = SCHEMA_POWER_MULTI_SWITCH
+        # Remove power options if we are in library flow as they are defined in the power profile
+        if self.is_library_flow:
+            del schema.schema[CONF_POWER]
+            del schema.schema[CONF_POWER_OFF]
+            schema = vol.Schema(schema.schema)
+        return schema
 
     def create_schema_virtual_power(
         self,
@@ -956,16 +968,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             if not errors:
                 return await self.async_step_power_advanced()
 
-        schema = SCHEMA_POWER_MULTI_SWITCH
-        # Remove power options if we are in library flow as they are defined in the power profile
-        if self.is_library_flow:
-            del schema.schema[CONF_POWER]
-            del schema.schema[CONF_POWER_OFF]
-            schema = vol.Schema(schema.schema)
-
         return self.async_show_form(
             step_id=Steps.MULTI_SWITCH,
-            data_schema=schema,
+            data_schema=self.create_schema_multi_switch(),
             errors=errors,
             last_step=False,
         )
