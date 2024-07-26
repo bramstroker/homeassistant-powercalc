@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.13.4:docker"
   },
-  "name": "LCD003",
+  "name": "Hue Akari Downlight",
   "standby_power": 0.2
 }
