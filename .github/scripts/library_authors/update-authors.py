@@ -47,6 +47,8 @@ def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
 
 
 def process_model_json_files(root_dir):
+    author_counts: dict[str, int] = {}
+
     # Find all model.json files in the directory tree
     model_json_files = glob.glob(os.path.join(root_dir, '**', 'model.json'), recursive=True)
 
@@ -57,6 +59,10 @@ def process_model_json_files(root_dir):
 
         author = read_author_from_file(os.path.abspath(model_json_file))
         if author:
+            if author in author_counts:
+                author_counts[author] += 1
+            else:
+                author_counts[author] = 1
             print(f"Skipping {model_json_file}, author already set to {author}")
             continue
 
@@ -67,6 +73,11 @@ def process_model_json_files(root_dir):
 
         write_author_to_file(os.path.abspath(model_json_file), author)
         print(f"Updated {model_json_file} with author {author}")
+
+    print("\nAuthors:")
+    sorted_authors = sorted(author_counts.items(), key=lambda x: x[1], reverse=True)
+    for author, count in sorted_authors:
+        print(f"{author} ({count} files)")
 
 
 def read_author_from_file(file_path: str) -> str | None:
