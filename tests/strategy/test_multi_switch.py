@@ -65,14 +65,17 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
     "config",
     [
         {
-            CONF_NAME: "Outlet self usage",
+            CONF_NAME: "My sensor",
+        },
+        {
+            CONF_NAME: "My sensor",
             CONF_MULTI_SWITCH: {
                 CONF_POWER: 0.5,
                 CONF_POWER_OFF: 1,
             },
         },
         {
-            CONF_NAME: "Outlet self usage",
+            CONF_NAME: "My sensor",
             CONF_MULTI_SWITCH: {
                 CONF_POWER: 0.5,
                 CONF_ENTITIES: [
@@ -83,7 +86,7 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
             },
         },
         {
-            CONF_NAME: "Outlet self usage",
+            CONF_NAME: "My sensor",
             CONF_MULTI_SWITCH: {
                 CONF_POWER_OFF: 0.5,
                 CONF_ENTITIES: [
@@ -99,17 +102,7 @@ async def test_strategy_configuration_error(hass: HomeAssistant, config: ConfigT
     with pytest.raises(StrategyConfigurationError):
         factory = PowerCalculatorStrategyFactory(hass)
         await factory.create(
-            {
-                CONF_NAME: "Outlet self usage",
-                CONF_MULTI_SWITCH: {
-                    CONF_POWER: 0.5,
-                    CONF_ENTITIES: [
-                        "switch.test1",
-                        "switch.test2",
-                        "switch.test3",
-                    ],
-                },
-            },
+            config,
             CalculationStrategy.MULTI_SWITCH,
             None,
             await create_source_entity("switch.test1", hass),
