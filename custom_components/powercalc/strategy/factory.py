@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition
@@ -14,6 +16,7 @@ from custom_components.powercalc.const import (
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_POWER,
+    CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
@@ -186,17 +189,26 @@ class PowerCalculatorStrategyFactory:
 
     def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
         """Create instance of multi switch strategy."""
-        multi_switch_config = config.get(CONF_MULTI_SWITCH)
-        if multi_switch_config is None:
-            if power_profile and power_profile.get_strategy_config(CalculationStrategy.MULTI_SWITCH):
-                multi_switch_config = power_profile.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
+        multi_switch_config: ConfigType = {}
+        if power_profile and power_profile.multi_switch_mode_config:
+            multi_switch_config = power_profile.multi_switch_mode_config
+        multi_switch_config.update(config.get(CONF_MULTI_SWITCH, {}))
 
-            if multi_switch_config is None:
-                raise StrategyConfigurationError("No multi_switch configuration supplied")
+        if not multi_switch_config:
+            raise StrategyConfigurationError("No multi_switch configuration supplied")
+
+        entities: list[str] = multi_switch_config.get(CONF_ENTITIES, [])
+        if not entities:
+            raise StrategyConfigurationError("No switch entities supplied")
+
+        on_power: Decimal | None = multi_switch_config.get(CONF_POWER)
+        off_power: Decimal | None = multi_switch_config.get(CONF_POWER_OFF)
+        if off_power is None or on_power is None:
+            raise StrategyConfigurationError("No power configuration supplied")
 
         return MultiSwitchStrategy(
             self._hass,
-            multi_switch_config.get(CONF_ENTITIES),  # type: ignore
-            on_power=multi_switch_config.get(CONF_POWER),  # type: ignore
-            off_power=config.get(CONF_STANDBY_POWER),  # type: ignore
+            entities,
+            on_power=Decimal(on_power),
+            off_power=Decimal(off_power),
         )

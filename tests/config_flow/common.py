@@ -10,7 +10,10 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import (
+    CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
     Steps,
 )
@@ -18,12 +21,18 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_MANUFACTURER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_SENSOR_TYPE,
+    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_SOURCE_ENTITY,
     ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
 DEFAULT_ENTITY_ID = "light.test"
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -65,6 +74,43 @@ async def initialize_options_flow(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Steps.INIT
     return result
+
+
+async def initialize_discovery_flow(
+    hass: HomeAssistant,
+    source_entity: SourceEntity,
+    power_profile: PowerProfile | None = None,
+    confirm_autodiscovered_model: bool = False,
+) -> FlowResult:
+    discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
+    if not power_profile:
+        power_profile = await get_power_profile(
+            hass,
+            {},
+            await discovery_manager.autodiscover_model(source_entity.entity_entry),
+        )
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
+        data={
+            # CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
+            CONF_NAME: "test",
+            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+            CONF_MANUFACTURER: power_profile.manufacturer,
+            CONF_MODEL: power_profile.model,
+            DISCOVERY_SOURCE_ENTITY: source_entity,
+            DISCOVERY_POWER_PROFILE: power_profile,
+        },
+    )
+    if not confirm_autodiscovered_model:
+        return result
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    return await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
 
 
 async def goto_virtual_power_strategy_step(

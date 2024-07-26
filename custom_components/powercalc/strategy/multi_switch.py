@@ -6,17 +6,18 @@ from decimal import Decimal
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import CONF_ENTITIES, STATE_ON
+from homeassistant.const import CONF_ENTITIES, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 
-from custom_components.powercalc.const import CONF_POWER
+from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF, DUMMY_ENTITY_ID
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        vol.Optional(CONF_POWER): vol.Any(vol.Coerce(float), cv.template),
+        vol.Optional(CONF_POWER): vol.Coerce(float),
+        vol.Optional(CONF_POWER_OFF): vol.Coerce(float),
         vol.Required(CONF_ENTITIES): cv.entities_domain(SWITCH_DOMAIN),
     },
 )
@@ -40,11 +41,21 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         if self.known_states is None:
-            self.known_states = {entity_id: self.hass.states.get(entity_id) for entity_id in self.switch_entities}
+            self.known_states = {
+                entity_id: (state.state if (state := self.hass.states.get(entity_id)) else STATE_UNAVAILABLE) for entity_id in self.switch_entities
+            }
 
-        self.known_states[entity_state.entity_id] = entity_state.state
+        if entity_state.entity_id != DUMMY_ENTITY_ID:
+            self.known_states[entity_state.entity_id] = entity_state.state
 
-        return Decimal(sum(self.on_power if state == STATE_ON else self.off_power for state in self.known_states.values()))
+        def _get_power(state: str) -> Decimal:
+            if state == STATE_UNAVAILABLE:
+                return Decimal(0)
+            if state == STATE_ON:
+                return self.on_power
+            return self.off_power
+
+        return Decimal(sum(_get_power(state) for state in self.known_states.values()))
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         return self.switch_entities  # type: ignore

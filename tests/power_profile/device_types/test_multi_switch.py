@@ -6,8 +6,6 @@ from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODEL,
     CONF_MULTI_SWITCH,
-    CONF_POWER,
-    CONF_STANDBY_POWER,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.conftest import MockEntityWithModel
@@ -33,7 +31,6 @@ async def test_multi_switch(
     power_sensor_id = "sensor.outlet1_device_power"
     switch1_id = "switch.outlet1"
     switch2_id = "switch.outlet2"
-    switch3_id = "switch.outlet3"
 
     await run_powercalc_setup(
         hass,
@@ -42,14 +39,8 @@ async def test_multi_switch(
             CONF_MANUFACTURER: manufacturer,
             CONF_MODEL: model,
             CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("multi_switch"),
-            CONF_STANDBY_POWER: 0.25,
             CONF_MULTI_SWITCH: {
-                CONF_POWER: 0.687,
-                CONF_ENTITIES: [
-                    switch1_id,
-                    switch2_id,
-                    switch3_id,
-                ],
+                CONF_ENTITIES: [switch1_id, switch2_id],
             },
         },
     )
@@ -61,14 +52,14 @@ async def test_multi_switch(
     hass.states.async_set(switch1_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.19"
+    assert hass.states.get(power_sensor_id).state == "0.69"
 
     hass.states.async_set(switch2_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.62"
+    assert hass.states.get(power_sensor_id).state == "1.38"
 
     hass.states.async_set(switch2_id, STATE_OFF)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "1.19"
+    assert hass.states.get(power_sensor_id).state == "0.94"

@@ -1,9 +1,7 @@
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
 
-from custom_components.powercalc import DOMAIN, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
@@ -12,8 +10,6 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_SENSOR_TYPE,
     CONF_SUB_PROFILE,
-    DISCOVERY_POWER_PROFILE,
-    DISCOVERY_SOURCE_ENTITY,
     SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
@@ -23,6 +19,7 @@ from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
+    initialize_discovery_flow,
     initialize_options_flow,
 )
 from tests.conftest import MockEntityWithModel
@@ -40,26 +37,7 @@ async def test_discovery_flow(
     )
 
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
-    discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
-    power_profile = await get_power_profile(
-        hass,
-        {},
-        await discovery_manager.autodiscover_model(source_entity.entity_entry),
-    )
-
-    result: FlowResult = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
-        data={
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-            CONF_NAME: "test",
-            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-            CONF_MANUFACTURER: "signify",
-            CONF_MODEL: "LCT010",
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-        },
-    )
+    result = await initialize_discovery_flow(hass, source_entity)
 
     # Confirm selected manufacturer/model
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -83,20 +61,7 @@ async def test_discovery_flow_remarks_are_shown(hass: HomeAssistant) -> None:
     """Model.json can provide remarks to show in the discovery flow. Check if these are displayed correctly"""
     source_entity = await create_source_entity("media_player.test", hass)
     power_profile = await get_power_profile(hass, {}, ModelInfo("sonos", "one"))
-
-    result: FlowResult = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
-        data={
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-            CONF_NAME: "test",
-            CONF_ENTITY_ID: "media_player.test",
-            CONF_MANUFACTURER: "sonos",
-            CONF_MODEL: "one",
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-        },
-    )
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
     assert result["description_placeholders"]["remarks"] is not None
 
 
@@ -114,19 +79,7 @@ async def test_discovery_flow_with_subprofile_selection(
     source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
 
-    result: FlowResult = await hass.config_entries.flow.async_init(
-        DOMAIN,
-        context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
-        data={
-            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-            CONF_NAME: "test",
-            CONF_MANUFACTURER: "lifx",
-            CONF_MODEL: "LIFX Z",
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-        },
-    )
+    result = await initialize_discovery_flow(hass, source_entity, power_profile)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     result = await hass.config_entries.flow.async_configure(
