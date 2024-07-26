@@ -1,8 +1,14 @@
+from unittest.mock import AsyncMock
+
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
+from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import Steps
 from custom_components.powercalc.const import (
@@ -92,4 +98,50 @@ async def test_discovery_flow(
     hass.states.async_set("switch.a", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "2.16"
+    assert hass.states.get("sensor.test_device_power").state == "0.82"
+
+    hass.states.async_set("switch.b", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_device_power").state == "1.64"
+
+
+async def test_discovery_flow_once_per_unique_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    hass.config.config_dir = get_test_config_dir()
+
+    device_id = "abcdef"
+    mock_device_registry(
+        hass,
+        {
+            device_id: DeviceEntry(
+                id=device_id,
+                manufacturer="tp-link",
+                model="HS300",
+            ),
+        },
+    )
+
+    entities: dict[str, RegistryEntry] = {}
+    for i in range(6):
+        entity_id = f"switch.test{i}"
+        entry = RegistryEntry(
+            id=entity_id,
+            entity_id=entity_id,
+            unique_id=f"{device_id}{i}",
+            device_id=device_id,
+            platform="switch",
+        )
+        entities[entity_id] = entry
+
+    mock_registry(
+        hass,
+        entities,
+    )
+
+    discovery_manager = DiscoveryManager(hass, {})
+    await discovery_manager.start_discovery()
+
+    assert len(mock_flow_init.mock_calls) == 1

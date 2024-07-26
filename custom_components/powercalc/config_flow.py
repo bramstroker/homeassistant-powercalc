@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import logging
-import uuid
 from abc import ABC
 from enum import StrEnum
 from typing import Any
@@ -92,6 +91,7 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
+from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
@@ -722,7 +722,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
 
-        unique_id = self.get_or_create_unique_id()
+        unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.power_profile)
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
@@ -787,7 +787,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 self.selected_sensor_type = SensorType.VIRTUAL_POWER
                 self.sensor_config.update(user_input)
 
-                unique_id = self.get_or_create_unique_id()
+                unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.power_profile)
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
 
@@ -799,18 +799,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
             last_step=False,
         )
-
-    def get_or_create_unique_id(self) -> str:
-        """Get or create the unique id."""
-        unique_id = self.sensor_config.get(CONF_UNIQUE_ID)
-        if unique_id:
-            return str(unique_id)
-
-        if self.source_entity and self.source_entity_id != DUMMY_ENTITY_ID:
-            source_unique_id = self.source_entity.unique_id or self.source_entity_id
-            return f"pc_{source_unique_id}"
-
-        return str(uuid.uuid4())
 
     async def forward_to_strategy_step(
         self,

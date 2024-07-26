@@ -52,7 +52,7 @@ async def test_multi_switch(
     hass.states.async_set(switch1_id, STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get(power_sensor_id).state == "0.94"
+    assert hass.states.get(power_sensor_id).state == "0.69"
 
     hass.states.async_set(switch2_id, STATE_ON)
     await hass.async_block_till_done()

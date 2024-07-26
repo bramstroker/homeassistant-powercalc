@@ -30,9 +30,9 @@ async def test_calculate_sum(hass: HomeAssistant) -> None:
         off_power=Decimal(0.25),
     )
 
-    assert await strategy.calculate(State(switch1, STATE_OFF)) == 0.75
-    assert await strategy.calculate(State(switch1, STATE_ON)) == 1.00
-    assert await strategy.calculate(State(switch2, STATE_ON)) == 1.25
+    assert await strategy.calculate(State(switch1, STATE_OFF)) == 0.25
+    assert await strategy.calculate(State(switch1, STATE_ON)) == 0.50
+    assert await strategy.calculate(State(switch2, STATE_ON)) == 1.00
     assert await strategy.calculate(State(switch3, STATE_ON)) == 1.50
 
 

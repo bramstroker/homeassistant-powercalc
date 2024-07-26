@@ -28,6 +28,7 @@ from .const import (
     CalculationStrategy,
 )
 from .errors import ModelNotSupportedError
+from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
@@ -57,9 +58,16 @@ class DiscoveryManager:
         self.ha_config = ha_config
         self.power_profiles: dict[str, PowerProfile | None] = {}
         self.manually_configured_entities: list[str] | None = None
+        self.initialized_flows: set[str] = set()
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
+
+        existing_entries = self.hass.config_entries.async_entries(DOMAIN)
+        for entry in existing_entries:
+            if entry.unique_id:
+                self.initialized_flows.add(entry.unique_id)
+
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
@@ -221,12 +229,13 @@ class DiscoveryManager:
         extra_discovery_data: dict | None,
     ) -> None:
         """Dispatch the discovery flow for a given entity."""
-        existing_entries = [
-            entry
-            for entry in self.hass.config_entries.async_entries(DOMAIN)
-            if entry.unique_id in [source_entity.unique_id, f"pc_{source_entity.unique_id}"]
-        ]
-        if existing_entries:
+
+        unique_id = get_or_create_unique_id({}, source_entity, power_profile)
+        unique_ids_to_check = [unique_id]
+        if unique_id.startswith("pc_"):
+            unique_ids_to_check.append(unique_id[3:])
+
+        if any(unique_id in self.initialized_flows for unique_id in unique_ids_to_check):
             _LOGGER.debug(
                 "%s: Already setup with discovery, skipping new discovery",
                 source_entity.entity_id,
@@ -246,6 +255,7 @@ class DiscoveryManager:
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)
 
+        self.initialized_flows.add(unique_id)
         discovery_flow.async_create_flow(
             self.hass,
             DOMAIN,
