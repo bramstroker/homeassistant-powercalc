@@ -874,13 +874,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "croniter"
-version = "3.0.0"
+version = "3.0.1"
 description = "croniter provides iteration for datetime object with cron like format"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.6"
 files = [
-    {file = "croniter-3.0.0-py2.py3-none-any.whl", hash = "sha256:92fcad6a4eb9749fa9cad2bba18916520b49408f6282a02aeac0dcda0586f7df"},
-    {file = "croniter-3.0.0.tar.gz", hash = "sha256:745b22960bb21ead6d79b25c0e849fffd2fe65215a944def6b235d4c72688b98"},
+    {file = "croniter-3.0.1-py2.py3-none-any.whl", hash = "sha256:bd95885f7241d0b3df40c7648bf1d88fa5c97c859c2ede8880e4622d58ecea57"},
+    {file = "croniter-3.0.1.tar.gz", hash = "sha256:cb7e23c4309bbacb141e0ecd2f6bd063ee8cbc9226479a831ee8b3d55328adee"},
 ]
 
 [package.dependencies]
