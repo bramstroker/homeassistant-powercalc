@@ -10,7 +10,7 @@ from homeassistant.const import CONF_ENTITIES, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 
-from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF
+from custom_components.powercalc.const import CONF_POWER, CONF_POWER_OFF, DUMMY_ENTITY_ID
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
@@ -41,9 +41,10 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
 
     async def calculate(self, entity_state: State) -> Decimal | None:
         if self.known_states is None:
-            self.known_states = {entity_id: self.hass.states.get(entity_id) for entity_id in self.switch_entities}
+            self.known_states = {entity_id: self.hass.states.get(entity_id).state for entity_id in self.switch_entities}
 
-        self.known_states[entity_state.entity_id] = entity_state.state
+        if entity_state.entity_id != DUMMY_ENTITY_ID:
+            self.known_states[entity_state.entity_id] = entity_state.state
 
         return Decimal(sum(self.on_power if state == STATE_ON else self.off_power for state in self.known_states.values()))
 
