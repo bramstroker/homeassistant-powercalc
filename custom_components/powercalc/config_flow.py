@@ -116,6 +116,8 @@ SENSOR_TYPE_MENU = {
 
 
 class Steps(StrEnum):
+    ADVANCED_OPTIONS = "advanced_options"
+    BASIC_OPTIONS = "basic_options"
     GROUP = "group"
     LIBRARY = "library"
     VIRTUAL_POWER = "virtual_power"
@@ -1275,6 +1277,15 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle options flow."""
+
+        menu_options = {
+            Steps.BASIC_OPTIONS: "Basic options",
+            "fixed_config": "Fixed configuration",
+            Steps.ADVANCED_OPTIONS: "Advanced options",
+        }
+        if self.sensor_type == SensorType.DAILY_ENERGY:
+            menu_options[Steps.DAILY_ENERGY] = "Daily energy options"
+
         errors = {}
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
@@ -1300,17 +1311,36 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 except ModelNotSupportedError:
                     errors["base"] = "not_supported"
 
-        schema = self.build_options_schema()
+        return self.async_show_menu(step_id=Steps.INIT, menu_options=menu_options)
+
+    async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        schema = self.build_basic_options_schema()
+        return await self.async_handle_options_step(user_input, schema, Steps.BASIC_OPTIONS)
+
+    async def async_step_advanced_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_POWER_ADVANCED,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Steps.ADVANCED_OPTIONS)
+
+    async def async_step_daily_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the daily energy options flow."""
+        schema = self.fill_schema_defaults(
+            self.create_daily_energy_schema(),
+            self.sensor_config[CONF_DAILY_FIXED_ENERGY],
+        )
+        return await self.async_handle_options_step(user_input, schema, Steps.DAILY_ENERGY)
+
+    async def async_handle_options_step(self, user_input: dict[str, Any], schema: vol.Schema, step: Steps) -> FlowResult:
+        errors = {}
         if user_input is not None:
             errors = await self.save_options(user_input, schema)
             if not errors:
                 return self.async_create_entry(title="", data={})
-
-        return self.async_show_form(
-            step_id=Steps.INIT,
-            data_schema=schema,
-            errors=errors,
-        )
+        return self.async_show_form(step_id=step, data_schema=schema, errors=errors)
 
     async def process_all_options(self, user_input: dict[str, Any], schema: vol.Schema) -> dict | None:
         """
@@ -1384,6 +1414,33 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             elif key in self.sensor_config:
                 self.sensor_config.pop(key)
         return
+
+    def build_basic_options_schema(self) -> vol.Schema:
+        """Build the basic options schema. depending on the selected sensor type."""
+        data_schema: vol.Schema = vol.Schema({})
+        if self.sensor_type == SensorType.VIRTUAL_POWER:
+            data_schema = (
+                vol.Schema(
+                    {
+                        vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
+                    },
+                )
+                .extend(SCHEMA_POWER_OPTIONS.schema)
+            )
+
+        if self.sensor_type == SensorType.REAL_POWER:
+            data_schema = SCHEMA_REAL_POWER_OPTIONS
+
+        if self.sensor_type == SensorType.DAILY_ENERGY:
+            data_schema = SCHEMA_DAILY_ENERGY_OPTIONS
+
+        if self.sensor_type == SensorType.GROUP:
+            data_schema = self.create_schema_group(self.config_entry)
+
+        return self.fill_schema_defaults(
+            data_schema,
+            self.sensor_config,
+        )
 
     def build_options_schema(self) -> vol.Schema:
         """Build the options schema. depending on the selected sensor type."""

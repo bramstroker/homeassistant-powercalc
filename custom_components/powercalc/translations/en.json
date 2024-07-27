@@ -278,15 +278,31 @@
       "unknown": "Unknown error occured, please see the logs for additional information"
     },
     "step": {
+      "advanced_options": {
+        "title": "Advanced options",
+        "data": {
+          "calculation_enabled_condition": "Calculation enabled condition",
+          "ignore_unavailable_state": "Ignore unavailable state",
+          "multiply_factor": "Multiply factor",
+          "multiply_factor_standby": "Multiply factor standby",
+          "unavailable_power": "Unavailable power"
+        }
+      },
+      "basic_options": {
+        "title": "Basic options",
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Source entity",
+          "name": "Name"
+        }
+      },
       "init": {
         "data": {
           "area": "Area",
           "attribute": "Attribute",
           "autostart": "Autostart",
-          "calculation_enabled_condition": "Calculation enabled condition",
           "calibrate": "Calibration values",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
           "device": "Device",
           "energy_integration_method": "Energy integration method",
           "entities": "Switch entities",
@@ -295,13 +311,9 @@
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
-          "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "max_power": "Max power",
           "min_power": "Min power",
-          "multiply_factor": "Multiply factor",
-          "multiply_factor_standby": "Multiply factor standby",
-          "name": "Name",
           "on_time": "On time",
           "playbooks": "Playbooks",
           "power": "Power",
@@ -313,7 +325,6 @@
           "states_power": "States power",
           "states_trigger": "State trigger",
           "sub_groups": "Sub groups",
-          "unavailable_power": "Unavailable power",
           "unit_of_measurement": "Unit of measurement",
           "update_frequency": "Update frequency",
           "utility_meter_tariffs": "Utility meter tariffs",
