@@ -6,20 +6,6 @@
 files: [
   {
     "source": "/custom_components/powercalc/translations/en.json",
-    "translation": "/custom_components/powercalc/translations/%locale%.json",
-    "languages_mapping": {
-        "locale": {
-            "cz": "cz",
-            "de": "de",
-            "fr": "fr",
-            "nl": "nl",
-            "pl": "pl",
-            "pt": "pt",
-            "pt-BR": "pt-BR",
-            "ro": "ro",
-            "sk": "sk",
-            "sv": "sv"
-        }
-    }
+    "translation": "/custom_components/powercalc/translations/%locale%.json"
   }
 ]
