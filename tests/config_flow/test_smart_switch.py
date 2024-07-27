@@ -111,7 +111,7 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.FIXED)
 
     user_input = {CONF_POWER: 50, CONF_SELF_USAGE_INCLUDED: True}
     result = await hass.config_entries.options.async_configure(
@@ -140,7 +140,7 @@ async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> Non
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.FIXED)
 
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_SELF_USAGE_INCLUDED)].description == {

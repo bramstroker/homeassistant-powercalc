@@ -25,8 +25,10 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
+    create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_discovery_flow,
+    initialize_options_flow,
     set_virtual_power_configuration,
 )
 from tests.conftest import MockEntityWithModel
@@ -145,3 +147,26 @@ async def test_discovery_flow_once_per_unique_device(
     await discovery_manager.start_discovery()
 
     assert len(mock_flow_init.mock_calls) == 1
+
+
+async def test_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.MULTI_SWITCH,
+            CONF_MULTI_SWITCH: {CONF_POWER: 10, CONF_POWER_OFF: 40, CONF_ENTITIES: ["switch.a", "switch.b"]},
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Steps.MULTI_SWITCH)
+
+    user_input = {CONF_POWER_OFF: 20, CONF_POWER: 5, CONF_ENTITIES: ["switch.a", "switch.c"]}
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MULTI_SWITCH] == {CONF_POWER: 5, CONF_POWER_OFF: 20, CONF_ENTITIES: ["switch.a", "switch.c"]}

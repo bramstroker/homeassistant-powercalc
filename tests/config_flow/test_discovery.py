@@ -121,7 +121,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
         config_entries.SOURCE_INTEGRATION_DISCOVERY,
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     user_input = {CONF_CREATE_ENERGY_SENSOR: False}

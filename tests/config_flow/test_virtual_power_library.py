@@ -23,7 +23,6 @@ from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
     goto_virtual_power_strategy_step,
-    initialize_options_flow,
     select_menu_item,
     set_virtual_power_configuration,
 )
@@ -114,7 +113,10 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["errors"] == {"base": "not_supported"}
+    assert result["type"] == data_entry_flow.FlowResultType.ABORT
+    assert result["reason"] == "model_not_supported"

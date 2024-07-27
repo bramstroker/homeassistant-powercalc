@@ -221,7 +221,7 @@ async def test_lut_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
 
     user_input = {CONF_CREATE_ENERGY_SENSOR: False}
 
