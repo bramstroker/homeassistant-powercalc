@@ -63,17 +63,24 @@ async def select_menu_item(
 async def initialize_options_flow(
     hass: HomeAssistant,
     entry: config_entries.ConfigEntry,
+    selected_menu_item: Steps,
 ) -> FlowResult:
-    await hass.config_entries.async_setup(entry.entry_id)
-    await hass.async_block_till_done()
+    if entry.state != config_entries.ConfigEntryState.LOADED:
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
     result = await hass.config_entries.options.async_init(
         entry.entry_id,
         data=None,
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
     assert result["step_id"] == Steps.INIT
-    return result
+    assert selected_menu_item in result["menu_options"]
+
+    return await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"next_step_id": selected_menu_item},
+    )
 
 
 async def initialize_discovery_flow(

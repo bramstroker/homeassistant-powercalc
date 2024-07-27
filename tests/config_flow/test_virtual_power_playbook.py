@@ -2,6 +2,7 @@ from homeassistant import data_entry_flow
 from homeassistant.const import ATTR_ENTITY_ID, CONF_ENTITY_ID, STATE_IDLE, STATE_PLAYING
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc.config_flow import Steps
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
     CONF_MODE,
@@ -81,7 +82,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.PLAYBOOK)
 
     user_input = {
         CONF_PLAYBOOKS: {

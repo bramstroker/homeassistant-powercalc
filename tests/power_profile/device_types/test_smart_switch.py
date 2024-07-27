@@ -15,6 +15,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import get_test_profile_dir, run_powercalc_setup
+from tests.config_flow.common import initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
 
@@ -170,10 +171,7 @@ async def test_smart_switch_power_input_gui_config_flow(
     assert hass.states.get(power_sensor_id).state == "0.23"
 
     # Change the power value via the options
-    result = await hass.config_entries.options.async_init(
-        config_entry.entry_id,
-        data=None,
-    )
+    result = await initialize_options_flow(hass, config_entry, Steps.FIXED)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_POWER: 100},

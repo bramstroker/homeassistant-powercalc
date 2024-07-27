@@ -266,67 +266,115 @@
     },
     "step": {
       "init": {
+        "data": {},
+        "data_description": {}
+      },
+      "group": {
         "data": {
           "area": "Área",
-          "attribute": "Atributo",
-          "autostart": "Iniciar automaticamente",
-          "calculation_enabled_condition": "Condição de cálculo ligado",
-          "calibrate": "Valores de calibração",
-          "create_energy_sensor": "Criar sensor de energia",
-          "create_utility_meters": "Criar medidores de utilidade",
           "device": "Device",
-          "energy_integration_method": "Método de cálculo de integração de energia",
-          "gamma_curve": "Curva gama",
           "group_energy_entities": "Entidades de energia adicionais",
           "group_member_sensors": "Sensores powercalc membros",
           "group_power_entities": "Entidades de potência adicionais",
           "hide_members": "Ocultar membros",
-          "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "max_power": "Potência máxima",
-          "min_power": "Potência mínima",
-          "multiply_factor": "Factor de multiplicação",
-          "multiply_factor_standby": "Multiply factor standby",
-          "name": "Nome",
-          "on_time": "Na hora",
-          "playbooks": "Gravações",
-          "power": "Potência",
-          "power_template": "Modelo de energia",
-          "repeat": "Repetir",
-          "self_usage_included": "Self usage included",
-          "standby_power": "Energia em espera",
-          "states_power": "Potência dos Estados",
-          "states_trigger": "State trigger",
-          "sub_groups": "Subgrupos",
-          "unavailable_power": "Potência indisponível",
-          "unit_of_measurement": "Unidade de medida",
-          "update_frequency": "Frequência de atualização",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "value": "Valor",
-          "value_template": "Modelo de valor"
+          "sub_groups": "Subgrupos"
         },
         "data_description": {
           "area": "Adiciona todos os sensores powercalc da área especificada",
-          "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e percentagens para ventoinhas",
-          "autostart": "Instruir para iniciar uma Sequência automaticamente quando o HA iniciar. Ex: 'program1'",
-          "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar true ou 1, caso contrário retornará 0",
-          "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20",
           "device": "Add the group entities powercalc creates to an existing device",
           "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
           "group_member_sensors": "Sensores Powercalc a incluir no grupo",
           "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
-          "ignore_unavailable_state": "Ligue esta opção para o sensor continuar disponível mesmo que a entidade fonte fique indisponível",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
+        }
+      },
+      "linear": {
+        "data": {
+          "attribute": "Atributo",
+          "calibrate": "Valores de calibração",
+          "gamma_curve": "Curva gama",
+          "max_power": "Potência máxima",
+          "min_power": "Potência mínima"
+        },
+        "data_description": {
+          "attribute": "Especifique o atributo. Quando deixado vazio, haverá brilho para luzes e percentagens para ventoinhas",
+          "calibrate": "Coloque um valor de calibração em cada linha. Exemplo\n\n1: 20"
+        }
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Iniciar automaticamente",
+          "playbooks": "Gravações",
+          "repeat": "Repetir",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Instruir para iniciar uma Sequência automaticamente quando o HA iniciar. Ex: 'program1'",
+          "playbooks": "Introduza uma Sequência em cada linha. Examplo\n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        }
+      },
+      "advanced_options": {
+        "data": {
+          "calculation_enabled_condition": "Condição de cálculo ligado",
+          "area": "Método de cálculo de integração de energia",
+          "ignore_unavailable_state": "Ignorar estado indisponível",
+          "multiply_factor": "Factor de multiplicação",
+          "multiply_factor_standby": "Multiply factor standby",
+          "unavailable_power": "Potência indisponível"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "A estratégia de cálculo defenida só será executada se este template retornar true ou 1, caso contrário retornará 0",
+          "ignore_unavailable_state": "Ligue esta opção para o sensor continuar disponível mesmo que a entidade fonte fique indisponível",
           "multiply_factor": "Multiplica a potência calculada por este factor. Pode ser útil para grupos de luzes",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "playbooks": "Introduza uma Sequência em cada linha. Examplo\n\nprogram1: washing_machine/program1.csv",
+          "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível"
+        }
+      },
+      "basic_options": {
+        "data": {
+          "create_energy_sensor": "Criar sensor de energia",
+          "create_utility_meters": "Criar medidores de utilidade",
+          "name": "Nome",
+          "standby_power": "Energia em espera"
+        }
+      },
+      "real_power": {
+        "data": {
+          "device": "Device"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "name": "Nome",
+          "on_time": "Na hora",
+          "unit_of_measurement": "Unidade de medida",
+          "update_frequency": "Frequência de atualização",
+          "value": "Valor",
+          "value_template": "Modelo de valor"
+        }
+      },
+      "fixed": {
+        "data": {
+          "power": "Potência",
+          "power_template": "Modelo de energia",
+          "self_usage_included": "Self usage included",
+          "states_power": "Potência dos Estados"
+        },
+        "data_description": {
           "power_template": "O modelo será avaliado para obter o valor da potência em W",
-          "repeat": "Ligar se pretende continuar a repetir a Sequência após terminar",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-          "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo",
-          "unavailable_power": "Potência em W a considerar quando a entidade fonte está em estado indisponível",
+          "states_power": "Um par 'estado: ptência' em cada linha, veja o exemplo acima"
+        }
+      },
+      "utility_meter_options": {
+        "data": {
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
       }

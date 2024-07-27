@@ -97,13 +97,28 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
             CONF_ENTITY_ID: "light.test",
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
             CONF_MODE: CalculationStrategy.FIXED,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_IGNORE_UNAVAILABLE_STATE: False,
             CONF_FIXED: {CONF_POWER: 40},
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "light.test", CONF_CREATE_UTILITY_METERS: True},
+    )
+
+    result = await initialize_options_flow(hass, entry, Steps.FIXED)
 
     user_input = {CONF_POWER: 50}
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input=user_input,
+    )
+
+    result = await initialize_options_flow(hass, entry, Steps.ADVANCED_OPTIONS)
+    user_input = {CONF_IGNORE_UNAVAILABLE_STATE: True}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -111,6 +126,8 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_FIXED][CONF_POWER] == 50
+    assert entry.data[CONF_CREATE_UTILITY_METERS]
+    assert entry.data[CONF_IGNORE_UNAVAILABLE_STATE]
 
 
 async def test_strategy_raises_unknown_error(hass: HomeAssistant) -> None:

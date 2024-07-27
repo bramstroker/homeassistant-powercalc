@@ -266,67 +266,115 @@
     },
     "step": {
       "init": {
+        "data": {},
+        "data_description": {}
+      },
+      "group": {
         "data": {
           "area": "Område",
-          "attribute": "Attribut",
-          "autostart": "Autostart",
-          "calculation_enabled_condition": "Beräkningsaktiverat villkor",
-          "calibrate": "Kalibreringsvärde",
-          "create_energy_sensor": "Skapa energisensor",
-          "create_utility_meters": "Skapa bruksmätare",
           "device": "Enhet",
-          "energy_integration_method": "Energi integration method",
-          "gamma_curve": "Gamma kurva",
           "group_energy_entities": "Medlem energi entiteter",
           "group_member_sensors": "Medlem powercalc sensorer",
           "group_power_entities": "Medlem effekt entiteter",
           "hide_members": "Dölj medlemmar",
-          "ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "max_power": "Max effekt",
-          "min_power": "Min effekt",
-          "multiply_factor": "Multipliceringsfaktor",
-          "multiply_factor_standby": "Multipliceringsfaktor för standby",
-          "name": "Namn",
-          "on_time": "Igång tid",
-          "playbooks": "Playbooks",
-          "power": "effekt",
-          "power_template": "Effektmall",
-          "repeat": "Repetera",
-          "self_usage_included": "Self usage included",
-          "standby_power": "Standby effekt",
-          "states_power": "Effekttillstånd",
-          "states_trigger": "State trigger",
-          "sub_groups": "Undergrupper",
-          "unavailable_power": "Otillgänglig effekt",
-          "unit_of_measurement": "Mätenhet",
-          "update_frequency": "Uppdateringsfrekvens",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "value": "Värde",
-          "value_template": "Värdemall"
+          "sub_groups": "Undergrupper"
         },
         "data_description": {
           "area": "Lägg till alla powercalc sensorer från det specifierade området",
-          "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
-          "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
-          "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
-          "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20",
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
           "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
           "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-          "ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
+        }
+      },
+      "linear": {
+        "data": {
+          "attribute": "Attribut",
+          "calibrate": "Kalibreringsvärde",
+          "gamma_curve": "Gamma kurva",
+          "max_power": "Max effekt",
+          "min_power": "Min effekt"
+        },
+        "data_description": {
+          "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
+          "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20"
+        }
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Autostart",
+          "playbooks": "Playbooks",
+          "repeat": "Repetera",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
+          "playbooks": "Lägg in en playbook per linje. Exampel \n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        }
+      },
+      "advanced_options": {
+        "data": {
+          "calculation_enabled_condition": "Beräkningsaktiverat villkor",
+          "area": "Energi integration method",
+          "ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
+          "multiply_factor": "Multipliceringsfaktor",
+          "multiply_factor_standby": "Multipliceringsfaktor för standby",
+          "unavailable_power": "Otillgänglig effekt"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
+          "ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
           "multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
           "multiply_factor_standby": "Om multipliceringsfaktor ska läggas på standby ström",
-          "playbooks": "Lägg in en playbook per linje. Exampel \n\nprogram1: washing_machine/program1.csv",
+          "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+        }
+      },
+      "basic_options": {
+        "data": {
+          "create_energy_sensor": "Skapa energisensor",
+          "create_utility_meters": "Skapa bruksmätare",
+          "name": "Namn",
+          "standby_power": "Standby effekt"
+        }
+      },
+      "real_power": {
+        "data": {
+          "device": "Enhet"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "name": "Namn",
+          "on_time": "Igång tid",
+          "unit_of_measurement": "Mätenhet",
+          "update_frequency": "Uppdateringsfrekvens",
+          "value": "Värde",
+          "value_template": "Värdemall"
+        }
+      },
+      "fixed": {
+        "data": {
+          "power": "effekt",
+          "power_template": "Effektmall",
+          "self_usage_included": "Self usage included",
+          "states_power": "Effekttillstånd"
+        },
+        "data_description": {
           "power_template": "Mall för att beräkna effekten i W",
-          "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
-          "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
+          "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan"
+        }
+      },
+      "utility_meter_options": {
+        "data": {
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
       }

@@ -266,67 +266,115 @@
     },
     "step": {
       "init": {
+        "data": {},
+        "data_description": {}
+      },
+      "group": {
         "data": {
           "area": "Zone",
-          "attribute": "Attribut",
-          "autostart": "Démarrage automatique",
-          "calculation_enabled_condition": "Condition de calcul activé",
-          "calibrate": "Valeurs d'étalonnage",
-          "create_energy_sensor": "Créer un capteur d'énergie",
-          "create_utility_meters": "Créer un compteur d'électricité",
           "device": "Device",
-          "energy_integration_method": "Méthode d'intégration énergétique",
-          "gamma_curve": "Courbe gamma",
           "group_energy_entities": "Entités d'énergies supplémentaires",
           "group_member_sensors": "Membres capteurs powercalc",
           "group_power_entities": "Entités de puissances supplémentaires",
           "hide_members": "Cacher membres",
-          "ignore_unavailable_state": "Ignorer l'état indisponible",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "max_power": "Puissance Max",
-          "min_power": "Puissance Min",
-          "multiply_factor": "Facteur de multiplication",
-          "multiply_factor_standby": "Multiply factor standby",
-          "name": "Nom",
-          "on_time": "Temps de fonctionnement",
-          "playbooks": "Playbooks",
-          "power": "Puissance",
-          "power_template": "Modèle de puissance",
-          "repeat": "Répéter",
-          "self_usage_included": "Self usage included",
-          "standby_power": "Consommation en veille",
-          "states_power": "Etats de puissance",
-          "states_trigger": "State trigger",
-          "sub_groups": "Sous-groupes",
-          "unavailable_power": "Alimentation indisponible",
-          "unit_of_measurement": "Unité de mesure",
-          "update_frequency": "Fréquence de mise à jour",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "value": "Valeur",
-          "value_template": "Modèle de valeur"
+          "sub_groups": "Sous-groupes"
         },
         "data_description": {
           "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
-          "attribute": "Spécifiez l'attribut. Lorsqu'il est laissé vide, la luminosité des lumières et le pourcentage des ventilateurs seront affichés.",
-          "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
-          "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
-          "calibrate": "Mettez une valeur d'étalonnage sur chaque ligne. Exemple\n\n1 : 20",
           "device": "Add the group entities powercalc creates to an existing device",
           "group_energy_entities": "Capteurs d'énergie supplémentaires (kWh) de votre installation HA à inclure",
           "group_member_sensors": "Capteurs Powercalc à inclure dans le groupe",
           "group_power_entities": "Capteurs de puissance supplémentaires (W) de votre installation HA à inclure",
-          "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe"
+        }
+      },
+      "linear": {
+        "data": {
+          "attribute": "Attribut",
+          "calibrate": "Valeurs d'étalonnage",
+          "gamma_curve": "Courbe gamma",
+          "max_power": "Puissance Max",
+          "min_power": "Puissance Min"
+        },
+        "data_description": {
+          "attribute": "Spécifiez l'attribut. Lorsqu'il est laissé vide, la luminosité des lumières et le pourcentage des ventilateurs seront affichés.",
+          "calibrate": "Mettez une valeur d'étalonnage sur chaque ligne. Exemple\n\n1 : 20"
+        }
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Démarrage automatique",
+          "playbooks": "Playbooks",
+          "repeat": "Répéter",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Indique de démarrer un certain playbook lorsque HA démarre. c'est-à-dire 'programme1'",
+          "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogramme1 : lave-linge/programme1.csv",
+          "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        }
+      },
+      "advanced_options": {
+        "data": {
+          "calculation_enabled_condition": "Condition de calcul activé",
+          "area": "Méthode d'intégration énergétique",
+          "ignore_unavailable_state": "Ignorer l'état indisponible",
+          "multiply_factor": "Facteur de multiplication",
+          "multiply_factor_standby": "Multiply factor standby",
+          "unavailable_power": "Alimentation indisponible"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "La stratégie de calcul de puissance configurée ne sera exécutée que lorsque ce modèle sera évalué à vrai ou 1, sinon le capteur de puissance affichera 0",
+          "ignore_unavailable_state": "Activez ce paramètre lorsque vous souhaitez que le capteur de puissance reste disponible même si l'entité source n'est pas disponible",
           "multiply_factor": "Multiplie la puissance calculée par ce rapport. Peut être utile pour les groupes légers",
           "multiply_factor_standby": "Whether to also apply multiplication factor to standby power",
-          "playbooks": "Entrez un playbook sur chaque ligne. Exemple\n\nprogramme1 : lave-linge/programme1.csv",
+          "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible"
+        }
+      },
+      "basic_options": {
+        "data": {
+          "create_energy_sensor": "Créer un capteur d'énergie",
+          "create_utility_meters": "Créer un compteur d'électricité",
+          "name": "Nom",
+          "standby_power": "Consommation en veille"
+        }
+      },
+      "real_power": {
+        "data": {
+          "device": "Device"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "name": "Nom",
+          "on_time": "Temps de fonctionnement",
+          "unit_of_measurement": "Unité de mesure",
+          "update_frequency": "Fréquence de mise à jour",
+          "value": "Valeur",
+          "value_template": "Modèle de valeur"
+        }
+      },
+      "fixed": {
+        "data": {
+          "power": "Puissance",
+          "power_template": "Modèle de puissance",
+          "self_usage_included": "Self usage included",
+          "states_power": "Etats de puissance"
+        },
+        "data_description": {
           "power_template": "Le modèle sera évalué pour obtenir la valeur de puissance en W",
-          "repeat": "Basculer lorsque vous souhaitez continuer à répéter le playbook une fois qu'il est terminé",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-          "sub_groups": "Tous les capteurs contenant des sous-groupes sélectionnés seront également ajoutés à ce groupe",
-          "unavailable_power": "Puissance en W pour enregistrer lorsque l'entité source a un état indisponible",
+          "states_power": "Une paire 'état : alimentation' sur chaque ligne, voir l'exemple ci-dessus"
+        }
+      },
+      "utility_meter_options": {
+        "data": {
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
       }

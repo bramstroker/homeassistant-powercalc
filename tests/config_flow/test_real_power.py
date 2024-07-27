@@ -98,23 +98,27 @@ async def test_real_power_options(hass: HomeAssistant) -> None:
             CONF_NAME: "Some name",
             CONF_ENTITY_ID: "sensor.my_real_power",
             CONF_SENSOR_TYPE: SensorType.REAL_POWER,
+            CONF_CREATE_UTILITY_METERS: False,
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_CREATE_UTILITY_METERS: True},
+    )
 
-    user_input = {
-        CONF_ENTITY_ID: "sensor.my_new_real_power",
-    }
+    result = await initialize_options_flow(hass, entry, Steps.REAL_POWER)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input=user_input,
+        user_input={CONF_ENTITY_ID: "sensor.my_new_real_power"},
     )
 
     await hass.async_block_till_done()
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_ENTITY_ID] == "sensor.my_new_real_power"
+    assert entry.data[CONF_CREATE_UTILITY_METERS]
 
     state = hass.states.get("sensor.some_name_energy")
     assert state

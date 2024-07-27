@@ -266,67 +266,115 @@
     },
     "step": {
       "init": {
+        "data": {},
+        "data_description": {}
+      },
+      "group": {
         "data": {
           "area": "Obszar",
-          "attribute": "Atrybut",
-          "autostart": "Autostart",
-          "calculation_enabled_condition": "Warunek włączenia obliczeń",
-          "calibrate": "Wartości kalibracji",
-          "create_energy_sensor": "Utwórz sensor energii",
-          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
           "device": "Urządzenie",
-          "energy_integration_method": "Metoda całkowania energii",
-          "gamma_curve": "Krzywa gamma",
           "group_energy_entities": "Członek encji energii",
           "group_member_sensors": "Członek czujników powercalc",
           "group_power_entities": "Członek encji mocy",
           "hide_members": "Ukryj członków",
-          "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "max_power": "Maksymalna moc",
-          "min_power": "Minimalna moc",
-          "multiply_factor": "Mnożnik",
-          "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
-          "name": "Nazwa",
-          "on_time": "Sumaryczny czas włączenia",
-          "playbooks": "Playbook'i",
-          "power": "Moc",
-          "power_template": "Szablon mocy",
-          "repeat": "Powtarzaj",
-          "self_usage_included": "Self usage included",
-          "standby_power": "Moc w trybie czuwania",
-          "states_power": "Moce stanów",
-          "states_trigger": "State trigger",
-          "sub_groups": "Podgrupy",
-          "unavailable_power": "Wartość mocy dla niedostęności",
-          "unit_of_measurement": "Jednostka pomiaru",
-          "update_frequency": "Częstotliwość aktualizacji",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "value": "Wartość",
-          "value_template": "Szablon wartości"
+          "sub_groups": "Podgrupy"
         },
         "data_description": {
           "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
-          "attribute": "Określ Atrybut. Gdy pole pozostanie puste, będzie to jasność dla świateł i procent dla wentylatorów",
-          "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
-          "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
-          "calibrate": "Umieść wartość kalibracji w każdym wierszu. Przykład\n\n1: 20",
           "device": "Dodaj encje grupy utworzone przez Powercalc dla istniejącego urządzenia",
           "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
           "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
           "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-          "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
+        }
+      },
+      "linear": {
+        "data": {
+          "attribute": "Atrybut",
+          "calibrate": "Wartości kalibracji",
+          "gamma_curve": "Krzywa gamma",
+          "max_power": "Maksymalna moc",
+          "min_power": "Minimalna moc"
+        },
+        "data_description": {
+          "attribute": "Określ Atrybut. Gdy pole pozostanie puste, będzie to jasność dla świateł i procent dla wentylatorów",
+          "calibrate": "Umieść wartość kalibracji w każdym wierszu. Przykład\n\n1: 20"
+        }
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Autostart",
+          "playbooks": "Playbook'i",
+          "repeat": "Powtarzaj",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
+          "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
+          "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        }
+      },
+      "advanced_options": {
+        "data": {
+          "calculation_enabled_condition": "Warunek włączenia obliczeń",
+          "area": "Metoda całkowania energii",
+          "ignore_unavailable_state": "Ignoruj stan niedostępny",
+          "multiply_factor": "Mnożnik",
+          "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
+          "unavailable_power": "Wartość mocy dla niedostęności"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
+          "ignore_unavailable_state": "Przełącz to ustawienie, jeśli chcesz, aby czujnik mocy pozostał dostępny, nawet jeśli encja źródłowa jest niedostępna",
           "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
           "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
-          "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
+          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)"
+        }
+      },
+      "basic_options": {
+        "data": {
+          "create_energy_sensor": "Utwórz sensor energii",
+          "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
+          "name": "Nazwa",
+          "standby_power": "Moc w trybie czuwania"
+        }
+      },
+      "real_power": {
+        "data": {
+          "device": "Urządzenie"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "name": "Nazwa",
+          "on_time": "Sumaryczny czas włączenia",
+          "unit_of_measurement": "Jednostka pomiaru",
+          "update_frequency": "Częstotliwość aktualizacji",
+          "value": "Wartość",
+          "value_template": "Szablon wartości"
+        }
+      },
+      "fixed": {
+        "data": {
+          "power": "Moc",
+          "power_template": "Szablon mocy",
+          "self_usage_included": "Self usage included",
+          "states_power": "Moce stanów"
+        },
+        "data_description": {
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
-          "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-          "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy",
-          "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
+          "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej"
+        }
+      },
+      "utility_meter_options": {
+        "data": {
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
       }

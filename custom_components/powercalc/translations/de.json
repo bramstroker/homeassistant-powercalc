@@ -266,67 +266,115 @@
     },
     "step": {
       "init": {
+        "data": {},
+        "data_description": {}
+      },
+      "group": {
         "data": {
           "area": "Bereich",
-          "attribute": "Attribut",
-          "autostart": "Autostart",
-          "calculation_enabled_condition": "Bedingung zur Aktivierung der Berechnung",
-          "calibrate": "Kalibrierungswerte",
-          "create_energy_sensor": "Energiessensor erstellen",
-          "create_utility_meters": "Utilitymeter erstellen",
           "device": "Gerät",
-          "energy_integration_method": "Integrations/Summierungs-Methode",
-          "gamma_curve": "Gammakurve",
           "group_energy_entities": "Energie-Entitäten der Gruppe",
           "group_member_sensors": "Mitglied powercalc sensors",
           "group_power_entities": "Leistungs-Entitäten der Gruppe",
           "hide_members": "Mitglieder ausblenden",
-          "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "include_non_powercalc_sensors": "Nicht powercalc Sensoren einschließen",
-          "max_power": "Maximale Leistung",
-          "min_power": "Minimale Leistung",
-          "multiply_factor": "Multiplikationsfaktor",
-          "multiply_factor_standby": "Multiplikationsfaktor Standby",
-          "name": "Name",
-          "on_time": "Dauer",
-          "playbooks": "Playbook",
-          "power": "Leistung",
-          "power_template": "Leistung-Template",
-          "repeat": "Wiederholen",
-          "self_usage_included": "Eigenverbrauch inklusive",
-          "standby_power": "Standby-Leistung",
-          "states_power": "Leistung je Zustand",
-          "states_trigger": "Status Auslöser",
-          "sub_groups": "Untergruppen",
-          "unavailable_power": "Leistung im Status 'nicht verfügbar'",
-          "unit_of_measurement": "Maßeinheit",
-          "update_frequency": "Aktualisierungsfrequenz",
-          "utility_meter_tariffs": "Verbrauchszähler Tarife",
-          "value": "Wert",
-          "value_template": "Wert-Template"
+          "sub_groups": "Untergruppen"
         },
         "data_description": {
           "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
-          "attribute": "Geben Sie das Attribut an. Bleibt es leer, wird die Helligkeit für Lichter und der Prozentsatz für Ventilatoren angegeben",
-          "autostart": "Geben Sie an, dass ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
-          "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
-          "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20",
           "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
           "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
           "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
           "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
-          "ignore_unavailable_state": "Schalten Sie diese Einstellung um, wenn Sie möchten, dass der Leistungssensor auch dann verfügbar bleibt, wenn die Quell-Entität nicht verfügbar ist",
           "include_non_powercalc_sensors": "Legen Sie fest, ob bei Verwendung der Bereichsoption auch NichtPowercalcSensoren berücksichtigt werden sollen",
+          "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt"
+        }
+      },
+      "linear": {
+        "data": {
+          "attribute": "Attribut",
+          "calibrate": "Kalibrierungswerte",
+          "gamma_curve": "Gammakurve",
+          "max_power": "Maximale Leistung",
+          "min_power": "Minimale Leistung"
+        },
+        "data_description": {
+          "attribute": "Geben Sie das Attribut an. Bleibt es leer, wird die Helligkeit für Lichter und der Prozentsatz für Ventilatoren angegeben",
+          "calibrate": "Geben Sie in jeder Zeile einen Kalibrierungswert an. Beispiel\n\n1: 20"
+        }
+      },
+      "playbook": {
+        "data": {
+          "autostart": "Autostart",
+          "playbooks": "Playbook",
+          "repeat": "Wiederholen",
+          "states_trigger": "Status Auslöser"
+        },
+        "data_description": {
+          "autostart": "Geben Sie an, dass ein bestimmtes Playbook beim Start von HA gestartet werden soll. i.e. 'program1'",
+          "playbooks": "Geben Sie in jeder Zeile ein Playbook ein. Beispiel\n\nprogram1: washing_machine/program1.csv",
+          "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
+          "states_trigger": "Auslösen eines Playbooks auf der Grundlage einer Zustandsänderung. Beispiel"
+        }
+      },
+      "advanced_options": {
+        "data": {
+          "calculation_enabled_condition": "Bedingung zur Aktivierung der Berechnung",
+          "area": "Integrations/Summierungs-Methode",
+          "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
+          "multiply_factor": "Multiplikationsfaktor",
+          "multiply_factor_standby": "Multiplikationsfaktor Standby",
+          "unavailable_power": "Leistung im Status 'nicht verfügbar'"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Die konfigurierte Leistungsberechnungsstrategie wird nur ausgeführt, wenn diese Vorlage den Wert true oder 1 ergibt, andernfalls zeigt der Leistungsmesser 0 an",
+          "ignore_unavailable_state": "Schalten Sie diese Einstellung um, wenn Sie möchten, dass der Leistungssensor auch dann verfügbar bleibt, wenn die Quell-Entität nicht verfügbar ist",
           "multiply_factor": "Multipliziert die berechnete Leistung mit diesem Faktor. Kann für Licht-Gruppen nützlich sein",
           "multiply_factor_standby": "ob der Multiplikationsfaktor auch auf die Standby-Leistung angewendet werden soll",
-          "playbooks": "Geben Sie in jeder Zeile ein Playbook ein. Beispiel\n\nprogram1: washing_machine/program1.csv",
+          "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist"
+        }
+      },
+      "basic_options": {
+        "data": {
+          "create_energy_sensor": "Energiessensor erstellen",
+          "create_utility_meters": "Utilitymeter erstellen",
+          "name": "Name",
+          "standby_power": "Standby-Leistung"
+        }
+      },
+      "real_power": {
+        "data": {
+          "device": "Gerät"
+        }
+      },
+      "daily_energy": {
+        "data": {
+          "name": "Name",
+          "on_time": "Dauer",
+          "unit_of_measurement": "Maßeinheit",
+          "update_frequency": "Aktualisierungsfrequenz",
+          "value": "Wert",
+          "value_template": "Wert-Template"
+        }
+      },
+      "fixed": {
+        "data": {
+          "power": "Leistung",
+          "power_template": "Leistung-Template",
+          "self_usage_included": "Eigenverbrauch inklusive",
+          "states_power": "Leistung je Zustand"
+        },
+        "data_description": {
           "power_template": "Template wird ausgewertet, um den Leistungswert in W zu erhalten",
-          "repeat": "Umschalten, wenn Sie das Playbook nach Abschluss wiederholen möchten",
           "self_usage_included": "Ob der Leistungswert die vom intelligenten Schalter selbst verbrauchte Leistung enthält.",
-          "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben",
-          "states_trigger": "Auslösen eines Playbooks auf der Grundlage einer Zustandsänderung. Beispiel",
-          "sub_groups": "Alle Sensoren aus den ausgewählten Untergruppen werden ebenfalls zu dieser Gruppe hinzugefügt",
-          "unavailable_power": "Leistung in W zur Aufzeichnung, wenn die Quell-Entität nicht verfügbar ist",
+          "states_power": "Ein 'state: power' Paar in jeder Zeile, siehe Beispiel oben"
+        }
+      },
+      "utility_meter_options": {
+        "data": {
+          "utility_meter_tariffs": "Verbrauchszähler Tarife"
+        },
+        "data_description": {
           "utility_meter_tariffs": "Eine Liste der unterstützten Tarife, leer lassen, wenn nur ein einziger Tarif benötigt wird."
         }
       }

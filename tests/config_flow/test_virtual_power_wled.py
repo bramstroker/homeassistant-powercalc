@@ -5,6 +5,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 
 import custom_components.test.sensor as test_sensor_platform
+from custom_components.powercalc.config_flow import Steps
 from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_POWER_FACTOR,
@@ -61,7 +62,7 @@ async def test_wled_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.WLED)
 
     user_input = {CONF_VOLTAGE: 12}
     result = await hass.config_entries.options.async_configure(
