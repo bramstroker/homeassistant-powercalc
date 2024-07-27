@@ -319,19 +319,15 @@
       "daily_energy": {
         "title": "Daily energy options",
         "data": {
-          "create_utility_meters": "Create utility meters",
-          "group": "Add to group",
           "name": "Name",
           "on_time": "On time",
           "start_time": "Start time",
-          "unique_id": "Unique id",
           "unit_of_measurement": "Unit of measurement",
           "update_frequency": "Update frequency",
           "value": "Value",
           "value_template": "Value template"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
           "on_time": "When left empty defaults to 1 day. always on",
           "update_frequency": "time in seconds between state updates of the sensor"
         }
@@ -355,8 +351,6 @@
         "title": "Group options",
         "data": {
           "area": "Area",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
           "device": "Device",
           "group_energy_entities": "Additional energy entities",
           "group_member_sensors": "Member powercalc sensors",
@@ -367,14 +361,27 @@
         },
         "data_description": {
           "area": "Adds all power sensors from the specified area",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "device": "Add the group entities powercalc creates to an existing device",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
           "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
+        }
+      },
+      "init": {
+        "menu_options": {
+          "advanced_options": "Advanced options",
+          "basic_options": "Basic options",
+          "daily_energy": "Daily energy options",
+          "fixed": "Fixed options",
+          "group": "Group options",
+          "linear": "Linear options",
+          "playbook": "Playbook options",
+          "multi_switch": "Multi switch options",
+          "real_power": "Real power options",
+          "utility_meter_options": "Utility meter options",
+          "wled": "WLED options"
         }
       },
       "linear": {
