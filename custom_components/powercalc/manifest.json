@@ -17,7 +17,7 @@
     "utility_meter"
   ],
   "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
-  "iot_class": "local_polling",
+  "iot_class": "calculated",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "requirements": [
     "numpy>=1.21.1"
