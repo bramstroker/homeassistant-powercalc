@@ -271,11 +271,16 @@ SCHEMA_POWER_LINEAR = vol.Schema(
     },
 )
 
-SCHEMA_POWER_MULTI_SWITCH = vol.Schema(
+SCHEMA_POWER_MULTI_SWITCH_LIBRARY = vol.Schema(
     {
         vol.Required(CONF_ENTITIES): selector.EntitySelector(
             selector.EntitySelectorConfig(domain=Platform.SWITCH, multiple=True),
         ),
+    },
+)
+SCHEMA_POWER_MULTI_SWITCH = vol.Schema(
+    {
+        **SCHEMA_POWER_MULTI_SWITCH_LIBRARY.schema,
         vol.Required(CONF_POWER): vol.Coerce(float),
         vol.Required(CONF_POWER_OFF): vol.Coerce(float),
     },
@@ -500,13 +505,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     def create_schema_multi_switch(self) -> vol.Schema:
         """Create the config schema for multi switch strategy."""
-        schema = SCHEMA_POWER_MULTI_SWITCH
-        # Remove power options if we are in library flow as they are defined in the power profile
-        if self.is_library_flow:
-            del schema.schema[CONF_POWER]
-            del schema.schema[CONF_POWER_OFF]
-            schema = vol.Schema(schema.schema)
-        return schema
+        return SCHEMA_POWER_MULTI_SWITCH if not self.is_library_flow else SCHEMA_POWER_MULTI_SWITCH_LIBRARY
 
     def create_schema_virtual_power(
         self,
