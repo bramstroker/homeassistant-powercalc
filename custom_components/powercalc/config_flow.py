@@ -1419,14 +1419,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Build the basic options schema. depending on the selected sensor type."""
         data_schema: vol.Schema = vol.Schema({})
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            data_schema = (
-                vol.Schema(
-                    {
-                        vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
-                    },
-                )
-                .extend(SCHEMA_POWER_OPTIONS.schema)
-            )
+            data_schema = vol.Schema(
+                {
+                    vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
+                },
+            ).extend(SCHEMA_POWER_OPTIONS.schema)
 
         if self.sensor_type == SensorType.REAL_POWER:
             data_schema = SCHEMA_REAL_POWER_OPTIONS
