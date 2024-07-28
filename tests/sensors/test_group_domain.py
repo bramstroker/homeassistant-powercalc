@@ -13,6 +13,7 @@ from pytest_homeassistant_custom_component.common import (
 
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
+    CONF_EXCLUDE_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_SENSOR_TYPE,
@@ -46,15 +47,21 @@ async def test_domain_group_all(hass: HomeAssistant) -> None:
                 platform="sensor",
                 device_class=SensorDeviceClass.POWER,
             ),
+            "sensor.d_power": RegistryEntry(
+                entity_id="sensor.c_power",
+                unique_id="4444",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
             "sensor.a_energy": RegistryEntry(
                 entity_id="sensor.a_energy",
-                unique_id="4444",
+                unique_id="5555",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
             ),
             "sensor.b_energy": RegistryEntry(
                 entity_id="sensor.b_energy",
-                unique_id="5555",
+                unique_id="6666",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
             ),
@@ -68,6 +75,7 @@ async def test_domain_group_all(hass: HomeAssistant) -> None:
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_GROUP_TYPE: GroupType.DOMAIN,
             CONF_NAME: "GroupAll",
+            CONF_EXCLUDE_ENTITIES: ["sensor.d_power"],
             CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )

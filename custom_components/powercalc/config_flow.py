@@ -41,6 +41,7 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_EXCLUDE_ENTITIES,
     CONF_FIXED,
     CONF_GAMMA_CURVE,
     CONF_GROUP,
@@ -345,6 +346,13 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=["all"] + [cls.value for cls in Platform],
+            ),
+        ),
+        vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=[SensorDeviceClass.ENERGY, SensorDeviceClass.POWER],
+                multiple=True,
             ),
         ),
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,

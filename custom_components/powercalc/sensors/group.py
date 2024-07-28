@@ -63,6 +63,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
+    CONF_EXCLUDE_ENTITIES,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -587,7 +588,8 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
                 entities,
                 EnergySensor if isinstance(self, GroupedEnergySensor) else PowerSensor,
             )
-        self._entities = set(entities)
+        excluded_entities = self._sensor_config.get(CONF_EXCLUDE_ENTITIES) or []
+        self._entities = set({entity for entity in entities if entity not in excluded_entities})
 
     async def on_start(self, _: Any) -> None:  # noqa
         """Initialize group sensor when HA is starting."""
