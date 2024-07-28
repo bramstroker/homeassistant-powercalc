@@ -143,11 +143,9 @@ from .sensors.daily_energy import (
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group import (
     add_to_associated_group,
-    create_domain_group_sensor,
-    create_group_sensors_gui,
+    create_group_sensors,
     create_group_sensors_yaml,
 )
-from .sensors.group_standby import create_general_standby_sensors
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -614,7 +612,7 @@ async def create_sensors(
         merged_sensor_config = get_merged_sensor_configuration(global_config, config)
         sensor_type = config.get(CONF_SENSOR_TYPE)
         if sensor_type and sensor_type == SensorType.GROUP:
-            return await create_group_sensors(hass, merged_sensor_config, config_entry)
+            return EntitiesBucket(new=await create_group_sensors(hass, merged_sensor_config, config_entry))
 
         return await create_individual_sensors(
             hass,
@@ -698,32 +696,6 @@ async def create_sensors(
         )
 
     return entities_to_add
-
-
-async def create_group_sensors(hass: HomeAssistant, sensor_config: ConfigType, config_entry: ConfigEntry | None) -> EntitiesBucket:
-    """Create group sensors for a given entity."""
-    group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
-    if group_type == GroupType.DOMAIN:
-        return EntitiesBucket(
-            new=await create_domain_group_sensor(
-                hass,
-                sensor_config,
-            ),
-        )
-    if group_type == GroupType.STANDBY:
-        return EntitiesBucket(
-            new=await create_general_standby_sensors(hass, sensor_config),
-        )
-
-    if group_type == GroupType.CUSTOM and config_entry:
-        return EntitiesBucket(
-            new=await create_group_sensors_gui(
-                hass=hass,
-                entry=config_entry,
-                sensor_config=sensor_config,
-            ),
-        )
-    return EntitiesBucket()  # pragma: no cover
 
 
 async def create_individual_sensors(

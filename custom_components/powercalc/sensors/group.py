@@ -88,6 +88,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
+from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.group_include.include import resolve_include_entities
 
 from .abstract import (
@@ -98,6 +99,7 @@ from .abstract import (
     generate_power_sensor_name,
 )
 from .energy import EnergySensor, VirtualEnergySensor
+from .group_standby import create_general_standby_sensors
 from .power import PowerSensor
 from .utility_meter import create_utility_meters
 
@@ -121,6 +123,26 @@ UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
 }
 
 
+async def create_group_sensors(hass: HomeAssistant, sensor_config: ConfigType, config_entry: ConfigEntry | None) -> list[Entity]:
+    """Create group sensors for a given sensor configuration."""
+    group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
+    if group_type == GroupType.DOMAIN:
+        return await create_domain_group_sensor(
+            hass,
+            sensor_config,
+        )
+    if group_type == GroupType.STANDBY:
+        return await create_general_standby_sensors(hass, sensor_config)
+
+    if group_type == GroupType.CUSTOM and config_entry:
+        return await create_group_sensors_gui(
+            hass=hass,
+            entry=config_entry,
+            sensor_config=sensor_config,
+        )
+    raise SensorConfigurationError(f"Group type {group_type} invalid")  # pragma: no cover
+
+
 async def create_group_sensors_yaml(
     group_name: str,
     sensor_config: dict[str, Any],
@@ -140,24 +162,7 @@ async def create_group_sensors_yaml(
             filters,
         )
 
-    return await create_group_sensors(hass, group_name, sensor_config, set(power_sensor_ids), set(energy_sensor_ids))
-
-
-def filter_entity_list_by_class(
-    all_entities: list,
-    class_name: type[EnergySensor | PowerSensor],
-    default_filters: list[Callable] | None = None,
-) -> list[str]:
-    filter_list = default_filters.copy() if default_filters else []
-    filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
-    filter_list.append(lambda elm: isinstance(elm, class_name))
-    return [
-        x.entity_id
-        for x in filter(
-            lambda x: all(f(x) for f in filter_list),
-            all_entities,
-        )
-    ]
+    return await create_group_sensors_custom(hass, group_name, sensor_config, set(power_sensor_ids), set(energy_sensor_ids))
 
 
 async def create_group_sensors_gui(
@@ -176,10 +181,10 @@ async def create_group_sensors_gui(
 
     energy_sensor_ids = await resolve_entity_ids_recursively(hass, entry, SensorDeviceClass.ENERGY)
 
-    return await create_group_sensors(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
+    return await create_group_sensors_custom(hass, group_name, sensor_config, power_sensor_ids, energy_sensor_ids)
 
 
-async def create_group_sensors(
+async def create_group_sensors_custom(
     hass: HomeAssistant,
     group_name: str,
     sensor_config: dict[str, Any],
@@ -234,7 +239,7 @@ async def create_domain_group_sensor(
         config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
     name: str = config.get(CONF_NAME, f"All {domain}")
     config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-    return await create_group_sensors(
+    return await create_group_sensors_custom(
         hass,
         name,
         config,
@@ -344,6 +349,23 @@ async def add_to_associated_group(
         data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: list(member_sensors)},
     )
     return group_entry
+
+
+def filter_entity_list_by_class(
+    all_entities: list,
+    class_name: type[EnergySensor | PowerSensor],
+    default_filters: list[Callable] | None = None,
+) -> list[str]:
+    filter_list = default_filters.copy() if default_filters else []
+    filter_list.append(lambda elm: not isinstance(elm, GroupedSensor))
+    filter_list.append(lambda elm: isinstance(elm, class_name))
+    return [
+        x.entity_id
+        for x in filter(
+            lambda x: all(f(x) for f in filter_list),
+            all_entities,
+        )
+    ]
 
 
 async def resolve_entity_ids_recursively(
