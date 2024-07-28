@@ -40,7 +40,8 @@ DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 async def select_menu_item(
     hass: HomeAssistant,
-    menu_item: SensorType | str,
+    menu_item: Steps,
+    next_step_id: Steps | None = None,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
     result = await hass.config_entries.flow.async_init(
@@ -53,9 +54,18 @@ async def select_menu_item(
         {"next_step_id": menu_item},
     )
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    if isinstance(menu_item, SensorType):
-        assert result["step_id"] == menu_item
+    if menu_item == Steps.MENU_GROUP:
+        assert result["type"] == data_entry_flow.FlowResultType.MENU
+    else:
+        assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    if next_step_id:
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {"next_step_id": next_step_id},
+        )
+        assert result["type"] == data_entry_flow.FlowResultType.FORM
+        assert result["step_id"] == next_step_id
 
     return result
 
@@ -139,7 +149,7 @@ async def goto_virtual_power_strategy_step(
     elif CONF_MODE not in user_input:
         user_input[CONF_MODE] = strategy
 
-    result = await select_menu_item(hass, SensorType.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,

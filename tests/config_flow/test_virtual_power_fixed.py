@@ -176,7 +176,7 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant) -> N
 
 
 async def test_entity_selection_mandatory(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
@@ -198,7 +198,7 @@ async def test_global_configuration_is_applied_to_field_default(
     }
     await run_powercalc_setup(hass, {}, global_config)
 
-    result = await select_menu_item(hass, SensorType.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {

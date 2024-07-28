@@ -42,6 +42,15 @@
         },
         "title": "Create a daily fixed sensor"
       },
+      "domain_group": {
+        "data": {
+          "name": "Name",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "domain": "Entity domain"
+        },
+        "title": "Create a domain based group sensor"
+      },
       "fixed": {
         "data": {
           "power": "Power",
