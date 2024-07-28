@@ -1469,7 +1469,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     async def async_handle_strategy_options_step(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the option processing for the selected strategy."""
         if not self.strategy:
-            return self.async_abort(reason="no_strategy_selected")
+            return self.async_abort(reason="no_strategy_selected")  # pragma: no cover
 
         step = STRATEGY_STEP_MAPPING.get(self.strategy, Steps.FIXED)
 
