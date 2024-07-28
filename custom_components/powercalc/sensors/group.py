@@ -578,20 +578,26 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if self.group_type != GroupType.DOMAIN:
             return
         domain = self._sensor_config.get(CONF_DOMAIN)
-        domain_entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
-        if not domain_entities:
-            _LOGGER.warning("No entities found for domain %s", domain)
-            self._attr_available = False
-            return
-        entities = filter_entity_list_by_class(
-            domain_entities,
-            EnergySensor if isinstance(self, GroupedEnergySensor) else PowerSensor,
-        )
+        if domain == "all":
+            entity_registry = er.async_get(self.hass)
+            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]
+        else:
+            entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
+            entities = filter_entity_list_by_class(
+                entities,
+                EnergySensor if isinstance(self, GroupedEnergySensor) else PowerSensor,
+            )
         self._entities = set(entities)
 
     async def on_start(self, _: Any) -> None:  # noqa
         """Initialize group sensor when HA is starting."""
         await self.init_domain_group()
+
+        if not self._entities:
+            _LOGGER.warning("No entities for group sensor %s, setting to unavailable", self.entity_id)
+            self._attr_available = False
+            self.async_write_ha_state()
+            return
 
         self.async_on_remove(
             async_track_state_change_event(

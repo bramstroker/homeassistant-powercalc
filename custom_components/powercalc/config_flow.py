@@ -343,7 +343,9 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=[cls.value for cls in Platform]),
+            selector.SelectSelectorConfig(
+                options=["all"] + [cls.value for cls in Platform],
+            ),
         ),
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
