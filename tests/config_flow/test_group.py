@@ -605,6 +605,17 @@ async def test_domain_group_flow(hass: HomeAssistant) -> None:
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }
+    config_entry: ConfigEntry = result["result"]
 
     power_state = hass.states.get("sensor.my_group_sensor_power")
     assert power_state
+
+    result = await hass.config_entries.options.async_init(
+        config_entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert Steps.BASIC_OPTIONS in result["menu_options"]
+    assert Steps.GROUP not in result["menu_options"]
+    assert Steps.UTILITY_METER_OPTIONS not in result["menu_options"]

@@ -131,6 +131,14 @@
         "description": "Select the device model. See the [list]({supported_models_link}) of supported models for more information",
         "title": "Model config"
       },
+      "menu_group": {
+        "menu_options": {
+          "group": "Standard group",
+          "domain_group": "Domain based group"
+        },
+        "title": "Choose the group type",
+        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
+      },
       "multi_switch": {
         "data": {
           "entities": "Switch entities",
