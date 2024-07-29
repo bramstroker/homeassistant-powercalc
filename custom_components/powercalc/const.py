@@ -54,6 +54,7 @@ CONF_ENERGY_SENSOR_NAMING = "energy_sensor_naming"
 CONF_ENERGY_SENSOR_FRIENDLY_NAMING = "energy_sensor_friendly_naming"
 CONF_ENERGY_SENSOR_PRECISION = "energy_sensor_precision"
 CONF_ENERGY_SENSOR_UNIT_PREFIX = "energy_sensor_unit_prefix"
+CONF_EXCLUDE_ENTITIES = "exclude_entities"
 CONF_FILTER = "filter"
 CONF_FIXED = "fixed"
 CONF_FORCE_UPDATE_FREQUENCY = "force_update_frequency"
@@ -63,6 +64,7 @@ CONF_GROUP = "group"
 CONF_GROUP_POWER_ENTITIES = "group_power_entities"
 CONF_GROUP_ENERGY_ENTITIES = "group_energy_entities"
 CONF_GROUP_MEMBER_SENSORS = "group_member_sensors"
+CONF_GROUP_TYPE = "group_type"
 CONF_GAMMA_CURVE = "gamma_curve"
 CONF_HIDE_MEMBERS = "hide_members"
 CONF_IGNORE_UNAVAILABLE_STATE = "ignore_unavailable_state"
@@ -211,3 +213,11 @@ class PowercalcDiscoveryType(StrEnum):
     STANDBY_GROUP = "standby_group"
     LIBRARY = "library"
     USER_YAML = "user_yaml"
+
+
+class GroupType(StrEnum):
+    """Possible group types."""
+
+    CUSTOM = "custom"
+    DOMAIN = "domain"
+    STANDBY = "standby"

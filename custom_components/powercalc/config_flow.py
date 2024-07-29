@@ -15,6 +15,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, Confi
 from homeassistant.const import (
     CONF_ATTRIBUTE,
     CONF_DEVICE,
+    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -40,12 +41,14 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_EXCLUDE_ENTITIES,
     CONF_FIXED,
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
@@ -87,6 +90,7 @@ from .const import (
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
     CalculationStrategy,
+    GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity
@@ -104,20 +108,11 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
 
-MENU_OPTION_LIBRARY = "menu_library"
-
-SENSOR_TYPE_MENU = {
-    SensorType.VIRTUAL_POWER: "Virtual power (manual)",
-    MENU_OPTION_LIBRARY: "Virtual power (library)",
-    SensorType.GROUP: "Group",
-    SensorType.DAILY_ENERGY: "Daily energy",
-    SensorType.REAL_POWER: "Energy from real power sensor",
-}
-
 
 class Steps(StrEnum):
     ADVANCED_OPTIONS = "advanced_options"
     BASIC_OPTIONS = "basic_options"
+    DOMAIN_GROUP = "domain_group"
     GROUP = "group"
     LIBRARY = "library"
     VIRTUAL_POWER = "virtual_power"
@@ -130,6 +125,8 @@ class Steps(StrEnum):
     DAILY_ENERGY = "daily_energy"
     REAL_POWER = "real_power"
     MANUFACTURER = "manufacturer"
+    MENU_LIBRARY = "menu_library"
+    MENU_GROUP = "menu_group"
     MODEL = "model"
     SUB_PROFILE = "sub_profile"
     USER = "user"
@@ -138,20 +135,33 @@ class Steps(StrEnum):
     UTILITY_METER_OPTIONS = "utility_meter_options"
 
 
+MENU_SENSOR_TYPE = {
+    Steps.VIRTUAL_POWER: "Virtual power (manual)",
+    Steps.MENU_LIBRARY: "Virtual power (library)",
+    Steps.MENU_GROUP: "Group",
+    Steps.DAILY_ENERGY: "Daily energy",
+    Steps.REAL_POWER: "Energy from real power sensor",
+}
+
+MENU_GROUP = {
+    Steps.GROUP: "Standard group",
+    Steps.DOMAIN_GROUP: "Domain based group",
+}
+
+MENU_OPTIONS = {
+    Steps.FIXED: "Fixed options",
+    Steps.LINEAR: "Linear options",
+    Steps.MULTI_SWITCH: "Multi switch options",
+    Steps.PLAYBOOK: "Playbook options",
+    Steps.WLED: "WLED options",
+}
+
 STRATEGY_STEP_MAPPING = {
     CalculationStrategy.FIXED: Steps.FIXED,
     CalculationStrategy.LINEAR: Steps.LINEAR,
     CalculationStrategy.MULTI_SWITCH: Steps.MULTI_SWITCH,
     CalculationStrategy.PLAYBOOK: Steps.PLAYBOOK,
     CalculationStrategy.WLED: Steps.WLED,
-}
-
-MENU_OPTION_LABELS = {
-    Steps.FIXED: "Fixed options",
-    Steps.LINEAR: "Linear options",
-    Steps.MULTI_SWITCH: "Multi switch options",
-    Steps.PLAYBOOK: "Playbook options",
-    Steps.WLED: "WLED options",
 }
 
 SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
@@ -327,6 +337,26 @@ SCHEMA_GROUP = vol.Schema(
         vol.Required(CONF_NAME): str,
         vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
+    },
+)
+
+SCHEMA_GROUP_DOMAIN = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        vol.Required(CONF_DOMAIN): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=["all"] + [cls.value for cls in Platform],
+            ),
+        ),
+        vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=[SensorDeviceClass.ENERGY, SensorDeviceClass.POWER],
+                multiple=True,
+            ),
+        ),
+        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )
 
@@ -774,7 +804,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handle the initial step."""
-        return self.async_show_menu(step_id=Steps.USER, menu_options=SENSOR_TYPE_MENU)
+        return self.async_show_menu(step_id=Steps.USER, menu_options=MENU_SENSOR_TYPE)
 
     async def async_step_menu_library(
         self,
@@ -830,22 +860,11 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         strategy: CalculationStrategy,
     ) -> ConfigFlowResult:
         """Forward to the next step based on the selected strategy."""
-        if strategy == CalculationStrategy.FIXED:
-            return await self.async_step_fixed()
-
-        if strategy == CalculationStrategy.LINEAR:
-            return await self.async_step_linear()
-
-        if strategy == CalculationStrategy.MULTI_SWITCH:
-            return await self.async_step_multi_switch()
-
-        if strategy == CalculationStrategy.PLAYBOOK:
-            return await self.async_step_playbook()
-
-        if strategy == CalculationStrategy.WLED:
-            return await self.async_step_wled()
-
-        return await self.async_step_library()
+        step = STRATEGY_STEP_MAPPING.get(strategy)
+        if step is None:
+            return await self.async_step_library()
+        method = getattr(self, f"async_step_{step}")
+        return await method()  # type: ignore
 
     async def async_step_daily_energy(
         self,
@@ -873,25 +892,25 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_menu_group(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the group choice step."""
+        return self.async_show_menu(step_id=Steps.MENU_GROUP, menu_options=MENU_GROUP)
+
     async def async_step_group(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handle the flow for group sensor."""
-        self.selected_sensor_type = SensorType.GROUP
         errors = self.validate_group_input(user_input)
-        if user_input is not None:
+        if user_input is not None and not errors:
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
 
-            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
-            await self.async_set_unique_id(unique_id)
-            self._abort_if_unique_id_configured()
-
-            if not errors:
-                if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
-                    return await self.async_step_utility_meter_options()
-                return self.create_config_entry()  # type: ignore
+            unique_id = str(user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME))
+            return await self.async_handle_group_creation(unique_id)
 
         group_schema = SCHEMA_GROUP.extend(
             self.create_schema_group().schema,
@@ -904,6 +923,41 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
+
+    async def async_step_domain_group(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Handle the flow for domain based group sensor."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            self.name = user_input.get(CONF_NAME)
+            domain = user_input.get(CONF_DOMAIN)
+            self.sensor_config.update(user_input)
+            self.sensor_config.update(
+                {
+                    CONF_GROUP_TYPE: GroupType.DOMAIN,
+                },
+            )
+            unique_id = f"powercalc_domaingroup_{domain}"
+            return await self.async_handle_group_creation(unique_id)
+
+        return self.async_show_form(
+            step_id=Steps.DOMAIN_GROUP,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GROUP_DOMAIN,
+                self.get_global_powercalc_config(),
+            ),
+            errors=errors,
+        )
+
+    async def async_handle_group_creation(self, unique_id: str) -> ConfigFlowResult:
+        """Handle the group creation."""
+        self.selected_sensor_type = SensorType.GROUP
+
+        await self.async_set_unique_id(unique_id)
+        self._abort_if_unique_id_configured()
+
+        if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+            return await self.async_step_utility_meter_options()
+        return self.create_config_entry()  # type: ignore
 
     async def async_step_smart_switch(
         self,
@@ -1328,14 +1382,16 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy and self.strategy != CalculationStrategy.LUT:
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
-                menu[strategy_step] = MENU_OPTION_LABELS[strategy_step]
+                menu[strategy_step] = MENU_OPTIONS[strategy_step]
             menu[Steps.ADVANCED_OPTIONS] = "Advanced options"
         if self.sensor_type == SensorType.DAILY_ENERGY:
             menu[Steps.DAILY_ENERGY] = "Daily energy options"
         if self.sensor_type == SensorType.REAL_POWER:
             menu[Steps.REAL_POWER] = "Real power options"
         if self.sensor_type == SensorType.GROUP:
-            menu[Steps.GROUP] = "Group options"
+            group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
+            if group_type == GroupType.CUSTOM:
+                menu[Steps.GROUP] = "Group options"
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             menu[Steps.UTILITY_METER_OPTIONS] = "Utility meter options"
@@ -1413,7 +1469,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     async def async_handle_strategy_options_step(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the option processing for the selected strategy."""
         if not self.strategy:
-            return self.async_abort(reason="no_strategy_selected")
+            return self.async_abort(reason="no_strategy_selected")  # pragma: no cover
 
         step = STRATEGY_STEP_MAPPING.get(self.strategy, Steps.FIXED)
 

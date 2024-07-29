@@ -31,7 +31,7 @@ from tests.config_flow.common import (
 
 
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.DAILY_ENERGY)
+    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
 
     user_input = {CONF_NAME: "My daily energy sensor"}
     result = await hass.config_entries.flow.async_configure(
@@ -44,7 +44,7 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -
 
 
 async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.DAILY_ENERGY)
+    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -99,7 +99,7 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
 
 
 async def test_on_time_option(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.DAILY_ENERGY)
+    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -126,7 +126,7 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
 
 
 async def test_utility_meter_options(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.DAILY_ENERGY)
+    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -169,7 +169,7 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await select_menu_item(hass, SensorType.DAILY_ENERGY)
+    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",

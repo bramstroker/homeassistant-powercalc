@@ -6,7 +6,6 @@ from homeassistant.helpers.selector import SelectSelector
 
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
-    MENU_OPTION_LIBRARY,
     Steps,
 )
 from custom_components.powercalc.const import (
@@ -40,7 +39,7 @@ async def test_manually_setup_from_library(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    result = await select_menu_item(hass, MENU_OPTION_LIBRARY)
+    result = await select_menu_item(hass, Steps.MENU_LIBRARY)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Steps.VIRTUAL_POWER
 
