@@ -42,6 +42,16 @@
         },
         "title": "Criar um sensor fixo diário"
       },
+      "domain_group": {
+        "data": {
+          "name": "Name",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "domain": "Entity domain",
+          "exclude_entities": "Exclude entities"
+        },
+        "title": "Create a domain based group sensor"
+      },
       "fixed": {
         "data": {
           "power": "Potência",
@@ -120,6 +130,14 @@
         },
         "description": "Selecione o modelo do dispositivo. Consulte a [lista]({supported_models_link}) de modelos compatíveis para obter mais informações",
         "title": "Configuração do modelo"
+      },
+      "menu_group": {
+        "menu_options": {
+          "group": "Standard group",
+          "domain_group": "Domain based group"
+        },
+        "title": "Choose the group type",
+        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
       },
       "multi_switch": {
         "data": {
