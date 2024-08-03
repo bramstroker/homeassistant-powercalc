@@ -103,7 +103,6 @@ from .const import (
     CONF_WILDCARD,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
-    DATA_DISCOVERED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
@@ -307,29 +306,12 @@ async def async_setup_platform(
         )
 
     if discovery_info:
-        # Support new YAML configuration structure. powercalc -> sensors.
-        if discovery_info.get(DISCOVERY_TYPE) == PowercalcDiscoveryType.USER_YAML:
-            config = discovery_info
-            discovery_info = None
-
-        elif discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
-            config = discovery_info
-            config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-            config[CONF_SENSOR_TYPE] = SensorType.GROUP
-            config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
-            discovery_info = None
-
-        elif discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
-            config = discovery_info
-            config[CONF_GROUP_TYPE] = GroupType.STANDBY
-            config[CONF_SENSOR_TYPE] = SensorType.GROUP
-            config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+        config = convert_discovery_info_to_sensor_config(discovery_info)
 
     await _async_setup_entities(
         hass,
         config,
         async_add_entities,
-        discovery_info=discovery_info,
     )
 
 
@@ -369,13 +351,12 @@ async def _async_setup_entities(
     config: dict[str, Any],
     async_add_entities: AddEntitiesCallback,
     config_entry: ConfigEntry | None = None,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Main routine to setup power/energy sensors from provided configuration."""
     register_entity_services()
 
     try:
-        entities = await create_sensors(hass, config, discovery_info, config_entry)
+        entities = await create_sensors(hass, config, config_entry)
         if config_entry:
             save_entity_ids_on_config_entry(hass, config_entry, entities)
     except SensorConfigurationError as err:
@@ -591,10 +572,30 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     return sensor_config
 
 
+def convert_discovery_info_to_sensor_config(
+    discovery_info: DiscoveryInfoType,
+) -> ConfigType:
+    """Convert discovery info to sensor config."""
+    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.DOMAIN_GROUP:
+        config = discovery_info
+        config[CONF_GROUP_TYPE] = GroupType.DOMAIN
+        config[CONF_SENSOR_TYPE] = SensorType.GROUP
+        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+        return config
+
+    if discovery_info[DISCOVERY_TYPE] == PowercalcDiscoveryType.STANDBY_GROUP:
+        config = discovery_info
+        config[CONF_GROUP_TYPE] = GroupType.STANDBY
+        config[CONF_SENSOR_TYPE] = SensorType.GROUP
+        config[CONF_ENTITY_ID] = DUMMY_ENTITY_ID
+        return config
+
+    return discovery_info
+
+
 async def create_sensors(
     hass: HomeAssistant,
     config: ConfigType,
-    discovery_info: DiscoveryInfoType | None = None,
     config_entry: ConfigEntry | None = None,
     context: CreationContext | None = None,
 ) -> EntitiesBucket:
@@ -619,7 +620,6 @@ async def create_sensors(
             merged_sensor_config,
             context,
             config_entry,
-            discovery_info,
         )
 
     # Setup power sensors for multiple appliances in one config entry
@@ -703,7 +703,6 @@ async def create_individual_sensors(
     sensor_config: dict,
     context: CreationContext,
     config_entry: ConfigEntry | None = None,
-    discovery_info: DiscoveryInfoType | None = None,
 ) -> EntitiesBucket:
     """Create entities (power, energy, utility_meters) which track the appliance."""
 
@@ -784,7 +783,7 @@ async def create_individual_sensors(
     )
 
     # Update several registries
-    hass.data[DOMAIN][DATA_DISCOVERED_ENTITIES if discovery_info else DATA_CONFIGURED_ENTITIES].update(
+    hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: entities_to_add},
     )
 
