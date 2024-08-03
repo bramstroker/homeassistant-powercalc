@@ -137,7 +137,7 @@
           "domain_group": "Domain based group"
         },
         "title": "Choose the group type",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
+        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
       },
       "multi_switch": {
         "data": {
