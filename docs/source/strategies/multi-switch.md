@@ -1,5 +1,7 @@
 # Multi Switch
 
+:material-tag-outline: 1.14 or higher
+
 The multi switch strategy allows you to combine the self usage of multiple switches into a single entity.
 This can be used for example to make a profile for Tp-Link HS300 power strip.
 
