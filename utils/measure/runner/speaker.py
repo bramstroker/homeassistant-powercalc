@@ -12,7 +12,7 @@ from util.measure_util import MeasureUtil
 from .runner import MeasurementRunner, RunnerResult
 
 DURATION_PER_VOLUME_LEVEL = 20
-STREAM_URL = "https://assets.ctfassets.net/4zjnzn055a4v/5d3omOpQeliAWkVm1QmZBj/308d35fbb226a4643aeb7b132949dbd3/g_pink.mp3"
+STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
 SLEEP_PRE_MEASURE = 2
 SLEEP_MUTE = 5
 
