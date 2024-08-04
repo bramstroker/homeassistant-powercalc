@@ -1,7 +1,7 @@
 # Profile library
 
 The component ships with predefined power profiles for different devices.
-You can find the list of supported devices in the [supported models] section.
+You can find the list of supported devices on the dedicated [library viewer](https://powercalc.lauwbier.nl).
 This library will keep extending by the effort of community users.
 
 At startup powercalc will check whether any of your entities are in the library, and will provide a discovered entry for you to setup.

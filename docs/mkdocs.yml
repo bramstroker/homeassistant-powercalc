@@ -22,7 +22,7 @@ theme:
       accent: purple
     - scheme: slate
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/toggle-switch
         name: Switch to light mode
       primary: teal
       accent: lime
@@ -74,6 +74,7 @@ nav:
       - 'troubleshooting/debug-logging.md'
       - 'troubleshooting/yeelight.md'
   - 'Contributing':
+      - 'contributing/index.md'
       - 'contributing/measure.md'
       - 'contributing/translating.md'
   - 'Tutorials':
