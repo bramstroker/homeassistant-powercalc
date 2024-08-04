@@ -21,7 +21,7 @@ Configuration
 ***********************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :includehidden:
    :titlesonly:
 
@@ -65,8 +65,3 @@ Community
    :maxdepth: 1
 
    community/tutorials
-
-.. toctree::
-   :hidden:
-
-   links
