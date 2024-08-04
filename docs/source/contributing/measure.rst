@@ -1,6 +1,11 @@
 Measure
 =======
 
+.. toctree::
+   :hidden:
+
+   measure-ocr
+
 .. warning::
     Incorrect use of electrical and measuring devices carries a risk of electric shock (electrocution). It can cause serious injury or even death!
 

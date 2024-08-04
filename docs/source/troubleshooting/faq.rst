@@ -34,7 +34,7 @@ It can take up to an hour for HA to gather statistics for the energy sensor. So 
 How can I setup an energy sensor for a device which has no entity in HA?
 ------------------------------------------------------------------------
 
-You can use :doc:`/daily-energy` for that.
+You can use :doc:`/sensor-types/daily-energy` for that.
 
 My device is not supported, what can I do?
 ------------------------------------------

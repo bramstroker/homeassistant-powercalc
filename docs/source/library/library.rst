@@ -1,6 +1,11 @@
 Profile library
 ===============
 
+.. toctree::
+   :hidden:
+
+   structure
+
 The component ships with predefined power profiles for different devices.
 You can find the list of supported devices in the `supported models`_ section.
 This library will keep extending by the effort of community users.
@@ -18,7 +23,7 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 
 For more information about the library structure, See :doc:`structure`.
 
-To contribute see the :doc:`measure <contributing/measure>` section.
+To contribute see the :doc:`measure </contributing/measure>` section.
 
 Custom models
 -------------
