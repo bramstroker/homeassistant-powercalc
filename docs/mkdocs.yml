@@ -14,6 +14,7 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
+    - content.action.edit
   palette:
     - schema: default
       toggle:
@@ -25,12 +26,12 @@ theme:
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
-      primary: teal
-      accent: lime
 extra:
   generator: false
 plugins:
   - search
+  - git-revision-date-localized:
+      enable_creation_date: true
 markdown_extensions:
   - admonition
   - pymdownx.superfences
@@ -83,3 +84,4 @@ nav:
   - 'Tutorials':
       - 'community/tutorials.md'
 repo_url: https://github.com/bramstroker/homeassistant-powercalc
+edit_uri: blob/master/docs/source/

@@ -90,6 +90,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 mkdocs = "*"
 mkdocs-material = "*"
+mkdocs-git-revision-date-localized-plugin = "*"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3"
