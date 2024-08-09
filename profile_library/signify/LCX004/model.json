@@ -10,5 +10,6 @@
   },
   "name": "Hue Gradient Lightstrip",
   "standby_power": 0.14,
-  "created_at": "2023-02-04T15:26:14"
+  "created_at": "2023-02-04T15:26:14",
+  "author": "AJ Banck <ajbanck@planet.nl>"
 }

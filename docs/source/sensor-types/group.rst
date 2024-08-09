@@ -2,6 +2,11 @@
 Groups
 ======
 
+.. toctree::
+   :hidden:
+
+   group/include-entities
+
 Powercalc provides several options to group individual power sensors into a single one which sums the total.
 This can be very useful to get a glance about the consumption of all your lights together for example.
 
@@ -120,7 +125,7 @@ Also see :doc:`real-power-sensor`
 Domain groups
 -------------
 
-Powercalc makes it easy to create a group sensors for all entities of a given domain with the ``create_domain_groups`` option.
+Powercalc makes it easy to create a group sensors for all entities of a given domain with the ``create_domain_groups`` option, or you can use the GUI, select :guilabel:`Group` -> :guilabel:`Domain group`.
 For example let's assume you want group sensors for all your lights and media players you can use the following configuration.
 
 .. code-block:: yaml
@@ -131,7 +136,16 @@ For example let's assume you want group sensors for all your lights and media pl
         - media_player
 
 .. note::
-    This will only include all virtual power sensors created with powercalc, not any other power sensors already available in your HA installation.
+    This will only include all virtual power sensors created with powercalc, not any other power sensors already available in your HA installation. This is because Powercalc cannot know the source for any given power sensor.
+
+You can also utilize this option to create a group to sum all energy sensors of your HA installation. Use ``all`` for that.
+
+.. code-block:: yaml
+
+    powercalc:
+      create_domain_groups:
+        - all
+
 
 Automatically include entities
 ------------------------------

@@ -27,5 +27,6 @@
   },
   "name": "Sonos Arc",
   "standby_power": 4.4,
-  "created_at": "2023-04-03T20:55:15"
+  "created_at": "2023-04-03T20:55:15",
+  "author": "vandalon <joris@vandalon.nl>"
 }

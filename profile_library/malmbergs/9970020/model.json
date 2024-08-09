@@ -10,5 +10,6 @@
   "name": "Malmbergs Sirius III",
   "standby_power": 0.89,
   "calculation_strategy": "lut",
-  "created_at": "2022-08-02T08:35:28"
+  "created_at": "2022-08-02T08:35:28",
+  "author": "Magnus Larsson <maglars2@gmail.com>"
 }

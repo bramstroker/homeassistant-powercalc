@@ -3,11 +3,13 @@ from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SENSOR_TYPE,
     CONF_UNIQUE_ID,
+    Platform,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
@@ -16,6 +18,7 @@ from homeassistant.helpers.selector import SelectSelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
 
 from custom_components.powercalc import SensorType, async_migrate_entry
+from custom_components.powercalc.config_flow import Steps
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_AREA,
@@ -27,6 +30,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MODE,
@@ -35,7 +39,9 @@ from custom_components.powercalc.const import (
     CONF_SUB_GROUPS,
     CONF_UTILITY_METER_TARIFFS,
     DOMAIN,
+    ENTRY_DATA_ENERGY_ENTITY,
     CalculationStrategy,
+    GroupType,
 )
 from custom_components.powercalc.sensors.group import add_to_associated_group
 from custom_components.test.light import MockLight
@@ -56,7 +62,7 @@ from tests.config_flow.common import (
 
 
 async def test_create_group_entry(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
@@ -83,7 +89,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
@@ -115,7 +121,7 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
     """
     await run_powercalc_setup(hass, {}, {CONF_CREATE_ENERGY_SENSORS: False})
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
@@ -154,7 +160,7 @@ async def test_group_include_area(
         {CONF_STATES_POWER: {"playing": 1.8}},
     )
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_AREA: area.id,
@@ -204,6 +210,7 @@ async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) 
         unique_id="abcdefg",
         data={
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestArea",
             CONF_AREA: "My area",
         },
         title="TestArea",
@@ -213,10 +220,11 @@ async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) 
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "TestArea",
         CONF_AREA: "My area",
     }
 
-    result = await initialize_options_flow(hass, config_entry)
+    result = await initialize_options_flow(hass, config_entry, Steps.GROUP)
 
     user_input = {}
     await hass.config_entries.options.async_configure(
@@ -225,9 +233,10 @@ async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) 
     )
     updated_entry = hass.config_entries.async_get_entry(config_entry.entry_id)
     assert updated_entry.data == {
+        ENTRY_DATA_ENERGY_ENTITY: "sensor.testarea_energy",
         CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "TestArea",
         CONF_CREATE_ENERGY_SENSOR: True,
-        CONF_CREATE_UTILITY_METERS: False,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
     }
@@ -259,7 +268,7 @@ async def test_include_area_powercalc_only(
 
     await setup_config_entry(hass, {CONF_ENTITY_ID: "switch.switch", CONF_NAME: "Test", CONF_FIXED: {CONF_POWER: 5}})
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {
         CONF_NAME: "My group sensor",
         CONF_AREA: area.id,
@@ -315,7 +324,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
     assert await hass.config_entries.async_setup(config_entry_3.entry_id)
     await hass.async_block_till_done()
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     data_schema: vol.Schema = result["data_schema"]
     select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
@@ -374,7 +383,7 @@ async def test_real_power_entry_selectable_as_group_member(
     assert await hass.config_entries.async_setup(config_entry_2.entry_id)
     await hass.async_block_till_done()
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     data_schema: vol.Schema = result["data_schema"]
     select: SelectSelector = data_schema.schema[CONF_GROUP_MEMBER_SENSORS]
@@ -403,7 +412,7 @@ async def test_real_power_entry_selectable_as_group_member(
 
 
 async def test_group_error_mandatory(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
     user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -432,7 +441,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
     )
 
     # Initialize a new config flow
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
 
     # Assert the two existing groups can be selected as subgroup
     data_schema: vol.Schema = result["data_schema"]
@@ -454,10 +463,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
 
     # Initialize the options flow for the newly created group
     new_entry: ConfigEntry = result["result"]
-    result = await hass.config_entries.options.async_init(
-        new_entry.entry_id,
-        data=None,
-    )
+    result = await initialize_options_flow(hass, new_entry, Steps.GROUP)
 
     # Assert that the group itself is not selectable as subgroup
     data_schema: vol.Schema = result["data_schema"]
@@ -475,11 +481,18 @@ async def test_group_options_flow(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "Kitchen",
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_CREATE_UTILITY_METERS: False,
             CONF_GROUP_POWER_ENTITIES: ["sensor.fridge_power"],
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_CREATE_UTILITY_METERS: True},
+    )
+
+    result = await initialize_options_flow(hass, entry, Steps.GROUP)
 
     new_entities = ["sensor.fridge_power", "sensor.kitchen_lights_power"]
     user_input = {CONF_GROUP_POWER_ENTITIES: new_entities}
@@ -492,13 +505,14 @@ async def test_group_options_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_GROUP_POWER_ENTITIES] == new_entities
+    assert entry.data[CONF_CREATE_UTILITY_METERS]
 
 
 async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) -> None:
     """Check that the toggle is default disabled when we set include_non_powercalc_sensors globally to false"""
     await run_powercalc_setup(hass, {}, {CONF_INCLUDE_NON_POWERCALC_SENSORS: False})
 
-    result = await select_menu_item(hass, SensorType.GROUP)
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
@@ -566,3 +580,42 @@ async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
     )
 
     assert not hass.states.get("sensor.none_power")
+
+
+async def test_domain_group_flow(hass: HomeAssistant) -> None:
+    """Test the group flow for a domain."""
+    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.DOMAIN_GROUP)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_DOMAIN: Platform.LIGHT,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_GROUP_TYPE: GroupType.DOMAIN,
+        CONF_NAME: "My group sensor",
+        CONF_DOMAIN: Platform.LIGHT,
+        CONF_UNIQUE_ID: "powercalc_domaingroup_light",
+        CONF_CREATE_ENERGY_SENSOR: True,
+        CONF_CREATE_UTILITY_METERS: False,
+    }
+    config_entry: ConfigEntry = result["result"]
+
+    power_state = hass.states.get("sensor.my_group_sensor_power")
+    assert power_state
+
+    result = await hass.config_entries.options.async_init(
+        config_entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert Steps.BASIC_OPTIONS in result["menu_options"]
+    assert Steps.GROUP not in result["menu_options"]
+    assert Steps.UTILITY_METER_OPTIONS not in result["menu_options"]

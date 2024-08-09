@@ -10,5 +10,6 @@
   "name": "Zipato RGBW Bulb V2",
   "standby_power": 0.3,
   "calculation_strategy": "lut",
-  "created_at": "2022-09-27T16:10:29"
+  "created_at": "2022-09-27T16:10:29",
+  "author": "jake404 <jake404@users.noreply.github.com>"
 }

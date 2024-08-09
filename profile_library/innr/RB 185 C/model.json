@@ -10,5 +10,6 @@
   },
   "name": "RB 185 C - E27 Smart Color Bulb",
   "standby_power": 0.4,
-  "created_at": "2023-02-04T11:22:13"
+  "created_at": "2023-02-04T11:22:13",
+  "author": "Florian Mulatz <33655308+florianmulatz@users.noreply.github.com>"
 }

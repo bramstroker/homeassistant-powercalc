@@ -120,6 +120,9 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
         **entity_reg_kwargs: Any,  # noqa: ANN401
     ) -> None:
         device_id = str(uuid.uuid4())
+        if "device_id" in entity_reg_kwargs:
+            device_id = entity_reg_kwargs["device_id"]
+            del entity_reg_kwargs["device_id"]
 
         unique_id = str(uuid.uuid4())
         if "unique_id" in entity_reg_kwargs:

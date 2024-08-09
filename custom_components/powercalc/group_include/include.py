@@ -2,7 +2,6 @@ import logging
 
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity import Entity
@@ -13,8 +12,6 @@ from custom_components.powercalc.const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
-    ENTRY_DATA_ENERGY_ENTITY,
-    ENTRY_DATA_POWER_ENTITY,
 )
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
@@ -45,9 +42,9 @@ async def resolve_include_entities(
             "Found possible include entities: %s",
             list(source_entities.keys()),
         )
-    for entity_id, source_entity in source_entities.items():
+    for source_entity in source_entities.values():
         resolved_entities.extend(
-            find_powercalc_entities_by_source_entity(hass, entity_id),
+            hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id, []),
         )
 
         # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
@@ -63,27 +60,6 @@ async def resolve_include_entities(
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities
-
-
-def find_powercalc_entities_by_source_entity(
-    hass: HomeAssistant,
-    source_entity_id: str,
-) -> list[Entity]:
-    # Check if we have powercalc sensors setup with YAML
-    if source_entity_id in hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]:
-        return hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES][source_entity_id]  # type: ignore
-
-    # Check if we have powercalc sensors setup with GUI
-    # todo: Seems the code below can be removed as powercalc config entries also are in the DATA_CONFIGURED_ENTITIES,
-    entities: list[Entity] = []
-    for entry in hass.config_entries.async_entries(DOMAIN):  # pragma: no cover
-        if entry.data.get(CONF_ENTITY_ID) != source_entity_id:
-            continue
-        if entry.data.get(ENTRY_DATA_POWER_ENTITY):
-            entities.append(RealPowerSensor(str(entry.data.get(ENTRY_DATA_POWER_ENTITY))))
-        if entry.data.get(ENTRY_DATA_ENERGY_ENTITY):
-            entities.append(RealEnergySensor(str(entry.data.get(ENTRY_DATA_ENERGY_ENTITY))))
-    return entities
 
 
 @callback

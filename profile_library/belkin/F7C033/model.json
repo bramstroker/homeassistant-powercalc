@@ -5,5 +5,6 @@
   "measure_method": "manual",
   "measure_device": "RRPM02 (Model); 4897037690801 (Barcode); Reduction Revolution Plug-in Power Meter",
   "measure_description": "Was not able to measure the standby power, the value is assumed",
-  "created_at": "2021-08-17T10:46:54"
+  "created_at": "2021-08-17T10:46:54",
+  "author": "OzGav <gavnosp@hotmail.com>"
 }

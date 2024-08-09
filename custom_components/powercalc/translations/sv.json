@@ -1,6 +1,6 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+    "remarks_smart_switch": "Denna profil visar endast effekt i standby-läge. \n Har du apparater som förbrukar ett fast effekt-värde när de är påslagna, kan du ange detta värde i nästa steg"
   },
   "config": {
     "abort": {
@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Skapa bruksmätare",
-          "group": "Add to group",
+          "group": "Lägg till i grupp",
           "name": "Namn",
           "on_time": "Igång tid",
           "start_time": "Starttid",
@@ -36,11 +36,21 @@
           "value_template": "Värdesmall"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
+          "group": "Fyll i ett eget gruppnamn för att skapa en ny grupp",
           "on_time": "Om lämnas tomt är standard 1 dag. Alltid på",
           "update_frequency": "Tid i sekunder mellan uppdatering av sensor"
         },
         "title": "Skapar en fast daglig sensor"
+      },
+      "domain_group": {
+        "data": {
+          "name": "Name",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "domain": "Entity domain",
+          "exclude_entities": "Exclude entities"
+        },
+        "title": "Create a domain based group sensor"
       },
       "fixed": {
         "data": {
@@ -59,26 +69,26 @@
       "group": {
         "data": {
           "area": "Område",
-          "create_energy_sensor": "Create energy sensor",
+          "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
           "device": "Enhet",
           "group_energy_entities": "Medlem energi entiteter",
           "group_member_sensors": "Medlem powercalc sensorer",
           "group_power_entities": "Medlem effekt entiteter",
           "hide_members": "Dölj medlemmar",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
           "name": "Namn",
           "sub_groups": "Undergrupper",
           "unique_id": "Unikt id"
         },
         "data_description": {
           "area": "Lägg till alla powercalc sensorer från det specifierade området",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensor": "Om powercalc ska skapa en kWh sensor",
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
           "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
           "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "include_non_powercalc_sensors": "Ange huruvida icke-powercalc-sensorer ska inkluderas när områdesalternativet används",
           "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
         },
         "title": "Skapa en gruppsensor"
@@ -121,6 +131,27 @@
         "description": "Välj enhetsmodell Se i [list]({supported_models_link}) För modeller som stöds eller mer information",
         "title": "Modell konfig"
       },
+      "menu_group": {
+        "menu_options": {
+          "group": "Standard group",
+          "domain_group": "Domain based group"
+        },
+        "title": "Choose the group type",
+        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
+      },
+      "multi_switch": {
+        "data": {
+          "entities": "Växla enheter",
+          "power": "Slå på",
+          "power_off": "Stäng av"
+        },
+        "data_description": {
+          "entities": "Välj alla individuella enheter som är del av multi-enheten",
+          "power": "Effekt för enstaka enhet när påslagen",
+          "power_off": "Effekt för enstaka enhet när avslagen"
+        },
+        "title": "Multi-enhetskonfiguration"
+      },
       "playbook": {
         "data": {
           "autostart": "Starta automatiskt",
@@ -144,7 +175,7 @@
           "multiply_factor": "Multipliceringsfaktor",
           "multiply_factor_standby": "Multipliceringsfaktor för standby",
           "unavailable_power": "Otillgänglig effekt",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "utility_meter_tariffs": "Tariffer för elförbrukning"
         },
         "data_description": {
           "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
@@ -152,7 +183,7 @@
           "multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
           "multiply_factor_standby": "Om multipliceringsfaktor ska läggas på standby ström",
           "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_tariffs": "Lista med tariffer som stöds. Lämna tomt om endast en tariff används."
         },
         "description": "Inställningarna nedan är för avancerad powercalc konfiguration. De flesta användare kommer inte använda dessa så du kan skippa dem",
         "title": "Avancerade inställningar"
@@ -162,7 +193,7 @@
           "create_utility_meters": "Skapa bruksmätare",
           "entity_id": "Effekt sensor id",
           "name": "Namn",
-          "device": "Device"
+          "device": "Enhet"
         },
         "data_description": {
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
@@ -181,11 +212,11 @@
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "Effekt",
+          "self_usage_included": "Egen förbrukning inkluderad"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
+          "power": "Ett fast effektvärde i Watt för den anslutna apparaten",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
         },
         "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
@@ -255,6 +286,9 @@
     }
   },
   "options": {
+    "abort": {
+      "model_not_support": "Model not supported"
+    },
     "error": {
       "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
       "fixed_states_power_only": "Den här entiteten kan bara jobba med 'state effekt' inte 'effekt'",
@@ -265,69 +299,176 @@
       "unknown": "Okänt fel inträffade, se loggen för mer information"
     },
     "step": {
-      "init": {
+      "advanced_options": {
+        "title": "Advanced options",
         "data": {
-          "area": "Område",
-          "attribute": "Attribut",
-          "autostart": "Autostart",
           "calculation_enabled_condition": "Beräkningsaktiverat villkor",
-          "calibrate": "Kalibreringsvärde",
-          "create_energy_sensor": "Skapa energisensor",
-          "create_utility_meters": "Skapa bruksmätare",
-          "device": "Enhet",
-          "energy_integration_method": "Energi integration method",
-          "gamma_curve": "Gamma kurva",
-          "group_energy_entities": "Medlem energi entiteter",
-          "group_member_sensors": "Medlem powercalc sensorer",
-          "group_power_entities": "Medlem effekt entiteter",
-          "hide_members": "Dölj medlemmar",
+          "energy_integration_method": "Energy integration method",
           "ignore_unavailable_state": "Ignorera ottillgängligt tillstånd",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "max_power": "Max effekt",
-          "min_power": "Min effekt",
           "multiply_factor": "Multipliceringsfaktor",
           "multiply_factor_standby": "Multipliceringsfaktor för standby",
+          "unavailable_power": "Otillgänglig effekt"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
+          "ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
+          "multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
+          "multiply_factor_standby": "Om multipliceringsfaktor ska läggas på standby ström",
+          "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd"
+        }
+      },
+      "basic_options": {
+        "title": "Basic options",
+        "data": {
+          "create_energy_sensor": "Skapa energisensor",
+          "create_utility_meters": "Skapa bruksmätare",
+          "entity_id": "Source entity",
+          "name": "Namn",
+          "standby_power": "Standby effekt"
+        },
+        "data_description": {
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+          "name": "Leaving blank will take the name from the source entity",
+          "standby_power": "Ange effekten som enheten förbrukar i avstängt läge"
+        }
+      },
+      "daily_energy": {
+        "title": "Daily energy options",
+        "data": {
           "name": "Namn",
           "on_time": "Igång tid",
-          "playbooks": "Playbooks",
-          "power": "effekt",
-          "power_template": "Effektmall",
-          "repeat": "Repetera",
-          "self_usage_included": "Self usage included",
-          "standby_power": "Standby effekt",
-          "states_power": "Effekttillstånd",
-          "states_trigger": "State trigger",
-          "sub_groups": "Undergrupper",
-          "unavailable_power": "Otillgänglig effekt",
+          "start_time": "Starttid",
           "unit_of_measurement": "Mätenhet",
           "update_frequency": "Uppdateringsfrekvens",
-          "utility_meter_tariffs": "Utility meter tariffs",
           "value": "Värde",
           "value_template": "Värdemall"
         },
         "data_description": {
+          "on_time": "When left empty defaults to 1 day. always on",
+          "update_frequency": "time in seconds between state updates of the sensor"
+        }
+      },
+      "fixed": {
+        "title": "Fixed options",
+        "data": {
+          "power": "effekt",
+          "power_template": "Effektmall",
+          "self_usage_included": "Self usage included",
+          "states_power": "Effekttillstånd"
+        },
+        "data_description": {
+          "power": "A fixed power value in Watts when the entity is ON",
+          "power_template": "Mall för att beräkna effekten i W",
+          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
+          "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan"
+        }
+      },
+      "group": {
+        "title": "Group options",
+        "data": {
+          "area": "Område",
+          "device": "Enhet",
+          "group_energy_entities": "Medlem energi entiteter",
+          "group_member_sensors": "Medlem powercalc sensorer",
+          "group_power_entities": "Medlem effekt entiteter",
+          "hide_members": "Dölj medlemmar",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "sub_groups": "Undergrupper"
+        },
+        "data_description": {
           "area": "Lägg till alla powercalc sensorer från det specifierade området",
-          "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
-          "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
-          "calculation_enabled_condition": "Den konfigurerade strategin för effektberäkning kommer endast att utföras när denna mall utvärderas som sann eller 1. Annars kommer effektsensorn att visa 0",
-          "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20",
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
           "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
           "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
-          "ignore_unavailable_state": "Växla den här inställningen när du vill att effektsensorn ska förbli tillgänglig även om källentiteten är otillgänglig",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
-          "multiply_factor": "Multiplicerar den beräknade effekten med denna kvot. Kan vara användbart för ljusgrupper",
-          "multiply_factor_standby": "Om multipliceringsfaktor ska läggas på standby ström",
+          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen"
+        }
+      },
+      "init": {
+        "menu_options": {
+          "advanced_options": "Advanced options",
+          "basic_options": "Basic options",
+          "daily_energy": "Daily energy options",
+          "fixed": "Fixed options",
+          "group": "Group options",
+          "linear": "Linear options",
+          "playbook": "Playbook options",
+          "multi_switch": "Multi switch options",
+          "real_power": "Real power options",
+          "utility_meter_options": "Utility meter options",
+          "wled": "WLED options"
+        }
+      },
+      "linear": {
+        "title": "Linear options",
+        "data": {
+          "attribute": "Attribut",
+          "calibrate": "Kalibreringsvärde",
+          "gamma_curve": "Gamma kurva",
+          "max_power": "Max effekt",
+          "min_power": "Min effekt"
+        },
+        "data_description": {
+          "attribute": "Ange attributet. Om tomt används ljusstyrka för lampor och procent för fläktar",
+          "calibrate": "Skriv ett kalibreringsvärde per rad.Exampel\n\n1: 20"
+        }
+      },
+      "multi_switch": {
+        "title": "Multi switch options",
+        "data": {
+          "entities": "Switch entities",
+          "power": "Power ON",
+          "power_off": "Power OFF"
+        },
+        "data_description": {
+          "entities": "Select all the individual switches that are part of the multi switch",
+          "power": "Power for a single switch when turned on",
+          "power_off": "Power for a single switch when turned off"
+        }
+      },
+      "playbook": {
+        "title": "Playbook options",
+        "data": {
+          "autostart": "Autostart",
+          "playbooks": "Playbooks",
+          "repeat": "Repetera",
+          "states_trigger": "State trigger"
+        },
+        "data_description": {
+          "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
           "playbooks": "Lägg in en playbook per linje. Exampel \n\nprogram1: washing_machine/program1.csv",
-          "power_template": "Mall för att beräkna effekten i W",
           "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "En 'tillstånd:effekt' par per rad, se exempel ovan",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1",
-          "sub_groups": "Alla sensorer i valda undergrupper kommer också läggas till i denna gruppen",
-          "unavailable_power": "Effekt i W att spela in när källentiteten har ett otillgängligt tillstånd",
+          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+        }
+      },
+      "real_power": {
+        "title": "Real power options",
+        "data": {
+          "device": "Enhet"
+        },
+        "data_description": {
+          "device": "Add the created energy sensor to an specific device"
+        }
+      },
+      "utility_meter_options": {
+        "title": "Utility meter options",
+        "data": {
+          "utility_meter_types": "Cycles",
+          "utility_meter_tariffs": "Utility meter tariffs"
+        },
+        "data_description": {
+          "utility_meter_types": "Create utility meters for specified cycles",
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+        }
+      },
+      "wled": {
+        "title": "WLED options",
+        "data": {
+          "power_factor": "Power factor",
+          "voltage": "Voltage"
         }
       }
     }

@@ -9,5 +9,6 @@
     "VERSION": "v1.11.6:docker"
   },
   "name": "Hue Signe Gradient Table Lamp",
-  "standby_power": 0.6
+  "standby_power": 0.6,
+  "author": "pwnagepeter <hauke@pwnagepeter.net>"
 }

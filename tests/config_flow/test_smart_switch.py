@@ -7,7 +7,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_POWER
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, MENU_OPTION_LIBRARY, Steps
+from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -51,7 +51,7 @@ async def test_smart_switch_flow(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    result = await select_menu_item(hass, MENU_OPTION_LIBRARY)
+    result = await select_menu_item(hass, Steps.MENU_LIBRARY)
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -111,7 +111,7 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.FIXED)
 
     user_input = {CONF_POWER: 50, CONF_SELF_USAGE_INCLUDED: True}
     result = await hass.config_entries.options.async_configure(
@@ -140,7 +140,7 @@ async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> Non
         },
     )
 
-    result = await initialize_options_flow(hass, entry)
+    result = await initialize_options_flow(hass, entry, Steps.FIXED)
 
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_SELF_USAGE_INCLUDED)].description == {

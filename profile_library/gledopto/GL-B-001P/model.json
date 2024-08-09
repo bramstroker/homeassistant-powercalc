@@ -10,5 +10,6 @@
   "name": "GL-B-001P",
   "standby_power": 0.31,
   "calculation_strategy": "lut",
-  "created_at": "2022-09-11T17:05:58"
+  "created_at": "2022-09-11T17:05:58",
+  "author": "el97 <erik1337.el@gmail.com>"
 }

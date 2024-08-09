@@ -3,6 +3,7 @@
   "measure_method": "manual",
   "measure_device": "Fibaro FGW102",
   "name": "Greenwave GWPN1",
+  "author": "Daniel O'Connor <daniel.oconnor@gmail.com>",
   "standby_power": 0.3,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",

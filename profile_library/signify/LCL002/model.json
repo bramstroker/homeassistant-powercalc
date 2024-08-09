@@ -11,5 +11,6 @@
   },
   "name": "Hue lightstrip outdoor",
   "standby_power": 0.25,
-  "config_flow_discovery_remarks": "This profile was measured with the default included PSU. If you run this with a PSU that is different from the included PSU this can skew the readings."
+  "config_flow_discovery_remarks": "This profile was measured with the default included PSU. If you run this with a PSU that is different from the included PSU this can skew the readings.",
+  "author": "Stuart Pearson <1926002+stuartp44@users.noreply.github.com>"
 }

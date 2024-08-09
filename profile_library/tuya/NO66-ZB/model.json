@@ -10,5 +10,6 @@
   "name": "Tuya Zigbee LED Smart Strip DC12V RGBCCT 60led/m",
   "standby_power": 1.05,
   "calculation_strategy": "lut",
-  "created_at": "2022-06-05T17:55:15"
+  "created_at": "2022-06-05T17:55:15",
+  "author": "@RubenKelevra <cyrond@gmail.com>"
 }

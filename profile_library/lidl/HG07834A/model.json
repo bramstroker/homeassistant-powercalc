@@ -10,5 +10,6 @@
   "name": "Livarno Lux GU10 spot RGB",
   "standby_power": 0.28,
   "calculation_strategy": "lut",
-  "created_at": "2023-02-08T08:32:06"
+  "created_at": "2023-02-08T08:32:06",
+  "author": "aqwserf <29235861+aqwserf@users.noreply.github.com>"
 }

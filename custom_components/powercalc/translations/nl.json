@@ -42,6 +42,16 @@
         },
         "title": "Maak een dagelijkse energieverbruik sensor"
       },
+      "domain_group": {
+        "data": {
+          "name": "Naam",
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "domain": "Entiteit domein",
+          "exclude_entities": "Entiteiten uitsluiten"
+        },
+        "title": "Maak een domein gebaseerde groepssensor"
+      },
       "fixed": {
         "data": {
           "power": "Vermogen",
@@ -120,6 +130,27 @@
         },
         "description": "Selecteer het model. Zie de [lijst]({supported_models_link}) van ondersteunde apparaten voor meer informatie",
         "title": "Model configuratie"
+      },
+      "menu_group": {
+        "menu_options": {
+          "group": "Standaard groep",
+          "domain_group": "Domein gebaseerde groep"
+        },
+        "title": "Kies het type groep",
+        "description": "Selecteer het type groepssensor dat je wilt aanmaken. Kies een domein gebaseerde groep als u alle entiteiten van een specifiek domein wilt groeperen of een sensor opsomming wilt maken van al uw energie sensoren."
+      },
+      "multi_switch": {
+        "data": {
+          "entities": "Schakelaar entiteiten",
+          "power": "Vermogen AAN",
+          "power_off": "Vermogen UIT"
+        },
+        "data_description": {
+          "entities": "Selecteer alle individuele schakelaars die deel uitmaken van de multi switch",
+          "power": "Vermogen voor één schakelaar wanneer ingeschakeld",
+          "power_off": "Vermogen voor één enkele schakelaar wanneer uitgeschakeld"
+        },
+        "title": "Multi switch configuratie"
       },
       "playbook": {
         "data": {
@@ -255,6 +286,9 @@
     }
   },
   "options": {
+    "abort": {
+      "model_not_support": "Model niet ondersteund"
+    },
     "error": {
       "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
       "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
@@ -265,69 +299,176 @@
       "unknown": "Onbekende fout opgetreden, bekijk de logs voor uitgebreide informatie"
     },
     "step": {
-      "init": {
+      "advanced_options": {
+        "title": "Geavanceerde opties",
         "data": {
-          "area": "Ruimte",
-          "attribute": "Attribuut",
-          "autostart": "Automatisch starten",
           "calculation_enabled_condition": "Calculatie ingeschakeld conditie",
-          "calibrate": "Kalibratie waardes",
-          "create_energy_sensor": "Creëer energie sensoren",
-          "create_utility_meters": "Creëer utiliteit meters",
-          "device": "Apparaat",
           "energy_integration_method": "Energie integratie methode",
-          "gamma_curve": "Gamma curve",
-          "group_energy_entities": "Additionele energie entiteiten",
-          "group_member_sensors": "Individuele Powercalc sensoren",
-          "group_power_entities": "Additionele vermogen entiteiten",
-          "hide_members": "Verberg onderliggende sensoren",
           "ignore_unavailable_state": "Negeer unavailable status",
-          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
-          "max_power": "Max vermogen",
-          "min_power": "Min vermogen",
           "multiply_factor": "Vermenigvuldigingsfactor",
           "multiply_factor_standby": "Vermenigvuldigingsfactor standby",
+          "unavailable_power": "Vermogen indien onbeschikbaar"
+        },
+        "data_description": {
+          "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
+          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
+          "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
+          "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
+          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is"
+        }
+      },
+      "basic_options": {
+        "title": "Basisopties",
+        "data": {
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "entity_id": "Bron entiteit",
+          "name": "Naam",
+          "standby_power": "Standby vermogen"
+        },
+        "data_description": {
+          "create_energy_sensor": "Laat powercalc een kWh meter maken",
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
+          "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
+          "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
+          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat"
+        }
+      },
+      "daily_energy": {
+        "title": "Dagelijkse energie opties",
+        "data": {
           "name": "Naam",
           "on_time": "Tijd aan per dag",
-          "playbooks": "Playbooks",
-          "power": "Vermogen",
-          "power_template": "Vermogen template",
-          "repeat": "Herhalen",
-          "self_usage_included": "Eigen verbruik inbegrepen",
-          "standby_power": "Standby vermogen",
-          "states_power": "Vermogen per status",
-          "states_trigger": "Status trigger",
-          "sub_groups": "Sub groepen",
-          "unavailable_power": "Vermogen indien onbeschikbaar",
+          "start_time": "Begintijd",
           "unit_of_measurement": "Eenheid",
           "update_frequency": "Update frequentie",
-          "utility_meter_tariffs": "Nutsmeter tarieven",
           "value": "Waarde",
           "value_template": "Waarde template"
         },
         "data_description": {
+          "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
+          "update_frequency": "tijd in seconden tussen status updates van de sensor"
+        }
+      },
+      "fixed": {
+        "title": "Fixed opties",
+        "data": {
+          "power": "Vermogen",
+          "power_template": "Vermogen template",
+          "self_usage_included": "Eigen verbruik inbegrepen",
+          "states_power": "Vermogen per status"
+        },
+        "data_description": {
+          "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
+          "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
+          "self_usage_included": "Of het opgegeven vermogen ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt.",
+          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
+        }
+      },
+      "group": {
+        "title": "Groep opties",
+        "data": {
+          "area": "Ruimte",
+          "device": "Apparaat",
+          "group_energy_entities": "Additionele energie entiteiten",
+          "group_member_sensors": "Individuele Powercalc sensoren",
+          "group_power_entities": "Additionele vermogen entiteiten",
+          "hide_members": "Verberg onderliggende sensoren",
+          "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
+          "sub_groups": "Sub groepen"
+        },
+        "data_description": {
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
-          "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
-          "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
-          "calculation_enabled_condition": "De geconfigureerde vermogen calculatie strategie wordt alleen uitgevoerd indien dit template evalueert naar 1, anders zal de energiesensor 0 tonen",
-          "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20",
           "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
           "group_energy_entities": "Additionele energie entiteiten (kWh)",
           "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
           "group_power_entities": "Additionele vermogen entiteiten (W)",
-          "ignore_unavailable_state": "Zet dit aan wanneer je de vermogen sensor beschikbaar wil houden ongeacht de bron sensor niet beschikbaar is.",
           "include_non_powercalc_sensors": "Bepaal of je niet-powercalc sensoren wilt opnemen bij gebruik van de ruimte optie",
-          "multiply_factor": "Vermenigvuldigd het gecalculeerde vermogen bij deze ratio. Kan handig zijn voor lamp groepen.",
-          "multiply_factor_standby": "Pas vermenigvuldigingsfactor toe op standby vermogen",
+          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
+        }
+      },
+      "init": {
+        "menu_options": {
+          "advanced_options": "Geavanceerde opties",
+          "basic_options": "Basisopties",
+          "daily_energy": "Dagelijkse energie opties",
+          "fixed": "Fixed opties",
+          "group": "Groep opties",
+          "linear": "Lineaire opties",
+          "playbook": "Playbook opties",
+          "multi_switch": "Multi switch opties",
+          "real_power": "Real power opties",
+          "utility_meter_options": "Nutsmeter opties",
+          "wled": "WLED opties"
+        }
+      },
+      "linear": {
+        "title": "Lineaire opties",
+        "data": {
+          "attribute": "Attribuut",
+          "calibrate": "Kalibratie waardes",
+          "gamma_curve": "Gamma curve",
+          "max_power": "Max vermogen",
+          "min_power": "Min vermogen"
+        },
+        "data_description": {
+          "attribute": "Specificeer een attribuut. Wanneer je dit leeg laat dan wordt helderheid gebruikt voor verlichting en percentage voor ventilatoren",
+          "calibrate": "Kalibratiewaarde op iedere regel. Voorbeeld\n\n1: 20"
+        }
+      },
+      "multi_switch": {
+        "title": "Multi switch opties",
+        "data": {
+          "entities": "Schakelaar entiteiten",
+          "power": "Vermogen AAN",
+          "power_off": "Vermogen UIT"
+        },
+        "data_description": {
+          "entities": "Selecteer alle individuele schakelaars die deel uitmaken van de multi switch",
+          "power": "Vermogen voor één schakelaar wanneer ingeschakeld",
+          "power_off": "Vermogen voor één enkele schakelaar wanneer uitgeschakeld"
+        }
+      },
+      "playbook": {
+        "title": "Playbook opties",
+        "data": {
+          "autostart": "Automatisch starten",
+          "playbooks": "Playbooks",
+          "repeat": "Herhalen",
+          "states_trigger": "Status trigger"
+        },
+        "data_description": {
+          "autostart": "Start een bepaald playbook direct nadat HA is opgestart. bv. 'program1'",
           "playbooks": "Plaats een playbook op iedere regel. Voorbeeld\n\nprogram1: washing_machine/program1.csv",
-          "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
           "repeat": "Zet aan wanneer je wilt dat het playbook opnieuw wordt afgespeeld nadat het is beeindigd",
-          "self_usage_included": "Of het opgegeven vermogen ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt.",
-          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven",
-          "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1",
-          "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd.",
-          "unavailable_power": "Vermogen in W wanneer de bron sensor onbeschikbaar is",
+          "states_trigger": "Start een bepaald playbook gebaseerd op status. Voorbeeld\n\nplaying: program1"
+        }
+      },
+      "real_power": {
+        "title": "Real power opties",
+        "data": {
+          "device": "Apparaat"
+        },
+        "data_description": {
+          "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
+        }
+      },
+      "utility_meter_options": {
+        "title": "Nutsmeter opties",
+        "data": {
+          "utility_meter_types": "Cycli",
+          "utility_meter_tariffs": "Nutsmeter tarieven"
+        },
+        "data_description": {
+          "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
           "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
+        }
+      },
+      "wled": {
+        "title": "WLED opties",
+        "data": {
+          "power_factor": "Vermogensfactor",
+          "voltage": "Spanning"
         }
       }
     }

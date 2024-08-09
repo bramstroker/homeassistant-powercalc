@@ -522,7 +522,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
         entity_state = state
-        if state.entity_id != self._source_entity.entity_id and (entity_state := self.hass.states.get(self._source_entity.entity_id)) is None:
+        if (
+            self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
+            and state.entity_id != self._source_entity.entity_id
+            and (entity_state := self.hass.states.get(self._source_entity.entity_id)) is None
+        ):
             return None
 
         unavailable_power = self._sensor_config.get(CONF_UNAVAILABLE_POWER)

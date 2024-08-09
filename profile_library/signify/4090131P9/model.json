@@ -9,5 +9,6 @@
     "VERSION": "v1.11.6:docker"
   },
   "name": "Hue Sana Wall Light",
-  "standby_power": 0.31
+  "standby_power": 0.31,
+  "author": "pwnagepeter <hauke@pwnagepeter.net>"
 }

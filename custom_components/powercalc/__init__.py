@@ -17,7 +17,6 @@ from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import (
     CONF_DOMAIN,
-    CONF_ENTITIES,
     CONF_SCAN_INTERVAL,
     EVENT_HOMEASSISTANT_STARTED,
     Platform,
@@ -61,7 +60,6 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
-    DATA_DISCOVERED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
     DATA_STANDBY_POWER_SENSORS,
@@ -231,7 +229,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DOMAIN_CONFIG: domain_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
-        DATA_DISCOVERED_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
         DATA_STANDBY_POWER_SENSORS: {},
     }
@@ -291,37 +288,20 @@ def setup_domain_groups(hass: HomeAssistant, global_config: ConfigType) -> None:
     if not domain_groups:
         return
 
-    async def _create_domain_groups(event: None) -> None:
-        """Create group sensors aggregating all power sensors from given domains."""
-        _LOGGER.debug("Setting up domain based group sensors..")
-        for domain in domain_groups:
-            if domain not in hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES):
-                _LOGGER.error(
-                    "Cannot setup group for domain %s, no entities found",
-                    domain,
-                )
-                continue
-
-            domain_entities = hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES)[domain]
-
-            hass.async_create_task(
-                async_load_platform(
-                    hass,
-                    SENSOR_DOMAIN,
-                    DOMAIN,
-                    {
-                        DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
-                        CONF_ENTITIES: domain_entities,
-                        CONF_DOMAIN: domain,
-                    },
-                    global_config,
-                ),
-            )
-
-    hass.bus.async_listen_once(
-        EVENT_HOMEASSISTANT_STARTED,
-        _create_domain_groups,
-    )
+    _LOGGER.debug("Setting up domain based group sensors..")
+    for domain in domain_groups:
+        hass.async_create_task(
+            async_load_platform(
+                hass,
+                SENSOR_DOMAIN,
+                DOMAIN,
+                {
+                    DISCOVERY_TYPE: PowercalcDiscoveryType.DOMAIN_GROUP,
+                    CONF_DOMAIN: domain,
+                },
+                global_config,
+            ),
+        )
 
 
 async def setup_yaml_sensors(

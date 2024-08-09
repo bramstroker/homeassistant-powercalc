@@ -5,5 +5,6 @@
   "measure_method": "script",
   "measure_device": "TP-Link Kasa HS110",
   "measure_description": "Measured with script made by smonesi (steps: bri 50/sat 60/hue 2000) and linearly interpolated to provide more data",
-  "created_at": "2021-08-21T14:47:39"
+  "created_at": "2021-08-21T14:47:39",
+  "author": "smonesi <63957397+smonesi@users.noreply.github.com>"
 }
