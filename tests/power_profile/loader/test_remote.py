@@ -311,7 +311,7 @@ async def test_fallback_to_local_library_on_client_connection_error(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """
-    Test that the local library is used when powercalc.lauwbier.nl is not available.
+    Test that the local library is used when api.powercalc.nl is not available.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2277
     """
     shutil.copy(get_library_json_path(), hass.config.path(STORAGE_DIR, "powercalc_profiles", "library.json"))

@@ -27,7 +27,7 @@ You could either install with HACS (recommended) or manual.
 ## Set up power sensors
 
 Powercalc has a built-in library of more than 400 power profiles. Currently, this exists mostly of lights.
-These profiles have been measured and provided by users. See [supported models](https://powercalc.lauwbier.nl) for the listing of supported devices.
+These profiles have been measured and provided by users. See [supported models](https://library.powercalc.nl) for the listing of supported devices.
 
 Powercalc scans your HA instance for entities which are supported for automatic configuration. It does that based on the manufacturer and model information known in HA.
 After following the installation steps above and restarting HA power (W) and energy sensors (kWh) should appear and you can add them to your installation by clicking `CONFIGURE`, as displayed in the screenshot below

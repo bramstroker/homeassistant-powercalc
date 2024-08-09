@@ -1191,7 +1191,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             step_id=Steps.MODEL,
             data_schema=await self.create_schema_model(),
             description_placeholders={
-                "supported_models_link": "https://powercalc.lauwbier.nl",
+                "supported_models_link": "https://library.powercalc.nl",
             },
             errors=errors,
             last_step=False,
