@@ -8,6 +8,7 @@ theme:
     - navigation.indexes
     - toc.integrate
     - navigation.top
+    - navigation.footer
     - search.suggest
     - search.highlight
     - content.tabs.link
@@ -26,6 +27,8 @@ theme:
         name: Switch to light mode
       primary: teal
       accent: lime
+extra:
+  generator: false
 plugins:
   - search
 markdown_extensions:
