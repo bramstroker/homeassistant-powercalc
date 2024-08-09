@@ -4,6 +4,6 @@
 
 Follow [Quick start](quick-start.md) for the initial installation / setup
 
-!!! note
+:material-github: [Github project](https://)
 
-    This project is under active development.
+:material-library: [Profile library](https://library.powercalc.nl)
