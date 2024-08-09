@@ -13,9 +13,7 @@ Follow the instruction below depending on your preferred configuration method GU
 
 Just click the button to directly add a powercalc sensor:
 
-```{image} https://my.home-assistant.io/badges/config_flow_start.svg
-:target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
-```
+[![config_flow_start](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
 
 Select `Virtual power (library)` and follow the instructions.
 
@@ -47,8 +45,7 @@ This applies for example to extensible led strips of different lengths.
 
 In the GUI flow this will be asked in the wizard as shown in screenshot below.
 
-```{image} /img/sub_profile.png
-```
+![sub_profile](../img/sub_profile.png)
 
 In YAML you'll need to append the sub profile to the model, separated by a slash:
 For example to select sub profile `length_9` of LIFX Z model.

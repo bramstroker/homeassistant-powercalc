@@ -7,9 +7,7 @@ This can be very useful to get a glance about the consumption of all your lights
 
 You can create a new group with the GUI using this button.
 
-```{image} https://my.home-assistant.io/badges/config_flow_start.svg
-:target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
-```
+[![config_flow_start](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
 
 When this is not working.
 
@@ -114,8 +112,7 @@ powercalc:
 
 If you use the GUI to create the groups you can use `Additional power entities` and `Additional energy entities` options.
 
-```{image} /img/group_additional_entities.png
-```
+![group_additional_entities](../img/group_additional_entities.png)
 
 Also see [Real power sensor](real-power-sensor.md)
 

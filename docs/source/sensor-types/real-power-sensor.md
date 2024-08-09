@@ -10,9 +10,7 @@ You can create this either with the YAML or GUI.
 
 Just click this button to start the configuration flow:
 
-```{image} https://my.home-assistant.io/badges/config_flow_start.svg
-:target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
-```
+[![config_flow_start](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
 
 Select `Energy from real power sensor` and follow the instructions.
 

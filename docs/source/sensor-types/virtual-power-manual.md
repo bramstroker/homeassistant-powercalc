@@ -10,9 +10,7 @@ You can create new virtual power sensors with the GUI.
 
 Just click the button to directly add a powercalc sensor:
 
-```{image} https://my.home-assistant.io/badges/config_flow_start.svg
-:target: https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc
-```
+[![config_flow_start](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
 
 When this is not working.
 
