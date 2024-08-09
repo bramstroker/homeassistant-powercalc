@@ -24,6 +24,10 @@ Select `Group` and follow the instructions.
     After you have created a group you can directly assign a virtual power sensor to it when creating the power sensor by selecting the group in the `Group` field.
     You can also create group directly from the power sensor creation page, by filling in a custom group name in the `Group` field.
 
+!!! warning
+
+    Currently sensors registering negative energy values are not supported in groups.
+
 ## Create group with YAML
 
 You can combine the `entities` option and `create_group` to group individual power sensors into a group.
