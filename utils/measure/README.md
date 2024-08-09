@@ -60,7 +60,7 @@ After the measurements are finished you will find the files in `export` director
 
 ## More information about measuring
 
-See the WIKI article for further documentation https://homeassistant-powercalc.readthedocs.io/en/latest/contributing/measure.html
+See the WIKI article for further documentation https://docs.powercalc.nl/contributing/measure
 
 ## Building and running docker image locally
 docker build -t measure .

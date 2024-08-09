@@ -19,7 +19,7 @@ Also a measure utility is included which allows user to measure their lights and
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
-Go to the [Quick Start](https://homeassistant-powercalc.readthedocs.io/en/latest/quick-start.html) for installation instruction.
+Go to the [Quick Start](https://docs.powercalc.nl/quick-start.html) for installation instruction.
 
-- [Full Documentation](https://homeassistant-powercalc.readthedocs.io/en/latest/)
+- [Full Documentation](https://docs.powercalc.nl)
 - [Supported model listing](docs/supported_models.md)
