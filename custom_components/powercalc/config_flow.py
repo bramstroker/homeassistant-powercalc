@@ -364,9 +364,8 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
     },
 )
 
-SCHEMA_GROUP_SUBTRACT = vol.Schema(
+SCHEMA_GROUP_SUBTRACT_OPTIONS = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(
             selector.EntitySelectorConfig(
                 domain=Platform.SENSOR,
@@ -381,6 +380,14 @@ SCHEMA_GROUP_SUBTRACT = vol.Schema(
                 multiple=True,
             ),
         ),
+    },
+)
+
+SCHEMA_GROUP_SUBTRACT = vol.Schema(
+    {
+        vol.Required(CONF_NAME): selector.TextSelector(),
+        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
+        **SCHEMA_GROUP_SUBTRACT_OPTIONS.schema,
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
@@ -1436,6 +1443,8 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
             if group_type == GroupType.CUSTOM:
                 menu[Steps.GROUP] = "Group options"
+            if group_type == GroupType.SUBTRACT:
+                menu[Steps.SUBTRACT_GROUP] = "Group options"
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             menu[Steps.UTILITY_METER_OPTIONS] = "Utility meter options"
@@ -1489,6 +1498,14 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Steps.GROUP)
+
+    async def async_step_subtract_group(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_SUBTRACT_OPTIONS,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Steps.SUBTRACT_GROUP)
 
     async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
