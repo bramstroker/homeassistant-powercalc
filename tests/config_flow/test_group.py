@@ -43,7 +43,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     GroupType,
 )
-from custom_components.powercalc.sensors.group import add_to_associated_group
+from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_group
 from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,

@@ -1,7 +1,6 @@
-# Groups
+# Custom group
 
-Powercalc provides several options to group individual power sensors into a single one which sums the total.
-This can be very useful to get a glance about the consumption of all your lights together for example.
+Create a group with a custom name and add individual power and energy sensors to it.
 
 ## Create group with GUI
 
@@ -15,7 +14,7 @@ When this is not working.
 - Click `Add integration`
 - Search and click `Powercalc`
 
-Select `Group` and follow the instructions.
+Select `Group` -> `Custom` and follow the instructions.
 
 !!! tip
 
@@ -112,40 +111,16 @@ powercalc:
 
 If you use the GUI to create the groups you can use `Additional power entities` and `Additional energy entities` options.
 
-![group_additional_entities](../img/group_additional_entities.png)
+![group_additional_entities](../../img/group_additional_entities.png)
 
-Also see [Real power sensor](real-power-sensor.md)
-
-## Domain groups
-
-Powercalc makes it easy to create a group sensors for all entities of a given domain with the `create_domain_groups` option, or you can use the GUI, select `Group` -> `Domain group`.
-For example let's assume you want group sensors for all your lights and media players you can use the following configuration.
-
-```yaml
-powercalc:
-  create_domain_groups:
-    - light
-    - media_player
-```
-
-!!! note
-
-    This will only include all virtual power sensors created with powercalc, not any other power sensors already available in your HA installation. This is because Powercalc cannot know the source for any given power sensor.
-
-You can also utilize this option to create a group to sum all energy sensors of your HA installation. Use `all` for that.
-
-```yaml
-powercalc:
-  create_domain_groups:
-    - all
-```
+Also see [Real power sensor](../real-power-sensor.md)
 
 ## Automatically include entities
 
 Powercalc has some options to automatically include entities in your group matching certain criteria.
 This can be useful to you don't have to manually specify each and every sensor.
 
-See [include entities](group/include-entities.md) for more information.
+See [include entities](include-entities.md) for more information.
 
 ## Force creating Riemann sum sensor
 
@@ -175,5 +150,5 @@ When you are not interested in the individual energy sensors of each light this 
 
 !!! important
 
-    Beware that if your group also consists of [daily energy](daily-energy.md) sensors the Riemann sum sensor will not be accurate, as it's could be missing the data of this sensor, because it does not always have a power sensor.
+    Beware that if your group also consists of [daily energy](../daily-energy.md) sensors the Riemann sum sensor will not be accurate, as it's could be missing the data of this sensor, because it does not always have a power sensor.
     So you only must use this option when the group power sensor contains all the power data from individual entities.

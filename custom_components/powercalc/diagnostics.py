@@ -3,7 +3,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, SensorType
-from custom_components.powercalc.sensors.group import resolve_entity_ids_recursively
+from custom_components.powercalc.sensors.group.custom import resolve_entity_ids_recursively
 
 
 async def async_get_config_entry_diagnostics(

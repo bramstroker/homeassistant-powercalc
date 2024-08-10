@@ -60,11 +60,7 @@ class StandbyPowerSensor(SensorEntity, PowerSensor):
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_has_entity_name = True
     _attr_unique_id = "powercalc_standby_group"
-
-    @property
-    def name(self) -> str:
-        """Name of the entity."""
-        return "All standby power"
+    _attr_name = "All standby power"
 
     def __init__(self, hass: HomeAssistant, rounding_digits: int = 2) -> None:
         self.standby_sensors: dict[str, Decimal] = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]

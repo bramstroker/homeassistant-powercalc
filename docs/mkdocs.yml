@@ -49,7 +49,11 @@ nav:
       - 'sensor-types/virtual-power-manual.md'
       - 'sensor-types/virtual-power-library.md'
       - 'sensor-types/daily-energy.md'
-      - 'sensor-types/group.md'
+      - 'Group':
+         - 'sensor-types/group/index.md'
+         - 'sensor-types/group/custom.md'
+         - 'sensor-types/group/domain.md'
+         - 'sensor-types/group/subtract.md'
       - 'sensor-types/real-power-sensor.md'
       - 'sensor-types/energy-sensor.md'
       - 'sensor-types/utility-meter.md'

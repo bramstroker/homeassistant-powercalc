@@ -85,7 +85,7 @@ from .const import (
 )
 from .discovery import DiscoveryManager
 from .sensor import SENSOR_CONFIG
-from .sensors.group import (
+from .sensors.group.config_entry_utils import (
     get_entries_having_subgroup,
     remove_group_from_power_sensor_entry,
     remove_power_sensor_from_associated_groups,
