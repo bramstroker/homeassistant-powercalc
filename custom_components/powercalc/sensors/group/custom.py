@@ -118,10 +118,10 @@ UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
 
 
 async def create_group_sensors_yaml(
+    hass: HomeAssistant,
     group_name: str,
     sensor_config: dict[str, Any],
     entities: list[Entity],
-    hass: HomeAssistant,
     filters: list[Callable] | None = None,
 ) -> list[Entity]:
     """Create grouped power and energy sensors."""
