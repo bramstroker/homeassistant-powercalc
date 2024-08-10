@@ -8,7 +8,7 @@ import custom_components.powercalc.sensors.group.custom as custom_group
 import custom_components.powercalc.sensors.group.domain as domain_group
 import custom_components.powercalc.sensors.group.standby as standby_group
 import custom_components.powercalc.sensors.group.subtract as subtract_group
-from custom_components.powercalc.const import CONF_CREATE_GROUP, CONF_GROUP_TYPE, GroupType
+from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
 from custom_components.powercalc.errors import SensorConfigurationError
 
 
@@ -37,7 +37,6 @@ async def create_group_sensors(
             )
         return await custom_group.create_group_sensors_yaml(
             hass=hass,
-            group_name=str(sensor_config.get(CONF_CREATE_GROUP)),
             sensor_config=sensor_config,
             entities=entities or [],
         )

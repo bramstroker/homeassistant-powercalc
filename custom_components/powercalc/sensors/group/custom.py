@@ -58,6 +58,7 @@ from custom_components.powercalc.const import (
     ATTR_IS_GROUP,
     CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_GROUP,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
@@ -119,7 +120,6 @@ UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
 
 async def create_group_sensors_yaml(
     hass: HomeAssistant,
-    group_name: str,
     sensor_config: dict[str, Any],
     entities: list[Entity],
     filters: list[Callable] | None = None,
@@ -136,6 +136,7 @@ async def create_group_sensors_yaml(
             filters,
         )
 
+    group_name = str(sensor_config.get(CONF_CREATE_GROUP))
     return await create_group_sensors_custom(hass, group_name, sensor_config, set(power_sensor_ids), set(energy_sensor_ids))
 
 
@@ -169,6 +170,8 @@ async def create_group_sensors_custom(
     """Create grouped power and energy sensors."""
 
     group_sensors: list[Entity] = []
+    if CONF_NAME not in sensor_config:
+        sensor_config[CONF_NAME] = group_name
 
     power_sensor = None
     if power_sensor_ids or force_create:
