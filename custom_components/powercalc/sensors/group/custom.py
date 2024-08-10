@@ -297,7 +297,9 @@ def create_grouped_power_sensor(
     power_sensor_ids: set[str],
 ) -> GroupedPowerSensor:
     name = generate_power_sensor_name(sensor_config, group_name)
-    unique_id = sensor_config.get(CONF_UNIQUE_ID) or group_name
+    unique_id = sensor_config.get(CONF_UNIQUE_ID)
+    if not unique_id:
+        unique_id = generate_unique_id(sensor_config)
     entity_id = generate_power_sensor_entity_id(
         hass,
         sensor_config,
@@ -363,6 +365,10 @@ def create_grouped_energy_sensor(
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
     )
+
+
+def generate_unique_id(sensor_config: dict[str, Any]) -> str:
+    return str(sensor_config[CONF_NAME])
 
 
 class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):

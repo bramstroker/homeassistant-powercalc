@@ -12,9 +12,9 @@ async def create_domain_group_sensor(
     config: ConfigType,
 ) -> list[Entity]:
     domain = config[CONF_DOMAIN]
-    if CONF_UNIQUE_ID not in config:
-        config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
     name: str = config.get(CONF_NAME, f"All {domain}")
+    if CONF_UNIQUE_ID not in config:
+        config[CONF_UNIQUE_ID] = generate_unique_id(config)
     config[CONF_GROUP_TYPE] = GroupType.DOMAIN
     return await create_group_sensors_custom(
         hass,
@@ -24,3 +24,7 @@ async def create_domain_group_sensor(
         set(),
         force_create=True,
     )
+
+
+def generate_unique_id(sensor_config: ConfigType) -> str:
+    return f"powercalc_domaingroup_{sensor_config[CONF_DOMAIN]}"

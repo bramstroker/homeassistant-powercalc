@@ -75,6 +75,7 @@ from .const import (
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_SUB_PROFILE,
+    CONF_SUBTRACT_ENTITIES,
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
@@ -100,6 +101,7 @@ from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from .sensors.group.factory import generate_unique_id
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.strategy_interface import PowerCalculationStrategyInterface
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
@@ -352,6 +354,28 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
             selector.EntitySelectorConfig(
                 domain=Platform.SENSOR,
                 device_class=[SensorDeviceClass.ENERGY, SensorDeviceClass.POWER],
+                multiple=True,
+            ),
+        ),
+        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GROUP_SUBTRACT = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        vol.Required(CONF_ENTITY_ID): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
+                multiple=False,
+            ),
+        ),
+        vol.Optional(CONF_SUBTRACT_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
                 multiple=True,
             ),
         ),
@@ -908,9 +932,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if user_input is not None and not errors:
             self.name = user_input.get(CONF_NAME)
             self.sensor_config.update(user_input)
-
-            unique_id = str(user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME))
-            return await self.async_handle_group_creation(unique_id)
+            return await self.async_handle_group_creation()
 
         group_schema = SCHEMA_GROUP.extend(
             self.create_schema_group().schema,
@@ -929,15 +951,13 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             self.name = user_input.get(CONF_NAME)
-            domain = user_input.get(CONF_DOMAIN)
             self.sensor_config.update(user_input)
             self.sensor_config.update(
                 {
                     CONF_GROUP_TYPE: GroupType.DOMAIN,
                 },
             )
-            unique_id = f"powercalc_domaingroup_{domain}"
-            return await self.async_handle_group_creation(unique_id)
+            return await self.async_handle_group_creation()
 
         return self.async_show_form(
             step_id=Steps.DOMAIN_GROUP,
@@ -948,10 +968,32 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_handle_group_creation(self, unique_id: str) -> ConfigFlowResult:
+    async def async_step_subtract_group(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Handle the flow for subtract group sensor."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            self.name = user_input.get(CONF_NAME)
+            self.sensor_config.update(user_input)
+            self.sensor_config.update(
+                {
+                    CONF_GROUP_TYPE: GroupType.SUBTRACT,
+                },
+            )
+            return await self.async_handle_group_creation()
+
+        return self.async_show_form(
+            step_id=Steps.DOMAIN_GROUP,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GROUP_DOMAIN,
+                self.get_global_powercalc_config(),
+            ),
+            errors=errors,
+        )
+
+    async def async_handle_group_creation(self) -> ConfigFlowResult:
         """Handle the group creation."""
         self.selected_sensor_type = SensorType.GROUP
-
+        unique_id = generate_unique_id(self.sensor_config)
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 

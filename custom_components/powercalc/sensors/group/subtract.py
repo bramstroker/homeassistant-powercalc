@@ -36,7 +36,7 @@ async def create_subtract_group_sensors(
     subtract_entities = config.get(CONF_SUBTRACT_ENTITIES)
 
     name = generate_power_sensor_name(config, group_name)
-    unique_id = config.get(CONF_UNIQUE_ID) or f"pc_subtract_{base_entity_id}"
+    unique_id = config.get(CONF_UNIQUE_ID, generate_unique_id(config))
     entity_id = generate_power_sensor_entity_id(
         hass,
         config,
@@ -66,6 +66,11 @@ async def create_subtract_group_sensors(
             ),
         )
     return sensors
+
+
+def generate_unique_id(sensor_config: ConfigType) -> str:
+    base_entity_id = str(sensor_config[CONF_ENTITY_ID])
+    return f"pc_subtract_{base_entity_id}"
 
 
 class SubtractGroupSensor(GroupedSensor, PowerSensor):
