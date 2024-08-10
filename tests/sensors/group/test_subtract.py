@@ -1,5 +1,7 @@
-from homeassistant.const import CONF_ENTITY_ID
+import pytest
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
@@ -7,12 +9,14 @@ from custom_components.powercalc.const import (
     CONF_SUBTRACT_ENTITIES,
     GroupType,
 )
+from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.sensors.group.subtract import validate_config
 from tests.common import (
     run_powercalc_setup,
 )
 
 
-async def test_subtract(hass: HomeAssistant) -> None:
+async def test_subtract_sensor(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.a_power", 100)
     hass.states.async_set("sensor.b_power", 20)
     hass.states.async_set("sensor.c_power", 25)
@@ -39,3 +43,56 @@ async def test_subtract(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.test_power")
     assert state.state == "52.55"
+
+
+@pytest.mark.parametrize(
+    "config,valid",
+    [
+        (
+            {
+                CONF_NAME: "Test",
+                CONF_SUBTRACT_ENTITIES: [
+                    "sensor.b_power",
+                    "sensor.c_power",
+                ],
+            },
+            False,
+        ),
+        (
+            {
+                CONF_NAME: "Test",
+                CONF_ENTITY_ID: "sensor.a_power",
+            },
+            False,
+        ),
+        (
+            {
+                CONF_ENTITY_ID: "sensor.a_power",
+                CONF_SUBTRACT_ENTITIES: [
+                    "sensor.b_power",
+                    "sensor.c_power",
+                    "sensor.d_power",
+                ],
+            },
+            False,
+        ),
+        (
+            {
+                CONF_NAME: "Test",
+                CONF_ENTITY_ID: "sensor.a_power",
+                CONF_SUBTRACT_ENTITIES: [
+                    "sensor.b_power",
+                    "sensor.c_power",
+                    "sensor.d_power",
+                ],
+            },
+            True,
+        ),
+    ],
+)
+async def test_validate(config: ConfigType, valid: bool) -> None:
+    if not valid:
+        with pytest.raises(SensorConfigurationError):
+            validate_config(config)
+    else:
+        validate_config(config)

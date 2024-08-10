@@ -133,6 +133,7 @@ class Steps(StrEnum):
     SUB_PROFILE = "sub_profile"
     USER = "user"
     SMART_SWITCH = "smart_switch"
+    SUBTRACT_GROUP = "subtract_group"
     INIT = "init"
     UTILITY_METER_OPTIONS = "utility_meter_options"
 
@@ -148,6 +149,7 @@ MENU_SENSOR_TYPE = {
 MENU_GROUP = {
     Steps.GROUP: "Standard group",
     Steps.DOMAIN_GROUP: "Domain based group",
+    Steps.SUBTRACT_GROUP: "Subtract group",
 }
 
 MENU_OPTIONS = {
@@ -982,9 +984,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             return await self.async_handle_group_creation()
 
         return self.async_show_form(
-            step_id=Steps.DOMAIN_GROUP,
+            step_id=Steps.SUBTRACT_GROUP,
             data_schema=self.fill_schema_defaults(
-                SCHEMA_GROUP_DOMAIN,
+                SCHEMA_GROUP_SUBTRACT,
                 self.get_global_powercalc_config(),
             ),
             errors=errors,

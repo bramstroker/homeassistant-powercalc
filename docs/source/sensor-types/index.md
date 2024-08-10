@@ -26,7 +26,7 @@ Create a virtual power sensor by manual configuration. This is the main feature 
 
 Create a virtual power sensor by selecting from the library of power profiles. See [supported models].
 
-## [Group](group.md)
+## [Group](group/index.md)
 
 Make a group of different individual powercalc sensors. For example you can get the total usage of your kitchen this way or your full house usage. Also supports sub groups and more.
 
@@ -38,7 +38,7 @@ This allows you to create an energy sensor for that which you can add to the ene
 ## [Energy from real power sensor](real-power-sensor.md)
 
 Use this when you have an existing power sensor in your installation, which you want to create energy sensor (and optionally utility meters) for.
-This also makes it possible to add the power sensor to a powercalc [group](group.md).
+This also makes it possible to add the power sensor to a powercalc [group](group/custom.md).
 
 ### Energy sensors and utility meters
 

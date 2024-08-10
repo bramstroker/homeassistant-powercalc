@@ -2,13 +2,10 @@ from __future__ import annotations
 
 import logging
 from _decimal import Decimal
+from typing import cast
 
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorStateClass,
-)
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfPower
-from homeassistant.core import HomeAssistant, State
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNKNOWN
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
 
@@ -17,10 +14,10 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SUBTRACT_ENTITIES,
 )
+from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.abstract import generate_power_sensor_entity_id, generate_power_sensor_name
 from custom_components.powercalc.sensors.energy import create_energy_sensor
-from custom_components.powercalc.sensors.group.custom import GroupedSensor
-from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,9 +28,10 @@ async def create_subtract_group_sensors(
 ) -> list[Entity]:
     """Create subtract group sensors."""
 
+    validate_config(config)
     group_name = str(config.get(CONF_NAME))
     base_entity_id = str(config.get(CONF_ENTITY_ID))
-    subtract_entities = config.get(CONF_SUBTRACT_ENTITIES)
+    subtract_entities = cast(list, config.get(CONF_SUBTRACT_ENTITIES))
 
     name = generate_power_sensor_name(config, group_name)
     unique_id = config.get(CONF_UNIQUE_ID, generate_unique_id(config))
@@ -53,7 +51,7 @@ async def create_subtract_group_sensors(
         config,
         entity_id,
         base_entity_id,
-        subtract_entities,  # type: ignore
+        subtract_entities,
         unique_id=unique_id,
     )
     sensors.append(power_sensor)
@@ -69,15 +67,24 @@ async def create_subtract_group_sensors(
 
 
 def generate_unique_id(sensor_config: ConfigType) -> str:
+    """Generate unique_id for subtract group sensor."""
     base_entity_id = str(sensor_config[CONF_ENTITY_ID])
     return f"pc_subtract_{base_entity_id}"
 
 
-class SubtractGroupSensor(GroupedSensor, PowerSensor):
-    _attr_device_class = SensorDeviceClass.POWER
-    _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = UnitOfPower.WATT
+def validate_config(config: ConfigType) -> None:
+    """Validate subtract group sensor configuration."""
+    if CONF_NAME not in config:
+        raise SensorConfigurationError("name is required")
 
+    if CONF_ENTITY_ID not in config:
+        raise SensorConfigurationError("entity_id is required")
+
+    if CONF_SUBTRACT_ENTITIES not in config:
+        raise SensorConfigurationError("subtract_entities is required")
+
+
+class SubtractGroupSensor(GroupedPowerSensor):
     def __init__(
         self,
         hass: HomeAssistant,
@@ -104,23 +111,7 @@ class SubtractGroupSensor(GroupedSensor, PowerSensor):
         self._base_entity_id = base_entity_id
         self._subtract_entities = subtract_entities
 
-    def calculate_initial_state(
-        self,
-        member_available_states: list[State],
-        member_states: list[State],
-    ) -> Decimal | str:
-        self._states = {state.entity_id: self._get_state_value_in_native_unit(state) for state in member_available_states}
-        return self.calculate_subtracted()
-
-    def calculate_new_state(self, state: State) -> Decimal | str:
-        if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-            if state.entity_id in self._states:
-                del self._states[state.entity_id]
-        else:
-            self._states[state.entity_id] = self._get_state_value_in_native_unit(state)
-        return self.calculate_subtracted()
-
-    def calculate_subtracted(self) -> Decimal | str:
+    def get_summed_state(self) -> Decimal | str:
         base_value = self._states.get(self._base_entity_id)
         if base_value is None:
             return STATE_UNKNOWN
