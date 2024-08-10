@@ -69,7 +69,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.group import PreviousStateStore
+from custom_components.powercalc.sensors.group.custom import PreviousStateStore
 from tests.common import (
     create_input_boolean,
     create_input_booleans,

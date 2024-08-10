@@ -220,3 +220,4 @@ class GroupType(StrEnum):
     CUSTOM = "custom"
     DOMAIN = "domain"
     STANDBY = "standby"
+    SUBTRACT = "subtract"

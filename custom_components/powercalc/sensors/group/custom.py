@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_UNIT_OF_MEASUREMENT,
@@ -47,14 +47,12 @@ from homeassistant.helpers.event import (
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.storage import Store
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.unit_conversion import (
     BaseUnitConverter,
     EnergyConverter,
     PowerConverter,
 )
 
-from custom_components.powercalc.config_flow import ConfigFlow
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
@@ -65,7 +63,6 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
-    CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
@@ -88,20 +85,17 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
-from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.group_include.include import resolve_include_entities
-
-from .abstract import (
+from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from .energy import EnergySensor, VirtualEnergySensor
-from .group_standby import create_general_standby_sensors
-from .power import PowerSensor
-from .utility_meter import create_utility_meters
+from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
@@ -121,26 +115,6 @@ UNIT_CONVERTERS: dict[str | None, type[BaseUnitConverter]] = {
     **{unit: EnergyConverter for unit in EnergyConverter.VALID_UNITS},
     **{unit: PowerConverter for unit in PowerConverter.VALID_UNITS},
 }
-
-
-async def create_group_sensors(hass: HomeAssistant, sensor_config: ConfigType, config_entry: ConfigEntry | None) -> list[Entity]:
-    """Create group sensors for a given sensor configuration."""
-    group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
-    if group_type == GroupType.DOMAIN:
-        return await create_domain_group_sensor(
-            hass,
-            sensor_config,
-        )
-    if group_type == GroupType.STANDBY:
-        return await create_general_standby_sensors(hass, sensor_config)
-
-    if group_type == GroupType.CUSTOM and config_entry:
-        return await create_group_sensors_gui(
-            hass=hass,
-            entry=config_entry,
-            sensor_config=sensor_config,
-        )
-    raise SensorConfigurationError(f"Group type {group_type} invalid")  # pragma: no cover
 
 
 async def create_group_sensors_yaml(
@@ -230,127 +204,6 @@ async def create_group_sensors_custom(
     return group_sensors
 
 
-async def create_domain_group_sensor(
-    hass: HomeAssistant,
-    config: ConfigType,
-) -> list[Entity]:
-    domain = config[CONF_DOMAIN]
-    if CONF_UNIQUE_ID not in config:
-        config[CONF_UNIQUE_ID] = f"powercalc_domaingroup_{domain}"
-    name: str = config.get(CONF_NAME, f"All {domain}")
-    config[CONF_GROUP_TYPE] = GroupType.DOMAIN
-    return await create_group_sensors_custom(
-        hass,
-        name,
-        config,
-        set(),
-        set(),
-        force_create=True,
-    )
-
-
-async def remove_power_sensor_from_associated_groups(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> list[ConfigEntry]:
-    """When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to."""
-    group_entries = [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and config_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
-    ]
-
-    for group_entry in group_entries:
-        member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
-        member_sensors.remove(config_entry.entry_id)
-
-        hass.config_entries.async_update_entry(
-            group_entry,
-            data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: member_sensors},
-        )
-
-    return group_entries
-
-
-async def remove_group_from_power_sensor_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> list[ConfigEntry]:
-    """When the user removes a group config entry we need to update all the virtual power sensors which reference this group."""
-    entries_to_update = [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.VIRTUAL_POWER and entry.data.get(CONF_GROUP) == config_entry.entry_id
-    ]
-
-    for group_entry in entries_to_update:
-        hass.config_entries.async_update_entry(
-            group_entry,
-            data={**group_entry.data, CONF_GROUP: None},
-        )
-
-    return entries_to_update
-
-
-async def add_to_associated_group(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> ConfigEntry | None:
-    """When the user has set a group on a virtual power config entry,
-    we need to add this config entry to the group members sensors and update the group.
-    """
-    sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
-    if sensor_type not in [SensorType.VIRTUAL_POWER, SensorType.DAILY_ENERGY]:
-        return None
-
-    if CONF_GROUP not in config_entry.data or not config_entry.data.get(CONF_GROUP):
-        return None
-
-    group_entry_id = str(config_entry.data.get(CONF_GROUP))
-    group_entry = hass.config_entries.async_get_entry(group_entry_id)
-
-    # When we are not dealing with a uuid, the user has set a group name manually
-    # Create a new group entry for this group
-    if not group_entry and len(group_entry_id) != 32:
-        group_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, group_entry_id)
-        if not group_entry:
-            group_entry = ConfigEntry(
-                version=ConfigFlow.VERSION,
-                minor_version=ConfigFlow.MINOR_VERSION,
-                domain=DOMAIN,
-                source=SOURCE_IMPORT,
-                title=group_entry_id,
-                data={
-                    CONF_SENSOR_TYPE: SensorType.GROUP,
-                    CONF_NAME: group_entry_id,
-                },
-                options={},
-                unique_id=group_entry_id,
-            )
-            await hass.config_entries.async_add(group_entry)
-
-    if not group_entry:
-        _LOGGER.warning(
-            "ConfigEntry %s: Cannot add/remove to group %s. It does not exist.",
-            config_entry.title,
-            group_entry_id,
-        )
-        return None
-
-    member_sensors = set(group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
-
-    # Config entry has already been added to associated group. just skip adding it again
-    if config_entry.entry_id in member_sensors:
-        return None
-
-    member_sensors.add(config_entry.entry_id)
-    hass.config_entries.async_update_entry(
-        group_entry,
-        data={**group_entry.data, CONF_GROUP_MEMBER_SENSORS: list(member_sensors)},
-    )
-    return group_entry
-
-
 def filter_entity_list_by_class(
     all_entities: list,
     class_name: type[EnergySensor | PowerSensor],
@@ -434,14 +287,6 @@ async def resolve_entity_ids_recursively(
         )
 
     return resolved_ids
-
-
-async def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
-    return [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
-    ]
 
 
 @callback
