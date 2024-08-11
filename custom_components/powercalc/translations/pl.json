@@ -203,6 +203,21 @@
         "description": "Obecnie określone ustawienia można konfigurować wyłącznie globalnie",
         "title": "Utwórz sensor energii dla istniejącego sensora mocy"
       },
+      "subtract_group": {
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Base entity",
+          "name": "Name",
+          "unique_id": "Unique id",
+          "subtract_entities": "Subtract entities"
+        },
+        "data_description": {
+          "entity_id": "The base entity to subtract the power from",
+          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+        },
+        "title": "Subtract group sensor"
+      },
       "sub_profile": {
         "data": {
           "sub_profile": "Podprofile"
@@ -398,6 +413,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
+          "subtract_group": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -452,6 +468,17 @@
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
         }
+      },
+      "subtract_group": {
+        "data": {
+          "entity_id": "Base entity",
+          "subtract_entities": "Subtract entities"
+        },
+        "data_description": {
+          "entity_id": "The base entity to subtract the power from",
+          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+        },
+        "title": "Group options"
       },
       "utility_meter_options": {
         "title": "Utility meter options",
