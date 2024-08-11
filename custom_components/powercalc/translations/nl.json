@@ -1,13 +1,13 @@
 {
   "common": {
-    "remarks_smart_switch": "Dit profiel biedt alleen stand-by-stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow"
+    "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow"
   },
   "config": {
     "abort": {
       "already_configured": "Sensor is reeds geconfigureerd, specifieer een uniek ID"
     },
     "error": {
-      "daily_energy_mandatory": "Je moet mimimaal waarde of waarde template opgeven",
+      "daily_energy_mandatory": "Je moet minimaal waarde of waarde template opgeven",
       "entity_mandatory": "Je moet verplicht een entiteit opgeven voor iedere andere strategie dan playbook",
       "fixed_mandatory": "Je dient minimaal een van de volgende velden te definieren: vermogen, vermogen template of vermogen per status",
       "fixed_states_power_only": "Deze entiteit kan alleen functioneren met 'states_power', niet 'power'",
@@ -50,7 +50,7 @@
           "domain": "Entiteit domein",
           "exclude_entities": "Entiteiten uitsluiten"
         },
-        "title": "Maak een domein gebaseerde groepssensor"
+        "title": "Maak een domein gebaseerde groep sensor"
       },
       "fixed": {
         "data": {
@@ -63,7 +63,7 @@
           "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
           "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
         },
-        "description": "Definieer een vaste vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
+        "description": "Definieer een vast vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Gefixeerde configuratie"
       },
       "group": {
@@ -191,7 +191,7 @@
       "real_power": {
         "data": {
           "create_utility_meters": "Creëer utiliteit meters",
-          "entity_id": "Vermogensensor id",
+          "entity_id": "Vermogen sensor id",
           "name": "Naam",
           "device": "Apparaat"
         },
@@ -202,6 +202,21 @@
         },
         "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
         "title": "Maak een energiesensor voor een bestaande stroomsensor"
+      },
+      "subtract_group": {
+        "data": {
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "entity_id": "Basis entiteit",
+          "name": "Naam",
+          "unique_id": "Uniek id",
+          "subtract_entities": "Entiteiten aftrekken"
+        },
+        "data_description": {
+          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
+          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
+        },
+        "title": "Groepssensor aftrekken"
       },
       "sub_profile": {
         "data": {
@@ -216,8 +231,8 @@
           "self_usage_included": "Eigen verbruik inbegrepen"
         },
         "data_description": {
-          "power": "Een vaste stroomwaarde in Watt voor het aangesloten apparaat.",
-          "self_usage_included": "Of de stroomwaarde ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt. Wanneer je dit weglaat zal Powercalc het zelfgebruik van de slimme schakelaar toevoegen aan de energiewaarde, dat is {self_usage_power}W"
+          "power": "Een vaste stroomwaarde in Watt voor het aangesloten apparaat",
+          "self_usage_included": "Of de stroomwaarde ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt. Wanneer je dit weglaat, zal Powercalc het eigen verbruik van de slimme schakelaar toevoegen aan de energiewaarde, dat is {self_usage_power}W"
         },
         "description": "Definieer het stroomverbruik van het aangesloten apparaat. Wanneer het geen vaste hoeveelheid stroom gebruikt, kunt u deze stap overslaan. In dat geval zal Powercalc een vermogenssensor aanmaken om het eigen gebruik van de slimme schakelaar te rapporteren.",
         "title": "Slimme schakelaar configuratie"
@@ -230,7 +245,7 @@
           "daily_energy": "Dagelijkse energie",
           "group": "Groep",
           "menu_library": "Virtueel vermogen (bibliotheek)",
-          "real_power": "Energie bebaseerd op bestaande vermogensensor",
+          "real_power": "Energie gebaseerd op bestaande vermogen sensor",
           "virtual_power": "Virtueel vermogen (handmatig)"
         },
         "title": "Kies het gewenste sensor type"
@@ -255,11 +270,11 @@
           "group": "Aan groep toevoegen",
           "mode": "Calculatie strategie",
           "name": "Naam",
-          "standby_power": "Standby vermogen",
+          "standby_power": "Stand-by vermogen",
           "unique_id": "Uniek id"
         },
         "data_description": {
-          "create_energy_sensor": "Laat powercalc een kWh meter maken",
+          "create_energy_sensor": "Laat Powercalc een kWh meter maken",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
           "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
@@ -398,6 +413,7 @@
           "playbook": "Playbook opties",
           "multi_switch": "Multi switch opties",
           "real_power": "Real power opties",
+          "subtract_group": "Groep opties",
           "utility_meter_options": "Nutsmeter opties",
           "wled": "WLED opties"
         }
@@ -452,6 +468,17 @@
         "data_description": {
           "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
         }
+      },
+      "subtract_group": {
+        "data": {
+          "entity_id": "Basis entiteit",
+          "subtract_entities": "Entiteiten aftrekken"
+        },
+        "data_description": {
+          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
+          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
+        },
+        "title": "Groep opties"
       },
       "utility_meter_options": {
         "title": "Nutsmeter opties",
@@ -544,7 +571,7 @@
       "description": "Een aantal profielen in de bibliotheek ondersteunen verschillende sub profielen. Deze service maakt het mogelijk om een andere te kiezen.",
       "fields": {
         "profile": {
-          "name": "Subprofiel",
+          "name": "Sub profiel",
           "description": "Specificeer een van de mogelijke sub profielen"
         }
       },
