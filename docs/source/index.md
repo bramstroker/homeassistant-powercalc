@@ -7,3 +7,5 @@ Follow [Quick start](quick-start.md) for the initial installation / setup
 :material-github: [Github project](https://github.com/bramstroker/homeassistant-powercalc)
 
 :material-library: [Profile library](https://library.powercalc.nl)
+
+![](img/logo2.svg){: style="height:250px;width:250px"}
