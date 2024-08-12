@@ -13,6 +13,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SUBTRACT_ENTITIES,
+    GroupType,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.abstract import generate_power_sensor_entity_id, generate_power_sensor_name
@@ -104,6 +105,7 @@ class SubtractGroupSensor(GroupedPowerSensor):
             entity_id=entity_id,
             sensor_config=sensor_config,
             rounding_digits=int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, 2)),
+            group_type=GroupType.SUBTRACT,
             unique_id=unique_id,
             device_id=None,  # todo: add device_id
         )
