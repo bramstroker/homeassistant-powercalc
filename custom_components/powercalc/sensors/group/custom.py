@@ -173,11 +173,14 @@ async def create_group_sensors_custom(
     if CONF_NAME not in sensor_config:
         sensor_config[CONF_NAME] = group_name
 
+    group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
+
     power_sensor = None
     if power_sensor_ids or force_create:
         power_sensor = create_grouped_power_sensor(
             hass,
             group_name,
+            group_type,
             sensor_config,
             set(power_sensor_ids),
         )
@@ -188,6 +191,7 @@ async def create_group_sensors_custom(
         energy_sensor = create_grouped_energy_sensor(
             hass,
             group_name,
+            group_type,
             sensor_config,
             set(energy_sensor_ids),
             power_sensor,
@@ -296,6 +300,7 @@ async def resolve_entity_ids_recursively(
 def create_grouped_power_sensor(
     hass: HomeAssistant,
     group_name: str,
+    group_type: GroupType,
     sensor_config: dict,
     power_sensor_ids: set[str],
 ) -> GroupedPowerSensor:
@@ -319,6 +324,7 @@ def create_grouped_power_sensor(
         unique_id=unique_id,
         sensor_config=sensor_config,
         rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION) or DEFAULT_POWER_SENSOR_PRECISION,
+        group_type=group_type,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
     )
@@ -328,6 +334,7 @@ def create_grouped_power_sensor(
 def create_grouped_energy_sensor(
     hass: HomeAssistant,
     group_name: str,
+    group_type: GroupType,
     sensor_config: dict,
     energy_sensor_ids: set[str],
     power_sensor: GroupedPowerSensor | None,
@@ -346,8 +353,12 @@ def create_grouped_energy_sensor(
 
     _LOGGER.debug("Creating grouped energy sensor: %s (entity_id=%s)", name, entity_id)
 
-    force_calculate_energy = bool(sensor_config.get(CONF_FORCE_CALCULATE_GROUP_ENERGY, False))
-    if power_sensor and force_calculate_energy:
+    should_create_riemann = bool(sensor_config.get(CONF_FORCE_CALCULATE_GROUP_ENERGY, False))
+    if not should_create_riemann and not energy_sensor_ids:
+        should_create_riemann = True
+    if group_type == GroupType.DOMAIN and sensor_config.get(CONF_DOMAIN) == "all":
+        should_create_riemann = False
+    if power_sensor and should_create_riemann:
         return VirtualEnergySensor(
             source_entity=power_sensor.entity_id,
             entity_id=entity_id,
@@ -365,6 +376,7 @@ def create_grouped_energy_sensor(
         unique_id=energy_unique_id,
         sensor_config=sensor_config,
         rounding_digits=sensor_config.get(CONF_ENERGY_SENSOR_PRECISION) or DEFAULT_ENERGY_SENSOR_PRECISION,
+        group_type=group_type,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
     )
@@ -388,6 +400,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         entity_id: str,
         sensor_config: dict[str, Any],
         rounding_digits: int,
+        group_type: GroupType,
         unique_id: str | None = None,
         device_id: str | None = None,
     ) -> None:
@@ -404,7 +417,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
         self._native_value_exact = Decimal(0)
         self._states: dict[str, Decimal] = {}
-        self.group_type: GroupType = GroupType(sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM))
+        self.group_type = group_type
 
     async def async_added_to_hass(self) -> None:
         """Register state listeners."""
@@ -600,6 +613,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         entity_id: str,
         sensor_config: dict[str, Any],
         rounding_digits: int,
+        group_type: GroupType,
         unique_id: str | None = None,
         device_id: str | None = None,
     ) -> None:
@@ -610,6 +624,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             entity_id,
             sensor_config,
             rounding_digits,
+            group_type,
             unique_id,
             device_id,
         )
