@@ -217,7 +217,7 @@ class DiscoveryManager:
 
         manufacturer = str(device_entry.manufacturer)
         model = str(device_entry.model)
-        model_id = str(device_entry.model_id) if hasattr(device_entry, "model_id") else None
+        model_id = device_entry.model_id if hasattr(device_entry, "model_id") else None
 
         if len(manufacturer) == 0 or len(model) == 0:
             return None

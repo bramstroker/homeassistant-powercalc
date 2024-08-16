@@ -153,7 +153,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
                     id=device_id,
                     manufacturer=manufacturer,
                     model=model,
-                    # model_id=model_id,
+                    model_id=model_id,
                 ),
             },
         )

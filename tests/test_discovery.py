@@ -325,6 +325,11 @@ async def test_load_model_with_slashes(
             "apple",
             "MQJ83",
         ),
+        (
+            ModelInfo("IKEA", "bladiebla", "LED1649C5"),
+            "ikea",
+            "LED1649C5",
+        ),
     ],
 )
 async def test_autodiscover_model_from_entity_entry(
@@ -338,7 +343,7 @@ async def test_autodiscover_model_from_entity_entry(
     Test the autodiscovery lookup from the library by manufacturer and model information
     A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
     """
-    mock_entity_with_model_information("light.testa", model_info.manufacturer, model_info.model)
+    mock_entity_with_model_information("light.testa", model_info.manufacturer, model_info.model, model_info.model_id)
 
     source_entity = await create_source_entity("light.testa", hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
@@ -419,7 +424,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
                 device_id="a",
             ),
             DeviceEntry(id="a", manufacturer="foo", model="bar"),
-            ModelInfo("foo", "bar"),
+            ModelInfo("foo", "bar", None),
         ),
         (
             RegistryEntry(
@@ -430,6 +435,16 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
             ),
             DeviceEntry(id="b", manufacturer="foo", model="bar"),
             None,
+        ),
+        (
+            RegistryEntry(
+                entity_id="switch.test",
+                unique_id=uuid.uuid4(),
+                platform="switch",
+                device_id="a",
+            ),
+            DeviceEntry(id="a", manufacturer="foo", model="bar", model_id="barry"),
+            ModelInfo("foo", "bar", "barry"),
         ),
     ],
 )
