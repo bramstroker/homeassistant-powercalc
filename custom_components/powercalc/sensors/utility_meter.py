@@ -206,6 +206,6 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     def native_value(self) -> Decimal | StateType:
         """Return the state of the sensor."""
         if self.rounding_digits and self._state is not None:
-            return round(self._state, self.rounding_digits)
+            return round(self._state, self.rounding_digits)  # type: ignore
 
         return self._state
