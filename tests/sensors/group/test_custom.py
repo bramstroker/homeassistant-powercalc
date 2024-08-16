@@ -17,6 +17,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_UNIQUE_ID,
+    STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
     UnitOfEnergy,
@@ -83,6 +84,10 @@ from tests.common import (
 async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     ent_reg = er.async_get(hass)
     await create_input_booleans(hass, ["test1", "test2"])
+    hass.states.async_set("input_boolean.test1", STATE_ON)
+    hass.states.async_set("input_boolean.test2", STATE_ON)
+
+    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -96,16 +101,17 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
                     CONF_UNIQUE_ID: "54552343242",
                     CONF_MODE: CalculationStrategy.FIXED,
                     CONF_FIXED: {CONF_POWER: 10.5},
+                    CONF_IGNORE_UNAVAILABLE_STATE: True,
                 },
                 get_simple_fixed_config("input_boolean.test2", 50),
             ],
         },
     )
 
-    hass.states.async_set("input_boolean.test1", STATE_ON)
-    hass.states.async_set("input_boolean.test2", STATE_ON)
-
     await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.test1_power")
+    assert power_state
 
     power_entry = ent_reg.async_get("sensor.testgroup_power")
     assert power_entry
@@ -122,6 +128,9 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
     }
     assert power_state.state == "60.50"
 
+    hass.states.async_set("sensor.test1_energy", "40.00")
+    await hass.async_block_till_done()
+
     energy_entry = ent_reg.async_get("sensor.testgroup_energy")
     assert energy_entry
     assert energy_entry.unique_id == "group_unique_id_energy"
@@ -135,6 +144,11 @@ async def test_grouped_power_sensor(hass: HomeAssistant) -> None:
         "sensor.test1_energy",
         "sensor.test2_energy",
     }
+
+    hass.states.async_set("input_boolean.test1", STATE_OFF)
+
+    power_state = hass.states.get("sensor.test1_power")
+    assert power_state.state == "10.50"
 
 
 async def test_subgroups_from_config_entry(hass: HomeAssistant) -> None:
@@ -408,6 +422,9 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     Group power sensor must only be unavailable when ALL group members are unavailable
     """
     await create_input_booleans(hass, ["test1", "test2"])
+    hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
+    hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -419,10 +436,6 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
             ],
         },
     )
-
-    hass.states.async_set("input_boolean.test1", STATE_UNAVAILABLE)
-    hass.states.async_set("input_boolean.test2", STATE_UNAVAILABLE)
-    await hass.async_block_till_done()
 
     power_state = hass.states.get("sensor.testgroup_power")
     assert power_state.state == STATE_UNAVAILABLE
@@ -436,6 +449,7 @@ async def test_group_unavailable_when_members_unavailable(hass: HomeAssistant) -
     ):
         hass.states.async_set("input_boolean.test1", STATE_ON)
         await hass.async_block_till_done()
+        await hass.async_block_till_done()  # Need to do double block since HA 2024.8
 
         power_state = hass.states.get("sensor.testgroup_power")
         assert power_state.state != STATE_UNAVAILABLE
@@ -666,6 +680,7 @@ async def test_include_config_entries_in_group(hass: HomeAssistant) -> None:
             CONF_NAME: "GroupA",
             CONF_GROUP_MEMBER_SENSORS: [config_entry.entry_id],
             CONF_GROUP_POWER_ENTITIES: ["sensor.other_power"],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 
@@ -1421,6 +1436,7 @@ async def test_disable_energy_sensor_creation_gui(hass: HomeAssistant) -> None:
 async def test_inital_group_sum_calculated(hass: HomeAssistant) -> None:
     """See https://github.com/bramstroker/homeassistant-powercalc/issues/1922"""
     hass.states.async_set("sensor.my_power", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
 
     await run_powercalc_setup(
         hass,
@@ -1565,6 +1581,7 @@ async def test_decimal_conversion_error_is_logged(hass: HomeAssistant, caplog: p
         ],
     )
     hass.states.async_set("sensor.test", "invalid")
+    await hass.async_block_till_done()
 
     assert "Error converting state value" in caplog.text
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
