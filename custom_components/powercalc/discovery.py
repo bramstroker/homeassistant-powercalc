@@ -194,13 +194,15 @@ class DiscoveryManager:
             model_info = ModelInfo(
                 model_info.manufacturer,
                 model_info.model.replace("/", "#slash#"),
+                model_info.model_id,
             )
 
         _LOGGER.debug(
-            "%s: Auto discovered model (manufacturer=%s, model=%s)",
+            "%s: Auto discovered model (manufacturer=%s, model=%s, model_id=%s)",
             entity_entry.entity_id,
             model_info.manufacturer,
             model_info.model,
+            model_info.model_id,
         )
         return model_info
 
@@ -215,11 +217,12 @@ class DiscoveryManager:
 
         manufacturer = str(device_entry.manufacturer)
         model = str(device_entry.model)
+        model_id = device_entry.model_id if hasattr(device_entry, "model_id") else None
 
         if len(manufacturer) == 0 or len(model) == 0:
             return None
 
-        return ModelInfo(manufacturer, model)
+        return ModelInfo(manufacturer, model, model_id)
 
     @callback
     def _init_entity_discovery(
