@@ -1,0 +1,93 @@
+site_name: Powercalc documentation
+docs_dir: source
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - toc.integrate
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - schema: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: teal
+      accent: purple
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  logo: img/logo.svg
+  favicon: img/logo.svg
+extra:
+  generator: false
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+  - 'index.md'
+  - 'quick-start.md'
+  - 'Sensor types':
+      - 'sensor-types/index.md'
+      - 'sensor-types/virtual-power-manual.md'
+      - 'sensor-types/virtual-power-library.md'
+      - 'sensor-types/daily-energy.md'
+      - 'Group':
+         - 'sensor-types/group/index.md'
+         - 'sensor-types/group/custom.md'
+         - 'sensor-types/group/domain.md'
+         - 'sensor-types/group/subtract.md'
+      - 'sensor-types/real-power-sensor.md'
+      - 'sensor-types/energy-sensor.md'
+      - 'sensor-types/utility-meter.md'
+  - 'Strategies':
+      - 'strategies/index.md'
+      - 'strategies/fixed.md'
+      - 'strategies/linear.md'
+      - 'strategies/lut.md'
+      - 'strategies/multi-switch.md'
+      - 'strategies/playbook.md'
+      - 'strategies/wled.md'
+      - 'strategies/composite.md'
+  - 'Configuration':
+      - 'configuration/global-configuration.md'
+      - 'configuration/sensor-configuration.md'
+      - 'configuration/multiply-factor.md'
+      - 'configuration/standby-power.md'
+      - 'configuration/new-yaml-structure.md'
+  - 'Misc':
+      - 'misc/naming.md'
+  - 'Library':
+      - 'library/library.md'
+      - 'library/structure.md'
+  - 'Troubleshooting':
+      - 'troubleshooting/faq.md'
+      - 'troubleshooting/debug-logging.md'
+      - 'troubleshooting/yeelight.md'
+  - 'Contributing':
+      - 'contributing/index.md'
+      - 'contributing/measure.md'
+      - 'contributing/translating.md'
+  - 'Tutorials':
+      - 'community/tutorials.md'
+repo_url: https://github.com/bramstroker/homeassistant-powercalc
+edit_uri: blob/master/docs/source/

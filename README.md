@@ -9,7 +9,7 @@
 [![Sonar quality gate](https://img.shields.io/sonar/alert_status/bramstroker_homeassistant-powercalc/master?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/summary/new_code?id=bramstroker_homeassistant-powercalc)
 [![BuyMeACoffee](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee&style=for-the-badge)](https://www.buymeacoffee.com/bramski)
 
-# :zap: PowerCalc: Home Assistant Virtual Power Sensors
+# <img src="https://docs.powercalc.nl/img/logo2.svg" width="400">
 
 PowerCalc is a custom component for Home Assistant to estimate the power consumption (as virtual meters) of lights, fans, smart speakers and other devices, which don't have a built-in power meter. The consumption of light entities is calculated using different strategies to estimate the power usage by looking at brightness, hue/saturation and color temperature. For other entities a generic calculation can be applied, based on the attributes relevant for that entity.
 
@@ -19,7 +19,7 @@ Also a measure utility is included which allows user to measure their lights and
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
-Go to the [Quick Start](https://homeassistant-powercalc.readthedocs.io/en/latest/quick-start.html) for installation instruction.
+Go to the [Quick Start](https://docs.powercalc.nl/quick-start/) for installation instruction.
 
-- [Full Documentation](https://homeassistant-powercalc.readthedocs.io/en/latest/)
-- [Supported model listing](docs/supported_models.md)
+- [Full Documentation](https://docs.powercalc.nl)
+- [Supported model listing](https://library.powercalc.nl)

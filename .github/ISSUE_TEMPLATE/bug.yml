@@ -16,8 +16,8 @@ body:
   attributes:
     label: Checklist
     options:
-      - label: I have read the [FAQ](https://homeassistant-powercalc.readthedocs.io/en/latest/troubleshooting/faq.html) to see if there is a known solution to my problem.
-      - label: I have enabled [debug logging](https://homeassistant-powercalc.readthedocs.io/en/latest/troubleshooting/debug-logging.html) for my installation.
+      - label: I have read the [FAQ](https://docs.powercalc.nl/troubleshooting/faq/) to see if there is a known solution to my problem.
+      - label: I have enabled [debug logging](https://docs.powercalc.nl/troubleshooting/debug-logging/) for my installation.
         required: true
       - label: I have filled out the issue template to the best of my ability.
         required: true
@@ -45,7 +45,7 @@ body:
 - type: textarea
   attributes:
     label: "Debug logs"
-    description: "To enable debug logs check this https://homeassistant-powercalc.readthedocs.io/en/latest/troubleshooting/debug-logging.html, this **needs** to include _everything_ from startup of Home Assistant to the point where you encounter the issue."
+    description: "To enable debug logs check this https://docs.powercalc.nl/troubleshooting/debug-logging/, this **needs** to include _everything_ from startup of Home Assistant to the point where you encounter the issue."
     render: text
   validations:
     required: true

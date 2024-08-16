@@ -93,6 +93,7 @@ from .const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
+    CONF_SUBTRACT_ENTITIES,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_OFFSET,
@@ -140,11 +141,8 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
-from .sensors.group import (
-    add_to_associated_group,
-    create_group_sensors,
-    create_group_sensors_yaml,
-)
+from .sensors.group.config_entry_utils import add_to_associated_group
+from .sensors.group.factory import create_group_sensors
 from .sensors.power import VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -211,6 +209,10 @@ SENSOR_CONFIG = {
         [cls.value for cls in UnitPrefix],
     ),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
+    vol.Optional(CONF_GROUP_TYPE): vol.In(
+        [cls.value for cls in GroupType],
+    ),
+    vol.Optional(CONF_SUBTRACT_ENTITIES): vol.All(cv.ensure_list, [cv.entity_id]),
     vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
     vol.Optional(CONF_INCLUDE): vol.Schema(
         {
@@ -300,13 +302,19 @@ async def async_setup_platform(
             breaks_in_ha_version=None,
             is_fixable=False,
             severity=IssueSeverity.WARNING,
-            learn_more_url="https://homeassistant-powercalc.readthedocs.io/en/latest/configuration/new-yaml-structure.html",
+            learn_more_url="https://docs.powercalc.nl/configuration/new-yaml-structure/",
             translation_key="deprecated_platform_yaml",
             translation_placeholders={"platform": SENSOR_DOMAIN},
         )
 
     if discovery_info:
         config = convert_discovery_info_to_sensor_config(discovery_info)
+
+    if config.get(CONF_GROUP_TYPE) == GroupType.SUBTRACT:
+        config[CONF_SENSOR_TYPE] = SensorType.GROUP
+
+    if CONF_CREATE_GROUP in config:
+        config[CONF_NAME] = config[CONF_CREATE_GROUP]
 
     await _async_setup_entities(
         hass,
@@ -687,11 +695,11 @@ async def create_sensors(
     # Create group sensors (power, energy, utility)
     if CONF_CREATE_GROUP in config:
         entities_to_add.new.extend(
-            await create_group_sensors_yaml(
-                str(config.get(CONF_CREATE_GROUP)),
+            await create_group_sensors(
+                hass,
                 get_merged_sensor_configuration(global_config, config, validate=False),
+                None,
                 entities_to_add.all(),
-                hass=hass,
             ),
         )
 

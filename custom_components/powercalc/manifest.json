@@ -16,7 +16,7 @@
     "select",
     "utility_meter"
   ],
-  "documentation": "https://github.com/bramstroker/homeassistant-powercalc",
+  "documentation": "https://docs.powercalc.nl",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/bramstroker/homeassistant-powercalc/issues",
   "requirements": [

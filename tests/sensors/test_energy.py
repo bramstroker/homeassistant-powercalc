@@ -269,6 +269,7 @@ async def test_real_energy_sensor(hass: HomeAssistant) -> None:
                     CONF_ENERGY_SENSOR_ID: "sensor.existing_energy",
                 },
             ],
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
 

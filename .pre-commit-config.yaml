@@ -14,6 +14,7 @@ repos:
       - id: check-symlinks
       - id: check-toml
       - id: check-yaml
+        exclude: mkdocs\.yml$
       - id: debug-statements
       - id: destroyed-symlinks
       - id: end-of-file-fixer

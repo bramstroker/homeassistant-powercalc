@@ -84,13 +84,21 @@ description = "Powercalc HA custom component"
 authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "*"
+mkdocs-material = "*"
+mkdocs-git-revision-date-localized-plugin = "*"
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3"
-ruff = "^0.5.0"
+ruff = "^0.6.0"
 mypy = "1.10.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.148"
+pytest-homeassistant-custom-component = "0.13.153"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^3.0.0"

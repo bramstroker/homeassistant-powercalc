@@ -56,7 +56,7 @@ async def create_energy_sensor(
     hass: HomeAssistant,
     sensor_config: ConfigType,
     power_sensor: PowerSensor,
-    source_entity: SourceEntity,
+    source_entity: SourceEntity | None = None,
 ) -> EnergySensor:
     """Create the energy sensor entity."""
     # User specified an existing energy sensor with "energy_sensor_id" option. Just return that one
@@ -134,8 +134,8 @@ async def create_energy_sensor(
         entity_category=entity_category,
         name=name,
         unit_prefix=unit_prefix,
-        powercalc_source_entity=source_entity.entity_id,
-        powercalc_source_domain=source_entity.domain,
+        powercalc_source_entity=source_entity.entity_id if source_entity else None,
+        powercalc_source_domain=source_entity.domain if source_entity else None,
         sensor_config=sensor_config,
         device_info=get_device_info(hass, sensor_config, source_entity),
     )
