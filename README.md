@@ -22,4 +22,4 @@ Also a measure utility is included which allows user to measure their lights and
 Go to the [Quick Start](https://docs.powercalc.nl/quick-start/) for installation instruction.
 
 - [Full Documentation](https://docs.powercalc.nl)
-- [Supported model listing](docs/supported_models.md)
+- [Supported model listing](https://library.powercalc.nl)
