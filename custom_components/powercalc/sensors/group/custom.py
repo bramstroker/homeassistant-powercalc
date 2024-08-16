@@ -417,6 +417,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         self._prev_state_store: PreviousStateStore = PreviousStateStore(hass)
         self._native_value_exact = Decimal(0)
         self._states: dict[str, Decimal] = {}
+        self._ignore_unavailable_state = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
         self.group_type = group_type
 
     async def async_added_to_hass(self) -> None:
@@ -511,14 +512,17 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         all_states = [self.hass.states.get(entity_id) for entity_id in self._entities]
         states: list[State] = list(filter(None, all_states))
         available_states = [state for state in states if state and state.state not in [STATE_UNKNOWN, STATE_UNAVAILABLE]]
-        new_state = self.calculate_initial_state(available_states, states)
+        if not available_states and not self._ignore_unavailable_state:
+            new_state: Decimal | str = STATE_UNAVAILABLE
+        else:
+            new_state = self.calculate_initial_state(available_states, states)
         self.set_new_state(new_state)
 
     @callback
     def set_new_state(self, state: Decimal | str) -> None:
         """Set the new state and update the entity."""
         if state == STATE_UNAVAILABLE or not isinstance(state, Decimal):
-            self._attr_available = bool(self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE))
+            self._attr_available = self._ignore_unavailable_state
             self.async_write_ha_state()
             return
 
@@ -592,7 +596,7 @@ class GroupedPowerSensor(GroupedSensor, PowerSensor):
 
     def get_summed_state(self) -> Decimal | str:
         if not self._states:
-            if self._sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE):
+            if self._ignore_unavailable_state:
                 return Decimal(0)
             return STATE_UNAVAILABLE
 
