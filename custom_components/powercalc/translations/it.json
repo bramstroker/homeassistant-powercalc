@@ -64,7 +64,7 @@
           "states_power": "One 'state: power' pair on each row, see example above"
         },
         "description": "Definisci un valore di potenza fisso per la tua entità. In alternativa puoi definire un valore di potenza per stato. Per esempio:\n\n`playing: 8.3`\n`pausa: 2.25`",
-        "title": "Fixed config"
+        "title": "Configurazione fissa"
       },
       "group": {
         "data": {
@@ -76,22 +76,22 @@
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Nascondi membri",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Includere sensori non powercalc",
           "name": "Nome",
           "sub_groups": "Sottogruppi",
           "unique_id": "Id univoco"
         },
         "data_description": {
-          "area": "Adds all power sensors from the specified area",
+          "area": "Aggiunge tutti i sensori di potenza dall'area specificata",
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "device": "Add the group entities powercalc creates to an existing device",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
-          "group_member_sensors": "Powercalc sensors to include in the group",
+          "group_member_sensors": "Sensori di Powercalc da includere nel gruppo",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
           "sub_groups": "All containing sensors from the selected subgroups will be added to this group as well"
         },
-        "title": "Create a group sensor"
+        "title": "Crea un sensore di gruppo"
       },
       "library": {
         "data": {
@@ -112,7 +112,7 @@
           "min_power": "Minima Potenza"
         },
         "data_description": {
-          "attribute": "Specify the attribute. When left empty will be brightness for lights and percentage for fans",
+          "attribute": "Specifica l'attributo. Quando lasciato vuoto sarà luminosità per le luci e percentuale per i ventilatori",
           "calibrate": "Inserire un valore di calibrazione su ogni riga. Esempio\n\n1: 20"
         },
         "title": "Configurazione lineare"
@@ -136,17 +136,17 @@
           "group": "Gruppo standard",
           "domain_group": "Domain based group"
         },
-        "title": "Choose the group type",
+        "title": "Scegli il tipo di gruppo",
         "description": "Seleziona il tipo di sensore di gruppo che vuoi creare. Scegliere un gruppo basato sul dominio se si desidera raggruppare tutte le entità di un dominio specifico, o creare un sensore che sommi tutti i sensori di energia. Scegli il gruppo standard altrimenti"
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Cambia entità",
+          "power": "Alimentazione ON",
+          "power_off": "Alimentazione Spenta"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
+          "entities": "Seleziona tutti i singoli interruttori che fanno parte del multi switch",
           "power": "Power for a single switch when turned on",
           "power_off": "Power for a single switch when turned off"
         },
@@ -191,13 +191,13 @@
       "real_power": {
         "data": {
           "create_utility_meters": "Crea contatori (utility meters)",
-          "entity_id": "Power sensor id",
+          "entity_id": "Id sensore di potenza",
           "name": "Nome",
           "device": "Dispositivo"
         },
         "data_description": {
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "name": "Base name for the energy and utility meter. Full entity name will be set accordingly to energy_sensor_naming setting",
+          "name": "Nome base per il misuratore di energia e utilità. Il nome completo dell'entità sarà impostato di conseguenza sull'impostazione energy_sensor_naming",
           "device": "Aggiungi il sensore di energia creato a un dispositivo specifico"
         },
         "description": "Currently specific settings can only be configured globally",
@@ -205,11 +205,11 @@
       },
       "subtract_group": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "unique_id": "Unique id",
+          "create_energy_sensor": "Crea sensore di energia",
+          "create_utility_meters": "Crea contatori (utility meters)",
+          "entity_id": "Entità di base",
+          "name": "Nome",
+          "unique_id": "Id univoco",
           "subtract_entities": "Subtract entities"
         },
         "data_description": {
@@ -309,7 +309,7 @@
       "fixed_states_power_only": "This entity can only work with 'states_power' not 'power'",
       "group_mandatory": "You must define at least subgroups or power and energy-entities",
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
-      "linear_min_higher_as_max": "Max power cannot be lower than min power",
+      "linear_min_higher_as_max": "La potenza massima non può essere inferiore a quella minima",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
       "unknown": "Unknown error occured, please see the logs for additional information"
     },
@@ -388,7 +388,7 @@
           "group_energy_entities": "Altre entità energetiche",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
-          "hide_members": "Hide members",
+          "hide_members": "Nascondi utenti",
           "include_non_powercalc_sensors": "Includi sensori non powercalc",
           "sub_groups": "Sottogruppi"
         },
@@ -436,8 +436,8 @@
         "title": "Opzioni multi-switch",
         "data": {
           "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "power": "Alimentazione Attiva",
+          "power_off": "Alimentazione Spenta"
         },
         "data_description": {
           "entities": "Seleziona tutti i singoli interruttori che fanno parte del multi switch",
@@ -478,13 +478,13 @@
           "entity_id": "The base entity to subtract the power from",
           "subtract_entities": "Select all the entities you want to subtract from the base entity"
         },
-        "title": "Group options"
+        "title": "Opzioni del gruppo"
       },
       "utility_meter_options": {
         "title": "Opzioni contatore utilità",
         "data": {
           "utility_meter_types": "Cicli",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_tariffs": "Tariffe"
         },
         "data_description": {
           "utility_meter_types": "Create utility meters for specified cycles",
@@ -492,7 +492,7 @@
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "Opzioni WLED",
         "data": {
           "power_factor": "Power factor",
           "voltage": "Tensione"
@@ -519,7 +519,7 @@
           "name": "Valore"
         }
       },
-      "name": "Calibrate energy sensor"
+      "name": "Calibra il sensore di energia"
     },
     "calibrate_utility_meter": {
       "description": "Calibrates a utility meter sensor.",
@@ -561,7 +561,7 @@
     },
     "reset_energy": {
       "description": "Ripristina un sensore di energia a zero kWh.",
-      "name": "Reset energy sensor"
+      "name": "Reimposta sensore di energia"
     },
     "stop_playbook": {
       "description": "Stop currently active playbook.",
