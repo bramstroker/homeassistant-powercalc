@@ -674,9 +674,7 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         """
         group_sum = Decimal(self._native_value_exact) if self._native_value_exact else Decimal(0)
         _LOGGER.debug("%s: Recalculate, current value: %s", self.entity_id, group_sum)
-        for state in member_states:
-            if state.state in [STATE_UNKNOWN, STATE_UNAVAILABLE]:
-                continue
+        for state in member_available_states:
             group_sum += self.calculate_delta(state)
 
         _LOGGER.debug(

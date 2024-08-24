@@ -807,8 +807,6 @@ async def create_individual_sensors(
             power_sensor = await create_power_sensor(hass, sensor_config, source_entity, config_entry)
         except PowercalcSetupError:
             return EntitiesBucket()
-        if not power_sensor:
-            return EntitiesBucket()
         entities_to_add.append(power_sensor)
         energy_sensor = await create_energy_sensor_if_needed(hass, sensor_config, power_sensor, source_entity)
         if energy_sensor:
