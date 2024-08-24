@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from decimal import Decimal
 
 from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
@@ -53,26 +54,20 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
     ) -> PowerCalculationStrategyInterface:
         """Create instance of calculation strategy based on configuration."""
-        if strategy == CalculationStrategy.LINEAR:
-            return self._create_linear(source_entity, config, power_profile)
-
-        if strategy == CalculationStrategy.FIXED:
-            return self._create_fixed(source_entity, config, power_profile)
-
-        if strategy == CalculationStrategy.LUT:
-            return self._create_lut(source_entity, power_profile)
-
-        if strategy == CalculationStrategy.MULTI_SWITCH:
-            return self._create_multi_switch(config, power_profile)
-
-        if strategy == CalculationStrategy.PLAYBOOK:
-            return self._create_playbook(config)
-
-        if strategy == CalculationStrategy.WLED:
-            return self._create_wled(source_entity, config)
+        strategy_mapping: dict[str, Callable[[], PowerCalculationStrategyInterface]] = {
+            CalculationStrategy.LINEAR: lambda: self._create_linear(source_entity, config, power_profile),
+            CalculationStrategy.FIXED: lambda: self._create_fixed(source_entity, config, power_profile),
+            CalculationStrategy.LUT: lambda: self._create_lut(source_entity, power_profile),
+            CalculationStrategy.MULTI_SWITCH: lambda: self._create_multi_switch(config, power_profile),
+            CalculationStrategy.PLAYBOOK: lambda: self._create_playbook(config),
+            CalculationStrategy.WLED: lambda: self._create_wled(source_entity, config),
+        }
 
         if strategy == CalculationStrategy.COMPOSITE:
             return await self._create_composite(config, power_profile, source_entity)
+
+        if strategy in strategy_mapping:
+            return strategy_mapping[strategy]()
 
         raise UnsupportedStrategyError("Invalid calculation mode", strategy)
 

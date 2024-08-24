@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import logging
-from _decimal import Decimal
+from decimal import Decimal
 from typing import cast
 
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNKNOWN
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
@@ -116,7 +116,7 @@ class SubtractGroupSensor(GroupedPowerSensor):
     def get_summed_state(self) -> Decimal | str:
         base_value = self._states.get(self._base_entity_id)
         if base_value is None:
-            return STATE_UNKNOWN
+            return STATE_UNAVAILABLE
         subtracted_value = base_value
         for entity_id in self._subtract_entities:
             subtracted_value -= self._states.get(entity_id, 0)

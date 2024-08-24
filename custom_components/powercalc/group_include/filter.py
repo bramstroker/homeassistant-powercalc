@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from enum import StrEnum
 from typing import Protocol, cast
 
@@ -59,26 +60,21 @@ def create_composite_filter(
 
 def create_filter(
     filter_type: str,
-    filter_config: ConfigType,
+    filter_config: ConfigType | str | list | Template,
     hass: HomeAssistant,
 ) -> IncludeEntityFilter:
-    if filter_type == CONF_DOMAIN:
-        return DomainFilter(filter_config)  # type: ignore
-    if filter_type == CONF_AREA:
-        return AreaFilter(hass, filter_config)  # type: ignore
-    if filter_type == CONF_WILDCARD:
-        return WildcardFilter(filter_config)  # type: ignore
-    if filter_type == CONF_GROUP:
-        return GroupFilter(hass, filter_config)  # type: ignore
-    if filter_type == CONF_TEMPLATE:
-        return TemplateFilter(hass, filter_config)  # type: ignore
-    if filter_type == CONF_ALL:
-        return NullFilter()
-    if filter_type == CONF_OR:
-        return create_composite_filter(filter_config, hass, FilterOperator.OR)
-    if filter_type == CONF_AND:
-        return create_composite_filter(filter_config, hass, FilterOperator.AND)
-    return NullFilter()
+    filter_mapping: dict[str, Callable[[], IncludeEntityFilter]] = {
+        CONF_DOMAIN: lambda: DomainFilter(filter_config),  # type: ignore
+        CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
+        CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
+        CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
+        CONF_TEMPLATE: lambda: TemplateFilter(hass, filter_config),  # type: ignore
+        CONF_ALL: lambda: NullFilter(),
+        CONF_OR: lambda: create_composite_filter(filter_config, hass, FilterOperator.OR),  # type: ignore
+        CONF_AND: lambda: create_composite_filter(filter_config, hass, FilterOperator.AND),  # type: ignore
+    }
+
+    return filter_mapping.get(filter_type, lambda: NullFilter())()
 
 
 class IncludeEntityFilter(Protocol):
