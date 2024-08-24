@@ -1082,15 +1082,15 @@ async def test_ignore_unavailable_state(hass: HomeAssistant) -> None:
 
 
 async def test_energy_sensor_delta_updates_new_sensor(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+
     await _create_energy_group(
         hass,
         "TestGroup",
         ["sensor.a_energy", "sensor.b_energy"],
     )
-
-    hass.states.async_set("sensor.a_energy", "2.00")
-    hass.states.async_set("sensor.b_energy", "3.00")
-    await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "5.0000"
 

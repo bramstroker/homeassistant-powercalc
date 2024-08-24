@@ -691,6 +691,17 @@ async def test_switch_sub_profile_service(hass: HomeAssistant) -> None:
     config_entry = hass.config_entries.async_get_entry(entry.entry_id)
     assert config_entry.data.get(CONF_MODEL) == "sub_profile_camera/night_vision"
 
+    # Trigger again for coverage, this should not change the state / raise an exception
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_SWITCH_SUB_PROFILE,
+        {
+            ATTR_ENTITY_ID: "sensor.test_power",
+            "profile": "night_vision",
+        },
+        blocking=True,
+    )
+
 
 async def test_switch_sub_profile_raises_exception_when_profile_has_no_sub_profiles(
     hass: HomeAssistant,

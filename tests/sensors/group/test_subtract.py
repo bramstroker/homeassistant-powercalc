@@ -1,5 +1,5 @@
 import pytest
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
@@ -43,6 +43,26 @@ async def test_subtract_sensor(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.test_power")
     assert state.state == "52.55"
+
+
+async def test_base_sensor_state_none(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.b_power", 20)
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test",
+            CONF_GROUP_TYPE: GroupType.SUBTRACT,
+            CONF_ENTITY_ID: "sensor.a_power",
+            CONF_SUBTRACT_ENTITIES: [
+                "sensor.b_power",
+            ],
+        },
+    )
+
+    state = hass.states.get("sensor.test_power")
+    assert state
+    assert state.state == STATE_UNAVAILABLE
 
 
 @pytest.mark.parametrize(
