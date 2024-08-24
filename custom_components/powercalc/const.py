@@ -13,7 +13,7 @@ from homeassistant.const import (
 )
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 
-MIN_HA_VERSION = "2024.3"
+MIN_HA_VERSION = "2024.4"
 
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
