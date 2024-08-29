@@ -1,6 +1,6 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+    "remarks_smart_switch": "Ten profil dostarcza tylko wartości poboru mocy w trybie czuwania. \n Gdy masz urządzenie, które zużywa stałą ilość energii po włączeniu, możesz podać tę wartość w następnym kroku przepływu konfiguracji"
   },
   "config": {
     "abort": {
@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
-          "group": "Add to group",
+          "group": "Dodaj do grupy",
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Moment uruchomienia",
@@ -36,7 +36,7 @@
           "value_template": "Szablon wartości"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
+          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień = zawsze włączone",
           "update_frequency": "Czas w sekundach między aktualizacjami stanu sensora"
         },
@@ -44,13 +44,13 @@
       },
       "domain_group": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Nazwa",
+          "create_energy_sensor": "Utwórz czujnik energii",
+          "create_utility_meters": "Utwórz liczniki mediów",
+          "domain": "Domena obiektu",
+          "exclude_entities": "Wyklucz obiekty"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Utwórz czujnik grupy oparty na domenie"
       },
       "fixed": {
         "data": {
@@ -69,21 +69,21 @@
       "group": {
         "data": {
           "area": "Obszar",
-          "create_energy_sensor": "Create energy sensor",
+          "create_energy_sensor": "Utwórz czujnik energii",
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
           "device": "Urządzenie",
           "group_energy_entities": "Członek encji energii",
           "group_member_sensors": "Członek czujników powercalc",
           "group_power_entities": "Członek encji mocy",
           "hide_members": "Ukryj członków",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Dołącz czujniki nie-powercalc",
           "name": "Nazwa",
           "sub_groups": "Podgrupy",
           "unique_id": "Unikatowy identyfikator"
         },
         "data_description": {
           "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
           "device": "Dodaj encje grupy utworzone przez Powercalc dla istniejącego urządzenia",
           "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
           "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
@@ -133,8 +133,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standard group",
-          "domain_group": "Domain based group"
+          "group": "Standardowa grupa",
+          "domain_group": "Grupa oparta na domenie"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
