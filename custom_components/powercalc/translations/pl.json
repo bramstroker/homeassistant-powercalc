@@ -88,7 +88,7 @@
           "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
           "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
           "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-powercalc podczas korzystania z opcji obszaru",
           "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
         },
         "title": "Utwórz czujnik grupy"
@@ -136,34 +136,34 @@
           "group": "Standardowa grupa",
           "domain_group": "Grupa oparta na domenie"
         },
-        "title": "Choose the group type",
+        "title": "Wybierz typ grupy",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Obiekty przełączników",
+          "power": "WŁĄCZ zasilanie",
+          "power_off": "WYŁĄCZ zasilanie"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Zaznacz wszystkie indywidualne przełączniki, które są częścią wieloprzełącznika",
+          "power": "Moc dla pojedynczego przełącznika, kiedy włączony",
+          "power_off": "Moc dla pojedynczego przełącznika, kiedy wyłączony"
         },
-        "title": "Multi switch config"
+        "title": "Konfiguracja wieloprzełącznika"
       },
       "playbook": {
         "data": {
           "autostart": "Autostart",
           "playbooks": "Playbook'i",
           "repeat": "Powtarzaj",
-          "states_trigger": "State trigger"
+          "states_trigger": "Spust stanu"
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
           "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzania: program1"
         },
         "title": "Konfiguracja Playbook'ów"
       },
@@ -175,7 +175,7 @@
           "multiply_factor": "Mnożnik",
           "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
           "unavailable_power": "Wartość mocy dla niedostęności",
-          "utility_meter_tariffs": "Utility meter tariffs"
+          "utility_meter_tariffs": "Taryfy licznika mediów"
         },
         "data_description": {
           "calculation_enabled_condition": "Skonfigurowana strategia obliczania mocy zostanie wykonana tylko wtedy, gdy ten szablon oszacuje prawdę lub 1, w przeciwnym razie czujnik mocy wyświetli 0",
@@ -183,7 +183,7 @@
           "multiply_factor": "Mnoży obliczoną moc przez ten współczynnik. Może być przydatny dla grup świateł",
           "multiply_factor_standby": "Czy zastosować mnożnik również do mocy w trybie gotowości",
           "unavailable_power": "Moc w W do rejestrowania, gdy encja źródłowa jest w stanie niedostępności (unavailable)",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
         },
         "description": "Poniższe opcje dotyczą zaawansowanej konfiguracji Powercalc. Większość użytkowników nie będzie z tego korzystać, więc możesz je pominąć",
         "title": "Opcje zaawansowane"
@@ -193,30 +193,30 @@
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
           "entity_id": "Identyfikator sensora mocy",
           "name": "Nazwa",
-          "device": "Device"
+          "device": "Urządzenie"
         },
         "data_description": {
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
           "name": "Podstawowa nazwa licznika energii i mediów. Pełna nazwa encji zostanie ustawiona zgodnie z ustawieniem energy_sensor_naming",
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
         },
         "description": "Obecnie określone ustawienia można konfigurować wyłącznie globalnie",
         "title": "Utwórz sensor energii dla istniejącego sensora mocy"
       },
       "subtract_group": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "unique_id": "Unique id",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "Utwórz czujnik energii",
+          "create_utility_meters": "Utwórz liczniki mediów",
+          "entity_id": "Główny obiekt",
+          "name": "Nazwa",
+          "unique_id": "Unikatowy identyfikator",
+          "subtract_entities": "Odejmujące obiekty"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Główny obiekt, od którego należy odejmować energie",
+          "subtract_entities": "Wybierz wszystkie elementy, które chcesz odjąć od podstawowego obiektu"
         },
-        "title": "Subtract group sensor"
+        "title": "Odejmujący czujnik grupy"
       },
       "sub_profile": {
         "data": {
@@ -227,15 +227,15 @@
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "Moc",
+          "self_usage_included": "Zawarte własne użycie"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
+          "power": "Stała wartość mocy w watach dla podłączonego urządzenia",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
         },
         "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
-        "title": "Smart switch config"
+        "title": "Konfiguracja inteligentnego przełącznika"
       },
       "user": {
         "data": {
@@ -251,14 +251,14 @@
         "title": "Wybierz typ sensora"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "Opcje licznika mediów",
         "description": "Define the settings for utility meter creation here",
         "data": {
-          "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_types": "Cykle",
+          "utility_meter_tariffs": "Taryfy"
         },
         "data_description": {
-          "utility_meter_types": "Create utility meters for specified cycles",
+          "utility_meter_types": "Utwórz liczniki mediów dla określonych cykli",
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
       },
@@ -302,7 +302,7 @@
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "Model nie jest wspierany"
     },
     "error": {
       "fixed_mandatory": "Musisz podać co najmniej jedno z: Moc, Szablon mocy lub Moce stanów",
@@ -315,10 +315,10 @@
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "Opcje zaawansowane",
         "data": {
           "calculation_enabled_condition": "Warunek włączenia obliczeń",
-          "energy_integration_method": "Energy integration method",
+          "energy_integration_method": "Metoda integracji energii",
           "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "multiply_factor": "Mnożnik",
           "multiply_factor_standby": "Mnożnik trybu gotowości (standby)",
@@ -333,28 +333,28 @@
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "Opcje podstawowe",
         "data": {
           "create_energy_sensor": "Utwórz sensor energii",
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
-          "entity_id": "Source entity",
+          "entity_id": "Jednostka źródłowa",
           "name": "Nazwa",
           "standby_power": "Moc w trybie czuwania"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
+          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "name": "Leaving blank will take the name from the source entity",
           "standby_power": "Define the amount of power the device is consuming when in an OFF state"
         }
       },
       "daily_energy": {
-        "title": "Daily energy options",
+        "title": "Dzienne opcje energii",
         "data": {
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
-          "start_time": "Start time",
+          "start_time": "Czas rozpoczęcia",
           "unit_of_measurement": "Jednostka pomiaru",
           "update_frequency": "Częstotliwość aktualizacji",
           "value": "Wartość",
@@ -366,22 +366,22 @@
         }
       },
       "fixed": {
-        "title": "Fixed options",
+        "title": "Opcje stałe",
         "data": {
           "power": "Moc",
           "power_template": "Szablon mocy",
-          "self_usage_included": "Self usage included",
+          "self_usage_included": "Zawarte własne użycie",
           "states_power": "Moce stanów"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
+          "power": "Stała wartość mocy w watach, gdy jednostka jest włączona",
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
           "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej"
         }
       },
       "group": {
-        "title": "Group options",
+        "title": "Opcje grupy",
         "data": {
           "area": "Obszar",
           "device": "Urządzenie",
@@ -389,7 +389,7 @@
           "group_member_sensors": "Członek czujników powercalc",
           "group_power_entities": "Członek encji mocy",
           "hide_members": "Ukryj członków",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "include_non_powercalc_sensors": "Dołącz czujniki nie-powercalc",
           "sub_groups": "Podgrupy"
         },
         "data_description": {
@@ -404,22 +404,22 @@
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
-          "daily_energy": "Daily energy options",
-          "fixed": "Fixed options",
-          "group": "Group options",
-          "linear": "Linear options",
-          "playbook": "Playbook options",
-          "multi_switch": "Multi switch options",
-          "real_power": "Real power options",
-          "subtract_group": "Group options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options"
+          "advanced_options": "Opcje zaawansowane",
+          "basic_options": "Opcje podstawowe",
+          "daily_energy": "Dzienne opcje energii",
+          "fixed": "Opcje stałe",
+          "group": "Opcje grupy",
+          "linear": "Opcje liniowe",
+          "playbook": "Opcje playbook",
+          "multi_switch": "Opcje wieloprzełącznika",
+          "real_power": "Opcje rzeczywistej mocy",
+          "subtract_group": "Opcje grupy",
+          "utility_meter_options": "Opcje licznika mediów",
+          "wled": "Opcje WLED"
         }
       },
       "linear": {
-        "title": "Linear options",
+        "title": "Opcje liniowe",
         "data": {
           "attribute": "Atrybut",
           "calibrate": "Wartości kalibracji",
@@ -433,69 +433,69 @@
         }
       },
       "multi_switch": {
-        "title": "Multi switch options",
+        "title": "Opcje wieloprzełącznika",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Obiekty przełączników",
+          "power": "WŁĄCZ zasilanie",
+          "power_off": "WYŁĄCZ zasilanie"
         },
         "data_description": {
           "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "power": "Moc dla pojedynczego przełącznika, kiedy włączony",
+          "power_off": "Moc dla pojedynczego przełącznika, kiedy wyłączony"
         }
       },
       "playbook": {
-        "title": "Playbook options",
+        "title": "Opcje playbook",
         "data": {
           "autostart": "Autostart",
           "playbooks": "Playbook'i",
           "repeat": "Powtarzaj",
-          "states_trigger": "State trigger"
+          "states_trigger": "Spust stanu"
         },
         "data_description": {
           "autostart": "Wskaż rozpoczęcie określonego playbooka po uruchomieniu HA. tj. 'program1'",
           "playbooks": "Wprowadź playbook w każdym wierszu. Przykład\n\nprogram1: pralka/program1.csv",
           "repeat": "Przełącz, jeśli chcesz powtarzać playbook po jego zakończeniu",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "states_trigger": "Wywołaj playbook na podstawie zmiany stanu. Przykład\n\nodtwarzania: program1"
         }
       },
       "real_power": {
-        "title": "Real power options",
+        "title": "Opcje rzeczywistej mocy",
         "data": {
           "device": "Urządzenie"
         },
         "data_description": {
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
         }
       },
       "subtract_group": {
         "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "Główny obiekt",
+          "subtract_entities": "Odejmujące obiekty"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Główny obiekt, od którego należy odejmować energie",
+          "subtract_entities": "Wybierz wszystkie elementy, które chcesz odjąć od podstawowego obiektu"
         },
-        "title": "Group options"
+        "title": "Opcje grupy"
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "Opcje licznika mediów",
         "data": {
-          "utility_meter_types": "Cycles",
+          "utility_meter_types": "Cykle",
           "utility_meter_tariffs": "Utility meter tariffs"
         },
         "data_description": {
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_types": "Utwórz liczniki mediów dla określonych cykli",
+          "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "Opcje WLED",
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Współczynnik mocy",
+          "voltage": "Napięcie"
         }
       }
     }
@@ -543,11 +543,11 @@
           "name": "Wartość"
         }
       },
-      "name": "Change GUI config"
+      "name": "Zmień konfigurację GUI"
     },
     "get_active_playbook": {
-      "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "description": "Pobierz bieżący playbook",
+      "name": "Pobierz aktywny playbook"
     },
     "increase_daily_energy": {
       "description": "Zwiększa sensor o zadaną wartość.",
