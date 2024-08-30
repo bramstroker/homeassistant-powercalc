@@ -329,7 +329,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Setup sensors from config entry (GUI config flow)."""
-    sensor_config = convert_config_entry_to_sensor_config(entry)
+    sensor_config = convert_config_entry_to_sensor_config(entry, hass)
 
     bind_config_entry_to_device(hass, entry)
 
@@ -517,7 +517,7 @@ def register_entity_services() -> None:
     )
 
 
-def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigType:
+def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:
     """Convert the config entry structure to the sensor config which we use to create the entities."""
     sensor_config = dict(config_entry.data.copy())
     sensor_type = sensor_config.get(CONF_SENSOR_TYPE)
@@ -525,7 +525,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     def process_template(config: dict, template_key: str, target_key: str) -> None:
         """Convert a template key in the config to a Template object."""
         if template_key in config:
-            config[target_key] = Template(config[template_key])
+            config[target_key] = Template(config[template_key], hass)
             del config[template_key]
 
     def process_on_time(config: dict) -> None:
@@ -577,6 +577,7 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry) -> ConfigTy
     if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
         sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
             sensor_config[CONF_CALCULATION_ENABLED_CONDITION],
+            hass,
         )
 
     return sensor_config
