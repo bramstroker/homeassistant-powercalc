@@ -232,9 +232,9 @@
         },
         "data_description": {
           "power": "Stała wartość mocy w watach dla podłączonego urządzenia",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "self_usage_included": "Czy wartość mocy zawiera moc zużywaną przez sam inteligentny przełącznik. Po pominięciu Powercalc doda własne użycie inteligentnego przełącznika do wartości mocy {self_usage_power}W"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
+        "description": "Zdefiniuj zużycie energii przez podłączone urządzenie. Jeśli nie używa stałej ilości energii, możesz pominąć ten krok. Powercalc ustawi czujnik mocy do własnego użycia inteligentnego przełącznika",
         "title": "Konfiguracja inteligentnego przełącznika"
       },
       "user": {
@@ -252,14 +252,14 @@
       },
       "utility_meter_options": {
         "title": "Opcje licznika mediów",
-        "description": "Define the settings for utility meter creation here",
+        "description": "Zdefiniuj ustawienia dla tworzenia liczników mediów",
         "data": {
           "utility_meter_types": "Cykle",
           "utility_meter_tariffs": "Taryfy"
         },
         "data_description": {
           "utility_meter_types": "Utwórz liczniki mediów dla określonych cykli",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
         }
       },
       "virtual_power": {
@@ -277,7 +277,7 @@
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
           "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp.",
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
-          "group": "Fill in a custom group name to create a new group",
+          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
           "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)",
           "unique_id": "Określ Unikatowy identyfikator. Umożliwi to skonfigurowanie wielu sensorów mocy dla tej samej encji. Jeśli nie zostanie określony, przyjmie Unikatowy identyfikator encji źródłowej"
@@ -344,9 +344,9 @@
         "data_description": {
           "create_energy_sensor": "Czy powercalc musi utworzyć czujnik kWh",
           "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działąć w cyklach dziennych, godzinowych itp.",
-          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "entity_id": "obiekt źródłowy, na który opiera się wirtualna moc; sensor mocy będzie nasłuchiwał na zmiany stanu tego obiektu dla swojej aktualizacji",
+          "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
+          "standby_power": "Określ ilość energii zużywanej przez urządzenie, gdy jest wyłączone"
         }
       },
       "daily_energy": {
@@ -361,8 +361,8 @@
           "value_template": "Szablon wartości"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień. zawsze włączone",
+          "update_frequency": "czas w sekundach między aktualizacjami stanu sensora"
         }
       },
       "fixed": {
@@ -376,7 +376,7 @@
         "data_description": {
           "power": "Stała wartość mocy w watach, gdy jednostka jest włączona",
           "power_template": "Szablon zostanie obliczony w celu uzyskania wartości mocy w W",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
+          "self_usage_included": "Czy wartość mocy obejmuje moc zużywaną przez sam inteligentny przełącznik.",
           "states_power": "Jedna para 'stan: moc' w każdym rzędzie, patrz przykład powyżej"
         }
       },
@@ -398,7 +398,7 @@
           "group_energy_entities": "Dodatkowe czujniki energii (kWh) pochodzące z HA do włączenia",
           "group_member_sensors": "Czujniki Powercalc do włączenia do grupy",
           "group_power_entities": "Dodatkowe czujniki mocy (W) pochodzące z HA do włączenia",
-          "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
+          "include_non_powercalc_sensors": "Zdecyduj, czy dołączyć czujniki nie-powercalc podczas korzystania z opcji obszaru",
           "sub_groups": "Wszystkie zawierające czujniki z wybranych podgrup zostaną również dodane do tej grupy"
         }
       },
@@ -440,7 +440,7 @@
           "power_off": "WYŁĄCZ zasilanie"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
+          "entities": "Zaznacz wszystkie indywidualne przełączniki, które są częścią wieloprzełącznika",
           "power": "Moc dla pojedynczego przełącznika, kiedy włączony",
           "power_off": "Moc dla pojedynczego przełącznika, kiedy wyłączony"
         }
