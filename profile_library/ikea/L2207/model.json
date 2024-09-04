@@ -10,5 +10,5 @@
     "VERSION": "v1.14.3:docker"
   },
   "name": "JETSTROM ceiling light panel, white spectrum, 60x60 cm (L2207)",
-  "standby_power": 0
+  "standby_power": 0.3
 }
