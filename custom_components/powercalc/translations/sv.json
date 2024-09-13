@@ -44,13 +44,13 @@
       },
       "domain_group": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Namn",
+          "create_energy_sensor": "Skapa energisensor",
+          "create_utility_meters": "Skapa bruksmätare",
+          "domain": "Entitet domän",
+          "exclude_entities": "Exkludera entiteter"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Skapa en domänbaserad gruppsensor"
       },
       "fixed": {
         "data": {
@@ -133,10 +133,10 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standard group",
-          "domain_group": "Domain based group"
+          "group": "Standardgrupp",
+          "domain_group": "Domänbaserad grupp"
         },
-        "title": "Choose the group type",
+        "title": "Välj grupptyp",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
       },
       "multi_switch": {
@@ -155,17 +155,17 @@
       "playbook": {
         "data": {
           "autostart": "Starta automatiskt",
-          "playbooks": "Playbooks",
+          "playbooks": "Spelböcker",
           "repeat": "Repetera",
-          "states_trigger": "State trigger"
+          "states_trigger": "Utlösare av tillstånd"
         },
         "data_description": {
           "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
           "playbooks": "Lägg in en playbook per linje. Exempel \n\nprogram1: washing_machine/program1.csv",
           "repeat": "Växla om du vill att playbooken ska repeteras när den är färdig",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "states_trigger": "Utlösa en spelbok baserad på en tillståndsändring. Exempel\n\nspelar: program1"
         },
-        "title": "Playbook config"
+        "title": "Spelbok konfiguration"
       },
       "power_advanced": {
         "data": {
@@ -198,22 +198,22 @@
         "data_description": {
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
           "name": "Basnamn för energi och bruksmätare. Fullt entitetsnamn kommer sättas enligt energy_sensor_naming inställningen",
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Lägg till den skapade energisensorn till en specifik enhet"
         },
         "description": "Nuvarande specifik inställning kan bara konfigureras globalt",
         "title": "Skapa en energisensor för en befintlig effektsensor"
       },
       "subtract_group": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "unique_id": "Unique id",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "Skapa energisensor",
+          "create_utility_meters": "Skapa bruksmätare",
+          "entity_id": "Basentiteten",
+          "name": "Namn",
+          "unique_id": "Unikt id",
+          "subtract_entities": "Subtrahera entiteter"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
+          "entity_id": "Basenheten för att subtrahera kraften från",
           "subtract_entities": "Select all the entities you want to subtract from the base entity"
         },
         "title": "Subtract group sensor"
