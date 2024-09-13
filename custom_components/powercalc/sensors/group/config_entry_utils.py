@@ -15,11 +15,7 @@ async def remove_power_sensor_from_associated_groups(
     config_entry: ConfigEntry,
 ) -> list[ConfigEntry]:
     """When the user remove a virtual power config entry we need to update all the groups which this sensor belongs to."""
-    group_entries = [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and config_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
-    ]
+    group_entries = get_groups_having_member(hass, config_entry)
 
     for group_entry in group_entries:
         member_sensors = group_entry.data.get(CONF_GROUP_MEMBER_SENSORS) or []
@@ -112,9 +108,19 @@ async def add_to_associated_group(
     return group_entry
 
 
-async def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
+def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
+    """Get all virtual power entries which have the subgroup in their subgroups list."""
     return [
         entry
         for entry in hass.config_entries.async_entries(DOMAIN)
         if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
+    ]
+
+
+def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> list[ConfigEntry]:
+    """Get all group entries which have the member sensor in their member list."""
+    return [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and member_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
     ]

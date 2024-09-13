@@ -369,7 +369,7 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     await hass.config_entries.async_reload(entry.entry_id)
 
     # Also reload all "parent" groups referring this group as a subgroup
-    for related_entry in await get_entries_having_subgroup(hass, entry):
+    for related_entry in get_entries_having_subgroup(hass, entry):
         await hass.config_entries.async_reload(related_entry.entry_id)
 
 

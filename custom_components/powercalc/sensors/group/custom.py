@@ -250,6 +250,8 @@ async def resolve_entity_ids_recursively(
             key = ENTRY_DATA_POWER_ENTITY if device_class == SensorDeviceClass.POWER else ENTRY_DATA_ENERGY_ENTITY
         if key not in member_entry.data:  # pragma: no cover
             continue
+        if key == ENTRY_DATA_ENERGY_ENTITY and bool(member_entry.data.get(CONF_CREATE_ENERGY_SENSOR)) is False:
+            continue
 
         resolved_ids.update([str(member_entry.data.get(key))])
 
