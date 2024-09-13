@@ -72,6 +72,7 @@
           "create_energy_sensor": "Energiesensor erstellen",
           "create_utility_meters": "Utilitymeter erstellen",
           "device": "Gerät",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Energie-Entitäten der Gruppe",
           "group_member_sensors": "Mitglied powercalc sensors",
           "group_power_entities": "Leistungs-Entitäten der Gruppe",
@@ -85,6 +86,7 @@
           "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
           "create_energy_sensor": "Ob powercalc einen kWh Sensor erstellen muss",
           "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
           "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
           "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",
@@ -290,6 +292,7 @@
           "power_factor": "Leistungs-Faktor",
           "voltage": "Volt"
         },
+        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
         "title": "WLED Konfiguration"
       }
     }
@@ -385,6 +388,7 @@
         "data": {
           "area": "Bereich",
           "device": "Gerät",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Energie-Entitäten der Gruppe",
           "group_member_sensors": "Mitglied powercalc sensors",
           "group_power_entities": "Leistungs-Entitäten der Gruppe",
@@ -395,6 +399,7 @@
         "data_description": {
           "area": "Fügt alle Powercalc-Sensoren aus dem angegebenen Bereich hinzu",
           "device": "Füge die von Powercalc erstellten Gruppenentitäten einem bestehenden Gerät hinzu",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Weitere Energiesensoren (kWh) aus Ihrer HA-Installation zum Einbeziehen",
           "group_member_sensors": "Powercalc-Sensoren zur Aufnahme in die Gruppe",
           "group_power_entities": "Weitere Leistungssensoren (W) von Ihrer HA-Installation zum Einbeziehen",

@@ -72,6 +72,7 @@
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
           "device": "Zařízení",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
@@ -85,6 +86,7 @@
           "area": "Přidá všechny energetické senzory z určené oblasti",
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "device": "Add the group entities powercalc creates to an existing device",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Další senzory energie (kWh) z vaší instalace HA k přidání",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Další senzory energie (W) z vaší instalace HA k přidání",
@@ -290,6 +292,7 @@
           "power_factor": "Power factor",
           "voltage": "Napětí"
         },
+        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
         "title": "Konfigurace WLED"
       }
     }
@@ -385,6 +388,7 @@
         "data": {
           "area": "Oblast",
           "device": "Zařízení",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
@@ -395,6 +399,7 @@
         "data_description": {
           "area": "Přidá všechny powercalc senzory z určené oblasti",
           "device": "Add the group entities powercalc creates to an existing device",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
