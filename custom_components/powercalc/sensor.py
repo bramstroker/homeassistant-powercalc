@@ -456,6 +456,8 @@ def save_entity_ids_on_config_entry(
                 f"No energy sensor created for config_entry {config_entry.entry_id}",
             )
         new_data.update({ENTRY_DATA_ENERGY_ENTITY: energy_entities[0]})
+    elif ENTRY_DATA_ENERGY_ENTITY in new_data:
+        new_data.pop(ENTRY_DATA_ENERGY_ENTITY)
 
     hass.config_entries.async_update_entry(
         config_entry,

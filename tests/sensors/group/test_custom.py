@@ -64,6 +64,7 @@ from custom_components.powercalc.const import (
     CONF_UNAVAILABLE_POWER,
     DOMAIN,
     DUMMY_ENTITY_ID,
+    ENTRY_DATA_ENERGY_ENTITY,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
@@ -1618,6 +1619,30 @@ async def test_force_calculate_energy(hass: HomeAssistant) -> None:
 
     group_state = hass.states.get("sensor.testgroup_energy")
     assert group_state.state is not STATE_UNAVAILABLE
+
+
+async def test_energy_entity_attribute_is_unset_correctly(hass: HomeAssistant) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/2476
+    When `create_energy_sensor` is set to false the `_energy_entity` property in config entry must also be unset.
+    """
+    member_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_UNIQUE_ID: "1234",
+            CONF_ENTITY_ID: "media_player.mediabox",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_ENERGY_SENSOR: True,
+        },
+        unique_id="1234",
+    )
+
+    hass.config_entries.async_update_entry(member_entry, data={**member_entry.data, CONF_CREATE_ENERGY_SENSOR: False})
+
+    member_entry = hass.config_entries.async_get_entry(member_entry.entry_id)
+    assert ENTRY_DATA_ENERGY_ENTITY not in member_entry.data
 
 
 async def _create_energy_group(
