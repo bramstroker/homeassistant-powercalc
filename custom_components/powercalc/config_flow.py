@@ -43,6 +43,7 @@ from .const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_EXCLUDE_ENTITIES,
     CONF_FIXED,
+    CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -553,6 +554,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
                 vol.Optional(CONF_HIDE_MEMBERS, default=False): selector.BooleanSelector(),
                 vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
+                vol.Optional(CONF_FORCE_CALCULATE_GROUP_ENERGY, default=False): selector.BooleanSelector(),
             },
         )
 

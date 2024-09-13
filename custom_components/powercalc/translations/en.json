@@ -72,6 +72,7 @@
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
           "device": "Device",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
@@ -85,6 +86,7 @@
           "area": "Adds all power sensors from the specified area",
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "device": "Add the group entities powercalc creates to an existing device",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
@@ -385,6 +387,7 @@
         "data": {
           "area": "Area",
           "device": "Device",
+          "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
@@ -395,6 +398,7 @@
         "data_description": {
           "area": "Adds all power sensors from the specified area",
           "device": "Add the group entities powercalc creates to an existing device",
+          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
           "group_member_sensors": "Powercalc sensors to include in the group",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",

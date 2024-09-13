@@ -1587,6 +1587,39 @@ async def test_decimal_conversion_error_is_logged(hass: HomeAssistant, caplog: p
     assert hass.states.get("sensor.testgroup_power").state == "0.00"
 
 
+async def test_force_calculate_energy(hass: HomeAssistant) -> None:
+    """
+    See https://github.com/bramstroker/homeassistant-powercalc/issues/2476
+    Test force_calculation_group_energy toggle in config flow applied correctly
+    """
+    member_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "media_player.mediabox",
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_FIXED: {CONF_POWER: 50},
+            CONF_CREATE_ENERGY_SENSOR: True,
+        },
+    )
+
+    group_entry = await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_MEMBER_SENSORS: [member_entry.entry_id],
+            CONF_FORCE_CALCULATE_GROUP_ENERGY: True,
+        },
+    )
+
+    hass.config_entries.async_update_entry(member_entry, data={**member_entry.data, CONF_CREATE_ENERGY_SENSOR: False})
+    await hass.config_entries.async_reload(group_entry.entry_id)
+
+    group_state = hass.states.get("sensor.testgroup_energy")
+    assert group_state.state is not STATE_UNAVAILABLE
+
+
 async def _create_energy_group(
     hass: HomeAssistant,
     name: str,
