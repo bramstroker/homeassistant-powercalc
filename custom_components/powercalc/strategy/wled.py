@@ -86,7 +86,7 @@ class WledStrategy(PowerCalculationStrategyInterface):
                 if estimated_current_entities:
                     return estimated_current_entities[0]
 
-        raise StrategyConfigurationError("{No estimated current entity found")
+        raise StrategyConfigurationError("{No estimated current entity found. Probably brightness limiter not enabled. See documentation")
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         if self._estimated_current_entity:
