@@ -520,9 +520,17 @@ def register_entity_services() -> None:
 
 
 def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:  # noqa: C901
-    """Convert the config entry structure to the sensor config which we use to create the entities."""
+    """Convert the config entry structure to the sensor config used to create the entities."""
     sensor_config = dict(config_entry.data.copy())
     sensor_type = sensor_config.get(CONF_SENSOR_TYPE)
+
+    def handle_sensor_type() -> None:
+        """Handle sensor type-specific configuration."""
+        if sensor_type == SensorType.GROUP:
+            sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
+        elif sensor_type == SensorType.REAL_POWER:
+            sensor_config[CONF_POWER_SENSOR_ID] = sensor_config.get(CONF_ENTITY_ID)
+            sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
 
     def process_template(config: dict, template_key: str, target_key: str) -> None:
         """Convert a template key in the config to a Template object."""
@@ -533,14 +541,9 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
     def process_on_time(config: dict) -> None:
         """Convert on_time dictionary to timedelta."""
         on_time = config.get(CONF_ON_TIME)
-        if on_time:
-            config[CONF_ON_TIME] = timedelta(
-                hours=on_time["hours"],
-                minutes=on_time["minutes"],
-                seconds=on_time["seconds"],
-            )
-        else:
-            config[CONF_ON_TIME] = timedelta(days=1)
+        config[CONF_ON_TIME] = (
+            timedelta(hours=on_time["hours"], minutes=on_time["minutes"], seconds=on_time["seconds"]) if on_time else timedelta(days=1)
+        )
 
     def process_states_power(states_power: dict) -> dict:
         """Convert state power values to Template objects where necessary."""
@@ -550,37 +553,51 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         """Convert calibration dictionary to list of strings."""
         return [f"{k} -> {v}" for k, v in calibrate.items()]
 
-    if sensor_type == SensorType.GROUP:
-        sensor_config[CONF_CREATE_GROUP] = sensor_config.get(CONF_NAME)
+    def process_daily_fixed_energy() -> None:
+        """Process daily fixed energy configuration."""
+        if CONF_DAILY_FIXED_ENERGY not in sensor_config:
+            return
 
-    if sensor_type == SensorType.REAL_POWER:
-        sensor_config[CONF_POWER_SENSOR_ID] = sensor_config.get(CONF_ENTITY_ID)
-        sensor_config[CONF_FORCE_ENERGY_SENSOR_CREATION] = True
-
-    if CONF_DAILY_FIXED_ENERGY in sensor_config:
-        daily_fixed_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_DAILY_FIXED_ENERGY))  # type: ignore
+        daily_fixed_config = copy.copy(sensor_config[CONF_DAILY_FIXED_ENERGY])
         process_template(daily_fixed_config, CONF_VALUE_TEMPLATE, CONF_VALUE)
         process_on_time(daily_fixed_config)
         sensor_config[CONF_DAILY_FIXED_ENERGY] = daily_fixed_config
 
-    if CONF_FIXED in sensor_config:
-        fixed_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_FIXED))  # type: ignore
+    def process_fixed_config() -> None:
+        """Process fixed energy configuration."""
+        if CONF_FIXED not in sensor_config:
+            return
+
+        fixed_config = copy.copy(sensor_config[CONF_FIXED])
         process_template(fixed_config, CONF_POWER_TEMPLATE, CONF_POWER)
         if CONF_STATES_POWER in fixed_config:
             fixed_config[CONF_STATES_POWER] = process_states_power(fixed_config[CONF_STATES_POWER])
         sensor_config[CONF_FIXED] = fixed_config
 
-    if CONF_LINEAR in sensor_config:
-        linear_config: dict[str, Any] = copy.copy(sensor_config.get(CONF_LINEAR))  # type: ignore
+    def process_linear_config() -> None:
+        """Process linear energy configuration."""
+        if CONF_LINEAR not in sensor_config:
+            return
+
+        linear_config = copy.copy(sensor_config[CONF_LINEAR])
         if CONF_CALIBRATE in linear_config:
             linear_config[CONF_CALIBRATE] = process_calibrate(linear_config[CONF_CALIBRATE])
         sensor_config[CONF_LINEAR] = linear_config
 
-    if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
-        sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
-            sensor_config[CONF_CALCULATION_ENABLED_CONDITION],
-            hass,
-        )
+    def process_calculation_enabled_condition() -> None:
+        """Process calculation enabled condition template."""
+        if CONF_CALCULATION_ENABLED_CONDITION in sensor_config:
+            sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = Template(
+                sensor_config[CONF_CALCULATION_ENABLED_CONDITION],
+                hass,
+            )
+
+    handle_sensor_type()
+
+    process_daily_fixed_energy()
+    process_fixed_config()
+    process_linear_config()
+    process_calculation_enabled_condition()
 
     return sensor_config
 
