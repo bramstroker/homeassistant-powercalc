@@ -519,7 +519,7 @@ def register_entity_services() -> None:
     )
 
 
-def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:
+def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeAssistant) -> ConfigType:  # noqa: C901
     """Convert the config entry structure to the sensor config which we use to create the entities."""
     sensor_config = dict(config_entry.data.copy())
     sensor_type = sensor_config.get(CONF_SENSOR_TYPE)
