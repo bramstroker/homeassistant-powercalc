@@ -1627,7 +1627,6 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 self.sensor_config[key] = user_input.get(key)
             elif key in self.sensor_config:
                 self.sensor_config.pop(key)
-        return
 
     def build_basic_options_schema(self) -> vol.Schema:
         """Build the basic options schema. depending on the selected sensor type."""
