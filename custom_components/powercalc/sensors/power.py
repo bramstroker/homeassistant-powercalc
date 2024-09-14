@@ -240,8 +240,6 @@ async def _select_sub_profile(
     source_entity: SourceEntity,
 ) -> None:
     """Select the appropriate sub-profile based on the source entity's state."""
-    if not power_profile.sub_profile_select:
-        return
     sub_profile_selector = SubProfileSelector(
         hass,
         sub_profile,
