@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # The builder image, used to build the virtual environment
-FROM python:3.12-bullseye as builder
+FROM python:3.12-bullseye AS builder
 
 RUN pip install poetry==1.7.1
 
