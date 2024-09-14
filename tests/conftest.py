@@ -32,7 +32,7 @@ from tests.common import mock_area_registry
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations: bool) -> None:
+def auto_enable_custom_integrations(enable_custom_integrations: bool) -> Generator:
     yield
 
 
