@@ -90,6 +90,7 @@ from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
+    SubProfileSelectConfig,
     SubProfileSelector,
 )
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
@@ -220,7 +221,7 @@ async def _get_power_profile(
                 model_info=model_info,
             )
             if power_profile and power_profile.sub_profile_select:
-                await _select_sub_profile(hass, power_profile, source_entity)
+                await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
         except ModelNotSupportedError as err:
             if not is_fully_configured(sensor_config):
                 _LOGGER.error(
@@ -235,6 +236,7 @@ async def _get_power_profile(
 async def _select_sub_profile(
     hass: HomeAssistant,
     power_profile: PowerProfile,
+    sub_profile: SubProfileSelectConfig,
     source_entity: SourceEntity,
 ) -> None:
     """Select the appropriate sub-profile based on the source entity's state."""
@@ -242,7 +244,7 @@ async def _select_sub_profile(
         return
     sub_profile_selector = SubProfileSelector(
         hass,
-        power_profile.sub_profile_select,
+        sub_profile,
         source_entity,
     )
     await power_profile.select_sub_profile(
