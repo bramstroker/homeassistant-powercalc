@@ -183,11 +183,6 @@ async def create_virtual_power_sensor(
             unique_id=unique_id,
             standby_power=standby_power,
             standby_power_on=standby_power_on,
-            update_frequency=sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY),  # type: ignore
-            multiply_factor=sensor_config.get(CONF_MULTIPLY_FACTOR),
-            multiply_factor_standby=sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY) or False,
-            ignore_unavailable_state=sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE) or False,
-            rounding_digits=sensor_config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
             sensor_config=sensor_config,
             power_profile=power_profile,
             config_entry=config_entry,
@@ -335,11 +330,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         unique_id: str | None,
         standby_power: Decimal | Template,
         standby_power_on: Decimal,
-        update_frequency: timedelta,
-        multiply_factor: float | None,
-        multiply_factor_standby: bool,
-        ignore_unavailable_state: bool,
-        rounding_digits: int,
         sensor_config: dict,
         power_profile: PowerProfile | None,
         config_entry: ConfigEntry | None,
@@ -354,11 +344,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_power_on = standby_power_on
         self._attr_force_update = True
         self._attr_unique_id = unique_id
-        self._update_frequency = update_frequency
-        self._multiply_factor = multiply_factor
-        self._multiply_factor_standby = multiply_factor_standby
-        self._ignore_unavailable_state = ignore_unavailable_state
-        self._rounding_digits = rounding_digits
+        self._update_frequency: timedelta = sensor_config.get(CONF_FORCE_UPDATE_FREQUENCY)  # type: ignore
+        self._multiply_factor = sensor_config.get(CONF_MULTIPLY_FACTOR)
+        self._multiply_factor_standby = bool(sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY, False))
+        self._ignore_unavailable_state = bool(sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE, False))
+        self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION))  # type: ignore
         self.entity_id = entity_id
         self._sensor_config = sensor_config
         self._track_entities: list = []
