@@ -79,7 +79,7 @@ class LightRunner(MeasurementRunner):
     def get_export_directory(self) -> str:
         return f"{self.light_info.model_id}"
 
-    def run(  # noqa: C901
+    def run(
         self,
         answers: dict[str, Any],
         export_directory: str,

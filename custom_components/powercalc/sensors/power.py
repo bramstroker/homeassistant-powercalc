@@ -385,7 +385,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._source_entity,
             )
 
-    async def async_added_to_hass(self) -> None:  # noqa: C901
+    async def async_added_to_hass(self) -> None:
         """Register callbacks."""
         await super().async_added_to_hass()
         await self.ensure_strategy_instance()
