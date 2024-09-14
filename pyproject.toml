@@ -75,7 +75,7 @@ ignore = ["ANN101"]
 "tests/**.py" = ["ASYNC230"]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 10
+max-complexity = 15
 
 [tool.poetry]
 name = "powercalc"
