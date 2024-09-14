@@ -107,7 +107,7 @@ class SubtractGroupSensor(GroupedPowerSensor):
             rounding_digits=int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, 2)),
             group_type=GroupType.SUBTRACT,
             unique_id=unique_id,
-            device_id=None,  # todo: add device_id
+            device_id=None,
         )
 
         self._base_entity_id = base_entity_id
