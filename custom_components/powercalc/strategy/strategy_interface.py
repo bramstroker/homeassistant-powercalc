@@ -14,9 +14,11 @@ class PowerCalculationStrategyInterface:
         """Validate correct setup of the strategy."""
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
+        """Return entities to track for this strategy."""
         return []
 
     def can_calculate_standby(self) -> bool:
+        """Return if this strategy can calculate standby power."""
         return False
 
     async def on_start(self, hass: HomeAssistant) -> None:

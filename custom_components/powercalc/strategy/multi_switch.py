@@ -62,6 +62,3 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
 
     def can_calculate_standby(self) -> bool:
         return True
-
-    async def validate_config(self) -> None:
-        pass
