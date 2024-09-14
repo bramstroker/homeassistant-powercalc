@@ -38,6 +38,7 @@ class RemoteLoader(Loader):
         self.last_update_time: float | None = None
 
     async def initialize(self) -> None:
+        """Initialize the loader."""
         self.library_contents = await self.load_library_json()
         self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
 
@@ -127,52 +128,78 @@ class RemoteLoader(Loader):
         force_update: bool = False,
         retry_count: int = 0,
     ) -> tuple[dict, str] | None:
-        model_info = self.model_infos.get(f"{manufacturer}/{model}")
-        if not model_info:
-            raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
-
+        """Load a model, downloading it if necessary, with retry logic."""
+        model_info = self._get_model_info(manufacturer, model)
         storage_path = self.get_storage_path(manufacturer, model)
         model_path = os.path.join(storage_path, "model.json")
 
-        needs_update = False
-        path_exists = os.path.exists(model_path)
-        if not path_exists:
-            needs_update = True
-
-        if path_exists:
-            remote_modification_time = self._get_remote_modification_time(model_info)
-            if self.last_update_time and remote_modification_time > self.last_update_time:
-                _LOGGER.debug("Remote profile is newer than local profile")
-                needs_update = True
-
-        if needs_update or force_update:
-            try:
-                callback = partial(self.download_profile, manufacturer, model, storage_path)
-                await self.download_with_retry(callback)
-                await self.set_last_update_time(time.time())
-            except ProfileDownloadError as e:
-                if not path_exists:
-                    await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
-                    raise e
-                _LOGGER.debug("Failed to download profile, falling back to local profile")
-
-        def _load_json() -> dict[str, Any]:
-            """Load model.json file for a given model."""
-            with open(model_path) as f:
-                return cast(dict[str, Any], json.load(f))
+        if await self._needs_update(model_info, model_path, force_update):
+            await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
 
         try:
-            json_data = await self.hass.async_add_executor_job(_load_json)  # type: ignore
+            json_data = await self._load_model_json(model_path)
         except JSONDecodeError as e:
-            _LOGGER.error("model.json file is not valid JSON")
-            if retry_count < 2:
-                _LOGGER.debug("Retrying to load model.json file")
-                return await self.load_model(manufacturer, model, True, retry_count + 1)
-            raise LibraryLoadingError("Failed to load model.json file") from e
+            return await self._handle_json_decode_error(e, manufacturer, model, retry_count)
 
         return json_data, storage_path
 
+    def _get_model_info(self, manufacturer: str, model: str) -> dict:
+        """Retrieve model info, or raise an error if not found."""
+        model_info = self.model_infos.get(f"{manufacturer}/{model}")
+        if not model_info:
+            raise LibraryLoadingError("Model not found in library: %s/%s", manufacturer, model)
+        return model_info
+
+    async def _needs_update(self, model_info: dict, model_path: str, force_update: bool) -> bool:
+        """Check if the model needs to be updated."""
+        path_exists = os.path.exists(model_path)
+        if not path_exists:
+            return True
+
+        remote_modification_time = self._get_remote_modification_time(model_info)
+        if self.last_update_time and remote_modification_time > self.last_update_time:
+            _LOGGER.debug("Remote profile is newer than local profile")
+            return True
+
+        return force_update
+
+    async def _download_profile_with_retry(self, manufacturer: str, model: str, storage_path: str, model_path: str) -> None:
+        """Attempt to download the profile, with retry logic and error handling."""
+        try:
+            callback = partial(self.download_profile, manufacturer, model, storage_path)
+            await self.download_with_retry(callback)
+            await self.set_last_update_time(time.time())
+        except ProfileDownloadError as e:
+            if not os.path.exists(model_path):
+                await self.hass.async_add_executor_job(shutil.rmtree, storage_path)
+                raise e
+            _LOGGER.debug("Failed to download profile, falling back to local profile")
+
+    async def _load_model_json(self, model_path: str) -> dict:
+        """Load the JSON data from the model file."""
+
+        def _load_json() -> dict[str, Any]:
+            with open(model_path) as f:
+                return cast(dict[str, Any], json.load(f))
+
+        return await self.hass.async_add_executor_job(_load_json)  # type: ignore
+
+    async def _handle_json_decode_error(
+        self,
+        error: JSONDecodeError,
+        manufacturer: str,
+        model: str,
+        retry_count: int,
+    ) -> tuple[dict, str] | None:
+        """Handle JSON decode errors with retry logic."""
+        _LOGGER.error("model.json file is not valid JSON")
+        if retry_count < 2:
+            _LOGGER.debug("Retrying to load model.json file")
+            return await self.load_model(manufacturer, model, True, retry_count + 1)
+        raise LibraryLoadingError("Failed to load model.json file") from error
+
     def get_storage_path(self, manufacturer: str, model: str) -> str:
+        """Retrieve the storage path for a given manufacturer and model."""
         return str(self.hass.config.path(STORAGE_DIR, "powercalc_profiles", manufacturer, model))
 
     def get_last_update_time(self) -> float | None:
@@ -207,6 +234,7 @@ class RemoteLoader(Loader):
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
+        """Get the remote modification time of the model"""
         remote_modification_time = model_info.get("updated_at", time.time())
         if isinstance(remote_modification_time, str):
             remote_modification_time = datetime.datetime.fromisoformat(remote_modification_time).timestamp()
