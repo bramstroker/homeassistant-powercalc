@@ -522,13 +522,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if self._power is not None:
             self._power = round(self._power, self._rounding_digits)
 
-        if state:
-            _LOGGER.debug(
-                '%s: State changed to "%s". Power:%s',
-                state.entity_id,
-                state.state,
-                self._power,
-            )
+        _LOGGER.debug(
+            '%s: State changed to "%s". Power:%s',
+            state.entity_id,
+            state.state,
+            self._power,
+        )
 
         self.async_write_ha_state()
 
