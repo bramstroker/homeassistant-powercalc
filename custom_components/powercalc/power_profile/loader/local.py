@@ -18,7 +18,7 @@ class LocalLoader(Loader):
         self._manufacturer_listing: dict[str, set[str]] = {}
 
     async def initialize(self) -> None:
-        pass
+        """Initialize the loader."""
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of available manufacturers."""
@@ -75,6 +75,7 @@ class LocalLoader(Loader):
         return models
 
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
+        """Load a model.json file from disk for a given manufacturer and model."""
         base_dir = (
             self._data_directory
             if self._is_custom_directory
@@ -101,6 +102,7 @@ class LocalLoader(Loader):
         return model_json, base_dir
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+        """Find a model for a given manufacturer. Also must check aliases."""
         manufacturer_dir = os.path.join(self._data_directory, manufacturer)
         if not os.path.exists(manufacturer_dir):
             return None

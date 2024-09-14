@@ -173,4 +173,4 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant, caplog: pytest
 
         await library.get_profile(ModelInfo("signify", "LCA001"))
 
-        assert "Linked model foo bar not found" in caplog.text
+        assert "Model foo bar not found" in caplog.text

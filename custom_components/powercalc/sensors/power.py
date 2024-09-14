@@ -90,6 +90,7 @@ from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import (
     PowerProfile,
+    SubProfileSelectConfig,
     SubProfileSelector,
 )
 from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
@@ -134,41 +135,13 @@ async def create_virtual_power_sensor(
     config_entry: ConfigEntry | None,
 ) -> VirtualPowerSensor:
     """Create the power sensor entity."""
-    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
-    power_profile = None
     try:
-        if not is_manually_configured(sensor_config):
-            try:
-                model_info = await discovery_manager.autodiscover_model(source_entity.entity_entry)
-                power_profile = await get_power_profile(
-                    hass,
-                    sensor_config,
-                    model_info=model_info,
-                )
-                # Check if this power profile supports automatic sub profile selection
-                # If so, trigger an initial selection of the sub profile bases on source entity state
-                if power_profile and power_profile.sub_profile_select:
-                    sub_profile_selector = SubProfileSelector(
-                        hass,
-                        power_profile.sub_profile_select,
-                        source_entity,
-                    )
-                    await power_profile.select_sub_profile(
-                        sub_profile_selector.select_sub_profile(
-                            State(source_entity.entity_id, STATE_UNKNOWN),
-                        ),
-                    )
-            except ModelNotSupportedError as err:
-                if not is_fully_configured(sensor_config):
-                    _LOGGER.error(
-                        "%s: Skipping sensor setup: %s",
-                        source_entity.entity_id,
-                        err,
-                    )
-                    raise err
-
-        if power_profile and power_profile.sensor_config != {}:
-            sensor_config.update(power_profile.sensor_config)
+        power_profile = await _get_power_profile(hass, sensor_config, source_entity)
+        if power_profile:
+            if power_profile.sensor_config != {}:
+                sensor_config.update(power_profile.sensor_config)
+            if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile.calculation_enabled_condition:
+                sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
 
         name = generate_power_sensor_name(
             sensor_config,
@@ -183,24 +156,10 @@ async def create_virtual_power_sensor(
             unique_id=unique_id,
         )
         entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
-
         strategy = detect_calculation_strategy(sensor_config, power_profile)
-
         calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
 
-        standby_power: Template | Decimal = Decimal(0)
-        standby_power_on = Decimal(0)
-        if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
-            if sensor_config.get(CONF_STANDBY_POWER) is not None:
-                standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
-                if not isinstance(standby_power, Template):
-                    standby_power = Decimal(standby_power)
-            elif power_profile is not None:
-                standby_power = Decimal(power_profile.standby_power)
-                standby_power_on = Decimal(power_profile.standby_power_on)
-
-        if CONF_CALCULATION_ENABLED_CONDITION not in sensor_config and power_profile is not None and power_profile.calculation_enabled_condition:
-            sensor_config[CONF_CALCULATION_ENABLED_CONDITION] = power_profile.calculation_enabled_condition
+        standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
@@ -235,6 +194,7 @@ async def create_virtual_power_sensor(
         )
         await power_sensor.validate()
         return power_sensor
+
     except (StrategyConfigurationError, UnsupportedStrategyError) as err:
         _LOGGER.error(
             "%s: Skipping sensor setup: %s",
@@ -242,6 +202,76 @@ async def create_virtual_power_sensor(
             err,
         )
         raise err
+
+
+async def _get_power_profile(
+    hass: HomeAssistant,
+    sensor_config: ConfigType,
+    source_entity: SourceEntity,
+) -> PowerProfile | None:
+    """Retrieve the power profile based on auto-discovery or manual configuration."""
+    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    power_profile = None
+    if not is_manually_configured(sensor_config):
+        try:
+            model_info = await discovery_manager.autodiscover_model(source_entity.entity_entry)
+            power_profile = await get_power_profile(
+                hass,
+                sensor_config,
+                model_info=model_info,
+            )
+            if power_profile and power_profile.sub_profile_select:
+                await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
+        except ModelNotSupportedError as err:
+            if not is_fully_configured(sensor_config):
+                _LOGGER.error(
+                    "%s: Skipping sensor setup: %s",
+                    source_entity.entity_id,
+                    err,
+                )
+                raise err
+    return power_profile
+
+
+async def _select_sub_profile(
+    hass: HomeAssistant,
+    power_profile: PowerProfile,
+    sub_profile: SubProfileSelectConfig,
+    source_entity: SourceEntity,
+) -> None:
+    """Select the appropriate sub-profile based on the source entity's state."""
+    if not power_profile.sub_profile_select:
+        return
+    sub_profile_selector = SubProfileSelector(
+        hass,
+        sub_profile,
+        source_entity,
+    )
+    await power_profile.select_sub_profile(
+        sub_profile_selector.select_sub_profile(
+            State(source_entity.entity_id, STATE_UNKNOWN),
+        ),
+    )
+
+
+def _get_standby_power(
+    sensor_config: ConfigType,
+    power_profile: PowerProfile | None,
+) -> tuple[Template | Decimal, Decimal]:
+    """Retrieve standby power settings from sensor config or power profile."""
+    standby_power: Template | Decimal = Decimal(0)
+    standby_power_on = Decimal(0)
+
+    if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
+        if sensor_config.get(CONF_STANDBY_POWER) is not None:
+            standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
+            if not isinstance(standby_power, Template):
+                standby_power = Decimal(standby_power)
+        elif power_profile is not None:
+            standby_power = Decimal(power_profile.standby_power)
+            standby_power_on = Decimal(power_profile.standby_power_on)
+
+    return standby_power, standby_power_on
 
 
 async def create_real_power_sensor(
@@ -367,7 +397,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._source_entity,
             )
 
-    async def async_added_to_hass(self) -> None:
+    async def async_added_to_hass(self) -> None:  # noqa: C901
         """Register callbacks."""
         await super().async_added_to_hass()
         await self.ensure_strategy_instance()
@@ -643,30 +673,28 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
         """Active a playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        await self._strategy_instance.activate_playbook(playbook_id)
+        strategy_instance = self._ensure_playbook_strategy()
+        await strategy_instance.activate_playbook(playbook_id)
 
     async def async_stop_playbook(self) -> None:
         """Stop an active playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        await self._strategy_instance.stop_playbook()
+        strategy_instance = self._ensure_playbook_strategy()
+        await strategy_instance.stop_playbook()
 
     def get_active_playbook(self) -> dict[str, str]:
         """Stop an active playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        playbook = self._strategy_instance.get_active_playbook()
+        strategy_instance = self._ensure_playbook_strategy()
+        playbook = strategy_instance.get_active_playbook()
         if not playbook:
             return {}
         return {"id": playbook.key}
+
+    def _ensure_playbook_strategy(self) -> PlaybookStrategy:
+        """Ensure we are dealing with a playbook sensor."""
+        assert self._strategy_instance is not None
+        if not isinstance(self._strategy_instance, PlaybookStrategy):
+            raise HomeAssistantError("supported only playbook enabled sensors")
+        return self._strategy_instance
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""

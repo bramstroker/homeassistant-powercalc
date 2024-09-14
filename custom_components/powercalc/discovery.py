@@ -306,21 +306,21 @@ class DiscoveryManager:
         provided.
         """
         found_entity_ids: list[str] = []
+        self._extract_entity_ids(search_dict, found_entity_ids)
+        return found_entity_ids
 
+    def _extract_entity_ids(self, search_dict: dict, found_entity_ids: list[str]) -> None:
+        """Helper function to recursively extract entity IDs."""
         for key, value in search_dict.items():
             if key == CONF_ENTITY_ID:
                 found_entity_ids.append(value)
-
             elif isinstance(value, dict):
-                results = self._find_entity_ids_in_yaml_config(value)
-                for result in results:
-                    found_entity_ids.append(result)  # pragma: no cover
-
+                self._extract_entity_ids(value, found_entity_ids)
             elif isinstance(value, list):
-                for item in value:
-                    if isinstance(item, dict):
-                        results = self._find_entity_ids_in_yaml_config(item)
-                        for result in results:
-                            found_entity_ids.append(result)
+                self._process_list_items(value, found_entity_ids)
 
-        return found_entity_ids
+    def _process_list_items(self, items: list, found_entity_ids: list[str]) -> None:
+        """Helper function to process list items."""
+        for item in items:
+            if isinstance(item, dict):
+                self._extract_entity_ids(item, found_entity_ids)

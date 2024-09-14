@@ -118,53 +118,63 @@ class ProfileLibrary:
         """Create a power profile object from the model JSON data."""
 
         try:
-            resolved_manufacturer: str | None = model_info.manufacturer
-            if not custom_directory:
-                resolved_manufacturer = await self._loader.find_manufacturer(model_info.manufacturer)
-
-            if not resolved_manufacturer:
+            manufacturer = await self._resolve_manufacturer(model_info, custom_directory)
+            if not manufacturer:
                 return None
 
-            resolved_model: str | None = model_info.model_id or model_info.model
-            if not custom_directory:
-                for model_identifier in (model_info.model_id, model_info.model):
-                    if not model_identifier:
-                        continue
-                    resolved_model = await self.find_model(resolved_manufacturer, model_identifier)
-                    if resolved_model:
-                        break
-
-            if not resolved_model:
+            model = await self._resolve_model(manufacturer, model_info, custom_directory)
+            if not model:
                 return None
 
-            loader = self._loader
-            if custom_directory:
-                loader = LocalLoader(self._hass, custom_directory, is_custom_directory=True)
-            result = await loader.load_model(resolved_manufacturer, resolved_model)
-            if not result:
-                raise LibraryError(f"Model {resolved_manufacturer} {resolved_model} not found")
-
-            json_data, directory = result
-            linked_profile = json_data.get("linked_lut")
-            if linked_profile:
-                manufacturer, model = linked_profile.split("/")
-                result = await loader.load_model(manufacturer, model)
-                if not result:
-                    raise LibraryError(f"Linked model {manufacturer} {model} not found")
-                directory = result[1]
+            json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
+            if linked_profile := json_data.get("linked_lut"):
+                linked_manufacturer, linked_model = linked_profile.split("/")
+                _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
         except LibraryError as e:
             _LOGGER.error("Problem loading model: %s", e)
             return None
 
+        return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
+
+    async def _resolve_manufacturer(self, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+        """Resolve the manufacturer, either from the model info or by loading it."""
+        if custom_directory:
+            return model_info.manufacturer
+        return await self._loader.find_manufacturer(model_info.manufacturer)
+
+    async def _resolve_model(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+        """Resolve the model identifier, searching for it if no custom directory is provided."""
+        if custom_directory:
+            return model_info.model_id or model_info.model
+
+        for model_identifier in (model_info.model_id, model_info.model):
+            if model_identifier:
+                resolved_model = await self.find_model(manufacturer, model_identifier)
+                if resolved_model:
+                    return resolved_model
+
+        return None
+
+    async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
+        """Load the model data from the appropriate directory."""
+        loader = LocalLoader(self._hass, custom_directory, is_custom_directory=True) if custom_directory else self._loader
+        result = await loader.load_model(manufacturer, model)
+        if not result:
+            raise LibraryError(f"Model {manufacturer} {model} not found")
+
+        return result
+
+    async def _create_power_profile_instance(self, manufacturer: str, model: str, directory: str, json_data: dict) -> PowerProfile:
+        """Create and initialize the PowerProfile object."""
         profile = PowerProfile(
             self._hass,
-            manufacturer=resolved_manufacturer,
-            model=resolved_model,
+            manufacturer=manufacturer,
+            model=model,
             directory=directory,
             json_data=json_data,
         )
-        # When the power profile supplies multiple sub profiles we select one by default
+
         if not profile.sub_profile and profile.sub_profile_select:
             await profile.select_sub_profile(profile.sub_profile_select.default)
 
