@@ -671,30 +671,28 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def async_activate_playbook(self, playbook_id: str) -> None:
         """Active a playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        await self._strategy_instance.activate_playbook(playbook_id)
+        strategy_instance = self._ensure_playbook_strategy()
+        await strategy_instance.activate_playbook(playbook_id)
 
     async def async_stop_playbook(self) -> None:
         """Stop an active playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        await self._strategy_instance.stop_playbook()
+        strategy_instance = self._ensure_playbook_strategy()
+        await strategy_instance.stop_playbook()
 
     def get_active_playbook(self) -> dict[str, str]:
         """Stop an active playbook"""
-        assert self._strategy_instance is not None
-        if not isinstance(self._strategy_instance, PlaybookStrategy):
-            raise HomeAssistantError("supported only playbook enabled sensors")
-
-        playbook = self._strategy_instance.get_active_playbook()
+        strategy_instance = self._ensure_playbook_strategy()
+        playbook = strategy_instance.get_active_playbook()
         if not playbook:
             return {}
         return {"id": playbook.key}
+
+    def _ensure_playbook_strategy(self) -> PlaybookStrategy:
+        """Ensure we are dealing with a playbook sensor."""
+        assert self._strategy_instance is not None
+        if not isinstance(self._strategy_instance, PlaybookStrategy):
+            raise HomeAssistantError("supported only playbook enabled sensors")
+        return self._strategy_instance
 
     async def async_switch_sub_profile(self, profile: str) -> None:
         """Switches to a new sub profile"""
