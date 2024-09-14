@@ -1,0 +1,2 @@
+class RunnerError(Exception):
+    pass

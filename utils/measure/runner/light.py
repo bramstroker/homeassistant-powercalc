@@ -25,6 +25,7 @@ from powermeter.errors import (
 )
 from util.measure_util import MeasureUtil
 
+from .errors import RunnerError
 from .runner import MeasurementRunner, RunnerResult
 
 CSV_HEADERS = {
@@ -477,7 +478,7 @@ class LightRunner(MeasurementRunner):
                 sat=int(last_row[2]),
             )
 
-        raise Exception(f"Color mode {self.color_mode} not supported")
+        raise RunnerError(f"Color mode {self.color_mode} not supported")
 
     def take_power_measurement(
         self,
