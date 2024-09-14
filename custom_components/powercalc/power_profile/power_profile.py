@@ -30,6 +30,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class DeviceType(StrEnum):
     CAMERA = "camera"
+    COVER_DOMAIN = "cover_domain"
+    COVER = "cover"
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
