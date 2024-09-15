@@ -43,24 +43,24 @@ This will simulate the device using 21 watts for 12 hours a day. The energy sens
 
     When you use `on_time` no power sensor (W) will be created, but only an energy sensor (kWh) will be available.
 
-## Services
+## Actions
 
 ### Resetting sensor
 
-To reset the energy sensor to zero use the `powercalc.reset_energy` service.
+To reset the energy sensor to zero use the `powercalc.reset_energy` action.
 
 ```yaml
-service: powercalc.reset_energy
+action: powercalc.reset_energy
 target:
   entity_id: sensor.my_energy
 ```
 
 ### Increasing sensor
 
-To increase the sensor with a given value use the `powercalc.increase_daily_energy` service.
+To increase the sensor with a given value use the `powercalc.increase_daily_energy` action.
 
 ```yaml
-service: powercalc.increase_daily_energy
+action: powercalc.increase_daily_energy
 data:
   value: 100
 target:
