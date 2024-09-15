@@ -91,7 +91,7 @@ powercalc:
 ## Manually executing the playbook
 
 To start executing a playbook you'll have to utilize HA automations.
-Powercalc provides two services which let's you control the playbook execution. `activate_playbook` and `stop_playbook`.
+Powercalc provides two actions which let's you control the playbook execution. `activate_playbook` and `stop_playbook`.
 For example to start the playbook when your washing machine enters a specific program use an automation similar as below.
 
 ```yaml
@@ -104,7 +104,7 @@ trigger:
     to: program1
 condition: []
 action:
-  - service: powercalc.activate_playbook
+  - action: powercalc.activate_playbook
     data:
       playbook_id: program1
     target:

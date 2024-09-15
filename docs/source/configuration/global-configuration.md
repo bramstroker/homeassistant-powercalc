@@ -5,7 +5,7 @@ Any configuration you do on a per sensor basis will override the global setting 
 
 !!! note
 
-    Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides a service `powercalc.change_gui_config`. Refer to [Change GUI configuration service].
+    Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action `powercalc.change_gui_config`. Refer to [Change GUI configuration action].
 
 You can add these options to `configuration.yaml` under the `powercalc:` property, like so:
 
@@ -41,9 +41,9 @@ All the possible options are listed below.
 | utility_meter_tariffs         | list    | **Optional** |                        | Define different tariffs. See [HA docs](https://www.home-assistant.io/integrations/utility_meter/#tariffs).                                                                                                                         |
 | include_non_powercalc_sensors | boolean | **Optional** | true                   | Control whether you want to include non powercalc sensors in groups. See [include entities](../sensor-types/group/include-entities.md)                                                                                              |
 
-## Change GUI configuration service
+## Change GUI configuration action
 
-To change the configuration options for all Powercalc GUI config entries at once you can utilize the service `powercalc.change_gui_config`.
+To change the configuration options for all Powercalc GUI config entries at once you can utilize the action `powercalc.change_gui_config`.
 You can use it to change the configuration for the following options
 
 - create_energy_sensor
@@ -51,11 +51,11 @@ You can use it to change the configuration for the following options
 - ignore_unavailable_state
 - energy_integration_method
 
-You can call this service from the GUI (`Developer tools` -> `Services`).
+You can call this action from the GUI (`Developer tools` -> `Actions`).
 For example to set `create_utility_meters` to yes for all powercalc GUI configurations:
 
 ```yaml
-service: powercalc.change_gui_config
+action: powercalc.change_gui_config
 data:
   field: create_utility_meters
   value: 1

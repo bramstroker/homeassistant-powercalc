@@ -58,12 +58,12 @@ powercalc:
       model: LIFX Z/length_9
 ```
 
-Powercalc also provides a service which you can call to switch to another sub profile while HA is running.
-The service is called `powercalc.switch_sub_profile`.
-You can call this service from the GUI (`Developer tools` -> `Services`) or from automations.
+Powercalc also provides an action which you can call to switch to another sub profile while HA is running.
+The action is called `powercalc.switch_sub_profile`.
+You can call this action from the GUI (`Developer tools` -> `Actions`) or from automations.
 
 ```yaml
-service: powercalc.switch_sub_profile
+action: powercalc.switch_sub_profile
 data:
   profile: length_5
 target:
