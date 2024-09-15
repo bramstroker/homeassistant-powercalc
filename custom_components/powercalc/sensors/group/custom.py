@@ -74,6 +74,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_PRECISION,
     CONF_SENSOR_TYPE,
     CONF_SUB_GROUPS,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     DATA_DOMAIN_ENTITIES,
     DEFAULT_ENERGY_SENSOR_PRECISION,
     DEFAULT_POWER_SENSOR_PRECISION,
@@ -199,12 +200,12 @@ async def create_group_sensors_custom(
 
         group_sensors.append(energy_sensor)
 
+        sensor_config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
         group_sensors.extend(
             await create_utility_meters(
                 hass,
                 energy_sensor,
                 sensor_config,
-                net_consumption=True,
             ),
         )
 

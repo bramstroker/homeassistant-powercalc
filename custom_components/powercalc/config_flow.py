@@ -79,6 +79,7 @@ from .const import (
     CONF_SUBTRACT_ENTITIES,
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
@@ -406,6 +407,7 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
                 multiple=True,
             ),
         ),
+        vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION, default=False): selector.BooleanSelector(),
     },
 )
 
@@ -1305,6 +1307,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle the flow for advanced options."""
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
+            if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                return await self.async_step_utility_meter_options()
             return self.create_config_entry()  # type: ignore
 
         return self.async_show_form(
@@ -1362,15 +1366,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                             options=ENERGY_INTEGRATION_METHODS,
                             mode=selector.SelectSelectorMode.DROPDOWN,
                         ),
-                    ),
-                },
-            )
-
-        if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
-            schema = schema.extend(
-                {
-                    vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
-                        selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
                     ),
                 },
             )
