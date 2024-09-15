@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from unittest.mock import patch
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -33,6 +34,7 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_SENSOR_ID,
     CONF_SENSOR_TYPE,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
@@ -263,3 +265,21 @@ async def test_regression(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
+
+
+async def test_net_consumption_option(hass: HomeAssistant) -> None:
+    """Test that the net consumption option is respected."""
+    with patch("custom_components.powercalc.sensors.utility_meter.VirtualUtilityMeter") as mock_utility_meter:
+        await run_powercalc_setup(
+            hass,
+            {
+                CONF_ENTITY_ID: "switch.test",
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_FIXED: {CONF_POWER: 50},
+                CONF_CREATE_UTILITY_METERS: True,
+                CONF_UTILITY_METER_NET_CONSUMPTION: True,
+            },
+        )
+
+        _, kwargs = mock_utility_meter.call_args
+        assert kwargs["net_consumption"] is True

@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_ENERGY_SENSOR_PRECISION,
     CONF_IGNORE_UNAVAILABLE_STATE,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
@@ -41,7 +42,6 @@ async def create_utility_meters(
     hass: HomeAssistant,
     energy_sensor: EnergySensor,
     sensor_config: dict,
-    net_consumption: bool = False,
 ) -> list[VirtualUtilityMeter]:
     """Create the utility meters."""
     if not sensor_config.get(CONF_CREATE_UTILITY_METERS):
@@ -83,7 +83,6 @@ async def create_utility_meters(
                 sensor_config,
                 meter_type,
                 unique_id,
-                net_consumption=net_consumption,
             )
             tariff_sensors.append(utility_meter)
             utility_meters.append(utility_meter)
@@ -151,7 +150,6 @@ async def create_utility_meter(
     unique_id: str | None = None,
     tariff: str | None = None,
     tariff_entity: str | None = None,
-    net_consumption: bool = False,
 ) -> VirtualUtilityMeter:
     """Create a utility meter entity, one per tariff."""
     parent_meter = entity_id
@@ -168,7 +166,7 @@ async def create_utility_meter(
         "name": name,
         "meter_type": meter_type,
         "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
-        "net_consumption": net_consumption,
+        "net_consumption": bool(sensor_config.get(CONF_UTILITY_METER_NET_CONSUMPTION, False)),
         "tariff": tariff,
         "tariff_entity": tariff_entity,
     }
