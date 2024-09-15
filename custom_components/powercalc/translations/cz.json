@@ -256,10 +256,12 @@
         "title": "Utility meter options",
         "description": "Define the settings for utility meter creation here",
         "data": {
+          "utility_meter_net_consumption": "Net consumption",
           "utility_meter_types": "Cycles",
           "utility_meter_tariffs": "Tariffs"
         },
         "data_description": {
+          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
           "utility_meter_types": "Create utility meters for specified cycles",
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }
@@ -488,10 +490,12 @@
       "utility_meter_options": {
         "title": "Utility meter options",
         "data": {
+          "utility_meter_net_consumption": "Net consumption",
           "utility_meter_types": "Cycles",
           "utility_meter_tariffs": "Utility meter tariffs"
         },
         "data_description": {
+          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
           "utility_meter_types": "Create utility meters for specified cycles",
           "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
         }

@@ -72,7 +72,7 @@
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
           "device": "Apparaat",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Forceer berekenen energie",
           "group_energy_entities": "Additionele energie entiteiten",
           "group_member_sensors": "Individuele Powercalc sensoren",
           "group_power_entities": "Additionele vermogen entiteiten",
@@ -86,7 +86,7 @@
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
           "create_energy_sensor": "Laat powercalc een kWh meter maken",
           "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
           "group_energy_entities": "Additionele energie entiteiten (kWh)",
           "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
           "group_power_entities": "Additionele vermogen entiteiten (W)",
@@ -256,10 +256,12 @@
         "title": "Nutsmeter opties",
         "description": "Definieer de instellingen voor de aanmaak van nutsmeters",
         "data": {
+          "utility_meter_net_consumption": "Nettoverbruik",
           "utility_meter_types": "Cycli",
           "utility_meter_tariffs": "Tarieven"
         },
         "data_description": {
+          "utility_meter_net_consumption": "Schakel dit in als je de bron als netto meter wilt behandelen. Hierdoor kan je teller zowel positief als negatief zijn.",
           "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
           "utility_meter_tariffs": "Een lijst met ondersteunde tarieven, laat leeg als er maar één tarief nodig is."
         }
@@ -292,7 +294,7 @@
           "power_factor": "Vermogensfactor",
           "voltage": "Spanning"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Zorg ervoor dat u helderheidsbegrenzer inschakelt in WLED-software. Zie ook https://docs.powercalc.nl/strategies/wled/",
         "title": "WLED configuratie"
       }
     }
@@ -388,7 +390,7 @@
         "data": {
           "area": "Ruimte",
           "device": "Apparaat",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Forceer berekenen energie",
           "group_energy_entities": "Additionele energie entiteiten",
           "group_member_sensors": "Individuele Powercalc sensoren",
           "group_power_entities": "Additionele vermogen entiteiten",
@@ -399,7 +401,7 @@
         "data_description": {
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
           "device": "Voeg de entiteiten toe aan een bestaand HA apparaat",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "Standaard worden de energiesensoren van de individuele sensoren opgeteld. Schakel deze optie in om een Riemann Sum sensor te forceren",
           "group_energy_entities": "Additionele energie entiteiten (kWh)",
           "group_member_sensors": "Powercalc sensoren die je wil toevoegen aan de groep",
           "group_power_entities": "Additionele vermogen entiteiten (W)",
@@ -488,10 +490,12 @@
       "utility_meter_options": {
         "title": "Nutsmeter opties",
         "data": {
+          "utility_meter_net_consumption": "Nettoverbruik",
           "utility_meter_types": "Cycli",
           "utility_meter_tariffs": "Nutsmeter tarieven"
         },
         "data_description": {
+          "utility_meter_net_consumption": "Schakel dit in als je de bron als netto meter wilt behandelen. Hierdoor kan je teller zowel positief als negatief zijn.",
           "utility_meter_types": "Maak nutsmeters voor de opgegeven cycli",
           "utility_meter_tariffs": "Een lijst met ondersteunde tarieven laat leeg als er maar één tarief nodig is."
         }
