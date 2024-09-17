@@ -65,6 +65,7 @@
       "type": "string",
       "enum": [
         "camera",
+        "cover",
         "light",
         "smart_switch",
         "smart_speaker",
