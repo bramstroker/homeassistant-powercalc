@@ -23,6 +23,7 @@ DEVICE_TYPES = [
     ("smart_switch", "Smart switches / plugs"),
     ("camera", "Cameras"),
     ("cover", "Covers"),
+    ("printer", "Printers"),
     ("network", "Networking"),
 ]
 
