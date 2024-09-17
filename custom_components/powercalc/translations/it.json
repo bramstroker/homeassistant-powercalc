@@ -248,7 +248,7 @@
           "group": "Gruppo",
           "menu_library": "Virtual power (library)",
           "real_power": "Energia da sensore di potenza reale",
-          "virtual_power": "Virtual power (manual)"
+          "virtual_power": "Potenza virtuale (manuale)"
         },
         "title": "Scegli il tipo di sensore"
       },
@@ -282,9 +282,9 @@
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "group": "Fill in a custom group name to create a new group",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state",
-          "unique_id": "Specify a unique_id. This will allow to setup multiple power sensors for the same entity. When not specified it will take the unique_id of the source entity"
+          "name": "Lasciando vuoto prenderà il nome dal dispositivo di origine",
+          "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF",
+          "unique_id": "Specifica un unique_id. Questo permetterà di impostare più sensori di alimentazione per la stessa entità. Quando non è specificato, prenderà l'unique_id dell'entità di origine"
         },
         "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
         "title": "Crea un sensore di potenza virtuale"
@@ -294,14 +294,14 @@
           "power_factor": "Power factor",
           "voltage": "Tensione"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
-        "title": "WLED config"
+        "description": "Assicurati di abilitare il limitatore di luminosità nel software WLED. Vedi anche https://docs.powercalc.nl/strategies/wled/",
+        "title": "Configurazione WLED"
       }
     }
   },
   "issues": {
     "deprecated_platform_yaml": {
-      "description": "Configuring sensors using `sensor->platform` has been deprecated. You need to change your configuration to `powercalc->sensors`. Click on 'Learn more' for further instructions.",
+      "description": "Configurare i sensori usando `sensor->piattaforma` è stato deprecato. È necessario modificare la configurazione in `powercalc->sensor`. Fare clic su 'Ulteriori informazioni' per ulteriori istruzioni.",
       "title": "La configurazione di Powercalc YAML è stata spostata"
     }
   },
@@ -316,7 +316,7 @@
       "linear_mandatory": "You must supply at least one of max_power or calibrate",
       "linear_min_higher_as_max": "La potenza massima non può essere inferiore a quella minima",
       "linear_unsupported_domain": "Entity domain not supported for linear mode. Must be one of: fan, light or mediaplayer. You can use the calibrate option however",
-      "unknown": "Unknown error occured, please see the logs for additional information"
+      "unknown": "Si è verificato un errore sconosciuto, consultare i registri per ulteriori informazioni"
     },
     "step": {
       "advanced_options": {
@@ -449,7 +449,7 @@
         "data_description": {
           "entities": "Seleziona tutti i singoli interruttori che fanno parte del multi switch",
           "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "power_off": "Accensione per un singolo interruttore quando spento"
         }
       },
       "playbook": {
@@ -490,20 +490,20 @@
       "utility_meter_options": {
         "title": "Opzioni contatore utilità",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Consumo netto",
           "utility_meter_types": "Cicli",
           "utility_meter_tariffs": "Tariffe"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_net_consumption": "Abilita questa opzione se vuoi trattare la sorgente come un contatore di rete. Questo permetterà al tuo contatore di andare sia positivo che negativo.",
+          "utility_meter_types": "Crea utility meters per cicli specificati",
+          "utility_meter_tariffs": "Un elenco di tariffe, lasciare vuoto se è necessaria una tariffa unica."
         }
       },
       "wled": {
         "title": "Opzioni WLED",
         "data": {
-          "power_factor": "Power factor",
+          "power_factor": "Fattore di potenza",
           "voltage": "Tensione"
         }
       }
@@ -511,17 +511,17 @@
   },
   "services": {
     "activate_playbook": {
-      "description": "Start execution of a playbook.",
+      "description": "Avvia l'esecuzione di un playbook.",
       "fields": {
         "playbook_id": {
           "description": "Playbook identifier.",
           "name": "Playbook"
         }
       },
-      "name": "Activate playbook"
+      "name": "Attiva playbook"
     },
     "calibrate_energy": {
-      "description": "Sets the energy sensor to a given kWh value.",
+      "description": "Imposta il sensore di energia ad un dato valore in kWh.",
       "fields": {
         "value": {
           "description": "Il valore da impostare.",
@@ -538,7 +538,7 @@
           "name": "Valore"
         }
       },
-      "name": "Calibrate utility meter"
+      "name": "Crea contatori (utility meters)"
     },
     "change_gui_config": {
       "description": "Batch change configuration of all Powercalc config entries",
@@ -556,7 +556,7 @@
     },
     "get_active_playbook": {
       "description": "Get current running playbook",
-      "name": "Get active playbook"
+      "name": "Ottieni playbook attivo"
     },
     "increase_daily_energy": {
       "description": "Aumenta il sensore con una data quantità.",
@@ -574,7 +574,7 @@
     },
     "stop_playbook": {
       "description": "Stop currently active playbook.",
-      "name": "Stop playbook"
+      "name": "Interrompi playbook"
     },
     "switch_sub_profile": {
       "description": "Some profiles in the library has different sub profiles. This service allows you to switch to another one.",
