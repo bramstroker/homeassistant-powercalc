@@ -67,6 +67,7 @@
         "camera",
         "cover",
         "light",
+        "printer",
         "smart_switch",
         "smart_speaker",
         "network"
