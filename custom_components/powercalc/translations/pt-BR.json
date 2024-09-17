@@ -72,7 +72,7 @@
           "create_energy_sensor": "Criar sensor de consumo",
           "create_utility_meters": "Criar medidores de utilidade",
           "device": "Dispositivo",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Forçar cálculo da energia",
           "group_energy_entities": "Entidades de energia adicionais",
           "group_member_sensors": "Sensores powercalc membros",
           "group_power_entities": "Entidades de potência adicionais",
@@ -86,7 +86,7 @@
           "area": "Adiciona todos os sensores de potência da área especificada",
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
           "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
           "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
           "group_member_sensors": "Sensores powercalc para incluir no grupo",
           "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
@@ -256,12 +256,12 @@
         "title": "Opções do medidor de utilidade",
         "description": "Defina as configurações para a criação do medidor de utilidade aqui",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Consumo líquido",
           "utility_meter_types": "Ciclos",
           "utility_meter_tariffs": "Tarifas"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Habilite isso se você deseja tratar a fonte como um medidor de rede. Isso permitirá que seu contador fique positivo e negativo.",
           "utility_meter_types": "Criar medidores de utilidade para ciclos específicos",
           "utility_meter_tariffs": "Uma lista de tarifas suportadas, deixe em branco se houver necessidade de uma tarifa única."
         }
@@ -294,7 +294,7 @@
           "power_factor": "Fator de potência",
           "voltage": "Voltagem"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Certifique-se de habilitar o limitador de brilho no software WLED. Veja também https://docs.powercalc.nl/strategies/wled/",
         "title": "Configuração WLED"
       }
     }
@@ -390,7 +390,7 @@
         "data": {
           "area": "Área",
           "device": "Dispositivo",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Forçar cálculo da energia",
           "group_energy_entities": "Entidades de energia adicionais",
           "group_member_sensors": "Sensores powercalc membros",
           "group_power_entities": "Entidades de potência adicionais",
@@ -401,7 +401,7 @@
         "data_description": {
           "area": "Adicionar todos os sensores de potência da área especificada",
           "device": "Adicionar o grupo de entidades powercalc a um dispositivo existente",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "Por padrão powercalc soma os sensores de energia dos sensores membros. Ative esta opção para forçar a criação de um sensor de soma Riemann",
           "group_energy_entities": "Sensores de energia adicionais (kWh) da sua instalação HA para incluir",
           "group_member_sensors": "Sensores Powercalc para incluir no grupo",
           "group_power_entities": "Sensores de potência adicionais (W) da sua instalação HA para incluir",
@@ -490,12 +490,12 @@
       "utility_meter_options": {
         "title": "Opções do medidor de utilidade",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Consumo líquido",
           "utility_meter_types": "Ciclos",
           "utility_meter_tariffs": "Utility meter tariffs"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Habilite isso se você deseja tratar a fonte como um medidor de rede. Isso permitirá que seu contador fique positivo e negativo.",
           "utility_meter_types": "Crie medidores de utilidade para ciclos específicos",
           "utility_meter_tariffs": "Uma lista de tarifas suportadas, deixe em branco se houver necessidade de uma tarifa única."
         }
