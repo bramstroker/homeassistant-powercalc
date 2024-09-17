@@ -9,6 +9,7 @@ from typing import NamedTuple, Protocol
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
+from homeassistant.components.cover import DOMAIN as COVER_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
@@ -30,7 +31,6 @@ _LOGGER = logging.getLogger(__name__)
 
 class DeviceType(StrEnum):
     CAMERA = "camera"
-    COVER_DOMAIN = "cover_domain"
     COVER = "cover"
     LIGHT = "light"
     SMART_SWITCH = "smart_switch"
@@ -47,6 +47,7 @@ class SubProfileMatcherType(StrEnum):
 
 DOMAIN_DEVICE_TYPE = {
     CAMERA_DOMAIN: DeviceType.CAMERA,
+    COVER_DOMAIN: DeviceType.COVER,
     LIGHT_DOMAIN: DeviceType.LIGHT,
     SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
     MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
