@@ -7,13 +7,16 @@ exclude-contributors:
   - 'github-actions'
   - 'renovate[bot]'
   - 'renovate'
+  - 'pre-commit-ci'
+  - 'pre-commit-ci[bot]'
+  - 'bramstroker'
 exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
 categories:
-  - title: '💡 Light models'
+  - title: '💡 Power profiles'
     labels:
-      - 'lightmodel'
+      - 'powerprofile'
   - title: '🚀 Features'
     labels:
       - 'feature'
