@@ -18,6 +18,10 @@
       "type": "string",
       "description": "The full name"
     },
+    "description": {
+      "type": "string",
+      "description": "A short description of the device"
+    },
     "standby_power": {
       "type": "number",
       "minimum": 0.05,
