@@ -51,14 +51,15 @@ class ProfileLibrary:
 
     @staticmethod
     def create_loader(hass: HomeAssistant) -> Loader:
-        loaders: list[Loader] = []
-        for data_dir in [
-            os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
-            os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
-            os.path.join(os.path.dirname(__file__), "../custom_data"),
-        ]:
-            if os.path.exists(data_dir):
-                loaders.append(LocalLoader(hass, data_dir))
+        loaders: list[Loader] = [
+            LocalLoader(hass, data_dir)
+            for data_dir in [
+                os.path.join(hass.config.config_dir, LEGACY_CUSTOM_DATA_DIRECTORY),
+                os.path.join(hass.config.config_dir, CUSTOM_DATA_DIRECTORY),
+                os.path.join(os.path.dirname(__file__), "../custom_data"),
+            ]
+            if os.path.exists(data_dir)
+        ]
 
         global_config = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
         disable_library_download: bool = bool(global_config.get(CONF_DISABLE_LIBRARY_DOWNLOAD, False))

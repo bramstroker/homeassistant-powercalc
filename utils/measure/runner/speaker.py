@@ -65,9 +65,7 @@ class SpeakerRunner(MeasurementRunner):
 
     @staticmethod
     def _build_model_json_data(summary: dict) -> dict:
-        calibrate_list = []
-        for volume in summary:
-            calibrate_list.append(f"{volume} -> {summary[volume]}")
+        calibrate_list = [f"{volume} -> {summary[volume]}" for volume in summary]
 
         return {
             "device_type": "smart_speaker",

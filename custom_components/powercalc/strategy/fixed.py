@@ -77,6 +77,7 @@ class FixedStrategy(PowerCalculationStrategyInterface):
             )
 
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
+        """Return entities that should be tracked."""
         track_templates: list[str | TrackTemplate] = []
 
         if isinstance(self._power, Template):
@@ -85,6 +86,6 @@ class FixedStrategy(PowerCalculationStrategyInterface):
         if self._per_state_power:
             for power in list(self._per_state_power.values()):
                 if isinstance(power, Template):
-                    track_templates.append(TrackTemplate(power, None, None))
+                    track_templates.append(TrackTemplate(power, None, None))  # noqa: PERF401
 
         return track_templates
