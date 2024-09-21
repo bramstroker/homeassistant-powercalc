@@ -11,7 +11,7 @@ from pathlib import Path
 from threading import Thread
 
 import cv2
-import numpy
+import numpy as np
 import pytesseract
 
 logging.basicConfig(
@@ -87,7 +87,7 @@ class RateCounter:
         elapsed_time = time.perf_counter() - self.start_time
         return self.iterations / elapsed_time
 
-    def render(self, frame: numpy.ndarray, rate: float) -> numpy.ndarray:
+    def render(self, frame: np.ndarray, rate: float) -> np.ndarray:
         """
         Places text showing the iterations per second in the CV2 display loop.
 
@@ -156,7 +156,7 @@ class VideoStream:
 
     def capture_image(
         self,
-        frame: numpy.ndarray | None = None,
+        frame: np.ndarray | None = None,
         captures: int = 0,
     ) -> int:
         """
@@ -204,7 +204,7 @@ class OcrRegionSelection:
 
     # Method to track mouse events
     def draw_rectangle(self, event: int, x: int, y: int) -> None:
-        x, y = numpy.int16([x, y])
+        x, y = np.int16([x, y])
 
         if event == cv2.EVENT_LBUTTONDOWN:
             # Start selection
@@ -222,7 +222,7 @@ class OcrRegionSelection:
             x_start, y_start = self.drag_start
             self.selection = (x_start, y_start, x, y)
 
-    def render(self, frame: numpy.ndarray) -> numpy.ndarray:
+    def render(self, frame: np.ndarray) -> np.ndarray:
         if self.selection:
             cv2.rectangle(
                 frame,
@@ -262,7 +262,7 @@ class OcrRegionSelection:
     def has_selection(self) -> bool:
         return self.selection is not None
 
-    def get_cropped_frame(self, frame: numpy.ndarray) -> numpy.ndarray:
+    def get_cropped_frame(self, frame: np.ndarray) -> np.ndarray:
         return frame[
             self.selection[1] : self.selection[3],
             self.selection[0] : self.selection[2],
@@ -342,7 +342,7 @@ class OCR:
         self.file.close()
         self.stopped = True
 
-    def render(self, frame: numpy.ndarray) -> numpy.ndarray:
+    def render(self, frame: np.ndarray) -> np.ndarray:
         if self.measurement is None:
             return frame
         return cv2.putText(
