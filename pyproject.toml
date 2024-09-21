@@ -67,7 +67,7 @@ target-version = "py312"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
-select = ["T10", "SLOT", "ICN", "FIX", "S", "PERF", "FURB", "LOG", "E", "W", "F", "B", "C", "I", "N", "UP", "ANN", "ASYNC", "BLE", "A", "COM", "C4", "G", "ISC", "NPY", "INP", "PIE", "T20", "PYI", "Q", "RET", "SLF", "SIM", "TID", "RUF", "SIM"]
+select = ["A", "ANN", "ASYNC", "B", "BLE", "C", "C4", "COM", "E", "F", "FIX", "FURB", "G", "ICN", "I", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PIE", "PYI", "Q", "RET", "RUF", "S", "SIM", "SLF", "SLOT", "T10", "T20", "TID", "UP", "W"]
 ignore = ["ANN101", "S101"]
 
 [tool.ruff.lint.per-file-ignores]
