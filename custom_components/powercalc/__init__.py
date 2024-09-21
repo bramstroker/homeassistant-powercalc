@@ -437,7 +437,7 @@ async def repair_none_config_entries_issue(hass: HomeAssistant) -> None:
         for entity in entities:
             entity_registry.async_remove(entity.entity_id)
         try:
-            unique_id = f"{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
+            unique_id = f"{int(time.time() * 1000)}_{random.randint(1000, 9999)}"  # noqa: S311
             object.__setattr__(entry, "unique_id", unique_id)
             hass.config_entries._entries._index_entry(entry)  # noqa
             await hass.config_entries.async_remove(entry.entry_id)
