@@ -268,10 +268,8 @@ class SubProfileSelector:
         self._matchers: list[SubProfileMatcher] = self._build_matchers()
 
     def _build_matchers(self) -> list[SubProfileMatcher]:
-        matchers: list[SubProfileMatcher] = []
-        for matcher_config in self._config.matchers:
-            matchers.append(self._create_matcher(matcher_config))
-        return matchers
+        """Create matchers from json config."""
+        return [self._create_matcher(matcher_config) for matcher_config in self._config.matchers]
 
     def select_sub_profile(self, entity_state: State) -> str:
         """Dynamically tries to select a sub profile depending on the entity state.
