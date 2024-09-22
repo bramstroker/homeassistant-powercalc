@@ -11,6 +11,3 @@ enhancement:
 
 bug:
   - head-branch: ['^fix', 'fix']
-
-release:
- - base-branch: 'master'
