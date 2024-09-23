@@ -258,7 +258,7 @@
         "data": {
           "utility_meter_net_consumption": "Net consumption",
           "utility_meter_types": "Cycles",
-          "utility_meter_tariffs": "Tariffs"
+          "utility_meter_tariffs": "Tariffer"
         },
         "data_description": {
           "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
@@ -307,7 +307,7 @@
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "Modellen stöds inte"
     },
     "error": {
       "fixed_mandatory": "Du måste ange minst en av Effekt, Effektmall eller effekttillstånd",
@@ -320,7 +320,7 @@
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "Avancerade inställningar",
         "data": {
           "calculation_enabled_condition": "Beräkningsaktiverat villkor",
           "energy_integration_method": "Energy integration method",
@@ -338,11 +338,11 @@
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "Grundläggande inställningar",
         "data": {
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
-          "entity_id": "Source entity",
+          "entity_id": "Källentitet",
           "name": "Namn",
           "standby_power": "Standby effekt"
         },
@@ -367,7 +367,7 @@
         },
         "data_description": {
           "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "update_frequency": "tid i sekunder mellan tillståndsuppdateringar av sensorn"
         }
       },
       "fixed": {
@@ -411,8 +411,8 @@
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
+          "advanced_options": "Avancerade inställningar",
+          "basic_options": "Grundläggande inställningar",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
           "group": "Group options",
@@ -422,7 +422,7 @@
           "real_power": "Real power options",
           "subtract_group": "Group options",
           "utility_meter_options": "Utility meter options",
-          "wled": "WLED options"
+          "wled": "WLED alternativ"
         }
       },
       "linear": {
@@ -458,7 +458,7 @@
           "autostart": "Autostart",
           "playbooks": "Playbooks",
           "repeat": "Repetera",
-          "states_trigger": "State trigger"
+          "states_trigger": "Tillstånd utlösare"
         },
         "data_description": {
           "autostart": "Indikera att en sepcifik playbook ska starta när HA startas. i.e. 'program1'",
@@ -490,21 +490,21 @@
       "utility_meter_options": {
         "title": "Utility meter options",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
+          "utility_meter_net_consumption": "Nettoförbrukning",
+          "utility_meter_types": "Cykler",
           "utility_meter_tariffs": "Utility meter tariffs"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Aktivera detta om du vill behandla källan som en nettomätare. Detta gör att din räknare kan gå både positivt och negativt.",
           "utility_meter_types": "Create utility meters for specified cycles",
-          "utility_meter_tariffs": "A list of supported tariffs, leave empty if only a single tariff is needed."
+          "utility_meter_tariffs": "Lista med tariffer som stöds. Lämna tomt om endast en tariff används."
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "WLED alternativ",
         "data": {
           "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "voltage": "Spänning"
         }
       }
     }
