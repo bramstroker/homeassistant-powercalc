@@ -1,13 +1,16 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Check if a directory argument is provided
 if [ -z "$1" ]; then
   echo "Usage: $0 <directory>"
   exit 1
 fi
 
-# Directory to search
-SEARCH_DIR="$1"
+# Directory to search (convert to absolute path)
+SEARCH_DIR="$(realpath "$1")"
 
 # Find all .csv.gz files recursively and loop over them
 find "$SEARCH_DIR" -type f -name "*.csv.gz" | while IFS= read -r file; do
@@ -20,5 +23,6 @@ find "$SEARCH_DIR" -type f -name "*.csv.gz" | while IFS= read -r file; do
     continue
   fi
 
-  poetry run python plot.py "$file" --output="$output"
+  # Call plot.py using the absolute path
+  poetry run python "$SCRIPT_DIR/plot.py" "$file" --output="$output"
 done
