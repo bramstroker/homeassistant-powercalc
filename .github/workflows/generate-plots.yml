@@ -24,8 +24,7 @@ jobs:
           cache_dependencies: 'false'
       - name: Run visualization tool
         run: |
-          cd ./utils/visualize
-          bash generate-all.sh ./profile_library
+          bash ./utils/visualize/generate-all.sh profile_library
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/master'
         with:
