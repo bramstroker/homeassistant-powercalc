@@ -1,4 +1,4 @@
-name: Generate support model list
+name: Generate plots
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       - name: Run visualization tool
         run: |
           cd ./utils/visualize
-          bash generate-all.sh
+          bash generate-all.sh ./profile_library
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/master'
         with:
