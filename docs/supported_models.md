@@ -1,4 +1,4 @@
-- [Lights](#lights) (346)
+- [Lights](#lights) (347)
 - [Smart speakers](#smart-speakers) (35)
 - [Smart switches / plugs](#smart-switches--plugs) (49)
 - [Cameras](#cameras) (2)
@@ -7,7 +7,7 @@
 - [Networking](#networking) (4)
 
 ## Lights
-#### 346 total
+#### 347 total
 
 |       A       |                B                |                                              C                                              |                                                                                                                                                  D                                                                                                                                                   |  E  |           F            |
 |---------------|---------------------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----:|------------------------|
@@ -171,6 +171,7 @@
 |osram          |PAR16 50 TW                      |Osram LIGHTIFY 6W GU10                                                                       |                                                                                                                                                                                                                                                                                                      |0.300|color_temp              |
 |oz smart things|DL41-03-10-R-ZB                  |Oz Smart Things Zigbee Downlight                                                             |DL41-03-10-R-ZB                                                                                                                                                                                                                                                                                       |0.720|color_temp,hs           |
 |paulmann licht |29145                            |Paulmann Licht GmbH RGBW Bulb E27 1055lm 11W                                                 |                                                                                                                                                                                                                                                                                                      |0.350|color_temp,hs           |
+|paulmann licht |29147                            |Paulmann Licht GmbH RGBW Reflector GU10 350lm 4.8W                                           |                                                                                                                                                                                                                                                                                                      |0.250|color_temp,hs           |
 |paulmann licht |29150                            |Paulmann Licht GmbH RGBW Bulb E14 470lm 5W                                                   |                                                                                                                                                                                                                                                                                                      |0.250|color_temp,hs           |
 |paulmann licht |371000002                        |Amaris RGBW LED Panels 595x295mm                                                             |                                                                                                                                                                                                                                                                                                      |1.330|color_temp,hs           |
 |paulmann licht |924.70                           |Paulmann Licht GmbH RGBW Base Spot                                                           |                                                                                                                                                                                                                                                                                                      |0.200|color_temp,hs           |
