@@ -129,12 +129,12 @@ class RemoteLoader(Loader):
         retry_count: int = 0,
     ) -> tuple[dict, str] | None:
         """Load a model, downloading it if necessary, with retry logic."""
-        model_info = self._get_model_info(manufacturer, model)
-        storage_path = self.get_storage_path(manufacturer, model)
+        model_info = self._get_model_info(manufacturer.lower(), model)
+        storage_path = self.get_storage_path(manufacturer.lower(), model)
         model_path = os.path.join(storage_path, "model.json")
 
         if await self._needs_update(model_info, model_path, force_update):
-            await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
+            await self._download_profile_with_retry(manufacturer.lower(), model, storage_path, model_path)
 
         try:
             json_data = await self._load_model_json(model_path)
