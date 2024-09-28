@@ -1,3 +1,4 @@
+import inspect
 import logging
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow
@@ -71,6 +72,11 @@ async def add_to_associated_group(
     if not group_entry and len(group_entry_id) != 32:
         group_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, group_entry_id)
         if not group_entry:
+            additional_args: dict = {}
+            signature = inspect.signature(ConfigEntry.__init__)
+            if "discovery_keys" in signature.parameters:
+                additional_args["discovery_keys"] = {}
+
             group_entry = ConfigEntry(
                 version=ConfigFlow.VERSION,
                 minor_version=ConfigFlow.MINOR_VERSION,
@@ -83,6 +89,7 @@ async def add_to_associated_group(
                 },
                 options={},
                 unique_id=group_entry_id,
+                **additional_args,
             )
             await hass.config_entries.async_add(group_entry)
 
