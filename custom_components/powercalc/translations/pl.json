@@ -256,7 +256,7 @@
         "title": "Opcje licznika mediów",
         "description": "Zdefiniuj ustawienia dla tworzenia liczników mediów",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Zużycie netto",
           "utility_meter_types": "Cykle",
           "utility_meter_tariffs": "Taryfy"
         },
@@ -490,7 +490,7 @@
       "utility_meter_options": {
         "title": "Opcje licznika mediów",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Zużycie netto",
           "utility_meter_types": "Cykle",
           "utility_meter_tariffs": "Utility meter tariffs"
         },
