@@ -32,6 +32,11 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
 
         return None
 
+    async def validate_config(self) -> None:
+        """Validate correct setup of the strategy."""
+        for sub_strategy in self.strategies:
+            await sub_strategy.strategy.validate_config()
+
     def get_entities_to_track(self) -> list[str | TrackTemplate]:
         track_templates: list[str | TrackTemplate] = []
         for sub_strategy in self.strategies:
@@ -41,6 +46,15 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
                     track_templates,
                 )
         return track_templates
+
+    def can_calculate_standby(self) -> bool:
+        """Return if this strategy can calculate standby power."""
+        return any(sub_strategy.strategy.can_calculate_standby() for sub_strategy in self.strategies)
+
+    async def on_start(self, hass: HomeAssistant) -> None:
+        """Called after HA has started"""
+        for sub_strategy in self.strategies:
+            await sub_strategy.strategy.on_start(hass)
 
     def resolve_track_templates_from_condition(
         self,
