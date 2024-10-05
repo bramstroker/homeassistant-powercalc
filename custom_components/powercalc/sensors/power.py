@@ -462,7 +462,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
-        if isinstance(self._strategy_instance, PlaybookStrategy):
+        if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
 
         @callback

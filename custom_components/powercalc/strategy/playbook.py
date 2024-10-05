@@ -203,6 +203,11 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
     def can_calculate_standby(self) -> bool:
         return bool(self._states_trigger and STATE_OFF in self._states_trigger)
 
+    @property
+    def registered_playbooks(self) -> list[str]:
+        playbooks = dict(self._config.get(CONF_PLAYBOOKS, {}))
+        return list(playbooks.keys())
+
 
 class PlaybookQueue:
     def __init__(self, items: list[PlaybookEntry]) -> None:

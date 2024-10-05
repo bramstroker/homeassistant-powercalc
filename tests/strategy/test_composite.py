@@ -24,6 +24,7 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
+    DUMMY_ENTITY_ID,
 )
 from tests.common import (
     get_test_config_dir,
@@ -235,7 +236,7 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     sensor_config = {
-        CONF_ENTITY_ID: dishwasher_mode_entity,
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_NAME: "Dishwasher",
         CONF_COMPOSITE: [
             {
@@ -246,7 +247,7 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
                 },
                 CONF_PLAYBOOK: {
                     CONF_PLAYBOOKS: {
-                        "playbook": "dishwasher.csv",
+                        "playbook": "composite/dishwasher.csv",
                     },
                 },
             },
@@ -287,3 +288,13 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.dishwasher_power").state == "20.00"
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "40.00"
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "9.60"
