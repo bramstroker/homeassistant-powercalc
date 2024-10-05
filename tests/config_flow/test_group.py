@@ -527,13 +527,13 @@ async def test_field_defaults_from_global_powercalc_config(hass: HomeAssistant) 
     assert not schema_keys[schema_keys.index(CONF_INCLUDE_NON_POWERCALC_SENSORS)].default()
 
 
-async def test_migrate_entity_to_version_3(hass: HomeAssistant) -> None:
+async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
     """Test migration of a group sensor entry to version 3. Should add `create_energy_sensor` field."""
     mock_entry = MockConfigEntry(domain=DOMAIN, data={CONF_SENSOR_TYPE: SensorType.GROUP}, version=2)
     mock_entry.add_to_hass(hass)
     await async_migrate_entry(hass, mock_entry)
     hass.config_entries.async_get_entry(mock_entry.entry_id)
-    assert mock_entry.version == 3
+    assert mock_entry.version == 4
     assert mock_entry.data.get(CONF_CREATE_ENERGY_SENSOR)
 
 

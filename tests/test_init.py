@@ -11,19 +11,23 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import EntityRegistry
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import repair_none_config_entries_issue
+from custom_components.powercalc import async_migrate_entry, repair_none_config_entries_issue
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_TEMPLATE,
     CONF_SENSOR_TYPE,
+    CONF_STATE_TRIGGER,
+    CONF_STATES_TRIGGER,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
     DUMMY_ENTITY_ID,
@@ -167,13 +171,14 @@ async def test_create_config_entry_without_energy_sensor(
         ENTRY_DATA_ENERGY_ENTITY: "sensor.testentry_energy",
         ENTRY_DATA_POWER_ENTITY: "sensor.testentry_power",
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_NAME: "testentry",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_FIXED: {
             CONF_POWER_TEMPLATE: template,
         },
     }
-    assert new_entry.version == 2
+    assert new_entry.version == 4
 
 
 async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
@@ -208,3 +213,38 @@ async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
         assert not hass.config_entries.async_get_entry(entry.entry_id)
     assert not hass.states.get("sensor.none_power")
     assert not hass.states.get("sensor.none_energy")
+
+
+async def test_migrate_config_entry_version_4(hass: HomeAssistant) -> None:
+    """
+    Test that a config entry is migrated from version 4 to version 5.
+    """
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_NAME: "testentry",
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_PLAYBOOK: {
+                CONF_STATES_TRIGGER: {
+                    "foo": "bar",
+                },
+            },
+        },
+        version=3,
+    )
+    entry.add_to_hass(hass)
+
+    await async_migrate_entry(hass, entry)
+
+    assert entry.version == 4
+    assert entry.data == {
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_NAME: "testentry",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_PLAYBOOK: {
+            CONF_STATE_TRIGGER: {
+                "foo": "bar",
+            },
+        },
+    }

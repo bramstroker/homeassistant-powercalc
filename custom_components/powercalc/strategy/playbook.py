@@ -22,22 +22,29 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOKS,
     CONF_REPEAT,
     CONF_STATE_TRIGGER,
+    CONF_STATES_TRIGGER,
 )
 from custom_components.powercalc.errors import StrategyConfigurationError
 
 from .strategy_interface import PowerCalculationStrategyInterface
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_PLAYBOOKS): vol.Schema(
-            {cv.string: cv.string},
-        ),
-        vol.Optional(CONF_AUTOSTART): cv.string,
-        vol.Optional(CONF_REPEAT, default=False): cv.boolean,
-        vol.Optional(CONF_STATE_TRIGGER): vol.Schema(
-            {cv.string: cv.string},
-        ),
-    },
+CONFIG_SCHEMA = vol.All(
+    cv.deprecated(CONF_STATES_TRIGGER, replacement_key=CONF_STATE_TRIGGER),
+    vol.Schema(
+        {
+            vol.Optional(CONF_PLAYBOOKS): vol.Schema(
+                {cv.string: cv.string},
+            ),
+            vol.Optional(CONF_AUTOSTART): cv.string,
+            vol.Optional(CONF_REPEAT, default=False): cv.boolean,
+            vol.Optional(CONF_STATE_TRIGGER): vol.Schema(
+                {cv.string: cv.string},
+            ),
+            vol.Optional(CONF_STATES_TRIGGER): vol.Schema(
+                {cv.string: cv.string},
+            ),
+        },
+    ),
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,7 +67,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._repeat: bool = bool(config.get(CONF_REPEAT))
         self._autostart: str | None = config.get(CONF_AUTOSTART)
         self._power = Decimal(0)
-        self._states_trigger: dict[str, str] | None = config.get(CONF_STATE_TRIGGER)
+        self._states_trigger: dict[str, str] | None = config.get(CONF_STATE_TRIGGER, config.get(CONF_STATES_TRIGGER))
         if not playbook_directory:
             self._playbook_directory: str = os.path.join(
                 hass.config.config_dir,
