@@ -135,8 +135,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standard group",
-          "domain_group": "Domain based group"
+          "group": "Standardgruppe",
+          "domain_group": "Domänenbasierte Gruppe"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
