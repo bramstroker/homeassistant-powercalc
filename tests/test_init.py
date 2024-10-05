@@ -15,6 +15,7 @@ from custom_components.powercalc import async_migrate_entry, repair_none_config_
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_CREATE_DOMAIN_GROUPS,
+    CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
@@ -170,13 +171,14 @@ async def test_create_config_entry_without_energy_sensor(
         ENTRY_DATA_ENERGY_ENTITY: "sensor.testentry_energy",
         ENTRY_DATA_POWER_ENTITY: "sensor.testentry_power",
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_CREATE_ENERGY_SENSOR: True,
         CONF_NAME: "testentry",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_FIXED: {
             CONF_POWER_TEMPLATE: template,
         },
     }
-    assert new_entry.version == 2
+    assert new_entry.version == 4
 
 
 async def test_repair_issue_with_none_sensors(hass: HomeAssistant) -> None:
