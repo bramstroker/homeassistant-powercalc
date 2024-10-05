@@ -1,7 +1,11 @@
+from datetime import timedelta
+
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import (
     CONF_CONDITION,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
+    CONF_NAME,
     STATE_OFF,
     STATE_ON,
     STATE_UNAVAILABLE,
@@ -9,7 +13,8 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
+from homeassistant.util import dt
+from pytest_homeassistant_custom_component.common import async_fire_time_changed, mock_device_registry, mock_registry
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
@@ -17,9 +22,15 @@ from custom_components.powercalc.const import (
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MULTI_SWITCH,
+    CONF_PLAYBOOK,
+    CONF_PLAYBOOKS,
     CONF_POWER,
+    CONF_POWER_OFF,
+    CONF_STANDBY_POWER,
 )
 from tests.common import (
+    get_test_config_dir,
     run_powercalc_setup,
 )
 
@@ -217,3 +228,160 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+
+async def test_playbook(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+
+    dishwasher_mode_entity = "sensor.dishwasher_operating_mode"
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
+    await hass.async_block_till_done()
+
+    sensor_config = {
+        CONF_ENTITY_ID: dishwasher_mode_entity,
+        CONF_NAME: "Dishwasher",
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": dishwasher_mode_entity,
+                    "state": "Cycle Active",
+                },
+                CONF_PLAYBOOK: {
+                    CONF_PLAYBOOKS: {
+                        "playbook": "composite/dishwasher.csv",
+                    },
+                },
+            },
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": dishwasher_mode_entity,
+                    "state": "Cycle Complete",
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 9.6,
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 1.6,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "9.60"
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Paused")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "1.60"
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Active")
+    await hass.async_block_till_done()
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=3))
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "20.00"
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=5))
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "40.00"
+
+    hass.states.async_set(dishwasher_mode_entity, "Cycle Complete")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "9.60"
+
+    hass.states.async_set(dishwasher_mode_entity, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "0.00"
+
+
+async def test_calculate_standby_power(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "switch.test",
+        CONF_STANDBY_POWER: 1,
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": "switch.test",
+                    "state": STATE_OFF,
+                },
+                CONF_MULTI_SWITCH: {
+                    CONF_POWER: 5,
+                    CONF_POWER_OFF: 2,
+                    CONF_ENTITIES: [
+                        "switch.test1",
+                        "switch.test2",
+                    ],
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 10,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("switch.test1", STATE_OFF)
+    hass.states.async_set("switch.test2", STATE_OFF)
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "4.00"
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"
+
+
+async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "switch.test",
+        CONF_STANDBY_POWER: 1,
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": "switch.test",
+                    "state": STATE_OFF,
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 5,
+                },
+            },
+            {
+                CONF_MULTI_SWITCH: {
+                    CONF_POWER: 5,
+                    CONF_POWER_OFF: 2,
+                    CONF_ENTITIES: [
+                        "switch.test1",
+                        "switch.test2",
+                    ],
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "1.00"

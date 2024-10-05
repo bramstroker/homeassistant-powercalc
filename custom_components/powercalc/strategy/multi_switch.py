@@ -45,7 +45,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
                 entity_id: (state.state if (state := self.hass.states.get(entity_id)) else STATE_UNAVAILABLE) for entity_id in self.switch_entities
             }
 
-        if entity_state.entity_id != DUMMY_ENTITY_ID:
+        if entity_state.entity_id != DUMMY_ENTITY_ID and entity_state.entity_id in self.switch_entities:
             self.known_states[entity_state.entity_id] = entity_state.state
 
         def _get_power(state: str) -> Decimal:

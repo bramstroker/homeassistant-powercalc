@@ -462,7 +462,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         self.async_on_remove(start.async_at_start(self.hass, initial_update))
 
-        if isinstance(self._strategy_instance, PlaybookStrategy):
+        if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
 
         @callback
@@ -616,7 +616,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         standby_power = self._standby_power
         if self._strategy_instance.can_calculate_standby():
-            standby_power = await self._strategy_instance.calculate(state) or Decimal(0)
+            standby_power = await self._strategy_instance.calculate(state) or self._standby_power
 
         evaluated = await evaluate_power(standby_power)
         if evaluated is None:

@@ -275,7 +275,7 @@ async def test_autodiscover_skips_unsupported_domains(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     mock_entity_with_model_information(
-        "media_player.test",
+        "device_tracker.test",
         "signify",
         "LCT010",
     )
