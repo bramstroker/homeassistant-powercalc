@@ -417,16 +417,18 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     version = config_entry.version
     data = {**config_entry.data}
 
-    if version <= 1 and CONF_FIXED in data and CONF_POWER in data[CONF_FIXED] and CONF_POWER_TEMPLATE in data[CONF_FIXED]:
-        data[CONF_FIXED].pop(CONF_POWER, None)
+    if version <= 1:
+        conf_fixed = data.get(CONF_FIXED, {})
+        if CONF_POWER in conf_fixed and CONF_POWER_TEMPLATE in conf_fixed:
+            conf_fixed.pop(CONF_POWER, None)
 
     if version <= 2 and data.get(CONF_SENSOR_TYPE) and CONF_CREATE_ENERGY_SENSOR not in data:
         data[CONF_CREATE_ENERGY_SENSOR] = True
 
     if version <= 3:
-        playbook = data.get(CONF_PLAYBOOK, {})
-        if CONF_STATES_TRIGGER in playbook:
-            data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = playbook.pop(CONF_STATES_TRIGGER)
+        conf_playbook = data.get(CONF_PLAYBOOK, {})
+        if CONF_STATES_TRIGGER in conf_playbook:
+            data[CONF_PLAYBOOK][CONF_STATE_TRIGGER] = conf_playbook.pop(CONF_STATES_TRIGGER)
 
     hass.config_entries.async_update_entry(config_entry, data=data, version=4)
 
