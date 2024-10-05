@@ -5,7 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.condition import ConditionCheckerType
 from homeassistant.helpers.event import TrackTemplate
@@ -39,6 +39,9 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
             strategy = sub_strategy.strategy
             if isinstance(strategy, PlaybookStrategy):
                 await self.activate_playbook(strategy)
+
+            if entity_state.state == STATE_OFF and not strategy.can_calculate_standby():
+                continue
             return await strategy.calculate(entity_state)
 
         return None
@@ -52,7 +55,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
     async def activate_playbook(strategy: PlaybookStrategy) -> None:
         """Activate the first playbook in the list."""
         if not strategy.registered_playbooks:
-            return
+            return  # pragma: no cover
         playbook = strategy.registered_playbooks[0]
         await strategy.activate_playbook(playbook)
 

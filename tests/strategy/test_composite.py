@@ -24,7 +24,6 @@ from custom_components.powercalc.const import (
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
-    DUMMY_ENTITY_ID,
 )
 from tests.common import (
     get_test_config_dir,
@@ -236,7 +235,7 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     sensor_config = {
-        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_ENTITY_ID: dishwasher_mode_entity,
         CONF_NAME: "Dishwasher",
         CONF_COMPOSITE: [
             {
@@ -298,3 +297,8 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.dishwasher_power").state == "9.60"
+
+    hass.states.async_set(dishwasher_mode_entity, STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.dishwasher_power").state == "0.00"
