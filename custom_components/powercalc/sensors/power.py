@@ -616,7 +616,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         standby_power = self._standby_power
         if self._strategy_instance.can_calculate_standby():
-            standby_power = await self._strategy_instance.calculate(state) or Decimal(0)
+            standby_power = await self._strategy_instance.calculate(state) or self._standby_power
 
         evaluated = await evaluate_power(standby_power)
         if evaluated is None:

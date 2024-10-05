@@ -349,3 +349,39 @@ async def test_calculate_standby_power(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "10.00"
+
+
+async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "switch.test",
+        CONF_STANDBY_POWER: 1,
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": "switch.test",
+                    "state": STATE_OFF,
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 5,
+                },
+            },
+            {
+                CONF_MULTI_SWITCH: {
+                    CONF_POWER: 5,
+                    CONF_POWER_OFF: 2,
+                    CONF_ENTITIES: [
+                        "switch.test1",
+                        "switch.test2",
+                    ],
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "1.00"

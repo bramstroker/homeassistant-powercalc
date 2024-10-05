@@ -30,19 +30,19 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         await self.stop_active_playbooks()
 
         for sub_strategy in self.strategies:
-            if sub_strategy.condition and not sub_strategy.condition(
-                self.hass,
-                {"state": entity_state},
-            ):
+            strategy = sub_strategy.strategy
+
+            if sub_strategy.condition and not sub_strategy.condition(self.hass, {"state": entity_state}):
                 continue
 
-            strategy = sub_strategy.strategy
             if isinstance(strategy, PlaybookStrategy):
                 await self.activate_playbook(strategy)
 
-            if entity_state.state == STATE_OFF and not strategy.can_calculate_standby():
-                continue
-            return await strategy.calculate(entity_state)
+            if entity_state.state == STATE_OFF and strategy.can_calculate_standby():
+                return await strategy.calculate(entity_state)
+
+            if entity_state.state != STATE_OFF:
+                return await strategy.calculate(entity_state)
 
         return None
 
