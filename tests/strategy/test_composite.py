@@ -3,6 +3,7 @@ from datetime import timedelta
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.const import (
     CONF_CONDITION,
+    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
     STATE_OFF,
@@ -21,9 +22,12 @@ from custom_components.powercalc.const import (
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
+    CONF_POWER_OFF,
+    CONF_STANDBY_POWER,
 )
 from tests.common import (
     get_test_config_dir,
@@ -226,7 +230,7 @@ async def test_nested_conditions(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
 
 
-async def test_composite_playbook(hass: HomeAssistant) -> None:
+async def test_playbook(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
 
     dishwasher_mode_entity = "sensor.dishwasher_operating_mode"
@@ -302,3 +306,46 @@ async def test_composite_playbook(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.dishwasher_power").state == "0.00"
+
+
+async def test_calculate_standby_power(hass: HomeAssistant) -> None:
+    sensor_config = {
+        CONF_ENTITY_ID: "switch.test",
+        CONF_STANDBY_POWER: 1,
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "entity_id": "switch.test",
+                    "state": STATE_OFF,
+                },
+                CONF_MULTI_SWITCH: {
+                    CONF_POWER: 5,
+                    CONF_POWER_OFF: 2,
+                    CONF_ENTITIES: [
+                        "switch.test1",
+                        "switch.test2",
+                    ],
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 10,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("switch.test1", STATE_OFF)
+    hass.states.async_set("switch.test2", STATE_OFF)
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "4.00"
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"
