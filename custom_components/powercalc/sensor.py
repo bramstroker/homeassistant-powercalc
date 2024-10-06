@@ -594,12 +594,17 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
                 hass,
             )
 
+    def process_utility_meter_offset() -> None:
+        if CONF_UTILITY_METER_OFFSET in sensor_config:
+            sensor_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=sensor_config[CONF_UTILITY_METER_OFFSET])
+
     handle_sensor_type()
 
     process_daily_fixed_energy()
     process_fixed_config()
     process_linear_config()
     process_calculation_enabled_condition()
+    process_utility_meter_offset()
 
     return sensor_config
 

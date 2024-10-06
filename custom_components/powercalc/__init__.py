@@ -80,6 +80,7 @@ from .const import (
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
     PowercalcDiscoveryType,
@@ -204,7 +205,43 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         _LOGGER.critical(msg)
         return False
 
-    domain_config: ConfigType = config.get(DOMAIN) or {
+    global_config = get_global_configuration(hass, config)
+
+    discovery_manager = DiscoveryManager(hass, config)
+    hass.data[DOMAIN] = {
+        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
+        DOMAIN_CONFIG: global_config,
+        DATA_CONFIGURED_ENTITIES: {},
+        DATA_DOMAIN_ENTITIES: {},
+        DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
+    }
+
+    await hass.async_add_executor_job(register_services, hass)
+
+    if global_config.get(CONF_ENABLE_AUTODISCOVERY):
+        await discovery_manager.start_discovery()
+
+    await setup_yaml_sensors(hass, config, global_config)
+
+    setup_domain_groups(hass, global_config)
+    setup_standby_group(hass, global_config)
+
+    try:
+        await repair_none_config_entries_issue(hass)
+    except Exception as e:  # noqa: BLE001  # pragma: no cover
+        _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
+
+    return True
+
+
+def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
+    global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+    if global_config_entry:
+        return dict(global_config_entry.data)
+
+    return config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -224,34 +261,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
-
-    discovery_manager = DiscoveryManager(hass, config)
-    hass.data[DOMAIN] = {
-        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
-        DOMAIN_CONFIG: domain_config,
-        DATA_CONFIGURED_ENTITIES: {},
-        DATA_DOMAIN_ENTITIES: {},
-        DATA_USED_UNIQUE_IDS: [],
-        DATA_STANDBY_POWER_SENSORS: {},
-    }
-
-    await hass.async_add_executor_job(register_services, hass)
-
-    if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        await discovery_manager.start_discovery()
-
-    await setup_yaml_sensors(hass, config, domain_config)
-
-    setup_domain_groups(hass, domain_config)
-    setup_standby_group(hass, domain_config)
-
-    try:
-        await repair_none_config_entries_issue(hass)
-    except Exception as e:  # noqa: BLE001  # pragma: no cover
-        _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
-
-    return True
 
 
 def register_services(hass: HomeAssistant) -> None:
@@ -361,6 +370,10 @@ async def setup_yaml_sensors(
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        hass.data[DOMAIN][DOMAIN_CONFIG] = entry.data
+        return True
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))

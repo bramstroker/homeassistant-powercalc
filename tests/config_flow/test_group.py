@@ -39,7 +39,9 @@ from custom_components.powercalc.const import (
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
     CONF_UTILITY_METER_NET_CONSUMPTION,
+    CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
+    CONF_UTILITY_METER_TYPES,
     DOMAIN,
     ENTRY_DATA_ENERGY_ENTITY,
     CalculationStrategy,
@@ -178,7 +180,9 @@ async def test_group_include_area(
     # Submit utility_meter_options step with default settings
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {},
+        {
+            CONF_UTILITY_METER_TYPES: ["daily"],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -192,8 +196,10 @@ async def test_group_include_area(
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: True,
+        CONF_UTILITY_METER_OFFSET: 0,
         CONF_UTILITY_METER_NET_CONSUMPTION: False,
         CONF_UTILITY_METER_TARIFFS: [],
+        CONF_UTILITY_METER_TYPES: ["daily"],
     }
 
     hass.states.async_set("sensor.test_power", 5)

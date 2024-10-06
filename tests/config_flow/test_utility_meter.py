@@ -32,7 +32,10 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"]},
+        {
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: ["daily"],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

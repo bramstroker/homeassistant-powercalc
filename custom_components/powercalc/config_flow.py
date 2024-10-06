@@ -39,11 +39,11 @@ from .const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
@@ -80,10 +80,12 @@ from .const import (
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_FRIENDLY_NAMING,
     CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_PRECISION,
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_SELF_USAGE_INCLUDED,
-    CONF_SENSORS, CONF_SENSOR_TYPE,
+    CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_STANDBY_POWER,
     CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
@@ -93,6 +95,7 @@ from .const import (
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_NET_CONSUMPTION,
+    CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
@@ -429,17 +432,25 @@ SCHEMA_GROUP_SUBTRACT = vol.Schema(
 
 SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
     {
-        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
-        ),
-        vol.Optional(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
+        vol.Required(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=METER_TYPES,
                 translation_key=CONF_METER_TYPE,
                 multiple=True,
             ),
         ),
+        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
+        ),
         vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION, default=False): selector.BooleanSelector(),
+        vol.Required(CONF_UTILITY_METER_OFFSET, default=0): selector.NumberSelector(
+            selector.NumberSelectorConfig(
+                min=0,
+                max=28,
+                mode=selector.NumberSelectorMode.BOX,
+                unit_of_measurement="days",
+            ),
+        ),
     },
 )
 
@@ -448,14 +459,17 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
+            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX),
+        ),
         vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX)
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
-        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )
@@ -468,7 +482,7 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
         vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
         **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
         vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
-            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX)
+            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX),
         ),
     },
 )
@@ -478,7 +492,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
-        self.global_config: ConfigType | None = None
+        self.global_config: ConfigType = {}
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str | None = None
         self.power_profile: PowerProfile | None = None
@@ -750,7 +764,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         schema = SCHEMA_POWER_ADVANCED
 
         if self.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-            schema = schema.extend(SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR)
+            schema = schema.extend(SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema)
 
         return schema
 
@@ -836,19 +850,22 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
                 else:
                     new_key = copy.copy(key)
-                    value = options.get(key)  # type: ignore
-                    new_key.description = {"suggested_value": value}  # type: ignore
+                    new_key.description = {"suggested_value": options.get(key)}  # type: ignore
             schema[new_key] = val
         return vol.Schema(schema)
 
-    def get_global_powercalc_config(self) -> dict[str, str]:
+    def get_global_powercalc_config(self) -> ConfigType:
         """Get the global powercalc config."""
         if self.global_config:
             return self.global_config
         powercalc = self.hass.data.get(DOMAIN) or {}
-        global_config = powercalc.get(DOMAIN_CONFIG) or {}
-        if CONF_FORCE_UPDATE_FREQUENCY in global_config and isinstance(global_config[CONF_FORCE_UPDATE_FREQUENCY], timedelta):
-            global_config[CONF_FORCE_UPDATE_FREQUENCY] = global_config[CONF_FORCE_UPDATE_FREQUENCY].total_seconds()
+        global_config = dict.copy(powercalc.get(DOMAIN_CONFIG) or {})
+        force_update_frequency = global_config.get(CONF_FORCE_UPDATE_FREQUENCY)
+        if isinstance(force_update_frequency, timedelta):
+            global_config[CONF_FORCE_UPDATE_FREQUENCY] = force_update_frequency.total_seconds()
+        utility_meter_offset = global_config.get(CONF_UTILITY_METER_OFFSET)
+        if isinstance(utility_meter_offset, timedelta):
+            global_config[CONF_UTILITY_METER_OFFSET] = utility_meter_offset.days
         if CONF_SENSORS in global_config:
             global_config.pop(CONF_SENSORS)
         self.global_config = global_config
@@ -1170,7 +1187,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             self.global_config.update(user_input)
 
-        if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSOR)) or user_input is not None:
+        if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
             return await self.async_step_global_configuration_utility_meter()
 
         return self.async_show_form(
