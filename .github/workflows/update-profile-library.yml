@@ -1,9 +1,9 @@
-name: Generate support model list
+name: Update profile library
 
 on:
   pull_request:
     paths:
-      - '.github/scripts/supported_models/**'
+      - '.github/scripts/profile_library/**'
   push:
     paths:
       - '**/model.json'
@@ -13,7 +13,7 @@ on:
 
 jobs:
   format:
-    name: Generate list
+    name: Update profile library
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,20 +26,19 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: |
-          python -m pip install -r ${{ github.workspace }}/.github/scripts/supported_models/requirements.txt
+          python -m pip install -r ${{ github.workspace }}/.github/scripts/profile_library/requirements.txt
       - name: Pull again
         run: git pull || true
       - name: Generate file
         run: |
-          python3 ${{ github.workspace }}/.github/scripts/supported_models/generate_file.py
+          python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library-json.py
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/master'
         with:
-          add: 'docs/supported_models.md profile_library/library.json'
+          add: 'profile_library/library.json'
           message: 'Update profile library'
       - name: Purge powercalc API memory cache
         run: |
-          curl -X GET "https://powercalc.lauwbier.nl/api/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
           curl -X GET "https://api.powercalc.nl/cache/flush" -H  "Authorization: Bearer ${{ secrets.POWERCALC_API_KEY }}"
       - name: Purge cloudflare cache
         uses: jakejarvis/cloudflare-purge-action@master
@@ -47,4 +46,4 @@ jobs:
           CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
           CLOUDFLARE_KEY: ${{ secrets.CLOUDFLARE_KEY }}
-          PURGE_URLS: '["https://powercalc.lauwbier.nl/api/library", "https://api.powercalc.nl/library"]'
+          PURGE_URLS: '["https://api.powercalc.nl/library"]'
