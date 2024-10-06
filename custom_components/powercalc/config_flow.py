@@ -108,8 +108,10 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
+    ENTITY_CATEGORIES,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
-    ENTITY_CATEGORIES, ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
+    GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity
@@ -387,6 +389,7 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=["all"] + [cls.value for cls in Platform],
+                mode=selector.SelectSelectorMode.DROPDOWN,
             ),
         ),
         vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
@@ -460,11 +463,12 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
-            )
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),  # type: ignore
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
         ),
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
-            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX),
+            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
         vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
             selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
@@ -484,13 +488,14 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
         vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
-            )
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),  # type: ignore
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
         ),
         vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
         **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
         vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
-            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX),
+            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
     },
 )
@@ -506,6 +511,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.power_profile: PowerProfile | None = None
         self.is_library_flow: bool = False
         self.skip_advanced_step: bool = False
+        self.is_options_flow: bool = isinstance(self, OptionsFlow)
 
     @abstractmethod
     @callback
@@ -994,8 +1000,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     ) -> FlowResult:
         """Handle the flow for advanced options."""
 
-        is_options_flow = isinstance(self, OptionsFlow)
-        if is_options_flow:
+        if self.is_options_flow:
             return self.persist_config_entry()  # type: ignore
 
         if user_input is not None or self.skip_advanced_step:
@@ -1100,6 +1105,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         if user_input is not None:
             self.global_config.update(user_input)
+            if self.is_options_flow:
+                return self.persist_config_entry()  # type: ignore
 
         if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
             return await self.async_step_global_configuration_utility_meter()
@@ -1118,6 +1125,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         if user_input is not None:
             self.global_config.update(user_input)
+            if self.is_options_flow:
+                return self.persist_config_entry()  # type: ignore
 
         if not bool(self.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
             return self.async_create_entry(
@@ -1583,12 +1592,12 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     def build_global_config_menu(self) -> dict[Steps, str]:
         """Build menu for global configuration"""
         menu = {
-            Steps.GLOBAL_CONFIGURATION: "Basic options"
+            Steps.GLOBAL_CONFIGURATION: "Basic options",
         }
         if self.global_config.get(CONF_CREATE_ENERGY_SENSORS):
-            menu[Steps.GLOBAL_CONFIGURATION_ENERGY]: "Energy options"
+            menu[Steps.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"
         if self.global_config.get(CONF_CREATE_UTILITY_METERS):
-            menu[Steps.GLOBAL_CONFIGURATION_UTILITY_METER]: "Utility meter options"
+            menu[Steps.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu
 
     def build_menu(self) -> dict[Steps, str]:
@@ -1618,6 +1627,22 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu[Steps.UTILITY_METER_OPTIONS] = "Utility meter options"
 
         return menu
+
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+            return self.persist_config_entry()
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION,
+                self.global_config,
+            ),
+            errors={},
+        )
 
     async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
@@ -1744,9 +1769,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def persist_config_entry(self) -> FlowResult:
         """Persist changed options on the config entry."""
+        data = self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config or self.sensor_config
+
         self.hass.config_entries.async_update_entry(
             self.config_entry,
-            data=self.sensor_config,
+            data=data,
         )
         return self.async_create_entry(title="", data={})
 

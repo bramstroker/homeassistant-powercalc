@@ -429,6 +429,49 @@
           "states_power": "One 'state: power' pair on each row, see example above"
         }
       },
+      "global_configuration": {
+        "title": "Basic options",
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "disable_extended_attributes": "Disable extended attributes",
+          "disable_library_download": "Disable remote library download",
+          "force_update_frequency": "Force update frequency",
+          "ignore_unavailable_state": "Ignore unavailable state",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "power_sensor_category": "Power sensor category",
+          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+          "power_sensor_naming": "Power sensor name pattern"
+        },
+        "data_description": {
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+          "disable_library_download": " Disable the Powercalc library download feature",
+          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
+          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_energy": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Energy integration method",
+          "energy_sensor_category": "Energy sensor category",
+          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
+          "energy_sensor_naming": "Energy sensor name pattern",
+          "energy_sensor_precision": "Energy sensor precision",
+          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "Utility meter options",
+        "data": {
+          "utility_meter_net_consumption": "Utility meter net consumption",
+          "utility_meter_tariffs": "Utility meter tariffs",
+          "utility_meter_types": "Utility meter types"
+        }
+      },
       "group": {
         "title": "Group options",
         "data": {
