@@ -108,8 +108,10 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
+    ENTITY_CATEGORIES,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
-    ENTITY_CATEGORIES, ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
+    GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity
@@ -460,8 +462,8 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
-            )
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),
+            ),
         ),
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX),
@@ -484,8 +486,8 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
         vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.SelectSelector(
             selector.SelectSelectorConfig(
-                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
-            )
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),
+            ),
         ),
         vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
         **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
@@ -1583,7 +1585,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     def build_global_config_menu(self) -> dict[Steps, str]:
         """Build menu for global configuration"""
         menu = {
-            Steps.GLOBAL_CONFIGURATION: "Basic options"
+            Steps.GLOBAL_CONFIGURATION: "Basic options",
         }
         if self.global_config.get(CONF_CREATE_ENERGY_SENSORS):
             menu[Steps.GLOBAL_CONFIGURATION_ENERGY]: "Energy options"
