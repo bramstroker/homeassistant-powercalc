@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import logging
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from enum import StrEnum
 from typing import Any, cast
 
@@ -40,10 +41,19 @@ from .const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_DISABLE_LIBRARY_DOWNLOAD,
+    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_SENSOR_CATEGORY,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
+    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -67,6 +77,9 @@ from .const import (
     CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_OFF,
+    CONF_POWER_SENSOR_CATEGORY,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
+    CONF_POWER_SENSOR_NAMING,
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_SELF_USAGE_INCLUDED,
@@ -139,9 +152,11 @@ class Steps(StrEnum):
     SUBTRACT_GROUP = "subtract_group"
     INIT = "init"
     UTILITY_METER_OPTIONS = "utility_meter_options"
+    GLOBAL_CONFIGURATION = "global_configuration"
 
 
 MENU_SENSOR_TYPE = {
+    Steps.GLOBAL_CONFIGURATION: "Global configuration",
     Steps.VIRTUAL_POWER: "Virtual power (manual)",
     Steps.MENU_LIBRARY: "Virtual power (library)",
     Steps.MENU_GROUP: "Group",
@@ -180,6 +195,20 @@ SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
 SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     {
         vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR = vol.Schema(
+    {
+        vol.Optional(
+            CONF_ENERGY_INTEGRATION_METHOD,
+            default=ENERGY_INTEGRATION_METHOD_LEFT,
+        ): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=ENERGY_INTEGRATION_METHODS,
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        ),
     },
 )
 
@@ -409,6 +438,29 @@ SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
             ),
         ),
         vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION, default=False): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+    {
+        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+        vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_ENABLE_AUTODISCOVERY, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.TextSelector(),  # todo
+        **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
+        vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX)),
+        vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.TimeSelector(),
+        vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.TextSelector(),
+        **SCHEMA_UTILITY_METER_OPTIONS.schema,
+        vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
     },
 )
 
@@ -688,19 +740,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         schema = SCHEMA_POWER_ADVANCED
 
         if self.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-            schema = schema.extend(
-                {
-                    vol.Optional(
-                        CONF_ENERGY_INTEGRATION_METHOD,
-                        default=ENERGY_INTEGRATION_METHOD_LEFT,
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=ENERGY_INTEGRATION_METHODS,
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                        ),
-                    ),
-                },
-            )
+            schema = schema.extend(SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR)
 
         return schema
 
@@ -786,7 +826,10 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     new_key = vol.Optional(key.schema, default=options.get(key))  # type: ignore
                 else:
                     new_key = copy.copy(key)
-                    new_key.description = {"suggested_value": options.get(key)}  # type: ignore
+                    value = options.get(key)  # type: ignore
+                    if isinstance(value, timedelta):
+                        continue
+                    new_key.description = {"suggested_value": value}  # type: ignore
             schema[new_key] = val
         return vol.Schema(schema)
 
@@ -1084,6 +1127,17 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """
         self.is_library_flow = True
         return await self.async_step_virtual_power(user_input)
+
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION,
+                self.get_global_powercalc_config(),
+            ),
+            errors={},
+        )
 
     async def async_step_virtual_power(
         self,
