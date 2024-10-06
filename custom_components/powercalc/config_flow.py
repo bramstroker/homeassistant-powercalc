@@ -108,8 +108,9 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
-    ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
+    GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity

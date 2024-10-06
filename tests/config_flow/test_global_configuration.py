@@ -32,7 +32,8 @@ from custom_components.powercalc.const import (
     DOMAIN,
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
-    ENTRY_GLOBAL_CONFIG_UNIQUE_ID, UnitPrefix,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+    UnitPrefix,
 )
 from tests.common import run_powercalc_setup
 from tests.config_flow.common import (
