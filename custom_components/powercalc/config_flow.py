@@ -43,7 +43,6 @@ from .const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
-    CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
@@ -83,7 +82,8 @@ from .const import (
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_SELF_USAGE_INCLUDED,
-    CONF_SENSORS, CONF_SENSOR_TYPE,
+    CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_STANDBY_POWER,
     CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
@@ -449,7 +449,7 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.TextSelector(),
         vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
-            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX)
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
         ),
         vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
@@ -468,7 +468,7 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
         vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
         **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
         vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
-            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX)
+            selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX),
         ),
     },
 )
