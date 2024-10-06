@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 from homeassistant import data_entry_flow
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.config_flow import Steps
@@ -69,7 +70,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         result["flow_id"],
         {
             CONF_UTILITY_METER_TARIFFS: ["foo"],
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
         },
     )
 
@@ -95,7 +96,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_UTILITY_METER_NET_CONSUMPTION: False,
         CONF_UTILITY_METER_OFFSET: 0,
         CONF_UTILITY_METER_TARIFFS: ["foo"],
-        CONF_UTILITY_METER_TYPES: ["daily"],
+        CONF_UTILITY_METER_TYPES: [DAILY],
     }
 
     global_config = hass.data[DOMAIN][DOMAIN_CONFIG]

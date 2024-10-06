@@ -1,4 +1,5 @@
 from homeassistant import data_entry_flow
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
@@ -144,7 +145,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
         result["flow_id"],
         {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
         },
     )
 
@@ -154,7 +155,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_UTILITY_METER_TARIFFS: ["peak"],
-        CONF_UTILITY_METER_TYPES: ["daily"],
+        CONF_UTILITY_METER_TYPES: [DAILY],
     }
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],

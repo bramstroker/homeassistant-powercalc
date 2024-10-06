@@ -1,6 +1,7 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_DOMAIN,
@@ -181,7 +182,7 @@ async def test_group_include_area(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
         },
     )
 
@@ -199,7 +200,7 @@ async def test_group_include_area(
         CONF_UTILITY_METER_OFFSET: 0,
         CONF_UTILITY_METER_NET_CONSUMPTION: False,
         CONF_UTILITY_METER_TARIFFS: [],
-        CONF_UTILITY_METER_TYPES: ["daily"],
+        CONF_UTILITY_METER_TYPES: [DAILY],
     }
 
     hass.states.async_set("sensor.test_power", 5)
