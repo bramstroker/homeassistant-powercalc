@@ -371,7 +371,7 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        hass.data[DOMAIN][DOMAIN_CONFIG] = entry.data
+        hass.data[DOMAIN][DOMAIN_CONFIG] = dict(entry.data)
         return True
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -382,6 +382,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        hass.data[DOMAIN][DOMAIN_CONFIG] = dict(entry.data)
+
     await hass.config_entries.async_reload(entry.entry_id)
 
     # Also reload all "parent" groups referring this group as a subgroup

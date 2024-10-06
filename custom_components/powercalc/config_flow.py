@@ -109,7 +109,7 @@ from .const import (
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
     CalculationStrategy,
-    ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
+    ENTITY_CATEGORIES, ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity
@@ -458,7 +458,11 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
     {
         vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
-        vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
+            )
+        ),
         vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX),
         ),
@@ -478,7 +482,11 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
     {
         vol.Optional(CONF_ENERGY_SENSOR_NAMING): selector.TextSelector(),
         vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
-        vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES))
+            )
+        ),
         vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
         **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
         vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
@@ -1536,6 +1544,10 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle options flow."""
+        if self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+            self.global_config = self.get_global_powercalc_config()
+            return self.async_show_menu(step_id=Steps.INIT, menu_options=self.build_global_config_menu())
+
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
             self.source_entity = await create_source_entity(
@@ -1567,6 +1579,17 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         except ModelNotSupportedError:
             return self.async_abort(reason="model_not_supported")
         return None
+
+    def build_global_config_menu(self) -> dict[Steps, str]:
+        """Build menu for global configuration"""
+        menu = {
+            Steps.GLOBAL_CONFIGURATION: "Basic options"
+        }
+        if self.global_config.get(CONF_CREATE_ENERGY_SENSORS):
+            menu[Steps.GLOBAL_CONFIGURATION_ENERGY]: "Energy options"
+        if self.global_config.get(CONF_CREATE_UTILITY_METERS):
+            menu[Steps.GLOBAL_CONFIGURATION_UTILITY_METER]: "Utility meter options"
+        return menu
 
     def build_menu(self) -> dict[Steps, str]:
         """Build the options menu."""
