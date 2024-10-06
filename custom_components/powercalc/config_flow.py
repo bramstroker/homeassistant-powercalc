@@ -109,7 +109,7 @@ from .const import (
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
     CalculationStrategy,
-    GroupType,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID, GroupType,
     SensorType,
 )
 from .discovery import get_power_profile_by_source_entity
@@ -1087,6 +1087,45 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             errors={},
         )
 
+    async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+
+        if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
+            return await self.async_step_global_configuration_utility_meter()
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION_ENERGY,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
+                self.global_config,
+            ),
+            errors={},
+        )
+
+    async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+
+        if not bool(self.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
+            return self.async_create_entry(
+                title="Global Configuration",
+                data=self.global_config,
+            )
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION_UTILITY_METER,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_UTILITY_METER_OPTIONS,
+                self.global_config,
+            ),
+            errors={},
+        )
+
 
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -1165,8 +1204,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
         self.global_config = self.get_global_powercalc_config()
-        await self.async_set_unique_id("powercalc_global_configuration")
-        # todo abort if already configured
+        await self.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+        self._abort_if_unique_id_configured()
 
         if user_input is not None:
             self.global_config.update(user_input)
@@ -1176,45 +1215,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             step_id=Steps.GLOBAL_CONFIGURATION,
             data_schema=self.fill_schema_defaults(
                 SCHEMA_GLOBAL_CONFIGURATION,
-                self.global_config,
-            ),
-            errors={},
-        )
-
-    async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the global configuration step."""
-
-        if user_input is not None:
-            self.global_config.update(user_input)
-
-        if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
-            return await self.async_step_global_configuration_utility_meter()
-
-        return self.async_show_form(
-            step_id=Steps.GLOBAL_CONFIGURATION_ENERGY,
-            data_schema=self.fill_schema_defaults(
-                SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
-                self.global_config,
-            ),
-            errors={},
-        )
-
-    async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the global configuration step."""
-
-        if user_input is not None:
-            self.global_config.update(user_input)
-
-        if not bool(self.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
-            return self.async_create_entry(
-                title="Global Configuration",
-                data=self.global_config,
-            )
-
-        return self.async_show_form(
-            step_id=Steps.GLOBAL_CONFIGURATION_UTILITY_METER,
-            data_schema=self.fill_schema_defaults(
-                SCHEMA_UTILITY_METER_OPTIONS,
                 self.global_config,
             ),
             errors={},
