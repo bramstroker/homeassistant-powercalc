@@ -17,6 +17,8 @@ Just click the button to directly add a powercalc sensor:
 
 Select `Virtual power (library)` and follow the instructions.
 
+To change the profile of an existing sensor, go to the sensor's settings and click on `Library options`.
+
 ## YAML
 
 Just specify the correct manufacturer and model.
