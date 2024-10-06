@@ -22,6 +22,7 @@ from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
     goto_virtual_power_strategy_step,
+    initialize_options_flow,
     select_menu_item,
     set_virtual_power_configuration,
 )
@@ -119,3 +120,42 @@ async def test_library_options_flow_raises_error_on_non_existing_power_profile(
 
     assert result["type"] == data_entry_flow.FlowResultType.ABORT
     assert result["reason"] == "model_not_supported"
+
+
+async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "ikea",
+            CONF_MODEL: "LED1545G12",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Steps.LIBRARY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Steps.MANUFACTURER
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: "signify"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Steps.MODEL
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MODEL: "LWB010"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MANUFACTURER] == "signify"
+    assert entry.data[CONF_MODEL] == "LWB010"
