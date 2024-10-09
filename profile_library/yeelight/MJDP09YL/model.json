@@ -10,5 +10,8 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "Mijia MJDP09YL",
-  "standby_power": 0.05
+  "standby_power": 0.05,
+  "aliases": [
+    "Mesh: MJDP09YL, yeelink.light.mbulb3"
+  ]
 }
