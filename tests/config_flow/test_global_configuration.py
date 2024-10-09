@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 
 import pytest
@@ -237,7 +238,7 @@ async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
     # Check if global config in hass object is updated.
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_TYPES] == [DAILY]
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_TARIFFS] == ["peak", "off_peak"]
-    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_OFFSET] == 1
+    assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_OFFSET] == timedelta(days=1)
     assert hass.data[DOMAIN][DOMAIN_CONFIG][CONF_UTILITY_METER_NET_CONSUMPTION]
 
 

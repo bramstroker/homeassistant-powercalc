@@ -100,6 +100,8 @@ from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
 
+FLAG_HAS_GLOBAL_GUI_CONFIG = "has_global_gui_config"
+
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.All(
@@ -272,6 +274,8 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
         global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
     if CONF_UTILITY_METER_OFFSET in global_config:
         global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
+    global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
+
     return global_config
 
 
@@ -387,6 +391,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
 
+    # Check if this is the initial creation of the global configuration entry
+    # If so, update the global configuration with the GUI configuration
+    # When the flag is set, the global configuration has already been applied during async_setup
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
+        await apply_global_gui_configuration_changes(hass, entry)
+
     return True
 
 
@@ -394,18 +405,25 @@ async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
 
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        # Apply global configuration changes to all entities
-        hass.data[DOMAIN][DOMAIN_CONFIG].update(get_global_gui_configuration(entry))
-        for entry in hass.config_entries.async_entries(DOMAIN):
-            if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-                continue
-            await hass.config_entries.async_reload(entry.entry_id)
+        await apply_global_gui_configuration_changes(hass, entry)
 
     await hass.config_entries.async_reload(entry.entry_id)
 
     # Also reload all "parent" groups referring this group as a subgroup
     for related_entry in get_entries_having_subgroup(hass, entry):
         await hass.config_entries.async_reload(related_entry.entry_id)
+
+
+async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Apply global configuration changes to all entities."""
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    global_config.update(get_global_gui_configuration(entry))
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+            continue
+        if entry.state != ConfigEntryState.LOADED:
+            continue
+        await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
