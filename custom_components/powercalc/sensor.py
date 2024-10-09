@@ -116,6 +116,7 @@ from .const import (
     ENTITY_CATEGORIES,
     ENTRY_DATA_ENERGY_ENTITY,
     ENTRY_DATA_POWER_ENTITY,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     SERVICE_ACTIVATE_PLAYBOOK,
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
@@ -332,6 +333,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Setup sensors from config entry (GUI config flow)."""
+
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        return
+
     sensor_config = convert_config_entry_to_sensor_config(entry, hass)
 
     bind_config_entry_to_device(hass, entry)

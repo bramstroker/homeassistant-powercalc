@@ -238,16 +238,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
-    global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
-    if global_config_entry:
-        global_config = dict(global_config_entry.data)
-        if CONF_FORCE_UPDATE_FREQUENCY in global_config:
-            global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
-        if CONF_UTILITY_METER_OFFSET in global_config:
-            global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
-        return global_config
-
-    return config.get(DOMAIN) or {
+    global_config = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -267,6 +258,21 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
         CONF_UTILITY_METER_TYPES: DEFAULT_UTILITY_METER_TYPES,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
+
+    global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+    if global_config_entry:
+        global_config.update(get_global_gui_configuration(global_config_entry))
+
+    return global_config
+
+
+def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
+    global_config = dict(config_entry.data)
+    if CONF_FORCE_UPDATE_FREQUENCY in global_config:
+        global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
+    if CONF_UTILITY_METER_OFFSET in global_config:
+        global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
+    return global_config
 
 
 def register_services(hass: HomeAssistant) -> None:
@@ -377,25 +383,23 @@ async def setup_yaml_sensors(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
 
-    entry.async_on_unload(entry.add_update_listener(async_update_entry))
-
-    # We are dealing with the global configuration config entry
-    # Load the data and override the global configuration in hass object
-    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        hass.data[DOMAIN][DOMAIN_CONFIG] = dict(entry.data)
-        return True
-
-    # We are dealing with a sensor config entry, forward to sensor.py for further setup
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    entry.async_on_unload(entry.add_update_listener(async_update_entry))
 
     return True
 
 
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
+
     if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
-        hass.data[DOMAIN][DOMAIN_CONFIG] = dict(entry.data)
-        # todo: maybe reload all config entries here, to apply updated global config to all sensors
+        # Apply global configuration changes to all entities
+        hass.data[DOMAIN][DOMAIN_CONFIG].update(get_global_gui_configuration(entry))
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+                continue
+            await hass.config_entries.async_reload(entry.entry_id)
 
     await hass.config_entries.async_reload(entry.entry_id)
 
