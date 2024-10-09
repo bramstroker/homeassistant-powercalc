@@ -425,6 +425,10 @@
           "wled": "Opcje WLED"
         }
       },
+      "library_options": {
+        "title": "Library options",
+        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+      },
       "linear": {
         "title": "Opcje liniowe",
         "data": {
