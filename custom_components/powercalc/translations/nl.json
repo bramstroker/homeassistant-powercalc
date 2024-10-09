@@ -425,6 +425,10 @@
           "wled": "WLED opties"
         }
       },
+      "library_options": {
+        "title": "Bibliotheek opties",
+        "description": "Momenteel is het huidige profiel geselecteerd: \nfabrikant: {manufacturer}\nmodel: {model}\n\nAls u het profiel wilt wijzigen, klikt u op volgende."
+      },
       "linear": {
         "title": "Lineaire opties",
         "data": {
