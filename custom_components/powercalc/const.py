@@ -30,6 +30,7 @@ DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"
 ENTRY_DATA_POWER_ENTITY = "_power_entity"
+ENTRY_GLOBAL_CONFIG_UNIQUE_ID = "powercalc_global_configuration"
 
 DUMMY_ENTITY_ID = "sensor.dummy"
 

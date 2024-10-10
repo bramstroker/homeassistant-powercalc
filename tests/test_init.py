@@ -1,4 +1,5 @@
 from homeassistant.components import input_boolean, light
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import (
     CONF_ENTITY_ID,
@@ -129,7 +130,7 @@ async def test_domain_group_with_utility_meter(
         CONF_ENABLE_AUTODISCOVERY: True,
         CONF_CREATE_DOMAIN_GROUPS: [light.DOMAIN],
         CONF_CREATE_UTILITY_METERS: True,
-        CONF_UTILITY_METER_TYPES: ["daily"],
+        CONF_UTILITY_METER_TYPES: [DAILY],
     }
 
     await run_powercalc_setup(hass, {}, domain_config)
