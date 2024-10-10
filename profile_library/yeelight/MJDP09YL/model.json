@@ -12,6 +12,7 @@
   "name": "Mijia MJDP09YL",
   "standby_power": 0.2,
   "aliases": [
+    "yeelink.light.mbulb3",
     "Mesh: MJDP09YL, yeelink.light.mbulb3"
   ]
 }
