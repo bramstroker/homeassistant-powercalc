@@ -12,6 +12,7 @@
   "name": "Yeelight M2 YLDP25YL/YLDP26YL",
   "standby_power": 0.27,
   "aliases": [
+    "yeelink.light.ml2",
     "Mesh: YLDP25YL/YLDP26YL, yeelink.light.ml2"
   ]
 }
