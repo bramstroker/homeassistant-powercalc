@@ -10,5 +10,8 @@
         "VERSION": "v1.14.10:docker"
     },
     "name": "LIFX A21",
-    "standby_power": 0.1
+    "standby_power": 0.1,
+    "aliases": [
+        "LIFX A21 1600lm US"
+    ]
 }
