@@ -70,7 +70,7 @@
         "title": "Global configuration",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
-          "create_energy_sensor": "Create energy sensor",
+          "create_energy_sensors": "Create energy sensors",
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
@@ -82,7 +82,7 @@
           "power_sensor_naming": "Power sensor name pattern"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
@@ -444,7 +444,7 @@
           "power_sensor_naming": "Power sensor name pattern"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create kWh sensors",
+          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
