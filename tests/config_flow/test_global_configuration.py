@@ -2,7 +2,7 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
-from homeassistant import data_entry_flow
+from homeassistant import config_entries, data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON, EntityCategory
@@ -167,6 +167,20 @@ async def test_initialize_options_succeeds_with_yaml_sensors_in_config(hass: Hom
 
     result = await initialize_options_flow(hass, entry, Steps.GLOBAL_CONFIGURATION)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+
+async def test_global_configuration_can_only_be_configured_once(hass: HomeAssistant) -> None:
+    """Test global configuration can only be configured once."""
+    create_mock_global_config_entry(
+        hass,
+        {},
+    )
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_USER},
+    )
+    assert Steps.GLOBAL_CONFIGURATION not in result["menu_options"]
 
 
 async def test_basic_options_flow(hass: HomeAssistant) -> None:

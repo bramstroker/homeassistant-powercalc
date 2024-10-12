@@ -163,7 +163,6 @@ class Steps(StrEnum):
 
 
 MENU_SENSOR_TYPE = {
-    Steps.GLOBAL_CONFIGURATION: "Global configuration",
     Steps.VIRTUAL_POWER: "Virtual power (manual)",
     Steps.MENU_LIBRARY: "Virtual power (library)",
     Steps.MENU_GROUP: "Group",
@@ -1206,7 +1205,17 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handle the initial step."""
-        return self.async_show_menu(step_id=Steps.USER, menu_options=MENU_SENSOR_TYPE)
+
+        menu = MENU_SENSOR_TYPE
+
+        global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
+            DOMAIN,
+            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        )
+        if not global_config_entry:
+            menu = {Steps.GLOBAL_CONFIGURATION: "Global configuration", **menu}
+
+        return self.async_show_menu(step_id=Steps.USER, menu_options=menu)
 
     async def async_step_menu_library(
         self,
