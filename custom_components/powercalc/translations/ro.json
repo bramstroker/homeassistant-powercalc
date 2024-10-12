@@ -66,6 +66,50 @@
         "description": "Definiți o valoare fixă a puterii pentru entitatea dvs. Alternativ, puteți defini o valoare de putere per stare. De exemplu:\n\n`redare: 8,3`\n`în pauză: 2,25`",
         "title": "Configurație fixă"
       },
+      "global_configuration": {
+        "title": "Global configuration",
+        "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "data": {
+          "create_energy_sensors": "Create energy sensors",
+          "create_utility_meters": "Create utility meters",
+          "disable_extended_attributes": "Disable extended attributes",
+          "disable_library_download": "Disable remote library download",
+          "force_update_frequency": "Force update frequency",
+          "ignore_unavailable_state": "Ignore unavailable state",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "power_sensor_category": "Power sensor category",
+          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+          "power_sensor_naming": "Power sensor name pattern"
+        },
+        "data_description": {
+          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+          "disable_library_download": "Disable the Powercalc library download feature",
+          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
+          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_energy": {
+        "title": "Energy options",
+        "data": {
+          "energy_integration_method": "Energy integration method",
+          "energy_sensor_category": "Energy sensor category",
+          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
+          "energy_sensor_naming": "Energy sensor name pattern",
+          "energy_sensor_precision": "Energy sensor precision",
+          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "Utility meter options",
+        "data": {
+          "utility_meter_net_consumption": "Utility meter net consumption",
+          "utility_meter_tariffs": "Utility meter tariffs",
+          "utility_meter_types": "Utility meter types"
+        }
+      },
       "group": {
         "data": {
           "area": "Zonă",
@@ -383,6 +427,51 @@
           "power_template": "Șablonul va fi evaluat pentru a obține valoarea puterii în W",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
           "states_power": "O pereche 'stare: putere' pe fiecare rând, vezi exemplul de mai sus"
+        }
+      },
+      "global_configuration": {
+        "title": "Basic options",
+        "data": {
+          "create_energy_sensors": "Create energy sensors",
+          "create_utility_meters": "Create utility meters",
+          "disable_extended_attributes": "Disable extended attributes",
+          "disable_library_download": "Disable remote library download",
+          "force_update_frequency": "Force update frequency",
+          "ignore_unavailable_state": "Ignore unavailable state",
+          "include_non_powercalc_sensors": "Include non powercalc sensors",
+          "power_sensor_category": "Power sensor category",
+          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
+          "power_sensor_naming": "Power sensor name pattern"
+        },
+        "data_description": {
+          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+          "disable_library_download": "Disable the Powercalc library download feature",
+          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
+          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+        }
+      },
+      "global_configuration_energy": {
+        "title": "Energy options",
+        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "data": {
+          "energy_integration_method": "Energy integration method",
+          "energy_sensor_category": "Energy sensor category",
+          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
+          "energy_sensor_naming": "Energy sensor name pattern",
+          "energy_sensor_precision": "Energy sensor precision",
+          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+        }
+      },
+      "global_configuration_utility_meter": {
+        "title": "Utility meter options",
+        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "data": {
+          "utility_meter_net_consumption": "Utility meter net consumption",
+          "utility_meter_tariffs": "Utility meter tariffs",
+          "utility_meter_types": "Utility meter types"
         }
       },
       "group": {
