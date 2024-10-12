@@ -98,7 +98,7 @@ ruff = "^0.6.0"
 mypy = "1.10.0"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.172"
+pytest-homeassistant-custom-component = "0.13.173"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^3.0.0"
@@ -109,7 +109,7 @@ psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = ">=3.13,<3.14"
 aioresponses = "^0.7.6"
 
 [build-system]
