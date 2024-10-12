@@ -1,13 +1,29 @@
 # Global configuration
 
-Powercalc provides some configuration which can be applied on a global level. This means any of this configuration option applies to all sensors created with powercalc.
-Any configuration you do on a per sensor basis will override the global setting for that sensor.
+Powercalc offers configuration options that can be set globally. These global settings will apply to all sensors created with Powercalc.
+However, if you configure settings for an individual sensor, those specific settings will take precedence over the global configuration for that sensor.
 
 !!! note
 
     Sensors created with the GUI do have a configuration set for `create_energy_sensors`, `create_utility_meters`, `ignore_unavailable_state` and `energy_integration_method`, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action `powercalc.change_gui_config`. Refer to [Change GUI configuration action].
 
-You can add these options to `configuration.yaml` under the `powercalc:` property, like so:
+Global configuration can be defined both in `configuration.yaml` and in the GUI.
+
+## GUI configuration
+
+Click the button to go to the Powercalc configuration flow:
+
+[![config_flow_start](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc)
+
+Select `Global configuration` and follow the instructions.
+
+When you'd like the change the configuration later, go to the Powercalc integration page, find the `Global configuration` entry and click on `Configure`.
+
+![Configure](../img/global_config_configure.png)
+
+## YAML configuration
+
+You can add the options to `configuration.yaml` under the `powercalc:` property, like so:
 
 ```yaml
 powercalc:
@@ -15,6 +31,8 @@ powercalc:
   power_sensor_naming: "{} Powersensor"
   create_energy_sensors: false
 ```
+
+## Configuration options
 
 All the possible options are listed below.
 
