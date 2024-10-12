@@ -1161,6 +1161,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#gui-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      GUI configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yaml-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      YAML configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#change-gui-configuration-action" class="md-nav__link">
     <span class="md-ellipsis">
       Change GUI configuration action
@@ -1759,18 +1786,27 @@
 
 
 <h1 id="global-configuration">Global configuration</h1>
-<p>Powercalc provides some configuration which can be applied on a global level. This means any of this configuration option applies to all sensors created with powercalc.
-Any configuration you do on a per sensor basis will override the global setting for that sensor.</p>
+<p>Powercalc offers configuration options that can be set globally. These global settings will apply to all sensors created with Powercalc.
+However, if you configure settings for an individual sensor, those specific settings will take precedence over the global configuration for that sensor.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Sensors created with the GUI do have a configuration set for <code>create_energy_sensors</code>, <code>create_utility_meters</code>, <code>ignore_unavailable_state</code> and <code>energy_integration_method</code>, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action <code>powercalc.change_gui_config</code>. Refer to [Change GUI configuration action].</p>
+<p>Sensors created with the GUI do have a configuration set for <code>create_energy_sensors</code>, <code>create_utility_meters</code>, <code>ignore_unavailable_state</code> and <code>energy_integration_method</code>, changing global configuration will not affect the existing GUI configuration entries, to make it easy to change all of them Powercalc provides an action <code>powercalc.change_gui_config</code>. Refer to <a href="#change-gui-configuration-action">Change GUI configuration action</a>.</p>
 </div>
-<p>You can add these options to <code>configuration.yaml</code> under the <code>powercalc:</code> property, like so:</p>
+<p>Global configuration can be defined both in <code>configuration.yaml</code> and in the GUI.</p>
+<h2 id="gui-configuration">GUI configuration</h2>
+<p>Click the button to go to the Powercalc configuration flow:</p>
+<p><a href="https://my.home-assistant.io/redirect/config_flow_start/?domain=powercalc"><img alt="config_flow_start" src="https://my.home-assistant.io/badges/config_flow_start.svg" /></a></p>
+<p>Select <code>Global configuration</code> and follow the instructions.</p>
+<p>When you'd like the change the configuration later, go to the Powercalc integration page, find the <code>Global configuration</code> entry and click on <code>Configure</code>.</p>
+<p><img alt="Configure" src="../../img/global_config_configure.png" /></p>
+<h2 id="yaml-configuration">YAML configuration</h2>
+<p>You can add the options to <code>configuration.yaml</code> under the <code>powercalc:</code> property, like so:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">powercalc</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">force_update_frequency</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">00:01:00</span><span class="w"> </span><span class="c1">#Each minute</span>
 <span class="w">  </span><span class="nt">power_sensor_naming</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{}</span><span class="nv"> </span><span class="s">Powersensor&quot;</span>
 <span class="w">  </span><span class="nt">create_energy_sensors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
+<h2 id="configuration-options">Configuration options</h2>
 <p>All the possible options are listed below.</p>
 <table>
 <thead>
@@ -1903,18 +1939,32 @@ Any configuration you do on a per sensor basis will override the global setting 
 <td>Category for the created power sensors. See <a href="https://developers.home-assistant.io/docs/core/entity/#generic-properties">HA docs</a>.</td>
 </tr>
 <tr>
+<td>utility_meter_net_consumption</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>false</td>
+<td>Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative. See <a href="https://www.home-assistant.io/integrations/utility_meter/#net_consumption">utility_net_consumption</a></td>
+</tr>
+<tr>
+<td>utility_meter_offset</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>00:00:00</td>
+<td>Offset for the utility meters. Format HH:MM:SS. See <a href="https://www.home-assistant.io/integrations/utility_meter/#offset">utility_offset</a></td>
+</tr>
+<tr>
 <td>utility_meter_types</td>
 <td>list</td>
 <td><strong>Optional</strong></td>
 <td>daily, weekly, monthly</td>
-<td>Define which cycles you want to create utility meters for. See <a href="https://www.home-assistant.io/integrations/utility_meter/#cycle">HA docs</a></td>
+<td>Define which cycles you want to create utility meters for. See <a href="https://www.home-assistant.io/integrations/utility_meter/#cycle">utility_cycle</a></td>
 </tr>
 <tr>
 <td>utility_meter_tariffs</td>
 <td>list</td>
 <td><strong>Optional</strong></td>
 <td></td>
-<td>Define different tariffs. See <a href="https://www.home-assistant.io/integrations/utility_meter/#tariffs">HA docs</a>.</td>
+<td>Define different tariffs. See <a href="https://www.home-assistant.io/integrations/utility_meter/#tariffs">utility_tariffs</a>.</td>
 </tr>
 <tr>
 <td>include_non_powercalc_sensors</td>
@@ -1963,7 +2013,7 @@ For example to set <code>create_utility_meters</code> to yes for all powercalc G
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 15, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 12, 2024</span>
   </span>
 
     

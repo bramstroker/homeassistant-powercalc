@@ -1739,66 +1739,10 @@ Not all configuration params listed below are available in the GUI, when you wan
 </thead>
 <tbody>
 <tr>
-<td>entity_id</td>
-<td>string</td>
-<td><strong>Required</strong></td>
-<td>HA entity ID. The id of the device you want your power sensor for</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>unique_id</td>
-<td>string</td>
+<td>calculation_enabled_condition</td>
+<td>template</td>
 <td><strong>Optional</strong></td>
-<td>Powercalc tries to get a unique_id from the source entity by default. When the source entity does not have a unique_id you can configure one yourself. This allows you to change the name, area etc from the GUI. You can use for example <a href="https://www.uuidgenerator.net/">https://www.uuidgenerator.net/</a> to generate a unique one</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>manufacturer</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>Manufacturer, most of the time this can be automatically discovered</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>model</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>Model id, most of the time this can be automatically discovered</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>standby_power</td>
-<td>float</td>
-<td><strong>Optional</strong></td>
-<td>Supply the wattage when the device is off. See <a href="../standby-power/">standby power</a>. Can also be a template</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>sleep_power</td>
-<td>object</td>
-<td><strong>Optional</strong></td>
-<td>Changes the power to some value x seconds after the device has turned off. See <a href="../standby-power/">standby power</a>.</td>
-<td></td>
-</tr>
-<tr>
-<td>unavailable_power</td>
-<td>float</td>
-<td><strong>Optional</strong></td>
-<td>Supply the wattage when the device has <code>unavailable</code> state. When not specified <code>standby_power</code> will be used, or 0.</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>disable_standby_power</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>Set to <code>true</code> to not show any power consumption when the device is standby</td>
-<td></td>
-</tr>
-<tr>
-<td>name</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>Override the name</td>
+<td>The configured power calculation strategy will only be executed when this template results in True, otherwise the power sensor will display 0</td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
@@ -1809,38 +1753,17 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
+<td>create_group</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>This setting is only applicable when you also use <code>entities</code> setting or <code>include</code>. Define a group name here. See [group(/sensor-types/group.md)</td>
+<td></td>
+</tr>
+<tr>
 <td>create_utility_meters</td>
 <td>boolean</td>
 <td><strong>Optional</strong></td>
 <td>Set to disable/enable utility meter creation. When set this will override global setting <code>create_utility_meters</code>. See <a href="../../sensor-types/utility-meter/">utility meter</a></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>utility_meter_types</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td>Define which cycles you want to create utility meters for. See <a href="https://www.home-assistant.io/integrations/utility_meter/#cycle">utility_cycle</a>. This will override global setting <code>utility_meter_types</code></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>utility_meter_offset</td>
-<td>string</td>
-<td><strong>Optional</strong></td>
-<td>Define the offset for utility meters. See <a href="https://www.home-assistant.io/integrations/utility_meter/#offset">utility_offset</a>.</td>
-<td></td>
-</tr>
-<tr>
-<td>utility_meter_net_consumption</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative. See <a href="https://www.home-assistant.io/integrations/utility_meter/#net_consumption">utility_net_consumption</a>.</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>utility_meter_tariffs</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td>Define different tariffs. See <a href="https://www.home-assistant.io/integrations/utility_meter/#tariffs">utility_tariffs</a>.</td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
@@ -1851,18 +1774,18 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td></td>
 </tr>
 <tr>
-<td>power_sensor_category</td>
-<td>string</td>
+<td>disable_standby_power</td>
+<td>boolean</td>
 <td><strong>Optional</strong></td>
-<td>Category for the created power sensor. See <a href="https://developers.home-assistant.io/docs/core/entity/#generic-properties">HA docs</a>.</td>
+<td>Set to <code>true</code> to not show any power consumption when the device is standby</td>
 <td></td>
 </tr>
 <tr>
-<td>power_sensor_naming</td>
+<td>energy_integration_method</td>
 <td>string</td>
 <td><strong>Optional</strong></td>
-<td>Change the name (and id) of the sensors. Use the <code>{}</code> placeholder for the entity name of your appliance. When set this will override global setting <code>power_sensor_naming</code>. Also see <a href="../../misc/naming/">naming</a>.</td>
-<td></td>
+<td>Integration method for the energy sensor. See <a href="https://www.home-assistant.io/integrations/integration/#method">HA docs</a></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
 <td>energy_sensor_category</td>
@@ -1879,11 +1802,11 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td></td>
 </tr>
 <tr>
-<td>energy_integration_method</td>
+<td>energy_sensor_id</td>
 <td>string</td>
 <td><strong>Optional</strong></td>
-<td>Integration method for the energy sensor. See <a href="https://www.home-assistant.io/integrations/integration/#method">HA docs</a></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+<td>Entity id of an existing energy sensor. Mostly used in conjunction with <code>power_sensor_id</code>.</td>
+<td></td>
 </tr>
 <tr>
 <td>energy_sensor_unit_prefix</td>
@@ -1893,10 +1816,87 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td></td>
 </tr>
 <tr>
+<td>entities</td>
+<td>list</td>
+<td><strong>Optional</strong></td>
+<td>Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See <a href="../../sensor-types/group/custom/">group</a></td>
+<td></td>
+</tr>
+<tr>
+<td>entity_id</td>
+<td>string</td>
+<td><strong>Required</strong></td>
+<td>HA entity ID. The id of the device you want your power sensor for</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>fixed</td>
+<td>object</td>
+<td><strong>Optional</strong></td>
+<td><a href="../../strategies/fixed/">Fixed strategy options</a></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>force_calculate_group_energy</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>Set this to <code>true</code> when you want to create a Riemann sum sensor for powercalc group. By default the group energy sensor sums all individual energy sensors from member entities.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>force_energy_sensor_creation</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>Set this to <code>true</code> when you want a new energy sensor to be created for the power sensor with <code>power_sensor_id</code>, even if the device already has an energy sensor entity of its own.</td>
+<td></td>
+</tr>
+<tr>
+<td>hide_members</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>Hide all group members in HA GUI, only applicable when <code>create_group</code> is also defined.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>ignore_unavailable_state</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>Set this to <code>true</code> when you want the power sensor to display a value (<code>unavailable_power</code>, <code>standby_power</code> or 0) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>include</td>
+<td>object</td>
+<td><strong>Optional</strong></td>
+<td>Use this in combination with <code>create_group</code> to automatically include entities from a certain area, group or template. See <a href="../../sensor-types/group/include-entities/">include entities</a></td>
+<td></td>
+</tr>
+<tr>
+<td>linear</td>
+<td>object</td>
+<td><strong>Optional</strong></td>
+<td><a href="../../strategies/linear/">Linear strategy options</a></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>manufacturer</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>Manufacturer, most of the time this can be automatically discovered</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
 <td>mode</td>
 <td>string</td>
 <td><strong>Optional</strong></td>
 <td>Calculation mode, one of <code>lut</code>, <code>linear</code>, <code>fixed</code>. The default mode is <code>lut</code></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>model</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>Model id, most of the time this can be automatically discovered</td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
@@ -1914,52 +1914,17 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td></td>
 </tr>
 <tr>
-<td>fixed</td>
-<td>object</td>
-<td><strong>Optional</strong></td>
-<td><a href="../../strategies/fixed/">Fixed strategy options</a></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>linear</td>
-<td>object</td>
-<td><strong>Optional</strong></td>
-<td><a href="../../strategies/linear/">Linear strategy options</a></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>wled</td>
-<td>object</td>
-<td><strong>Optional</strong></td>
-<td><a href="../../strategies/wled/">WLED strategy options</a></td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>entities</td>
-<td>list</td>
-<td><strong>Optional</strong></td>
-<td>Makes it possible to add multiple entities at once in one powercalc entry. Also enable possibility to create group sensors automatically. See <a href="../../sensor-types/group/custom/">group</a></td>
-<td></td>
-</tr>
-<tr>
-<td>create_group</td>
+<td>name</td>
 <td>string</td>
 <td><strong>Optional</strong></td>
-<td>This setting is only applicable when you also use <code>entities</code> setting or <code>include</code>. Define a group name here. See [group(/sensor-types/group.md)</td>
-<td></td>
-</tr>
-<tr>
-<td>hide_members</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>Hide all group members in HA GUI, only applicable when <code>create_group</code> is also defined.</td>
+<td>Override the name</td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
-<td>include</td>
-<td>object</td>
+<td>power_sensor_category</td>
+<td>string</td>
 <td><strong>Optional</strong></td>
-<td>Use this in combination with <code>create_group</code> to automatically include entities from a certain area, group or template. See <a href="../../sensor-types/group/include-entities/">include entities</a></td>
+<td>Category for the created power sensor. See <a href="https://developers.home-assistant.io/docs/core/entity/#generic-properties">HA docs</a>.</td>
 <td></td>
 </tr>
 <tr>
@@ -1970,38 +1935,73 @@ Not all configuration params listed below are available in the GUI, when you wan
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
-<td>force_energy_sensor_creation</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>Set this to <code>true</code> when you want a new energy sensor to be created for the power sensor with <code>power_sensor_id</code>, even if the device already has an energy sensor entity of its own.</td>
-<td></td>
-</tr>
-<tr>
-<td>force_calculate_group_energy</td>
-<td>boolean</td>
-<td><strong>Optional</strong></td>
-<td>Set this to <code>true</code> when you want to create a Riemann sum sensor for powercalc group. By default the group energy sensor sums all individual energy sensors from member entities.</td>
-<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
-</tr>
-<tr>
-<td>energy_sensor_id</td>
+<td>power_sensor_naming</td>
 <td>string</td>
 <td><strong>Optional</strong></td>
-<td>Entity id of an existing energy sensor. Mostly used in conjunction with <code>power_sensor_id</code>.</td>
+<td>Change the name (and id) of the sensors. Use the <code>{}</code> placeholder for the entity name of your appliance. When set this will override global setting <code>power_sensor_naming</code>. Also see <a href="../../misc/naming/">naming</a>.</td>
 <td></td>
 </tr>
 <tr>
-<td>ignore_unavailable_state</td>
-<td>boolean</td>
+<td>sleep_power</td>
+<td>object</td>
 <td><strong>Optional</strong></td>
-<td>Set this to <code>true</code> when you want the power sensor to display a value (<code>unavailable_power</code>, <code>standby_power</code> or 0) regardless of whether the source entity is available. The can be useful for example on a TV which state can become unavailable when it is set to off.</td>
+<td>Changes the power to some value x seconds after the device has turned off. See <a href="../standby-power/">standby power</a>.</td>
+<td></td>
+</tr>
+<tr>
+<td>standby_power</td>
+<td>float</td>
+<td><strong>Optional</strong></td>
+<td>Supply the wattage when the device is off. See <a href="../standby-power/">standby power</a>. Can also be a template</td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 <tr>
-<td>calculation_enabled_condition</td>
-<td>template</td>
+<td>unavailable_power</td>
+<td>float</td>
 <td><strong>Optional</strong></td>
-<td>The configured power calculation strategy will only be executed when this template results in True, otherwise the power sensor will display 0</td>
+<td>Supply the wattage when the device has <code>unavailable</code> state. When not specified <code>standby_power</code> will be used, or 0.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>utility_meter_net_consumption</td>
+<td>boolean</td>
+<td><strong>Optional</strong></td>
+<td>Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative. See <a href="https://www.home-assistant.io/integrations/utility_meter/#net_consumption">utility_net_consumption</a>.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>utility_meter_offset</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>Define the offset for utility meters. See <a href="https://www.home-assistant.io/integrations/utility_meter/#offset">utility_offset</a>.</td>
+<td></td>
+</tr>
+<tr>
+<td>utility_meter_tariffs</td>
+<td>list</td>
+<td><strong>Optional</strong></td>
+<td>Define different tariffs. See <a href="https://www.home-assistant.io/integrations/utility_meter/#tariffs">utility_tariffs</a>.</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>utility_meter_types</td>
+<td>list</td>
+<td><strong>Optional</strong></td>
+<td>Define which cycles you want to create utility meters for. See <a href="https://www.home-assistant.io/integrations/utility_meter/#cycle">utility_cycle</a>. This will override global setting <code>utility_meter_types</code></td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>unique_id</td>
+<td>string</td>
+<td><strong>Optional</strong></td>
+<td>Powercalc tries to get a unique_id from the source entity by default. When the source entity does not have a unique_id you can configure one yourself. This allows you to change the name, area etc from the GUI. You can use for example <a href="https://www.uuidgenerator.net/">https://www.uuidgenerator.net/</a> to generate a unique one</td>
+<td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
+</tr>
+<tr>
+<td>wled</td>
+<td>object</td>
+<td><strong>Optional</strong></td>
+<td><a href="../../strategies/wled/">WLED strategy options</a></td>
 <td><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7 9 19l-5.5-5.5 1.41-1.41L9 16.17 19.59 5.59z"/></svg></span></td>
 </tr>
 </tbody>
@@ -2028,7 +2028,7 @@ Not all configuration params listed below are available in the GUI, when you wan
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 6, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">October 12, 2024</span>
   </span>
 
     
