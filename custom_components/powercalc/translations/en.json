@@ -432,7 +432,7 @@
       "global_configuration": {
         "title": "Basic options",
         "data": {
-          "create_energy_sensor": "Create energy sensor",
+          "create_energy_sensors": "Create energy sensors",
           "create_utility_meters": "Create utility meters",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
@@ -444,7 +444,7 @@
           "power_sensor_naming": "Power sensor name pattern"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensor": "Whether powercalc needs to create kWh sensors",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": " Disable the Powercalc library download feature",
@@ -455,6 +455,7 @@
       },
       "global_configuration_energy": {
         "title": "Energy options",
+        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -466,6 +467,7 @@
       },
       "global_configuration_utility_meter": {
         "title": "Utility meter options",
+        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",
