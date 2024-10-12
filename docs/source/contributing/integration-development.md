@@ -12,21 +12,21 @@ So it's highly recommended to use the tests to verify your changes. See the [Run
 2. Fork and clone the Powercalc repository:
 
     ```bash
-   git clone https://github.com/YOUR_GIT_USERNAME/homeassistant-powercalc
-   cd homeassistant-powercalc
-   git remote add upstream https://github.com/bramstroker/homeassistant-powercalc.git
+    git clone https://github.com/YOUR_GIT_USERNAME/homeassistant-powercalc
+    cd homeassistant-powercalc
+    git remote add upstream https://github.com/bramstroker/homeassistant-powercalc.git
     ```
 
 3. Copy or symlink the `custom_components/powercalc` directory to your Home Assistant configuration directory:
 
     ```bash
-   ln -s $(pwd)/custom_components/powercalc /path/to/your/homeassistant/config/custom_components/powercalc
+    ln -s $(pwd)/custom_components/powercalc /path/to/your/homeassistant/config/custom_components/powercalc
     ```
 
 4. Start Home Assistant Core in development mode:
 
     ```bash
-   hass -c /path/to/your/homeassistant/config --dev
+    hass -c /path/to/your/homeassistant/config --dev
     ```
 
 ## Running the tests
