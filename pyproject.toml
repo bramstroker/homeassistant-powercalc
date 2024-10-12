@@ -109,7 +109,7 @@ psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = ">=3.13,<3.14"
 aioresponses = "^0.7.6"
 
 [build-system]
