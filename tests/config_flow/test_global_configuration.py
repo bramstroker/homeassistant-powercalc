@@ -319,6 +319,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
         {
             CONF_CREATE_ENERGY_SENSORS: True,
             CONF_CREATE_UTILITY_METERS: True,
+            CONF_FORCE_UPDATE_FREQUENCY: 1200,
         },
     )
     await hass.config_entries.async_setup(global_config_entry.entry_id)

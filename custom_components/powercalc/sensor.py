@@ -68,7 +68,6 @@ from .const import (
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
@@ -604,10 +603,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
         if CONF_UTILITY_METER_OFFSET in sensor_config:
             sensor_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=sensor_config[CONF_UTILITY_METER_OFFSET])
 
-    def process_force_update_frequency() -> None:
-        if CONF_FORCE_UPDATE_FREQUENCY in sensor_config:
-            sensor_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=sensor_config[CONF_FORCE_UPDATE_FREQUENCY])
-
     handle_sensor_type()
 
     process_daily_fixed_energy()
@@ -615,7 +610,6 @@ def convert_config_entry_to_sensor_config(config_entry: ConfigEntry, hass: HomeA
     process_linear_config()
     process_calculation_enabled_condition()
     process_utility_meter_offset()
-    process_force_update_frequency()
 
     return sensor_config
 
