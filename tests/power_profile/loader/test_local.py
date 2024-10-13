@@ -44,7 +44,7 @@ async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[st
     assert found_model == expected
 
     # Also check that loading the model works
-    found_model and loader.load_model(manufacturer, found_model)
+    found_model and await loader.load_model(manufacturer, found_model)
 
 
 @pytest.mark.parametrize(

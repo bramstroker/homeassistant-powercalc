@@ -836,17 +836,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Build the config under daily_energy: key."""
         config: dict[str, Any] = {
             CONF_DAILY_FIXED_ENERGY: {},
-            CONF_CREATE_UTILITY_METERS: user_input.get(CONF_CREATE_UTILITY_METERS) or False,
         }
-        for key in schema.schema:
-            val = user_input.get(key)
-            if val is None:
-                continue
-            if key in [CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID]:
-                config[str(key)] = val
-                continue
+        for key, val in user_input.items():
+            if key in schema.schema and val is not None:
+                if key in {CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID}:
+                    config[str(key)] = val
+                    continue
 
-            config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
+                config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
         return config
 
     @staticmethod
@@ -1813,7 +1810,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         self._process_user_input(user_input, schema)
 
-        if self.sensor_type == SensorType.DAILY_ENERGY:
+        if self.sensor_type == SensorType.DAILY_ENERGY and current_step == Steps.DAILY_ENERGY:
             self.sensor_config.update(self.build_daily_energy_config(user_input, SCHEMA_DAILY_ENERGY_OPTIONS))
 
         if CONF_ENTITY_ID in user_input:
