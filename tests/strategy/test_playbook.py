@@ -318,6 +318,43 @@ async def test_multiply_factor(hass: HomeAssistant) -> None:
     await elapse_and_assert_power(hass, 2, "60.00")
 
 
+async def test_source_entity_trigger(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_NAME: "Test",
+            CONF_PLAYBOOK: {
+                CONF_PLAYBOOKS: {
+                    "on": "test2.csv",
+                },
+                CONF_STATE_TRIGGER: {
+                    STATE_ON: "on",
+                },
+            },
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+    await elapse_and_assert_power(hass, 2, "20.00")
+
+    hass.states.async_set("switch.test", STATE_OFF)
+    await hass.async_block_till_done()
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(seconds=60))
+    await hass.async_block_till_done()
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+    await elapse_and_assert_power(hass, 2, "20.00")
+
+
 async def test_state_trigger(hass: HomeAssistant) -> None:
     hass.config.config_dir = get_test_config_dir()
     await run_powercalc_setup(
