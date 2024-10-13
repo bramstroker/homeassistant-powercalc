@@ -263,6 +263,7 @@ def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigT
 
     global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
     if global_config_entry:
+        _LOGGER.debug("Found global configuration entry: %s", global_config_entry.data)
         global_config.update(get_global_gui_configuration(global_config_entry))
 
     return global_config
@@ -394,9 +395,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Check if this is the initial creation of the global configuration entry
     # If so, update the global configuration with the GUI configuration
     # When the flag is set, the global configuration has already been applied during async_setup
-    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
-    if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
-        await apply_global_gui_configuration_changes(hass, entry)
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+        if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
+            await apply_global_gui_configuration_changes(hass, entry)
 
     return True
 
