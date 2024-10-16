@@ -108,8 +108,6 @@ class LocalLoader(Loader):
             return None
 
         model_dirs = await self._hass.async_add_executor_job(os.listdir, manufacturer_dir)
-        for model in search:
-            if model in model_dirs:
-                return model
+        search_lower = {phrase.lower() for phrase in search}
 
-        return None
+        return next((model for model in model_dirs if model.lower() in search_lower), None)

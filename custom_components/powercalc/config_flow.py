@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import copy
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
+from datetime import timedelta
 from enum import StrEnum
-from typing import Any
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
@@ -38,12 +39,21 @@ from .const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
+    CONF_DISABLE_EXTENDED_ATTRIBUTES,
+    CONF_DISABLE_LIBRARY_DOWNLOAD,
     CONF_ENERGY_INTEGRATION_METHOD,
+    CONF_ENERGY_SENSOR_CATEGORY,
+    CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
+    CONF_ENERGY_SENSOR_NAMING,
+    CONF_ENERGY_SENSOR_PRECISION,
+    CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_EXCLUDE_ENTITIES,
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
+    CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
@@ -67,10 +77,15 @@ from .const import (
     CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_OFF,
+    CONF_POWER_SENSOR_CATEGORY,
+    CONF_POWER_SENSOR_FRIENDLY_NAMING,
+    CONF_POWER_SENSOR_NAMING,
+    CONF_POWER_SENSOR_PRECISION,
     CONF_POWER_TEMPLATE,
     CONF_REPEAT,
     CONF_SELF_USAGE_INCLUDED,
     CONF_SENSOR_TYPE,
+    CONF_SENSORS,
     CONF_STANDBY_POWER,
     CONF_STATE_TRIGGER,
     CONF_STATES_POWER,
@@ -80,6 +95,7 @@ from .const import (
     CONF_UNAVAILABLE_POWER,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_NET_CONSUMPTION,
+    CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
@@ -92,6 +108,8 @@ from .const import (
     DUMMY_ENTITY_ID,
     ENERGY_INTEGRATION_METHOD_LEFT,
     ENERGY_INTEGRATION_METHODS,
+    ENTITY_CATEGORIES,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     CalculationStrategy,
     GroupType,
     SensorType,
@@ -119,6 +137,7 @@ class Steps(StrEnum):
     DOMAIN_GROUP = "domain_group"
     GROUP = "group"
     LIBRARY = "library"
+    LIBRARY_OPTIONS = "library_options"
     VIRTUAL_POWER = "virtual_power"
     FIXED = "fixed"
     LINEAR = "linear"
@@ -138,6 +157,9 @@ class Steps(StrEnum):
     SUBTRACT_GROUP = "subtract_group"
     INIT = "init"
     UTILITY_METER_OPTIONS = "utility_meter_options"
+    GLOBAL_CONFIGURATION = "global_configuration"
+    GLOBAL_CONFIGURATION_ENERGY = "global_configuration_energy"
+    GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
 
 MENU_SENSOR_TYPE = {
@@ -179,6 +201,20 @@ SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
 SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     {
         vol.Optional(CONF_CREATE_ENERGY_SENSOR, default=True): selector.BooleanSelector(),
+    },
+)
+
+SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR = vol.Schema(
+    {
+        vol.Optional(
+            CONF_ENERGY_INTEGRATION_METHOD,
+            default=ENERGY_INTEGRATION_METHOD_LEFT,
+        ): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=ENERGY_INTEGRATION_METHODS,
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        ),
     },
 )
 
@@ -352,6 +388,7 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=["all"] + [cls.value for cls in Platform],
+                mode=selector.SelectSelectorMode.DROPDOWN,
             ),
         ),
         vol.Optional(CONF_EXCLUDE_ENTITIES): selector.EntitySelector(
@@ -397,17 +434,68 @@ SCHEMA_GROUP_SUBTRACT = vol.Schema(
 
 SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
     {
-        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
-            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
-        ),
-        vol.Optional(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
+        vol.Required(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=METER_TYPES,
                 translation_key=CONF_METER_TYPE,
                 multiple=True,
             ),
         ),
+        vol.Optional(CONF_UTILITY_METER_TARIFFS, default=[]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=[], custom_value=True, multiple=True),
+        ),
         vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION, default=False): selector.BooleanSelector(),
+        vol.Required(CONF_UTILITY_METER_OFFSET, default=0): selector.NumberSelector(
+            selector.NumberSelectorConfig(
+                min=0,
+                max=28,
+                mode=selector.NumberSelectorMode.BOX,
+                unit_of_measurement="days",
+            ),
+        ),
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
+    {
+        vol.Optional(CONF_POWER_SENSOR_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_POWER_SENSOR_CATEGORY): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),  # type: ignore
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        ),
+        vol.Optional(CONF_POWER_SENSOR_PRECISION): selector.NumberSelector(
+            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
+        ),
+        vol.Optional(CONF_FORCE_UPDATE_FREQUENCY): selector.NumberSelector(
+            selector.NumberSelectorConfig(unit_of_measurement=UnitOfTime.SECONDS, mode=selector.NumberSelectorMode.BOX),
+        ),
+        vol.Optional(CONF_IGNORE_UNAVAILABLE_STATE, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
+        vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
+    {
+        vol.Optional(CONF_ENERGY_SENSOR_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_FRIENDLY_NAMING): selector.TextSelector(),
+        vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=list(filter(lambda item: item is not None, ENTITY_CATEGORIES)),  # type: ignore
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        ),
+        vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
+        **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
+        vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
+            selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
+        ),
     },
 )
 
@@ -416,10 +504,18 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
+        self.global_config: ConfigType = {}
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str | None = None
         self.power_profile: PowerProfile | None = None
         self.is_library_flow: bool = False
+        self.skip_advanced_step: bool = False
+        self.is_options_flow: bool = isinstance(self, OptionsFlow)
+
+    @abstractmethod
+    @callback
+    def persist_config_entry(self) -> FlowResult:
+        pass  # pragma: no cover
 
     async def validate_strategy_config(self) -> dict:
         """Validate the strategy config."""
@@ -626,7 +722,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         ]
         return vol.Schema(
             {
-                vol.Required(CONF_MANUFACTURER): selector.SelectSelector(
+                vol.Required(CONF_MANUFACTURER, default=self.sensor_config.get(CONF_MANUFACTURER)): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=manufacturers,
                         mode=selector.SelectSelectorMode.DROPDOWN,
@@ -645,7 +741,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         ]
         return vol.Schema(
             {
-                vol.Required(CONF_MODEL): selector.SelectSelector(
+                vol.Required(CONF_MODEL, default=self.sensor_config.get(CONF_MODEL)): selector.SelectSelector(
                     selector.SelectSelectorConfig(
                         options=models,
                         mode=selector.SelectSelectorMode.DROPDOWN,
@@ -675,6 +771,15 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
             },
         )
+
+    def create_schema_advanced(self) -> vol.Schema:
+        """Create the advanced options schema."""
+        schema = SCHEMA_POWER_ADVANCED
+
+        if self.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
+            schema = schema.extend(SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema)
+
+        return schema
 
     def create_source_entity_selector(
         self,
@@ -731,17 +836,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Build the config under daily_energy: key."""
         config: dict[str, Any] = {
             CONF_DAILY_FIXED_ENERGY: {},
-            CONF_CREATE_UTILITY_METERS: user_input.get(CONF_CREATE_UTILITY_METERS) or False,
         }
-        for key in schema.schema:
-            val = user_input.get(key)
-            if val is None:
-                continue
-            if key in [CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID]:
-                config[str(key)] = val
-                continue
+        for key, val in user_input.items():
+            if key in schema.schema and val is not None:
+                if key in {CONF_CREATE_UTILITY_METERS, CONF_GROUP, CONF_NAME, CONF_UNIQUE_ID}:
+                    config[str(key)] = val
+                    continue
 
-            config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
+                config[CONF_DAILY_FIXED_ENERGY][str(key)] = val
         return config
 
     @staticmethod
@@ -762,9 +864,22 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             schema[new_key] = val
         return vol.Schema(schema)
 
-    def get_global_powercalc_config(self) -> dict[str, str]:
+    def get_global_powercalc_config(self) -> ConfigType:
+        """Get the global powercalc config."""
+        if self.global_config:
+            return self.global_config
         powercalc = self.hass.data.get(DOMAIN) or {}
-        return powercalc.get(DOMAIN_CONFIG) or {}
+        global_config = dict.copy(powercalc.get(DOMAIN_CONFIG) or {})
+        force_update_frequency = global_config.get(CONF_FORCE_UPDATE_FREQUENCY)
+        if isinstance(force_update_frequency, timedelta):
+            global_config[CONF_FORCE_UPDATE_FREQUENCY] = force_update_frequency.total_seconds()
+        utility_meter_offset = global_config.get(CONF_UTILITY_METER_OFFSET)
+        if isinstance(utility_meter_offset, timedelta):
+            global_config[CONF_UTILITY_METER_OFFSET] = utility_meter_offset.days
+        if CONF_SENSORS in global_config:
+            global_config.pop(CONF_SENSORS)
+        self.global_config = global_config
+        return global_config
 
     def get_fixed_power_config_for_smart_switch(self, user_input: dict[str, Any]) -> dict[str, Any]:
         """Get the fixed power config for smart switch."""
@@ -777,6 +892,253 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             power += self_usage_on
         return {CONF_POWER: power}
 
+    async def async_step_manufacturer(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Ask the user to select the manufacturer."""
+        if user_input is not None:
+            self.sensor_config.update(
+                {CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)},
+            )
+            return await self.async_step_model()
+
+        schema = await self.create_schema_manufacturer()
+        return self.async_show_form(
+            step_id=Steps.MANUFACTURER,
+            data_schema=schema,
+            errors={},
+            last_step=False,
+        )
+
+    async def async_step_model(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Ask the user to select the model."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
+            library = await ProfileLibrary.factory(self.hass)
+            profile = await library.get_profile(
+                ModelInfo(
+                    self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
+                    self.sensor_config.get(CONF_MODEL),  # type: ignore
+                ),
+            )
+            self.power_profile = profile
+            if self.power_profile and not await self.power_profile.has_sub_profiles:
+                errors = await self.validate_strategy_config()
+            if not errors:
+                return await self.async_step_post_library()
+
+        return self.async_show_form(
+            step_id=Steps.MODEL,
+            data_schema=await self.create_schema_model(),
+            description_placeholders={
+                "supported_models_link": "https://library.powercalc.nl",
+            },
+            errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_post_library(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """
+        Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
+        Forwards to the next step in the flow.
+        """
+        if self.power_profile and await self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
+            return await self.async_step_sub_profile()
+
+        if self.power_profile and self.power_profile.needs_fixed_config:
+            return await self.async_step_fixed()
+
+        if (
+            self.power_profile
+            and self.power_profile.device_type == DeviceType.SMART_SWITCH
+            and self.power_profile.calculation_strategy == CalculationStrategy.FIXED
+        ):
+            return await self.async_step_smart_switch()
+
+        if self.power_profile and self.power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return await self.async_step_multi_switch()
+
+        return await self.async_step_power_advanced()
+
+    async def async_step_sub_profile(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for sub profile selection."""
+        if user_input is not None:
+            # Append the sub profile to the model
+            model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
+            self.sensor_config[CONF_MODEL] = model
+            return await self.async_step_power_advanced()
+
+        model_info = ModelInfo(
+            self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
+            self.sensor_config.get(CONF_MODEL),  # type: ignore
+        )
+        return self.async_show_form(
+            step_id=Steps.SUB_PROFILE,
+            data_schema=await self.create_schema_sub_profile(model_info),
+            errors={},
+            last_step=False,
+        )
+
+    async def async_step_power_advanced(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for advanced options."""
+
+        if self.is_options_flow:
+            return self.persist_config_entry()  # type: ignore
+
+        if user_input is not None or self.skip_advanced_step:
+            self.sensor_config.update(user_input or {})
+            if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
+                return await self.async_step_utility_meter_options()
+            return self.persist_config_entry()  # type: ignore
+
+        return self.async_show_form(
+            step_id=Steps.POWER_ADVANCED,
+            data_schema=self.fill_schema_defaults(
+                self.create_schema_advanced(),
+                self.get_global_powercalc_config(),
+            ),
+            errors={},
+        )
+
+    async def async_step_smart_switch(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Asks the user for the power of connect appliance for the smart switch."""
+        if user_input is not None:
+            self.sensor_config.update(
+                {
+                    CONF_SELF_USAGE_INCLUDED: user_input.get(CONF_SELF_USAGE_INCLUDED),
+                    CONF_MODE: CalculationStrategy.FIXED,
+                    CONF_FIXED: self.get_fixed_power_config_for_smart_switch(user_input),
+                },
+            )
+            return await self.async_step_power_advanced()
+
+        self_usage_on = 0
+        if self.power_profile and self.power_profile.fixed_mode_config:
+            self_usage_on = self.power_profile.fixed_mode_config.get(CONF_POWER, 0)
+        return self.async_show_form(
+            step_id=Steps.SMART_SWITCH,
+            data_schema=SCHEMA_POWER_SMART_SWITCH,
+            description_placeholders={"self_usage_power": str(self_usage_on)},
+            errors={},
+            last_step=False,
+        )
+
+    async def async_step_fixed(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for fixed sensor."""
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_FIXED: user_input})
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return await self.async_step_power_advanced()
+
+        return self.async_show_form(
+            step_id=Steps.FIXED,
+            data_schema=SCHEMA_POWER_FIXED,
+            errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_multi_switch(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for multi switch strategy."""
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_MULTI_SWITCH: user_input})
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return await self.async_step_power_advanced()
+
+        return self.async_show_form(
+            step_id=Steps.MULTI_SWITCH,
+            data_schema=self.create_schema_multi_switch(),
+            errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_utility_meter_options(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for utility meter options."""
+        if user_input is not None:
+            self.sensor_config.update(user_input or {})
+            return self.persist_config_entry()  # type: ignore
+
+        return self.async_show_form(
+            step_id=Steps.UTILITY_METER_OPTIONS,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_UTILITY_METER_OPTIONS,
+                self.get_global_powercalc_config(),
+            ),
+            errors={},
+        )
+
+    async def async_step_global_configuration_energy(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+            if self.is_options_flow:
+                return self.persist_config_entry()  # type: ignore
+
+        if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
+            return await self.async_step_global_configuration_utility_meter()
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION_ENERGY,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR,
+                self.global_config,
+            ),
+            errors={},
+        )
+
+    async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+            if self.is_options_flow:
+                return self.persist_config_entry()  # type: ignore
+
+        if not bool(self.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
+            return self.async_create_entry(
+                title="Global Configuration",
+                data=self.global_config,
+            )
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION_UTILITY_METER,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_UTILITY_METER_OPTIONS,
+                self.global_config,
+            ),
+            errors={},
+        )
+
 
 class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     """Handle a config flow for PowerCalc."""
@@ -787,7 +1149,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Initialize options flow."""
         self.selected_sensor_type: str | None = None
         self.name: str | None = None
-        self.skip_advanced_step: bool = False
         super().__init__()
 
     @staticmethod
@@ -803,7 +1164,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle integration discovery."""
         _LOGGER.debug("Starting discovery flow: %s", discovery_info)
 
-        self.skip_advanced_step = True  # We don't want to ask advanced option when discovered
+        self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
 
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
@@ -834,14 +1195,24 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
             return await self.async_step_wled()
 
-        return await self.async_step_library()
+        return cast(ConfigFlowResult, await self.async_step_library())
 
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> ConfigFlowResult:
         """Handle the initial step."""
-        return self.async_show_menu(step_id=Steps.USER, menu_options=MENU_SENSOR_TYPE)
+
+        menu = MENU_SENSOR_TYPE
+
+        global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
+            DOMAIN,
+            ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
+        )
+        if not global_config_entry:
+            menu = {Steps.GLOBAL_CONFIGURATION: "Global configuration", **menu}
+
+        return self.async_show_menu(step_id=Steps.USER, menu_options=menu)
 
     async def async_step_menu_library(
         self,
@@ -853,10 +1224,29 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.is_library_flow = True
         return await self.async_step_virtual_power(user_input)
 
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+        self.global_config = self.get_global_powercalc_config()
+        await self.async_set_unique_id(ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+        self._abort_if_unique_id_configured()
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+            return await self.async_step_global_configuration_energy()
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION,
+                self.global_config,
+            ),
+            errors={},
+        )
+
     async def async_step_virtual_power(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for virtual power sensor."""
         errors: dict[str, str] = {}
 
@@ -895,7 +1285,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def forward_to_strategy_step(
         self,
         strategy: CalculationStrategy,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Forward to the next step based on the selected strategy."""
         step = STRATEGY_STEP_MAPPING.get(strategy)
         if step is None:
@@ -906,7 +1296,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_daily_energy(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for daily energy sensor."""
         errors = self.validate_daily_energy_input(user_input)
 
@@ -921,7 +1311,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(self.build_daily_energy_config(user_input, schema))
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.create_config_entry()  # type: ignore
+            return self.persist_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id=Steps.DAILY_ENERGY,
@@ -932,14 +1322,14 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_menu_group(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the group choice step."""
         return self.async_show_menu(step_id=Steps.MENU_GROUP, menu_options=MENU_GROUP)
 
     async def async_step_group(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for group sensor."""
         errors = self.validate_group_input(user_input)
         if user_input is not None and not errors:
@@ -959,7 +1349,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_domain_group(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_domain_group(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for domain based group sensor."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -981,7 +1371,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_subtract_group(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+    async def async_step_subtract_group(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for subtract group sensor."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -1003,7 +1393,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_handle_group_creation(self) -> ConfigFlowResult:
+    async def async_handle_group_creation(self) -> FlowResult:
         """Handle the group creation."""
         self.selected_sensor_type = SensorType.GROUP
         unique_id = generate_unique_id(self.sensor_config)
@@ -1012,57 +1402,12 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
-        return self.create_config_entry()  # type: ignore
-
-    async def async_step_smart_switch(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Asks the user for the power of connect appliance for the smart switch."""
-        if user_input is not None:
-            self.sensor_config.update(
-                {
-                    CONF_SELF_USAGE_INCLUDED: user_input.get(CONF_SELF_USAGE_INCLUDED),
-                    CONF_MODE: CalculationStrategy.FIXED,
-                    CONF_FIXED: self.get_fixed_power_config_for_smart_switch(user_input),
-                },
-            )
-            return await self.async_step_power_advanced()
-
-        self_usage_on = 0
-        if self.power_profile and self.power_profile.fixed_mode_config:
-            self_usage_on = self.power_profile.fixed_mode_config.get(CONF_POWER, 0)
-        return self.async_show_form(
-            step_id=Steps.SMART_SWITCH,
-            data_schema=SCHEMA_POWER_SMART_SWITCH,
-            description_placeholders={"self_usage_power": str(self_usage_on)},
-            errors={},
-            last_step=False,
-        )
-
-    async def async_step_fixed(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Handle the flow for fixed sensor."""
-        errors = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_FIXED: user_input})
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
-
-        return self.async_show_form(
-            step_id=Steps.FIXED,
-            data_schema=SCHEMA_POWER_FIXED,
-            errors=errors,
-            last_step=False,
-        )
+        return self.persist_config_entry()  # type: ignore
 
     async def async_step_linear(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for linear sensor."""
         errors = {}
         if user_input is not None:
@@ -1078,29 +1423,10 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_multi_switch(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Handle the flow for multi switch strategy."""
-        errors = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_MULTI_SWITCH: user_input})
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
-
-        return self.async_show_form(
-            step_id=Steps.MULTI_SWITCH,
-            data_schema=self.create_schema_multi_switch(),
-            errors=errors,
-            last_step=False,
-        )
-
     async def async_step_playbook(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for playbook sensor."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -1130,7 +1456,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_WLED: user_input})
             errors = await self.validate_strategy_config()
             if not errors:
-                return await self.async_step_power_advanced()
+                return cast(ConfigFlowResult, await self.async_step_power_advanced())
 
         return self.async_show_form(
             step_id=Steps.WLED,
@@ -1142,7 +1468,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_library(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Try to autodiscover manufacturer/model first.
         Ask the user to confirm this or forward to manual library selection.
         """
@@ -1184,7 +1510,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_real_power(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for real power sensor"""
 
         self.selected_sensor_type = SensorType.REAL_POWER
@@ -1193,7 +1519,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(user_input)
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.create_config_entry()  # type: ignore
+            return self.persist_config_entry()  # type: ignore
 
         return self.async_show_form(
             step_id=Steps.REAL_POWER,
@@ -1202,144 +1528,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
-    async def async_step_manufacturer(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Ask the user to select the manufacturer."""
-        if user_input is not None:
-            self.sensor_config.update(
-                {CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)},
-            )
-            return await self.async_step_model()
-
-        schema = await self.create_schema_manufacturer()
-        return self.async_show_form(
-            step_id=Steps.MANUFACTURER,
-            data_schema=schema,
-            errors={},
-            last_step=False,
-        )
-
-    async def async_step_model(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Ask the user to select the model."""
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
-            library = await ProfileLibrary.factory(self.hass)
-            profile = await library.get_profile(
-                ModelInfo(
-                    self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
-                    self.sensor_config.get(CONF_MODEL),  # type: ignore
-                ),
-            )
-            self.power_profile = profile
-            if self.power_profile and not await self.power_profile.has_sub_profiles:
-                errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_post_library()
-
-        return self.async_show_form(
-            step_id=Steps.MODEL,
-            data_schema=await self.create_schema_model(),
-            description_placeholders={
-                "supported_models_link": "https://library.powercalc.nl",
-            },
-            errors=errors,
-            last_step=False,
-        )
-
-    async def async_step_post_library(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """
-        Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
-        Forwards to the next step in the flow.
-        """
-        if self.power_profile and await self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
-            return await self.async_step_sub_profile()
-
-        if self.power_profile and self.power_profile.needs_fixed_config:
-            return await self.async_step_fixed()
-
-        if (
-            self.power_profile
-            and self.power_profile.device_type == DeviceType.SMART_SWITCH
-            and self.power_profile.calculation_strategy == CalculationStrategy.FIXED
-        ):
-            return await self.async_step_smart_switch()
-
-        if self.power_profile and self.power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
-            return await self.async_step_multi_switch()
-
-        return await self.async_step_power_advanced()
-
-    async def async_step_sub_profile(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Handle the flow for sub profile selection."""
-        if user_input is not None:
-            # Append the sub profile to the model
-            model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
-            self.sensor_config[CONF_MODEL] = model
-            return await self.async_step_power_advanced()
-
-        model_info = ModelInfo(
-            self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
-            self.sensor_config.get(CONF_MODEL),  # type: ignore
-        )
-        return self.async_show_form(
-            step_id=Steps.SUB_PROFILE,
-            data_schema=await self.create_schema_sub_profile(model_info),
-            errors={},
-            last_step=False,
-        )
-
-    async def async_step_power_advanced(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Handle the flow for advanced options."""
-        if user_input is not None or self.skip_advanced_step:
-            self.sensor_config.update(user_input or {})
-            if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
-                return await self.async_step_utility_meter_options()
-            return self.create_config_entry()  # type: ignore
-
-        return self.async_show_form(
-            step_id=Steps.POWER_ADVANCED,
-            data_schema=self.fill_schema_defaults(
-                self.create_schema_advanced(),
-                self.get_global_powercalc_config(),
-            ),
-            errors={},
-        )
-
-    async def async_step_utility_meter_options(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
-        """Handle the flow for utility meter options."""
-        if user_input is not None:
-            self.sensor_config.update(user_input or {})
-            return self.create_config_entry()  # type: ignore
-
-        return self.async_show_form(
-            step_id=Steps.UTILITY_METER_OPTIONS,
-            data_schema=self.fill_schema_defaults(
-                SCHEMA_UTILITY_METER_OPTIONS,
-                self.get_global_powercalc_config(),
-            ),
-            errors={},
-        )
-
     @callback
-    def create_config_entry(self) -> ConfigFlowResult:
+    def persist_config_entry(self) -> FlowResult:
         """Create the config entry."""
         if self.unique_id:
             self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
@@ -1350,27 +1540,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
 
         return self.async_create_entry(title=str(self.name), data=self.sensor_config)
-
-    def create_schema_advanced(self) -> vol.Schema:
-        """Create the advanced options schema."""
-        schema = SCHEMA_POWER_ADVANCED
-
-        if self.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-            schema = schema.extend(
-                {
-                    vol.Optional(
-                        CONF_ENERGY_INTEGRATION_METHOD,
-                        default=ENERGY_INTEGRATION_METHOD_LEFT,
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=ENERGY_INTEGRATION_METHODS,
-                            mode=selector.SelectSelectorMode.DROPDOWN,
-                        ),
-                    ),
-                },
-            )
-
-        return schema
 
 
 class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
@@ -1390,6 +1559,10 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle options flow."""
+        if self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+            self.global_config = self.get_global_powercalc_config()
+            return self.async_show_menu(step_id=Steps.INIT, menu_options=self.build_global_config_menu())
+
         self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
             self.source_entity = await create_source_entity(
@@ -1422,6 +1595,17 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             return self.async_abort(reason="model_not_supported")
         return None
 
+    def build_global_config_menu(self) -> dict[Steps, str]:
+        """Build menu for global configuration"""
+        menu = {
+            Steps.GLOBAL_CONFIGURATION: "Basic options",
+        }
+        if self.global_config.get(CONF_CREATE_ENERGY_SENSORS):
+            menu[Steps.GLOBAL_CONFIGURATION_ENERGY] = "Energy options"
+        if self.global_config.get(CONF_CREATE_UTILITY_METERS):
+            menu[Steps.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
+        return menu
+
     def build_menu(self) -> dict[Steps, str]:
         """Build the options menu."""
         menu = {
@@ -1431,6 +1615,8 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             if self.strategy and self.strategy != CalculationStrategy.LUT:
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
                 menu[strategy_step] = MENU_OPTIONS[strategy_step]
+            if self.power_profile:
+                menu[Steps.LIBRARY_OPTIONS] = "Library options"
             menu[Steps.ADVANCED_OPTIONS] = "Advanced options"
         if self.sensor_type == SensorType.DAILY_ENERGY:
             menu[Steps.DAILY_ENERGY] = "Daily energy options"
@@ -1447,6 +1633,22 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu[Steps.UTILITY_METER_OPTIONS] = "Utility meter options"
 
         return menu
+
+    async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the global configuration step."""
+
+        if user_input is not None:
+            self.global_config.update(user_input)
+            return self.persist_config_entry()
+
+        return self.async_show_form(
+            step_id=Steps.GLOBAL_CONFIGURATION,
+            data_schema=self.fill_schema_defaults(
+                SCHEMA_GLOBAL_CONFIGURATION,
+                self.global_config,
+            ),
+            errors={},
+        )
 
     async def async_step_basic_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
@@ -1524,6 +1726,21 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Handle the basic options flow."""
         return await self.async_handle_strategy_options_step(user_input)
 
+    async def async_step_library_options(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the basic options flow."""
+        self.is_library_flow = True
+        if user_input is not None:
+            return await self.async_step_manufacturer()
+
+        return self.async_show_form(
+            step_id=Steps.LIBRARY_OPTIONS,
+            description_placeholders={
+                "manufacturer": self.power_profile.manufacturer,  # type: ignore
+                "model": self.power_profile.model,  # type: ignore
+            },
+            last_step=False,
+        )
+
     async def async_handle_strategy_options_step(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the option processing for the selected strategy."""
         if not self.strategy:
@@ -1549,14 +1766,24 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         processes user input against the select schema.
         And finally persist the changes on the config entry
         """
-        errors = {}
+        errors: dict[str, str] | None = {}
         if user_input is not None:
-            errors = await self.save_options(user_input, schema)
+            errors = await self.process_all_options(user_input, schema)
             if not errors:
-                return self.async_create_entry(title="", data={})
+                return self.persist_config_entry()
         return self.async_show_form(step_id=step, data_schema=schema, errors=errors)
 
-    async def process_all_options(self, user_input: dict[str, Any], schema: vol.Schema) -> dict | None:
+    def persist_config_entry(self) -> FlowResult:
+        """Persist changed options on the config entry."""
+        data = self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config or self.sensor_config
+
+        self.hass.config_entries.async_update_entry(
+            self.config_entry,
+            data=data,
+        )
+        return self.async_create_entry(title="", data={})
+
+    async def process_all_options(self, user_input: dict[str, Any], schema: vol.Schema) -> dict[str, str] | None:
         """
         Process the provided user input against the schema,
         and save the options data in current_config to save later on
@@ -1583,28 +1810,13 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         self._process_user_input(user_input, schema)
 
-        if self.sensor_type == SensorType.DAILY_ENERGY:
+        if self.sensor_type == SensorType.DAILY_ENERGY and current_step == Steps.DAILY_ENERGY:
             self.sensor_config.update(self.build_daily_energy_config(user_input, SCHEMA_DAILY_ENERGY_OPTIONS))
 
         if CONF_ENTITY_ID in user_input:
             self.sensor_config[CONF_ENTITY_ID] = user_input[CONF_ENTITY_ID]
 
         return None
-
-    async def save_options(
-        self,
-        user_input: dict[str, Any],
-        schema: vol.Schema,
-    ) -> dict:
-        """Save options, and return errors when validation fails."""
-        errors = await self.process_all_options(user_input, schema)
-        if errors:
-            return errors
-        self.hass.config_entries.async_update_entry(
-            self.config_entry,
-            data=self.sensor_config,
-        )
-        return {}
 
     def _process_user_input(
         self,

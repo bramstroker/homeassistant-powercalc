@@ -7,7 +7,7 @@
     "dependencies"
   ],
   "ignoreDeps": [
-    "mypy"
+    "python"
   ],
   "dependencyDashboard": false,
   "packageRules": [

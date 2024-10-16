@@ -7,6 +7,7 @@ import pytest
 from freezegun import freeze_time
 from homeassistant.components import utility_meter
 from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.utility_meter.const import DAILY, HOURLY
 from homeassistant.components.utility_meter.sensor import (
     ATTR_STATUS,
     ATTR_TARIFF,
@@ -59,7 +60,7 @@ async def test_tariff_sensors_are_created(hass: HomeAssistant) -> None:
             CONF_FIXED: {CONF_POWER: 50},
             CONF_CREATE_UTILITY_METERS: True,
             CONF_UTILITY_METER_TARIFFS: ["general", "peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: ["daily", "hourly"],
+            CONF_UTILITY_METER_TYPES: [DAILY, HOURLY],
         },
     )
 
@@ -103,7 +104,7 @@ async def test_tariff_sensors_created_for_gui_sensors(hass: HomeAssistant) -> No
         {},
         {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
         },
     )
 
@@ -149,7 +150,7 @@ async def test_utility_meter_is_not_created_twice(
         {
             CONF_UNIQUE_ID: "1234",
             CONF_CREATE_UTILITY_METERS: True,
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
             CONF_POWER_SENSOR_ID: power_sensor_id,
             CONF_ENERGY_SENSOR_ID: energy_sensor_id,
         },
@@ -160,7 +161,7 @@ async def test_utility_meter_is_not_created_twice(
         {
             CONF_UNIQUE_ID: "1234",
             CONF_CREATE_UTILITY_METERS: True,
-            CONF_UTILITY_METER_TYPES: ["daily"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
             CONF_POWER_SENSOR_ID: power_sensor_id,
             CONF_ENERGY_SENSOR_ID: energy_sensor_id,
         },

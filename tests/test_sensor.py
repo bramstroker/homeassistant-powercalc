@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
     CONF_ENABLE_AUTODISCOVERY,
+    CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
     CONF_ENERGY_SENSOR_NAMING,
     CONF_FIXED,
@@ -62,6 +63,7 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_UTILITY_METER_TYPES,
     DOMAIN,
+    ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
     SensorType,
 )
@@ -852,3 +854,47 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     power_state = hass.states.get("sensor.testentry_power")
     assert power_state.attributes.get(ATTR_SOURCE_ENTITY) == new_light_id
     assert power_state.state == "100.00"
+
+
+async def test_regression(hass: HomeAssistant) -> None:
+    #
+    # {
+    #     "entity_id": "light.standing_lamp",
+    #     "mode": "fixed",
+    #     "create_energy_sensor": true,
+    #     "create_utility_meters": false,
+    #     "fixed": {
+    #         "power": 11.0
+    #     },
+    #     "energy_integration_method": "left",
+    #     "unique_id": "pc_91b5b2b04e889549cb19effa3dea97e1",
+    #     "sensor_type": "virtual_power",
+    #     "name": "Standing lamp",
+    #     "_power_entity": "sensor.standing_lamp_power",
+    #     "_energy_entity": "sensor.standing_lamp_power"
+    # }
+
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_MODE: CalculationStrategy.FIXED,
+            CONF_NAME: "Standing lamp",
+            CONF_ENTITY_ID: "light.standing_lamp",
+            CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,
+            CONF_FIXED: {CONF_POWER: 11},
+            CONF_UNIQUE_ID: "pc_91b5b2b04e889549cb19effa3dea97e1",
+        },
+        unique_id="pc_91b5b2b04e889549cb19effa3dea97e1",
+    )
+    entry.add_to_hass(hass)
+
+    await run_powercalc_setup(
+        hass,
+        {},
+    )
+
+    assert hass.states.get("sensor.standing_lamp_power")
+    assert hass.states.get("sensor.standing_lamp_energy")

@@ -85,6 +85,7 @@ nav:
       - 'troubleshooting/yeelight.md'
   - 'Contributing':
       - 'contributing/index.md'
+      - 'contributing/integration-development.md'
       - 'contributing/measure.md'
       - 'contributing/translating.md'
   - 'Tutorials':

@@ -31,59 +31,6 @@ PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../.
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 
 
-def generate_supported_model_list(model_listing: list[dict]):
-    """Generate static file containing the supported models."""
-    toc_links: list[str] = []
-    tables_output: str = ""
-
-    for device_type in DEVICE_TYPES:
-        relevant_models = [
-            model
-            for model in model_listing
-            if model.get("device_type") == device_type[0]
-        ]
-        num_devices = len(relevant_models)
-
-        anchor = device_type[1].lower().replace("/", "").replace(" ", "-")
-        toc_links.append(f"- [{device_type[1]}](#{anchor}) ({num_devices})\n")
-
-        writer = MarkdownTableWriter()
-        headers = [
-            "manufacturer",
-            "model id",
-            "name",
-            "aliases",
-            "standby",
-        ]
-        if device_type[0] == "light":
-            headers.append("color modes")
-
-        writer.header_list = headers
-        rows = []
-        for model in relevant_models:
-            row = [
-                model["manufacturer"],
-                model["model"],
-                model["name"],
-                "<br />".join(model.get("aliases") or []),
-                model.get("standby_power") or 0,
-            ]
-            if device_type[0] == "light":
-                row.append(",".join(model.get("color_modes") or []))
-            rows.append(row)
-
-        rows = sorted(rows, key=lambda x: (x[0], x[1]))
-        writer.value_matrix = rows
-        tables_output += f"\n## {device_type[1]}\n#### {num_devices} total\n\n"
-        tables_output += writer.dumps()
-
-    md_file = open(os.path.join(PROJECT_ROOT, "docs/supported_models.md"), "w")
-    md_file.write("".join(toc_links) + tables_output)
-    md_file.close()
-
-    print("Generated supported_models.md")
-
-
 def generate_library_json(model_listing: list[dict]) -> None:
     manufacturers: dict[str, dict] = {}
     for model in model_listing:
@@ -187,5 +134,4 @@ def get_last_commit_time(directory: str) -> datetime:
 
 
 model_list = get_model_list()
-generate_supported_model_list(model_list)
 generate_library_json(model_list)

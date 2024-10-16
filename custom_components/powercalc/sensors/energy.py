@@ -246,7 +246,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         unit_prefix: str | None = None,
         device_info: DeviceInfo | None = None,
     ) -> None:
-        round_digits: int = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, 2)
+        round_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, 2))
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
 
         params = {

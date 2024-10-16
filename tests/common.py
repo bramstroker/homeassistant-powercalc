@@ -154,10 +154,11 @@ def get_test_profile_dir(sub_dir: str) -> str:
     )
 
 
-def get_test_config_dir() -> str:
+def get_test_config_dir(append_path: str = "") -> str:
     return os.path.join(
         os.path.dirname(__file__),
         "testing_config",
+        append_path,
     )
 
 
