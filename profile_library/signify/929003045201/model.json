@@ -1,0 +1,19 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-10-05T15:28:08.036556",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 4,
+    "SLEEP_TIME": 2,
+    "VERSION": "v1.14.8:docker"
+  },
+  "name": "Hue Centura Spot",
+  "aliases": [
+    "929003045201_01",
+    "929003045201_02",
+    "929003045201_03"
+  ],
+  "standby_power": 0.26
+}
