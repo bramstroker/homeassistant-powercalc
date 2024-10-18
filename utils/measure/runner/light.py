@@ -58,7 +58,7 @@ class LightRunner(MeasurementRunner):
     def __init__(self, measure_util: MeasureUtil) -> None:
         self.light_controller = LightControllerFactory().create()
         self.measure_util = measure_util
-        self.color_mode: ColorMode | None = None
+        self.color_modes: set[ColorMode] | None = None
         self.num_lights: int = 1
         self.is_dummy_load_connected: bool = False
         self.dummy_load_value: float = 0
@@ -67,7 +67,7 @@ class LightRunner(MeasurementRunner):
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
-        self.color_mode = answers["color_mode"]
+        self.color_modes = set(answers["color_mode"])
         self.num_lights = int(answers.get("num_lights") or 1)
         self.is_dummy_load_connected = bool(answers.get("dummy_load"))
         if self.is_dummy_load_connected:
@@ -79,24 +79,32 @@ class LightRunner(MeasurementRunner):
     def get_export_directory(self) -> str:
         return f"{self.light_info.model_id}"
 
-    def run(
+    def run(self, answers: dict[str, Any], export_directory: str) -> RunnerResult | None:
+        [self.run_color_mode(answers, export_directory, color_mode) for color_mode in self.color_modes]
+
+        return RunnerResult(
+            model_json_data={"calculation_strategy": "lut"},
+        )
+
+    def run_color_mode(
         self,
         answers: dict[str, Any],
         export_directory: str,
-    ) -> RunnerResult | None:
+        color_mode: ColorMode,
+    ) -> None:
         """Run the measurement session for lights"""
-        csv_file_path = f"{export_directory}/{self.color_mode}.csv"
+        csv_file_path = f"{export_directory}/{color_mode.value}.csv"
 
         resume_at = None
         file_write_mode = "w"
         write_header_row = True
         if self.should_resume(csv_file_path):
             _LOGGER.info("Resuming measurements")
-            resume_at = self.get_resume_variation(csv_file_path)
+            resume_at = self.get_resume_variation(csv_file_path, color_mode)
             file_write_mode = "a"
             write_header_row = False
 
-        variations = list(self.get_variations(self.color_mode, resume_at))
+        variations = list(self.get_variations(color_mode, resume_at))
         num_variations = len(variations)
 
         _LOGGER.info(
@@ -105,7 +113,7 @@ class LightRunner(MeasurementRunner):
         )
 
         with open(csv_file_path, file_write_mode, newline="") as csv_file:
-            csv_writer = CsvWriter(csv_file, self.color_mode, write_header_row)
+            csv_writer = CsvWriter(csv_file, color_mode, write_header_row)
 
             if resume_at is None:
                 self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
@@ -113,7 +121,7 @@ class LightRunner(MeasurementRunner):
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(
                 "Start taking measurements for color mode: %s",
-                self.color_mode,
+                color_mode.value,
             )
             _LOGGER.info("Waiting %d seconds...", config.SLEEP_INITIAL)
             time.sleep(config.SLEEP_INITIAL)
@@ -131,7 +139,7 @@ class LightRunner(MeasurementRunner):
                 _LOGGER.info("Changing light to: %s", variation)
                 variation_start_time = time.time()
                 self.light_controller.change_light_state(
-                    self.color_mode,
+                    color_mode,
                     on=True,
                     **asdict(variation),
                 )
@@ -153,7 +161,7 @@ class LightRunner(MeasurementRunner):
                 try:
                     power = self.take_power_measurement(variation_start_time)
                 except OutdatedMeasurementError:
-                    power = self.nudge_and_remeasure(self.color_mode, variation)
+                    power = self.nudge_and_remeasure(color_mode, variation)
                 except ZeroReadingError as error:
                     self.num_0_readings += 1
                     _LOGGER.warning("Discarding measurement: %s", error)
@@ -161,11 +169,11 @@ class LightRunner(MeasurementRunner):
                         _LOGGER.error(
                             "Aborting measurement session. Received too many 0 readings",
                         )
-                        return None
+                        return
                     continue
                 except PowerMeterError as error:
                     _LOGGER.error("Aborting: %s", error)
-                    return None
+                    return
                 _LOGGER.info("Measured power: %.2f", power)
                 csv_writer.write_measurement(variation, power)
 
@@ -180,10 +188,6 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get("gzip", True)):
             self.gzip_csv(csv_file_path)
-
-        return RunnerResult(
-            model_json_data={"calculation_strategy": "lut"},
-        )
 
     def get_dummy_load_value(self) -> float:
         """Get the previously measured dummy load value"""
@@ -428,7 +432,7 @@ class LightRunner(MeasurementRunner):
             )
         return should_resume
 
-    def get_resume_variation(self, csv_file_path: str) -> Variation | None:
+    def get_resume_variation(self, csv_file_path: str, color_mode: ColorMode) -> Variation | None:
         """This method returns the variation to resume at.
 
         It reads the last row from the CSV file and converts it into a Variation object.
@@ -465,20 +469,20 @@ class LightRunner(MeasurementRunner):
             rows = csv.reader(csv_file)
             last_row = list(rows)[-1]
 
-        if self.color_mode == ColorMode.BRIGHTNESS:
+        if color_mode == ColorMode.BRIGHTNESS:
             return Variation(bri=int(last_row[0]))
 
-        if self.color_mode == ColorMode.COLOR_TEMP:
+        if color_mode == ColorMode.COLOR_TEMP:
             return ColorTempVariation(bri=int(last_row[0]), ct=int(last_row[1]))
 
-        if self.color_mode == ColorMode.HS:
+        if color_mode == ColorMode.HS:
             return HsVariation(
                 bri=int(last_row[0]),
                 hue=int(last_row[1]),
                 sat=int(last_row[2]),
             )
 
-        raise RunnerError(f"Color mode {self.color_mode} not supported")
+        raise RunnerError(f"Color mode {color_mode} not supported")
 
     def take_power_measurement(
         self,
@@ -536,7 +540,12 @@ class LightRunner(MeasurementRunner):
             inquirer.List(
                 name="color_mode",
                 message="Select the color mode",
-                choices=[ColorMode.HS, ColorMode.COLOR_TEMP, ColorMode.BRIGHTNESS],
+                choices=[
+                    (ColorMode.HS, {ColorMode.HS}),
+                    (ColorMode.COLOR_TEMP, {ColorMode.COLOR_TEMP}),
+                    (ColorMode.BRIGHTNESS, {ColorMode.BRIGHTNESS}),
+                    ("hs + color_temp", {ColorMode.HS, ColorMode.COLOR_TEMP}),
+                ],
                 default=ColorMode.HS,
             ),
             inquirer.Confirm(
