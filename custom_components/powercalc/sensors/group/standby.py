@@ -19,6 +19,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_POWER_SENSOR_PRECISION,
     DATA_STANDBY_POWER_SENSORS,
+    DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     DUMMY_ENTITY_ID,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
@@ -36,7 +37,7 @@ async def create_general_standby_sensors(
     sensors: list[Entity] = []
     power_sensor = StandbyPowerSensor(
         hass,
-        rounding_digits=config.get(CONF_POWER_SENSOR_PRECISION),  # type: ignore
+        rounding_digits=int(config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION)),
     )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):

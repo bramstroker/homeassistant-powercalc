@@ -74,6 +74,7 @@ from custom_components.powercalc.const import (
     DATA_CALCULATOR_FACTORY,
     DATA_DISCOVERY_MANAGER,
     DATA_STANDBY_POWER_SENSORS,
+    DEFAULT_POWER_SENSOR_PRECISION,
     DOMAIN,
     DUMMY_ENTITY_ID,
     OFF_STATES,
@@ -348,7 +349,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._multiply_factor = sensor_config.get(CONF_MULTIPLY_FACTOR)
         self._multiply_factor_standby = bool(sensor_config.get(CONF_MULTIPLY_FACTOR_STANDBY, False))
         self._ignore_unavailable_state = bool(sensor_config.get(CONF_IGNORE_UNAVAILABLE_STATE, False))
-        self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION))  # type: ignore
+        self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
         self.entity_id = entity_id
         self._sensor_config = sensor_config
         self._track_entities: list = []
