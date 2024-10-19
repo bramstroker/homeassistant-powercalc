@@ -113,6 +113,7 @@ from .const import (
     CalculationStrategy,
     GroupType,
     SensorType,
+    UnitPrefix,
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
@@ -204,7 +205,7 @@ SCHEMA_ENERGY_SENSOR_TOGGLE = vol.Schema(
     },
 )
 
-SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR = vol.Schema(
+SCHEMA_ENERGY_OPTIONS = vol.Schema(
     {
         vol.Optional(
             CONF_ENERGY_INTEGRATION_METHOD,
@@ -212,6 +213,17 @@ SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR = vol.Schema(
         ): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=ENERGY_INTEGRATION_METHODS,
+                mode=selector.SelectSelectorMode.DROPDOWN,
+            ),
+        ),
+        vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[
+                    selector.SelectOptionDict(value=UnitPrefix.KILO, label="k (kilo)"),
+                    selector.SelectOptionDict(value=UnitPrefix.MEGA, label="M (mega)"),
+                    selector.SelectOptionDict(value=UnitPrefix.GIGA, label="G (giga)"),
+                    selector.SelectOptionDict(value=UnitPrefix.TERA, label="T (tera)"),
+                ],
                 mode=selector.SelectSelectorMode.DROPDOWN,
             ),
         ),
@@ -491,8 +503,7 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
                 mode=selector.SelectSelectorMode.DROPDOWN,
             ),
         ),
-        vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): selector.TextSelector(),
-        **SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema,
+        **SCHEMA_ENERGY_OPTIONS.schema,
         vol.Optional(CONF_ENERGY_SENSOR_PRECISION): selector.NumberSelector(
             selector.NumberSelectorConfig(min=0, max=6, mode=selector.NumberSelectorMode.BOX, step=1),
         ),
@@ -777,7 +788,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         schema = SCHEMA_POWER_ADVANCED
 
         if self.sensor_config.get(CONF_CREATE_ENERGY_SENSOR):
-            schema = schema.extend(SCHEMA_ENERGY_INTEGRATION_METHOD_SELECTOR.schema)
+            schema = schema.extend(SCHEMA_ENERGY_OPTIONS.schema)
 
         return schema
 
