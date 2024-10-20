@@ -1,7 +1,10 @@
 import logging
+import time
 from typing import Any
 
 import inquirer
+
+import config
 from controller.charging.controller import ChargingController
 from controller.charging.factory import ChargingControllerFactory
 from util.measure_util import MeasureUtil
@@ -32,18 +35,32 @@ class ChargingRunner(MeasurementRunner):
         input("Hit enter when you are ready to start..")
 
         battery_level = self.controller.get_battery_level()
-        _LOGGER.info("Battery level: %d%%", battery_level)
+        is_charging = self.controller.is_charging()
+        measurements: dict[int, list[float]] = {}
+
+        while battery_level < 100 and is_charging:
+            battery_level = self.controller.get_battery_level()
+            is_charging = self.controller.is_charging()
+            _LOGGER.info("Battery level: %d%%", battery_level)
+            if battery_level not in measurements:
+                measurements[battery_level] = []
+            power = self.measure_util.take_measurement(time.time())
+            _LOGGER.info("Measured power: %.2f W", power)
+            measurements[battery_level].append(power)
+            time.sleep(config.SLEEP_TIME)
+
+        print("Done charging, start measurements for trickle charging..")
 
         return RunnerResult(model_json_data=self._build_model_json_data(summary))
 
     @staticmethod
-    def _build_model_json_data(summary: dict) -> dict:
-        calibrate_list = [f"{volume} -> {summary[volume]}" for volume in summary]
+    def _build_model_json_data(measurements: dict[int, list[float]]) -> dict:
+        calibrate_list = []
 
         return {
-            "device_type": "smart_speaker",
+            "device_type": "vacuum",
             "calculation_strategy": "linear",
-            "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+            "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
             "linear_config": {"calibrate": calibrate_list},
         }
 

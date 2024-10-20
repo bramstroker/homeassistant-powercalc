@@ -33,6 +33,9 @@ class HassChargingController(ChargingController):
 
     def is_charging(self) -> bool:
         """Check if the device is currently charging"""
+        # @todo: Implement this method
+        return True
+
         entity = self.client.get_entity(self.entity_id)
         return entity.state.attributes["docked"]
 

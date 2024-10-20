@@ -47,16 +47,17 @@ del HS_SAT_PRECISION
 SELECTED_LIGHT_CONTROLLER = config(
     "LIGHT_CONTROLLER",
     cast=Choices([t.value for t in LightControllerType]),
+    default=LightControllerType.HASS.value,
 )
 SELECTED_MEDIA_CONTROLLER = config(
     "MEDIA_CONTROLLER",
     cast=Choices([t.value for t in MediaControllerType]),
-    default=MediaControllerType.HASS,
+    default=MediaControllerType.HASS.value,
 )
 SELECTED_CHARGING_CONTROLLER = config(
     "CHARGING_CONTROLLER",
     cast=Choices([t.value for t in ChargingControllerType]),
-    default=ChargingControllerType.HASS,
+    default=ChargingControllerType.HASS.value,
 )
 SELECTED_POWER_METER = config(
     "POWER_METER",

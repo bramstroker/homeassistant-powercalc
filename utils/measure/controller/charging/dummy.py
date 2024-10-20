@@ -11,6 +11,9 @@ class DummyChargingController(ChargingController):
     def get_battery_level(self) -> int:
         return 0
 
+    def is_charging(self) -> bool:
+        return True
+
     def get_questions(self) -> list[inquirer.questions.Question]:
         return []
 

@@ -10,6 +10,10 @@ class ChargingController(Protocol):
         """Get actual battery level of the device"""
         ...
 
+    def is_charging(self) -> bool:
+        """Check if the device is currently charging"""
+        ...
+
     def get_questions(self) -> list[inquirer.questions.Question]:
         """Get questions to ask for the chosen light controller"""
         ...
