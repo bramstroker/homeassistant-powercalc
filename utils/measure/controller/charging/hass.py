@@ -57,11 +57,6 @@ class HassChargingController(ChargingController):
 
         return [
             inquirer.List(
-                name="charging_device_type",
-                message="Select the charging device type",
-                choices=[(charging_device_type.value, charging_device_type) for charging_device_type in ChargingDeviceType],
-            ),
-            inquirer.List(
                 name="charging_entity_id",
                 message="Select the charging entity",
                 choices=get_entity_list,

@@ -7,5 +7,5 @@ class ChargingControllerType(str, Enum):
 
 
 class ChargingDeviceType(str, Enum):
-    VACUUM = "vacuum robot"
+    VACUUM_ROBOT = "vacuum robot"
     MOBILE_PHONE = "mobile phone"

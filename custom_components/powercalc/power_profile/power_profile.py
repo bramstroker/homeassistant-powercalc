@@ -14,6 +14,7 @@ from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
+from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import translation
@@ -37,7 +38,9 @@ class DeviceType(StrEnum):
     PRINTER = "printer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
+    MOBILE_PHONE = "mobile_phone"
     NETWORK = "network"
+    VACUUM_ROBOT = "vacuum_robot"
 
 
 class SubProfileMatcherType(StrEnum):
@@ -54,7 +57,8 @@ DOMAIN_DEVICE_TYPE = {
     SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
     MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
     BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
-    SENSOR_DOMAIN: DeviceType.PRINTER,
+    SENSOR_DOMAIN: DeviceType.PRINTER,  #todo: add MOBILE_PHONE
+    VACUUM_DOMAIN: DeviceType.VACUUM_ROBOT,
 }
 
 
