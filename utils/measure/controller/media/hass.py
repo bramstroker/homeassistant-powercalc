@@ -4,8 +4,9 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
-from media_controller.controller import MediaController
-from media_controller.errors import MediaPlayerError
+
+from .controller import MediaController
+from .errors import MediaPlayerError
 
 _LOGGER = logging.getLogger("measure")
 

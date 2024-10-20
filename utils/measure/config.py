@@ -1,8 +1,9 @@
 import logging
 
+from controller.charging.const import ChargingControllerType
+from controller.light.const import LightControllerType
+from controller.media.const import MediaControllerType
 from decouple import Choices, UndefinedValueError, config
-from light_controller.const import LightControllerType
-from media_controller.const import MediaControllerType
 from powermeter.const import PowerMeterType
 
 MIN_BRIGHTNESS = min(
@@ -51,6 +52,11 @@ SELECTED_MEDIA_CONTROLLER = config(
     "MEDIA_CONTROLLER",
     cast=Choices([t.value for t in MediaControllerType]),
     default=MediaControllerType.HASS,
+)
+SELECTED_CHARGING_CONTROLLER = config(
+    "MEDIA_CONTROLLER",
+    cast=Choices([t.value for t in ChargingControllerType]),
+    default=ChargingControllerType.HASS,
 )
 SELECTED_POWER_METER = config(
     "POWER_METER",

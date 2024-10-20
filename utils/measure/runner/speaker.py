@@ -4,8 +4,8 @@ from typing import Any
 
 import config
 import inquirer
-from media_controller.controller import MediaController
-from media_controller.factory import MediaControllerFactory
+from controller.media.controller import MediaController
+from controller.media.factory import MediaControllerFactory
 from powermeter.errors import ZeroReadingError
 from util.measure_util import MeasureUtil
 

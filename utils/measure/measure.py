@@ -12,15 +12,16 @@ from typing import Any
 
 import config
 import inquirer
+from controller.light.errors import LightControllerError
 from decouple import UndefinedValueError
 from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
-from light_controller.errors import LightControllerError
 from powermeter.errors import PowerMeterError
 from powermeter.factory import PowerMeterFactory
 from powermeter.powermeter import PowerMeter
 from runner.average import AverageRunner
+from runner.charging import ChargingRunner
 from runner.light import LightRunner
 from runner.recorder import RecorderRunner
 from runner.runner import MeasurementRunner
@@ -46,6 +47,7 @@ class MeasureType(str, Enum):
     SPEAKER = "Smart speaker"
     RECORDER = "Recorder"
     AVERAGE = "Average"
+    CHARGING = "Charging device"
 
 
 _LOGGER = logging.getLogger("measure")
@@ -292,6 +294,9 @@ class RunnerFactory:
 
         if device_type == MeasureType.AVERAGE:
             return AverageRunner(measure_util)
+
+        if device_type == MeasureType.CHARGING:
+            return ChargingRunner(measure_util)
 
         return LightRunner(measure_util)
 
