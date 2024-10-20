@@ -217,6 +217,7 @@
         "data": {
           "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
           "energy_integration_method": "Metóda energetickej integrácie",
+          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "multiply_factor": "Násobný faktor",
           "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
