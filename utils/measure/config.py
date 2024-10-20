@@ -54,7 +54,7 @@ SELECTED_MEDIA_CONTROLLER = config(
     default=MediaControllerType.HASS,
 )
 SELECTED_CHARGING_CONTROLLER = config(
-    "MEDIA_CONTROLLER",
+    "CHARGING_CONTROLLER",
     cast=Choices([t.value for t in ChargingControllerType]),
     default=ChargingControllerType.HASS,
 )
