@@ -72,8 +72,8 @@ class ChargingRunner(MeasurementRunner):
             "calculation_strategy": "linear",
             "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
             "linear_config": {
-                "attribute": "battery_level",  #todo: from controller
-                "calibrate": calibrate_list
+                "attribute": "battery_level",  # todo: from controller
+                "calibrate": calibrate_list,
             },
         }
 
