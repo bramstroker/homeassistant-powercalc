@@ -14,6 +14,9 @@ from .runner import MeasurementRunner, RunnerResult
 _LOGGER = logging.getLogger("measure")
 
 
+TRICKLE_CHARGING_TIME = 1800
+
+
 class ChargingRunner(MeasurementRunner):
     def __init__(self, measure_util: MeasureUtil) -> None:
         self.measure_util = measure_util
@@ -35,12 +38,15 @@ class ChargingRunner(MeasurementRunner):
         input("Hit enter when you are ready to start..")
 
         battery_level = self.controller.get_battery_level()
-        is_charging = self.controller.is_charging()
         measurements: dict[int, list[float]] = {}
 
-        while battery_level < 100 and is_charging:
+        while battery_level < 100:
             battery_level = self.controller.get_battery_level()
             is_charging = self.controller.is_charging()
+            if not is_charging:
+                # todo: should we raise?
+                _LOGGER.error("Device is not charging anymore.")
+                break
             _LOGGER.info("Battery level: %d%%", battery_level)
             if battery_level not in measurements:
                 measurements[battery_level] = []
@@ -51,17 +57,25 @@ class ChargingRunner(MeasurementRunner):
 
         print("Done charging, start measurements for trickle charging..")
 
-        return RunnerResult(model_json_data=self._build_model_json_data(summary))
+        trickle_power = self.measure_util.take_average_measurement(TRICKLE_CHARGING_TIME)
 
-    @staticmethod
-    def _build_model_json_data(measurements: dict[int, list[float]]) -> dict:
+        return RunnerResult(model_json_data=self._build_model_json_data(measurements, trickle_power))
+
+    def _build_model_json_data(self, measurements: dict[int, list[float]], trickle_power: float) -> dict:
+        """Build the model JSON data from the measurements"""
         calibrate_list = []
+        for battery_level, powers in measurements.items():
+            average_power = round(sum(powers) / len(powers), 2)
+            calibrate_list.append({battery_level: average_power})
 
         return {
             "device_type": "vacuum",
             "calculation_strategy": "linear",
             "calculation_enabled_condition": "{{ is_state('[[entity]]', 'docked') }}",
-            "linear_config": {"calibrate": calibrate_list},
+            "linear_config": {
+                "attribute": "battery_level",  #todo: from controller
+                "calibrate": calibrate_list
+            },
         }
 
     def get_questions(self) -> list[inquirer.questions.Question]:
