@@ -1,0 +1,2 @@
+class ControllerError(Exception):
+    pass

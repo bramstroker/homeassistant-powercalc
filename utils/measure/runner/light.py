@@ -15,9 +15,9 @@ from typing import Any, TextIO
 
 import config
 import inquirer
-from light_controller.const import ColorMode
-from light_controller.controller import LightInfo
-from light_controller.factory import LightControllerFactory
+from controller.light.const import ColorMode
+from controller.light.controller import LightInfo
+from controller.light.factory import LightControllerFactory
 from powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
