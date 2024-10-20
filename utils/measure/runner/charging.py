@@ -2,9 +2,8 @@ import logging
 import time
 from typing import Any
 
-import inquirer
-
 import config
+import inquirer
 from controller.charging.controller import ChargingController
 from controller.charging.factory import ChargingControllerFactory
 from util.measure_util import MeasureUtil
