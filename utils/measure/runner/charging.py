@@ -27,7 +27,7 @@ class ChargingRunner(MeasurementRunner):
         summary = {}
 
         print(
-            "WARNING: during the measurement session the volume will be increased to the maximum, which can be harmful for your ears",
+            "Make sure the device is as close to 0% charged as possible before starting the test.",
         )
         input("Hit enter when you are ready to start..")
 
