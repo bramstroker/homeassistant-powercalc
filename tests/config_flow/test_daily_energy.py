@@ -1,4 +1,5 @@
 from homeassistant import data_entry_flow
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
@@ -20,6 +21,7 @@ from custom_components.powercalc.const import (
     CONF_SENSOR_TYPE,
     CONF_UPDATE_FREQUENCY,
     CONF_UTILITY_METER_TARIFFS,
+    CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
 )
 from tests.config_flow.common import (
@@ -143,14 +145,19 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
         result["flow_id"],
         {
             CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
         },
     )
 
     config_entry: ConfigEntry = result["result"]
+    assert config_entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 10
 
     result = await initialize_options_flow(hass, config_entry, Steps.UTILITY_METER_OPTIONS)
 
-    user_input = {CONF_UTILITY_METER_TARIFFS: ["peak"]}
+    user_input = {
+        CONF_UTILITY_METER_TARIFFS: ["peak"],
+        CONF_UTILITY_METER_TYPES: [DAILY],
+    }
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input=user_input,
@@ -158,6 +165,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert config_entry.data[CONF_UTILITY_METER_TARIFFS] == ["peak"]
+    assert config_entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 10
 
 
 async def test_add_to_group(hass: HomeAssistant) -> None:
@@ -207,4 +215,12 @@ async def test_can_set_basic_options(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_CREATE_UTILITY_METERS]
+
+    # Make sure the value is not overwritten when using other option dialog
+    result = await initialize_options_flow(hass, entry, Steps.DAILY_ENERGY)
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_VALUE: 75},
+    )
     assert entry.data[CONF_CREATE_UTILITY_METERS]

@@ -34,6 +34,7 @@ from custom_components.powercalc.const import (
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_POWER_SENSOR_ID,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
+    DEFAULT_ENERGY_SENSOR_PRECISION,
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
@@ -246,7 +247,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         unit_prefix: str | None = None,
         device_info: DeviceInfo | None = None,
     ) -> None:
-        round_digits: int = sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, 2)
+        round_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
 
         params = {

@@ -183,7 +183,7 @@ class Measure:
 
         json_string = json.dumps(
             json_data,
-            indent=4,
+            indent=2,
             sort_keys=True,
         )
         with open(os.path.join(directory, "model.json"), "w") as json_file:

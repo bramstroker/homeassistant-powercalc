@@ -6,6 +6,7 @@ import asyncio
 import logging
 import random
 import time
+from datetime import timedelta
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -70,6 +71,7 @@ from .const import (
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_NAME_PATTERN,
     DEFAULT_ENERGY_SENSOR_PRECISION,
+    DEFAULT_ENERGY_UNIT_PREFIX,
     DEFAULT_ENTITY_CATEGORY,
     DEFAULT_POWER_NAME_PATTERN,
     DEFAULT_POWER_SENSOR_PRECISION,
@@ -80,6 +82,7 @@ from .const import (
     DOMAIN_CONFIG,
     ENERGY_INTEGRATION_METHODS,
     ENTITY_CATEGORIES,
+    ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
     PowercalcDiscoveryType,
@@ -97,6 +100,8 @@ from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
 from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
+
+FLAG_HAS_GLOBAL_GUI_CONFIG = "has_global_gui_config"
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -204,7 +209,39 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         _LOGGER.critical(msg)
         return False
 
-    domain_config: ConfigType = config.get(DOMAIN) or {
+    global_config = get_global_configuration(hass, config)
+
+    discovery_manager = DiscoveryManager(hass, config)
+    hass.data[DOMAIN] = {
+        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
+        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
+        DOMAIN_CONFIG: global_config,
+        DATA_CONFIGURED_ENTITIES: {},
+        DATA_DOMAIN_ENTITIES: {},
+        DATA_USED_UNIQUE_IDS: [],
+        DATA_STANDBY_POWER_SENSORS: {},
+    }
+
+    await hass.async_add_executor_job(register_services, hass)
+
+    if global_config.get(CONF_ENABLE_AUTODISCOVERY):
+        await discovery_manager.start_discovery()
+
+    await setup_yaml_sensors(hass, config, global_config)
+
+    setup_domain_groups(hass, global_config)
+    setup_standby_group(hass, global_config)
+
+    try:
+        await repair_none_config_entries_issue(hass)
+    except Exception as e:  # noqa: BLE001  # pragma: no cover
+        _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
+
+    return True
+
+
+def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
+    global_config = config.get(DOMAIN) or {
         CONF_POWER_SENSOR_NAMING: DEFAULT_POWER_NAME_PATTERN,
         CONF_POWER_SENSOR_PRECISION: DEFAULT_POWER_SENSOR_PRECISION,
         CONF_POWER_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
@@ -212,7 +249,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_ENERGY_SENSOR_NAMING: DEFAULT_ENERGY_NAME_PATTERN,
         CONF_ENERGY_SENSOR_PRECISION: DEFAULT_ENERGY_SENSOR_PRECISION,
         CONF_ENERGY_SENSOR_CATEGORY: DEFAULT_ENTITY_CATEGORY,
-        CONF_ENERGY_SENSOR_UNIT_PREFIX: UnitPrefix.KILO,
+        CONF_ENERGY_SENSOR_UNIT_PREFIX: DEFAULT_ENERGY_UNIT_PREFIX,
         CONF_FORCE_UPDATE_FREQUENCY: DEFAULT_UPDATE_FREQUENCY,
         CONF_DISABLE_EXTENDED_ATTRIBUTES: False,
         CONF_IGNORE_UNAVAILABLE_STATE: False,
@@ -225,33 +262,23 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
     }
 
-    discovery_manager = DiscoveryManager(hass, config)
-    hass.data[DOMAIN] = {
-        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
-        DOMAIN_CONFIG: domain_config,
-        DATA_CONFIGURED_ENTITIES: {},
-        DATA_DOMAIN_ENTITIES: {},
-        DATA_USED_UNIQUE_IDS: [],
-        DATA_STANDBY_POWER_SENSORS: {},
-    }
+    global_config_entry = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, ENTRY_GLOBAL_CONFIG_UNIQUE_ID)
+    if global_config_entry:
+        _LOGGER.debug("Found global configuration entry: %s", global_config_entry.data)
+        global_config.update(get_global_gui_configuration(global_config_entry))
 
-    await hass.async_add_executor_job(register_services, hass)
+    return global_config
 
-    if domain_config.get(CONF_ENABLE_AUTODISCOVERY):
-        await discovery_manager.start_discovery()
 
-    await setup_yaml_sensors(hass, config, domain_config)
+def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
+    global_config = dict(config_entry.data)
+    if CONF_FORCE_UPDATE_FREQUENCY in global_config:
+        global_config[CONF_FORCE_UPDATE_FREQUENCY] = timedelta(seconds=global_config[CONF_FORCE_UPDATE_FREQUENCY])
+    if CONF_UTILITY_METER_OFFSET in global_config:
+        global_config[CONF_UTILITY_METER_OFFSET] = timedelta(days=global_config[CONF_UTILITY_METER_OFFSET])
+    global_config[FLAG_HAS_GLOBAL_GUI_CONFIG] = True
 
-    setup_domain_groups(hass, domain_config)
-    setup_standby_group(hass, domain_config)
-
-    try:
-        await repair_none_config_entries_issue(hass)
-    except Exception as e:  # noqa: BLE001  # pragma: no cover
-        _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
-
-    return True
+    return global_config
 
 
 def register_services(hass: HomeAssistant) -> None:
@@ -361,19 +388,45 @@ async def setup_yaml_sensors(
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Powercalc integration from a config entry."""
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     entry.async_on_unload(entry.add_update_listener(async_update_entry))
+
+    # Check if this is the initial creation of the global configuration entry
+    # If so, update the global configuration with the GUI configuration
+    # When the flag is set, the global configuration has already been applied during async_setup
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+        if global_config.get(FLAG_HAS_GLOBAL_GUI_CONFIG, False) is False:
+            await apply_global_gui_configuration_changes(hass, entry)
+
     return True
 
 
 async def async_update_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update a given config entry."""
+
+    if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        await apply_global_gui_configuration_changes(hass, entry)
+
     await hass.config_entries.async_reload(entry.entry_id)
 
     # Also reload all "parent" groups referring this group as a subgroup
     for related_entry in get_entries_having_subgroup(hass, entry):
         await hass.config_entries.async_reload(related_entry.entry_id)
+
+
+async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Apply global configuration changes to all entities."""
+    global_config = hass.data[DOMAIN][DOMAIN_CONFIG]
+    global_config.update(get_global_gui_configuration(entry))
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+            continue
+        if entry.state != ConfigEntryState.LOADED:
+            continue
+        await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

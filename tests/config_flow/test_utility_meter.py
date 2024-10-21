@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from homeassistant import data_entry_flow
+from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.const import CONF_ENTITY_ID, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 
@@ -32,7 +33,10 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"]},
+        {
+            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -65,7 +69,7 @@ async def test_utility_meter_net_consumption(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_UTILITY_METER_TYPES: ["daily"],
+                CONF_UTILITY_METER_TYPES: [DAILY],
                 CONF_UTILITY_METER_NET_CONSUMPTION: True,
             },
         )

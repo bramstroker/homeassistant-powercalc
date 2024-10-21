@@ -34,7 +34,9 @@ async def test_real_power(hass: HomeAssistant) -> None:
     # Submit utility meter options step with default settings
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {},
+        {
+            CONF_UTILITY_METER_TYPES: [DAILY],
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
