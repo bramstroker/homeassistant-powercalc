@@ -1,6 +1,6 @@
 import json
-import os
 import logging
+import os
 from typing import Any, cast
 
 from homeassistant.core import HomeAssistant
@@ -11,6 +11,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class LocalLoader(Loader):
     def __init__(self, hass: HomeAssistant, directory: str, is_custom_directory: bool = False) -> None:
         self._model_aliases: dict[str, dict[str, str]] = {}
@@ -19,7 +20,7 @@ class LocalLoader(Loader):
         self._hass = hass
         self._manufacturer_listing: dict[str, set[str]] = {}
 
-        self._device_path_matcher: dict[str, dict[str, str]]= {}
+        self._device_path_matcher: dict[str, dict[str, str]] = {}
 
     async def initialize(self) -> None:
         """Initialize the loader."""
@@ -85,11 +86,11 @@ class LocalLoader(Loader):
         manufacturer_exists = self._device_path_matcher.get(manufacturer)
         if not manufacturer_exists:
             return None
-        
+
         model_dir = manufacturer_exists.get(model)
         if not model_dir:
             raise LibraryLoadingError(f"Model {model} not found")
-        
+
         model_json_path = os.path.join(model_dir, "model.json")
         if not os.path.exists(model_json_path):
             raise LibraryLoadingError(f"model.json not found for {manufacturer} and {model} in {model_dir}")
@@ -109,7 +110,7 @@ class LocalLoader(Loader):
         if not manufacturer_exists:
             _LOGGER.info("Manufacturer does not exist in custom library: %s", manufacturer)
             return None
-        
+
         search_lower = {phrase.lower() for phrase in search}
 
         return next((model for model in manufacturer_exists.keys() if model.lower() in search_lower), None)
@@ -122,7 +123,7 @@ class LocalLoader(Loader):
             self._data_directory
             if self._is_custom_directory
             else os.path.join(
-                self._data_directory
+                self._data_directory,
             )
         )
 
@@ -145,7 +146,7 @@ class LocalLoader(Loader):
                 continue
 
             library[manufacturer] = {}
-        
+
             models = await self._hass.async_add_executor_job(os.walk, manufacturer_dir)
             models = await self._hass.async_add_executor_job(next, models)
 
@@ -154,7 +155,7 @@ class LocalLoader(Loader):
                 if not os.path.exists(model_dir):
                     _LOGGER.error("Model directory %s should be there but is not!", model_dir)
                     continue
-                
+
                 library[manufacturer][model] = model_dir
 
                 model_json_path = os.path.join(model_dir, "model.json")
