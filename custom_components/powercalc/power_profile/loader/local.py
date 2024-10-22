@@ -1,6 +1,6 @@
 import json
-import os
 import logging
+import os
 from typing import Any, cast
 
 from homeassistant.core import HomeAssistant
@@ -11,6 +11,7 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class LocalLoader(Loader):
     def __init__(self, hass: HomeAssistant, directory: str, is_custom_directory: bool = False) -> None:
         self._model_aliases: dict[str, dict[str, str]] = {}
@@ -19,7 +20,7 @@ class LocalLoader(Loader):
         self._hass = hass
         self._manufacturer_listing: dict[str, set[str]] = {}
 
-        self._device_path_matcher: dict[str, dict[str, str]]= {}
+        self._device_path_matcher: dict[str, dict[str, str]] = {}
 
     async def initialize(self) -> None:
         """Initialize the loader."""
@@ -122,7 +123,7 @@ class LocalLoader(Loader):
             self._data_directory
             if self._is_custom_directory
             else os.path.join(
-                self._data_directory
+                self._data_directory,
             )
         )
 
