@@ -94,7 +94,7 @@ class LightRunner(MeasurementRunner):
         )
 
     def prepare_measurements_for_color_mode(self, export_directory: str, color_mode: ColorMode) -> MeasurementRunInput:
-        """Prepare the light for measurements"""
+        """Fetch all variations for the given color mode and prepare the measurement session."""
 
         csv_file_path = f"{export_directory}/{color_mode.value}.csv"
 
