@@ -4,7 +4,7 @@
     "HS400",
     "hs500"
   ],
-  "device_type": "smart_switch",
+  "device_type": "light",
   "calculation_strategy": "multi_switch",
   "multi_switch_config": {
     "power": 0.82,

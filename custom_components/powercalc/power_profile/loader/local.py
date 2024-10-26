@@ -181,6 +181,13 @@ class LocalLoader(Loader):
 
                 library[manufacturer].update({model_dir.lower(): profile})
                 for alias in profile.aliases:
+                    profile = PowerProfile(
+                        self._hass,
+                        manufacturer=manufacturer,
+                        model=alias,
+                        directory=model_path,
+                        json_data=model_json,
+                    )
                     library[manufacturer].update({alias.lower(): profile})
 
         return library
