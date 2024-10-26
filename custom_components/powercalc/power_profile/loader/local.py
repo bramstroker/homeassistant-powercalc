@@ -179,7 +179,7 @@ class LocalLoader(Loader):
                     json_data=model_json,
                 )
 
-                if library.get(manufacturer).get(model_dir.lower()):
+                if library[manufacturer].get(model_dir.lower()):
                     raise LibraryLoadingError(f"Double entry manufacturer/model by model+alias in custom library: {manufacturer}/{model_dir}")
 
                 library[manufacturer].update({model_dir.lower(): profile})
