@@ -67,8 +67,7 @@ class LightRunner(MeasurementRunner):
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
-        # self.color_modes = set(answers["color_mode"])
-        self.color_modes = {ColorMode.HS, ColorMode.COLOR_TEMP}
+        self.color_modes = set(answers["color_mode"])
         self.num_lights = int(answers.get("num_lights") or 1)
         self.is_dummy_load_connected = bool(answers.get("dummy_load"))
         if self.is_dummy_load_connected:
@@ -600,17 +599,17 @@ class LightRunner(MeasurementRunner):
     def get_questions(self) -> list[inquirer.questions.Question]:
         """Get questions to ask for the light runner"""
         questions = [
-            # inquirer.List(
-            #     name="color_mode",
-            #     message="Select the color mode",
-            #     choices=[
-            #         (ColorMode.HS, {ColorMode.HS}),
-            #         (ColorMode.COLOR_TEMP, {ColorMode.COLOR_TEMP}),
-            #         (ColorMode.BRIGHTNESS, {ColorMode.BRIGHTNESS}),
-            #         ("hs + color_temp", {ColorMode.HS, ColorMode.COLOR_TEMP}),
-            #     ],
-            #     default=ColorMode.HS,
-            # ),
+            inquirer.List(
+                name="color_mode",
+                message="Select the color mode",
+                choices=[
+                    (ColorMode.HS, {ColorMode.HS}),
+                    (ColorMode.COLOR_TEMP, {ColorMode.COLOR_TEMP}),
+                    (ColorMode.BRIGHTNESS, {ColorMode.BRIGHTNESS}),
+                    ("hs + color_temp", {ColorMode.HS, ColorMode.COLOR_TEMP}),
+                ],
+                default=ColorMode.HS,
+            ),
             inquirer.Confirm(
                 name="gzip",
                 message="Do you want to gzip CSV files?",
