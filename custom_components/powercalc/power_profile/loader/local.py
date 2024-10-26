@@ -28,7 +28,7 @@ class LocalLoader(Loader):
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""
         if device_type is None:
-            return list(self._manufacturer_model_listing.keys())
+            return set(self._manufacturer_model_listing.keys())
 
         manufacturers: set[str] = set()
         for manufacturer in self._manufacturer_model_listing.keys():
@@ -87,7 +87,7 @@ class LocalLoader(Loader):
 
         if not self._is_custom_directory:
             if self._manufacturer_model_listing == {}:
-                self.initialize()
+                await self.initialize()
 
             lib_models = self._manufacturer_model_listing.get(_manufacturer)
             if lib_models is None:
@@ -148,7 +148,7 @@ class LocalLoader(Loader):
         )
 
         if not os.path.exists(base_path):
-            _LOGGER.warning("Custom library directory does not exist: %s", base_path)
+            _LOGGER.error("Custom library directory does not exist: %s", base_path)
             return library
 
         base_dir_content = await self._hass.async_add_executor_job(os.walk, base_path)
@@ -161,9 +161,6 @@ class LocalLoader(Loader):
 
         for manufacturer_dir in base_dir_content[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
-            if not os.path.exists(manufacturer_path):
-                _LOGGER.error("Manufacturer directory %s should be there but is not!", manufacturer_path)
-                continue
 
             model_dir_content = await self._hass.async_add_executor_job(os.walk, manufacturer_path)
             model_dir_content = await self._hass.async_add_executor_job(next, model_dir_content)
@@ -172,42 +169,27 @@ class LocalLoader(Loader):
             for model_dir in model_dir_content[1]:
                 pattern = re.compile(r"^\..*")
                 if pattern.match(model_dir):
-                    _LOGGER.info("Hidden model %s for manufacturer %s detected. Not imported!", model_dir, manufacturer)
                     continue
 
                 model_path = os.path.join(manufacturer_path, model_dir)
-                if not os.path.exists(model_path):
-                    _LOGGER.error("Model directory %s should be there but is not!", model_path)
-                    continue
 
                 model = model_dir.lower()
 
                 model_json_path = os.path.join(model_path, "model.json")
                 if not os.path.exists(model_json_path):
-                    # QUESTION: raise error?
                     _LOGGER.warning("model.json should exist in %s!", model_path)
                     continue
 
                 if library.get(manufacturer) is None:
                     library[manufacturer] = {}
 
-                library[manufacturer].update({model: {"path": model_path}})
-
                 model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
+                device_type = DeviceType(model_json.get("device_type"), DeviceType.LIGHT)
+                model_data = {"device_type": device_type, "path": model_path}
+                aliases: list[str] = model_json.get("aliases", [])
 
-                if model_json.get("device_type"):
-                    library[manufacturer][model].update(
-                        {"device_type": model_json.get("device_type")},
-                    )
-
-                aliases = model_json.get("aliases")
-                if aliases:
-                    for alias in aliases:
-                        library[manufacturer].update({alias.lower(): {"path": model_path}})
-
-                        if model_json.get("device_type"):
-                            library[manufacturer][alias.lower()].update(
-                                {"device_type": model_json.get("device_type")},
-                            )
+                library[manufacturer].update({model: model_data})
+                for alias in aliases:
+                    library[manufacturer].update({alias.lower(): model_data})
 
         return library
