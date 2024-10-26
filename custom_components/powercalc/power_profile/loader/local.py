@@ -97,16 +97,14 @@ class LocalLoader(Loader):
 
             model_path = lib_model.get_model_directory()
             if model_path is None:
-                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s",
-                                _manufacturer, _model)
+                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s", _manufacturer, _model)
                 return None
             model_json = lib_model.json_data
         else:
             model_path = os.path.join(self._data_directory)
             model_json_path = os.path.join(model_path, "model.json")
             if not os.path.exists(model_json_path):
-                raise LibraryLoadingError(
-                    f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
+                raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
 
             def _load_json() -> dict[str, Any]:
                 """Load model.json file for a given model."""
