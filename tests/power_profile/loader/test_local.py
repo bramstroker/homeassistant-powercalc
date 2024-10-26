@@ -11,15 +11,18 @@ from tests.common import get_test_config_dir
 @pytest.mark.parametrize(
     "manufacturer,search,expected",
     [
-        ["tp-link", {"HS300"}, "hs300"],
-        ["TP-link", {"HS300"}, "hs300"],
-        ["tp-link", {"HS400"}, "hs400"],  # alias
+        ["tp-link", {"HS300"}, "HS300"],
+        ["TP-link", {"HS300"}, "HS300"],
+        ["tp-link", {"hs300"}, "HS300"],
+        ["TP-link", {"hs300"}, "HS300"],
+        ["tp-link", {"HS400"}, "HS400"],  # alias
+        ["tp-link", {"hs400"}, "HS400"],  # alias
         ["tp-link", {"Hs500"}, "hs500"],  # alias
         ["tp-link", {"bla"}, None],
         ["foo", {"bar"}, None],
-        ["casing", {"CaSinG- Test"}, "casing- test"],
-        ["casing", {"CasinG- test"}, "casing- test"],
-        ["casing", {"CASING- TEST"}, "casing- test"],
+        ["casing", {"CaSinG- Test"}, "CaSinG- Test"],
+        ["casing", {"CasinG- test"}, "CaSinG- Test"],
+        ["casing", {"CASING- TEST"}, "CaSinG- Test"],
         ["hidden-directories", {".test"}, None],
         ["hidden-directories", {".hidden_model"}, None],
     ],
@@ -74,7 +77,7 @@ async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "hidden-directories", "casing"}
     assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.SMART_SWITCH)
-    assert "tp-link" not in await loader.get_manufacturer_listing(DeviceType.LIGHT)
+    assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.LIGHT)
     assert "tp-link" not in await loader.get_manufacturer_listing(DeviceType.COVER)
 
 
@@ -83,8 +86,9 @@ async def test_get_model_listing(hass: HomeAssistant) -> None:
     assert "HS300" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
     assert "light20" not in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
     assert "light20" in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
-    assert {"hs300", "hs400", "hs500", "light20"} == await loader.get_model_listing("tp-link", None)
-    assert "hs400" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
+    assert {"HS300", "HS400", "hs500", "light20"} == await loader.get_model_listing("tp-link", None)
+    assert "HS400" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
+    assert "HS400" not in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
     assert "test" in await loader.get_model_listing("Tasmota", DeviceType.LIGHT)
     assert ".test" not in await loader.get_model_listing("hidden-directories", DeviceType.LIGHT)
 
