@@ -70,8 +70,8 @@ def create_filter(
         CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
         CONF_TEMPLATE: lambda: TemplateFilter(hass, filter_config),  # type: ignore
         CONF_ALL: lambda: NullFilter(),
-        CONF_OR: lambda: create_composite_filter(filter_config, hass, FilterOperator.OR),  # type: ignore
-        CONF_AND: lambda: create_composite_filter(filter_config, hass, FilterOperator.AND),  # type: ignore
+        CONF_OR: lambda: create_composite_filter(filter_config, hass, FilterOperator.OR),
+        CONF_AND: lambda: create_composite_filter(filter_config, hass, FilterOperator.AND),
     }
 
     return filter_mapping.get(filter_type, lambda: NullFilter())()

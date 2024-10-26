@@ -217,6 +217,7 @@
         "data": {
           "calculation_enabled_condition": "Bedingung zur Aktivierung der Berechnung",
           "energy_integration_method": "Integrations/Summierungs-Methode",
+          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
           "ignore_unavailable_state": "Status 'nicht verfügbar' ignorieren",
           "multiply_factor": "Multiplikationsfaktor",
           "multiply_factor_standby": "Multiplikationsfaktor Standby",
