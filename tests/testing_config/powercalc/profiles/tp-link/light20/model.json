@@ -1,9 +1,5 @@
 {
   "name": "IKEA Control outlet",
-  "aliases": [
-    "HS400",
-    "hs500"
-  ],
   "device_type": "light",
   "calculation_strategy": "multi_switch",
   "multi_switch_config": {

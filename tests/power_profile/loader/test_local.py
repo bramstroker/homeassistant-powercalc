@@ -87,8 +87,8 @@ async def test_get_model_listing(hass: HomeAssistant) -> None:
     assert "light20" not in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
     assert "light20" in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
     assert {"HS300", "HS400", "hs500", "light20"} == await loader.get_model_listing("tp-link", None)
-    assert "HS300" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
-    assert "HS400" not in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
+    assert "HS400" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
+    assert "HS400" not in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
     assert "test" in await loader.get_model_listing("Tasmota", DeviceType.LIGHT)
     assert ".test" not in await loader.get_model_listing("hidden-directories", DeviceType.LIGHT)
 
