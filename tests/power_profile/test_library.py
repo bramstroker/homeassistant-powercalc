@@ -95,11 +95,14 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     hass.config.config_dir = get_test_config_dir()
     caplog.set_level(logging.ERROR)
     library = await ProfileLibrary.factory(hass)
+    await library.initialize()
     models = await library.get_model_listing("hidden-directories")
     assert len(models) == 1
     assert len(caplog.records) == 0
 
-
+# QUESTION: This test does not raise exception any more in local.py because no model
+#           without model.json is in library. Hence the new exception is raised by
+#           _load_model_data: "Model {manufacturer} {model} not found"
 async def test_exception_is_raised_when_no_model_json_present(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
