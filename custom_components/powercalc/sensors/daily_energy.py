@@ -79,7 +79,7 @@ async def create_daily_fixed_energy_sensor(
     sensor_config: ConfigType,
     source_entity: SourceEntity | None = None,
 ) -> DailyEnergySensor:
-    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)  # type: ignore
+    mode_config: ConfigType = sensor_config.get(CONF_DAILY_FIXED_ENERGY)
 
     name = generate_energy_sensor_name(
         sensor_config,
@@ -104,7 +104,7 @@ async def create_daily_fixed_energy_sensor(
     if CONF_ON_TIME in mode_config:
         on_time = mode_config.get(CONF_ON_TIME)
         if not isinstance(on_time, timedelta):
-            on_time = timedelta(seconds=on_time)  # type: ignore
+            on_time = timedelta(seconds=on_time)
     else:
         on_time = timedelta(days=1)
 
@@ -112,9 +112,9 @@ async def create_daily_fixed_energy_sensor(
         hass,
         name,
         entity_id,
-        mode_config.get(CONF_VALUE),  # type: ignore
-        mode_config.get(CONF_UNIT_OF_MEASUREMENT),  # type: ignore
-        mode_config.get(CONF_UPDATE_FREQUENCY),  # type: ignore
+        mode_config.get(CONF_VALUE),
+        mode_config.get(CONF_UNIT_OF_MEASUREMENT),
+        mode_config.get(CONF_UPDATE_FREQUENCY),
         sensor_config,
         on_time=on_time,
         start_time=mode_config.get(CONF_START_TIME),

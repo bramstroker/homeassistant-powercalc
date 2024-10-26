@@ -933,8 +933,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
-                    self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
-                    self.sensor_config.get(CONF_MODEL),  # type: ignore
+                    self.sensor_config.get(CONF_MANUFACTURER),
+                    self.sensor_config.get(CONF_MODEL),
                 ),
             )
             self.power_profile = profile
@@ -991,8 +991,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return await self.async_step_power_advanced()
 
         model_info = ModelInfo(
-            self.sensor_config.get(CONF_MANUFACTURER),  # type: ignore
-            self.sensor_config.get(CONF_MODEL),  # type: ignore
+            self.sensor_config.get(CONF_MANUFACTURER),
+            self.sensor_config.get(CONF_MODEL),
         )
         return self.async_show_form(
             step_id=Steps.SUB_PROFILE,

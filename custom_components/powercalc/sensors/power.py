@@ -258,7 +258,7 @@ def _get_standby_power(
 
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER) is not None:
-            standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
+            standby_power = sensor_config.get(CONF_STANDBY_POWER)
             if not isinstance(standby_power, Template):
                 standby_power = Decimal(standby_power)
         elif power_profile is not None:
@@ -597,7 +597,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state."""
         assert self._strategy_instance is not None
-        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
+        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)
         if sleep_power:
             delay = sleep_power.get(CONF_DELAY)
 
@@ -611,7 +611,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
             self._sleep_power_timer = async_call_later(
                 self.hass,
-                delay,  # type: ignore
+                delay,
                 _update_sleep_power,
             )
 

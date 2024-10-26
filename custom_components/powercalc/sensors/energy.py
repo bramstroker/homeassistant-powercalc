@@ -192,7 +192,7 @@ def get_unit_prefix(
 
     if unit_prefix == UnitPrefix.NONE:
         unit_prefix = None
-    return unit_prefix
+    return unit_prefix  # type: ignore
 
 
 @callback
