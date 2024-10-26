@@ -52,7 +52,7 @@ class LocalLoader(Loader):
 
     async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
         """Get listing of available models for a given manufacturer.
-        
+
         param manufacturer: manufacturer always handled in lower case
         param device_type:  models of the manufacturer will be filtered by DeviceType, models
                             without assigned device_type will be handled as DeviceType.LIGHT.
@@ -66,9 +66,7 @@ class LocalLoader(Loader):
             return models
 
         for model in self._manufacturer_model_listing.get(_manufacturer):
-
-            supported_device_type = DeviceType(
-                self._manufacturer_model_listing.get(_manufacturer).get(model).get("device_type", DeviceType.LIGHT))
+            supported_device_type = DeviceType(self._manufacturer_model_listing.get(_manufacturer).get(model).get("device_type", DeviceType.LIGHT))
             if device_type and device_type != supported_device_type:
                 continue
             models.add(model)
@@ -77,12 +75,12 @@ class LocalLoader(Loader):
 
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None | LibraryLoadingError:
         """Load a model.json file from disk for a given manufacturer.lower() and model.lower()
-           by querying the custom library.
-           If self._is_custom_directory == true model.json will be loaded directy from there.
-        
-           returns: tuple[dict, str] model.json as dictionary and model as lower case
-           returns: None when manufacturer, model or model path not found
-           raises LibraryLoadingError: model.json not found
+        by querying the custom library.
+        If self._is_custom_directory == true model.json will be loaded directy from there.
+
+        returns: tuple[dict, str] model.json as dictionary and model as lower case
+        returns: None when manufacturer, model or model path not found
+        raises LibraryLoadingError: model.json not found
         """
         _manufacturer = manufacturer.lower()
         _model = model.lower()
@@ -98,22 +96,19 @@ class LocalLoader(Loader):
 
             lib_model = lib_models.get(_model)
             if lib_model is None:
-                _LOGGER.info("Model does not exist in custom library for manufacturer %s: %s",
-                            _manufacturer, _model)
+                _LOGGER.info("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
                 return None
 
             model_path = lib_model.get("path")
             if model_path is None:
-                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " +
-                                "have a path: %s", _manufacturer, _model)
+                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s", _manufacturer, _model)
                 return None
         else:
             model_path = os.path.join(self._data_directory)
 
         model_json_path = os.path.join(model_path, "model.json")
         if not os.path.exists(model_json_path):
-            raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " +
-                                      f"and model {_model} in path {model_json_path}")
+            raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
 
         def _load_json() -> dict[str, Any]:
             """Load model.json file for a given model."""
@@ -138,8 +133,8 @@ class LocalLoader(Loader):
 
     async def _load_custom_library(self) -> dict:
         """Loading custom models and aliases from file system.
-             Manufacturer directories without model directrories and model.json files within
-             are not loaded. Same is with model directories without model.json files.
+        Manufacturer directories without model directrories and model.json files within
+        are not loaded. Same is with model directories without model.json files.
         """
 
         # QUESTION: What is the difference originally when _is_custom_directory is true
@@ -167,8 +162,7 @@ class LocalLoader(Loader):
         for manufacturer_dir in base_dir_content[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
             if not os.path.exists(manufacturer_path):
-                _LOGGER.error("Manufacturer directory %s should be there but is not!", 
-                              manufacturer_path)
+                _LOGGER.error("Manufacturer directory %s should be there but is not!", manufacturer_path)
                 continue
 
             model_dir_content = await self._hass.async_add_executor_job(os.walk, manufacturer_path)
@@ -176,10 +170,9 @@ class LocalLoader(Loader):
 
             manufacturer = manufacturer_dir.lower()
             for model_dir in model_dir_content[1]:
-                pattern = re.compile('^\..*')
+                pattern = re.compile(r"^\..*")
                 if pattern.match(model_dir):
-                    _LOGGER.info("Hidden model %s for manufacturer %s detected. Not imported!",
-                                  model_dir, manufacturer)
+                    _LOGGER.info("Hidden model %s for manufacturer %s detected. Not imported!", model_dir, manufacturer)
                     continue
 
                 model_path = os.path.join(manufacturer_path, model_dir)
@@ -198,24 +191,23 @@ class LocalLoader(Loader):
                 if library.get(manufacturer) is None:
                     library[manufacturer] = {}
 
-                library[manufacturer].update({ model: { "path": model_path }})
+                library[manufacturer].update({model: {"path": model_path}})
 
                 model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
 
                 if model_json.get("device_type"):
                     library[manufacturer][model].update(
-                        { "device_type": model_json.get("device_type") }
-                        )
+                        {"device_type": model_json.get("device_type")},
+                    )
 
                 aliases = model_json.get("aliases")
                 if aliases:
                     for alias in aliases:
-                        library[manufacturer].update({ alias.lower(): { "path": model_path }})
+                        library[manufacturer].update({alias.lower(): {"path": model_path}})
 
                         if model_json.get("device_type"):
                             library[manufacturer][alias.lower()].update(
-                                { "device_type": model_json.get("device_type") }
-                                )
-
+                                {"device_type": model_json.get("device_type")},
+                            )
 
         return library
