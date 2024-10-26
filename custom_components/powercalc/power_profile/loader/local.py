@@ -18,7 +18,6 @@ class LocalLoader(Loader):
         self._is_custom_directory = is_custom_directory
         self._data_directory = directory
         self._hass = hass
-
         self._manufacturer_model_listing: dict[str, dict[str, PowerProfile]] = {}
 
     async def initialize(self) -> None:
@@ -59,19 +58,19 @@ class LocalLoader(Loader):
                             None will return all models of a manufacturer.
         returns:            Set[str] of models
         """
-        _manufacturer = manufacturer.lower()
 
-        models: set[str] = set()
-        if self._manufacturer_model_listing.get(_manufacturer) is None:
-            return models
+        found_models: set[str] = set()
+        models = self._manufacturer_model_listing.get(manufacturer.lower())
+        if not models:
+            return found_models
 
-        for model in self._manufacturer_model_listing.get(_manufacturer):
-            profile = self._manufacturer_model_listing.get(_manufacturer).get(model)
+        for model in models:
+            profile = models.get(model)
             if device_type and device_type != profile.device_type:
                 continue
-            models.add(model)
+            found_models.add(profile.model)
 
-        return models
+        return found_models
 
     async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None | LibraryLoadingError:
         """Load a model.json file from disk for a given manufacturer.lower() and model.lower()
@@ -86,36 +85,36 @@ class LocalLoader(Loader):
         _model = model.lower()
 
         if not self._is_custom_directory:
-            if self._manufacturer_model_listing == {}:
-                await self.initialize()
-
             lib_models = self._manufacturer_model_listing.get(_manufacturer)
             if lib_models is None:
-                _LOGGER.info("Manufacturer does not exist in custom library: %s", _manufacturer)
+                _LOGGER.error("Manufacturer does not exist in custom library: %s", _manufacturer)
                 return None
 
             lib_model = lib_models.get(_model)
             if lib_model is None:
-                _LOGGER.info("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
+                _LOGGER.error("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
                 return None
 
-            model_path = lib_model.get("path")
+            model_path = lib_model.get_model_directory()
             if model_path is None:
-                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s", _manufacturer, _model)
+                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s",
+                                _manufacturer, _model)
                 return None
+            model_json = lib_model.json_data
         else:
             model_path = os.path.join(self._data_directory)
+            model_json_path = os.path.join(model_path, "model.json")
+            if not os.path.exists(model_json_path):
+                raise LibraryLoadingError(
+                    f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
 
-        model_json_path = os.path.join(model_path, "model.json")
-        if not os.path.exists(model_json_path):
-            raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
+            def _load_json() -> dict[str, Any]:
+                """Load model.json file for a given model."""
+                with open(model_json_path) as file:
+                    return cast(dict[str, Any], json.load(file))
 
-        def _load_json() -> dict[str, Any]:
-            """Load model.json file for a given model."""
-            with open(model_json_path) as file:
-                return cast(dict[str, Any], json.load(file))
+            model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
 
-        model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
         return model_json, model_path
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
@@ -129,7 +128,8 @@ class LocalLoader(Loader):
 
         search_lower = {phrase.lower() for phrase in search}
 
-        return next((model for model in models.keys() if model.lower() in search_lower), None)
+        profile = next((models[model] for model in models.keys() if model.lower() in search_lower), None)
+        return profile.model if profile else None
 
     def _load_custom_library(self) -> dict:
         """Loading custom models and aliases from file system.
