@@ -91,7 +91,7 @@ class LutRegistry:
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
-            return gzip.open(gzip_path, "rt")  # noqa: SIM115
+            return gzip.open(gzip_path, "rt")
 
         raise LutFileNotFoundError("Data file not found: %s")
 
