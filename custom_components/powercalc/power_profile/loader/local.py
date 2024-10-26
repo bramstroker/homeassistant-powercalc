@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.power_profile.error import LibraryLoadingError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
-from custom_components.powercalc.power_profile.power_profile import DeviceType
+from custom_components.powercalc.power_profile.power_profile import DeviceType, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,11 +19,11 @@ class LocalLoader(Loader):
         self._data_directory = directory
         self._hass = hass
 
-        self._manufacturer_model_listing: dict[str, dict[str, dict[str, str]]] = {}
+        self._manufacturer_model_listing: dict[str, dict[str, PowerProfile]] = {}
 
     async def initialize(self) -> None:
         """Initialize the loader."""
-        self._manufacturer_model_listing = await self._load_custom_library()
+        self._manufacturer_model_listing = await self._hass.async_add_executor_job(self._load_custom_library)
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""
@@ -66,8 +66,8 @@ class LocalLoader(Loader):
             return models
 
         for model in self._manufacturer_model_listing.get(_manufacturer):
-            supported_device_type = DeviceType(self._manufacturer_model_listing.get(_manufacturer).get(model).get("device_type", DeviceType.LIGHT))
-            if device_type and device_type != supported_device_type:
+            profile = self._manufacturer_model_listing.get(_manufacturer).get(model)
+            if device_type and device_type != profile.device_type:
                 continue
             models.add(model)
 
@@ -131,14 +131,14 @@ class LocalLoader(Loader):
 
         return next((model for model in models.keys() if model.lower() in search_lower), None)
 
-    async def _load_custom_library(self) -> dict:
+    def _load_custom_library(self) -> dict:
         """Loading custom models and aliases from file system.
         Manufacturer directories without model directrories and model.json files within
         are not loaded. Same is with model directories without model.json files.
         """
 
         # QUESTION: What is the difference originally when _is_custom_directory is true
-        library: dict[str, dict[str, str]] = {}
+        library: dict[str, dict[str, PowerProfile]] = {}
         base_path = (
             self._data_directory
             if self._is_custom_directory
@@ -151,29 +151,21 @@ class LocalLoader(Loader):
             _LOGGER.error("Custom library directory does not exist: %s", base_path)
             return library
 
-        base_dir_content = await self._hass.async_add_executor_job(os.walk, base_path)
-        base_dir_content = await self._hass.async_add_executor_job(next, base_dir_content)
-
         def _load_json() -> dict[str, Any]:
             """Load model.json file for a given model."""
             with open(model_json_path) as file:
                 return cast(dict[str, Any], json.load(file))
 
-        for manufacturer_dir in base_dir_content[1]:
+        for manufacturer_dir in next(os.walk(base_path))[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
 
-            model_dir_content = await self._hass.async_add_executor_job(os.walk, manufacturer_path)
-            model_dir_content = await self._hass.async_add_executor_job(next, model_dir_content)
-
             manufacturer = manufacturer_dir.lower()
-            for model_dir in model_dir_content[1]:
+            for model_dir in next(os.walk(manufacturer_path))[1]:
                 pattern = re.compile(r"^\..*")
                 if pattern.match(model_dir):
                     continue
 
                 model_path = os.path.join(manufacturer_path, model_dir)
-
-                model = model_dir.lower()
 
                 model_json_path = os.path.join(model_path, "model.json")
                 if not os.path.exists(model_json_path):
@@ -183,13 +175,18 @@ class LocalLoader(Loader):
                 if library.get(manufacturer) is None:
                     library[manufacturer] = {}
 
-                model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
-                device_type = DeviceType(model_json.get("device_type"), DeviceType.LIGHT)
-                model_data = {"device_type": device_type, "path": model_path}
-                aliases: list[str] = model_json.get("aliases", [])
+                model_json = _load_json()
 
-                library[manufacturer].update({model: model_data})
-                for alias in aliases:
-                    library[manufacturer].update({alias.lower(): model_data})
+                profile = PowerProfile(
+                    self._hass,
+                    manufacturer=manufacturer,
+                    model=model_dir,
+                    directory=model_path,
+                    json_data=model_json,
+                )
+
+                library[manufacturer].update({model_dir.lower(): profile})
+                for alias in profile.aliases:
+                    library[manufacturer].update({alias.lower(): profile})
 
         return library
