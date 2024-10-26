@@ -50,19 +50,16 @@ from custom_components.powercalc.const import (
     ATTR_INTEGRATION,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CALCULATION_STRATEGY_CONF_KEYS,
     CONF_CALCULATION_ENABLED_CONDITION,
-    CONF_COMPOSITE,
     CONF_DELAY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
-    CONF_FIXED,
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_LINEAR,
     CONF_MODEL,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
-    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
@@ -70,7 +67,6 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    CONF_WLED,
     DATA_CALCULATOR_FACTORY,
     DATA_DISCOVERY_MANAGER,
     DATA_STANDBY_POWER_SENSORS,
@@ -299,11 +295,11 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
     """
     if CONF_MODEL in sensor_config:
         return False
-    return any(key in sensor_config for key in [CONF_LINEAR, CONF_FIXED, CONF_PLAYBOOK, CONF_COMPOSITE])
+    return any(key in sensor_config for key in CALCULATION_STRATEGY_CONF_KEYS)
 
 
 def is_fully_configured(config: ConfigType) -> bool:
-    return any(key in config for key in [CONF_LINEAR, CONF_WLED, CONF_FIXED, CONF_PLAYBOOK])
+    return any(key in config for key in CALCULATION_STRATEGY_CONF_KEYS)
 
 
 class PowerSensor(BaseEntity):

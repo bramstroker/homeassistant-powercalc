@@ -1,5 +1,7 @@
 """The Powercalc constants."""
 
+from __future__ import annotations
+
 from datetime import timedelta
 from enum import StrEnum
 from typing import Literal
@@ -205,6 +207,9 @@ class CalculationStrategy(StrEnum):
     FIXED = "fixed"
     PLAYBOOK = "playbook"
     WLED = "wled"
+
+
+CALCULATION_STRATEGY_CONF_KEYS: list[str] = [strategy.value for strategy in CalculationStrategy]
 
 
 class SensorType(StrEnum):

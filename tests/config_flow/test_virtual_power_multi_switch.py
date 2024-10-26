@@ -22,7 +22,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
@@ -170,3 +170,38 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_MULTI_SWITCH] == {CONF_POWER: 5, CONF_POWER_OFF: 20, CONF_ENTITIES: ["switch.a", "switch.c"]}
+
+
+async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+    """
+    See #2612
+    When the source entity had manufacturer and model information the multi switch setup would fail
+    And raise error "Model not found in library" in the logs
+    """
+
+    mock_entity_with_model_information(
+        "switch.test",
+        "_TZ3000_u3oupgdy",
+        "TS0004",
+        unique_id=DEFAULT_UNIQUE_ID,
+    )
+
+    create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.MULTI_SWITCH,
+            CONF_MULTI_SWITCH: {
+                CONF_POWER: 10,
+                CONF_POWER_OFF: 40,
+                CONF_ENTITIES: ["switch.a", "switch.b"],
+            },
+            CONF_NAME: "Foo bar",
+        },
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    assert hass.states.get("sensor.foo_bar_power")
+    assert hass.states.get("sensor.foo_bar_energy")
