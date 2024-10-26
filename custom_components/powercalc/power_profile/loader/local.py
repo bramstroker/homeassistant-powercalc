@@ -22,7 +22,7 @@ class LocalLoader(Loader):
 
     async def initialize(self) -> None:
         """Initialize the loader."""
-        self._manufacturer_model_listing = await self._hass.async_add_executor_job(self._load_custom_library)
+        self._manufacturer_model_listing = await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""
@@ -30,7 +30,7 @@ class LocalLoader(Loader):
             return set(self._manufacturer_model_listing.keys())
 
         manufacturers: set[str] = set()
-        for manufacturer in self._manufacturer_model_listing.keys():
+        for manufacturer in self._manufacturer_model_listing:
             models = await self.get_model_listing(manufacturer, device_type)
             if not models:
                 continue
@@ -64,15 +64,14 @@ class LocalLoader(Loader):
         if not models:
             return found_models
 
-        for model in models:
-            profile = models.get(model)
+        for profile in models.values():
             if device_type and device_type != profile.device_type:
                 continue
             found_models.add(profile.model)
 
         return found_models
 
-    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None | LibraryLoadingError:
+    async def load_model(self, manufacturer: str, model: str) -> tuple[dict, str] | None:
         """Load a model.json file from disk for a given manufacturer.lower() and model.lower()
         by querying the custom library.
         If self._is_custom_directory == true model.json will be loaded directy from there.
@@ -96,17 +95,12 @@ class LocalLoader(Loader):
                 return None
 
             model_path = lib_model.get_model_directory()
-            if model_path is None:
-                _LOGGER.warning("Model exists in custom library for manufacturer %s but does not " + "have a path: %s",
-                                _manufacturer, _model)
-                return None
             model_json = lib_model.json_data
         else:
             model_path = os.path.join(self._data_directory)
             model_json_path = os.path.join(model_path, "model.json")
             if not os.path.exists(model_json_path):
-                raise LibraryLoadingError(
-                    f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
+                raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
 
             def _load_json() -> dict[str, Any]:
                 """Load model.json file for a given model."""
@@ -128,7 +122,7 @@ class LocalLoader(Loader):
 
         search_lower = {phrase.lower() for phrase in search}
 
-        profile = next((models[model] for model in models.keys() if model.lower() in search_lower), None)
+        profile = next((models[model] for model in models if model.lower() in search_lower), None)
         return profile.model if profile else None
 
     def _load_custom_library(self) -> dict:

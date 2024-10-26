@@ -51,7 +51,7 @@ async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[st
     "manufacturer,expected",
     [
         ["tp-link", "tp-link"],
-        ["TP-Link", 'tp-link'],
+        ["TP-Link", "tp-link"],
         ["foo", None],
     ],
 )
