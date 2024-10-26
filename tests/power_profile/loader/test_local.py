@@ -15,11 +15,13 @@ async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant) -> None:
         await loader.initialize()
     assert "Double entry manufacturer/model by model+alias in custom library:" in str(excinfo.value)
 
+
 async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant) -> None:
     loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-alias"))
     with pytest.raises(LibraryLoadingError) as excinfo:
         await loader.initialize()
     assert "Double entry manufacturer/model by alias+alias in custom library:" in str(excinfo.value)
+
 
 @pytest.mark.parametrize(
     "manufacturer,search,expected",
