@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import gzip
-import io
 import logging
 import os
 from collections import defaultdict
@@ -10,7 +9,7 @@ from csv import reader
 from dataclasses import dataclass
 from decimal import Decimal
 from functools import partial
-from typing import Any
+from typing import Any, TextIO
 
 import numpy as np
 from homeassistant.components import light
@@ -86,13 +85,13 @@ class LutRegistry:
         return lookup_dict
 
     @staticmethod
-    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> io.TextIOWrapper:
+    def get_lut_file(power_profile: PowerProfile, color_mode: ColorMode) -> TextIO:
         path = os.path.join(power_profile.get_model_directory(), f"{color_mode}.csv")
 
         gzip_path = f"{path}.gz"
         if os.path.exists(gzip_path):
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
-            return gzip.open(gzip_path, "rt")  # type: ignore
+            return gzip.open(gzip_path, "rt")  # noqa: SIM115
 
         raise LutFileNotFoundError("Data file not found: %s")
 

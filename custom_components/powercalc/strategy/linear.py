@@ -115,7 +115,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER))),  # type: ignore[arg-type]
+                (max_value, float(self._config.get(CONF_MAX_POWER))),
             )
             return calibration_list
 
@@ -174,9 +174,9 @@ class LinearStrategy(PowerCalculationStrategyInterface):
     def get_attribute(self, entity_state: State) -> str | None:
         """Returns the attribute which needs to be read for the linear calculation."""
         if CONF_ATTRIBUTE in self._config:
-            return self._config.get(CONF_ATTRIBUTE)
+            return str(self._config.get(CONF_ATTRIBUTE))
 
-        entity_domain = entity_state.domain  # type: ignore
+        entity_domain = entity_state.domain  # type: ignore[attr-defined]
         if entity_domain == light.DOMAIN:
             return ATTR_BRIGHTNESS
 

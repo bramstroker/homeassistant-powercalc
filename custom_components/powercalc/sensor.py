@@ -741,7 +741,7 @@ async def add_discovered_entities(
 ) -> None:
     """Add discovered entities based on include configuration."""
     if CONF_INCLUDE in config:
-        found_entities, discoverable_entities = await resolve_include_entities(hass, config.get(CONF_INCLUDE))  # type: ignore
+        found_entities, discoverable_entities = await resolve_include_entities(hass, config.get(CONF_INCLUDE))
         entities_to_add.existing.extend(found_entities)
         for entity_id in discoverable_entities:
             sensor_configs[entity_id] = {CONF_ENTITY_ID: entity_id}

@@ -1,0 +1,18 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-10-21T07:32:02.153411",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "aliases": [
+    "FLEX RGBW Z3"
+  ],
+  "name": "SMART+ ZB FLEX 3P RGB + TW",
+  "standby_power": 0.26,
+  "author": "@RubenKelevra <cyrond@gmail.com>"
+}
