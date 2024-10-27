@@ -9,18 +9,25 @@ from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_config_dir
 
 
-async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant) -> None:
+async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-model"))
-    with pytest.raises(LibraryLoadingError) as excinfo:
+    with caplog.at_level(logging.ERROR):
         await loader.initialize()
-    assert "Double entry manufacturer/model by model+alias in custom library:" in str(excinfo.value)
+    assert "Double entry manufacturer/model by model+alias in custom library:" in caplog.text
 
 
-async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant) -> None:
+async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-alias"))
-    with pytest.raises(LibraryLoadingError) as excinfo:
+    with caplog.at_level(logging.ERROR):
         await loader.initialize()
-    assert "Double entry manufacturer/model by alias+alias in custom library:" in str(excinfo.value)
+        assert "Double entry manufacturer/model by alias+alias in custom library" in caplog.text
+
+
+async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/missing-model-json"))
+    with caplog.at_level(logging.ERROR):
+        await loader.initialize()
+        assert "model.json should exist in" in caplog.text
 
 
 @pytest.mark.parametrize(
@@ -63,9 +70,9 @@ async def test_load_model_returns_none_when_manufacturer_not_found(hass: HomeAss
 
 async def test_load_model_returns_warning_when_manufacturer_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = await _create_loader(hass)
-    with caplog.at_level(logging.INFO):
+    with caplog.at_level(logging.ERROR):
         await loader.load_model("foo", "bar")
-    assert "Manufacturer does not exist in custom library: foo" in caplog.text
+        assert "Manufacturer does not exist in custom library: foo" in caplog.text
 
 
 async def test_load_model_returns_none_when_model_not_found(hass: HomeAssistant) -> None:

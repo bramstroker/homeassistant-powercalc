@@ -9,6 +9,7 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
     STATE_PAUSED,
+    STATE_PLAYING,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
@@ -401,6 +402,11 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     await elapse_and_assert_power(hass, 1, "0.10")
+
+    hass.states.async_set("media_player.sonos", STATE_PLAYING)
+    await hass.async_block_till_done()
+
+    assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
 
 
 async def elapse_and_assert_power(

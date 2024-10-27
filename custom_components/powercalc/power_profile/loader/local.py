@@ -40,8 +40,7 @@ class LocalLoader(Loader):
 
     async def find_manufacturer(self, search: str) -> str | None:
         """Check if a manufacturer is available."""
-        # QUESTION: Should this function return search or search.lower()?
-        #             and should it do search.lower() in ... ?
+
         _search = search.lower()
         manufacturer_list = self._manufacturer_model_listing.keys()
         if _search in manufacturer_list:
@@ -131,7 +130,6 @@ class LocalLoader(Loader):
         are not loaded. Same is with model directories without model.json files.
         """
 
-        # QUESTION: What is the difference originally when _is_custom_directory is true
         library: dict[str, dict[str, PowerProfile]] = {}
         base_path = (
             self._data_directory
@@ -163,7 +161,7 @@ class LocalLoader(Loader):
 
                 model_json_path = os.path.join(model_path, "model.json")
                 if not os.path.exists(model_json_path):
-                    _LOGGER.warning("model.json should exist in %s!", model_path)
+                    _LOGGER.error("model.json should exist in %s!", model_path)
                     continue
 
                 if library.get(manufacturer) is None:
@@ -179,13 +177,17 @@ class LocalLoader(Loader):
                     json_data=model_json,
                 )
 
-                if library[manufacturer].get(model_dir.lower()):
-                    raise LibraryLoadingError(f"Double entry manufacturer/model by model+alias in custom library: {manufacturer}/{model_dir}")
+                model_key = model_dir.lower()
+                if library[manufacturer].get(model_key):
+                    _LOGGER.error("Double entry manufacturer/model by model+alias in custom library: %s/%s", manufacturer, model_dir)
+                    continue
 
-                library[manufacturer].update({model_dir.lower(): profile})
+                library[manufacturer].update({model_key: profile})
                 for alias in profile.aliases:
-                    if library[manufacturer].get(alias.lower()):
-                        raise LibraryLoadingError(f"Double entry manufacturer/model by alias+alias in custom library: {manufacturer}/{alias}")
+                    alias_key = alias.lower()
+                    if library[manufacturer].get(alias_key):
+                        _LOGGER.error("Double entry manufacturer/model by alias+alias in custom library: %s/%s", manufacturer, alias)
+                        continue
 
                     profile = PowerProfile(
                         self._hass,
@@ -194,6 +196,6 @@ class LocalLoader(Loader):
                         directory=model_path,
                         json_data=model_json,
                     )
-                    library[manufacturer].update({alias.lower(): profile})
+                    library[manufacturer].update({alias_key: profile})
 
         return library
