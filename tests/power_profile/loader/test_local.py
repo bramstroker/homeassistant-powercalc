@@ -3,9 +3,24 @@ import logging
 import pytest
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc.power_profile.error import LibraryLoadingError
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_config_dir
+
+
+async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant) -> None:
+    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-model"))
+    with pytest.raises(LibraryLoadingError) as excinfo:
+        await loader.initialize()
+    assert "Double entry manufacturer/model by model+alias in custom library:" in str(excinfo.value)
+
+
+async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant) -> None:
+    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-alias"))
+    with pytest.raises(LibraryLoadingError) as excinfo:
+        await loader.initialize()
+    assert "Double entry manufacturer/model by alias+alias in custom library:" in str(excinfo.value)
 
 
 @pytest.mark.parametrize(
@@ -28,13 +43,19 @@ from tests.common import get_test_config_dir
     ],
 )
 async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[str], expected: str | None) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles"))
-    await loader.initialize()
+    loader = await _create_loader(hass)
     found_model = await loader.find_model(manufacturer, search)
     assert found_model == expected
 
 
 # Tests for load_model
+async def test_load_model_raise_no_modeljson_exception(hass: HomeAssistant) -> None:
+    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles/test/nojson"), is_custom_directory=True)
+    with pytest.raises(LibraryLoadingError) as excinfo:
+        await loader.load_model("test", "nojson")
+    assert "model.json not found for manufacturer" in str(excinfo.value)
+
+
 async def test_load_model_returns_none_when_manufacturer_not_found(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert await loader.load_model("foo", "bar") is None

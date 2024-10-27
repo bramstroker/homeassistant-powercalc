@@ -179,8 +179,14 @@ class LocalLoader(Loader):
                     json_data=model_json,
                 )
 
+                if library[manufacturer].get(model_dir.lower()):
+                    raise LibraryLoadingError(f"Double entry manufacturer/model by model+alias in custom library: {manufacturer}/{model_dir}")
+
                 library[manufacturer].update({model_dir.lower(): profile})
                 for alias in profile.aliases:
+                    if library[manufacturer].get(alias.lower()):
+                        raise LibraryLoadingError(f"Double entry manufacturer/model by alias+alias in custom library: {manufacturer}/{alias}")
+
                     profile = PowerProfile(
                         self._hass,
                         manufacturer=manufacturer,
