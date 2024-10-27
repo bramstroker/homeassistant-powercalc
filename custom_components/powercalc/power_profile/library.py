@@ -120,11 +120,11 @@ class ProfileLibrary:
 
         try:
             manufacturer = await self._resolve_manufacturer(model_info, custom_directory)
-            if not manufacturer:
+            if manufacturer is None:
                 return None
 
             model = await self._resolve_model(manufacturer, model_info, custom_directory)
-            if not model:
+            if model is None:
                 return None
 
             json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)

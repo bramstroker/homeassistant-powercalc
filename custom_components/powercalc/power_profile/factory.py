@@ -28,10 +28,11 @@ async def get_power_profile(
         model = config.get(CONF_MODEL) or model_info.model
         model_id = model_info.model_id
 
-    if not manufacturer or not model:
+    custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
+
+    if (not manufacturer or not model) and not custom_model_directory:
         return None
 
-    custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
     if custom_model_directory:
         custom_model_directory = os.path.join(
             hass.config.config_dir,
@@ -40,7 +41,7 @@ async def get_power_profile(
 
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(
-        ModelInfo(manufacturer, model, model_id),
+        ModelInfo(manufacturer or "", model or "", model_id),
         custom_model_directory,
     )
     if profile is None:

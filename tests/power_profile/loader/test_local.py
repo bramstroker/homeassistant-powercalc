@@ -1,12 +1,14 @@
 import logging
 
 import pytest
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
+from custom_components.powercalc.const import CONF_CUSTOM_MODEL_DIRECTORY
 from custom_components.powercalc.power_profile.error import LibraryLoadingError
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
-from tests.common import get_test_config_dir
+from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
 
 
 async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
@@ -124,6 +126,27 @@ async def test_get_model_listing(hass: HomeAssistant) -> None:
 async def test_get_model_listing_unknown_manufacturer(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert not await loader.get_model_listing("foo", DeviceType.LIGHT)
+
+
+async def test_custom_model_directory(hass: HomeAssistant) -> None:
+    """
+    Test that we can setup a virtual power sensor using a custom model directory.
+    The source entity has no model and/or manufacturer information set.
+    Verify that the power profile is loaded from the custom model directory correctly, and sensors are created.
+    """
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "switch.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("fixed"),
+        },
+    )
+
+    hass.states.async_set("switch.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "50.00"
 
 
 async def _create_loader(hass: HomeAssistant) -> LocalLoader:
