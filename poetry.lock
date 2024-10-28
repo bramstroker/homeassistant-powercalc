@@ -992,13 +992,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "croniter"
-version = "3.0.4"
+version = "4.0.0"
 description = "croniter provides iteration for datetime object with cron like format"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.6"
 files = [
-    {file = "croniter-3.0.4-py2.py3-none-any.whl", hash = "sha256:96e14cdd5dcb479dd48d7db14b53d8434b188dfb9210448bef6f65663524a6f0"},
-    {file = "croniter-3.0.4.tar.gz", hash = "sha256:f9dcd4bdb6c97abedb6f09d6ed3495b13ede4d4544503fa580b6372a56a0c520"},
+    {file = "croniter-4.0.0-py2.py3-none-any.whl", hash = "sha256:312717b8017ad6052817934af563f6754b1f25cb942dcca1e617240aca4aa254"},
+    {file = "croniter-4.0.0.tar.gz", hash = "sha256:3df735b70d005b68414d80728987ecba4d71054a1bb1b011f6d475bdefdbeddd"},
 ]
 
 [package.dependencies]
@@ -4408,4 +4408,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "e2004eca934e4e78a68ac6cab227cbb01af41a28512d73c37c001567d3f7e51e"
+content-hash = "452a6edb516964ad36266ef79fd452677c06ff01e3849d0dc15e38d9aa1ced1d"
