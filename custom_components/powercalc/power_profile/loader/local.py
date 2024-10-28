@@ -132,7 +132,7 @@ class LocalLoader(Loader):
 
         library: dict[str, dict[str, PowerProfile]] = {}
         base_path = self._data_directory
-        
+
         if not os.path.exists(base_path):
             _LOGGER.error("Custom library directory does not exist: %s", base_path)
             return library
