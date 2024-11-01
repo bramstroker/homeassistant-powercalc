@@ -95,7 +95,6 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     hass.config.config_dir = get_test_config_dir()
     caplog.set_level(logging.ERROR)
     library = await ProfileLibrary.factory(hass)
-    await library.initialize()
     models = await library.get_model_listing("hidden-directories")
     assert len(models) == 1
     assert len(caplog.records) == 0

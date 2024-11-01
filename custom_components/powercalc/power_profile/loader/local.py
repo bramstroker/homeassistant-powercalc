@@ -22,7 +22,8 @@ class LocalLoader(Loader):
 
     async def initialize(self) -> None:
         """Initialize the loader."""
-        self._manufacturer_model_listing = await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
+        if not self._is_custom_directory:
+            await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
 
     async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""
@@ -82,32 +83,27 @@ class LocalLoader(Loader):
         _manufacturer = manufacturer.lower()
         _model = model.lower()
 
-        if not self._is_custom_directory:
-            lib_models = self._manufacturer_model_listing.get(_manufacturer)
-            if lib_models is None:
-                _LOGGER.error("Manufacturer does not exist in custom library: %s", _manufacturer)
-                return None
-
-            lib_model = lib_models.get(_model)
-            if lib_model is None:
-                _LOGGER.error("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
-                return None
-
-            model_path = lib_model.get_model_directory()
-            model_json = lib_model.json_data
-        else:
+        if self._is_custom_directory:
             model_path = os.path.join(self._data_directory)
             model_json_path = os.path.join(model_path, "model.json")
             if not os.path.exists(model_json_path):
                 raise LibraryLoadingError(f"model.json not found for manufacturer {_manufacturer} " + f"and model {_model} in path {model_json_path}")
 
-            def _load_json() -> dict[str, Any]:
-                """Load model.json file for a given model."""
-                with open(model_json_path) as file:
-                    return cast(dict[str, Any], json.load(file))
+            model_json = await self._hass.async_add_executor_job(self._load_json, model_json_path)
+            return model_json, model_path
 
-            model_json = await self._hass.async_add_executor_job(_load_json)  # type: ignore
+        lib_models = self._manufacturer_model_listing.get(_manufacturer)
+        if lib_models is None:
+            _LOGGER.error("Manufacturer does not exist in custom library: %s", _manufacturer)
+            return None
 
+        lib_model = lib_models.get(_model)
+        if lib_model is None:
+            _LOGGER.error("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
+            return None
+
+        model_path = lib_model.get_model_directory()
+        model_json = lib_model.json_data
         return model_json, model_path
 
     async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
@@ -124,23 +120,17 @@ class LocalLoader(Loader):
         profile = next((models[model] for model in models if model.lower() in search_lower), None)
         return profile.model if profile else None
 
-    def _load_custom_library(self) -> dict:
+    def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.
         Manufacturer directories without model directrories and model.json files within
         are not loaded. Same is with model directories without model.json files.
         """
 
-        library: dict[str, dict[str, PowerProfile]] = {}
         base_path = self._data_directory
 
         if not os.path.exists(base_path):
             _LOGGER.error("Custom library directory does not exist: %s", base_path)
-            return library
-
-        def _load_json() -> dict[str, Any]:
-            """Load model.json file for a given model."""
-            with open(model_json_path) as file:
-                return cast(dict[str, Any], json.load(file))
+            return
 
         for manufacturer_dir in next(os.walk(base_path))[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
@@ -158,11 +148,7 @@ class LocalLoader(Loader):
                     _LOGGER.error("model.json should exist in %s!", model_path)
                     continue
 
-                if library.get(manufacturer) is None:
-                    library[manufacturer] = {}
-
-                model_json = _load_json()
-
+                model_json = self._load_json(model_json_path)
                 profile = PowerProfile(
                     self._hass,
                     manufacturer=manufacturer,
@@ -171,25 +157,36 @@ class LocalLoader(Loader):
                     json_data=model_json,
                 )
 
-                model_key = model_dir.lower()
-                if library[manufacturer].get(model_key):
-                    _LOGGER.error("Double entry manufacturer/model by model+alias in custom library: %s/%s", manufacturer, model_dir)
-                    continue
-
-                library[manufacturer].update({model_key: profile})
+                self._add_profile_to_library(profile)
                 for alias in profile.aliases:
-                    alias_key = alias.lower()
-                    if library[manufacturer].get(alias_key):
-                        _LOGGER.error("Double entry manufacturer/model by alias+alias in custom library: %s/%s", manufacturer, alias)
-                        continue
-
-                    profile = PowerProfile(
-                        self._hass,
-                        manufacturer=manufacturer,
-                        model=alias,
-                        directory=model_path,
-                        json_data=model_json,
+                    self._add_profile_to_library(
+                        PowerProfile(
+                            self._hass,
+                            manufacturer=manufacturer,
+                            model=alias,
+                            directory=model_path,
+                            json_data=model_json,
+                        ),
                     )
-                    library[manufacturer].update({alias_key: profile})
 
-        return library
+    def _add_profile_to_library(self, profile: PowerProfile) -> None:
+        """Add profile to the library lookup dictionary."""
+        manufacturer = profile.manufacturer
+        if self._manufacturer_model_listing.get(manufacturer) is None:
+            self._manufacturer_model_listing[manufacturer] = {}
+
+        search_key = profile.model.lower()
+        if self._manufacturer_model_listing[manufacturer].get(search_key):
+            _LOGGER.error(
+                "Double entry manufacturer/model in custom library: %s/%s",
+                profile.manufacturer,
+                profile.model,
+            )
+            return
+
+        self._manufacturer_model_listing[manufacturer].update({search_key: profile})
+
+    def _load_json(self, model_json_path: str) -> dict[str, Any]:
+        """Load model.json file for a given model."""
+        with open(model_json_path) as file:
+            return cast(dict[str, Any], json.load(file))

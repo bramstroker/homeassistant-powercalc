@@ -15,14 +15,14 @@ async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: 
     loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-model"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
-    assert "Double entry manufacturer/model by model+alias in custom library:" in caplog.text
+    assert "Double entry manufacturer/model in custom library:" in caplog.text
 
 
 async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-alias"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
-        assert "Double entry manufacturer/model by alias+alias in custom library" in caplog.text
+        assert "Double entry manufacturer/model in custom library" in caplog.text
 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
