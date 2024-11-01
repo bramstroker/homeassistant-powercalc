@@ -424,7 +424,7 @@ async def apply_global_gui_configuration_changes(hass: HomeAssistant, entry: Con
     for entry in hass.config_entries.async_entries(DOMAIN):
         if entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
             continue
-        if entry.state != ConfigEntryState.LOADED:
+        if entry.state != ConfigEntryState.LOADED:  # pragma: no cover
             continue
         await hass.config_entries.async_reload(entry.entry_id)
 

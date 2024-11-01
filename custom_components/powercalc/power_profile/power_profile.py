@@ -96,6 +96,10 @@ class PowerProfile:
         return self._json_data.get("name") or ""
 
     @property
+    def json_data(self) -> ConfigType:
+        return self._json_data
+
+    @property
     def standby_power(self) -> float:
         return self._json_data.get("standby_power") or 0
 
