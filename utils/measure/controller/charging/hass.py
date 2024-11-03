@@ -12,8 +12,10 @@ from .const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from .controller import ChargingController
 
 DEVICE_TYPE_DOMAIN = {
-    ChargingDeviceType.VACUUM_ROBOT: "sensor",
+    ChargingDeviceType.VACUUM_ROBOT: "vacuum",
 }
+
+ATTR_BATTERY_LEVEL = "battery_level"
 
 
 class HassChargingController(ChargingController):
@@ -65,10 +67,11 @@ class HassChargingController(ChargingController):
                 name=QUESTION_BATTERY_LEVEL_ATTRIBUTE,
                 message="Select the battery_level attribute",
                 choices=get_attribute_list,
+                ignore=lambda x: ATTR_BATTERY_LEVEL in get_attribute_list(x),
             ),
         ]
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         self.entity_id = answers[QUESTION_ENTITY_ID]
         self.charging_device_type = answers[QUESTION_CHARGING_DEVICE_TYPE]
-        self.battery_level_attribute = answers[QUESTION_BATTERY_LEVEL_ATTRIBUTE]
+        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE, ATTR_BATTERY_LEVEL)
