@@ -4,6 +4,7 @@ import time
 from typing import Any
 
 import inquirer
+from const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from homeassistant_api import Client, HomeassistantAPIError
 
 from .const import MAX_MIRED, MIN_MIRED, ColorMode
@@ -55,20 +56,20 @@ class HassLightController(LightController):
 
         return [
             inquirer.List(
-                name="light_entity_id",
-                message="Select the light",
+                name=QUESTION_ENTITY_ID,
+                message="Select the light entity",
                 choices=light_list,
             ),
             inquirer.Text(
-                name="light_model_id",
+                name=QUESTION_MODEL_ID,
                 message="What model is your light? Ex: LED1837R5",
                 validate=lambda _, x: len(x) > 0,
             ),
         ]
 
     def process_answers(self, answers: dict[str, Any]) -> None:
-        self._entity_id = answers["light_entity_id"]
-        self._model_id = answers["light_model_id"]
+        self._entity_id = answers[QUESTION_ENTITY_ID]
+        self._model_id = answers[QUESTION_MODEL_ID]
 
     def build_hs_json_body(self, bri: int, hue: int, sat: int) -> dict:
         return {

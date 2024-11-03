@@ -12,6 +12,7 @@ from typing import Any
 
 import config
 import inquirer
+from const import QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
 from controller.light.errors import LightControllerError
 from decouple import UndefinedValueError
 from decouple import config as decouple_config
@@ -135,7 +136,7 @@ class Measure:
         if not runner_result:
             _LOGGER.error("Some error occurred during the measurement session")
 
-        generate_model_json: bool = answers.get("generate_model_json", False) and export_directory
+        generate_model_json: bool = answers.get(QUESTION_GENERATE_MODEL_JSON, False) and export_directory
 
         if generate_model_json:
             try:
@@ -147,8 +148,8 @@ class Measure:
             self.write_model_json(
                 directory=export_directory,
                 standby_power=standby_power,
-                name=answers["model_name"],
-                measure_device=answers["measure_device"],
+                name=answers[QUESTION_MODEL_NAME],
+                measure_device=answers[QUESTION_MEASURE_DEVICE],
                 extra_json_data=runner_result.model_json_data,
             )
 
@@ -197,23 +198,23 @@ class Measure:
         Returns generic questions which are asked regardless of the choosen device type
         Additionally the configured runner and power_meter can also provide further questions
         """
-        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER]:
+        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER, MeasureType.CHARGING]:
             questions = [
                 inquirer.Confirm(
-                    name="generate_model_json",
+                    name=QUESTION_GENERATE_MODEL_JSON,
                     message="Do you want to generate model.json?",
                     default=True,
                 ),
                 inquirer.Text(
-                    name="model_name",
+                    name=QUESTION_MODEL_NAME,
                     message=f"Specify the full {self.measure_type} model name",
-                    ignore=lambda answers: not answers.get("generate_model_json"),
+                    ignore=lambda answers: not answers.get(QUESTION_GENERATE_MODEL_JSON),
                     validate=validate_required,
                 ),
                 inquirer.Text(
-                    name="measure_device",
+                    name=QUESTION_MEASURE_DEVICE,
                     message="Which powermeter (manufacturer, model) do you use to take the measurement?",
-                    ignore=lambda answers: not answers.get("generate_model_json"),
+                    ignore=lambda answers: not answers.get(QUESTION_GENERATE_MODEL_JSON),
                     validate=validate_required,
                 ),
             ]

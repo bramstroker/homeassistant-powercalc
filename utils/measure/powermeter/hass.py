@@ -6,6 +6,7 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 
+from .const import QUESTION_POWERMETER_ENTITY_ID
 from .errors import PowerMeterError
 from .powermeter import PowerMeasurementResult, PowerMeter
 
@@ -39,7 +40,7 @@ class HassPowerMeter(PowerMeter):
 
         return [
             inquirer.List(
-                name="powermeter_entity_id",
+                name=QUESTION_POWERMETER_ENTITY_ID,
                 message="Select the powermeter",
                 choices=power_sensor_list,
             ),
@@ -52,4 +53,4 @@ class HassPowerMeter(PowerMeter):
         return sorted(power_sensors)
 
     def process_answers(self, answers: dict[str, Any]) -> None:
-        self._entity_id = answers["powermeter_entity_id"]
+        self._entity_id = answers[QUESTION_POWERMETER_ENTITY_ID]

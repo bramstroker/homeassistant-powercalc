@@ -2,6 +2,7 @@ import logging
 from typing import Any
 
 import inquirer
+from const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
 
@@ -69,17 +70,17 @@ class HassMediaController(MediaController):
 
         return [
             inquirer.List(
-                name="media_player_entity_id",
+                name=QUESTION_ENTITY_ID,
                 message="Select the media player",
                 choices=entity_list,
             ),
             inquirer.Text(
-                name="media_player_model_id",
+                name=QUESTION_MODEL_ID,
                 message="What model is your media player? Ex: Sonos One SL",
                 validate=lambda _, x: len(x) > 0,
             ),
         ]
 
     def process_answers(self, answers: dict[str, Any]) -> None:
-        self._entity_id = answers["media_player_entity_id"]
-        self._model_id = answers["media_player_model_id"]
+        self._entity_id = answers[QUESTION_ENTITY_ID]
+        self._model_id = answers[QUESTION_MODEL_ID]

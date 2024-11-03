@@ -6,6 +6,7 @@ from typing import Any
 import inquirer
 from util.measure_util import MeasureUtil
 
+from .const import QUESTION_EXPORT_FILENAME
 from .runner import MeasurementRunner, RunnerResult
 
 INTERVAL = 2
@@ -21,7 +22,7 @@ class RecorderRunner(MeasurementRunner):
         self.filename = DEFAULT_FILENAME
 
     def prepare(self, answers: dict[str, Any]) -> None:
-        self.filename = answers["export_filename"]
+        self.filename = answers[QUESTION_EXPORT_FILENAME]
 
     def run(
         self,
@@ -49,7 +50,7 @@ class RecorderRunner(MeasurementRunner):
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
             inquirer.Text(
-                name="export_filename",
+                name=QUESTION_EXPORT_FILENAME,
                 message="To which file do you want to export?",
                 default=DEFAULT_FILENAME,
             ),

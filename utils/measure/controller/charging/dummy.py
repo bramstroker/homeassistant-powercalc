@@ -8,11 +8,15 @@ from .controller import ChargingController
 
 
 class DummyChargingController(ChargingController):
+    def __init__(self) -> None:
+        self._battery_level = 0
+
     def get_battery_level(self) -> int:
-        return 0
+        self._battery_level += 1
+        return self._battery_level - 1
 
     def is_charging(self) -> bool:
-        return True
+        return self._battery_level <= 100
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         return []

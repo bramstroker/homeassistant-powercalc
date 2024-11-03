@@ -38,7 +38,6 @@ class DeviceType(StrEnum):
     PRINTER = "printer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
-    MOBILE_PHONE = "mobile_phone"
     NETWORK = "network"
     VACUUM_ROBOT = "vacuum_robot"
 
@@ -57,7 +56,7 @@ DOMAIN_DEVICE_TYPE = {
     SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
     MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
     BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
-    SENSOR_DOMAIN: DeviceType.PRINTER,  # todo: add MOBILE_PHONE
+    SENSOR_DOMAIN: DeviceType.PRINTER,
     VACUUM_DOMAIN: DeviceType.VACUUM_ROBOT,
 }
 

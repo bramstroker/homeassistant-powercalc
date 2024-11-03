@@ -25,6 +25,7 @@ from powermeter.errors import (
 )
 from util.measure_util import MeasureUtil
 
+from .const import QUESTION_COLOR_MODE, QUESTION_DUMMY_LOAD, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from .errors import RunnerError
 from .runner import MeasurementRunner, RunnerResult
 
@@ -67,9 +68,9 @@ class LightRunner(MeasurementRunner):
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.light_controller.process_answers(answers)
-        self.color_modes = set(answers["color_mode"])
-        self.num_lights = int(answers.get("num_lights") or 1)
-        self.is_dummy_load_connected = bool(answers.get("dummy_load"))
+        self.color_modes = set(answers[QUESTION_COLOR_MODE])
+        self.num_lights = int(answers.get(QUESTION_NUM_LIGHTS) or 1)
+        self.is_dummy_load_connected = bool(answers.get(QUESTION_DUMMY_LOAD))
         if self.is_dummy_load_connected:
             self.dummy_load_value = self.get_dummy_load_value()
             _LOGGER.info("Using %.2fW as dummy load value", self.dummy_load_value)
@@ -209,7 +210,7 @@ class LightRunner(MeasurementRunner):
             self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
             _LOGGER.info("Turning off the light")
 
-        if bool(answers.get("gzip", True)):
+        if bool(answers.get(QUESTION_GZIP, True)):
             self.gzip_csv(measurement_info.csv_file)
 
     def get_dummy_load_value(self) -> float:
@@ -600,7 +601,7 @@ class LightRunner(MeasurementRunner):
         """Get questions to ask for the light runner"""
         questions = [
             inquirer.List(
-                name="color_mode",
+                name=QUESTION_COLOR_MODE,
                 message="Select the color mode",
                 choices=[
                     (ColorMode.HS, {ColorMode.HS}),
@@ -611,25 +612,25 @@ class LightRunner(MeasurementRunner):
                 default=ColorMode.HS,
             ),
             inquirer.Confirm(
-                name="gzip",
+                name=QUESTION_GZIP,
                 message="Do you want to gzip CSV files?",
                 default=True,
             ),
             inquirer.Confirm(
-                name="dummy_load",
+                name=QUESTION_DUMMY_LOAD,
                 message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
                 default=False,
             ),
             inquirer.Confirm(
-                name="multiple_lights",
+                name=QUESTION_MULTIPLE_LIGHTS,
                 message="Are you measuring multiple lights. In some situations it helps to connect multiple lights to "
                 "be able to measure low currents.",
                 default=False,
             ),
             inquirer.Text(
-                name="num_lights",
+                name=QUESTION_NUM_LIGHTS,
                 message="How many lights are you measuring?",
-                ignore=lambda answers: not answers.get("multiple_lights"),
+                ignore=lambda answers: not answers.get(QUESTION_MULTIPLE_LIGHTS),
                 validate=lambda _, current: re.match(r"\d+", current),
             ),
         ]
