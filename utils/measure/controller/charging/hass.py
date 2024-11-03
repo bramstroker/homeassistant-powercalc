@@ -12,7 +12,7 @@ from .const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from .controller import ChargingController
 
 DEVICE_TYPE_DOMAIN = {
-    ChargingDeviceType.VACUUM_ROBOT: "vacuum",
+    ChargingDeviceType.VACUUM_ROBOT: "sensor",
 }
 
 
@@ -36,7 +36,7 @@ class HassChargingController(ChargingController):
     def is_charging(self) -> bool:
         """Check if the device is currently charging"""
 
-        entity = self.client.get_entity(self.entity_id)
+        entity = self.client.get_entity(entity_id=self.entity_id)
         return entity.state.attributes["docked"]
 
     def get_questions(self) -> list[inquirer.questions.Question]:
