@@ -41,6 +41,12 @@ class HassChargingController(ChargingController):
         entity = self.client.get_entity(entity_id=self.entity_id)
         return entity.state.state == "docked"
 
+    def is_valid_state(self) -> bool:
+        """Check if the entity is in a valid state where it is available, either charging or performing tasks"""
+
+        entity = self.client.get_entity(entity_id=self.entity_id)
+        return entity.state.state in ["docked", "cleaning", "returning", "idle", "paused"]
+
     def get_questions(self) -> list[inquirer.questions.Question]:
         def get_entity_list(answers: dict[str, Any]) -> list:
             domain = DEVICE_TYPE_DOMAIN.get(ChargingDeviceType(answers[QUESTION_CHARGING_DEVICE_TYPE]), "sensor")
