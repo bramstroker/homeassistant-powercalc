@@ -43,8 +43,27 @@ class ChargingRunner(MeasurementRunner):
         )
         input("Hit enter when you are ready to start..")
 
+        print()
+
         battery_level = self.controller.get_battery_level()
         measurements: dict[int, list[float]] = {}
+        is_charging = self.controller.is_charging()
+        is_valid_state = self.controller.is_valid_state()
+        wait_message_printed = False
+
+        if battery_level < 100:
+            while not is_charging:
+                if is_valid_state:
+                    if not wait_message_printed:
+                        print("waiting for vacuum cleaner to start charging...")
+                        wait_message_printed = True
+                    time.sleep(1)
+                else:
+                    raise RunnerError("Device is not in a valid state.")
+                is_charging = self.controller.is_charging()
+                is_valid_state = self.controller.is_valid_state()
+            if wait_message_printed:
+                print("vacuum cleaner started charging, starting measurements")
 
         while battery_level < 100:
             battery_level = self.controller.get_battery_level()
