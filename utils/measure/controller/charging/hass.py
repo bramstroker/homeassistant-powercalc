@@ -39,7 +39,7 @@ class HassChargingController(ChargingController):
         """Check if the device is currently charging"""
 
         entity = self.client.get_entity(entity_id=self.entity_id)
-        return entity.state.attributes["docked"]
+        return entity.state.state == "docked"
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         def get_entity_list(answers: dict[str, Any]) -> list:
