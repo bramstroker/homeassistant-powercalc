@@ -74,4 +74,4 @@ class HassChargingController(ChargingController):
     def process_answers(self, answers: dict[str, Any]) -> None:
         self.entity_id = answers[QUESTION_ENTITY_ID]
         self.charging_device_type = answers[QUESTION_CHARGING_DEVICE_TYPE]
-        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE, ATTR_BATTERY_LEVEL)
+        self.battery_level_attribute = answers.get(QUESTION_BATTERY_LEVEL_ATTRIBUTE) or ATTR_BATTERY_LEVEL
