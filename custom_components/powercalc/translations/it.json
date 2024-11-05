@@ -116,7 +116,7 @@
           "create_energy_sensor": "Crea sensore di energia",
           "create_utility_meters": "Crea contatori (utility meters)",
           "device": "Dispositivo",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Forza il calcolo dell'energia",
           "group_energy_entities": "Altre entità energetiche",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
@@ -128,7 +128,7 @@
         },
         "data_description": {
           "area": "Aggiunge tutti i sensori di potenza dall'area specificata",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
@@ -320,10 +320,10 @@
           "mode": "Calculation strategy",
           "name": "Nome",
           "standby_power": "Potenza in standby",
-          "unique_id": "Unique id"
+          "unique_id": "Id univoco"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "group": "Fill in a custom group name to create a new group",
