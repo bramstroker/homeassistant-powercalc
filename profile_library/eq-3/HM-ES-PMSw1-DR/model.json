@@ -16,5 +16,5 @@
   },
   "created_at": "2024-09-06T18:37:40",
   "author": "CV",
-  "description": "HomematicIP DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device."
+  "description": "Homematic DIN rail mount smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device."
 }
