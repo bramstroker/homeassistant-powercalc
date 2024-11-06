@@ -55,11 +55,11 @@ class ChargingRunner(MeasurementRunner):
             while not is_charging:
                 if not is_valid_state:
                     raise RunnerError("Device is not in a valid state.")
-        
+
                 if not wait_message_printed:
                     print("waiting for vacuum cleaner to start charging...")
                     wait_message_printed = True
-        
+
                 time.sleep(1)
                 is_charging = self.controller.is_charging()
                 is_valid_state = self.controller.is_valid_state()
