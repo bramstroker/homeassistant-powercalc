@@ -189,7 +189,7 @@ async def create_tariff_select(
     tariff_select = TariffSelect(
         name,
         tariffs,
-        select_unique_id,
+        unique_id=select_unique_id,
     )
 
     await select_component.async_add_entities([tariff_select])
