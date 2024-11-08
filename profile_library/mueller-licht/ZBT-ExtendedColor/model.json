@@ -9,7 +9,7 @@
         "SLEEP_TIME": 3,
         "VERSION": "v1.14.10:docker"
     },
-    "name": "Extended color light (ZBT-ExtendedColor)",
+    "name": "tint GU10 spot white+color",
     "standby_power": 1.27,
     "author": "Amjad Saadeh <amjad@saadeh.dev>"
 }
