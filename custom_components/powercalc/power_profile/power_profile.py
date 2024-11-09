@@ -118,11 +118,11 @@ class PowerProfile:
 
     @property
     def linked_lut(self) -> str | None:
-        return self._json_data.get("linked_lut")  # type: ignore
+        return self._json_data.get("linked_lut")
 
     @property
     def calculation_enabled_condition(self) -> str | None:
-        return self._json_data.get("calculation_enabled_condition")  # type: ignore
+        return self._json_data.get("calculation_enabled_condition")
 
     @property
     def aliases(self) -> list[str]:
@@ -191,7 +191,7 @@ class PowerProfile:
             translation_key = f"component.{DOMAIN}.common.remarks_smart_switch"
             return translations.get(translation_key)
 
-        return remarks  # type: ignore
+        return remarks
 
     async def get_sub_profiles(self) -> list[str]:
         """Get listing of possible sub profiles."""

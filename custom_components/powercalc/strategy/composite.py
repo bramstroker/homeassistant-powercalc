@@ -7,7 +7,7 @@ from decimal import Decimal
 
 from homeassistant.const import CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.condition import ConditionCheckerType  # type: ignore
+from homeassistant.helpers.condition import ConditionCheckerType
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 

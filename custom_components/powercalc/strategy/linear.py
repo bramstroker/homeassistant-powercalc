@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -48,7 +49,7 @@ _LOGGER = logging.getLogger(__name__)
 class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: ConfigType,
+        config: dict[str, Any],
         hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: float | None,
@@ -115,7 +116,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER))),
+                (max_value, float(self._config.get(CONF_MAX_POWER))),  # type: ignore
             )
             return calibration_list
 
