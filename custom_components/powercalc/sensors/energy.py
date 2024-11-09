@@ -121,7 +121,7 @@ async def _get_related_energy_sensor(
             real_energy_sensor.entity_id,
             power_sensor.entity_id,
         )
-        return real_energy_sensor  # type: ignore
+        return real_energy_sensor
 
     _LOGGER.debug(
         "No existing energy sensor found for the power sensor '%s'",
@@ -142,7 +142,7 @@ async def _create_virtual_energy_sensor(
         sensor_config.get(CONF_NAME),
         source_entity,
     )
-    unique_id = f"{power_sensor.unique_id}_energy" if power_sensor.unique_id else None
+    unique_id = f"{power_sensor.unique_id}_energy" if power_sensor.unique_id is not None else None
     entity_id = generate_energy_sensor_entity_id(
         hass,
         sensor_config,

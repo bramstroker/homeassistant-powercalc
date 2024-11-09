@@ -638,7 +638,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType:  # type: ignore[override]
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
