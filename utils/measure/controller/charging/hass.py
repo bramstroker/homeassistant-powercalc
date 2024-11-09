@@ -5,11 +5,13 @@ from typing import Any
 import inquirer
 from const import QUESTION_ENTITY_ID
 from controller.errors import ControllerError
+from homeassistant.helpers.typing import StateType
 from homeassistant_api import Client, HomeassistantAPIError
 from runner.const import QUESTION_CHARGING_DEVICE_TYPE
 
 from .const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from .controller import ChargingController
+from .errors import BatteryLevelRetrievalError, ChargingControllerError
 
 DEVICE_TYPE_DOMAIN = {
     ChargingDeviceType.VACUUM_ROBOT: "vacuum",
@@ -32,20 +34,26 @@ class HassChargingController(ChargingController):
     def get_battery_level(self) -> int:
         """Get actual battery level of the device"""
 
-        entity = self.client.get_entity(entity_id=self.entity_id)
-        return int(entity.state.attributes[self.battery_level_attribute])
+        state = self._get_entity_state().state
+        if self.battery_level_attribute not in state.attributes:
+            raise BatteryLevelRetrievalError(f"Attribute {self.battery_level_attribute} not found in entity {self.entity_id}")
+        return int(state.attributes[self.battery_level_attribute])
 
     def is_charging(self) -> bool:
         """Check if the device is currently charging"""
 
-        entity = self.client.get_entity(entity_id=self.entity_id)
-        return entity.state.state == "docked"
+        return self._get_entity_state().state == "docked"
 
     def is_valid_state(self) -> bool:
         """Check if the entity is in a valid state where it is available, either charging or performing tasks"""
 
+        return self._get_entity_state().state in ["docked", "cleaning", "returning", "idle", "paused"]
+
+    def _get_entity_state(self) -> StateType:
         entity = self.client.get_entity(entity_id=self.entity_id)
-        return entity.state.state in ["docked", "cleaning", "returning", "idle", "paused"]
+        if not entity:
+            raise ChargingControllerError(f"Entity {self.entity_id} not found")
+        return entity.state
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         def get_entity_list(answers: dict[str, Any]) -> list:

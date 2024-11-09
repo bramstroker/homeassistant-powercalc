@@ -6,6 +6,7 @@ import config
 import inquirer
 from controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from controller.charging.controller import ChargingController
+from controller.charging.errors import ChargingControllerError
 from controller.charging.factory import ChargingControllerFactory
 from util.measure_util import MeasureUtil
 
@@ -47,36 +48,31 @@ class ChargingRunner(MeasurementRunner):
 
         battery_level = self.controller.get_battery_level()
         measurements: dict[int, list[float]] = {}
-        is_charging = self.controller.is_charging()
-        wait_message_printed = False
 
         if battery_level < 100:
-            while not is_charging:
-                if not self.controller.is_valid_state():
-                    raise RunnerError("Device is not in a valid state.")
+            self.wait_for_vacuum_to_start_charging()
 
-                if not wait_message_printed:
-                    print("waiting for vacuum cleaner to start charging...")
-                    wait_message_printed = True
-
-                time.sleep(1)
-                is_charging = self.controller.is_charging()
-
-            if wait_message_printed:
-                print("vacuum cleaner started charging, starting measurements")
-
+        error_count = 0
         while battery_level < 100:
-            battery_level = self.controller.get_battery_level()
-            is_charging = self.controller.is_charging()
-            if not is_charging:
-                raise RunnerError("Device is not charging anymore.")
-            _LOGGER.info("Battery level: %d%%", battery_level)
-            if battery_level not in measurements:
-                measurements[battery_level] = []
-            power = self.measure_util.take_measurement(time.time())
-            _LOGGER.info("Measured power: %.2f W", power)
-            measurements[battery_level].append(power)
-            time.sleep(config.SLEEP_TIME)
+            try:
+                battery_level = self.controller.get_battery_level()
+                is_charging = self.controller.is_charging()
+                if not is_charging:
+                    raise RunnerError("Device is not charging anymore.")
+                _LOGGER.info("Battery level: %d%%", battery_level)
+                if battery_level not in measurements:
+                    measurements[battery_level] = []
+                power = self.measure_util.take_measurement(time.time())
+                _LOGGER.info("Measured power: %.2f W", power)
+                measurements[battery_level].append(power)
+                time.sleep(config.SLEEP_TIME)
+                error_count = 0
+            except ChargingControllerError as e:
+                _LOGGER.error("Error during measurement: %s", e)
+                error_count += 1
+                if error_count > 10:
+                    raise RunnerError("Too many errors occurred during measurements. aborting") from e
+                time.sleep(config.SLEEP_TIME)
 
         print("Done charging, start measurements for trickle charging..")
 
@@ -84,6 +80,23 @@ class ChargingRunner(MeasurementRunner):
         measurements[100] = [trickle_power]
 
         return RunnerResult(model_json_data=self._build_model_json_data(measurements))
+
+    def wait_for_vacuum_to_start_charging(self) -> None:
+        is_charging = self.controller.is_charging()
+        wait_message_printed = False
+        while not is_charging:
+            if not self.controller.is_valid_state():
+                raise RunnerError("Device is not in a valid state.")
+
+            if not wait_message_printed:
+                print("waiting for vacuum cleaner to start charging...")
+                wait_message_printed = True
+
+            time.sleep(1)
+            is_charging = self.controller.is_charging()
+
+        if wait_message_printed:
+            print("vacuum cleaner started charging, starting measurements")
 
     def _build_model_json_data(self, measurements: dict[int, list[float]]) -> dict:
         """Build the model JSON data from the measurements"""

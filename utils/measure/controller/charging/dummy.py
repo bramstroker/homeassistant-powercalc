@@ -15,6 +15,9 @@ class DummyChargingController(ChargingController):
         self._battery_level += 1
         return self._battery_level - 1
 
+    def is_valid_state(self) -> bool:
+        return True
+
     def is_charging(self) -> bool:
         return self._battery_level <= 100
 
