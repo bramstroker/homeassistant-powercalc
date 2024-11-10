@@ -1,6 +1,5 @@
 QUESTION_COLOR_MODE = "color_mode"
 QUESTION_GZIP = "gzip"
-QUESTION_DUMMY_LOAD = "dummy_load"
 QUESTION_MULTIPLE_LIGHTS = "multiple_lights"
 QUESTION_NUM_LIGHTS = "num_lights"
 QUESTION_EXPORT_FILENAME = "export_filename"

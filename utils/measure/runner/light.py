@@ -10,7 +10,6 @@ import time
 from collections.abc import Iterator
 from dataclasses import asdict, dataclass
 from datetime import datetime as dt
-from pathlib import Path
 from typing import Any, TextIO
 
 import config
@@ -25,7 +24,7 @@ from powermeter.errors import (
 )
 from util.measure_util import MeasureUtil
 
-from .const import QUESTION_COLOR_MODE, QUESTION_DUMMY_LOAD, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
+from .const import QUESTION_COLOR_MODE, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
 from .errors import RunnerError
 from .runner import MeasurementRunner, RunnerResult
 
@@ -61,8 +60,6 @@ class LightRunner(MeasurementRunner):
         self.measure_util = measure_util
         self.color_modes: set[ColorMode] | None = None
         self.num_lights: int = 1
-        self.is_dummy_load_connected: bool = False
-        self.dummy_load_value: float = 0
         self.num_0_readings: int = 0
         self.light_info: LightInfo | None = None
 
@@ -70,11 +67,6 @@ class LightRunner(MeasurementRunner):
         self.light_controller.process_answers(answers)
         self.color_modes = set(answers[QUESTION_COLOR_MODE])
         self.num_lights = int(answers.get(QUESTION_NUM_LIGHTS) or 1)
-        self.is_dummy_load_connected = bool(answers.get(QUESTION_DUMMY_LOAD))
-        if self.is_dummy_load_connected:
-            self.dummy_load_value = self.get_dummy_load_value()
-            _LOGGER.info("Using %.2fW as dummy load value", self.dummy_load_value)
-
         self.light_info = self.light_controller.get_light_info()
 
     def get_export_directory(self) -> str:
@@ -212,31 +204,6 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get(QUESTION_GZIP, True)):
             self.gzip_csv(measurement_info.csv_file)
-
-    def get_dummy_load_value(self) -> float:
-        """Get the previously measured dummy load value"""
-
-        dummy_load_file = os.path.join(
-            Path(__file__).parent.parent.absolute(),
-            ".persistent/dummy_load",
-        )
-        if not os.path.exists(dummy_load_file):
-            return self.measure_dummy_load(dummy_load_file)
-
-        with open(dummy_load_file) as f:
-            return float(f.read())
-
-    def measure_dummy_load(self, file_path: str) -> float:
-        """Measure the dummy load and persist the value for future measurement session"""
-        input(
-            "Only connect your dummy load to your smart plug, not the light! Press enter to start measuring the dummy load..",
-        )
-        average = self.measure_util.take_average_measurement(30)
-        with open(file_path, "w") as f:
-            f.write(str(average))
-
-        input("Connect your light now and press enter to start measuring..")
-        return average
 
     def get_variations(
         self,
@@ -555,10 +522,6 @@ class LightRunner(MeasurementRunner):
         """Request a power reading from the configured power meter"""
         value = self.measure_util.take_measurement(start_timestamp, retry_count)
 
-        # Subtract Dummy Load (if present)
-        if self.is_dummy_load_connected:
-            value -= self.dummy_load_value
-
         # Determine per load power consumption
         value /= self.num_lights
 
@@ -615,11 +578,6 @@ class LightRunner(MeasurementRunner):
                 name=QUESTION_GZIP,
                 message="Do you want to gzip CSV files?",
                 default=True,
-            ),
-            inquirer.Confirm(
-                name=QUESTION_DUMMY_LOAD,
-                message="Did you connect a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
-                default=False,
             ),
             inquirer.Confirm(
                 name=QUESTION_MULTIPLE_LIGHTS,

@@ -5,8 +5,7 @@ from typing import Any
 import inquirer
 from const import QUESTION_ENTITY_ID
 from controller.errors import ControllerError
-from homeassistant.helpers.typing import StateType
-from homeassistant_api import Client, HomeassistantAPIError
+from homeassistant_api import Client, HomeassistantAPIError, State
 from runner.const import QUESTION_CHARGING_DEVICE_TYPE
 
 from .const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
@@ -34,7 +33,7 @@ class HassChargingController(ChargingController):
     def get_battery_level(self) -> int:
         """Get actual battery level of the device"""
 
-        state = self._get_entity_state().state
+        state = self._get_entity_state()
         if self.battery_level_attribute not in state.attributes:
             raise BatteryLevelRetrievalError(f"Attribute {self.battery_level_attribute} not found in entity {self.entity_id}")
         return int(state.attributes[self.battery_level_attribute])
@@ -49,7 +48,7 @@ class HassChargingController(ChargingController):
 
         return self._get_entity_state().state in ["docked", "cleaning", "returning", "idle", "paused"]
 
-    def _get_entity_state(self) -> StateType:
+    def _get_entity_state(self) -> State:
         entity = self.client.get_entity(entity_id=self.entity_id)
         if not entity:
             raise ChargingControllerError(f"Entity {self.entity_id} not found")
