@@ -933,8 +933,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
-                    self.sensor_config.get(CONF_MANUFACTURER),
-                    self.sensor_config.get(CONF_MODEL),
+                    str(self.sensor_config.get(CONF_MANUFACTURER)),
+                    str(self.sensor_config.get(CONF_MODEL)),
                 ),
             )
             self.power_profile = profile
@@ -991,8 +991,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return await self.async_step_power_advanced()
 
         model_info = ModelInfo(
-            self.sensor_config.get(CONF_MANUFACTURER),
-            self.sensor_config.get(CONF_MODEL),
+            str(self.sensor_config.get(CONF_MANUFACTURER)),
+            str(self.sensor_config.get(CONF_MODEL)),
         )
         return self.async_show_form(
             step_id=Steps.SUB_PROFILE,
@@ -1008,13 +1008,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for advanced options."""
 
         if self.is_options_flow:
-            return self.persist_config_entry()  # type: ignore
+            return self.persist_config_entry()
 
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.persist_config_entry()  # type: ignore
+            return self.persist_config_entry()
 
         return self.async_show_form(
             step_id=Steps.POWER_ADVANCED,
@@ -1096,7 +1096,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for utility meter options."""
         if user_input is not None:
             self.sensor_config.update(user_input or {})
-            return self.persist_config_entry()  # type: ignore
+            return self.persist_config_entry()
 
         return self.async_show_form(
             step_id=Steps.UTILITY_METER_OPTIONS,
@@ -1113,7 +1113,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if user_input is not None:
             self.global_config.update(user_input)
             if self.is_options_flow:
-                return self.persist_config_entry()  # type: ignore
+                return self.persist_config_entry()
 
         if not bool(self.global_config.get(CONF_CREATE_ENERGY_SENSORS)) or user_input is not None:
             return await self.async_step_global_configuration_utility_meter()
@@ -1133,7 +1133,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if user_input is not None:
             self.global_config.update(user_input)
             if self.is_options_flow:
-                return self.persist_config_entry()  # type: ignore
+                return self.persist_config_entry()
 
         if not bool(self.global_config.get(CONF_CREATE_UTILITY_METERS)) or user_input is not None:
             return self.async_create_entry(
@@ -1197,9 +1197,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.sensor_config = discovery_info.copy()
 
         self.context["title_placeholders"] = {
-            "name": self.source_entity.name,
-            "manufacturer": self.sensor_config.get(CONF_MANUFACTURER),
-            "model": self.sensor_config.get(CONF_MODEL),
+            "name": self.name or "",
+            "manufacturer": str(self.sensor_config.get(CONF_MANUFACTURER)),
+            "model": str(self.sensor_config.get(CONF_MODEL)),
         }
         self.is_library_flow = True
 
@@ -1322,7 +1322,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(self.build_daily_energy_config(user_input, schema))
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.persist_config_entry()  # type: ignore
+            return self.persist_config_entry()
 
         return self.async_show_form(
             step_id=Steps.DAILY_ENERGY,
@@ -1413,7 +1413,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
-        return self.persist_config_entry()  # type: ignore
+        return self.persist_config_entry()
 
     async def async_step_linear(
         self,
@@ -1530,7 +1530,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             self.sensor_config.update(user_input)
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                 return await self.async_step_utility_meter_options()
-            return self.persist_config_entry()  # type: ignore
+            return self.persist_config_entry()
 
         return self.async_show_form(
             step_id=Steps.REAL_POWER,

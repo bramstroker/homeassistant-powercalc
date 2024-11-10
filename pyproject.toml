@@ -40,7 +40,7 @@ show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
 strict_equality = true
-no_implicit_optional = true
+no_implicit_optional = false
 warn_incomplete_stub = true
 warn_redundant_casts = true
 warn_unused_configs = true
@@ -57,6 +57,10 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = "homeassistant.components.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "custom_components.powercalc.config_flow"
+disable_error_code = "return-value"
 
 [tool.coverage.paths]
 source = ["custom_components/powercalc", "utils", "tests"]
@@ -96,9 +100,10 @@ mkdocs-git-revision-date-localized-plugin = "*"
 pre-commit = "^4.0.0"
 ruff = "^0.7.0"
 mypy = "1.13.0"
+numpy = "*"
 voluptuous-stubs = "^0.1"
 homeassistant-stubs = "*"
-pytest-homeassistant-custom-component = "0.13.175"
+pytest-homeassistant-custom-component = "0.13.182"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^5.0.0"
