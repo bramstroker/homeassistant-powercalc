@@ -10,6 +10,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+from inquirer.render import ConsoleRender
+
 import config
 import inquirer
 from const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
@@ -62,7 +64,8 @@ MEASURE_TYPE_RUNNER = {
 
 _LOGGER = logging.getLogger("measure")
 
-with open(os.path.join(sys.path[0], ".VERSION")) as f:
+script_dir = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(script_dir, ".VERSION")) as f:
     _VERSION = f.read().strip()
 
 
@@ -73,7 +76,7 @@ class Measure:
     If you answered yes to generating a model JSON file, a model.json will be created in export/<model-id>
     """
 
-    def __init__(self, power_meter: PowerMeter) -> None:
+    def __init__(self, power_meter: PowerMeter, console_render: ConsoleRender | None = None) -> None:
         """This class measures the power consumption of a device.
 
         Parameters
@@ -84,6 +87,7 @@ class Measure:
         self.power_meter = power_meter
         self.runner: MeasurementRunner | None = None
         self.measure_type: MeasureType = MeasureType.LIGHT
+        self.console_render = console_render
 
     def start(self) -> None:
         """Starts the measurement session.
@@ -122,6 +126,7 @@ class Measure:
             self.measure_type = inquirer.list_input(
                 "What kind of measurement session do you want to run?",
                 choices=[cls.value for cls in MeasureType],
+                render=self.console_render,
             )
 
         measure_util = MeasureUtil(self.power_meter)
@@ -245,8 +250,7 @@ class Measure:
 
         return questions
 
-    @staticmethod
-    def ask_questions(questions: list[Question]) -> dict[str, Any]:
+    def ask_questions(self, questions: list[Question]) -> dict[str, Any]:
         """
         Ask question and return a dictionary with the answers.
         It will also check if any predefined answers are defined in .env, and will skip asking these
@@ -265,7 +269,7 @@ class Measure:
                     conf_value = bool(str_to_bool(conf_value))
                 predefined_answers[question_name] = conf_value
 
-        answers = inquirer.prompt(questions_to_ask, answers=predefined_answers)
+        answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
 
         _LOGGER.debug("Answers: %s", answers)
 
@@ -303,9 +307,7 @@ def main() -> None:
 
     try:
         power_meter = PowerMeterFactory().create()
-
         measure = Measure(power_meter)
-        measure_util = MeasureUtil(power_meter)
 
         args = sys.argv[1:]
         if len(args) > 0 and args[0] == "average":
@@ -317,6 +319,7 @@ def main() -> None:
             if questions:
                 answers = measure.ask_questions(questions)
                 power_meter.process_answers(answers)
+            measure_util = MeasureUtil(power_meter)
             measure_util.take_average_measurement(duration)
             exit(0)
 
