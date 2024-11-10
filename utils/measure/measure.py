@@ -10,8 +10,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from inquirer.render import ConsoleRender
-
 import config
 import inquirer
 from const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
@@ -20,6 +18,7 @@ from decouple import UndefinedValueError
 from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
+from inquirer.render import ConsoleRender
 from powermeter.errors import PowerMeterError
 from powermeter.factory import PowerMeterFactory
 from powermeter.powermeter import PowerMeter

@@ -26,18 +26,19 @@ def test_measure() -> None:
     sys.stdin = StringIO()
     sys.stdout = StringIO()
 
-    render = ConsoleRender(event_generator=event_factory(
-        key.ENTER,  # MEASURE_TYPE
-        "n",  # DUMMY_LOAD
-        "y",  # GENERATE_MODEL_JSON
-        key.ENTER,  # COLOR_MODE
-        key.ENTER,  # GZIP
-        "n",  # MULTIPLE_LIGHTS
-    ))
+    render = ConsoleRender(
+        event_generator=event_factory(
+            key.ENTER,  # MEASURE_TYPE
+            "n",  # DUMMY_LOAD
+            "y",  # GENERATE_MODEL_JSON
+            key.ENTER,  # COLOR_MODE
+            key.ENTER,  # GZIP
+            "n",  # MULTIPLE_LIGHTS
+        )
+    )
 
     power_meter = DummyPowerMeter()
     measure = Measure(power_meter, console_render=render)
 
-    with patch('builtins.input', return_value=''):
+    with patch("builtins.input", return_value=""):
         measure.start()
-    
