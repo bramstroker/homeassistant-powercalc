@@ -643,7 +643,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return cast(StateType, self._power)
 
     @property
-    def available(self) -> bool:
+    def available(self) -> bool:  # type: ignore[override]
         """Return True if entity is available."""
         return self._power is not None
 
@@ -727,6 +727,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # type: ignore[override]
         """Return the unique_id of the sensor."""
         return self._unique_id
