@@ -26,7 +26,6 @@ jobs:
             -qq \
             --timeout=9 \
             --durations=10 \
-            -n auto \
             --cov custom_components.powercalc \
             --cov-report xml \
             -o console_output_style=count \
