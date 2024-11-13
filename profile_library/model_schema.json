@@ -74,7 +74,8 @@
         "printer",
         "smart_switch",
         "smart_speaker",
-        "network"
+        "network",
+        "vacuum_robot"
       ],
       "description": "Type of device"
     },
