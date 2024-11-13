@@ -175,11 +175,15 @@ class PowerProfile:
         ) and not self._json_data.get("fixed_config")
 
     @property
-    def device_type(self) -> DeviceType:
+    def device_type(self) -> DeviceType | None:
         device_type = self._json_data.get("device_type")
         if not device_type:
             return DeviceType.LIGHT
-        return DeviceType(device_type)
+        try:
+            return DeviceType(device_type)
+        except ValueError:
+            _LOGGER.error("Unknown device type: %s", device_type)
+            return None
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:
@@ -257,6 +261,9 @@ class PowerProfile:
             self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and source_entity.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
+
+        if self.device_type is None:
+            return False
 
         entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
         return entity_domain == source_entity.domain
