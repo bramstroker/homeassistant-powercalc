@@ -44,7 +44,7 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
     except KeyError:
         discovery_manager = DiscoveryManager(hass, {})
-    return await get_power_profile(hass, {}, await discovery_manager.autodiscover_model(source_entity.entity_entry))
+    return await get_power_profile(hass, {}, await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry))
 
 
 class DiscoveryManager:
@@ -71,8 +71,11 @@ class DiscoveryManager:
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
-            model_info = await self.autodiscover_model(entity_entry)
+            model_info = await self.extract_model_info_from_entity(entity_entry)
             if not model_info:
+                continue
+
+            if not await self.is_entity_supported(entity_entry):
                 continue
             power_profile = await self.get_power_profile(
                 entity_entry.entity_id,
@@ -82,8 +85,6 @@ class DiscoveryManager:
                 entity_entry.entity_id,
                 self.hass,
             )
-            if not await self.is_entity_supported(entity_entry):
-                continue
 
             self._init_entity_discovery(source_entity, power_profile, {})
 
@@ -115,7 +116,7 @@ class DiscoveryManager:
         if not self.should_process_entity(entity_entry):
             return False
 
-        model_info = await self.autodiscover_model(entity_entry)
+        model_info = await self.extract_model_info_from_entity(entity_entry)
         if not model_info or not model_info.manufacturer or not model_info.model:
             return False
 
@@ -177,7 +178,7 @@ class DiscoveryManager:
 
         return True
 
-    async def autodiscover_model(self, entity_entry: er.RegistryEntry | None) -> ModelInfo | None:
+    async def extract_model_info_from_entity(self, entity_entry: er.RegistryEntry | None) -> ModelInfo | None:
         """Try to auto discover manufacturer and model from the known device information."""
         if not entity_entry or not entity_entry.device_id:
             return None

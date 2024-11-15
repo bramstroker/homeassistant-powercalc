@@ -104,7 +104,7 @@ async def initialize_discovery_flow(
         power_profile = await get_power_profile(
             hass,
             {},
-            await discovery_manager.autodiscover_model(source_entity.entity_entry),
+            await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry),
         )
 
     result = await hass.config_entries.flow.async_init(
