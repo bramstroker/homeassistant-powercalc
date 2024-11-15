@@ -153,7 +153,7 @@ class ProfileLibrary:
             if model_identifier:
                 resolved_model = await self.find_model(manufacturer, model_identifier)
                 if resolved_model:
-                    return resolved_model
+                    return resolved_model[0]   #todo
 
         return None
 
@@ -181,7 +181,7 @@ class ProfileLibrary:
 
         return profile
 
-    async def find_model(self, manufacturer: str, model: str) -> str | None:
+    async def find_model(self, manufacturer: str, model: str) -> list[str]:
         """Check whether this power profile supports a given model ID.
         Also looks at possible aliases.
         """

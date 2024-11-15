@@ -473,12 +473,12 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 
 async def test_find_model(remote_loader: RemoteLoader) -> None:
     model = await remote_loader.find_model("apple", {"HomePod (gen 2)"})
-    assert model == "MQJ83"
+    assert model == ["MQJ83"]
 
 
 async def test_find_model_returns_none(remote_loader: RemoteLoader) -> None:
     model = await remote_loader.find_model("apple", {"Non existing model"})
-    assert model is None
+    assert model == []
 
 
 def clear_storage_dir(storage_path: str) -> None:
