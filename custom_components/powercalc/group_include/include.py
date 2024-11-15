@@ -56,7 +56,7 @@ async def resolve_include_entities(
             elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
-        if not resolved_entities and source_entity and await discovery_manager.is_entity_supported(source_entity):
+        if not resolved_entities and source_entity and await discovery_manager.is_entity_supported(source_entity, None):
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities

@@ -30,7 +30,7 @@ from .const import (
 from .errors import ModelNotSupportedError
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
-from .power_profile.library import ModelInfo
+from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,25 +70,68 @@ class DiscoveryManager:
 
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
+        library = await ProfileLibrary.factory(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
-            model_info = await self.extract_model_info_from_entity(entity_entry)
-            if not model_info:
-                continue
-
-            if not await self.is_entity_supported(entity_entry):
-                continue
-            power_profile = await self.get_power_profile(
-                entity_entry.entity_id,
-                model_info,
-            )
             source_entity = await create_source_entity(
                 entity_entry.entity_id,
                 self.hass,
             )
 
+            model_info = await self.extract_model_info_from_entity(entity_entry)
+            if not model_info:
+                continue
+
+            if self.is_wled_light(model_info, entity_entry):
+                await self.init_wled_flow(model_info, source_entity)
+                continue
+
+            manufacturer = await library.resolve_manufacturer(model_info)
+            if not manufacturer:
+                _LOGGER.debug(
+                    "%s: Manufacturer not found in library, skipping discovery",
+                    entity_entry.entity_id,
+                )
+                continue
+
+            model = await library.resolve_model(manufacturer, model_info)
+            if not model:
+                _LOGGER.debug(
+                    "%s: Model not found in library, skipping discovery",
+                    entity_entry.entity_id,
+                )
+                continue
+
+            if not await self.is_entity_supported(entity_entry, model_info):
+                continue
+            power_profile = await self.get_power_profile(
+                entity_entry.entity_id,
+                model_info,
+            )
+
             self._init_entity_discovery(source_entity, power_profile, {})
 
         _LOGGER.debug("Done auto discovering entities")
+
+    async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
+        """Initialize the discovery flow for a WLED light."""
+        self._init_entity_discovery(
+            source_entity,
+            power_profile=None,
+            extra_discovery_data={
+                CONF_MODE: CalculationStrategy.WLED,
+                CONF_MANUFACTURER: model_info.manufacturer,
+                CONF_MODEL: model_info.model,
+            },
+        )
+
+    @staticmethod
+    def is_wled_light(model_info: ModelInfo, entity_entry: er.RegistryEntry) -> bool:
+        """Check if the entity is a WLED light."""
+        return (
+            model_info.manufacturer == MANUFACTURER_WLED
+            and entity_entry.domain == LIGHT_DOMAIN
+            and not re.search("master|segment", str(entity_entry.original_name), flags=re.IGNORECASE)
+        )
 
     async def get_power_profile(
         self,
@@ -112,11 +155,12 @@ class DiscoveryManager:
             )
             return None
 
-    async def is_entity_supported(self, entity_entry: er.RegistryEntry) -> bool:
+    async def is_entity_supported(self, entity_entry: er.RegistryEntry, model_info: ModelInfo | None) -> bool:
         if not self.should_process_entity(entity_entry):
             return False
 
-        model_info = await self.extract_model_info_from_entity(entity_entry)
+        if not model_info:
+            model_info = await self.extract_model_info_from_entity(entity_entry)
         if not model_info or not model_info.manufacturer or not model_info.model:
             return False
 
@@ -124,26 +168,6 @@ class DiscoveryManager:
             entity_entry.entity_id,
             self.hass,
         )
-
-        if (
-            model_info.manufacturer == MANUFACTURER_WLED
-            and entity_entry.domain == LIGHT_DOMAIN
-            and not re.search(
-                "master|segment",
-                str(entity_entry.original_name),
-                flags=re.IGNORECASE,
-            )
-        ):
-            self._init_entity_discovery(
-                source_entity,
-                power_profile=None,
-                extra_discovery_data={
-                    CONF_MODE: CalculationStrategy.WLED,
-                    CONF_MANUFACTURER: model_info.manufacturer,
-                    CONF_MODEL: model_info.model,
-                },
-            )
-            return False
 
         power_profile = await self.get_power_profile(entity_entry.entity_id, model_info)
         if not power_profile:

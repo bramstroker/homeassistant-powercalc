@@ -119,11 +119,11 @@ class ProfileLibrary:
         """Create a power profile object from the model JSON data."""
 
         try:
-            manufacturer = await self._resolve_manufacturer(model_info, custom_directory)
+            manufacturer = await self.resolve_manufacturer(model_info, custom_directory)
             if manufacturer is None:
                 return None
 
-            model = await self._resolve_model(manufacturer, model_info, custom_directory)
+            model = await self.resolve_model(manufacturer, model_info, custom_directory)
             if model is None:
                 return None
 
@@ -138,13 +138,13 @@ class ProfileLibrary:
 
         return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
 
-    async def _resolve_manufacturer(self, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+    async def resolve_manufacturer(self, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
         """Resolve the manufacturer, either from the model info or by loading it."""
         if custom_directory:
             return model_info.manufacturer
         return await self._loader.find_manufacturer(model_info.manufacturer)
 
-    async def _resolve_model(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+    async def resolve_model(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         if custom_directory:
             return model_info.model_id or model_info.model
