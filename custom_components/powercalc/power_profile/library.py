@@ -153,7 +153,7 @@ class ProfileLibrary:
             if model_identifier:
                 resolved_model = await self.find_model(manufacturer, model_identifier)
                 if resolved_model:
-                    return resolved_model[0]   #todo
+                    return resolved_model[0]  # todo
 
         return None
 
