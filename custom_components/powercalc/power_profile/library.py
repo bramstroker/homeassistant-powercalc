@@ -119,11 +119,11 @@ class ProfileLibrary:
         """Create a power profile object from the model JSON data."""
 
         try:
-            manufacturer = await self.resolve_manufacturer(model_info, custom_directory)
+            manufacturer = await self.find_manufacturer(model_info, custom_directory)
             if manufacturer is None:
                 return None
 
-            model = await self.resolve_model(manufacturer, model_info, custom_directory)
+            model = await self.find_models(manufacturer, model_info, custom_directory)
             if model is None:
                 return None
 
@@ -138,24 +138,30 @@ class ProfileLibrary:
 
         return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
 
-    async def resolve_manufacturer(self, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
+    async def find_manufacturer(self, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
         """Resolve the manufacturer, either from the model info or by loading it."""
         if custom_directory:
             return model_info.manufacturer
         return await self._loader.find_manufacturer(model_info.manufacturer)
 
-    async def resolve_model(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
+    async def find_models(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         if custom_directory:
             return model_info.model_id or model_info.model
 
+        found_models: list[str] = []
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
-                resolved_model = await self.find_model(manufacturer, model_identifier)
-                if resolved_model:
-                    return resolved_model[0]  # todo
+                search = {
+                    model_identifier,
+                    model_identifier.replace("#slash#", "/"),
+                    model_identifier.lower(),
+                    model_identifier.lower().replace("#slash#", "/"),
+                    re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model_identifier),
+                }
+                found_models.extend(await self._loader.find_model(manufacturer, search))
 
-        return None
+        return found_models[0] if found_models else None
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
@@ -180,21 +186,6 @@ class ProfileLibrary:
             await profile.select_sub_profile(profile.sub_profile_select.default)
 
         return profile
-
-    async def find_model(self, manufacturer: str, model: str) -> list[str]:
-        """Check whether this power profile supports a given model ID.
-        Also looks at possible aliases.
-        """
-
-        search = {
-            model,
-            model.replace("#slash#", "/"),
-            model.lower(),
-            model.lower().replace("#slash#", "/"),
-            re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model),
-        }
-
-        return await self._loader.find_model(manufacturer, search)
 
     def get_loader(self) -> Loader:
         return self._loader

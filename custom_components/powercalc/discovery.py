@@ -92,7 +92,7 @@ class DiscoveryManager:
             await self.init_wled_flow(model_info, source_entity)
             return
 
-        manufacturer = await library.resolve_manufacturer(model_info)
+        manufacturer = await library.find_manufacturer(model_info)
         if not manufacturer:
             _LOGGER.debug(
                 "%s: Manufacturer not found in library, skipping discovery",
@@ -100,7 +100,7 @@ class DiscoveryManager:
             )
             return
 
-        model = await library.resolve_model(manufacturer, model_info)
+        model = await library.find_models(manufacturer, model_info)
         if not model:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping discovery",
