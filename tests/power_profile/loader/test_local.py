@@ -26,7 +26,7 @@ async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: 
 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles/missing-model-json"))
+    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/missing-model-json"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
         assert "model.json should exist in" in caplog.text
