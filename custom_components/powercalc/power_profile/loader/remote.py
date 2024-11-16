@@ -227,11 +227,13 @@ class RemoteLoader(Loader):
         """Find the model in the library."""
 
         models = self.manufacturer_models.get(manufacturer, [])
-        model = next(
-            (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
-            None,
-        )
-        return [model] if model else []
+        result = []
+        for model in models:
+            model_id = model.get("id")
+            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
+                result.append(model_id)
+
+        return result
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:

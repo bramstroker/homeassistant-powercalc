@@ -1,0 +1,34 @@
+{
+    "manufacturers": [
+        {
+            "name": "test_manu",
+            "aliases": [],
+            "models": [
+                {
+                    "id": "model1",
+                    "name": "Test profile",
+                    "device_type": "light",
+                    "aliases": [
+                        "CCT Light"
+                    ],
+                    "updated_at": "2024-07-21T11:13:03+02:00",
+                    "color_modes": [
+                        "color_temp"
+                    ]
+                },
+                {
+                    "id": "model2",
+                    "name": "Test profile",
+                    "device_type": "light",
+                    "aliases": [
+                        "CCT Light"
+                    ],
+                    "updated_at": "2024-07-21T11:13:03+02:00",
+                    "color_modes": [
+                        "color_temp"
+                    ]
+                }
+            ]
+        }
+    ]
+}
