@@ -37,6 +37,19 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
         assert model in models
 
 
+@pytest.mark.parametrize(
+    "model_info,expected_models",
+    [
+        (ModelInfo("signify", "LCT010"), {"LCT010"}),
+        (ModelInfo("lidl", "HG06106A/HG06104A"), {"HG06104A", "HG06106A"}),
+    ],
+)
+async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_models: set[str]) -> None:
+    library = await ProfileLibrary.factory(hass)
+    models = await library.find_models(model_info.manufacturer, model_info)
+    assert models == expected_models
+
+
 async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("yeelight", "YLDL01YL"))

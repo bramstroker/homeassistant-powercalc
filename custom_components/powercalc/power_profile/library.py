@@ -148,19 +148,21 @@ class ProfileLibrary:
 
     async def find_models(self, manufacturer: str, model_info: ModelInfo) -> set[str]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
-        found_models: set[str] = set()
+        search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
-                search = {
-                    model_identifier,
-                    model_identifier.replace("#slash#", "/"),
-                    model_identifier.lower(),
-                    model_identifier.lower().replace("#slash#", "/"),
-                    re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model_identifier),
-                }
-                found_models.update(await self._loader.find_model(manufacturer, search))
+                model_identifier = model_identifier.replace("#slash#", "/")
+                search.update(
+                    {
+                        model_identifier,
+                        model_identifier.lower(),
+                        re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model_identifier),
+                    },
+                )
+                if "/" in model_identifier:
+                    search.update(model_identifier.split("/"))
 
-        return found_models
+        return set(await self._loader.find_model(manufacturer, search))
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
