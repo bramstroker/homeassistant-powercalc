@@ -1,3 +1,6 @@
+from selectors import SelectSelector
+
+import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
@@ -100,6 +103,51 @@ async def test_discovery_flow_with_subprofile_selection(
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "lifx",
         CONF_MODEL: "LIFX Z/length_6",
+        CONF_NAME: "test",
+        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
+    }
+
+
+async def test_discovery_flow_multi_profiles(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """Test that discovery provides the user with a choice when multiple profiles are available"""
+    mock_entity_with_model_information(
+        "light.test",
+        "signify",
+        "LCT010",
+        unique_id=DEFAULT_UNIQUE_ID,
+    )
+
+    source_entity = await create_source_entity(DEFAULT_ENTITY_ID, hass)
+    power_profiles = [
+        await get_power_profile(hass, {}, ModelInfo("signify", "LCT010")),
+        await get_power_profile(hass, {}, ModelInfo("signify", "LCT012")),
+    ]
+    result = await initialize_discovery_flow(hass, source_entity, power_profiles)
+
+    assert result["step_id"] == Steps.LIBRARY_MULTI_PROFILE
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+
+    data_schema: vol.Schema = result["data_schema"]
+    select: SelectSelector = data_schema.schema[CONF_MODEL]
+    options = select.config["options"]
+    assert len(options) == 2
+    option_labels = [option["label"] for option in options]
+    assert option_labels == ["LCT010", "LCT012"]
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_MODEL: options[1]["value"]},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "signify",
+        CONF_MODEL: "LCT012",
         CONF_NAME: "test",
         CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }

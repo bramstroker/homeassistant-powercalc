@@ -138,6 +138,7 @@ class Steps(StrEnum):
     DOMAIN_GROUP = "domain_group"
     GROUP = "group"
     LIBRARY = "library"
+    LIBRARY_MULTI_PROFILE = "library_multi_profile"
     LIBRARY_OPTIONS = "library_options"
     VIRTUAL_POWER = "virtual_power"
     FIXED = "fixed"
@@ -518,7 +519,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.global_config: ConfigType = {}
         self.source_entity: SourceEntity | None = None
         self.source_entity_id: str | None = None
-        self.power_profile: PowerProfile | None = None
+        self.selected_profile: PowerProfile | None = None
         self.is_library_flow: bool = False
         self.skip_advanced_step: bool = False
         self.is_options_flow: bool = isinstance(self, OptionsFlow)
@@ -531,14 +532,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     async def validate_strategy_config(self) -> dict:
         """Validate the strategy config."""
         strategy_name = CalculationStrategy(
-            self.sensor_config.get(CONF_MODE) or self.power_profile.calculation_strategy,  # type: ignore
+            self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         strategy = await self._create_strategy_object(
             self.hass,
             strategy_name,
             self.sensor_config,
             self.source_entity,  # type: ignore
-            self.power_profile,
+            self.selected_profile,
         )
         try:
             await strategy.validate_config()
@@ -894,9 +895,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     def get_fixed_power_config_for_smart_switch(self, user_input: dict[str, Any]) -> dict[str, Any]:
         """Get the fixed power config for smart switch."""
-        if self.power_profile is None:
+        if self.selected_profile is None:
             return {CONF_POWER: 0}  # pragma: no cover
-        self_usage_on = self.power_profile.fixed_mode_config.get(CONF_POWER, 0) if self.power_profile.fixed_mode_config else 0
+        self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER, 0) if self.selected_profile.fixed_mode_config else 0
         power = user_input.get(CONF_POWER, 0)
         self_usage_included = user_input.get(CONF_SELF_USAGE_INCLUDED, True)
         if self_usage_included:
@@ -937,8 +938,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     str(self.sensor_config.get(CONF_MODEL)),
                 ),
             )
-            self.power_profile = profile
-            if self.power_profile and not await self.power_profile.has_sub_profiles:
+            self.selected_profile = profile
+            if self.selected_profile and not await self.selected_profile.has_sub_profiles:
                 errors = await self.validate_strategy_config()
             if not errors:
                 return await self.async_step_post_library()
@@ -961,20 +962,20 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
         Forwards to the next step in the flow.
         """
-        if self.power_profile and await self.power_profile.has_sub_profiles and not self.power_profile.sub_profile_select:
+        if self.selected_profile and await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
             return await self.async_step_sub_profile()
 
-        if self.power_profile and self.power_profile.needs_fixed_config:
+        if self.selected_profile and self.selected_profile.needs_fixed_config:
             return await self.async_step_fixed()
 
         if (
-            self.power_profile
-            and self.power_profile.device_type == DeviceType.SMART_SWITCH
-            and self.power_profile.calculation_strategy == CalculationStrategy.FIXED
+            self.selected_profile
+            and self.selected_profile.device_type == DeviceType.SMART_SWITCH
+            and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED
         ):
             return await self.async_step_smart_switch()
 
-        if self.power_profile and self.power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+        if self.selected_profile and self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
             return await self.async_step_multi_switch()
 
         return await self.async_step_power_advanced()
@@ -1041,8 +1042,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return await self.async_step_power_advanced()
 
         self_usage_on = 0
-        if self.power_profile and self.power_profile.fixed_mode_config:
-            self_usage_on = self.power_profile.fixed_mode_config.get(CONF_POWER, 0)
+        if self.selected_profile and self.selected_profile.fixed_mode_config:
+            self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER, 0)
         return self.async_show_form(
             step_id=Steps.SMART_SWITCH,
             data_schema=SCHEMA_POWER_SMART_SWITCH,
@@ -1159,6 +1160,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Initialize options flow."""
         self.selected_sensor_type: str | None = None
+        self.discovered_profiles: dict[str, PowerProfile] = {}
         self.name: str | None = None
         super().__init__()
 
@@ -1186,12 +1188,16 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
 
-        unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.power_profile)
+        unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.selected_profile)
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
+        power_profiles: list[PowerProfile] = []
         if DISCOVERY_POWER_PROFILES in discovery_info:
-            self.power_profile = discovery_info[DISCOVERY_POWER_PROFILES][0]
+            power_profiles = discovery_info[DISCOVERY_POWER_PROFILES]
+            self.discovered_profiles = {profile.unique_id: profile for profile in power_profiles}
+            if len(power_profiles) == 1:
+                self.selected_profile = power_profiles[0]
             del discovery_info[DISCOVERY_POWER_PROFILES]
 
         self.sensor_config = discovery_info.copy()
@@ -1205,6 +1211,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         if discovery_info.get(CONF_MODE) == CalculationStrategy.WLED:
             return await self.async_step_wled()
+
+        if len(power_profiles) > 1:
+            return cast(ConfigFlowResult, await self.async_step_library_multi_profile())
 
         return cast(ConfigFlowResult, await self.async_step_library())
 
@@ -1280,7 +1289,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 self.selected_sensor_type = SensorType.VIRTUAL_POWER
                 self.sensor_config.update(user_input)
 
-                unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.power_profile)
+                unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.selected_profile)
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
 
@@ -1476,6 +1485,48 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             last_step=False,
         )
 
+    async def async_step_library_multi_profile(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """This step gets executed when multiple profiles are found for the source entity."""
+        if user_input is not None:
+            selected_model: str = user_input.get(CONF_MODEL)  # type: ignore
+            selected_profile = self.discovered_profiles.get(selected_model)
+            if selected_profile is None:  # pragma: no cover
+                return self.async_abort(reason="invalid_profile")
+            self.selected_profile = selected_profile
+            self.sensor_config.update(
+                {
+                    CONF_MANUFACTURER: selected_profile.manufacturer,
+                    CONF_MODEL: selected_profile.model,
+                },
+            )
+            return await self.async_step_post_library(user_input)
+
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_MODEL): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=[
+                            selector.SelectOptionDict(
+                                value=profile.unique_id,
+                                label=profile.model,
+                            )
+                            for profile in self.discovered_profiles.values()
+                        ],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    ),
+                ),
+            },
+        )
+
+        return self.async_show_form(
+            step_id=Steps.LIBRARY_MULTI_PROFILE,
+            data_schema=schema,
+            last_step=False,
+        )
+
     async def async_step_library(
         self,
         user_input: dict[str, Any] | None = None,
@@ -1484,32 +1535,32 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         Ask the user to confirm this or forward to manual library selection.
         """
         if user_input is not None:
-            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.power_profile:
+            if user_input.get(CONF_CONFIRM_AUTODISCOVERED_MODEL) and self.selected_profile:
                 self.sensor_config.update(
                     {
-                        CONF_MANUFACTURER: self.power_profile.manufacturer,
-                        CONF_MODEL: self.power_profile.model,
+                        CONF_MANUFACTURER: self.selected_profile.manufacturer,
+                        CONF_MODEL: self.selected_profile.model,
                     },
                 )
                 return await self.async_step_post_library(user_input)
 
             return await self.async_step_manufacturer()
 
-        if self.source_entity and self.source_entity.entity_entry and self.power_profile is None:
+        if self.source_entity and self.source_entity.entity_entry and self.selected_profile is None:
             try:
-                self.power_profile = await get_power_profile_by_source_entity(self.hass, self.source_entity)
+                self.selected_profile = await get_power_profile_by_source_entity(self.hass, self.source_entity)
             except ModelNotSupportedError:
-                self.power_profile = None
-        if self.power_profile:
-            remarks = self.power_profile.config_flow_discovery_remarks
+                self.selected_profile = None
+        if self.selected_profile:
+            remarks = self.selected_profile.config_flow_discovery_remarks
             if remarks:
                 remarks = "\n\n" + remarks
             return self.async_show_form(
                 step_id=Steps.LIBRARY,
                 description_placeholders={
                     "remarks": remarks,
-                    "manufacturer": self.power_profile.manufacturer,
-                    "model": self.power_profile.model,
+                    "manufacturer": self.selected_profile.manufacturer,
+                    "model": self.selected_profile.model,
                 },
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
@@ -1595,12 +1646,12 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
         try:
             model_info = ModelInfo(manufacturer, model)
-            self.power_profile = await get_power_profile(
+            self.selected_profile = await get_power_profile(
                 self.hass,
                 {},
                 model_info,
             )
-            if self.power_profile and self.power_profile.needs_fixed_config:
+            if self.selected_profile and self.selected_profile.needs_fixed_config:
                 self.strategy = CalculationStrategy.FIXED
         except ModelNotSupportedError:
             return self.async_abort(reason="model_not_supported")
@@ -1626,7 +1677,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             if self.strategy and self.strategy != CalculationStrategy.LUT:
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
                 menu[strategy_step] = MENU_OPTIONS[strategy_step]
-            if self.power_profile:
+            if self.selected_profile:
                 menu[Steps.LIBRARY_OPTIONS] = "Library options"
             menu[Steps.ADVANCED_OPTIONS] = "Advanced options"
         if self.sensor_type == SensorType.DAILY_ENERGY:
@@ -1746,8 +1797,8 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         return self.async_show_form(
             step_id=Steps.LIBRARY_OPTIONS,
             description_placeholders={
-                "manufacturer": self.power_profile.manufacturer,  # type: ignore
-                "model": self.power_profile.model,  # type: ignore
+                "manufacturer": self.selected_profile.manufacturer,  # type: ignore
+                "model": self.selected_profile.model,  # type: ignore
             },
             last_step=False,
         )
@@ -1760,7 +1811,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         step = STRATEGY_STEP_MAPPING.get(self.strategy, Steps.FIXED)
 
         schema = self.create_strategy_schema(self.strategy, self.source_entity_id)
-        if self.power_profile and self.power_profile.device_type == DeviceType.SMART_SWITCH:
+        if self.selected_profile and self.selected_profile.device_type == DeviceType.SMART_SWITCH:
             schema = SCHEMA_POWER_SMART_SWITCH
 
         strategy_options = self.sensor_config.get(str(self.strategy)) or {}
@@ -1804,7 +1855,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         current_step: Steps = Steps(str(self.cur_step["step_id"]))
         is_strategy_step = current_step in STRATEGY_STEP_MAPPING.values()
         if self.strategy and is_strategy_step:
-            if self.power_profile and self.power_profile.device_type == DeviceType.SMART_SWITCH:
+            if self.selected_profile and self.selected_profile.device_type == DeviceType.SMART_SWITCH:
                 self._process_user_input(user_input, SCHEMA_POWER_SMART_SWITCH)
                 user_input = self.get_fixed_power_config_for_smart_switch(user_input)
 

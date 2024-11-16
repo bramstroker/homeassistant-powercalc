@@ -93,6 +93,10 @@ class PowerProfile:
         return self._model
 
     @property
+    def unique_id(self) -> str:
+        return self._json_data.get("unique_id") or f"{self._manufacturer}_{self._model}"
+
+    @property
     def name(self) -> str:
         return self._json_data.get("name") or ""
 
