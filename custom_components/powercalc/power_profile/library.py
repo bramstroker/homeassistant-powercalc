@@ -119,15 +119,18 @@ class ProfileLibrary:
         """Create a power profile object from the model JSON data."""
 
         try:
-            manufacturer = await self.find_manufacturer(model_info, custom_directory)
-            if manufacturer is None:
-                return None
+            manufacturer = model_info.manufacturer
+            model = model_info.model
+            if not custom_directory:
+                manufacturer = await self.find_manufacturer(model_info)  # type: ignore
+                if manufacturer is None:
+                    return None  # type: ignore
 
-            models = await self.find_models(manufacturer, model_info, custom_directory)
-            if not models:
-                return None
+                models = await self.find_models(manufacturer, model_info)
+                if not models:
+                    return None
 
-            model = next(iter(models))
+                model = next(iter(models))
 
             json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
             if linked_profile := json_data.get("linked_lut"):
@@ -140,17 +143,12 @@ class ProfileLibrary:
 
         return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
 
-    async def find_manufacturer(self, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
+    async def find_manufacturer(self, model_info: ModelInfo) -> str | None:
         """Resolve the manufacturer, either from the model info or by loading it."""
-        if custom_directory:
-            return model_info.manufacturer
         return await self._loader.find_manufacturer(model_info.manufacturer)
 
-    async def find_models(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> set[str]:
+    async def find_models(self, manufacturer: str, model_info: ModelInfo) -> set[str]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
-        if custom_directory:
-            return {model_info.model_id or model_info.model}
-
         found_models: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
