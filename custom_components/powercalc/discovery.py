@@ -22,7 +22,7 @@ from .const import (
     CONF_MODEL,
     CONF_SENSORS,
     DATA_DISCOVERY_MANAGER,
-    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     CalculationStrategy,
@@ -44,7 +44,8 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
     except KeyError:
         discovery_manager = DiscoveryManager(hass, {})
-    return await discovery_manager.discover_entity(source_entity)
+    profiles = await discovery_manager.discover_entity(source_entity)
+    return profiles[0] if profiles else None
 
 
 class DiscoveryManager:
@@ -73,10 +74,10 @@ class DiscoveryManager:
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
-            power_profile = await self.discover_entity(source_entity)
-            if not power_profile:
+            power_profiles = await self.discover_entity(source_entity)
+            if not power_profiles:
                 continue
-            self._init_entity_discovery(source_entity, power_profile, {})
+            self._init_entity_discovery(source_entity, power_profiles, {})
 
         _LOGGER.debug("Done auto discovering entities")
 
@@ -89,7 +90,7 @@ class DiscoveryManager:
     async def discover_entity(
         self,
         source_entity: SourceEntity,
-    ) -> PowerProfile | None:
+    ) -> list[PowerProfile] | None:
         """Discover a single entity in Powercalc library and start the discovery flow if supported."""
 
         library = await self._get_library()
@@ -126,16 +127,17 @@ class DiscoveryManager:
         if not await self.is_entity_supported(source_entity.entity_entry, model_info):
             return None
 
-        return await self.get_power_profile(
+        power_profile = await self.get_power_profile(
             source_entity.entity_entry.entity_id,
             model_info,
         )
+        return [power_profile] if power_profile else None
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
         self._init_entity_discovery(
             source_entity,
-            power_profile=None,
+            power_profiles=None,
             extra_discovery_data={
                 CONF_MODE: CalculationStrategy.WLED,
                 CONF_MANUFACTURER: model_info.manufacturer,
@@ -270,12 +272,12 @@ class DiscoveryManager:
     def _init_entity_discovery(
         self,
         source_entity: SourceEntity,
-        power_profile: PowerProfile | None,
+        power_profiles: list[PowerProfile] | None,
         extra_discovery_data: dict | None,
     ) -> None:
         """Dispatch the discovery flow for a given entity."""
 
-        unique_id = get_or_create_unique_id({}, source_entity, power_profile)
+        unique_id = get_or_create_unique_id({}, source_entity, power_profiles[0] if power_profiles else None)
         unique_ids_to_check = [unique_id]
         if unique_id.startswith("pc_"):
             unique_ids_to_check.append(unique_id[3:])
@@ -292,10 +294,12 @@ class DiscoveryManager:
             DISCOVERY_SOURCE_ENTITY: source_entity,
         }
 
-        if power_profile:
-            discovery_data[DISCOVERY_POWER_PROFILE] = power_profile
-            discovery_data[CONF_MANUFACTURER] = power_profile.manufacturer
-            discovery_data[CONF_MODEL] = power_profile.model
+        if power_profiles:
+            discovery_data[DISCOVERY_POWER_PROFILES] = power_profiles
+            if len(power_profiles) == 1:
+                power_profile = power_profiles[0]
+                discovery_data[CONF_MANUFACTURER] = power_profile.manufacturer
+                discovery_data[CONF_MODEL] = power_profile.model
 
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)

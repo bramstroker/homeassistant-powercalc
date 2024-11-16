@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
-    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
@@ -117,7 +117,7 @@ async def initialize_discovery_flow(
             CONF_MANUFACTURER: power_profile.manufacturer,
             CONF_MODEL: power_profile.model,
             DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
+            DISCOVERY_POWER_PROFILES: [power_profile],
         },
     )
     if not confirm_autodiscovered_model:

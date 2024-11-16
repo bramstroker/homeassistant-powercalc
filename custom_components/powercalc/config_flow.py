@@ -101,7 +101,7 @@ from .const import (
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
     CONF_WLED,
-    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
     DOMAIN_CONFIG,
@@ -1190,9 +1190,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(unique_id)
         self._abort_if_unique_id_configured()
 
-        if DISCOVERY_POWER_PROFILE in discovery_info:
-            self.power_profile = discovery_info[DISCOVERY_POWER_PROFILE]
-            del discovery_info[DISCOVERY_POWER_PROFILE]
+        if DISCOVERY_POWER_PROFILES in discovery_info:
+            self.power_profile = discovery_info[DISCOVERY_POWER_PROFILES][0]
+            del discovery_info[DISCOVERY_POWER_PROFILES]
 
         self.sensor_config = discovery_info.copy()
 
