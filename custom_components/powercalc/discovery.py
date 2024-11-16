@@ -130,7 +130,7 @@ class DiscoveryManager:
         for model in models:
             model_info = ModelInfo(manufacturer, model)
             profile = await get_power_profile(self.hass, {}, model_info=model_info)
-            if not profile:
+            if not profile:  # pragma: no cover
                 continue
             if not await self.is_entity_supported(source_entity.entity_entry, model_info, profile):
                 continue
@@ -175,10 +175,8 @@ class DiscoveryManager:
 
         if not power_profile:
             power_profile = await get_power_profile(self.hass, {}, model_info)
-        if not power_profile:
-            return False
 
-        return power_profile.is_entity_domain_supported(entity_entry)
+        return power_profile.is_entity_domain_supported(entity_entry) if power_profile else False
 
     def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
         """Do some validations on the registry entry to see if it qualifies for discovery."""
