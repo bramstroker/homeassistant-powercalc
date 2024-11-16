@@ -44,7 +44,7 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
     except KeyError:
         discovery_manager = DiscoveryManager(hass, {})
-    return await get_power_profile(hass, {}, await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry))
+    return await discovery_manager.discover_entity(source_entity)
 
 
 class DiscoveryManager:
@@ -59,11 +59,10 @@ class DiscoveryManager:
         self.power_profiles: dict[str, PowerProfile | None] = {}
         self.manually_configured_entities: list[str] | None = None
         self.initialized_flows: set[str] = set()
+        self.library: ProfileLibrary | None = None
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
-
-        library = await ProfileLibrary.factory(self.hass)
 
         existing_config_entries = self.hass.config_entries.async_entries(DOMAIN)
         for entry in existing_config_entries:
@@ -73,49 +72,64 @@ class DiscoveryManager:
         _LOGGER.debug("Start auto discovering entities")
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
-            await self.discover_entity(library, entity_entry)
+            source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
+            power_profile = await self.discover_entity(source_entity)
+            if not power_profile:
+                continue
+            self._init_entity_discovery(source_entity, power_profile, {})
 
         _LOGGER.debug("Done auto discovering entities")
 
-    async def discover_entity(self, library: ProfileLibrary, entity_entry: er.RegistryEntry) -> None:
+    async def _get_library(self) -> ProfileLibrary:
+        """Get the powercalc library instance."""
+        if not self.library:
+            self.library = await ProfileLibrary.factory(self.hass)
+        return self.library
+
+    async def discover_entity(
+        self,
+        source_entity: SourceEntity,
+    ) -> PowerProfile | None:
         """Discover a single entity in Powercalc library and start the discovery flow if supported."""
-        source_entity = await create_source_entity(
-            entity_entry.entity_id,
-            self.hass,
-        )
 
-        model_info = await self.extract_model_info_from_entity(entity_entry)
+        library = await self._get_library()
+        if source_entity.entity_entry is None:  # pragma: no cover
+            return None
+
+        model_info = await self.extract_model_info_from_entity(source_entity.entity_entry)
         if not model_info:
-            return
+            return None
 
-        if self.is_wled_light(model_info, entity_entry):
+        if self.is_wled_light(model_info, source_entity.entity_entry):
             await self.init_wled_flow(model_info, source_entity)
-            return
+            return None
 
         manufacturer = await library.find_manufacturer(model_info)
         if not manufacturer:
             _LOGGER.debug(
                 "%s: Manufacturer not found in library, skipping discovery",
-                entity_entry.entity_id,
+                source_entity.entity_entry.entity_id,
             )
-            return
+            return None
 
-        model = await library.find_models(manufacturer, model_info)
-        if not model:
+        models = await library.find_models(manufacturer, model_info)
+        if not models:
             _LOGGER.debug(
                 "%s: Model not found in library, skipping discovery",
-                entity_entry.entity_id,
+                source_entity.entity_entry.entity_id,
             )
-            return
+            return None
 
-        if not await self.is_entity_supported(entity_entry, model_info):
-            return
-        power_profile = await self.get_power_profile(
-            entity_entry.entity_id,
+        model = next(iter(models))
+        model_info = ModelInfo(manufacturer, model)
+
+        if not await self.is_entity_supported(source_entity.entity_entry, model_info):
+            return None
+
+        return await self.get_power_profile(
+            source_entity.entity_entry.entity_id,
             model_info,
         )
-
-        self._init_entity_discovery(source_entity, power_profile, {})
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
@@ -169,16 +183,11 @@ class DiscoveryManager:
         if not model_info or not model_info.manufacturer or not model_info.model:
             return False
 
-        source_entity = await create_source_entity(
-            entity_entry.entity_id,
-            self.hass,
-        )
-
         power_profile = await self.get_power_profile(entity_entry.entity_id, model_info)
         if not power_profile:
             return False
 
-        return power_profile.is_entity_domain_supported(source_entity)
+        return power_profile.is_entity_domain_supported(entity_entry)
 
     def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
         """Do some validations on the registry entry to see if it qualifies for discovery."""

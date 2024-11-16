@@ -123,9 +123,11 @@ class ProfileLibrary:
             if manufacturer is None:
                 return None
 
-            model = await self.find_models(manufacturer, model_info, custom_directory)
-            if model is None:
+            models = await self.find_models(manufacturer, model_info, custom_directory)
+            if not models:
                 return None
+
+            model = next(iter(models))
 
             json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
             if linked_profile := json_data.get("linked_lut"):
@@ -144,12 +146,12 @@ class ProfileLibrary:
             return model_info.manufacturer
         return await self._loader.find_manufacturer(model_info.manufacturer)
 
-    async def find_models(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> str | None:
+    async def find_models(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None = None) -> set[str]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         if custom_directory:
-            return model_info.model_id or model_info.model
+            return {model_info.model_id or model_info.model}
 
-        found_models: list[str] = []
+        found_models: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
                 search = {
@@ -159,9 +161,9 @@ class ProfileLibrary:
                     model_identifier.lower().replace("#slash#", "/"),
                     re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model_identifier),
                 }
-                found_models.extend(await self._loader.find_model(manufacturer, search))
+                found_models.update(await self._loader.find_model(manufacturer, search))
 
-        return found_models[0] if found_models else None
+        return found_models
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""

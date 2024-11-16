@@ -17,6 +17,7 @@ from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import translation
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
@@ -247,16 +248,15 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
-    def is_entity_domain_supported(self, source_entity: SourceEntity) -> bool:
+    def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
-        entity_entry = source_entity.entity_entry
         if (
-            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and source_entity.domain == LIGHT_DOMAIN
+            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and entity_entry.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
 
         entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
-        return entity_domain == source_entity.domain
+        return entity_domain == entity_entry.domain
 
 
 class SubProfileSelector:
