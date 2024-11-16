@@ -124,12 +124,11 @@ class ProfileLibrary:
             if not custom_directory:
                 manufacturer = await self.find_manufacturer(model_info)  # type: ignore
                 if manufacturer is None:
-                    return None  # type: ignore
+                    raise LibraryError(f"Manufacturer {model_info.manufacturer} not found")
 
                 models = await self.find_models(manufacturer, model_info)
                 if not models:
-                    return None
-
+                    raise LibraryError(f"Model {manufacturer} {model} not found")
                 model = next(iter(models))
 
             json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)

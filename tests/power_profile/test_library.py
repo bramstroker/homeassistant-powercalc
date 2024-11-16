@@ -100,9 +100,6 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     assert len(caplog.records) == 0
 
 
-# QUESTION: This test does not raise exception any more in local.py because no model
-#           without model.json is in library. Hence the new exception is raised by
-#           _load_model_data: "Model {manufacturer} {model} not found"
 async def test_exception_is_raised_when_no_model_json_present(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
@@ -123,6 +120,33 @@ async def test_create_power_profile_raises_library_error(hass: HomeAssistant, ca
     mock_loader.load_model = AsyncMock(return_value=None)
     mock_loader.find_manufacturer = AsyncMock(return_value="signify")
     mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
+    library = ProfileLibrary(hass, loader=mock_loader)
+    await library.initialize()
+    await library.create_power_profile(ModelInfo("signify", "LCT010"))
+
+    assert "Problem loading model" in caplog.text
+
+
+async def test_create_power_raise_library_error_when_model_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """When model is not found in library a LibraryError should be raised"""
+    caplog.set_level(logging.ERROR)
+    mock_loader = LocalLoader(hass, "")
+    mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_manufacturer = AsyncMock(return_value="signify")
+    mock_loader.find_model = AsyncMock(return_value=[])
+    library = ProfileLibrary(hass, loader=mock_loader)
+    await library.initialize()
+    await library.create_power_profile(ModelInfo("signify", "LCT010"))
+
+    assert "Problem loading model" in caplog.text
+
+
+async def test_create_power_raise_library_error_when_manufacturer_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """When model is not found in library a LibraryError should be raised"""
+    caplog.set_level(logging.ERROR)
+    mock_loader = LocalLoader(hass, "")
+    mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_manufacturer = AsyncMock(return_value=None)
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
     await library.create_power_profile(ModelInfo("signify", "LCT010"))
