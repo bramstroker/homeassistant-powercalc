@@ -1,6 +1,6 @@
 import logging
 import uuid
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.light import (
@@ -283,6 +283,48 @@ async def test_autodiscover_skips_unsupported_domains(
     await run_powercalc_setup(hass, {})
 
     assert not hass.states.get("sensor.test_power")
+
+
+async def test_autodiscover_continues_when_one_entity_fails(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Auto discovery should continue when one entity fails to load model information"""
+
+    caplog.set_level(logging.ERROR)
+
+    mock_device_registry(
+        hass,
+        {
+            "signify-device": DeviceEntry(
+                id="signify-device",
+                manufacturer="signify",
+                model="LCT010",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test1": RegistryEntry(
+                entity_id="light.test1",
+                unique_id="1234",
+                platform="light",
+                device_id="signify-device",
+            ),
+            "light.test2": RegistryEntry(
+                entity_id="light.test2",
+                unique_id="1235",
+                platform="light",
+                device_id="signify-device",
+            ),
+        },
+    )
+    with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_manufacturer", new_callable=AsyncMock) as mock_find_models:
+        mock_find_models.side_effect = [Exception("Test exception"), "signify"]
+        await run_powercalc_setup(hass, {})
+        assert "Error during auto discovery" in caplog.text
 
 
 async def test_load_model_with_slashes(

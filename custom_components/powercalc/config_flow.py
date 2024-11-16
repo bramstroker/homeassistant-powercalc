@@ -1547,10 +1547,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             return await self.async_step_manufacturer()
 
         if self.source_entity and self.source_entity.entity_entry and self.selected_profile is None:
-            try:
-                self.selected_profile = await get_power_profile_by_source_entity(self.hass, self.source_entity)
-            except ModelNotSupportedError:
-                self.selected_profile = None
+            self.selected_profile = await get_power_profile_by_source_entity(self.hass, self.source_entity)
         if self.selected_profile:
             remarks = self.selected_profile.config_flow_discovery_remarks
             if remarks:

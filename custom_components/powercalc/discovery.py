@@ -27,7 +27,6 @@ from .const import (
     DOMAIN,
     CalculationStrategy,
 )
-from .errors import ModelNotSupportedError
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -74,10 +73,16 @@ class DiscoveryManager:
         entity_registry = er.async_get(self.hass)
         for entity_entry in list(entity_registry.entities.values()):
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
-            power_profiles = await self.discover_entity(source_entity)
-            if not power_profiles:
-                continue
-            self._init_entity_discovery(source_entity, power_profiles, {})
+            try:
+                power_profiles = await self.discover_entity(source_entity)
+                if not power_profiles:
+                    continue
+                self._init_entity_discovery(source_entity, power_profiles, {})
+            except Exception:
+                _LOGGER.exception(
+                    "%s: Error during auto discovery",
+                    source_entity.entity_id,
+                )
 
         _LOGGER.debug("Done auto discovering entities")
 
@@ -121,17 +126,17 @@ class DiscoveryManager:
             )
             return None
 
-        model = next(iter(models))
-        model_info = ModelInfo(manufacturer, model)
+        power_profiles = []
+        for model in models:
+            model_info = ModelInfo(manufacturer, model)
+            profile = await get_power_profile(self.hass, {}, model_info=model_info)
+            if not profile:
+                continue
+            if not await self.is_entity_supported(source_entity.entity_entry, model_info, profile):
+                continue
+            power_profiles.append(profile)
 
-        if not await self.is_entity_supported(source_entity.entity_entry, model_info):
-            return None
-
-        power_profile = await self.get_power_profile(
-            source_entity.entity_entry.entity_id,
-            model_info,
-        )
-        return [power_profile] if power_profile else None
+        return power_profiles
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
@@ -154,29 +159,12 @@ class DiscoveryManager:
             and not re.search("master|segment", str(entity_entry.original_name), flags=re.IGNORECASE)
         )
 
-    async def get_power_profile(
+    async def is_entity_supported(
         self,
-        entity_id: str,
-        model_info: ModelInfo,
-    ) -> PowerProfile | None:
-        if entity_id in self.power_profiles:
-            return self.power_profiles[entity_id]
-
-        try:
-            self.power_profiles[entity_id] = await get_power_profile(
-                self.hass,
-                {},
-                model_info=model_info,
-            )
-            return self.power_profiles[entity_id]
-        except ModelNotSupportedError:
-            _LOGGER.debug(
-                "%s: Model not found in library, skipping discovery",
-                entity_id,
-            )
-            return None
-
-    async def is_entity_supported(self, entity_entry: er.RegistryEntry, model_info: ModelInfo | None) -> bool:
+        entity_entry: er.RegistryEntry,
+        model_info: ModelInfo | None = None,
+        power_profile: PowerProfile | None = None,
+    ) -> bool:
         if not self.should_process_entity(entity_entry):
             return False
 
@@ -185,7 +173,8 @@ class DiscoveryManager:
         if not model_info or not model_info.manufacturer or not model_info.model:
             return False
 
-        power_profile = await self.get_power_profile(entity_entry.entity_id, model_info)
+        if not power_profile:
+            power_profile = await get_power_profile(self.hass, {}, model_info)
         if not power_profile:
             return False
 
@@ -242,7 +231,7 @@ class DiscoveryManager:
             )
 
         _LOGGER.debug(
-            "%s: Auto discovered model (manufacturer=%s, model=%s, model_id=%s)",
+            "%s: Found model information on device (manufacturer=%s, model=%s, model_id=%s)",
             entity_entry.entity_id,
             model_info.manufacturer,
             model_info.model,
