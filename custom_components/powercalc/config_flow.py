@@ -186,6 +186,8 @@ MENU_OPTIONS = {
     Steps.WLED: "WLED options",
 }
 
+LIBRARY_URL = "https://library.powercalc.nl"
+
 STRATEGY_STEP_MAPPING = {
     CalculationStrategy.FIXED: Steps.FIXED,
     CalculationStrategy.LINEAR: Steps.LINEAR,
@@ -948,7 +950,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             step_id=Steps.MODEL,
             data_schema=await self.create_schema_model(),
             description_placeholders={
-                "supported_models_link": "https://library.powercalc.nl",
+                "supported_models_link": LIBRARY_URL,
             },
             errors=errors,
             last_step=False,
@@ -1524,6 +1526,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id=Steps.LIBRARY_MULTI_PROFILE,
             data_schema=schema,
+            description_placeholders={
+                "library_link": LIBRARY_URL,
+            },
             last_step=False,
         )
 
