@@ -1528,6 +1528,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             data_schema=schema,
             description_placeholders={
                 "library_link": LIBRARY_URL,
+                "manufacturer": str(self.sensor_config.get(CONF_MANUFACTURER)),
+                "model": str(self.sensor_config.get(CONF_MODEL)),
             },
             last_step=False,
         )

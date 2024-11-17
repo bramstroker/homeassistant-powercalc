@@ -43,7 +43,10 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
     except KeyError:
         discovery_manager = DiscoveryManager(hass, {})
-    profiles = await discovery_manager.discover_entity(source_entity)
+    model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
+    if not model_info:
+        return None
+    profiles = await discovery_manager.discover_entity(source_entity, model_info)
     return profiles[0] if profiles else None
 
 
@@ -74,10 +77,13 @@ class DiscoveryManager:
         for entity_entry in list(entity_registry.entities.values()):
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
             try:
-                power_profiles = await self.discover_entity(source_entity)
+                model_info = await self.extract_model_info_from_entity(source_entity.entity_entry)
+                if not model_info:
+                    continue
+                power_profiles = await self.discover_entity(source_entity, model_info)
                 if not power_profiles:
                     continue
-                self._init_entity_discovery(source_entity, power_profiles, {})
+                self._init_entity_discovery(source_entity, model_info, power_profiles, {})
             except Exception:
                 _LOGGER.exception(
                     "%s: Error during auto discovery",
@@ -95,15 +101,12 @@ class DiscoveryManager:
     async def discover_entity(
         self,
         source_entity: SourceEntity,
+        model_info: ModelInfo,
     ) -> list[PowerProfile] | None:
         """Discover a single entity in Powercalc library and start the discovery flow if supported."""
 
         library = await self._get_library()
         if source_entity.entity_entry is None:  # pragma: no cover
-            return None
-
-        model_info = await self.extract_model_info_from_entity(source_entity.entity_entry)
-        if not model_info:
             return None
 
         if self.is_wled_light(model_info, source_entity.entity_entry):
@@ -142,6 +145,7 @@ class DiscoveryManager:
         """Initialize the discovery flow for a WLED light."""
         self._init_entity_discovery(
             source_entity,
+            model_info,
             power_profiles=None,
             extra_discovery_data={
                 CONF_MODE: CalculationStrategy.WLED,
@@ -259,6 +263,7 @@ class DiscoveryManager:
     def _init_entity_discovery(
         self,
         source_entity: SourceEntity,
+        model_info: ModelInfo,
         power_profiles: list[PowerProfile] | None,
         extra_discovery_data: dict | None,
     ) -> None:
@@ -287,6 +292,9 @@ class DiscoveryManager:
                 power_profile = power_profiles[0]
                 discovery_data[CONF_MANUFACTURER] = power_profile.manufacturer
                 discovery_data[CONF_MODEL] = power_profile.model
+            else:
+                discovery_data[CONF_MANUFACTURER] = model_info.manufacturer
+                discovery_data[CONF_MODEL] = model_info.model or model_info.model_id
 
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)
