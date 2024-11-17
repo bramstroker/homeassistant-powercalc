@@ -150,8 +150,6 @@ class DiscoveryManager:
             power_profiles=None,
             extra_discovery_data={
                 CONF_MODE: CalculationStrategy.WLED,
-                CONF_MANUFACTURER: model_info.manufacturer,
-                CONF_MODEL: model_info.model,
             },
         )
 
@@ -297,9 +295,11 @@ class DiscoveryManager:
                 power_profile = power_profiles[0]
                 discovery_data[CONF_MANUFACTURER] = power_profile.manufacturer
                 discovery_data[CONF_MODEL] = power_profile.model
-            else:
-                discovery_data[CONF_MANUFACTURER] = model_info.manufacturer
-                discovery_data[CONF_MODEL] = model_info.model or model_info.model_id
+
+        if CONF_MANUFACTURER not in discovery_data:
+            discovery_data[CONF_MANUFACTURER] = model_info.manufacturer
+        if CONF_MODEL not in discovery_data:
+            discovery_data[CONF_MODEL] = model_info.model or model_info.model_id
 
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)

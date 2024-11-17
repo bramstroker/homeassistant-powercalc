@@ -27,7 +27,7 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -124,7 +124,6 @@ from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerPr
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .sensors.group.factory import generate_unique_id
 from .strategy.factory import PowerCalculatorStrategyFactory
-from .strategy.strategy_interface import PowerCalculationStrategyInterface
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
 _LOGGER = logging.getLogger(__name__)
@@ -536,13 +535,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         strategy_name = CalculationStrategy(
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
-        strategy = await self._create_strategy_object(
-            self.hass,
-            strategy_name,
-            self.sensor_config,
-            self.source_entity,  # type: ignore
-            self.selected_profile,
-        )
+        factory = PowerCalculatorStrategyFactory(self.hass)
+        strategy = await factory.create(self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         try:
             await strategy.validate_config()
         except StrategyConfigurationError as error:
@@ -582,23 +576,6 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             errors["base"] = "daily_energy_mandatory"
 
         return errors
-
-    @staticmethod
-    async def _create_strategy_object(
-        hass: HomeAssistant,
-        strategy: str,
-        config: dict,
-        source_entity: SourceEntity,
-        power_profile: PowerProfile | None = None,
-    ) -> PowerCalculationStrategyInterface:
-        """Create the calculation strategy object."""
-        factory = PowerCalculatorStrategyFactory(hass)
-        if power_profile is None and CONF_MANUFACTURER in config and strategy != CalculationStrategy.WLED:
-            library = await ProfileLibrary.factory(hass)
-            power_profile = await library.get_profile(
-                ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL)),  # type: ignore
-            )
-        return await factory.create(config, strategy, power_profile, source_entity)
 
     def create_strategy_schema(self, strategy: CalculationStrategy, source_entity_id: str) -> vol.Schema:
         """Get the config schema for a given power calculation strategy."""
