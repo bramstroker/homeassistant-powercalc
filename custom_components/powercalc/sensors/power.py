@@ -206,7 +206,7 @@ async def _get_power_profile(
     power_profile = None
     if not is_manually_configured(sensor_config):
         try:
-            model_info = await discovery_manager.autodiscover_model(source_entity.entity_entry)
+            model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
             power_profile = await get_power_profile(
                 hass,
                 sensor_config,

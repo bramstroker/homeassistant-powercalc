@@ -126,10 +126,10 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LCA007"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity("light.test", "test", "light"),
+        RegistryEntry(entity_id="light.test", platform="hue", unique_id="1234"),
     )
     assert not power_profile.is_entity_domain_supported(
-        SourceEntity("switch.test", "test", "switch"),
+        RegistryEntry(entity_id="switch.test", platform="bla", unique_id="1234"),
     )
 
 
@@ -139,15 +139,10 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LOM001"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity(
-            "light.test",
-            "test",
-            "light",
-            entity_entry=RegistryEntry(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="hue",
-            ),
+        RegistryEntry(
+            entity_id="light.test",
+            unique_id="1234",
+            platform="hue",
         ),
     )
 

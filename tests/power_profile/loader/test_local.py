@@ -12,21 +12,21 @@ from tests.common import get_test_config_dir, get_test_profile_dir, run_powercal
 
 
 async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-model"))
+    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/double-model"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
     assert "Double entry manufacturer/model in custom library:" in caplog.text
 
 
 async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/double-alias"))
+    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/double-alias"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
         assert "Double entry manufacturer/model in custom library" in caplog.text
 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc/profiles_lib_broken/missing-model-json"))
+    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/missing-model-json"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
         assert "model.json should exist in" in caplog.text
@@ -35,20 +35,20 @@ async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pyt
 @pytest.mark.parametrize(
     "manufacturer,search,expected",
     [
-        ["tp-link", {"HS300"}, "HS300"],
-        ["TP-link", {"HS300"}, "HS300"],
-        ["tp-link", {"hs300"}, "HS300"],
-        ["TP-link", {"hs300"}, "HS300"],
-        ["tp-link", {"HS400"}, "HS400"],  # alias
-        ["tp-link", {"hs400"}, "HS400"],  # alias
-        ["tp-link", {"Hs500"}, "hs500"],  # alias
-        ["tp-link", {"bla"}, None],
-        ["foo", {"bar"}, None],
-        ["casing", {"CaSinG- Test"}, "CaSinG- Test"],
-        ["casing", {"CasinG- test"}, "CaSinG- Test"],
-        ["casing", {"CASING- TEST"}, "CaSinG- Test"],
-        ["hidden-directories", {".test"}, None],
-        ["hidden-directories", {".hidden_model"}, None],
+        ["tp-link", {"HS300"}, ["HS300"]],
+        ["TP-link", {"HS300"}, ["HS300"]],
+        ["tp-link", {"hs300"}, ["HS300"]],
+        ["TP-link", {"hs300"}, ["HS300"]],
+        ["tp-link", {"HS400"}, ["HS400"]],  # alias
+        ["tp-link", {"hs400"}, ["HS400"]],  # alias
+        ["tp-link", {"Hs500"}, ["hs500"]],  # alias
+        ["tp-link", {"bla"}, []],
+        ["foo", {"bar"}, []],
+        ["casing", {"CaSinG- Test"}, ["CaSinG- Test"]],
+        ["casing", {"CasinG- test"}, ["CaSinG- Test"]],
+        ["casing", {"CASING- TEST"}, ["CaSinG- Test"]],
+        ["hidden-directories", {".test"}, []],
+        ["hidden-directories", {".hidden_model"}, []],
     ],
 )
 async def test_find_model(hass: HomeAssistant, manufacturer: str, search: set[str], expected: str | None) -> None:
@@ -70,23 +70,9 @@ async def test_load_model_returns_none_when_manufacturer_not_found(hass: HomeAss
     assert await loader.load_model("foo", "bar") is None
 
 
-async def test_load_model_returns_warning_when_manufacturer_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = await _create_loader(hass)
-    with caplog.at_level(logging.ERROR):
-        await loader.load_model("foo", "bar")
-        assert "Manufacturer does not exist in custom library: foo" in caplog.text
-
-
 async def test_load_model_returns_none_when_model_not_found(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert await loader.load_model("tp-link", "bar") is None
-
-
-async def test_load_model_returns_warning_when_model_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = await _create_loader(hass)
-    with caplog.at_level(logging.INFO):
-        await loader.load_model("tp-link", "bar")
-    assert "Model does not exist in custom library for manufacturer tp-link: bar" in caplog.text
 
 
 # Test find_manufacturer
