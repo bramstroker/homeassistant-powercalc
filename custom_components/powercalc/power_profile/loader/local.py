@@ -94,12 +94,10 @@ class LocalLoader(Loader):
 
         lib_models = self._manufacturer_model_listing.get(_manufacturer)
         if lib_models is None:
-            _LOGGER.error("Manufacturer does not exist in custom library: %s", _manufacturer)
             return None
 
         lib_model = lib_models.get(_model)
         if lib_model is None:
-            _LOGGER.error("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
             return None
 
         model_path = lib_model.get_model_directory()
