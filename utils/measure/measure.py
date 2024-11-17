@@ -82,6 +82,8 @@ class Measure:
         ----------
         power_meter : PowerMeter
             The power meter to use.
+        console_render : ConsoleRender, optional
+            The console renderer to use, by default None
         """
         self.power_meter = power_meter
         self.runner: MeasurementRunner | None = None
