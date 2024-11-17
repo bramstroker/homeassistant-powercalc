@@ -11,3 +11,6 @@ class PowerMeterType(str, Enum):
     TASMOTA = "tasmota"
     TUYA = "tuya"
     MYSTROM = "mystrom"
+
+
+QUESTION_POWERMETER_ENTITY_ID = "powermeter_entity_id"

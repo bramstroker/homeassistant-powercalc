@@ -1,7 +1,8 @@
 from typing import Any
 
 import inquirer
-from media_controller.controller import MediaController
+
+from .controller import MediaController
 
 
 class DummyMediaController(MediaController):

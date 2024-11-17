@@ -12,15 +12,17 @@ from typing import Any
 
 import config
 import inquirer
+from const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from controller.light.errors import LightControllerError
 from decouple import UndefinedValueError
 from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
-from light_controller.errors import LightControllerError
 from powermeter.errors import PowerMeterError
 from powermeter.factory import PowerMeterFactory
 from powermeter.powermeter import PowerMeter
 from runner.average import AverageRunner
+from runner.charging import ChargingRunner
 from runner.light import LightRunner
 from runner.recorder import RecorderRunner
 from runner.runner import MeasurementRunner
@@ -46,6 +48,16 @@ class MeasureType(str, Enum):
     SPEAKER = "Smart speaker"
     RECORDER = "Recorder"
     AVERAGE = "Average"
+    CHARGING = "Charging device"
+
+
+MEASURE_TYPE_RUNNER = {
+    MeasureType.LIGHT: LightRunner,
+    MeasureType.SPEAKER: SpeakerRunner,
+    MeasureType.RECORDER: RecorderRunner,
+    MeasureType.AVERAGE: AverageRunner,
+    MeasureType.CHARGING: ChargingRunner,
+}
 
 
 _LOGGER = logging.getLogger("measure")
@@ -112,9 +124,12 @@ class Measure:
                 choices=[cls.value for cls in MeasureType],
             )
 
-        self.runner = RunnerFactory().create_runner(self.measure_type, self.power_meter)
+        measure_util = MeasureUtil(self.power_meter)
+        self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util)
 
         answers = self.ask_questions(self.get_questions())
+        if answers[QUESTION_DUMMY_LOAD]:
+            measure_util.initialize_dummy_load()
         self.power_meter.process_answers(answers)
         self.runner.prepare(answers)
 
@@ -129,11 +144,13 @@ class Measure:
             if not os.path.exists(export_directory):
                 os.makedirs(export_directory)
 
+        if answers[QUESTION_DUMMY_LOAD]:
+            input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
         runner_result = self.runner.run(answers, export_directory)
         if not runner_result:
             _LOGGER.error("Some error occurred during the measurement session")
 
-        generate_model_json: bool = answers.get("generate_model_json", False) and export_directory
+        generate_model_json: bool = answers.get(QUESTION_GENERATE_MODEL_JSON, False) and export_directory
 
         if generate_model_json:
             try:
@@ -145,8 +162,8 @@ class Measure:
             self.write_model_json(
                 directory=export_directory,
                 standby_power=standby_power,
-                name=answers["model_name"],
-                measure_device=answers["measure_device"],
+                name=answers[QUESTION_MODEL_NAME],
+                measure_device=answers[QUESTION_MEASURE_DEVICE],
                 extra_json_data=runner_result.model_json_data,
             )
 
@@ -195,23 +212,28 @@ class Measure:
         Returns generic questions which are asked regardless of the choosen device type
         Additionally the configured runner and power_meter can also provide further questions
         """
-        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER]:
+        if self.measure_type in [MeasureType.LIGHT, MeasureType.SPEAKER, MeasureType.CHARGING]:
             questions = [
                 inquirer.Confirm(
-                    name="generate_model_json",
+                    name=QUESTION_GENERATE_MODEL_JSON,
                     message="Do you want to generate model.json?",
                     default=True,
                 ),
+                inquirer.Confirm(
+                    name=QUESTION_DUMMY_LOAD,
+                    message="Do you want to use a dummy load? This can help to be able to measure standby power and low brightness levels correctly",
+                    default=False,
+                ),
                 inquirer.Text(
-                    name="model_name",
+                    name=QUESTION_MODEL_NAME,
                     message=f"Specify the full {self.measure_type} model name",
-                    ignore=lambda answers: not answers.get("generate_model_json"),
+                    ignore=lambda answers: not answers.get(QUESTION_GENERATE_MODEL_JSON),
                     validate=validate_required,
                 ),
                 inquirer.Text(
-                    name="measure_device",
+                    name=QUESTION_MEASURE_DEVICE,
                     message="Which powermeter (manufacturer, model) do you use to take the measurement?",
-                    ignore=lambda answers: not answers.get("generate_model_json"),
+                    ignore=lambda answers: not answers.get(QUESTION_GENERATE_MODEL_JSON),
                     validate=validate_required,
                 ),
             ]
@@ -274,26 +296,6 @@ def str_to_bool(value: Any) -> bool:  # noqa: ANN401
     if not value:
         return False
     return str(value).lower() in ("y", "yes", "t", "true", "on", "1")
-
-
-class RunnerFactory:
-    @staticmethod
-    def create_runner(
-        device_type: MeasureType,
-        power_meter: PowerMeter,
-    ) -> MeasurementRunner:
-        """Creates a runner instance based on selected device type"""
-        measure_util = MeasureUtil(power_meter)
-        if device_type == MeasureType.SPEAKER:
-            return SpeakerRunner(measure_util)
-
-        if device_type == MeasureType.RECORDER:
-            return RecorderRunner(measure_util)
-
-        if device_type == MeasureType.AVERAGE:
-            return AverageRunner(measure_util)
-
-        return LightRunner(measure_util)
 
 
 def main() -> None:
