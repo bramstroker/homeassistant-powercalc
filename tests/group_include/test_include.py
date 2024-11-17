@@ -323,6 +323,61 @@ async def test_include_group(hass: HomeAssistant) -> None:
     }
 
 
+async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
+    mock_device_registry(
+        hass,
+        {
+            "device-a": DeviceEntry(
+                id="device-a",
+                manufacturer="Signify",
+                model="LCT012",
+            ),
+            "device-b": DeviceEntry(
+                id="device-b",
+                manufacturer="Signify",
+                model="Room",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "light.a": RegistryEntry(
+                entity_id="light.a",
+                unique_id="111",
+                platform="light",
+                device_id="device-a",
+            ),
+            "light.b": RegistryEntry(
+                entity_id="light.b",
+                unique_id="222",
+                platform="light",
+                device_id="device-b",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "Powercalc group",
+                CONF_INCLUDE: {CONF_DOMAIN: "light"},
+            },
+        ],
+    )
+
+    group_state = hass.states.get("sensor.powercalc_group_power")
+    assert group_state
+    assert group_state.attributes.get(ATTR_ENTITIES) == {
+        "light.a_power",
+    }
+
+    assert len(caplog.records) == 0
+
+
 async def test_error_is_logged_when_group_not_exists(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,

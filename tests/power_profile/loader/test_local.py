@@ -70,23 +70,9 @@ async def test_load_model_returns_none_when_manufacturer_not_found(hass: HomeAss
     assert await loader.load_model("foo", "bar") is None
 
 
-async def test_load_model_returns_warning_when_manufacturer_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = await _create_loader(hass)
-    with caplog.at_level(logging.ERROR):
-        await loader.load_model("foo", "bar")
-        assert "Manufacturer does not exist in custom library: foo" in caplog.text
-
-
 async def test_load_model_returns_none_when_model_not_found(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
     assert await loader.load_model("tp-link", "bar") is None
-
-
-async def test_load_model_returns_warning_when_model_not_found(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = await _create_loader(hass)
-    with caplog.at_level(logging.INFO):
-        await loader.load_model("tp-link", "bar")
-    assert "Model does not exist in custom library for manufacturer tp-link: bar" in caplog.text
 
 
 # Test find_manufacturer

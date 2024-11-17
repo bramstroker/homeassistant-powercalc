@@ -593,7 +593,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     ) -> PowerCalculationStrategyInterface:
         """Create the calculation strategy object."""
         factory = PowerCalculatorStrategyFactory(hass)
-        if power_profile is None and CONF_MANUFACTURER in config:
+        if power_profile is None and CONF_MANUFACTURER in config and strategy != CalculationStrategy.WLED:
             library = await ProfileLibrary.factory(hass)
             power_profile = await library.get_profile(
                 ModelInfo(config.get(CONF_MANUFACTURER), config.get(CONF_MODEL)),  # type: ignore
@@ -771,10 +771,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Create sub profile schema."""
         library = await ProfileLibrary.factory(self.hass)
         profile = await library.get_profile(model_info)
-        sub_profiles = [
-            selector.SelectOptionDict(value=sub_profile, label=sub_profile)
-            for sub_profile in await profile.get_sub_profiles()  # type: ignore
-        ]
+        sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
         return vol.Schema(
             {
                 vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(

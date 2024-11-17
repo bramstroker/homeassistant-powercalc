@@ -93,7 +93,7 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
-    ) -> PowerProfile | None:
+    ) -> PowerProfile:
         """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
         sub_profile = None
@@ -102,9 +102,6 @@ class ProfileLibrary:
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
         profile = await self.create_power_profile(model_info, custom_directory)
-
-        if not profile:
-            return None
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -115,30 +112,25 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
-    ) -> PowerProfile | None:
+    ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
 
-        try:
-            manufacturer = model_info.manufacturer
-            model = model_info.model
-            if not custom_directory:
-                manufacturer = await self.find_manufacturer(model_info)  # type: ignore
-                if manufacturer is None:
-                    raise LibraryError(f"Manufacturer {model_info.manufacturer} not found")
+        manufacturer = model_info.manufacturer
+        model = model_info.model
+        if not custom_directory:
+            manufacturer = await self.find_manufacturer(model_info)  # type: ignore
+            if manufacturer is None:
+                raise LibraryError(f"Manufacturer {model_info.manufacturer} not found")
 
-                models = await self.find_models(manufacturer, model_info)
-                if not models:
-                    raise LibraryError(f"Model {manufacturer} {model} not found")
-                model = next(iter(models))
+            models = await self.find_models(manufacturer, model_info)
+            if not models:
+                raise LibraryError(f"Model {manufacturer} {model} not found")
+            model = next(iter(models))
 
-            json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
-            if linked_profile := json_data.get("linked_lut"):
-                linked_manufacturer, linked_model = linked_profile.split("/")
-                _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
-
-        except LibraryError as e:
-            _LOGGER.error("Problem loading model: %s", e)
-            return None
+        json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
+        if linked_profile := json_data.get("linked_lut"):
+            linked_manufacturer, linked_model = linked_profile.split("/")
+            _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
         return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
 

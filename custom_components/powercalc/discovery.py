@@ -27,6 +27,7 @@ from .const import (
     DOMAIN,
     CalculationStrategy,
 )
+from .errors import ModelNotSupportedError
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -178,7 +179,10 @@ class DiscoveryManager:
             return False
 
         if not power_profile:
-            power_profile = await get_power_profile(self.hass, {}, model_info)
+            try:
+                power_profile = await get_power_profile(self.hass, {}, model_info)
+            except ModelNotSupportedError:
+                return False
 
         return power_profile.is_entity_domain_supported(entity_entry) if power_profile else False
 
