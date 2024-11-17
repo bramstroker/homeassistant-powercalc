@@ -1523,13 +1523,15 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             },
         )
 
+        manufacturer = str(self.sensor_config.get(CONF_MANUFACTURER))
+        model = str(self.sensor_config.get(CONF_MODEL))
         return self.async_show_form(
             step_id=Steps.LIBRARY_MULTI_PROFILE,
             data_schema=schema,
             description_placeholders={
-                "library_link": LIBRARY_URL,
-                "manufacturer": str(self.sensor_config.get(CONF_MANUFACTURER)),
-                "model": str(self.sensor_config.get(CONF_MODEL)),
+                "library_link": f"{LIBRARY_URL}/?manufacturer={manufacturer}",
+                "manufacturer": manufacturer,
+                "model": model,
             },
             last_step=False,
         )
