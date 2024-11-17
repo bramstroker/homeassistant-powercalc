@@ -1,3 +1,4 @@
+import os
 import sys
 from io import StringIO
 from unittest.mock import patch
@@ -22,12 +23,9 @@ def event_factory(*args):
     return Iterable(*args)
 
 
-def test_measure() -> None:
-    sys.stdin = StringIO()
-    sys.stdout = StringIO()
-
-    render = ConsoleRender(
-        event_generator=event_factory(
+def test_wizard() -> None:
+    measure = _create_measure_instance(
+        event_factory(
             key.ENTER,  # MEASURE_TYPE
             "n",  # DUMMY_LOAD
             "y",  # GENERATE_MODEL_JSON
@@ -37,8 +35,38 @@ def test_measure() -> None:
         )
     )
 
-    power_meter = DummyPowerMeter()
-    measure = Measure(power_meter, console_render=render)
+    with patch("builtins.input", return_value=""):
+        measure.start()
+
+
+def test_2() -> None:
+    os.environ["SELECTED_DEVICE_TYPE"] = "Light bulb(s)"
+    os.environ["COLOR_MODE"] = "color_temp"
+    os.environ["GENERATE_MODEL_JSON"] = "true"
+    os.environ["GZIP"] = "true"
+    os.environ["MULTIPLE_LIGHTS"] = "false"
+    os.environ["LIGHT_ENTITY_ID"] = "xx"
+    os.environ["MEASURE_DEVICE"] = "Shelly Plug S"
+    os.environ["NUM_LIGHTS"] = "1"
+    os.environ["LIGHT_MODEL_ID"] = "xx"
+    os.environ["MODEL_NAME"] = "xx"
+    os.environ["DUMMY_LOAD"] = "true"
+    os.environ["POWERMETER_ENTITY_ID"] = "sensor.my_power"
+    os.environ["RESUME"] = "true"
+
+    measure = _create_measure_instance()
 
     with patch("builtins.input", return_value=""):
         measure.start()
+
+
+def _create_measure_instance(console_events: Iterable | None = None) -> Measure:
+    sys.stdin = StringIO()
+    sys.stdout = StringIO()
+
+    render = ConsoleRender(
+        event_generator=console_events
+    )
+
+    power_meter = DummyPowerMeter()
+    return Measure(power_meter, render)
