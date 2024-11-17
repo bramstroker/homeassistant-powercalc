@@ -398,14 +398,20 @@ async def test_load_model_with_slashes(
             "ikea",
             "LED1649C5",
         ),
+        (
+            "sensor.test",
+            ModelInfo("Signify Netherlands B.V.", "LLC020"),
+            None,
+            None,
+        ),
     ],
 )
 async def test_discover_entity(
     hass: HomeAssistant,
     entity_id: str,
     model_info: ModelInfo,
-    expected_manufacturer: str,
-    expected_model: str,
+    expected_manufacturer: str | None,
+    expected_model: str | None,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
@@ -416,6 +422,10 @@ async def test_discover_entity(
 
     source_entity = await create_source_entity(entity_id, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
+
+    if not expected_manufacturer:
+        assert not power_profile
+        return
 
     assert power_profile.manufacturer == expected_manufacturer
     assert power_profile.model == expected_model
