@@ -32,7 +32,7 @@ def test_wizard() -> None:
             key.ENTER,  # COLOR_MODE
             key.ENTER,  # GZIP
             "n",  # MULTIPLE_LIGHTS
-        )
+        ),
     )
 
     with patch("builtins.input", return_value=""):
