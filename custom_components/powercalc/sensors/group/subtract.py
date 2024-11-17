@@ -13,6 +13,7 @@ from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSORS,
     CONF_POWER_SENSOR_PRECISION,
     CONF_SUBTRACT_ENTITIES,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     DEFAULT_POWER_SENSOR_PRECISION,
     GroupType,
 )
@@ -20,6 +21,7 @@ from custom_components.powercalc.errors import SensorConfigurationError
 from custom_components.powercalc.sensors.abstract import generate_power_sensor_entity_id, generate_power_sensor_name
 from custom_components.powercalc.sensors.energy import create_energy_sensor
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
+from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,11 +60,19 @@ async def create_subtract_group_sensors(
     )
     sensors.append(power_sensor)
     if config.get(CONF_CREATE_ENERGY_SENSORS):
-        sensors.append(
-            await create_energy_sensor(
+        energy_sensor = await create_energy_sensor(
+            hass,
+            config,
+            power_sensor,
+        )
+        sensors.append(energy_sensor)
+
+        config[CONF_UTILITY_METER_NET_CONSUMPTION] = True
+        sensors.extend(
+            await create_utility_meters(
                 hass,
+                energy_sensor,
                 config,
-                power_sensor,
             ),
         )
     return sensors

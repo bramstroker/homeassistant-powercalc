@@ -5,6 +5,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.const import (
     CONF_CREATE_GROUP,
+    CONF_CREATE_UTILITY_METERS,
     CONF_GROUP_TYPE,
     CONF_SUBTRACT_ENTITIES,
     GroupType,
@@ -26,6 +27,7 @@ async def test_subtract_sensor(hass: HomeAssistant) -> None:
         {
             CONF_CREATE_GROUP: "Test",
             CONF_GROUP_TYPE: GroupType.SUBTRACT,
+            CONF_CREATE_UTILITY_METERS: True,
             CONF_ENTITY_ID: "sensor.a_power",
             CONF_SUBTRACT_ENTITIES: [
                 "sensor.b_power",
@@ -43,6 +45,8 @@ async def test_subtract_sensor(hass: HomeAssistant) -> None:
 
     state = hass.states.get("sensor.test_power")
     assert state.state == "52.55"
+
+    assert hass.states.get("sensor.test_energy_daily")
 
 
 async def test_base_sensor_state_none(hass: HomeAssistant) -> None:

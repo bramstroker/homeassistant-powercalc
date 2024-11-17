@@ -170,7 +170,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         if playbook_id in self._loaded_playbooks:
             return self._loaded_playbooks[playbook_id]
 
-        playbooks: dict[str, str] = self._config.get(CONF_PLAYBOOKS)
+        playbooks: dict[str, str] = self._config.get(CONF_PLAYBOOKS)  # type: ignore
         if playbook_id not in playbooks:
             raise StrategyConfigurationError(
                 f"Playbook with id {playbook_id} not defined in playbooks config",

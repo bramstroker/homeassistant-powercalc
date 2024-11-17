@@ -121,7 +121,7 @@ async def _get_related_energy_sensor(
             real_energy_sensor.entity_id,
             power_sensor.entity_id,
         )
-        return real_energy_sensor  # type: ignore
+        return real_energy_sensor
 
     _LOGGER.debug(
         "No existing energy sensor found for the power sensor '%s'",
@@ -142,7 +142,7 @@ async def _create_virtual_energy_sensor(
         sensor_config.get(CONF_NAME),
         source_entity,
     )
-    unique_id = f"{power_sensor.unique_id}_energy" if power_sensor.unique_id else None
+    unique_id = f"{power_sensor.unique_id}_energy" if power_sensor.unique_id is not None else None
     entity_id = generate_energy_sensor_entity_id(
         hass,
         sensor_config,
@@ -180,10 +180,10 @@ def get_unit_prefix(
 ) -> str | None:
     unit_prefix = sensor_config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX)
 
-    power_unit = power_sensor.unit_of_measurement
+    power_unit = UnitOfPower(power_sensor.unit_of_measurement)  # type: ignore
     power_state = hass.states.get(power_sensor.entity_id)
-    if power_unit is None and power_state:
-        power_unit = power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)  # pragma: no cover
+    if power_unit is None and power_state:  # type: ignore
+        power_unit = power_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)  # type: ignore  # pragma: no cover
 
     # When the power sensor is in kW, we don't want to add an extra k prefix.
     # As this would result in an energy sensor having kkWh unit, which is obviously invalid
@@ -192,7 +192,7 @@ def get_unit_prefix(
 
     if unit_prefix == UnitPrefix.NONE:
         unit_prefix = None
-    return unit_prefix  # type: ignore
+    return unit_prefix
 
 
 @callback
@@ -276,7 +276,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
             self._attr_entity_category = EntityCategory(entity_category)
 
     @property
-    def extra_state_attributes(self) -> dict[str, str] | None:
+    def extra_state_attributes(self) -> dict[str, str] | None:  # type: ignore[override]
         """Return the state attributes of the energy sensor."""
         if self._sensor_config.get(CONF_DISABLE_EXTENDED_ATTRIBUTES):
             return super().extra_state_attributes
@@ -294,7 +294,7 @@ class VirtualEnergySensor(IntegrationSensor, EnergySensor):
         return attrs
 
     @property
-    def icon(self) -> str:
+    def icon(self) -> str:  # type: ignore[override]
         return ENERGY_ICON
 
     @callback
@@ -323,11 +323,11 @@ class RealEnergySensor(EnergySensor):
         self._unique_id = unique_id
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str | None:  # type: ignore[override]
         """Return the name of the sensor."""
         return self._name
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # type: ignore[override]
         """Return the unique_id of the sensor."""
         return self._unique_id

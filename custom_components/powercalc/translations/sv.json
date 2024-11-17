@@ -71,28 +71,28 @@
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
           "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
+          "create_utility_meters": "Skapa bruksmätare",
+          "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
           "force_update_frequency": "Force update frequency",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
+          "ignore_unavailable_state": "Ignorera ej tillgängligt tillstånd",
+          "include_non_powercalc_sensors": "Inkludera icke-powercalc sensorer",
+          "power_sensor_category": "Kategori för strömsensor",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
           "power_sensor_naming": "Power sensor name pattern"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
+          "create_energy_sensors": "Huruvida powercalc behöver skapa kWh sensorer",
+          "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykler dag, timme etc.",
+          "disable_extended_attributes": "Inaktivera alla extra attribut powercalc bidrar till effekt, energi och grupp enhet stater. Detta kommer att bidra till att hålla databasen storlek liten",
+          "disable_library_download": "Inaktivera nedladdningsfunktionen för Powercalc-biblioteket",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
+          "ignore_unavailable_state": "Håll Powercalc-sensorer tillgängliga, även när källenheten inte är tillgänglig",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Energialternativ",
         "data": {
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
@@ -175,7 +175,7 @@
           "model": "Modell ID"
         },
         "description": "Välj enhetsmodell Se i [list]({supported_models_link}) För modeller som stöds eller mer information",
-        "title": "Modell konfig"
+        "title": "Konfiguration för modell"
       },
       "menu_group": {
         "menu_options": {
@@ -183,7 +183,7 @@
           "domain_group": "Domänbaserad grupp"
         },
         "title": "Välj grupptyp",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
+        "description": "Välj vilken typ av gruppsensor du vill skapa. Välj domänbaserad grupp om du vill gruppera alla enheter i en specifik domän eller skapa en sensor som summerar all din energisensor. Välj standardgrupp annars"
       },
       "multi_switch": {
         "data": {
@@ -431,11 +431,11 @@
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "Grundläggande alternativ",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
+          "create_energy_sensors": "Skapa energisensor",
           "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
+          "disable_extended_attributes": "Inaktivera utökade attribut",
           "disable_library_download": "Disable remote library download",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
@@ -455,7 +455,7 @@
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Energialternativ",
         "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
         "data": {
           "energy_integration_method": "Energy integration method",
@@ -537,11 +537,11 @@
         "title": "Multi switch options",
         "data": {
           "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "power": "Ström PÅ",
+          "power_off": "Ström AV"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
+          "entities": "Välj alla enskilda switchar som ingår i multibrytaren",
           "power": "Power for a single switch when turned on",
           "power_off": "Power for a single switch when turned off"
         }
@@ -572,14 +572,14 @@
       },
       "subtract_group": {
         "data": {
-          "entity_id": "Base entity",
+          "entity_id": "Basentiteten",
           "subtract_entities": "Subtract entities"
         },
         "data_description": {
           "entity_id": "The base entity to subtract the power from",
           "subtract_entities": "Select all the entities you want to subtract from the base entity"
         },
-        "title": "Group options"
+        "title": "Gruppalternativ"
       },
       "utility_meter_options": {
         "title": "Utility meter options",
@@ -597,7 +597,7 @@
       "wled": {
         "title": "WLED alternativ",
         "data": {
-          "power_factor": "Power factor",
+          "power_factor": "Effektfaktor",
           "voltage": "Spänning"
         }
       }

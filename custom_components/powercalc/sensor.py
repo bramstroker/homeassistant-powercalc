@@ -8,7 +8,7 @@ import uuid
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any
+from typing import Any, cast
 
 import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.entity_registry as er
@@ -741,7 +741,8 @@ async def add_discovered_entities(
 ) -> None:
     """Add discovered entities based on include configuration."""
     if CONF_INCLUDE in config:
-        found_entities, discoverable_entities = await resolve_include_entities(hass, config.get(CONF_INCLUDE))
+        include_config: dict = cast(dict, config[CONF_INCLUDE])
+        found_entities, discoverable_entities = await resolve_include_entities(hass, include_config)
         entities_to_add.existing.extend(found_entities)
         for entity_id in discoverable_entities:
             sensor_configs[entity_id] = {CONF_ENTITY_ID: entity_id}

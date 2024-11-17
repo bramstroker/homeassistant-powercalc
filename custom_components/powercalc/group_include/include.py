@@ -66,7 +66,7 @@ async def resolve_include_entities(
 def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
-) -> dict[str, entity_registry.RegistryEntry | None]:
+) -> dict[str, entity_registry.RegistryEntry]:
     entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
 
     entity_reg = entity_registry.async_get(hass)
