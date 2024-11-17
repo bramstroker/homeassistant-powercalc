@@ -65,7 +65,7 @@ def _create_measure_instance(console_events: Iterable | None = None) -> Measure:
     sys.stdout = StringIO()
 
     render = ConsoleRender(
-        event_generator=console_events
+        event_generator=console_events,
     )
 
     power_meter = DummyPowerMeter()
