@@ -1,6 +1,8 @@
 import logging
+import os
 import time
 from datetime import datetime as dt
+from pathlib import Path
 
 import config
 from powermeter.errors import (
@@ -16,6 +18,7 @@ _LOGGER = logging.getLogger("measure")
 class MeasureUtil:
     def __init__(self, power_meter: PowerMeter) -> None:
         self.power_meter = power_meter
+        self.dummy_load_value: float | None = None
 
     def take_average_measurement(self, duration: int) -> float:
         """Measure average power consumption for a given time period in seconds"""
@@ -28,6 +31,9 @@ class MeasureUtil:
             readings.append(power)
             time.sleep(config.SLEEP_TIME)
         average = round(sum(readings) / len(readings), 2)
+        if self.dummy_load_value:
+            average -= self.dummy_load_value
+
         _LOGGER.info("Average power: %s", average)
         return average
 
@@ -77,4 +83,38 @@ class MeasureUtil:
                 time.sleep(config.SLEEP_TIME_SAMPLE)
 
         # Determine Average PM reading
-        return sum(measurements) / len(measurements)
+        average = sum(measurements) / len(measurements)
+        if self.dummy_load_value:
+            average -= self.dummy_load_value
+        return average
+
+    def initialize_dummy_load(self) -> float:
+        """Get the previously measured dummy load value, or take a new measurement if it doesn't exist"""
+
+        dummy_load_file = os.path.join(
+            Path(__file__).parent.parent.absolute(),
+            ".persistent/dummy_load",
+        )
+        if os.path.exists(dummy_load_file):
+            with open(dummy_load_file) as f:
+                value = float(f.read())
+            _LOGGER.info("Dummy load was already measured before, value: %sW", value)
+
+            inquirer = input("Do you want to measure the dummy load again? (y/n): ")
+            if inquirer.lower() == "n":
+                self.dummy_load_value = value
+                return self.dummy_load_value
+
+        self.dummy_load_value = self._measure_dummy_load(dummy_load_file)
+        return self.dummy_load_value
+
+    def _measure_dummy_load(self, file_path: str) -> float:
+        """Measure the dummy load and persist the value for future measurement session"""
+        print()
+        print("Make sure your dummy load has a constant power consumption! Fully resistant loads are recommended.")
+        print("Only connect your dummy load to your smart plug, not the device which you want to measure!")
+        input("Press enter to start measuring the dummy load..")
+        average = self.take_average_measurement(1)
+        with open(file_path, "w") as f:
+            f.write(str(average))
+        return average
