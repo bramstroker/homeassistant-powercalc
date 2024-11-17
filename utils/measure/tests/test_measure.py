@@ -34,7 +34,7 @@ def test_measure() -> None:
             key.ENTER,  # COLOR_MODE
             key.ENTER,  # GZIP
             "n",  # MULTIPLE_LIGHTS
-        )
+        ),
     )
 
     power_meter = DummyPowerMeter()
