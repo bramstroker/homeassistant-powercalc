@@ -254,7 +254,7 @@ def _get_standby_power(
 
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER) is not None:
-            standby_power = sensor_config.get(CONF_STANDBY_POWER)
+            standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
             if not isinstance(standby_power, Template):
                 standby_power = Decimal(standby_power)
         elif power_profile is not None:
@@ -593,9 +593,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state."""
         assert self._strategy_instance is not None
-        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)
+        sleep_power: dict[str, float] = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
-            delay = sleep_power.get(CONF_DELAY)
+            delay = sleep_power.get(CONF_DELAY) or 0
 
             @callback
             def _update_sleep_power(*_: Any) -> None:  # noqa: ANN401
@@ -638,12 +638,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType:  # type: ignore[override]
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
     @property
-    def available(self) -> bool:
+    def available(self) -> bool:  # type: ignore[override]
         """Return True if entity is available."""
         return self._power is not None
 
@@ -727,6 +727,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # type: ignore[override]
         """Return the unique_id of the sensor."""
         return self._unique_id

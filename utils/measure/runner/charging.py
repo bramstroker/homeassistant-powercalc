@@ -17,7 +17,7 @@ from .runner import MeasurementRunner, RunnerResult
 _LOGGER = logging.getLogger("measure")
 
 
-TRICKLE_CHARGING_TIME = 2
+TRICKLE_CHARGING_TIME = 1800
 
 
 class ChargingRunner(MeasurementRunner):
