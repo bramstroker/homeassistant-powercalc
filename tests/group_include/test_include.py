@@ -365,6 +365,7 @@ async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: p
             {
                 CONF_CREATE_GROUP: "Powercalc group",
                 CONF_INCLUDE: {CONF_DOMAIN: "light"},
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
             },
         ],
     )
@@ -372,7 +373,7 @@ async def test_include_skips_unsupported_entities(hass: HomeAssistant, caplog: p
     group_state = hass.states.get("sensor.powercalc_group_power")
     assert group_state
     assert group_state.attributes.get(ATTR_ENTITIES) == {
-        "light.a_power",
+        "sensor.a_power",
     }
 
     assert len(caplog.records) == 0

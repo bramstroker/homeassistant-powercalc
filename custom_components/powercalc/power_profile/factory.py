@@ -23,6 +23,7 @@ async def get_power_profile(
     hass: HomeAssistant,
     config: dict,
     model_info: ModelInfo | None = None,
+    log_errors: bool = True,
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
@@ -50,7 +51,8 @@ async def get_power_profile(
             custom_model_directory,
         )
     except LibraryError as err:
-        _LOGGER.error("Problem loading model: %s", err)
+        if log_errors:
+            _LOGGER.error("Problem loading model: %s", err)
         raise ModelNotSupportedError(
             f"Model not found in library (manufacturer: {manufacturer}, model: {model})",
         ) from err

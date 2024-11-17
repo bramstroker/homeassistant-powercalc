@@ -169,6 +169,7 @@ class DiscoveryManager:
         entity_entry: er.RegistryEntry,
         model_info: ModelInfo | None = None,
         power_profile: PowerProfile | None = None,
+        log_profile_loading_errors: bool = True,
     ) -> bool:
         if not self.should_process_entity(entity_entry):
             return False
@@ -180,7 +181,7 @@ class DiscoveryManager:
 
         if not power_profile:
             try:
-                power_profile = await get_power_profile(self.hass, {}, model_info)
+                power_profile = await get_power_profile(self.hass, {}, model_info, log_errors=log_profile_loading_errors)
             except ModelNotSupportedError:
                 return False
 
