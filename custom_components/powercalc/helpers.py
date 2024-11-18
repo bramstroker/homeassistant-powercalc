@@ -44,7 +44,11 @@ def get_library_json_path() -> str:
     return get_library_path("library.json")
 
 
-def get_or_create_unique_id(sensor_config: ConfigType, source_entity: SourceEntity, power_profile: PowerProfile | None) -> str:
+def get_or_create_unique_id(
+    sensor_config: ConfigType,
+    source_entity: SourceEntity,
+    power_profile: PowerProfile | None,
+) -> str:
     """Get or create the unique id."""
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if unique_id:

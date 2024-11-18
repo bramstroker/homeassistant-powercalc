@@ -25,7 +25,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
-    DISCOVERY_POWER_PROFILE,
+    DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     ENERGY_INTEGRATION_METHOD_LEFT,
     CalculationStrategy,
@@ -96,29 +96,40 @@ async def initialize_options_flow(
 async def initialize_discovery_flow(
     hass: HomeAssistant,
     source_entity: SourceEntity,
-    power_profile: PowerProfile | None = None,
+    power_profiles: PowerProfile | list[PowerProfile] | None = None,
     confirm_autodiscovered_model: bool = False,
 ) -> FlowResult:
     discovery_manager: DiscoveryManager = DiscoveryManager(hass, {})
-    if not power_profile:
-        power_profile = await get_power_profile(
-            hass,
-            {},
-            await discovery_manager.autodiscover_model(source_entity.entity_entry),
+    if not power_profiles:
+        power_profiles = [
+            await get_power_profile(
+                hass,
+                {},
+                await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry),
+            ),
+        ]
+
+    discovery_data = {
+        CONF_NAME: "test",
+        CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
+        DISCOVERY_SOURCE_ENTITY: source_entity,
+    }
+
+    if isinstance(power_profiles, PowerProfile):
+        discovery_data.update(
+            {
+                CONF_MANUFACTURER: power_profiles.manufacturer,
+                CONF_MODEL: power_profiles.model,
+            },
         )
+        power_profiles = [power_profiles]
+
+    discovery_data[DISCOVERY_POWER_PROFILES] = power_profiles
 
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_INTEGRATION_DISCOVERY},
-        data={
-            # CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
-            CONF_NAME: "test",
-            CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
-            CONF_MANUFACTURER: power_profile.manufacturer,
-            CONF_MODEL: power_profile.model,
-            DISCOVERY_SOURCE_ENTITY: source_entity,
-            DISCOVERY_POWER_PROFILE: power_profile,
-        },
+        data=discovery_data,
     )
     if not confirm_autodiscovered_model:
         return result

@@ -42,12 +42,11 @@ class CompositeLoader(Loader):
 
         return None
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find the model in the library."""
 
+        models = []
         for loader in self.loaders:
-            model = await loader.find_model(manufacturer, search)
-            if model:
-                return model
+            models.extend(await loader.find_model(manufacturer, search))
 
-        return None
+        return models

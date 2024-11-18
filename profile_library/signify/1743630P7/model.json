@@ -1,0 +1,16 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-06-13T13:09:23.423201",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.12.9:docker"
+  },
+  "aliases": [],
+  "name": "Hue Welcome outdoor wall",
+  "standby_power": 0.5,
+  "author": "Paul Bottein"
+}

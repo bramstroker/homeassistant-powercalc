@@ -61,6 +61,31 @@ async def test_manually_setup_from_library(
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
+async def test_manual_setup_from_library_skips_to_manufacturer_step(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+) -> None:
+    """Test that the flow skips to the manufacturer step if the model is not found in the library."""
+    mock_entity_with_model_information(
+        "light.test",
+        "ikea",
+        "LEEEEE",
+        unique_id=DEFAULT_UNIQUE_ID,
+    )
+
+    result = await select_menu_item(hass, Steps.MENU_LIBRARY)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Steps.VIRTUAL_POWER
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "light.test"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Steps.MANUFACTURER
+
+
 async def test_manufacturer_listing_is_filtered_by_entity_domain(
     hass: HomeAssistant,
 ) -> None:

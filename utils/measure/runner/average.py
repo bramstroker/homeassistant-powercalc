@@ -4,6 +4,7 @@ from typing import Any
 import inquirer
 from util.measure_util import MeasureUtil
 
+from .const import QUESTION_DURATION
 from .runner import MeasurementRunner, RunnerResult
 
 INTERVAL = 2
@@ -17,7 +18,7 @@ class AverageRunner(MeasurementRunner):
         self.duration = duration
 
     def prepare(self, answers: dict[str, Any]) -> None:
-        self.duration = int(answers["duration"])
+        self.duration = int(answers[QUESTION_DURATION])
 
     def run(
         self,
@@ -33,7 +34,7 @@ class AverageRunner(MeasurementRunner):
     def get_questions(self) -> list[inquirer.questions.Question]:
         return [
             inquirer.Text(
-                name="duration",
+                name=QUESTION_DURATION,
                 message="For how long do you want to measure? In seconds",
             ),
         ]
