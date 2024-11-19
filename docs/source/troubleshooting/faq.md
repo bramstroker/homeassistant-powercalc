@@ -9,13 +9,13 @@ Powercalc also uses this terminology to name your sensors. It creates a `_power`
 ## Why is no power sensor appearing for my light?
 
 - Make sure you have `powercalc:` entry added to your configuration.
-- Check if your light model is in the [supported models] list)
+- Check if your light model is in the [supported models](https://library.powercalc.nl) list)
 - Check the HA logs for errors
 
 ## My light is in the supported model list but not discovered. What can I do?
 
 Powercalc scans your HA installation for all devices having a manufacturer and model information.
-It tries to match this information against the model_id and aliases shown in the [supported models] list.
+It tries to match this information against the model_id and aliases shown in the [supported models](https://library.powercalc.nl) list.
 Some integrations return different product codes / model id's for the same light which may cause a mismatch. For example Hue and Zigbee2Mqtt.
 To have a look at which model was discovered by powercalc you can enable debug logging.
 Now look for the lines `Auto discovered model (manufacturer=xx, model=xx)` in the logs, and see if the model id matches.
