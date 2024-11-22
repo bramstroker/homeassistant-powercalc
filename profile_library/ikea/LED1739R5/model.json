@@ -9,6 +9,6 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.15.4:docker"
   },
-  "name": "LED1739R5",
+  "name": "TRADFRI bulb GU10 WS 400 lm, dimmable, white spectrum",
   "standby_power": 0.26
 }
