@@ -38,7 +38,7 @@ from custom_components.powercalc.const import (
     SensorType,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.daily_energy import (
+from custom_components.powercalc.sensors.energy.daily_fixed import (
     DEFAULT_DAILY_UPDATE_FREQUENCY,
     create_daily_fixed_energy_sensor,
 )

@@ -40,12 +40,12 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
 
-from .abstract import (
+from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
-from .power import PowerSensor, RealPowerSensor
+from custom_components.powercalc.sensors.power import PowerSensor, RealPowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"

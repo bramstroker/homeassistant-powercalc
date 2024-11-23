@@ -138,13 +138,13 @@ from .errors import (
     SensorConfigurationError,
 )
 from .group_include.include import resolve_include_entities
-from .sensors.daily_energy import (
+from .sensors.energy.daily_fixed import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
     create_daily_fixed_energy_sensor,
 )
-from .sensors.energy import EnergySensor, create_energy_sensor
-from .sensors.energy_untracked import UNTRACKED_ENERGY_SCHEMA, create_untracked_energy_sensor
+from .sensors.energy.energy import EnergySensor, create_energy_sensor
+from .sensors.energy.untracked import UNTRACKED_ENERGY_SCHEMA, create_untracked_energy_sensor
 from .sensors.group.config_entry_utils import add_to_associated_group
 from .sensors.group.factory import create_group_sensors
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor, create_real_power_sensor_instance

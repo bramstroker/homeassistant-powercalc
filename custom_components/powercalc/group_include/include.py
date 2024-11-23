@@ -13,7 +13,7 @@ from custom_components.powercalc.const import (
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
 )
-from custom_components.powercalc.sensors.energy import RealEnergySensor
+from custom_components.powercalc.sensors.energy.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
 from .filter import (

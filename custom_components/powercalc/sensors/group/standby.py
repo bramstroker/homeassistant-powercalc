@@ -24,7 +24,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     SIGNAL_POWER_SENSOR_STATE_CHANGE,
 )
-from custom_components.powercalc.sensors.energy import create_energy_sensor
+from custom_components.powercalc.sensors.energy.energy import create_energy_sensor
 from custom_components.powercalc.sensors.power import PowerSensor
 
 _LOGGER = logging.getLogger(__name__)

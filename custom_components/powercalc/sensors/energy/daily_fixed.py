@@ -45,9 +45,9 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 
-from .abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
-from .energy import EnergySensor
-from .power import VirtualPowerSensor, create_virtual_power_sensor
+from custom_components.powercalc.sensors.abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
+from custom_components.powercalc.sensors.energy.energy import EnergySensor
+from custom_components.powercalc.sensors.power import VirtualPowerSensor, create_virtual_power_sensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"

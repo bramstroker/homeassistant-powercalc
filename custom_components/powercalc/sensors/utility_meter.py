@@ -31,7 +31,7 @@ from custom_components.powercalc.const import (
 )
 
 from .abstract import BaseEntity
-from .energy import EnergySensor, RealEnergySensor
+from .energy.energy import EnergySensor, RealEnergySensor
 
 _LOGGER = logging.getLogger(__name__)
 

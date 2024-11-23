@@ -33,12 +33,12 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.device_binding import get_device_info
 
-from .abstract import (
+from custom_components.powercalc.sensors.abstract import (
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
 )
 from .energy import EnergySensor, get_unit_prefix
-from .power import PowerSensor
+from custom_components.powercalc.sensors.power import PowerSensor
 
 ENERGY_ICON = "mdi:lightning-bolt"
 ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
