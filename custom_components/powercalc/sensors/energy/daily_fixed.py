@@ -44,7 +44,6 @@ from custom_components.powercalc.const import (
     DEFAULT_ENERGY_SENSOR_PRECISION,
     UnitPrefix,
 )
-
 from custom_components.powercalc.sensors.abstract import generate_energy_sensor_entity_id, generate_energy_sensor_name
 from custom_components.powercalc.sensors.energy.energy import EnergySensor
 from custom_components.powercalc.sensors.power import VirtualPowerSensor, create_virtual_power_sensor
