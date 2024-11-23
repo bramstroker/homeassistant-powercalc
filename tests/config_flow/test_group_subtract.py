@@ -39,8 +39,6 @@ async def test_subtract_group_flow(hass: HomeAssistant) -> None:
         user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    config_entry: ConfigEntry = result["result"]
-    assert config_entry.unique_id == "pc_subtract_sensor.outlet_power"
     assert result["data"] == {
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_GROUP_TYPE: GroupType.SUBTRACT,

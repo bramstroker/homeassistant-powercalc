@@ -122,7 +122,6 @@ from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
-from .sensors.group.factory import generate_unique_id
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -1381,9 +1380,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_handle_group_creation(self) -> FlowResult:
         """Handle the group creation."""
         self.selected_sensor_type = SensorType.GROUP
-        unique_id = generate_unique_id(self.sensor_config)
-        await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
