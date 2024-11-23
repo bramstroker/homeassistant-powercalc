@@ -755,9 +755,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         last_sensor_state = await self.async_get_last_sensor_data()
         try:
             if last_sensor_state and last_sensor_state.native_value:
-                self._set_native_value(Decimal(last_sensor_state.native_value))  # type: ignore
+                self._attr_native_value = Decimal(last_sensor_state.native_value)  # type: ignore
             elif last_state:
-                self._set_native_value(Decimal(last_state.state))
+                self._attr_native_value = Decimal(last_state.state)
             _LOGGER.debug(
                 "%s: Restoring state: %s",
                 self.entity_id,
