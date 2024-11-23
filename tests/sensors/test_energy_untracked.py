@@ -1,62 +1,50 @@
-import logging
-import homeassistant.util.dt as dt_util
 from datetime import timedelta
-from unittest.mock import patch
+from decimal import Decimal
 
+import homeassistant.util.dt as dt_util
 import pytest
 from freezegun import freeze_time
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
-    ATTR_DEVICE_CLASS,
-    ATTR_ENTITY_ID,
-    ATTR_UNIT_OF_MEASUREMENT,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_UNIQUE_ID,
-    EntityCategory,
-    UnitOfEnergy,
-    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
-    async_fire_time_changed,
     mock_device_registry,
     mock_registry,
 )
 
-from custom_components.powercalc.const import (
-    ATTR_ENTITIES,
-    ATTR_SOURCE_DOMAIN,
-    ATTR_SOURCE_ENTITY,
-    CONF_CREATE_ENERGY_SENSORS,
-    CONF_CREATE_GROUP,
-    CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_SENSOR_ID,
-    CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_FIXED,
-    CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_POWER,
-    CONF_POWER_SENSOR_ID,
-    DOMAIN,
-    SERVICE_CALIBRATE_ENERGY,
-    UnitPrefix,
-)
-from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (
-    create_input_boolean,
-    get_simple_fixed_config,
     run_powercalc_setup,
 )
 
-
+@pytest.mark.parametrize(
+    "states",
+    [
+        [
+            (Decimal(250), 0, Decimal(0)),
+            (Decimal(280), 30, Decimal(0)),
+            (Decimal(250), 60, Decimal(0)),
+            (Decimal(420), 90, Decimal(0)),
+            (Decimal(300), 150, Decimal(0.0135)),
+        ],
+        [
+            (Decimal(1000), 0, Decimal(0)),
+            (Decimal(1000), 3600, Decimal(1.0)), # todo, implement sub interval when power is constant
+        ],
+        [
+            (Decimal(250), 0, Decimal(0)),
+            (Decimal(120), 60, Decimal(0)),  # lower value seen
+            (Decimal(300), 150, Decimal(0)),
+        ],
+    ],
+)
 async def test_untracked_energy_sensor(
     hass: HomeAssistant,
+    states: list[tuple[Decimal, int, Decimal]],
 ) -> None:
     mock_device_registry(
         hass,
@@ -92,31 +80,15 @@ async def test_untracked_energy_sensor(
             "untracked": {
                 "power_exceeds": 200,
                 "min_time": timedelta(minutes=2),
-            }
+            },
         },
     )
 
     await hass.async_block_till_done()
 
-    hass.states.async_set("sensor.mains_power", 250)
-    await hass.async_block_till_done()
-
-    with freeze_time(dt_util.utcnow() + timedelta(seconds=30)):
-        hass.states.async_set("sensor.mains_power", 280)
-        await hass.async_block_till_done()
-
-    with freeze_time(dt_util.utcnow() + timedelta(seconds=60)):
-        hass.states.async_set("sensor.mains_power", 250)
-        await hass.async_block_till_done()
-
-    with freeze_time(dt_util.utcnow() + timedelta(seconds=90)):
-        hass.states.async_set("sensor.mains_power", 420)
-        await hass.async_block_till_done()
-
-    with freeze_time(dt_util.utcnow() + timedelta(seconds=150)):
-        hass.states.async_set("sensor.mains_power", 300)
-        await hass.async_block_till_done()
-
-    state = hass.states.get("sensor.untracked_energy")
-    assert state
-    assert state.state == "0.0064"
+    for state, seconds, expected in states:
+        with freeze_time(dt_util.utcnow() + timedelta(seconds=seconds)):
+            hass.states.async_set("sensor.mains_power", state)
+            await hass.async_block_till_done()
+            energy = Decimal(hass.states.get("sensor.untracked_energy").state)
+            assert round(energy, 4) == round(expected, 4)

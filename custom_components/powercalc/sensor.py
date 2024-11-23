@@ -146,8 +146,7 @@ from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.energy_untracked import UNTRACKED_ENERGY_SCHEMA, create_untracked_energy_sensor
 from .sensors.group.config_entry_utils import add_to_associated_group
 from .sensors.group.factory import create_group_sensors
-from .sensors.power import PowerSensor, RealPowerSensor, VirtualPowerSensor, create_power_sensor, \
-    create_real_power_sensor_instance
+from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor, create_real_power_sensor_instance
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
