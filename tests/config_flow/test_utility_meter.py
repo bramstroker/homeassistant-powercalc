@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from homeassistant import data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY
-from homeassistant.const import CONF_ENTITY_ID, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
@@ -14,7 +14,7 @@ from custom_components.powercalc.const import (
     CONF_UTILITY_METER_TYPES,
     CalculationStrategy,
 )
-from tests.config_flow.common import DEFAULT_ENTITY_ID, DEFAULT_UNIQUE_ID, goto_virtual_power_strategy_step, set_virtual_power_configuration
+from tests.config_flow.common import DEFAULT_ENTITY_ID, goto_virtual_power_strategy_step, set_virtual_power_configuration
 
 
 async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
@@ -24,7 +24,6 @@ async def test_utility_meter_tariffs(hass: HomeAssistant) -> None:
         {
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MODE: CalculationStrategy.FIXED,
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
             CONF_CREATE_UTILITY_METERS: True,
         },
     )
@@ -58,7 +57,6 @@ async def test_utility_meter_net_consumption(hass: HomeAssistant) -> None:
         {
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MODE: CalculationStrategy.FIXED,
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
             CONF_CREATE_UTILITY_METERS: True,
         },
     )

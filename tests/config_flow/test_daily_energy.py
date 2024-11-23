@@ -3,7 +3,6 @@ from homeassistant.components.utility_meter.const import DAILY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
-    CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
     UnitOfEnergy,
     UnitOfPower,
@@ -25,7 +24,6 @@ from custom_components.powercalc.const import (
     CONF_VALUE,
 )
 from tests.config_flow.common import (
-    DEFAULT_UNIQUE_ID,
     create_mock_entry,
     initialize_options_flow,
     select_menu_item,
@@ -50,7 +48,6 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_VALUE: 0.5,
         CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
         CONF_CREATE_UTILITY_METERS: False,
@@ -70,7 +67,6 @@ async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
             CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
         },
         CONF_CREATE_UTILITY_METERS: False,
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
     }
 
     await hass.async_block_till_done()
@@ -105,7 +101,6 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_VALUE: 10,
         CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
         CONF_ON_TIME: {
@@ -132,7 +127,6 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_VALUE: 10,
         CONF_CREATE_UTILITY_METERS: True,
     }
@@ -181,7 +175,6 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_VALUE: 10,
         CONF_GROUP: group_entry.entry_id,
     }

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import logging
+import uuid
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from enum import StrEnum
@@ -117,12 +118,10 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
-from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
-from .sensors.group.factory import generate_unique_id
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -260,7 +259,6 @@ SCHEMA_DAILY_ENERGY_OPTIONS = vol.Schema(
 SCHEMA_DAILY_ENERGY = vol.Schema(
     {
         vol.Required(CONF_NAME): selector.TextSelector(),
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 ).extend(SCHEMA_DAILY_ENERGY_OPTIONS.schema)
@@ -286,7 +284,6 @@ SCHEMA_POWER_LIBRARY = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): selector.EntitySelector(),
         vol.Optional(CONF_NAME): selector.TextSelector(),
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     },
 )
 
@@ -308,7 +305,6 @@ SCHEMA_POWER_OPTIONS_LIBRARY = vol.Schema(
 SCHEMA_POWER_BASE = vol.Schema(
     {
         vol.Optional(CONF_NAME): selector.TextSelector(),
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
     },
 )
 
@@ -1155,6 +1151,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
 
+        await self.async_set_unique_id(str(uuid.uuid4()))
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
         del discovery_info[DISCOVERY_SOURCE_ENTITY]
@@ -1163,10 +1160,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.source_entity_id = self.source_entity.entity_id
         self.name = self.source_entity.name
-
-        unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.selected_profile)
-        await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
 
         power_profiles: list[PowerProfile] = []
         if DISCOVERY_POWER_PROFILES in discovery_info:
@@ -1207,6 +1200,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         )
         if not global_config_entry:
             menu = {Steps.GLOBAL_CONFIGURATION: "Global configuration", **menu}
+
+        await self.async_set_unique_id(str(uuid.uuid4()))
 
         return self.async_show_menu(step_id=Steps.USER, menu_options=menu)
 
@@ -1265,10 +1260,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 self.selected_sensor_type = SensorType.VIRTUAL_POWER
                 self.sensor_config.update(user_input)
 
-                unique_id = get_or_create_unique_id(self.sensor_config, self.source_entity, self.selected_profile)
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-
                 return await self.forward_to_strategy_step(selected_strategy)
 
         return self.async_show_form(
@@ -1300,9 +1291,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if user_input is not None and not errors:
             self.selected_sensor_type = SensorType.DAILY_ENERGY
             self.name = user_input.get(CONF_NAME)
-            unique_id = user_input.get(CONF_UNIQUE_ID) or user_input.get(CONF_NAME)
-            await self.async_set_unique_id(unique_id)
-            self._abort_if_unique_id_configured()
 
             self.sensor_config.update(self.build_daily_energy_config(user_input, schema))
             if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
@@ -1392,9 +1380,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_handle_group_creation(self) -> FlowResult:
         """Handle the group creation."""
         self.selected_sensor_type = SensorType.GROUP
-        unique_id = generate_unique_id(self.sensor_config)
-        await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
@@ -1573,9 +1558,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     @callback
     def persist_config_entry(self) -> FlowResult:
         """Create the config entry."""
-        if self.unique_id:
-            self.sensor_config.update({CONF_UNIQUE_ID: self.unique_id})
-
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         self.sensor_config.update({CONF_NAME: self.name})
         if self.source_entity_id:

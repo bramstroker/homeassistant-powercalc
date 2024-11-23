@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -89,7 +89,6 @@ async def test_discovery_flow(
         CONF_MANUFACTURER: manufacturer,
         CONF_MODEL: model,
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
         CONF_MULTI_SWITCH: {
             CONF_ENTITIES: ["switch.a", "switch.b"],
         },

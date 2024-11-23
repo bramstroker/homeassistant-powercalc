@@ -4,7 +4,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SENSOR_TYPE,
-    CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant
 
@@ -48,7 +47,6 @@ async def test_subtract_group_flow(hass: HomeAssistant) -> None:
         CONF_CREATE_UTILITY_METERS: False,
         CONF_ENTITY_ID: "sensor.outlet_power",
         CONF_SUBTRACT_ENTITIES: ["sensor.light_power"],
-        CONF_UNIQUE_ID: "pc_subtract_sensor.outlet_power",
     }
     config_entry: ConfigEntry = result["result"]
 

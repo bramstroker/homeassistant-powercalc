@@ -5,6 +5,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
+from custom_components.powercalc import async_setup_entry
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
@@ -151,9 +152,9 @@ async def test_smart_switch_power_input_gui_config_flow(
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
-    entries = hass.config_entries.async_entries(DOMAIN)
-    assert len(entries) == 1
-    config_entry = entries[0]
+    await async_setup_entry(hass, result["result"])
+
+    config_entry = result["result"]
 
     # Toggle the switch to different states and check for correct power values
     power_state = hass.states.get(power_sensor_id)
