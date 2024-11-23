@@ -1,56 +1,21 @@
-import logging
-import homeassistant.util.dt as dt_util
 from datetime import timedelta
-from unittest.mock import patch
 
-import pytest
+import homeassistant.util.dt as dt_util
 from freezegun import freeze_time
-from homeassistant.components.sensor import ATTR_STATE_CLASS, SensorStateClass
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
 from homeassistant.const import (
-    ATTR_DEVICE_CLASS,
-    ATTR_ENTITY_ID,
-    ATTR_UNIT_OF_MEASUREMENT,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_UNIQUE_ID,
-    EntityCategory,
-    UnitOfEnergy,
-    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
-from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
-    async_fire_time_changed,
     mock_device_registry,
     mock_registry,
 )
 
-from custom_components.powercalc.const import (
-    ATTR_ENTITIES,
-    ATTR_SOURCE_DOMAIN,
-    ATTR_SOURCE_ENTITY,
-    CONF_CREATE_ENERGY_SENSORS,
-    CONF_CREATE_GROUP,
-    CONF_DISABLE_EXTENDED_ATTRIBUTES,
-    CONF_ENERGY_SENSOR_ID,
-    CONF_ENERGY_SENSOR_UNIT_PREFIX,
-    CONF_FIXED,
-    CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_IGNORE_UNAVAILABLE_STATE,
-    CONF_POWER,
-    CONF_POWER_SENSOR_ID,
-    DOMAIN,
-    SERVICE_CALIBRATE_ENERGY,
-    UnitPrefix,
-)
-from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (
-    create_input_boolean,
-    get_simple_fixed_config,
     run_powercalc_setup,
 )
 
@@ -92,7 +57,7 @@ async def test_untracked_energy_sensor(
             "untracked": {
                 "power_exceeds": 200,
                 "min_time": timedelta(minutes=2),
-            }
+            },
         },
     )
 

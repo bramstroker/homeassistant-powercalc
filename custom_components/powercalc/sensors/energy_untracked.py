@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import inspect
 import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-import voluptuous as vol
-
 import homeassistant.helpers.config_validation as cv
-from homeassistant.components.integration.sensor import IntegrationSensor, UNIT_PREFIXES, UNIT_TIME, _IntegrationMethod
-from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN, RestoreSensor, SensorEntity
-from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+import voluptuous as vol
+from homeassistant.components.integration.sensor import UNIT_PREFIXES, UNIT_TIME, _IntegrationMethod
+from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.sensor import RestoreSensor, SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     CONF_NAME,
-    UnitOfEnergy, UnitOfTime,
+    UnitOfEnergy,
+    UnitOfTime,
 )
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers import start
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityCategory
@@ -27,7 +26,6 @@ from custom_components.powercalc.const import (
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
-    CONF_FORCE_UPDATE_FREQUENCY,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_SENSOR_PRECISION,
 )
@@ -135,9 +133,7 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
 
         if (last_sensor_data := await self.async_get_last_sensor_data()) is not None:
             self._attr_native_value = last_sensor_data.native_value
-            self._attr_native_unit_of_measurement = (
-                last_sensor_data.native_unit_of_measurement
-            )
+            self._attr_native_unit_of_measurement = last_sensor_data.native_unit_of_measurement
         else:
             self._attr_native_value = 0
 
@@ -190,14 +186,17 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
         total_integration = Decimal(0)
 
         # Iterate over consecutive pairs of (time, power) values
-        for (t1, p1), (t2, p2) in zip(self._seen_power_values, self._seen_power_values[1:]):
+        for (t1, p1), (t2, p2) in zip(self._seen_power_values, self._seen_power_values[1:], strict=False):
             elapsed = Decimal((t2 - t1).seconds)
             area = self._method.calculate_area_with_two_states(elapsed, p1, p2)
             scaled = area / (self._unit_prefix * self._unit_time)
 
             _LOGGER.debug(
                 "%s: Integration between %s and %s: %s",
-                self.entity_id, t1, t2, scaled
+                self.entity_id,
+                t1,
+                t2,
+                scaled,
             )
 
             total_integration += scaled
