@@ -17,6 +17,7 @@ from homeassistant.components.utility_meter.sensor import UtilityMeterSensor
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.typing import StateType
+from propcache import cached_property
 
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
@@ -256,10 +257,13 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
         """Return the unique id."""
         return self._attr_unique_id
 
-    @property
-    def native_value(self) -> Decimal | StateType:  # type: ignore[override]
+    @cached_property
+    def native_value(self) -> StateType | Decimal:  # type: ignore[override]
         """Return the state of the sensor."""
-        if self.rounding_digits and self._state is not None:
-            return Decimal(round(self._state, self.rounding_digits))
+        if hasattr(self, "_state"):
+            if self.rounding_digits and self._state is not None:
+                return Decimal(round(self._state, self.rounding_digits))
 
-        return self._state
+            return self._state
+
+        return self._attr_native_value  # type: ignore[return-value]
