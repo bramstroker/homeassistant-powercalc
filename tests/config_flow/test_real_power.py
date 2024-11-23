@@ -1,5 +1,6 @@
 from homeassistant import data_entry_flow
 from homeassistant.components.utility_meter.const import DAILY, WEEKLY
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME, CONF_SENSOR_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -85,11 +86,13 @@ async def test_energy_sensor_is_bound_to_power_device(hass: HomeAssistant) -> No
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
+    config_entry: ConfigEntry = result["result"]
+
     await hass.async_block_till_done()
 
     energy_sensor_entry = entity_registry.async_get("sensor.test_energy")
     assert energy_sensor_entry
-    assert energy_sensor_entry.unique_id == "123_energy"
+    assert energy_sensor_entry.unique_id == f"{config_entry.unique_id}_energy"
     assert energy_sensor_entry.device_id == device_id
 
 

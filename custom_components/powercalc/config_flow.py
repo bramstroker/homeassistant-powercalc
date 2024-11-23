@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import logging
+import uuid
 from abc import ABC, abstractmethod
 from datetime import timedelta
 from enum import StrEnum
@@ -1151,6 +1152,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
 
+        await self.async_set_unique_id(str(uuid.uuid4()))
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
         del discovery_info[DISCOVERY_SOURCE_ENTITY]
@@ -1199,6 +1201,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         )
         if not global_config_entry:
             menu = {Steps.GLOBAL_CONFIGURATION: "Global configuration", **menu}
+
+        await self.async_set_unique_id(str(uuid.uuid4()))
 
         return self.async_show_menu(step_id=Steps.USER, menu_options=menu)
 
