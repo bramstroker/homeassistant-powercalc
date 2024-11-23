@@ -2,7 +2,7 @@ from selectors import SelectSelector
 
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.common import create_source_entity
@@ -56,7 +56,6 @@ async def test_discovery_flow(
         CONF_MANUFACTURER: "signify",
         CONF_MODEL: "LCT010",
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
 
 
@@ -104,7 +103,6 @@ async def test_discovery_flow_with_subprofile_selection(
         CONF_MANUFACTURER: "lifx",
         CONF_MODEL: "LIFX Z/length_6",
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
 
 
@@ -149,7 +147,6 @@ async def test_discovery_flow_multi_profiles(
         CONF_MANUFACTURER: "signify",
         CONF_MODEL: "LCT012",
         CONF_NAME: "test",
-        CONF_UNIQUE_ID: f"pc_{DEFAULT_UNIQUE_ID}",
     }
 
 

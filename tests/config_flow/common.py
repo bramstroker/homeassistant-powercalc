@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import ConfigType
@@ -155,7 +155,6 @@ async def goto_virtual_power_strategy_step(
         user_input = {
             CONF_ENTITY_ID: DEFAULT_ENTITY_ID,
             CONF_MODE: strategy,
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         }
     elif CONF_MODE not in user_input:
         user_input[CONF_MODE] = strategy
@@ -226,7 +225,6 @@ def assert_default_virtual_power_entry_data(
             CONF_CREATE_ENERGY_SENSOR: True,
             CONF_CREATE_UTILITY_METERS: False,
             CONF_NAME: "test",
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
             CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_LEFT,
         }
         | expected_strategy_options

@@ -1,6 +1,6 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
 
@@ -112,7 +112,6 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
         {
             CONF_ENTITY_ID: "switch.test",
             CONF_MODE: CalculationStrategy.LUT,
-            CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         },
     )
 
