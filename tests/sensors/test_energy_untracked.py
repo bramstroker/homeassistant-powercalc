@@ -21,6 +21,7 @@ from tests.common import (
     run_powercalc_setup,
 )
 
+
 @pytest.mark.parametrize(
     "states",
     [
@@ -33,7 +34,7 @@ from tests.common import (
         ],
         [
             (Decimal(1000), 0, Decimal(0)),
-            (Decimal(1000), 3600, Decimal(1.0)), # todo, implement sub interval when power is constant
+            (Decimal(1000), 3600, Decimal(1.0)),  # todo, implement sub interval when power is constant
         ],
         [
             (Decimal(250), 0, Decimal(0)),
