@@ -39,7 +39,6 @@ from custom_components.powercalc.const import (
 )
 from custom_components.powercalc.device_binding import get_device_info
 from custom_components.powercalc.errors import SensorConfigurationError
-
 from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
     generate_energy_sensor_entity_id,
