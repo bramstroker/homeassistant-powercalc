@@ -115,7 +115,7 @@ async def create_power_sensor(
     """Create the power sensor based on powercalc sensor configuration."""
     if CONF_POWER_SENSOR_ID in sensor_config:
         # Use an existing power sensor, only create energy sensors / utility meters
-        return await create_real_power_sensor_instance(hass, sensor_config.get(CONF_POWER_SENSOR_ID), sensor_config)
+        return await create_real_power_sensor_instance(hass, str(sensor_config.get(CONF_POWER_SENSOR_ID)), sensor_config)
 
     return await create_virtual_power_sensor(
         hass,
@@ -274,7 +274,7 @@ async def create_real_power_sensor_instance(
     device_id = None
     unit_of_measurement = None
     ent_reg = er.async_get(hass)
-    entity_entry = ent_reg.async_get(power_sensor_id)  # type: ignore
+    entity_entry = ent_reg.async_get(power_sensor_id)
     if entity_entry:
         if not unique_id:
             unique_id = entity_entry.unique_id
@@ -282,7 +282,7 @@ async def create_real_power_sensor_instance(
         unit_of_measurement = entity_entry.unit_of_measurement
 
     return RealPowerSensor(
-        entity_id=power_sensor_id,  # type: ignore
+        entity_id=power_sensor_id,
         device_id=device_id,
         unique_id=unique_id,
         unit_of_measurement=unit_of_measurement,

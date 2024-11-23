@@ -17,9 +17,11 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
+from custom_components.powercalc.const import CONF_MIN_TIME, CONF_POWER_THRESHOLD, CONF_UNTRACKED_ENERGY
 from tests.common import (
     run_powercalc_setup,
 )
+
 
 @pytest.mark.parametrize(
     "states",
@@ -33,7 +35,7 @@ from tests.common import (
         ],
         [
             (Decimal(1000), 0, Decimal(0)),
-            (Decimal(1000), 3600, Decimal(1.0)), # todo, implement sub interval when power is constant
+            (Decimal(1000), 3600, Decimal(1.0)),  # todo, implement sub interval when power is constant
         ],
         [
             (Decimal(250), 0, Decimal(0)),
@@ -77,9 +79,9 @@ async def test_untracked_energy_sensor(
         {
             CONF_ENTITY_ID: "sensor.mains_power",
             CONF_NAME: "untracked",
-            "untracked": {
-                "power_exceeds": 200,
-                "min_time": timedelta(minutes=2),
+            CONF_UNTRACKED_ENERGY: {
+                CONF_POWER_THRESHOLD: 200,
+                CONF_MIN_TIME: timedelta(minutes=2),
             },
         },
     )

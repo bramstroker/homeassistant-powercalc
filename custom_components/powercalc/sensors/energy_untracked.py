@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -17,15 +18,16 @@ from homeassistant.const import (
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers import start
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_ENERGY_INTEGRATION_METHOD,
-    CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_PRECISION,
+    CONF_MIN_TIME,
+    CONF_POWER_THRESHOLD,
+    CONF_UNTRACKED_ENERGY,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_SENSOR_PRECISION,
 )
@@ -43,8 +45,8 @@ ENTITY_ID_FORMAT = SENSOR_DOMAIN + ".{}"
 
 UNTRACKED_ENERGY_SCHEMA = vol.Schema(
     {
-        vol.Required("power_exceeds"): vol.Coerce(float),
-        vol.Required("min_time"): cv.time_period,
+        vol.Required(CONF_POWER_THRESHOLD): vol.Coerce(float),
+        vol.Required(CONF_MIN_TIME): cv.time_period,
     },
 )
 
@@ -70,11 +72,10 @@ async def create_untracked_energy_sensor(
         source_entity,
         unique_id=unique_id,
     )
-    entity_category = sensor_config.get(CONF_ENERGY_SENSOR_CATEGORY)
     unit_prefix = get_unit_prefix(hass, sensor_config, power_sensor)
 
     _LOGGER.debug(
-        "Creating energy sensor (entity_id=%s, source_entity=%s, unit_prefix=%s)",
+        "Creating untracked energy sensor (entity_id=%s, source_entity=%s, unit_prefix=%s)",
         entity_id,
         power_sensor.entity_id,
         unit_prefix,
@@ -84,7 +85,6 @@ async def create_untracked_energy_sensor(
         source_entity=power_sensor.entity_id,
         unique_id=unique_id,
         entity_id=entity_id,
-        entity_category=entity_category,
         name=name,
         unit_prefix=unit_prefix,
         sensor_config=sensor_config,
@@ -96,6 +96,9 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
     """Untracked energy sensor, totalling kWh."""
 
     _attr_state_class = SensorStateClass.TOTAL_INCREASING
+    _attr_icon = ENERGY_ICON
+    _attr_device_class = SensorDeviceClass.ENERGY
+    _attr_should_poll = False
 
     def __init__(
         self,
@@ -103,44 +106,46 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
         entity_id: str,
         sensor_config: ConfigType,
         unique_id: str | None = None,
-        entity_category: EntityCategory | None = None,
         name: str | None = None,
         unit_prefix: str | None = None,
         device_info: DeviceInfo | None = None,
     ) -> None:
-        round_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
+        self._rounding_digits: int = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
         integration_method: str = sensor_config.get(CONF_ENERGY_INTEGRATION_METHOD, DEFAULT_ENERGY_INTEGRATION_METHOD)
 
         self._sensor_config = sensor_config
         self.entity_id = entity_id
 
+        untracked_config: dict[str, Any] = sensor_config[CONF_UNTRACKED_ENERGY]
+        self._power_threshold = Decimal(untracked_config[CONF_POWER_THRESHOLD])
+        self._min_time: timedelta = untracked_config[CONF_MIN_TIME]
+
         self._source_entity = source_entity
         self._tracking_started_at: datetime | None = None
-        self._min_time: timedelta = sensor_config["untracked"]["min_time"]
         self._seen_power_values: list[tuple[datetime, Decimal]] = []
         self._method = _IntegrationMethod.from_name(integration_method)
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR  # todo
-        self._attr_device_class = SensorDeviceClass.ENERGY
-        self._attr_icon = ENERGY_ICON
-        if entity_category:
-            self._attr_entity_category = EntityCategory(entity_category)
+        self._attr_unique_id = unique_id
+        self._attr_name = name
+        self._attr_device_info = device_info
+        self._attr_suggested_display_precision = self._rounding_digits or DEFAULT_ENERGY_SENSOR_PRECISION
 
         self._unit_prefix = UNIT_PREFIXES[unit_prefix]
         self._unit_time = UNIT_TIME[UnitOfTime.HOURS]
 
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Handle entity which will be added."""
 
         if (last_sensor_data := await self.async_get_last_sensor_data()) is not None:
-            self._attr_native_value = last_sensor_data.native_value
+            self._attr_native_value = Decimal(str(last_sensor_data.native_value))
             self._attr_native_unit_of_measurement = last_sensor_data.native_unit_of_measurement
         else:
-            self._attr_native_value = 0
+            self._attr_native_value = Decimal(0)
 
         self.async_on_remove(start.async_at_start(self.hass, self.start_tracking))
 
     async def start_tracking(self, _: Any) -> None:  # noqa
-        """Initialize group sensor when HA is starting."""
+        """Initialize tracking the source entity after HA has started."""
 
         self.async_on_remove(
             async_track_state_change_event(
@@ -152,7 +157,7 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
 
     @callback
     def on_state_change(self, event: Event[EventStateChangedData]) -> None:
-        """Triggered when one of the group entities changes state."""
+        """Triggered when power sensor changes state."""
         new_state = event.data.get("new_state")
         if not new_state:  # pragma: no cover
             return
@@ -177,6 +182,8 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
 
         _LOGGER.debug("%s: Min time reached, calculate integration", self.entity_id)
         integration = self.calculate_integration()
+        if not isinstance(self._attr_native_value, Decimal):
+            self._attr_native_value = Decimal(0)
         self._attr_native_value += integration
 
         self.async_write_ha_state()
@@ -205,8 +212,14 @@ class UntrackedEnergySensor(EnergySensor, RestoreSensor):
 
     def is_matching_condition(self, power: Decimal) -> bool:
         """Check if the state matches the requirements."""
-        power_threshold = self._sensor_config["untracked"]["power_exceeds"]
-        return power > power_threshold
+        return power > self._power_threshold
+
+    @property
+    def native_value(self) -> Decimal | None:  # type: ignore[override]
+        """Return the state of the sensor."""
+        if isinstance(self._attr_native_value, Decimal) and self._attr_native_value:
+            return round(self._attr_native_value, self._rounding_digits)
+        return self._attr_native_value  # type: ignore
 
     @callback
     def async_reset(self) -> None:

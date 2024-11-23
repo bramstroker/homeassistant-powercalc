@@ -96,6 +96,7 @@ from .const import (
     CONF_SUBTRACT_ENTITIES,
     CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
+    CONF_UNTRACKED_ENERGY,
     CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
@@ -188,7 +189,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_WLED): WLED_SCHEMA,
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
     vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
-    vol.Optional("untracked"): UNTRACKED_ENERGY_SCHEMA,
+    vol.Optional(CONF_UNTRACKED_ENERGY): UNTRACKED_ENERGY_SCHEMA,
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
@@ -868,6 +869,8 @@ async def handle_energy_sensor_creation(
     entities_to_add: list[Entity],
 ) -> EnergySensor | None:
     """Handle the creation of an energy sensor if needed."""
+    energy_sensor: EnergySensor | None = None
+
     if CONF_DAILY_FIXED_ENERGY in sensor_config:
         energy_sensor = await create_daily_fixed_energy_sensor(hass, sensor_config, source_entity)
         entities_to_add.append(energy_sensor)
@@ -877,13 +880,13 @@ async def handle_energy_sensor_creation(
                 entities_to_add.append(daily_fixed_power_sensor)
         return energy_sensor
 
-    if "untracked" in sensor_config:
+    if CONF_UNTRACKED_ENERGY in sensor_config:
         power_sensor = await create_real_power_sensor_instance(hass, source_entity.entity_id, sensor_config)
         energy_sensor = await create_untracked_energy_sensor(hass, sensor_config, power_sensor, source_entity)
         entities_to_add.append(energy_sensor)
         return energy_sensor
 
-    return None
+    return energy_sensor
 
 
 async def create_energy_sensor_if_needed(
