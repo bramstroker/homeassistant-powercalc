@@ -34,6 +34,7 @@ async def test_get_unique_id_from_config() -> None:
     config = {CONF_UNIQUE_ID: "1234"}
     assert get_or_create_unique_id(config, SourceEntity("test", "light.test", "light"), None) == "1234"
 
+
 async def test_get_unique_id_generated() -> None:
     unique_id = get_or_create_unique_id({}, SourceEntity("test", "light.test", "light"), None)
     assert len(unique_id) == 13
