@@ -2,10 +2,10 @@ import logging
 
 from decouple import Choices, UndefinedValueError, config
 
+from measure.const import MeasureType
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
-from measure.const import MeasureType
 from measure.powermeter.const import PowerMeterType
 
 
@@ -266,4 +266,3 @@ class MeasureConfig:
     def get_conf_value(key: str) -> str | None:
         """Get configuration value from environment variable"""
         return config(key, default=None)
-

@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
-
 from measure.config import MeasureConfig
 from measure.powermeter.dummy import DummyPowerMeter
 from readchar import key

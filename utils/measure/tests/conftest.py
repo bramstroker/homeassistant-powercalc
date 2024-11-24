@@ -5,8 +5,6 @@ import shutil
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
 
 
@@ -17,6 +15,7 @@ def clean_export_directory() -> None:
         os.makedirs(export_dir)
     shutil.rmtree(export_dir)
     yield
+
 
 @pytest.fixture
 @patch("measure.config.MeasureConfig")
