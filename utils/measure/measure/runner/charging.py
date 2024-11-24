@@ -2,17 +2,17 @@ import logging
 import time
 from typing import Any
 
-import config
 import inquirer
-from controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
-from controller.charging.controller import ChargingController
-from controller.charging.errors import ChargingControllerError
-from controller.charging.factory import ChargingControllerFactory
-from util.measure_util import MeasureUtil
 
-from .const import QUESTION_CHARGING_DEVICE_TYPE
-from .errors import RunnerError
-from .runner import MeasurementRunner, RunnerResult
+from measure import config
+from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
+from measure.controller.charging.controller import ChargingController
+from measure.controller.charging.errors import ChargingControllerError
+from measure.controller.charging.factory import ChargingControllerFactory
+from measure.runner.const import QUESTION_CHARGING_DEVICE_TYPE
+from measure.runner.errors import RunnerError
+from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.util.measure_util import MeasureUtil
 
 _LOGGER = logging.getLogger("measure")
 

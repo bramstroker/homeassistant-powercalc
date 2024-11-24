@@ -1,12 +1,11 @@
 import logging
 
-import config
-
-from .const import LightControllerType
-from .controller import LightController
-from .dummy import DummyLightController
-from .hass import HassLightController
-from .hue import HueLightController
+from measure import config
+from measure.controller.light.const import LightControllerType
+from measure.controller.light.controller import LightController
+from measure.controller.light.dummy import DummyLightController
+from measure.controller.light.hass import HassLightController
+from measure.controller.light.hue import HueLightController
 
 _LOGGER = logging.getLogger("measure")
 

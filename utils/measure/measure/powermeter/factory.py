@@ -1,19 +1,18 @@
 import logging
 
-import config
-
-from .const import PowerMeterType
-from .dummy import DummyPowerMeter
-from .errors import PowerMeterError
-from .hass import HassPowerMeter
-from .kasa import KasaPowerMeter
-from .manual import ManualPowerMeter
-from .mystrom import MyStromPowerMeter
-from .ocr import OcrPowerMeter
-from .powermeter import PowerMeter
-from .shelly import ShellyPowerMeter
-from .tasmota import TasmotaPowerMeter
-from .tuya import TuyaPowerMeter
+from measure import config
+from measure.powermeter.const import PowerMeterType
+from measure.powermeter.dummy import DummyPowerMeter
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.hass import HassPowerMeter
+from measure.powermeter.kasa import KasaPowerMeter
+from measure.powermeter.manual import ManualPowerMeter
+from measure.powermeter.mystrom import MyStromPowerMeter
+from measure.powermeter.ocr import OcrPowerMeter
+from measure.powermeter.powermeter import PowerMeter
+from measure.powermeter.shelly import ShellyPowerMeter
+from measure.powermeter.tasmota import TasmotaPowerMeter
+from measure.powermeter.tuya import TuyaPowerMeter
 
 _LOGGER = logging.getLogger("measure")
 

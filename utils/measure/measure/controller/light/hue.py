@@ -6,8 +6,8 @@ from typing import Any
 import inquirer
 from phue import Bridge, PhueRegistrationException
 
-from .controller import LightController, LightInfo
-from .errors import LightControllerError, ModelNotDiscoveredError
+from measure.controller.light.controller import LightController, LightInfo
+from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 
 TYPE_LIGHT = "light"
 TYPE_GROUP = "group"

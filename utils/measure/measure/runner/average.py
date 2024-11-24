@@ -2,7 +2,8 @@ import logging
 from typing import Any
 
 import inquirer
-from util.measure_util import MeasureUtil
+
+from measure.util.measure_util import MeasureUtil
 
 from .const import QUESTION_DURATION
 from .runner import MeasurementRunner, RunnerResult

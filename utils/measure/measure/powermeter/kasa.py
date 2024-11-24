@@ -6,7 +6,7 @@ from typing import Any
 
 from kasa import SmartPlug
 
-from .powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class KasaPowerMeter(PowerMeter):

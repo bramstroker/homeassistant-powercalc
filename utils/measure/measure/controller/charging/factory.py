@@ -1,11 +1,10 @@
 import logging
 
-import config
-
-from .const import ChargingControllerType
-from .controller import ChargingController
-from .dummy import DummyChargingController
-from .hass import HassChargingController
+from measure import config
+from measure.controller.charging.const import ChargingControllerType
+from measure.controller.charging.controller import ChargingController
+from measure.controller.charging.dummy import DummyChargingController
+from measure.controller.charging.hass import HassChargingController
 
 _LOGGER = logging.getLogger("measure")
 

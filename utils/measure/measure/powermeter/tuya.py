@@ -5,8 +5,8 @@ from typing import Any
 
 import tuyapower
 
-from .errors import PowerMeterError
-from .powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 STATUS_OK = "OK"
 

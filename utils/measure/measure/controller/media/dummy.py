@@ -2,7 +2,7 @@ from typing import Any
 
 import inquirer
 
-from .controller import MediaController
+from measure.controller.media.controller import MediaController
 
 
 class DummyMediaController(MediaController):

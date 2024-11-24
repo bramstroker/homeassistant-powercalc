@@ -12,21 +12,21 @@ from dataclasses import asdict, dataclass
 from datetime import datetime as dt
 from typing import Any, TextIO
 
-import config
 import inquirer
-from controller.light.const import ColorMode
-from controller.light.controller import LightInfo
-from controller.light.factory import LightControllerFactory
-from powermeter.errors import (
+
+from measure import config
+from measure.controller.light.const import ColorMode
+from measure.controller.light.controller import LightInfo
+from measure.controller.light.factory import LightControllerFactory
+from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
-from util.measure_util import MeasureUtil
-
-from .const import QUESTION_COLOR_MODE, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
-from .errors import RunnerError
-from .runner import MeasurementRunner, RunnerResult
+from measure.runner.const import QUESTION_COLOR_MODE, QUESTION_GZIP, QUESTION_MULTIPLE_LIGHTS, QUESTION_NUM_LIGHTS
+from measure.runner.errors import RunnerError
+from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.util.measure_util import MeasureUtil
 
 CSV_HEADERS = {
     ColorMode.HS: ["bri", "hue", "sat", "watt"],

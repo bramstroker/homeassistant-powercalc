@@ -2,12 +2,12 @@ import logging
 from typing import Any
 
 import inquirer
-from const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from homeassistant_api import Client
 from homeassistant_api.errors import HomeassistantAPIError, InternalServerError
 
-from .controller import MediaController
-from .errors import MediaPlayerError
+from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.controller.media.controller import MediaController
+from measure.controller.media.errors import MediaPlayerError
 
 _LOGGER = logging.getLogger("measure")
 

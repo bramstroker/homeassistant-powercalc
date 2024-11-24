@@ -4,7 +4,7 @@ from typing import Any, Protocol
 
 import inquirer.questions
 
-from .const import MAX_MIRED, MIN_MIRED
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED
 
 
 class LightInfo:

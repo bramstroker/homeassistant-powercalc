@@ -6,9 +6,9 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 
-from .const import QUESTION_POWERMETER_ENTITY_ID
-from .errors import PowerMeterError
-from .powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class HassPowerMeter(PowerMeter):

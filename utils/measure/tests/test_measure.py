@@ -5,10 +5,9 @@ from unittest.mock import patch
 
 from inquirer import events
 from inquirer.render import ConsoleRender
-from powermeter.dummy import DummyPowerMeter
+from measure.measure import Measure
+from measure.powermeter.dummy import DummyPowerMeter
 from readchar import key
-
-from ..measure import Measure
 
 
 class EventGenerator:
@@ -39,16 +38,20 @@ def test_wizard() -> None:
         measure.start()
 
 
-@patch("config")
+@patch("measure.config.config")
 def test_2(mock_config) -> None:
     def mock_config_side_effect(key: str, default=None):
         values = {
-            "SELECTED_DEVICE_TYPE": "Light bulb(s)",
+            "SELECTED_MEASURE_TYPE": "Light bulb(s)",
             "COLOR_MODE": "color_temp",
         }
         return values.get(key, default)
 
     mock_config.side_effect = mock_config_side_effect
+
+    from measure.config import SELECTED_MEASURE_TYPE
+
+    assert SELECTED_MEASURE_TYPE == "sqlite://:memory:"
 
     # os.environ["SELECTED_DEVICE_TYPE"] = "Light bulb(s)"
     # os.environ["COLOR_MODE"] = "color_temp"
@@ -66,8 +69,8 @@ def test_2(mock_config) -> None:
 
     measure = _create_measure_instance()
 
-    with patch("builtins.input", return_value=""):
-        measure.start()
+    # with patch("builtins.input", return_value=""):
+    measure.start()
 
 
 def _create_measure_instance(console_events: EventGenerator | None = None) -> Measure:

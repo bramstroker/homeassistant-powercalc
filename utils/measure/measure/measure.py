@@ -11,27 +11,28 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import config
 import inquirer
-from const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
-from controller.light.errors import LightControllerError
 from decouple import UndefinedValueError
 from decouple import config as decouple_config
 from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from inquirer.render import ConsoleRender
-from powermeter.errors import PowerMeterError
-from powermeter.factory import PowerMeterFactory
-from powermeter.powermeter import PowerMeter
-from runner.average import AverageRunner
-from runner.charging import ChargingRunner
-from runner.light import LightRunner
-from runner.recorder import RecorderRunner
-from runner.runner import MeasurementRunner
-from runner.speaker import SpeakerRunner
-from util.measure_util import MeasureUtil
 
-# sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+from measure import config
+from measure.const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from measure.controller.light.errors import LightControllerError
+from measure.powermeter.errors import PowerMeterError
+from measure.powermeter.factory import PowerMeterFactory
+from measure.powermeter.powermeter import PowerMeter
+from measure.runner.average import AverageRunner
+from measure.runner.charging import ChargingRunner
+from measure.runner.light import LightRunner
+from measure.runner.recorder import RecorderRunner
+from measure.runner.runner import MeasurementRunner
+from measure.runner.speaker import SpeakerRunner
+from measure.util.measure_util import MeasureUtil
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()

@@ -2,12 +2,13 @@ import logging
 import time
 from typing import Any
 
-import config
 import inquirer
-from controller.media.controller import MediaController
-from controller.media.factory import MediaControllerFactory
-from powermeter.errors import ZeroReadingError
-from util.measure_util import MeasureUtil
+
+from measure import config
+from measure.controller.media.controller import MediaController
+from measure.controller.media.factory import MediaControllerFactory
+from measure.powermeter.errors import ZeroReadingError
+from measure.util.measure_util import MeasureUtil
 
 from .runner import MeasurementRunner, RunnerResult
 

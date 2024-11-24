@@ -7,8 +7,8 @@ from typing import Any
 
 import requests
 
-from .errors import ApiConnectionError
-from .powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.errors import ApiConnectionError
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 

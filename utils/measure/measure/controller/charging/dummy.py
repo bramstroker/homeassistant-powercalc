@@ -4,7 +4,7 @@ from typing import Any
 
 import inquirer.questions
 
-from .controller import ChargingController
+from measure.controller.charging.controller import ChargingController
 
 
 class DummyChargingController(ChargingController):

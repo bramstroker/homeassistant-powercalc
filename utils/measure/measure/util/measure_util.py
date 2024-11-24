@@ -4,13 +4,13 @@ import time
 from datetime import datetime as dt
 from pathlib import Path
 
-import config
-from powermeter.errors import (
+from measure import config
+from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
     ZeroReadingError,
 )
-from powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 

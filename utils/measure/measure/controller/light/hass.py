@@ -4,12 +4,12 @@ import time
 from typing import Any
 
 import inquirer
-from const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
 from homeassistant_api import Client, HomeassistantAPIError
 
-from .const import MAX_MIRED, MIN_MIRED, ColorMode
-from .controller import LightController, LightInfo
-from .errors import LightControllerError
+from measure.const import QUESTION_ENTITY_ID, QUESTION_MODEL_ID
+from measure.controller.light.const import MAX_MIRED, MIN_MIRED, ColorMode
+from measure.controller.light.controller import LightController, LightInfo
+from measure.controller.light.errors import LightControllerError
 
 
 class HassLightController(LightController):

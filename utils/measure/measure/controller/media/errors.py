@@ -1,4 +1,4 @@
-from controller.errors import ControllerError
+from measure.controller.errors import ControllerError
 
 
 class MediaPlayerError(ControllerError):

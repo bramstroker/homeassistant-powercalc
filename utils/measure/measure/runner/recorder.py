@@ -4,10 +4,10 @@ import time
 from typing import Any
 
 import inquirer
-from util.measure_util import MeasureUtil
 
-from .const import QUESTION_EXPORT_FILENAME
-from .runner import MeasurementRunner, RunnerResult
+from measure.runner.const import QUESTION_EXPORT_FILENAME
+from measure.runner.runner import MeasurementRunner, RunnerResult
+from measure.util.measure_util import MeasureUtil
 
 INTERVAL = 2
 

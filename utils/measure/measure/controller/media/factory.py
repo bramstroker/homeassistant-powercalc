@@ -1,11 +1,10 @@
 import logging
 
-import config
-
-from .const import MediaControllerType
-from .controller import MediaController
-from .dummy import DummyMediaController
-from .hass import HassMediaController
+from measure import config
+from measure.controller.media.const import MediaControllerType
+from measure.controller.media.controller import MediaController
+from measure.controller.media.dummy import DummyMediaController
+from measure.controller.media.hass import HassMediaController
 
 _LOGGER = logging.getLogger("measure")
 
