@@ -1,6 +1,6 @@
 import logging
 
-from measure import config
+from measure.config import MeasureConfig
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.dummy import DummyChargingController
@@ -10,9 +10,11 @@ _LOGGER = logging.getLogger("measure")
 
 
 class ChargingControllerFactory:
-    @staticmethod
-    def hass() -> HassChargingController:
-        return HassChargingController(config.HASS_URL, config.HASS_TOKEN)
+    def __init__(self, config: MeasureConfig) -> None:
+        self.config = config
+
+    def hass(self) -> HassChargingController:
+        return HassChargingController(self.config.hass_url, self.config.hass_token)
 
     @staticmethod
     def dummy() -> DummyChargingController:
@@ -24,10 +26,10 @@ class ChargingControllerFactory:
             ChargingControllerType.DUMMY: self.dummy,
             ChargingControllerType.HASS: self.hass,
         }
-        factory = factories.get(config.SELECTED_CHARGING_CONTROLLER)
+        factory = factories.get(self.config.selected_charging_controller)
         if factory is None:
             raise Exception(
-                f"Could not find a factory for {config.SELECTED_CHARGING_CONTROLLER}",
+                f"Could not find a factory for {self.config.selected_charging_controller}",
             )
 
         return factory()

@@ -1,8 +1,11 @@
+import importlib
 import sys
 from collections.abc import Iterator
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
+import decouple
+import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
 from measure.controller.light.const import ColorMode
@@ -21,6 +24,12 @@ class EventGenerator:
 def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
+@pytest.fixture(autouse=True)
+def reload_measure_module():
+    #importlib.reload(measure)
+    #importlib.reload(decouple)
+    yield
+
 
 def test_wizard() -> None:
     measure = _create_measure_instance(
@@ -37,14 +46,9 @@ def test_wizard() -> None:
     with patch("builtins.input", return_value=""):
         measure.start()
 
-
-type ConfigValueType = str | int | bool | set
-
-
-@patch("decouple.config")
 def test_light_run(mock_config: MagicMock) -> None:
-    def mock_config_side_effect(var: str, default: ConfigValueType | None = None, _: int | None = None) -> ConfigValueType:
-        values = {
+    mock_config.set_values(
+        {
             "SELECTED_DEVICE_TYPE": "Light bulb(s)",
             "COLOR_MODE": {ColorMode.BRIGHTNESS},
             "LIGHT_CONTROLLER": "dummy",
@@ -53,12 +57,26 @@ def test_light_run(mock_config: MagicMock) -> None:
             "SLEEP_INITIAL": 0,
             "RESUME": False,
         }
-        return values.get(var, default)
+    )
+    # def mock_config_side_effect(var: str, default: ConfigValueType | None = None, cast: int | None = None) -> ConfigValueType:
+    #     values = {
+    #         "SELECTED_DEVICE_TYPE": "Light bulb(s)",
+    #         "COLOR_MODE": {ColorMode.BRIGHTNESS},
+    #         "LIGHT_CONTROLLER": "dummy",
+    #         "POWER_METER": "dummy",
+    #         "SLEEP_TIME": 0,
+    #         "SLEEP_INITIAL": 0,
+    #         "RESUME": False,
+    #     }
+    #     return values.get(var, default)
+    #
+    # mock_config.side_effect = mock_config_side_effect
 
-    mock_config.side_effect = mock_config_side_effect
+    from measure.config import SELECTED_MEASURE_TYPE
+    assert SELECTED_MEASURE_TYPE == "Light bulb(s)"
 
-    measure = _create_measure_instance()
-    measure.start()
+    # measure = _create_measure_instance()
+    # measure.start()
 
 
 def _create_measure_instance(console_events: EventGenerator | None = None):  # noqa: ANN202

@@ -5,119 +5,258 @@ from decouple import Choices, UndefinedValueError, config
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
+from measure.measure import MeasureType
 from measure.powermeter.const import PowerMeterType
 
-MIN_BRIGHTNESS = min(
-    max(
-        config(
-            "MIN_BRIGHTNESS",
-            default=config("START_BRIGHTNESS", default=1, cast=int),
+class MeasureConfig:
+    @property
+    def min_brightness(self) -> int:
+        return min(
+            max(
+                config(
+                    "MIN_BRIGHTNESS",
+                    default=config("START_BRIGHTNESS", default=1, cast=int),
+                    cast=int,
+                ),
+                1,
+            ),
+            255,
+        )
+
+    @property
+    def max_brightness(self) -> int:
+        return 255
+
+    @property
+    def min_sat(self) -> int:
+        return min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
+
+    @property
+    def max_sat(self) -> int:
+        return min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
+
+    @property
+    def min_hue(self) -> int:
+        return min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
+
+    @property
+    def max_hue(self) -> int:
+        return min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
+
+    @property
+    def ct_bri_steps(self) -> int:
+        if self.selected_power_meter == PowerMeterType.MANUAL:
+            return 15
+        return min(config("CT_BRI_STEPS", default=5, cast=int), 10)
+
+    @property
+    def ct_mired_steps(self) -> int:
+        if self.selected_power_meter == PowerMeterType.MANUAL:
+            return 50
+        return min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
+
+    @property
+    def bri_bri_steps(self) -> int:
+        if self.selected_power_meter == PowerMeterType.MANUAL:
+            return 3
+        return 1
+
+    @property
+    def hs_bri_precision(self) -> float:
+        hs_bri_precision = config("HS_BRI_PRECISION", default=1, cast=float)
+        hs_bri_precision = min(hs_bri_precision, 4)
+        hs_bri_precision = max(hs_bri_precision, 0.5)
+        return hs_bri_precision
+
+    @property
+    def hs_bri_steps(self) -> int:
+        return round(32 / self.hs_bri_precision)
+
+    @property
+    def hs_hue_precision(self) -> float:
+        hs_hue_precision = config("HS_HUE_PRECISION", default=1, cast=float)
+        hs_hue_precision = min(hs_hue_precision, 4)
+        hs_hue_precision = max(hs_hue_precision, 0.5)
+        return hs_hue_precision
+
+    @property
+    def hs_hue_steps(self) -> int:
+        return round(2731 / self.hs_hue_precision)
+
+    @property
+    def hs_sat_precision(self) -> float:
+        hs_sat_precision = config("HS_SAT_PRECISION", default=1, cast=float)
+        hs_sat_precision = min(hs_sat_precision, 4)
+        hs_sat_precision = max(hs_sat_precision, 0.5)
+        return hs_sat_precision
+
+    @property
+    def hs_sat_steps(self) -> int:
+        return round(32 / self.hs_sat_precision)
+
+    @property
+    def selected_light_controller(self) -> LightControllerType:
+        return config(
+            "LIGHT_CONTROLLER",
+            cast=Choices([t.value for t in LightControllerType]),
+            default=LightControllerType.HASS.value,
+        )
+
+    @property
+    def selected_media_controller(self) -> MediaControllerType:
+        return config(
+            "MEDIA_CONTROLLER",
+            cast=Choices([t.value for t in MediaControllerType]),
+            default=MediaControllerType.HASS.value,
+        )
+
+    @property
+    def selected_charging_controller(self) -> ChargingControllerType:
+        return config(
+            "CHARGING_CONTROLLER",
+            cast=Choices([t.value for t in ChargingControllerType]),
+            default=ChargingControllerType.HASS.value,
+        )
+
+    @property
+    def selected_power_meter(self) -> PowerMeterType:
+        return config(
+            "POWER_METER",
+            cast=Choices([t.value for t in PowerMeterType]),
+        )
+
+    @property
+    def log_level(self) -> int:
+        return config("LOG_LEVEL", default=logging.INFO)
+
+    @property
+    def sleep_initial(self) -> int:
+        return 10
+
+    @property
+    def sleep_standby(self) -> int:
+        return config("SLEEP_STANDBY", default=20, cast=int)
+
+    @property
+    def sleep_time(self) -> int:
+        return config("SLEEP_TIME", default=2, cast=int)
+
+    @property
+    def sleep_time_sample(self) -> int:
+        return config("SLEEP_TIME_SAMPLE", default=1, cast=int)
+
+    @property
+    def sleep_time_hue(self) -> int:
+        return config("SLEEP_TIME_HUE", default=5, cast=int)
+
+    @property
+    def sleep_time_sat(self) -> int:
+        return config("SLEEP_TIME_SAT", default=10, cast=int)
+
+    @property
+    def sleep_time_ct(self) -> int:
+        return config("SLEEP_TIME_CT", default=10, cast=int)
+
+    @property
+    def sleep_time_nudge(self) -> float:
+        return config("SLEEP_TIME_NUDGE", default=10, cast=float)
+
+    @property
+    def pulse_time_nudge(self) -> float:
+        return config("PULSE_TIME_NUDGE", default=2, cast=float)
+
+    @property
+    def max_retries(self) -> int:
+        return config("MAX_RETRIES", default=5, cast=int)
+
+    @property
+    def max_nudges(self) -> int:
+        return config("MAX_NUDGES", default=0, cast=int)
+
+    @property
+    def sample_count(self) -> int:
+        if self.selected_power_meter == PowerMeterType.MANUAL:
+            return 1
+        return config("SAMPLE_COUNT", default=1, cast=int)
+
+    @property
+    def selected_measure_type(self) -> str | None:
+        try:
+            return MeasureType(config("SELECTED_DEVICE_TYPE", default=config("SELECTED_MEASURE_TYPE")))
+        except UndefinedValueError:
+            return None
+
+    @property
+    def resume(self) -> bool:
+        try:
+            return config("RESUME", cast=bool)
+        except UndefinedValueError:
+            return False
+
+    @property
+    def shelly_ip(self) -> str:
+        return config("SHELLY_IP")
+
+    @property
+    def shelly_timeout(self) -> int:
+        return config("SHELLY_TIMEOUT", default=5, cast=int)
+
+    @property
+    def tuya_device_id(self) -> str:
+        return config("TUYA_DEVICE_ID")
+
+    @property
+    def tuya_device_ip(self) -> str:
+        return config("TUYA_DEVICE_IP")
+
+    @property
+    def tuya_device_key(self) -> str:
+        return config("TUYA_DEVICE_KEY")
+
+    @property
+    def tuya_device_version(self) -> str:
+        return config("TUYA_DEVICE_VERSION", default="3.3")
+
+    @property
+    def hue_bridge_ip(self) -> str:
+        return config("HUE_BRIDGE_IP")
+
+    @property
+    def hass_url(self) -> str:
+        return config("HASS_URL")
+
+    @property
+    def hass_token(self) -> str:
+        return config("HASS_TOKEN")
+
+    @property
+    def hass_call_update_entity_service(self) -> bool:
+        return config(
+            "HASS_CALL_UPDATE_ENTITY_SERVICE",
+            default=False,
+            cast=bool,
+        )
+
+    @property
+    def light_transition_time(self) -> int:
+        return config(
+            "LIGHT_TRANSITION_TIME",
+            default=0,
             cast=int,
-        ),
-        1,
-    ),
-    255,
-)
-MAX_BRIGHTNESS = 255
-MIN_SAT = min(max(config("MIN_SAT", default=1, cast=int), 1), 255)
-MAX_SAT = min(max(config("MAX_SAT", default=255, cast=int), 1), 255)
-MIN_HUE = min(max(config("MIN_HUE", default=1, cast=int), 1), 65535)
-MAX_HUE = min(max(config("MAX_HUE", default=65535, cast=int), 1), 65535)
-CT_BRI_STEPS = min(config("CT_BRI_STEPS", default=5, cast=int), 10)
-CT_MIRED_STEPS = min(config("CT_MIRED_STEPS", default=10, cast=int), 10)
-BRI_BRI_STEPS = 1
+        )
 
-HS_BRI_PRECISION = config("HS_BRI_PRECISION", default=1, cast=float)
-HS_BRI_PRECISION = min(HS_BRI_PRECISION, 4)
-HS_BRI_PRECISION = max(HS_BRI_PRECISION, 0.5)
-HS_BRI_STEPS = round(32 / HS_BRI_PRECISION)
-del HS_BRI_PRECISION
+    @property
+    def tasmota_device_ip(self) -> str:
+        return config("TASMOTA_DEVICE_IP")
 
-HS_HUE_PRECISION = config("HS_HUE_PRECISION", default=1, cast=float)
-HS_HUE_PRECISION = min(HS_HUE_PRECISION, 4)
-HS_HUE_PRECISION = max(HS_HUE_PRECISION, 0.5)
-HS_HUE_STEPS = round(2731 / HS_HUE_PRECISION)
-del HS_HUE_PRECISION
+    @property
+    def kasa_device_ip(self) -> str:
+        return config("KASA_DEVICE_IP")
 
-HS_SAT_PRECISION = config("HS_SAT_PRECISION", default=1, cast=float)
-HS_SAT_PRECISION = min(HS_SAT_PRECISION, 4)
-HS_SAT_PRECISION = max(HS_SAT_PRECISION, 0.5)
-HS_SAT_STEPS = round(32 / HS_SAT_PRECISION)
-del HS_SAT_PRECISION
+    @property
+    def mystrom_device_ip(self) -> str:
+        return config("MYSTROM_DEVICE_IP")
 
-SELECTED_LIGHT_CONTROLLER = config(
-    "LIGHT_CONTROLLER",
-    cast=Choices([t.value for t in LightControllerType]),
-    default=LightControllerType.HASS.value,
-)
-SELECTED_MEDIA_CONTROLLER = config(
-    "MEDIA_CONTROLLER",
-    cast=Choices([t.value for t in MediaControllerType]),
-    default=MediaControllerType.HASS.value,
-)
-SELECTED_CHARGING_CONTROLLER = config(
-    "CHARGING_CONTROLLER",
-    cast=Choices([t.value for t in ChargingControllerType]),
-    default=ChargingControllerType.HASS.value,
-)
-SELECTED_POWER_METER = config(
-    "POWER_METER",
-    cast=Choices([t.value for t in PowerMeterType]),
-)
-
-LOG_LEVEL = config("LOG_LEVEL", default=logging.INFO)
-SLEEP_INITIAL = 10
-SLEEP_STANDBY = config("SLEEP_STANDBY", default=20, cast=int)
-SLEEP_TIME = config("SLEEP_TIME", default=2, cast=int)
-SLEEP_TIME_SAMPLE = config("SLEEP_TIME_SAMPLE", default=1, cast=int)
-SLEEP_TIME_HUE = config("SLEEP_TIME_HUE", default=5, cast=int)
-SLEEP_TIME_SAT = config("SLEEP_TIME_SAT", default=10, cast=int)
-SLEEP_TIME_CT = config("SLEEP_TIME_CT", default=10, cast=int)
-SLEEP_TIME_NUDGE = config("SLEEP_TIME_NUDGE", default=10, cast=float)
-
-PULSE_TIME_NUDGE = config("PULSE_TIME_NUDGE", default=2, cast=float)
-MAX_RETRIES = config("MAX_RETRIES", default=5, cast=int)
-MAX_NUDGES = config("MAX_NUDGES", default=0, cast=int)
-SAMPLE_COUNT = config("SAMPLE_COUNT", default=1, cast=int)
-
-SHELLY_IP = config("SHELLY_IP")
-SHELLY_TIMEOUT = config("SHELLY_TIMEOUT", default=5, cast=int)
-TUYA_DEVICE_ID = config("TUYA_DEVICE_ID")
-TUYA_DEVICE_IP = config("TUYA_DEVICE_IP")
-TUYA_DEVICE_KEY = config("TUYA_DEVICE_KEY")
-TUYA_DEVICE_VERSION = config("TUYA_DEVICE_VERSION", default="3.3")
-HUE_BRIDGE_IP = config("HUE_BRIDGE_IP")
-HASS_URL = config("HASS_URL")
-HASS_TOKEN = config("HASS_TOKEN")
-HASS_CALL_UPDATE_ENTITY_SERVICE = config(
-    "HASS_CALL_UPDATE_ENTITY_SERVICE",
-    default=False,
-    cast=bool,
-)
-LIGHT_TRANSITION_TIME = config(
-    "LIGHT_TRANSITION_TIME",
-    default=0,
-    cast=int,
-)
-TASMOTA_DEVICE_IP = config("TASMOTA_DEVICE_IP")
-KASA_DEVICE_IP = config("KASA_DEVICE_IP")
-MYSTROM_DEVICE_IP = config("MYSTROM_DEVICE_IP")
-
-CSV_ADD_DATETIME_COLUMN = config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
-
-try:
-    SELECTED_MEASURE_TYPE = config("SELECTED_DEVICE_TYPE")
-except UndefinedValueError:
-    SELECTED_MEASURE_TYPE = None
-
-try:
-    RESUME = config("RESUME", cast=bool)
-except UndefinedValueError:
-    RESUME = None
-
-# Change some settings when selected power meter is manual
-if SELECTED_POWER_METER == PowerMeterType.MANUAL:
-    SAMPLE_COUNT = 1
-    BRI_BRI_STEPS = 3
-    CT_BRI_STEPS = 15
-    CT_MIRED_STEPS = 50
+    @property
+    def csv_add_datetime_column(self) -> bool:
+        return config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)

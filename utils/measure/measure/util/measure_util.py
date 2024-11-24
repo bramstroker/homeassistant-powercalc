@@ -4,6 +4,7 @@ import time
 from datetime import datetime as dt
 
 from measure import config
+from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
@@ -16,9 +17,10 @@ _LOGGER = logging.getLogger("measure")
 
 
 class MeasureUtil:
-    def __init__(self, power_meter: PowerMeter) -> None:
+    def __init__(self, power_meter: PowerMeter, config: MeasureConfig) -> None:
         self.power_meter = power_meter
         self.dummy_load_value: float | None = None
+        self.config = config
 
     def take_average_measurement(self, duration: int) -> float:
         """Measure average power consumption for a given time period in seconds"""
@@ -29,7 +31,7 @@ class MeasureUtil:
             power = self.power_meter.get_power().power
             _LOGGER.info("Measured power: %.2f", power)
             readings.append(power)
-            time.sleep(config.SLEEP_TIME)
+            time.sleep(self.config.sleep_time)
         average = round(sum(readings) / len(readings), 2)
         if self.dummy_load_value:
             average -= self.dummy_load_value
@@ -45,7 +47,7 @@ class MeasureUtil:
         """Get a measurement from the powermeter, take multiple samples and calculate the average"""
         measurements = []
         # Take multiple samples to reduce noise
-        for i in range(1, config.SAMPLE_COUNT + 1):
+        for i in range(1, self.config.sample_count + 1):
             _LOGGER.debug("Taking sample %d", i)
             error = None
             measurement: PowerMeasurementResult | None = None
@@ -63,7 +65,7 @@ class MeasureUtil:
                 if measurement.updated < start_timestamp:
                     error = OutdatedMeasurementError(
                         "Power measurement is outdated. Aborting after %d successive retries",
-                        config.MAX_RETRIES,
+                        self.config.max_retries,
                     )
 
                 # Check if we not have a 0 measurement
@@ -72,15 +74,15 @@ class MeasureUtil:
 
             if error:
                 # Prevent endless recursion. Throw error when max retries is reached
-                if retry_count == config.MAX_RETRIES:
+                if retry_count == self.config.max_retries:
                     raise error
                 retry_count += 1
-                time.sleep(config.SLEEP_TIME)
+                time.sleep(self.config.sleep_time)
                 return self.take_measurement(start_timestamp, retry_count)
 
             measurements.append(measurement.power)
-            if config.SAMPLE_COUNT > 1:
-                time.sleep(config.SLEEP_TIME_SAMPLE)
+            if self.config.sample_count > 1:
+                time.sleep(self.config.sleep_time_sample)
 
         # Determine Average PM reading
         average = sum(measurements) / len(measurements)

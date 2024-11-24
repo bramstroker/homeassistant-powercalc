@@ -7,7 +7,6 @@ import logging
 import os
 import sys
 from datetime import datetime
-from enum import Enum
 from typing import Any
 
 import inquirer
@@ -17,8 +16,9 @@ from inquirer.errors import ValidationError
 from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
-from measure import config
-from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from measure.config import MeasureConfig
+from measure.const import MeasureType, PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, \
+    QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
@@ -36,24 +36,16 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 with open(os.path.join(PROJECT_DIR, ".VERSION")) as f:
     _VERSION = f.read().strip()
 
+config = MeasureConfig()
+
 logging.basicConfig(
-    level=logging.getLevelName(config.LOG_LEVEL),
+    level=logging.getLevelName(config.log_level),
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(os.path.join(PROJECT_DIR, "measure.log")),
         logging.StreamHandler(),
     ],
 )
-
-
-class MeasureType(str, Enum):
-    """Type of devices to measure power of"""
-
-    LIGHT = "Light bulb(s)"
-    SPEAKER = "Smart speaker"
-    RECORDER = "Recorder"
-    AVERAGE = "Average"
-    CHARGING = "Charging device"
 
 
 MEASURE_TYPE_RUNNER = {
@@ -75,7 +67,12 @@ class Measure:
     If you answered yes to generating a model JSON file, a model.json will be created in export/<model-id>
     """
 
-    def __init__(self, power_meter: PowerMeter, console_render: ConsoleRender | None = None) -> None:
+    def __init__(
+        self,
+        power_meter: PowerMeter,
+        config: MeasureConfig,
+        console_render: ConsoleRender | None = None,
+    ) -> None:
         """This class measures the power consumption of a device.
 
         Parameters
@@ -89,6 +86,7 @@ class Measure:
         self.runner: MeasurementRunner | None = None
         self.measure_type: MeasureType = MeasureType.LIGHT
         self.console_render = console_render
+        self.config = config
 
     def start(self) -> None:
         """Starts the measurement session.
@@ -109,20 +107,20 @@ class Measure:
         >>> measure.start()
         """
 
-        _LOGGER.info("Selected powermeter: %s", config.SELECTED_POWER_METER)
+        _LOGGER.info("Selected powermeter: %s", self.config.selected_power_meter)
         if self.measure_type == MeasureType.LIGHT:
             _LOGGER.info(
                 "Selected light controller: %s",
-                config.SELECTED_LIGHT_CONTROLLER,
+                self.config.selected_light_controller,
             )
         if self.measure_type == MeasureType.SPEAKER:
             _LOGGER.info(
                 "Selected media controller: %s",
-                config.SELECTED_MEDIA_CONTROLLER,
+                self.config.selected_media_controller,
             )
 
-        if config.SELECTED_MEASURE_TYPE:
-            self.measure_type = MeasureType(config.SELECTED_MEASURE_TYPE)
+        if self.config.selected_measure_type:
+            self.measure_type = MeasureType(self.config.selected_measure_type)
         else:
             self.measure_type = inquirer.list_input(
                 "What kind of measurement session do you want to run?",
@@ -130,8 +128,8 @@ class Measure:
                 render=self.console_render,
             )
 
-        measure_util = MeasureUtil(self.power_meter)
-        self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util)
+        measure_util = MeasureUtil(self.power_meter, self.config)
+        self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util, self.config)
 
         answers = self.ask_questions(self.get_questions())
         if answers[QUESTION_DUMMY_LOAD]:
@@ -179,8 +177,8 @@ class Measure:
                 export_directory,
             )
 
-    @staticmethod
     def write_model_json(
+        self,
         directory: str,
         standby_power: float,
         name: str,
@@ -195,8 +193,8 @@ class Measure:
             "measure_description": "Measured with utils/measure script",
             "measure_settings": {
                 "VERSION": _VERSION,
-                "SAMPLE_COUNT": config.SAMPLE_COUNT,
-                "SLEEP_TIME": config.SLEEP_TIME,
+                "SAMPLE_COUNT": self.config.sample_count,
+                "SLEEP_TIME": self.config.sleep_time,
             },
             "name": name,
             "standby_power": standby_power,
@@ -307,8 +305,8 @@ def main() -> None:
     print(f"Powercalc measure: {_VERSION}\n")
 
     try:
-        power_meter = PowerMeterFactory().create()
-        measure = Measure(power_meter)
+        power_meter = PowerMeterFactory(config).create()
+        measure = Measure(power_meter, config)
 
         args = sys.argv[1:]
         if len(args) > 0 and args[0] == "average":
@@ -320,7 +318,7 @@ def main() -> None:
             if questions:
                 answers = measure.ask_questions(questions)
                 power_meter.process_answers(answers)
-            measure_util = MeasureUtil(power_meter)
+            measure_util = MeasureUtil(power_meter, config)
             measure_util.take_average_measurement(duration)
             exit(0)
 

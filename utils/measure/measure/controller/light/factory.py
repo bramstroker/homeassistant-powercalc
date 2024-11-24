@@ -1,6 +1,6 @@
 import logging
 
-from measure import config
+from measure.config import MeasureConfig
 from measure.controller.light.const import LightControllerType
 from measure.controller.light.controller import LightController
 from measure.controller.light.dummy import DummyLightController
@@ -11,13 +11,14 @@ _LOGGER = logging.getLogger("measure")
 
 
 class LightControllerFactory:
-    @staticmethod
-    def hass() -> HassLightController:
-        return HassLightController(config.HASS_URL, config.HASS_TOKEN, config.LIGHT_TRANSITION_TIME)
+    def __init__(self, config: MeasureConfig) -> None:
+        self.config = config
 
-    @staticmethod
-    def hue() -> HueLightController:
-        return HueLightController(config.HUE_BRIDGE_IP)
+    def hass(self) -> HassLightController:
+        return HassLightController(self.config.hass_url, self.config.hass_token, self.config.light_transition_time)
+
+    def hue(self) -> HueLightController:
+        return HueLightController(self.config.hue_bridge_ip)
 
     @staticmethod
     def dummy() -> DummyLightController:
@@ -30,10 +31,10 @@ class LightControllerFactory:
             LightControllerType.HUE: self.hue,
             LightControllerType.HASS: self.hass,
         }
-        factory = factories.get(config.SELECTED_LIGHT_CONTROLLER)
+        factory = factories.get(self.config.selected_light_controller)
         if factory is None:
             raise Exception(
-                f"Could not find a factory for {config.SELECTED_LIGHT_CONTROLLER}",
+                f"Could not find a factory for {self.config.selected_light_controller}",
             )
 
         return factory()

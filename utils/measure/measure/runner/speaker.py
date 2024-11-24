@@ -11,6 +11,7 @@ from measure.powermeter.errors import ZeroReadingError
 from measure.util.measure_util import MeasureUtil
 
 from .runner import MeasurementRunner, RunnerResult
+from ..config import MeasureConfig
 
 DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
@@ -21,8 +22,9 @@ _LOGGER = logging.getLogger("measure")
 
 
 class SpeakerRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil) -> None:
+    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
         self.measure_util = measure_util
+        self.config = config
         self.media_controller: MediaController = MediaControllerFactory().create()
 
     def prepare(self, answers: dict[str, Any]) -> None:
@@ -83,9 +85,9 @@ class SpeakerRunner(MeasurementRunner):
         start_time = time.time()
         _LOGGER.info(
             "Measuring standby power. Waiting for %d seconds...",
-            config.SLEEP_STANDBY,
+            self.config.sleep_standby,
         )
-        time.sleep(config.SLEEP_STANDBY)
+        time.sleep(self.config.sleep_standby)
         try:
             return self.measure_util.take_measurement(start_time)
         except ZeroReadingError:

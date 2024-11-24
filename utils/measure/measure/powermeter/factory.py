@@ -1,6 +1,7 @@
 import logging
 
 from measure import config
+from measure.config import MeasureConfig
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.dummy import DummyPowerMeter
 from measure.powermeter.errors import PowerMeterError
@@ -18,21 +19,22 @@ _LOGGER = logging.getLogger("measure")
 
 
 class PowerMeterFactory:
+    def __init__(self, config: MeasureConfig) -> None:
+        self.config = config
+
     @staticmethod
     def dummy() -> DummyPowerMeter:
         return DummyPowerMeter()
 
-    @staticmethod
-    def hass() -> HassPowerMeter:
+    def hass(self) -> HassPowerMeter:
         return HassPowerMeter(
-            config.HASS_URL,
-            config.HASS_TOKEN,
-            config.HASS_CALL_UPDATE_ENTITY_SERVICE,
+            self.config.hass_url,
+            self.config.hass_token,
+            self.config.hass_call_update_entity_service,
         )
 
-    @staticmethod
-    def kasa() -> KasaPowerMeter:
-        return KasaPowerMeter(config.KASA_DEVICE_IP)
+    def kasa(self) -> KasaPowerMeter:
+        return KasaPowerMeter(self.config.kasa_device_ip)
 
     @staticmethod
     def manual() -> ManualPowerMeter:
@@ -42,25 +44,21 @@ class PowerMeterFactory:
     def ocr() -> OcrPowerMeter:
         return OcrPowerMeter()
 
-    @staticmethod
-    def shelly() -> ShellyPowerMeter:
-        return ShellyPowerMeter(config.SHELLY_IP, config.SHELLY_TIMEOUT)
+    def shelly(self) -> ShellyPowerMeter:
+        return ShellyPowerMeter(self.config.shelly_ip, self.config.shelly_timeout)
 
-    @staticmethod
-    def tasmota() -> TasmotaPowerMeter:
-        return TasmotaPowerMeter(config.TASMOTA_DEVICE_IP)
+    def tasmota(self) -> TasmotaPowerMeter:
+        return TasmotaPowerMeter(self.config.tasmota_device_ip)
 
-    @staticmethod
-    def mystrom() -> MyStromPowerMeter:
-        return MyStromPowerMeter(config.MYSTROM_DEVICE_IP)
+    def mystrom(self) -> MyStromPowerMeter:
+        return MyStromPowerMeter(self.config.mystrom_device_ip)
 
-    @staticmethod
-    def tuya() -> TuyaPowerMeter:
+    def tuya(self) -> TuyaPowerMeter:
         return TuyaPowerMeter(
-            config.TUYA_DEVICE_ID,
-            config.TUYA_DEVICE_IP,
-            config.TUYA_DEVICE_KEY,
-            config.TUYA_DEVICE_VERSION,
+            self.config.tuya_device_id,
+            self.config.tuya_device_ip,
+            self.config.tuya_device_key,
+            self.config.tuya_device_version,
         )
 
     def create(self) -> PowerMeter:
@@ -76,10 +74,10 @@ class PowerMeterFactory:
             PowerMeterType.DUMMY: self.dummy,
             PowerMeterType.MYSTROM: self.mystrom,
         }
-        factory = factories.get(config.SELECTED_POWER_METER)
+        factory = factories.get(self.config.selected_power_meter)
         if factory is None:
             raise PowerMeterError(
-                f"Could not find a factory for {config.SELECTED_POWER_METER}",
+                f"Could not find a factory for {self.config.selected_power_meter}",
             )
 
         return factory()

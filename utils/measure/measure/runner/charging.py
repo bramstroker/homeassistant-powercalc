@@ -5,6 +5,7 @@ from typing import Any
 import inquirer
 
 from measure import config
+from measure.config import MeasureConfig
 from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController
 from measure.controller.charging.errors import ChargingControllerError
@@ -21,11 +22,12 @@ TRICKLE_CHARGING_TIME = 1800
 
 
 class ChargingRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil) -> None:
+    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
         self.battery_level_entity: str | None = None
+        self.config = config
         self.battery_level_attribute: str | None = None
         self.measure_util = measure_util
-        self.controller: ChargingController = ChargingControllerFactory().create()
+        self.controller: ChargingController = ChargingControllerFactory(config).create()
         self.charging_device_type: ChargingDeviceType | None = None
 
     def prepare(self, answers: dict[str, Any]) -> None:
@@ -65,14 +67,14 @@ class ChargingRunner(MeasurementRunner):
                 power = self.measure_util.take_measurement(time.time())
                 _LOGGER.info("Measured power: %.2f W", power)
                 measurements[battery_level].append(power)
-                time.sleep(config.SLEEP_TIME)
+                time.sleep(self.config.sleep_time)
                 error_count = 0
             except ChargingControllerError as e:
                 _LOGGER.error("Error during measurement: %s", e)
                 error_count += 1
                 if error_count > 10:
                     raise RunnerError("Too many errors occurred during measurements. aborting") from e
-                time.sleep(config.SLEEP_TIME)
+                time.sleep(self.config.sleep_time)
 
         print("Done charging, start measurements for trickle charging..")
 
