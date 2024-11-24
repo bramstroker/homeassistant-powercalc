@@ -9,7 +9,7 @@
 [![Sonar quality gate](https://img.shields.io/sonar/alert_status/bramstroker_homeassistant-powercalc/master?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/summary/new_code?id=bramstroker_homeassistant-powercalc)
 [![BuyMeACoffee](https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee&style=for-the-badge)](https://www.buymeacoffee.com/bramski)
 
-# <picture>
+<picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://docs.powercalc.nl/img/logo2.svg">
   <img alt="Powercalc logo" src="https://docs.powercalc.nl/img/logo2_light.svg" width="400">
 </picture>
