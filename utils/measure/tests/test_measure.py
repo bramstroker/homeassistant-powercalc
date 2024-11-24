@@ -1,4 +1,3 @@
-import os
 import sys
 from collections.abc import Iterator
 from io import StringIO
@@ -40,20 +39,30 @@ def test_wizard() -> None:
         measure.start()
 
 
-def test_2() -> None:
-    os.environ["SELECTED_DEVICE_TYPE"] = "Light bulb(s)"
-    os.environ["COLOR_MODE"] = "color_temp"
-    os.environ["GENERATE_MODEL_JSON"] = "true"
-    os.environ["GZIP"] = "true"
-    os.environ["MULTIPLE_LIGHTS"] = "false"
-    os.environ["LIGHT_ENTITY_ID"] = "xx"
-    os.environ["MEASURE_DEVICE"] = "Shelly Plug S"
-    os.environ["NUM_LIGHTS"] = "1"
-    os.environ["LIGHT_MODEL_ID"] = "xx"
-    os.environ["MODEL_NAME"] = "xx"
-    os.environ["DUMMY_LOAD"] = "true"
-    os.environ["POWERMETER_ENTITY_ID"] = "sensor.my_power"
-    os.environ["RESUME"] = "true"
+@patch("config")
+def test_2(mock_config) -> None:
+    def mock_config_side_effect(key: str, default=None):
+        values = {
+            "SELECTED_DEVICE_TYPE": "Light bulb(s)",
+            "COLOR_MODE": "color_temp",
+        }
+        return values.get(key, default)
+
+    mock_config.side_effect = mock_config_side_effect
+
+    # os.environ["SELECTED_DEVICE_TYPE"] = "Light bulb(s)"
+    # os.environ["COLOR_MODE"] = "color_temp"
+    # os.environ["GENERATE_MODEL_JSON"] = "true"
+    # os.environ["GZIP"] = "true"
+    # os.environ["MULTIPLE_LIGHTS"] = "false"
+    # os.environ["LIGHT_ENTITY_ID"] = "xx"
+    # os.environ["MEASURE_DEVICE"] = "Shelly Plug S"
+    # os.environ["NUM_LIGHTS"] = "1"
+    # os.environ["LIGHT_MODEL_ID"] = "xx"
+    # os.environ["MODEL_NAME"] = "xx"
+    # os.environ["DUMMY_LOAD"] = "true"
+    # os.environ["POWERMETER_ENTITY_ID"] = "sensor.my_power"
+    # os.environ["RESUME"] = "true"
 
     measure = _create_measure_instance()
 

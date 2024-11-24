@@ -8,6 +8,7 @@ import os
 import sys
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 import config
@@ -30,13 +31,18 @@ from runner.runner import MeasurementRunner
 from runner.speaker import SpeakerRunner
 from util.measure_util import MeasureUtil
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+# sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
+with open(os.path.join(PROJECT_DIR, ".VERSION")) as f:
+    _VERSION = f.read().strip()
 
 logging.basicConfig(
     level=logging.getLevelName(config.LOG_LEVEL),
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler(os.path.join(sys.path[0], "measure.log")),
+        logging.FileHandler(os.path.join(PROJECT_DIR, "measure.log")),
         logging.StreamHandler(),
     ],
 )
@@ -62,10 +68,6 @@ MEASURE_TYPE_RUNNER = {
 
 
 _LOGGER = logging.getLogger("measure")
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(script_dir, ".VERSION")) as f:
-    _VERSION = f.read().strip()
 
 
 class Measure:
@@ -143,7 +145,7 @@ class Measure:
         runner_export_directory = self.runner.get_export_directory()
         if runner_export_directory:
             export_directory = os.path.join(
-                os.path.dirname(__file__),
+                PROJECT_DIR,
                 "export",
                 self.runner.get_export_directory(),
             )
