@@ -1,6 +1,5 @@
 import logging
 
-from measure import config
 from measure.config import MeasureConfig
 from measure.controller.media.const import MediaControllerType
 from measure.controller.media.controller import MediaController

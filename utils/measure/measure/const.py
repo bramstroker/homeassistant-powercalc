@@ -12,6 +12,7 @@ QUESTION_MODEL_ID = "model_id"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
 
+
 class MeasureType(str, Enum):
     """Type of devices to measure power of"""
 

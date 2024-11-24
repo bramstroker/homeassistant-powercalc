@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import os
 import shutil
 from unittest.mock import patch
@@ -15,21 +16,25 @@ def clean_export_directory() -> None:
     shutil.rmtree(export_dir)
     yield
 
+
 @pytest.fixture(scope="session", autouse=True)
 @patch("decouple.config")
 def mock_config_init(mock_config) -> None:
     mock_config_instance = MockConfig()
-    def mock_config_side_effect(var: str, default: ConfigValueType | None = None,
-                                cast: int | None = None) -> ConfigValueType:
+
+    def mock_config_side_effect(var: str, default: ConfigValueType | None = None, cast: int | None = None) -> ConfigValueType:
         return mock_config_instance.get(var, default, cast)
 
     mock_config.side_effect = mock_config_side_effect
+
 
 @pytest.fixture(scope="session")
 def mock_config() -> MockConfig:
     return MockConfig()
 
+
 type ConfigValueType = str | int | bool | set
+
 
 class MockConfig:
     _instance = None  # Class-level attribute to hold the singleton instance

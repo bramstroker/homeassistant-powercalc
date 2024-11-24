@@ -3,7 +3,6 @@ import os
 import time
 from datetime import datetime as dt
 
-from measure import config
 from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
 from measure.powermeter.errors import (

@@ -1,6 +1,5 @@
 import logging
 
-from measure import config
 from measure.config import MeasureConfig
 from measure.powermeter.const import PowerMeterType
 from measure.powermeter.dummy import DummyPowerMeter

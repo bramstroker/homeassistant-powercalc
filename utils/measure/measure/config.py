@@ -8,6 +8,7 @@ from measure.controller.media.const import MediaControllerType
 from measure.measure import MeasureType
 from measure.powermeter.const import PowerMeterType
 
+
 class MeasureConfig:
     @property
     def min_brightness(self) -> int:

@@ -17,8 +17,7 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure.config import MeasureConfig
-from measure.const import MeasureType, PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, \
-    QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME, MeasureType
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory

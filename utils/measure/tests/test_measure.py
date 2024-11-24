@@ -1,10 +1,8 @@
-import importlib
 import sys
 from collections.abc import Iterator
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
-import decouple
 import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
@@ -24,10 +22,11 @@ class EventGenerator:
 def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
+
 @pytest.fixture(autouse=True)
 def reload_measure_module():
-    #importlib.reload(measure)
-    #importlib.reload(decouple)
+    # importlib.reload(measure)
+    # importlib.reload(decouple)
     yield
 
 
@@ -46,6 +45,7 @@ def test_wizard() -> None:
     with patch("builtins.input", return_value=""):
         measure.start()
 
+
 def test_light_run(mock_config: MagicMock) -> None:
     mock_config.set_values(
         {
@@ -56,7 +56,7 @@ def test_light_run(mock_config: MagicMock) -> None:
             "SLEEP_TIME": 0,
             "SLEEP_INITIAL": 0,
             "RESUME": False,
-        }
+        },
     )
     # def mock_config_side_effect(var: str, default: ConfigValueType | None = None, cast: int | None = None) -> ConfigValueType:
     #     values = {
@@ -73,6 +73,7 @@ def test_light_run(mock_config: MagicMock) -> None:
     # mock_config.side_effect = mock_config_side_effect
 
     from measure.config import SELECTED_MEASURE_TYPE
+
     assert SELECTED_MEASURE_TYPE == "Light bulb(s)"
 
     # measure = _create_measure_instance()
