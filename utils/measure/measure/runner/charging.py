@@ -4,7 +4,6 @@ from typing import Any
 
 import inquirer
 
-from measure import config
 from measure.config import MeasureConfig
 from measure.controller.charging.const import QUESTION_BATTERY_LEVEL_ATTRIBUTE, ChargingDeviceType
 from measure.controller.charging.controller import ChargingController

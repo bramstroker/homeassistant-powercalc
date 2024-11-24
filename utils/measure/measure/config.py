@@ -5,8 +5,9 @@ from decouple import Choices, UndefinedValueError, config
 from measure.controller.charging.const import ChargingControllerType
 from measure.controller.light.const import LightControllerType
 from measure.controller.media.const import MediaControllerType
-from measure.measure import MeasureType
+from measure.const import MeasureType
 from measure.powermeter.const import PowerMeterType
+
 
 class MeasureConfig:
     @property
@@ -260,3 +261,9 @@ class MeasureConfig:
     @property
     def csv_add_datetime_column(self) -> bool:
         return config("CSV_ADD_DATETIME_COLUMN", default=False, cast=bool)
+
+    @staticmethod
+    def get_conf_value(key: str) -> str | None:
+        """Get configuration value from environment variable"""
+        return config(key, default=None)
+

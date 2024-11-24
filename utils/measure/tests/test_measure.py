@@ -1,14 +1,13 @@
-import importlib
 import sys
 from collections.abc import Iterator
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
-import decouple
 import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
-from measure.controller.light.const import ColorMode
+
+from measure.config import MeasureConfig
 from measure.powermeter.dummy import DummyPowerMeter
 from readchar import key
 
@@ -24,10 +23,11 @@ class EventGenerator:
 def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
+
 @pytest.fixture(autouse=True)
 def reload_measure_module():
-    #importlib.reload(measure)
-    #importlib.reload(decouple)
+    # importlib.reload(measure)
+    # importlib.reload(decouple)
     yield
 
 
@@ -46,40 +46,21 @@ def test_wizard() -> None:
     with patch("builtins.input", return_value=""):
         measure.start()
 
+
 def test_light_run(mock_config: MagicMock) -> None:
-    mock_config.set_values(
-        {
-            "SELECTED_DEVICE_TYPE": "Light bulb(s)",
-            "COLOR_MODE": {ColorMode.BRIGHTNESS},
-            "LIGHT_CONTROLLER": "dummy",
-            "POWER_METER": "dummy",
-            "SLEEP_TIME": 0,
-            "SLEEP_INITIAL": 0,
-            "RESUME": False,
-        }
-    )
-    # def mock_config_side_effect(var: str, default: ConfigValueType | None = None, cast: int | None = None) -> ConfigValueType:
-    #     values = {
-    #         "SELECTED_DEVICE_TYPE": "Light bulb(s)",
-    #         "COLOR_MODE": {ColorMode.BRIGHTNESS},
-    #         "LIGHT_CONTROLLER": "dummy",
-    #         "POWER_METER": "dummy",
-    #         "SLEEP_TIME": 0,
-    #         "SLEEP_INITIAL": 0,
-    #         "RESUME": False,
-    #     }
-    #     return values.get(var, default)
-    #
-    # mock_config.side_effect = mock_config_side_effect
+    mock_config.selected_measure_type = "Light bulb(s)"
+    mock_config.color_mode = {"brightness"}
+    mock_config.selected_light_controller = "dummy"
+    mock_config.power_meter = "dummy"
+    mock_config.sleep_time = 0
+    mock_config.sleep_initial = 0
+    mock_config.resume = False
 
-    from measure.config import SELECTED_MEASURE_TYPE
-    assert SELECTED_MEASURE_TYPE == "Light bulb(s)"
-
-    # measure = _create_measure_instance()
-    # measure.start()
+    measure = _create_measure_instance(config=mock_config)
+    measure.start()
 
 
-def _create_measure_instance(console_events: EventGenerator | None = None):  # noqa: ANN202
+def _create_measure_instance(config: MeasureConfig | None = None, console_events: EventGenerator | None = None):  # noqa: ANN202
     from measure.measure import Measure
 
     sys.stdin = StringIO()
@@ -90,4 +71,4 @@ def _create_measure_instance(console_events: EventGenerator | None = None):  # n
     )
 
     power_meter = DummyPowerMeter()
-    return Measure(power_meter, render)
+    return Measure(power_meter, config, render)

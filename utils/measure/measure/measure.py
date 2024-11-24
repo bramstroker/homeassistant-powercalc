@@ -17,8 +17,7 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure.config import MeasureConfig
-from measure.const import MeasureType, PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, \
-    QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME, MeasureType
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
@@ -262,8 +261,8 @@ class Measure:
         for question in questions:
             question_name = str(question.name)
             env_var = question_name.upper()
-            if config_key_exists(env_var):
-                conf_value = decouple_config(env_var)
+            conf_value = self.config.get_conf_value(env_var)
+            if conf_value:
                 if isinstance(question, inquirer.Confirm):
                     conf_value = bool(str_to_bool(conf_value))
                 predefined_answers[question_name] = conf_value

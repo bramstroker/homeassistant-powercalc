@@ -1,9 +1,12 @@
 from __future__ import annotations
+
 import os
 import shutil
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+
+from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
 
 
@@ -15,21 +18,23 @@ def clean_export_directory() -> None:
     shutil.rmtree(export_dir)
     yield
 
-@pytest.fixture(scope="session", autouse=True)
-@patch("decouple.config")
-def mock_config_init(mock_config) -> None:
-    mock_config_instance = MockConfig()
-    def mock_config_side_effect(var: str, default: ConfigValueType | None = None,
-                                cast: int | None = None) -> ConfigValueType:
-        return mock_config_instance.get(var, default, cast)
+@pytest.fixture
+@patch("measure.config.MeasureConfig")
+def mock_config(mock) -> MagicMock:
+    # Create an instance of the mocked class
+    mock_instance = mock.return_value
 
-    mock_config.side_effect = mock_config_side_effect
+    # Mock specific property values
+    mock_instance.min_brightness = 100
+    mock_instance.max_brightness = 200
+    mock_instance.min_sat = 10
+    mock_instance.max_sat = 20
 
-@pytest.fixture(scope="session")
-def mock_config() -> MockConfig:
-    return MockConfig()
+    return mock_instance
+
 
 type ConfigValueType = str | int | bool | set
+
 
 class MockConfig:
     _instance = None  # Class-level attribute to hold the singleton instance
