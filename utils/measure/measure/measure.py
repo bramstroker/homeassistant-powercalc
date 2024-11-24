@@ -8,7 +8,6 @@ import os
 import sys
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 from typing import Any
 
 import inquirer
@@ -19,7 +18,7 @@ from inquirer.questions import Question
 from inquirer.render import ConsoleRender
 
 from measure import config
-from measure.const import QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
+from measure.const import PROJECT_DIR, QUESTION_DUMMY_LOAD, QUESTION_GENERATE_MODEL_JSON, QUESTION_MEASURE_DEVICE, QUESTION_MODEL_NAME
 from measure.controller.light.errors import LightControllerError
 from measure.powermeter.errors import PowerMeterError
 from measure.powermeter.factory import PowerMeterFactory
@@ -34,8 +33,6 @@ from measure.util.measure_util import MeasureUtil
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = Path(os.path.join(script_dir, "../")).resolve()
 with open(os.path.join(PROJECT_DIR, ".VERSION")) as f:
     _VERSION = f.read().strip()
 

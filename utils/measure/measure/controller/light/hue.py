@@ -6,6 +6,7 @@ from typing import Any
 import inquirer
 from phue import Bridge, PhueRegistrationException
 
+from measure.const import PROJECT_DIR
 from measure.controller.light.controller import LightController, LightInfo
 from measure.controller.light.errors import LightControllerError, ModelNotDiscoveredError
 
@@ -72,8 +73,8 @@ class HueLightController(LightController):
     @staticmethod
     def initialize_hue_bridge(bridge_ip: str) -> Bridge:
         config_file_path = os.path.join(
-            os.path.dirname(__file__),
-            "../.persistent/.python_hue",
+            PROJECT_DIR,
+            ".persistent/.python_hue",
         )
         try:
             bridge = Bridge(ip=bridge_ip, config_file_path=config_file_path)

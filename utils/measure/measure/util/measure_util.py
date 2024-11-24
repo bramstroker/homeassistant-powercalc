@@ -2,9 +2,9 @@ import logging
 import os
 import time
 from datetime import datetime as dt
-from pathlib import Path
 
 from measure import config
+from measure.const import PROJECT_DIR
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -92,7 +92,7 @@ class MeasureUtil:
         """Get the previously measured dummy load value, or take a new measurement if it doesn't exist"""
 
         dummy_load_file = os.path.join(
-            Path(__file__).parent.parent.absolute(),
+            PROJECT_DIR,
             ".persistent/dummy_load",
         )
         if os.path.exists(dummy_load_file):
