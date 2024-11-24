@@ -29,7 +29,6 @@
           "name": "Nume",
           "on_time": "Timp pornit",
           "start_time": "Timpul de pornire",
-          "unique_id": "ID unic",
           "unit_of_measurement": "Unitate de măsură",
           "update_frequency": "Frecvență actualizare",
           "value": "Valoare",
@@ -123,8 +122,7 @@
           "hide_members": "Ascunde members",
           "include_non_powercalc_sensors": "Include senzori non-powercalc",
           "name": "Nume",
-          "sub_groups": "Subgrupuri",
-          "unique_id": "ID unic"
+          "sub_groups": "Subgrupuri"
         },
         "data_description": {
           "area": "Adaugă toți senzorii de putere din zona specificată",
@@ -148,6 +146,13 @@
         },
         "description": "Producătorul \"{manufacturer}\" și modelul \"{model}\" au fost detectate automat pentru dispozitivul dvs.{remarks}",
         "title": "Bibliotecă"
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Select model"
+        },
+        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
+        "title": "Library"
       },
       "linear": {
         "data": {
@@ -256,7 +261,6 @@
           "create_utility_meters": "Create utility meters",
           "entity_id": "Base entity",
           "name": "Name",
-          "unique_id": "Unique id",
           "subtract_entities": "Subtract entities"
         },
         "data_description": {
@@ -319,8 +323,7 @@
           "group": "Adăugați la grup",
           "mode": "Strategia de calcul",
           "name": "Nume",
-          "standby_power": "Putere in Standby",
-          "unique_id": "ID unic"
+          "standby_power": "Putere in Standby"
         },
         "data_description": {
           "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
@@ -328,8 +331,7 @@
           "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
           "group": "Fill in a custom group name to create a new group",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
-          "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT",
-          "unique_id": "Specificați un ID unic. Acest lucru va permite configurarea mai multor senzori de putere pentru aceeași entitate. Când nu este specificat, va lua ID-ul unic al entității sursă"
+          "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT"
         },
         "description": "Consultați manualul pentru mai multe informații despre posibilele strategii și opțiuni de configurare",
         "title": "Creați un senzor de putere virtual"

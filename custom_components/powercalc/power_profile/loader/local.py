@@ -94,31 +94,29 @@ class LocalLoader(Loader):
 
         lib_models = self._manufacturer_model_listing.get(_manufacturer)
         if lib_models is None:
-            _LOGGER.error("Manufacturer does not exist in custom library: %s", _manufacturer)
             return None
 
         lib_model = lib_models.get(_model)
         if lib_model is None:
-            _LOGGER.error("Model does not exist in custom library for manufacturer %s: %s", _manufacturer, _model)
             return None
 
         model_path = lib_model.get_model_directory()
         model_json = lib_model.json_data
         return model_json, model_path
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find a model for a given manufacturer. Also must check aliases."""
         _manufacturer = manufacturer.lower()
 
         models = self._manufacturer_model_listing.get(_manufacturer)
         if not models:
             _LOGGER.info("Manufacturer does not exist in custom library: %s", _manufacturer)
-            return None
+            return []
 
         search_lower = {phrase.lower() for phrase in search}
 
         profile = next((models[model] for model in models if model.lower() in search_lower), None)
-        return profile.model if profile else None
+        return [profile.model] if profile else []
 
     def _load_custom_library(self) -> None:
         """Loading custom models and aliases from file system.

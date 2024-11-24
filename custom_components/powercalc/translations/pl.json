@@ -29,7 +29,6 @@
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Moment uruchomienia",
-          "unique_id": "Unikatowy identyfikator",
           "unit_of_measurement": "Jednostka pomiaru",
           "update_frequency": "Częstotliwość aktualizacji",
           "value": "Wartość",
@@ -123,8 +122,7 @@
           "hide_members": "Ukryj członków",
           "include_non_powercalc_sensors": "Dołącz czujniki nie-powercalc",
           "name": "Nazwa",
-          "sub_groups": "Podgrupy",
-          "unique_id": "Unikatowy identyfikator"
+          "sub_groups": "Podgrupy"
         },
         "data_description": {
           "area": "Dodaje wszystkie czujniki Powercalc z podanego obszaru",
@@ -148,6 +146,13 @@
         },
         "description": "Producent \"{manufacturer}\" i model \"{model}\" zostały automatycznie wykryte dla twojego światła.{remarks}",
         "title": "Biblioteka"
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Select model"
+        },
+        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
+        "title": "Library"
       },
       "linear": {
         "data": {
@@ -256,7 +261,6 @@
           "create_utility_meters": "Utwórz liczniki mediów",
           "entity_id": "Główny obiekt",
           "name": "Nazwa",
-          "unique_id": "Unikatowy identyfikator",
           "subtract_entities": "Odejmujące obiekty"
         },
         "data_description": {
@@ -319,8 +323,7 @@
           "group": "Dodaj do grupy",
           "mode": "Strategia obliczeniowa",
           "name": "Nazwa",
-          "standby_power": "Moc w trybie czuwania",
-          "unique_id": "Unikatowy identyfikator"
+          "standby_power": "Moc w trybie czuwania"
         },
         "data_description": {
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
@@ -328,8 +331,7 @@
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
           "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
-          "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)",
-          "unique_id": "Określ Unikatowy identyfikator. Umożliwi to skonfigurowanie wielu sensorów mocy dla tej samej encji. Jeśli nie zostanie określony, przyjmie Unikatowy identyfikator encji źródłowej"
+          "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)"
         },
         "description": "Więcej informacji o możliwych strategiach i opcjach konfiguracji znajdziesz w dokumentacji",
         "title": "Stwórz wirtualny sensor mocy"

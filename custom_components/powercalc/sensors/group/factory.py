@@ -1,5 +1,4 @@
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.typing import ConfigType
@@ -48,17 +47,3 @@ async def create_group_sensors(
         )
 
     raise SensorConfigurationError(f"Group type {group_type} invalid")  # pragma: no cover
-
-
-def generate_unique_id(sensor_config: ConfigType) -> str:
-    """Generate a unique ID for a group sensor."""
-    if CONF_UNIQUE_ID in sensor_config:
-        return str(sensor_config[CONF_UNIQUE_ID])
-
-    group_type: GroupType = sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
-    if group_type == GroupType.DOMAIN:
-        return domain_group.generate_unique_id(sensor_config)
-    if group_type == GroupType.SUBTRACT:
-        return subtract_group.generate_unique_id(sensor_config)
-
-    return custom_group.generate_unique_id(sensor_config)

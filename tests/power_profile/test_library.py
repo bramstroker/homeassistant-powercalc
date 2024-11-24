@@ -6,6 +6,7 @@ import pytest
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_DISABLE_LIBRARY_DOWNLOAD
+from custom_components.powercalc.power_profile.error import LibraryError, LibraryLoadingError
 from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.composite import CompositeLoader
 from custom_components.powercalc.power_profile.loader.local import LocalLoader
@@ -35,6 +36,19 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
     models = await library.get_model_listing(manufacturer)  # Trigger twice to test cache
     for model in expected_models:
         assert model in models
+
+
+@pytest.mark.parametrize(
+    "model_info,expected_models",
+    [
+        (ModelInfo("signify", "LCT010"), {"LCT010"}),
+        (ModelInfo("lidl", "HG06106A/HG06104A"), {"HG06104A", "HG06106A"}),
+    ],
+)
+async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_models: set[str]) -> None:
+    library = await ProfileLibrary.factory(hass)
+    models = await library.find_models(model_info.manufacturer, model_info)
+    assert models == expected_models
 
 
 async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
@@ -82,10 +96,10 @@ async def test_get_profile(
     assert profile.get_model_directory().endswith(f"{expected_manufacturer}/{expected_model}")
 
 
-async def test_get_non_existing_profile(hass: HomeAssistant) -> None:
+async def test_get_non_existing_profile_raises_exception(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
-    profile = await library.get_profile(ModelInfo("foo", "bar"))
-    assert not profile
+    with pytest.raises(LibraryError):
+        await library.get_profile(ModelInfo("foo", "bar"))
 
 
 async def test_hidden_directories_are_skipped_from_model_listing(
@@ -100,34 +114,51 @@ async def test_hidden_directories_are_skipped_from_model_listing(
     assert len(caplog.records) == 0
 
 
-# QUESTION: This test does not raise exception any more in local.py because no model
-#           without model.json is in library. Hence the new exception is raised by
-#           _load_model_data: "Model {manufacturer} {model} not found"
 async def test_exception_is_raised_when_no_model_json_present(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    caplog.set_level(logging.ERROR)
     library = await ProfileLibrary.factory(hass)
-    await library.create_power_profile(
-        ModelInfo("foo", "bar"),
-        get_test_profile_dir("no-model-json"),
-    )
-    assert "model.json not found" in caplog.text
+    with pytest.raises(LibraryLoadingError):
+        await library.create_power_profile(
+            ModelInfo("foo", "bar"),
+            get_test_profile_dir("no-model-json"),
+        )
 
 
-async def test_create_power_profile_raises_library_error(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+async def test_create_power_profile_raises_library_error(hass: HomeAssistant) -> None:
     """When no loader is able to load the model, a LibraryError should be raised."""
-    caplog.set_level(logging.ERROR)
     mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
     mock_loader.find_manufacturer = AsyncMock(return_value="signify")
     mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
-    await library.create_power_profile(ModelInfo("signify", "LCT010"))
+    with pytest.raises(LibraryError):
+        await library.create_power_profile(ModelInfo("signify", "LCT010"))
 
-    assert "Problem loading model" in caplog.text
+
+async def test_create_power_raise_library_error_when_model_not_found(hass: HomeAssistant) -> None:
+    """When model is not found in library a LibraryError should be raised"""
+    mock_loader = LocalLoader(hass, "")
+    mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_manufacturer = AsyncMock(return_value="signify")
+    mock_loader.find_model = AsyncMock(return_value=[])
+    library = ProfileLibrary(hass, loader=mock_loader)
+    await library.initialize()
+    with pytest.raises(LibraryError):
+        await library.create_power_profile(ModelInfo("signify", "LCT010"))
+
+
+async def test_create_power_raise_library_error_when_manufacturer_not_found(hass: HomeAssistant) -> None:
+    """When model is not found in library a LibraryError should be raised"""
+    mock_loader = LocalLoader(hass, "")
+    mock_loader.load_model = AsyncMock(return_value=None)
+    mock_loader.find_manufacturer = AsyncMock(return_value=None)
+    library = ProfileLibrary(hass, loader=mock_loader)
+    await library.initialize()
+    with pytest.raises(LibraryError):
+        await library.create_power_profile(ModelInfo("signify", "LCT010"))
 
 
 async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
@@ -155,8 +186,7 @@ async def test_linked_lut_loading(hass: HomeAssistant) -> None:
     assert os.path.exists(os.path.join(profile.get_model_directory(), "color_temp.csv.gz"))
 
 
-async def test_linked_profile_loading_failed(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    caplog.set_level(logging.ERROR)
+async def test_linked_profile_loading_failed(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
 
     remote_loader_class = "custom_components.powercalc.power_profile.loader.remote.RemoteLoader"
@@ -174,6 +204,5 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant, caplog: pytest
 
         mock_load_model.side_effect = async_load_model_patch
 
-        await library.get_profile(ModelInfo("signify", "LCA001"))
-
-        assert "Model foo bar not found" in caplog.text
+        with pytest.raises(LibraryError):
+            await library.get_profile(ModelInfo("signify", "LCA001"))

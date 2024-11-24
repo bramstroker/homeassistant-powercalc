@@ -24,7 +24,7 @@ Create a virtual power sensor by manual configuration. This is the main feature 
 
 ## [Virtual power (library)](virtual-power-library.md)
 
-Create a virtual power sensor by selecting from the library of power profiles. See [supported models].
+Create a virtual power sensor by selecting from the library of power profiles. See [supported models](https://library.powercalc.nl).
 
 ## [Group](group/index.md)
 

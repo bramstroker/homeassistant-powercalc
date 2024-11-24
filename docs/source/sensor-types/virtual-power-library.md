@@ -1,7 +1,7 @@
 # Virtual power sensor (library)
 
 Powercalc has a huge library of power profiles which can be directly used without the need of extensive configuration.
-For all supported devices please see the [supported models] listing.
+For all supported devices please see the [supported models](https://library.powercalc.nl) listing.
 
 Most of the time Powercalc will find compatible devices in your system and provide you with a discovery flow which you only need to accept.
 

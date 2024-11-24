@@ -29,7 +29,6 @@
           "name": "Nome",
           "on_time": "On time",
           "start_time": "Orario d'inizio",
-          "unique_id": "Id univoco",
           "unit_of_measurement": "Unità di misura",
           "update_frequency": "Frequenza di aggiornamento",
           "value": "Valore",
@@ -123,8 +122,7 @@
           "hide_members": "Nascondi membri",
           "include_non_powercalc_sensors": "Includere sensori non powercalc",
           "name": "Nome",
-          "sub_groups": "Sottogruppi",
-          "unique_id": "Id univoco"
+          "sub_groups": "Sottogruppi"
         },
         "data_description": {
           "area": "Aggiunge tutti i sensori di potenza dall'area specificata",
@@ -148,6 +146,13 @@
         },
         "description": "Produttore \"{manufacturer}\" e modello \"{model}\" sono stati rilevati automaticamente per il tuo dispositivo.{remarks}",
         "title": "Libreria"
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Select model"
+        },
+        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
+        "title": "Library"
       },
       "linear": {
         "data": {
@@ -256,7 +261,6 @@
           "create_utility_meters": "Crea contatori (utility meters)",
           "entity_id": "Entità di base",
           "name": "Nome",
-          "unique_id": "Id univoco",
           "subtract_entities": "Subtract entities"
         },
         "data_description": {
@@ -319,8 +323,7 @@
           "group": "Aggiungi al gruppo",
           "mode": "Calculation strategy",
           "name": "Nome",
-          "standby_power": "Potenza in standby",
-          "unique_id": "Id univoco"
+          "standby_power": "Potenza in standby"
         },
         "data_description": {
           "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
@@ -328,8 +331,7 @@
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "group": "Fill in a custom group name to create a new group",
           "name": "Lasciando vuoto prenderà il nome dal dispositivo di origine",
-          "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF",
-          "unique_id": "Specifica un unique_id. Questo permetterà di impostare più sensori di alimentazione per la stessa entità. Quando non è specificato, prenderà l'unique_id dell'entità di origine"
+          "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF"
         },
         "description": "See the readme for more information about the possible strategies and configuration options. Either source entity or name is required, or both.",
         "title": "Crea un sensore di potenza virtuale"

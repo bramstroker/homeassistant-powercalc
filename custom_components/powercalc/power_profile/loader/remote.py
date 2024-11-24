@@ -223,14 +223,17 @@ class RemoteLoader(Loader):
 
         return await self.hass.async_add_executor_job(_write)  # type: ignore
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find the model in the library."""
 
         models = self.manufacturer_models.get(manufacturer, [])
-        return next(
-            (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
-            None,
-        )
+        result = []
+        for model in models:
+            model_id = model.get("id")
+            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
+                result.append(model_id)
+
+        return result
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
