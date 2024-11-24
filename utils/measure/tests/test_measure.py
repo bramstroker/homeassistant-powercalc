@@ -9,18 +9,18 @@ from inquirer.render import ConsoleRender
 from powermeter.dummy import DummyPowerMeter
 from readchar import key
 
-from measure import Measure
+from ..measure import Measure
 
 
 class EventGenerator:
-    def __init__(self, *args: key | str) -> None:
-        self.iterator: Iterator[key | str] = args.__iter__()
+    def __init__(self, *args: str) -> None:
+        self.iterator: Iterator[str] = args.__iter__()
 
     def next(self) -> events.KeyPressed:
         return events.KeyPressed(next(self.iterator))
 
 
-def event_factory(*args: key | str) -> EventGenerator:
+def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
 
