@@ -11,8 +11,7 @@
 
 # <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://docs.powercalc.nl/img/logo2.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://docs.powercalc.nl/img/logo2_light.svg">
-  <img alt="Powercalc logo" src="https://docs.powercalc.nl/img/logo2.svg" width="400">
+  <img alt="Powercalc logo" src="https://docs.powercalc.nl/img/logo2_light.svg" width="400">
 </picture>
 
 PowerCalc is a custom component for Home Assistant to estimate the power consumption (as virtual meters) of lights, fans, smart speakers and other devices, which don't have a built-in power meter. The consumption of light entities is calculated using different strategies to estimate the power usage by looking at brightness, hue/saturation and color temperature. For other entities a generic calculation can be applied, based on the attributes relevant for that entity.
