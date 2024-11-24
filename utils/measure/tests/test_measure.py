@@ -1,26 +1,27 @@
 import os
 import sys
+from collections.abc import Iterator
 from io import StringIO
 from unittest.mock import patch
 
 from inquirer import events
 from inquirer.render import ConsoleRender
+from powermeter.dummy import DummyPowerMeter
 from readchar import key
 
-from ..measure import Measure
-from ..powermeter.dummy import DummyPowerMeter
+from measure import Measure
 
 
-class Iterable:
-    def __init__(self, *args):
-        self.iterator = args.__iter__()
+class EventGenerator:
+    def __init__(self, *args: key | str) -> None:
+        self.iterator: Iterator[key | str] = args.__iter__()
 
-    def next(self):
+    def next(self) -> events.KeyPressed:
         return events.KeyPressed(next(self.iterator))
 
 
-def event_factory(*args):
-    return Iterable(*args)
+def event_factory(*args: key | str) -> EventGenerator:
+    return EventGenerator(*args)
 
 
 def test_wizard() -> None:
@@ -60,7 +61,7 @@ def test_2() -> None:
         measure.start()
 
 
-def _create_measure_instance(console_events: Iterable | None = None) -> Measure:
+def _create_measure_instance(console_events: EventGenerator | None = None) -> Measure:
     sys.stdin = StringIO()
     sys.stdout = StringIO()
 
