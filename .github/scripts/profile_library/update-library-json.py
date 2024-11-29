@@ -74,8 +74,17 @@ def generate_library_json(model_listing: list[dict]) -> None:
 
 
 def get_manufacturer_json(manufacturer: str) -> dict:
-    with open(os.path.join(DATA_DIR, manufacturer, "manufacturer.json")) as json_file:
-        return json.load(json_file)
+    json_path = os.path.join(DATA_DIR, manufacturer, "manufacturer.json")
+    try:
+        with open(json_path) as json_file:
+            return json.load(json_file)
+    except FileNotFoundError as e:
+        default_json = { "name": manufacturer, "aliases":[] }
+        with open(json_path, 'w', encoding='utf-8') as json_file:
+            json.dump(default_json, json_file, ensure_ascii=False, indent=4)
+        git.Repo(PROJECT_ROOT).git.add(json_path)
+        print(f"Added {json_path}")
+        return default_json
 
 
 def get_model_list() -> list[dict]:
