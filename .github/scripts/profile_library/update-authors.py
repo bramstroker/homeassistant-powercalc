@@ -6,28 +6,28 @@ import sys
 
 
 def run_git_command(command):
-    """ Run a git command and return the output. """
+    """Run a git command and return the output."""
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     result.check_returncode()  # Raise an error if the command fails
     return result.stdout.strip()
 
 
 def get_commits_affected_directory(directory: str) -> list:
-    """ Get a list of commits that affected the given directory, including renames. """
+    """Get a list of commits that affected the given directory, including renames."""
     command = f"git log --follow --format='%H' -- '{directory}'"
     commits = run_git_command(command)
     return commits.splitlines()
 
 
 def get_commit_author(commit_hash: str) -> str:
-    """ Get the author of a given commit. """
+    """Get the author of a given commit."""
     command = f"git show -s --format='%an <%ae>' {commit_hash}"
     author = run_git_command(command)
     return author
 
 
 def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
-    """ Find the first commit that affected the directory and return the author's name. """
+    """Find the first commit that affected the directory and return the author's name."""
     commits = get_commits_affected_directory(file)
     for commit in reversed(commits):  # Process commits from the oldest to newest
         command = f"git diff-tree --no-commit-id --name-only -r {commit}"
@@ -35,11 +35,7 @@ def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
             return get_commit_author(commit)
 
         affected_files = run_git_command(command)
-        paths = [
-            file.replace("profile_library", "custom_components/powercalc/data"),
-            file.replace("profile_library", "data"),
-            file
-        ]
+        paths = [file.replace("profile_library", "custom_components/powercalc/data"), file.replace("profile_library", "data"), file]
         if any(path in affected_files.splitlines() for path in paths):
             author = get_commit_author(commit)
             return author
@@ -48,7 +44,7 @@ def find_first_commit_author(file: str, check_paths: bool = True) -> str | None:
 
 def process_model_json_files(root_dir):
     # Find all model.json files in the directory tree
-    model_json_files = glob.glob(os.path.join(root_dir, '**', 'model.json'), recursive=True)
+    model_json_files = glob.glob(os.path.join(root_dir, "**", "model.json"), recursive=True)
 
     for model_json_file in model_json_files:
         # Skip sub profiles
@@ -71,7 +67,7 @@ def process_model_json_files(root_dir):
 
 def read_author_from_file(file_path: str) -> str | None:
     """Read the author from the model.json file."""
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         json_data = json.load(file)
 
     return json_data.get("author")
@@ -80,7 +76,7 @@ def read_author_from_file(file_path: str) -> str | None:
 def write_author_to_file(file_path: str, author: str) -> None:
     """Write the author to the model.json file."""
     # Read the existing content
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         json_data = json.load(file)
 
     json_data["author"] = author
