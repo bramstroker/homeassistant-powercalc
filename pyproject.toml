@@ -29,6 +29,7 @@ markers = [
     "skip_remote_loader_mocking: Do not mock globally registered remote loader mock",
 ]
 log_level = "DEBUG"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.isort]
 profile = "black"
