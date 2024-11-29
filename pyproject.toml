@@ -16,9 +16,9 @@ classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.12.0"
+requires-python = ">=3.13.0"
 dependencies = ["homeassistant"]
 
 [tool.pytest.ini_options]
@@ -36,7 +36,7 @@ profile = "black"
 multi_line_output = 3
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 show_error_codes = true
 follow_imports = "silent"
 local_partial_types = true
@@ -68,7 +68,7 @@ source = ["custom_components/powercalc", "utils", "tests"]
 
 [tool.ruff]
 line-length = 150
-target-version = "py312"
+target-version = "py313"
 exclude = ["utils/measure/playground", "utils/visualize", ".github", "docs"]
 
 [tool.ruff.lint]
@@ -109,14 +109,13 @@ types-pytz = "^2024.1"
 types-croniter = "^2.0"
 croniter = "^5.0.0"
 pytest-cov = "^6.0"
-pytest-profiling = "^1.7"
 # Requirements below are needed since HA 2023.9.3, not sure why
 psutil_home_assistant = "*"
 fnv_hash_fast = "*"
 cronsim = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = ">=3.13,<3.14"
 aioresponses = "^0.7.6"
 
 [build-system]
