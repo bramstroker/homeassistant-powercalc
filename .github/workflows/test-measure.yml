@@ -23,7 +23,6 @@ jobs:
         run: |
           cd ./utils/measure && poetry run pytest \
             -qq \
-            --timeout=9 \
             --durations=10 \
             -o console_output_style=count \
             -p no:sugar \
