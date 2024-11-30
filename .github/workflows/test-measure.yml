@@ -21,7 +21,7 @@ jobs:
           directory: './utils/measure'
       - name: Run tests
         run: |
-          poetry run pytest \
+          poetry run ./utils/measure/pytest \
             -qq \
             --timeout=9 \
             --durations=10 \
