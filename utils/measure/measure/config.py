@@ -66,8 +66,7 @@ class MeasureConfig:
     def hs_bri_precision(self) -> float:
         hs_bri_precision = config("HS_BRI_PRECISION", default=1, cast=float)
         hs_bri_precision = min(hs_bri_precision, 4)
-        hs_bri_precision = max(hs_bri_precision, 0.5)
-        return hs_bri_precision
+        return max(hs_bri_precision, 0.5)
 
     @property
     def hs_bri_steps(self) -> int:
@@ -77,8 +76,7 @@ class MeasureConfig:
     def hs_hue_precision(self) -> float:
         hs_hue_precision = config("HS_HUE_PRECISION", default=1, cast=float)
         hs_hue_precision = min(hs_hue_precision, 4)
-        hs_hue_precision = max(hs_hue_precision, 0.5)
-        return hs_hue_precision
+        return max(hs_hue_precision, 0.5)
 
     @property
     def hs_hue_steps(self) -> int:
@@ -88,8 +86,7 @@ class MeasureConfig:
     def hs_sat_precision(self) -> float:
         hs_sat_precision = config("HS_SAT_PRECISION", default=1, cast=float)
         hs_sat_precision = min(hs_sat_precision, 4)
-        hs_sat_precision = max(hs_sat_precision, 0.5)
-        return hs_sat_precision
+        return max(hs_sat_precision, 0.5)
 
     @property
     def hs_sat_steps(self) -> int:
