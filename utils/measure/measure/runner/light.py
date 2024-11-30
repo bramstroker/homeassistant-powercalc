@@ -131,8 +131,12 @@ class LightRunner(MeasurementRunner):
         with open(measurement_info.csv_file, file_write_mode, newline="") as csv_file:
             csv_writer = CsvWriter(csv_file, color_mode, write_header_row, self.config)
 
-            if measurement_info.is_resuming is None:
-                self.light_controller.change_light_state(ColorMode.BRIGHTNESS, on=False)
+            # To avoid bugs in some lights, when set to low brightness initially
+            # where they turn off again. And also bugs where lights will turn off
+            # again, after they recevied two turn-off commands, followed by a single
+            # turn on command, we set them to maximum brightness, twice here.
+            # See issue #2598
+            self.set_light_to_maximum_brightness(color_mode)
 
             # Initially wait longer so the smartplug can settle
             _LOGGER.info(
@@ -205,6 +209,37 @@ class LightRunner(MeasurementRunner):
 
         if bool(answers.get(QUESTION_GZIP, True)):
             self.gzip_csv(measurement_info.csv_file)
+
+    def set_light_to_maximum_brightness(self, color_mode: ColorMode) -> None:
+        """
+        Set the light to maximum brightness twice to avoid that bugs in some lights will
+        cause them to be off
+        """
+        _LOGGER.info("Turning on light with maximum brightness")
+        # Turn the light on twice to ensure it's in the correct state
+        for _ in range(2):
+            if color_mode == ColorMode.HS:
+                self.light_controller.change_light_state(
+                    color_mode,
+                    on=True,
+                    bri=255,
+                    hue=0,  # Set default hue
+                    sat=1,  # Set default saturation
+                )
+            elif color_mode == ColorMode.COLOR_TEMP:
+                self.light_controller.change_light_state(
+                    color_mode,
+                    on=True,
+                    bri=255,
+                    ct=self.light_info.min_mired,  # Set to minimum mired value for color temp
+                )
+            else:
+                self.light_controller.change_light_state(
+                    color_mode,
+                    on=True,
+                    bri=255,
+                )
+            time.sleep(2)  # Wait for the light to process
 
     def get_variations(
         self,
