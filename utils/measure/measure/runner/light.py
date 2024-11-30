@@ -215,7 +215,7 @@ class LightRunner(MeasurementRunner):
         Set the light to maximum brightness twice to avoid that bugs in some lights will
         cause them to be off
         """
-        _LOGGER.info("Turning on light with maximum brightness",)
+        _LOGGER.info("Turning on light with maximum brightness")
         # Turn the light on twice to ensure it's in the correct state
         for _ in range(2):
             if color_mode == ColorMode.HS:
@@ -224,20 +224,20 @@ class LightRunner(MeasurementRunner):
                     on=True,
                     bri=255,
                     hue=0,  # Set default hue
-                    sat=1  # Set default saturation
+                    sat=1,  # Set default saturation
                 )
             elif color_mode == ColorMode.COLOR_TEMP:
                 self.light_controller.change_light_state(
                     color_mode,
                     on=True,
                     bri=255,
-                    ct=self.light_info.min_mired  # Set to minimum mired value for color temp
+                    ct=self.light_info.min_mired,  # Set to minimum mired value for color temp
                 )
             else:
                 self.light_controller.change_light_state(
                     color_mode,
                     on=True,
-                    bri=255
+                    bri=255,
                 )
             time.sleep(2)  # Wait for the light to process
 
