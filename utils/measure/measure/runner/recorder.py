@@ -5,6 +5,7 @@ from typing import Any
 
 import inquirer
 
+from measure.config import MeasureConfig
 from measure.runner.const import QUESTION_EXPORT_FILENAME
 from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasureUtil
@@ -17,8 +18,9 @@ DEFAULT_FILENAME = "record.csv"
 
 
 class RecorderRunner(MeasurementRunner):
-    def __init__(self, measure_util: MeasureUtil) -> None:
+    def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
         self.measure_util = measure_util
+        self.config = config
         self.filename = DEFAULT_FILENAME
 
     def prepare(self, answers: dict[str, Any]) -> None:
@@ -38,6 +40,7 @@ class RecorderRunner(MeasurementRunner):
                 writer = csv.writer(csv_file)
                 while True:
                     timestamp = time.time()
+                    print("Measurement")
                     measurement = self.measure_util.take_measurement(timestamp)
                     _LOGGER.info("Measurement %.2f", measurement)
                     writer.writerow([timestamp - start_time, measurement])

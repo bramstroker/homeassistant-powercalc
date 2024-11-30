@@ -24,11 +24,18 @@ def clean_export_directory() -> None:
 @pytest.fixture
 def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
     @patch("measure.config.MeasureConfig", autospec=True)
-    def _mock_config(mock: MagicMock, config_values: dict | None = None, set_question_defaults: bool = True) -> MagicMock:
+    def _mock_config(
+        mock: MagicMock,
+        config_values: dict | None = None,
+        set_question_defaults: bool = True,
+        question_defaults: dict | None = None,
+    ) -> MagicMock:
         if config_values is None:
             config_values = {
                 "selected_light_controller": "dummy",
                 "selected_power_meter": "dummy",
+                "selected_media_controller": "dummy",
+                "selected_charging_controller": "dummy",
                 "sleep_time": 0,
                 "sleep_initial": 0,
                 "sleep_standby": 0,
@@ -50,6 +57,7 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
                 "num_lights": 1,
                 "selected_measure_type": "Light bulb(s)",
                 "color_mode": {ColorMode.BRIGHTNESS},
+                **(question_defaults or {}),
                 **config_values,
             }
 

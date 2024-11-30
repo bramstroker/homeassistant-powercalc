@@ -131,7 +131,7 @@ class Measure:
         self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util, self.config)
 
         answers = self.ask_questions(self.get_questions())
-        if answers[QUESTION_DUMMY_LOAD]:
+        if answers.get(QUESTION_DUMMY_LOAD, False):
             measure_util.initialize_dummy_load()
         self.power_meter.process_answers(answers)
         self.runner.prepare(answers)
@@ -147,7 +147,7 @@ class Measure:
             if not os.path.exists(export_directory):
                 os.makedirs(export_directory)
 
-        if answers[QUESTION_DUMMY_LOAD]:
+        if answers.get(QUESTION_DUMMY_LOAD, False):
             input("Please connect the appliance you want to measure in parallel to the dummy load and press enter to start measurement session...")
         runner_result = self.runner.run(answers, export_directory)
         if not runner_result:
