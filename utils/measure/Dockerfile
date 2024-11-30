@@ -27,4 +27,4 @@ WORKDIR /app
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY . .
 
-ENTRYPOINT ["python", "measure/measure.py"]
+ENTRYPOINT ["python", "-m", "measure.measure"]

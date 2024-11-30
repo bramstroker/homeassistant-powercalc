@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import os
 import shutil
+from collections.abc import Callable
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+from measure.config import MeasureConfig
 from measure.const import PROJECT_DIR
+from measure.controller.light.const import ColorMode
 
 
 @pytest.fixture(autouse=True)
@@ -18,39 +22,45 @@ def clean_export_directory() -> None:
 
 
 @pytest.fixture
-@patch("measure.config.MeasureConfig")
-def mock_config(mock) -> MagicMock:
-    # Create an instance of the mocked class
-    mock_instance = mock.return_value
+def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
+    @patch("measure.config.MeasureConfig", autospec=True)
+    def _mock_config(mock: MagicMock, config_values: dict | None = None, set_question_defaults: bool = True) -> MagicMock:
+        if config_values is None:
+            config_values = {
+                "selected_light_controller": "dummy",
+                "selected_power_meter": "dummy",
+                "sleep_time": 0,
+                "sleep_initial": 0,
+                "sleep_standby": 0,
+                "resume": False,
+                "min_brightness": 0,
+                "max_brightness": 255,
+                "bri_bri_steps": 1,
+                "sample_count": 1,
+                "sleep_time_sample": 0,
+            }
+        if set_question_defaults:
+            config_values = {
+                "generate_model_json": True,
+                "dummy_load": False,
+                "model_name": "Test model",
+                "measure_device": "Shelly Plug S",
+                "gzip": True,
+                "multiple_lights": False,
+                "num_lights": 1,
+                "selected_measure_type": "Light bulb(s)",
+                "color_mode": {ColorMode.BRIGHTNESS},
+                **config_values,
+            }
 
-    # Mock specific property values
-    mock_instance.min_brightness = 100
-    mock_instance.max_brightness = 200
-    mock_instance.min_sat = 10
-    mock_instance.max_sat = 20
+        mock_instance = mock.return_value
+        mock_instance.get_conf_value = MagicMock()
+        mock_instance.get_conf_value.side_effect = lambda k: config_values.get(k.lower(), None)
 
-    return mock_instance
+        properties = {prop for prop in dir(MeasureConfig) if isinstance(getattr(MeasureConfig, prop, None), property)}
+        for prop in properties:
+            setattr(mock_instance, prop, config_values.get(prop, None))
 
+        return mock_instance
 
-type ConfigValueType = str | int | bool | set
-
-
-class MockConfig:
-    _instance = None  # Class-level attribute to hold the singleton instance
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
-
-    def __init__(self) -> None:
-        self.values: dict[str, str] = {}
-
-    def clear(self) -> None:
-        self.values.clear()
-
-    def set_values(self, values: dict[str, str]) -> None:
-        self.values = values
-
-    def get(self, var: str, default: str | None = None, cast: int | None = None) -> str:
-        return self.values.get(var, default)
+    return _mock_config

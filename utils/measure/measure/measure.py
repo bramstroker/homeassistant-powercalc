@@ -262,12 +262,14 @@ class Measure:
             question_name = str(question.name)
             env_var = question_name.upper()
             conf_value = self.config.get_conf_value(env_var)
-            if conf_value:
+            if conf_value is not None:
                 if isinstance(question, inquirer.Confirm):
                     conf_value = bool(str_to_bool(conf_value))
                 predefined_answers[question_name] = conf_value
+                questions_to_ask.remove(question)
 
         answers = inquirer.prompt(questions_to_ask, answers=predefined_answers, render=self.console_render)
+        answers.update(predefined_answers)
 
         _LOGGER.debug("Answers: %s", answers)
 

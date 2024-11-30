@@ -1,12 +1,13 @@
+import os
 import sys
 from collections.abc import Iterator
 from io import StringIO
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 from inquirer import events
 from inquirer.render import ConsoleRender
 from measure.config import MeasureConfig
+from measure.const import PROJECT_DIR
 from measure.powermeter.dummy import DummyPowerMeter
 from readchar import key
 
@@ -23,20 +24,19 @@ def event_factory(*args: str) -> EventGenerator:
     return EventGenerator(*args)
 
 
-@pytest.fixture(autouse=True)
-def reload_measure_module():
-    # importlib.reload(measure)
-    # importlib.reload(decouple)
-    yield
-
-
-def test_wizard() -> None:
+def test_wizard(mock_config_factory) -> None:  # noqa: ANN001
+    mock_config = mock_config_factory(
+        set_question_defaults=False,
+    )
     measure = _create_measure_instance(
-        event_factory(
+        mock_config,
+        console_events=event_factory(
             key.ENTER,  # MEASURE_TYPE
             "n",  # DUMMY_LOAD
             "y",  # GENERATE_MODEL_JSON
-            key.ENTER,  # COLOR_MODE
+            key.DOWN,  # COLOR_MODE
+            key.DOWN,
+            key.ENTER,
             key.ENTER,  # GZIP
             "n",  # MULTIPLE_LIGHTS
         ),
@@ -45,21 +45,21 @@ def test_wizard() -> None:
     with patch("builtins.input", return_value=""):
         measure.start()
 
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/brightness.csv.gz"))
+    assert not os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
 
-def test_light_run(mock_config: MagicMock) -> None:
-    mock_config.selected_measure_type = "Light bulb(s)"
-    mock_config.color_mode = {"brightness"}
-    mock_config.selected_light_controller = "dummy"
-    mock_config.power_meter = "dummy"
-    mock_config.sleep_time = 0
-    mock_config.sleep_initial = 0
-    mock_config.resume = False
+
+def test_light_run_brightness(mock_config_factory) -> None:  # noqa: ANN001
+    mock_config = mock_config_factory()
 
     measure = _create_measure_instance(config=mock_config)
     measure.start()
 
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/brightness.csv.gz"))
+    assert os.path.exists(os.path.join(PROJECT_DIR, "export/dummy/model.json"))
 
-def _create_measure_instance(config: MeasureConfig | None = None, console_events: EventGenerator | None = None):  # noqa: ANN202
+
+def _create_measure_instance(config: MeasureConfig, console_events: EventGenerator | None = None):  # noqa: ANN202
     from measure.measure import Measure
 
     sys.stdin = StringIO()
