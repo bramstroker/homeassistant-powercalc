@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'measure'
+      - 'measure/**'
   pull_request:
     paths:
-      - 'measure'
+      - 'measure/**'
 
 jobs:
   tests:
