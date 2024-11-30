@@ -23,6 +23,7 @@ requests = "^2.28"
 tuyapower = "^0.2"
 typing-extensions = "^4.6"
 pycryptodome = "*"
+pytest = "^8.3.3"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.2"
@@ -30,3 +31,6 @@ ruff = "^0.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "."
