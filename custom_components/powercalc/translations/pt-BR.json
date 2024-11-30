@@ -29,7 +29,6 @@
           "name": "Nome",
           "on_time": "Na hora",
           "start_time": "Hora de início",
-          "unique_id": "ID único",
           "unit_of_measurement": "Unidade de medida",
           "update_frequency": "Frequência de atualização",
           "value": "Valor",
@@ -85,7 +84,7 @@
           "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
+          "disable_library_download": "Desativar o recurso de download da biblioteca Powercalc",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
           "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
           "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
@@ -123,8 +122,7 @@
           "hide_members": "Ocultar membros",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
           "name": "Nome",
-          "sub_groups": "Subgrupos",
-          "unique_id": "ID único"
+          "sub_groups": "Subgrupos"
         },
         "data_description": {
           "area": "Adiciona todos os sensores de potência da área especificada",
@@ -263,7 +261,6 @@
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade base",
           "name": "Nome",
-          "unique_id": "ID único",
           "subtract_entities": "Subtrair entidades"
         },
         "data_description": {
@@ -326,8 +323,7 @@
           "group": "Adicionar ao grupo",
           "mode": "Estratégia de cálculo",
           "name": "Nome",
-          "standby_power": "Potência em standby",
-          "unique_id": "ID único"
+          "standby_power": "Potência em standby"
         },
         "data_description": {
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
@@ -335,8 +331,7 @@
           "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
           "group": "Preencha um nome de grupo personalizado para criar um novo grupo",
           "name": "Deixar em branco levará o nome da entidade de origem",
-          "standby_power": "Defina a quantidade de potência que o dispositivo está consumindo quando estiver DESLIGADO",
-          "unique_id": "Especifique um unique_id. Isso permitirá configurar vários sensores de potência para a mesma entidade. Quando não especificado, levará o unique_id da entidade de origem"
+          "standby_power": "Defina a quantidade de potência que o dispositivo está consumindo quando estiver DESLIGADO"
         },
         "description": "Consulte o leia-me para obter mais informações sobre as possíveis estratégias e opções de configuração",
         "title": "Criar um sensor de potência virtual"

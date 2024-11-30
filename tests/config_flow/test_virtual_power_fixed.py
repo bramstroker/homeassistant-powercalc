@@ -272,6 +272,6 @@ async def test_setup_twice_for_same_entity(hass: HomeAssistant) -> None:
         {CONF_POWER: 20},
     )
 
-    assert hass.async_block_till_done()
+    await hass.async_block_till_done()
     assert hass.states.get("sensor.my_nice_sensor_power")
     assert hass.states.get("sensor.my_nice_sensor_2_power")

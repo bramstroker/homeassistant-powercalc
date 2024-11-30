@@ -34,7 +34,7 @@ So it's highly recommended to use the tests to verify your changes. See the [Run
 In order to run the tests, you need to install the dependencies. You can do this by running the following command:
 
 ```bash
-poetry env use 3.12
+poetry env use 3.13
 tests/setup.sh
 poetry install --no-root
 ```

@@ -51,7 +51,7 @@ poetry install
 #### Start measurements
 
 ```
-poetry run python measure.py
+poetry run python -m measure.measure
 ```
 
 The script will ask you a few questions, than proceed taking measurements.

@@ -1523,7 +1523,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             return self.async_show_form(
                 step_id=Steps.LIBRARY,
                 description_placeholders={
-                    "remarks": remarks,
+                    "remarks": remarks,  # type: ignore
                     "manufacturer": self.selected_profile.manufacturer,
                     "model": self.selected_profile.model,
                 },

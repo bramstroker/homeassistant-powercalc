@@ -1,0 +1,29 @@
+name: Test measure util
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'utils/measure/**'
+  pull_request:
+    paths:
+      - 'utils/measure/**'
+
+jobs:
+  tests:
+    runs-on: "ubuntu-latest"
+    name: Run tests
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - uses: ./.github/workflows/poetry-composite-action
+        with:
+          directory: './utils/measure'
+      - name: Run tests
+        run: |
+          cd ./utils/measure && poetry run pytest \
+            -qq \
+            --durations=10 \
+            -o console_output_style=count \
+            -p no:sugar \
+            tests

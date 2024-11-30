@@ -25,6 +25,7 @@ from .const import (
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
+    MANUFACTURER_WLED,
     CalculationStrategy,
 )
 from .errors import ModelNotSupportedError
@@ -34,8 +35,6 @@ from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
-
-MANUFACTURER_WLED = "WLED"
 
 
 async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity: SourceEntity) -> PowerProfile | None:
