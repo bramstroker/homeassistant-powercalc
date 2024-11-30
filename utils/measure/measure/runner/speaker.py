@@ -23,7 +23,7 @@ class SpeakerRunner(MeasurementRunner):
     def __init__(self, measure_util: MeasureUtil, config: MeasureConfig) -> None:
         self.measure_util = measure_util
         self.config = config
-        self.media_controller: MediaController = MediaControllerFactory().create()
+        self.media_controller: MediaController = MediaControllerFactory(config).create()
 
     def prepare(self, answers: dict[str, Any]) -> None:
         self.media_controller.process_answers(answers)
