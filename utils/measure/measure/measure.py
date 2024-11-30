@@ -131,10 +131,11 @@ class Measure:
         self.runner = MEASURE_TYPE_RUNNER[self.measure_type](measure_util, self.config)
 
         answers = self.ask_questions(self.get_questions())
-        if answers.get(QUESTION_DUMMY_LOAD, False):
-            measure_util.initialize_dummy_load()
         self.power_meter.process_answers(answers)
         self.runner.prepare(answers)
+
+        if answers.get(QUESTION_DUMMY_LOAD, False):
+            measure_util.initialize_dummy_load()
 
         export_directory = None
         runner_export_directory = self.runner.get_export_directory()
