@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-11-25T16:19:34.226963",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus Plug S",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.15.4:docker"
+  },
+  "name": "IKEA JETSTRÖM L2206",
+  "standby_power": 0.32
+}

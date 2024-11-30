@@ -9,6 +9,7 @@ from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    MANUFACTURER_WLED,
 )
 from custom_components.powercalc.errors import ModelNotSupportedError
 
@@ -36,6 +37,9 @@ async def get_power_profile(
     custom_model_directory = config.get(CONF_CUSTOM_MODEL_DIRECTORY)
 
     if (not manufacturer or not model) and not custom_model_directory:
+        return None
+
+    if manufacturer == MANUFACTURER_WLED:
         return None
 
     if custom_model_directory:

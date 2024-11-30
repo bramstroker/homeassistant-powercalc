@@ -259,10 +259,8 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     @property
     def native_value(self) -> StateType | Decimal:  # type: ignore[override]
         """Return the state of the sensor."""
-        if hasattr(self, "_state"):
-            if self.rounding_digits and self._state is not None:
-                return Decimal(round(self._state, self.rounding_digits))
+        value = self._state if hasattr(self, "_state") else self._attr_native_value  # pre HA 2024.12 value was stored in _state
+        if self.rounding_digits and value is not None:
+            return Decimal(round(value, self.rounding_digits))  # type: ignore
 
-            return self._state
-
-        return self._attr_native_value  # type: ignore[return-value]
+        return value  # type: ignore

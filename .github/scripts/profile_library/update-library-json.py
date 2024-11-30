@@ -3,12 +3,11 @@ from __future__ import annotations
 import glob
 import json
 import os
-import git
 import sys
 from datetime import datetime
 from pathlib import Path
 
-from pytablewriter import MarkdownTableWriter
+import git
 
 sys.path.insert(
     1,
@@ -39,7 +38,8 @@ def generate_library_json(model_listing: list[dict]) -> None:
         if not manufacturer:
             manufacturer = {
                 **get_manufacturer_json(manufacturer_name),
-                **{"models": [], "device_types": []},
+                "models": [],
+                "device_types": [],
             }
             manufacturers[manufacturer_name] = manufacturer
 
@@ -53,7 +53,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "device_type": "device_type",
             "aliases": "aliases",
             "updated_at": "updated_at",
-            "color_modes": "color_modes"
+            "color_modes": "color_modes",
         }
 
         # Create a new dictionary with updated keys
@@ -74,8 +74,17 @@ def generate_library_json(model_listing: list[dict]) -> None:
 
 
 def get_manufacturer_json(manufacturer: str) -> dict:
-    with open(os.path.join(DATA_DIR, manufacturer, "manufacturer.json")) as json_file:
-        return json.load(json_file)
+    json_path = os.path.join(DATA_DIR, manufacturer, "manufacturer.json")
+    try:
+        with open(json_path) as json_file:
+            return json.load(json_file)
+    except FileNotFoundError:
+        default_json = {"name": manufacturer, "aliases": []}
+        with open(json_path, "w", encoding="utf-8") as json_file:
+            json.dump(default_json, json_file, ensure_ascii=False, indent=4)
+        git.Repo(PROJECT_ROOT).git.add(json_path)
+        print(f"Added {json_path}")
+        return default_json
 
 
 def get_model_list() -> list[dict]:
@@ -129,8 +138,7 @@ def get_last_commit_time(directory: str) -> datetime:
     if commits:
         last_commit = commits[0]
         return last_commit.committed_datetime
-    else:
-        return datetime.fromtimestamp(0)
+    return datetime.fromtimestamp(0)
 
 
 model_list = get_model_list()

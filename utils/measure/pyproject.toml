@@ -6,7 +6,7 @@ authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
 aiohttp = "^3.8"
 chardet = "^5.1"
 charset-normalizer = "^3.1"
