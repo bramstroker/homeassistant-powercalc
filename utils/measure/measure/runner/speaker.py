@@ -4,13 +4,12 @@ from typing import Any
 
 import inquirer
 
+from measure.config import MeasureConfig
 from measure.controller.media.controller import MediaController
 from measure.controller.media.factory import MediaControllerFactory
 from measure.powermeter.errors import ZeroReadingError
+from measure.runner.runner import MeasurementRunner, RunnerResult
 from measure.util.measure_util import MeasureUtil
-
-from ..config import MeasureConfig
-from .runner import MeasurementRunner, RunnerResult
 
 DURATION_PER_VOLUME_LEVEL = 20
 STREAM_URL = "https://powercalc.s3.eu-west-1.amazonaws.com/g_pink.mp3"
