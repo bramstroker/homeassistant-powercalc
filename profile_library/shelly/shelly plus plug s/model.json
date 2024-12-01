@@ -3,7 +3,7 @@
   "measure_method": "manual",
   "measure_device": "GW Instek GPM-8310",
   "name": "Shelly Plus Plug S",
-  "standby_power": 0.740,
+  "standby_power": 0.74,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
