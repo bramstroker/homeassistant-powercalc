@@ -54,23 +54,34 @@ class ShellyApiGen2Plus(ShellyApi):
         However, some Gen2+ devices are designed purely for power measurement without any relay (so they can't act as a switch).
         For those devices, the endpoint "/rpc/PM1.GetStatus?id=0" is used instead.
         """
+        endpoints = ["/rpc/Switch.GetStatus?id=0", "/rpc/PM1.GetStatus?id=0"]
+        for endpoint in endpoints:
+            if self._check_endpoint_availability(endpoint):
+                self._endpoint = endpoint
+                return
+        raise ApiConnectionError("Could not find available Shelly Gen2+ endpoint")
+
+    def _check_endpoint_availability(self, endpoint: str) -> bool:
+        """Check if the endpoint is available on the Shelly device"""
         try:
-            uri = f"http://{self.ip_address}{self._endpoint}"
+            uri = f"http://{self.ip_address}{endpoint}"
             _LOGGER.debug("Checking Gen2+ endpoint: %s", uri)
             response = requests.get(uri, timeout=self.timeout)
-            if response.status_code == 404:
-                _LOGGER.debug("Switch endpoint not found, switching to PM1 endpoint")
-                self._endpoint = "/rpc/PM1.GetStatus?id=0"
+            if response.status_code != 200:
+                _LOGGER.debug("Problem checking Shelly Gen2+ endpoint, invalid statusCode: %s", response.status_code)
+                return False
         except requests.RequestException as e:
             _LOGGER.error("Problem checking Shelly Gen2+ endpoint: %s", e)
-            raise ApiConnectionError("Could not verify Shelly Gen2+ endpoint") from e
+            return False
+
+        return True
 
 
 class ShellyPowerMeter(PowerMeter):
     def __init__(self, shelly_ip: str, timeout: int = 5) -> None:
         self.timeout = timeout
         self.ip_address = shelly_ip
-        api_version = self.detect_api_version()
+        api_version = self._detect_api_version()
         if api_version == 1:
             self.api = ShellyApiGen1()
         else:
@@ -91,7 +102,7 @@ class ShellyPowerMeter(PowerMeter):
         json = r.json()
         return self.api.parse_json(json)
 
-    def detect_api_version(self) -> int:
+    def _detect_api_version(self) -> int:
         """Check the generation / supported API version. All shelly's should implement the /shelly endpoint"""
         try:
             uri = f"http://{self.ip_address}/shelly"
