@@ -1151,7 +1151,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
         self.skip_advanced_step = True  # We don't want to ask advanced options when discovered
 
-        await self.async_set_unique_id(str(uuid.uuid4()))
+        await self.async_set_unique_id(discovery_info.get(CONF_UNIQUE_ID, str(uuid.uuid4())))
         self.selected_sensor_type = SensorType.VIRTUAL_POWER
         self.source_entity = discovery_info[DISCOVERY_SOURCE_ENTITY]
         del discovery_info[DISCOVERY_SOURCE_ENTITY]

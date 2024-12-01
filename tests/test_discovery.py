@@ -431,6 +431,33 @@ async def test_discover_entity(
     assert power_profile.model == expected_model
 
 
+async def test_same_entity_is_not_discovered_twice(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+        title="Test",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+    )
+    config_entry.add_to_hass(hass)
+
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 0
+
+
 async def test_get_power_profile_empty_manufacturer(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,
