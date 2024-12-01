@@ -32,13 +32,38 @@ class ShellyApiGen1(ShellyApi):
         return PowerMeasurementResult(float(meter["power"]), float(meter["timestamp"]))
 
 
-class ShellyApiGen2(ShellyApi):
+class ShellyApiGen2Plus(ShellyApi):
+    def __init__(self, ip_address: str, timeout: int) -> None:
+        self.ip_address = ip_address
+        self.timeout = timeout
+        self._endpoint = "/rpc/Switch.GetStatus?id=0"
+
     @property
     def endpoint(self) -> str:
-        return "/rpc/Switch.GetStatus?id=0"
+        return self._endpoint
 
     def parse_json(self, json: dict) -> PowerMeasurementResult:
         return PowerMeasurementResult(float(json["apower"]), time.time())
+
+    def check_gen2_plus_endpoints(self) -> None:
+        """
+        Checking the endpoint for Gen2+ devices.
+
+        Shelly Gen2+ devices come with different capabilities, and depending on the device type, they may have different API endpoints.
+        By default, we try to use the "/rpc/Switch.GetStatus?id=0" endpoint, which is suitable for devices that support switching.
+        However, some Gen2+ devices are designed purely for power measurement without any relay (so they can't act as a switch).
+        For those devices, the endpoint "/rpc/PM1.GetStatus?id=0" is used instead.
+        """
+        try:
+            uri = f"http://{self.ip_address}{self._endpoint}"
+            _LOGGER.debug("Checking Gen2+ endpoint: %s", uri)
+            response = requests.get(uri, timeout=self.timeout)
+            if response.status_code == 404:
+                _LOGGER.debug("Switch endpoint not found, switching to PM1 endpoint")
+                self._endpoint = "/rpc/PM1.GetStatus?id=0"
+        except requests.RequestException as e:
+            _LOGGER.error("Problem checking Shelly Gen2+ endpoint: %s", e)
+            raise ApiConnectionError("Could not verify Shelly Gen2+ endpoint") from e
 
 
 class ShellyPowerMeter(PowerMeter):
@@ -46,7 +71,11 @@ class ShellyPowerMeter(PowerMeter):
         self.timeout = timeout
         self.ip_address = shelly_ip
         api_version = self.detect_api_version()
-        self.api = ShellyApiGen1() if api_version == 1 else ShellyApiGen2()
+        if api_version == 1:
+            self.api = ShellyApiGen1()
+        else:
+            self.api = ShellyApiGen2Plus(self.ip_address, self.timeout)
+            self.api.check_gen2_plus_endpoints()
 
     def get_power(self) -> PowerMeasurementResult:
         """Get a new power reading from the Shelly device"""
