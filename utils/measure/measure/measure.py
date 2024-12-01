@@ -256,7 +256,7 @@ class Measure:
         """
 
         # Only ask questions which answers are not predefined in .env file
-        questions_to_ask = [question for question in questions if not config_key_exists(str(question.name).upper())]
+        questions_to_ask = list(questions)
 
         predefined_answers = {}
         for question in questions:
