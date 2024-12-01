@@ -155,10 +155,18 @@ class DiscoveryManager:
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
+        unique_id = get_or_create_unique_id({}, source_entity, None)
+        if self._is_already_discovered(source_entity, unique_id):
+            _LOGGER.debug(
+                "%s: Already setup with discovery, skipping new discovery",
+                source_entity.entity_id,
+            )
+            return
+
         self._init_entity_discovery(
             source_entity,
             model_info,
-            get_or_create_unique_id({}, source_entity, None),
+            unique_id,
             power_profiles=None,
             extra_discovery_data={
                 CONF_MODE: CalculationStrategy.WLED,
