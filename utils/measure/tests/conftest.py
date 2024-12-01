@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Protocol
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -72,3 +72,35 @@ def mock_config_factory() -> Callable[[dict[str, Any]], MagicMock]:
         return mock_instance
 
     return _mock_config
+
+
+class MockRequestsGetFactory(Protocol):
+    def __call__(self, responses: dict[str, tuple[dict, int]]) -> patch: ...
+
+
+@pytest.fixture
+def mock_requests_get_factory() -> MockRequestsGetFactory:
+    """
+    Mock the requests.get function to return the specified responses.
+    """
+
+    def factory(responses: dict[str, tuple[dict, int]]) -> patch:
+        def mock_requests_get(url: str, *args, **kwargs):  # noqa
+            response_data, status_code = responses.get(url, ({"error": "Unknown endpoint"}, 404))
+
+            # Create a mock response object
+            class MockResponse:
+                def __init__(self, json_data: dict, status_code: int) -> None:
+                    self.json_data = json_data
+                    self.status_code = status_code
+
+                def json(self) -> dict:
+                    return self.json_data
+
+            return MockResponse(response_data, status_code)
+
+        mock_request = patch("requests.get", side_effect=mock_requests_get)
+        mock_request.start()
+        return mock_request
+
+    return factory
