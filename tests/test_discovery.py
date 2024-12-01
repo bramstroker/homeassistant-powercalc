@@ -28,9 +28,13 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_MANUFACTURER,
+    CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_FACTOR,
     CONF_SENSOR_TYPE,
+    CONF_VOLTAGE,
+    CONF_WLED,
     DOMAIN,
     SensorType,
 )
@@ -451,6 +455,40 @@ async def test_same_entity_is_not_discovered_twice(
     config_entry.add_to_hass(hass)
 
     mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 0
+
+
+async def test_wled_not_discovered_twice(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="pc_a848face92cd",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "WLED",
+            CONF_MODE: "wled",
+            CONF_MODEL: "FOSS",
+            CONF_NAME: "Ledstrip TV boven",
+            CONF_UNIQUE_ID: "pc_a848face92cd",
+            CONF_WLED: {
+                CONF_POWER_FACTOR: 0.9,
+                CONF_VOLTAGE: 5.0,
+            },
+        },
+        title="Test",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+    )
+    config_entry.add_to_hass(hass)
+
+    mock_entity_with_model_information("light.test", "WLED", "FOSS")
 
     await run_powercalc_setup(hass, {})
 
