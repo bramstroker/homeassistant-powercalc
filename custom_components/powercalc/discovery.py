@@ -315,6 +315,9 @@ class DiscoveryManager:
             discovery_data.update(extra_discovery_data)
 
         self.initialized_flows.update({unique_id, source_entity.entity_id})
+
+        _LOGGER.debug("%s: Initiating discovery flow, unique_id=%s", source_entity.entity_id, unique_id)
+
         discovery_flow.async_create_flow(
             self.hass,
             DOMAIN,
