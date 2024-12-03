@@ -204,3 +204,71 @@ def _create_measure_instance(config: MeasureConfig, console_events: EventGenerat
 
     power_meter = DummyPowerMeter()
     return Measure(power_meter, config, render)
+
+def test_ask_questions_with_no_predefined_answers(mock_config_factory) -> None:
+    mock_config = mock_config_factory()
+    measure = _create_measure_instance(config=mock_config)
+
+    questions = [
+        inquirer.Text('question1', message="What is your name?"),
+        inquirer.Confirm('question2', message="Do you agree?")
+    ]
+
+    with patch('inquirer.prompt', return_value={'question1': 'Alice', 'question2': True}):
+        answers = measure.ask_questions(questions)
+
+    assert answers['question1'] == 'Alice'
+    assert answers['question2'] is True
+
+
+def test_ask_questions_with_all_predefined_answers(mock_config_factory) -> None:
+    mock_config = mock_config_factory()
+    measure = _create_measure_instance(config=mock_config)
+
+    questions = [
+        inquirer.Text('question1', message="What is your name?"),
+        inquirer.Confirm('question2', message="Do you agree?")
+    ]
+
+    mock_config.get_conf_value = lambda x: 'Alice' if x == 'QUESTION1' else True
+
+    answers = measure.ask_questions(questions)
+
+    assert answers['question1'] == 'Alice'
+    assert answers['question2'] is True
+
+
+def test_ask_questions_with_partial_predefined_answers(mock_config_factory) -> None:
+    mock_config = mock_config_factory()
+    measure = _create_measure_instance(config=mock_config)
+
+    questions = [
+        inquirer.Text('question1', message="What is your name?"),
+        inquirer.Confirm('question2', message="Do you agree?")
+    ]
+
+    mock_config.get_conf_value = lambda x: 'Alice' if x == 'QUESTION1' else None
+
+    with patch('inquirer.prompt', return_value={'question2': True}):
+        answers = measure.ask_questions(questions)
+
+    assert answers['question1'] == 'Alice'
+    assert answers['question2'] is True
+
+
+def test_ask_questions_with_invalid_question_type(mock_config_factory) -> None:
+    mock_config = mock_config_factory()
+    measure = _create_measure_instance(config=mock_config)
+
+    questions = [
+        inquirer.Text('question1', message="What is your name?"),
+        inquirer.List('question2', message="Choose an option", choices=['Option 1', 'Option 2'])
+    ]
+
+    mock_config.get_conf_value = lambda x: None
+
+    with patch('inquirer.prompt', return_value={'question1': 'Bob', 'question2': 'Option 1'}):
+        answers = measure.ask_questions(questions)
+
+    assert answers['question1'] == 'Bob'
+    assert answers['question2'] == 'Option 1'
