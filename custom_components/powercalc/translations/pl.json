@@ -66,15 +66,15 @@
         "title": "Konfiguracja stała"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Konfiguracja globalna",
+        "description": "Skonfiguruj globalną konfigurację Powercalc. Aby uzyskać więcej informacji zobacz [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Dodatkowe opcje dla sensorów energi i liczników można podać w kolejnych krokach.",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
+          "create_energy_sensors": "Utwórz sensory energii",
+          "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
-          "ignore_unavailable_state": "Ignore unavailable state",
+          "force_update_frequency": "Wymuś częstotliwość aktualizacji",
+          "ignore_unavailable_state": "Ignoruj stan niedostępny",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
@@ -82,7 +82,7 @@
         },
         "data_description": {
           "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
@@ -102,11 +102,11 @@
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "Opcje licznika mediów",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Zużycie netto licznika zużycia energii",
+          "utility_meter_tariffs": "Taryfy licznika mediów",
+          "utility_meter_types": "Typy licznika mediów"
         }
       },
       "group": {
@@ -310,7 +310,7 @@
           "utility_meter_tariffs": "Taryfy"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Włącz to, jeśli chcesz traktować źródło jako licznik netto. Pozwoli to licznikowi przejąć wartości zarówno dodatnie, jak i ujemne.",
           "utility_meter_types": "Utwórz liczniki mediów dla określonych cykli",
           "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
         }
@@ -436,19 +436,19 @@
         "title": "Basic options",
         "data": {
           "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
+          "create_utility_meters": "Utwórz liczniki mediów",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignore unavailable state",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "power_sensor_friendly_naming": "",
+          "power_sensor_naming": "Wzór nazwy czujnika mocy"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
+          "create_energy_sensors": "Czy Powercalc musi utworzyć sensor kWh",
+          "create_utility_meters": "Pozwól, aby powercalc tworzył liczniki mediów, które będą działać w cyklach dziennych, godzinowych itp.",
           "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
           "disable_library_download": "Disable the Powercalc library download feature",
           "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
@@ -469,12 +469,12 @@
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "title": "Opcje licznika mediów",
+        "description": "Zdefiniuj domyślne ustawienia dla liczników mediów. Zobacz [documentation](https://docs.powercalc.nl/configuration/global-configuration/) aby uzyskać więcej informacji",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Zużycie netto licznika zużycia energii",
+          "utility_meter_tariffs": "Taryfy licznika mediów",
+          "utility_meter_types": "Typy licznika mediów"
         }
       },
       "group": {
@@ -591,7 +591,7 @@
           "utility_meter_tariffs": "Utility meter tariffs"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Włącz to, jeśli chcesz traktować źródło jako licznik netto. Pozwoli to licznikowi przejąć wartości zarówno dodatnie, jak i ujemne.",
           "utility_meter_types": "Utwórz liczniki mediów dla określonych cykli",
           "utility_meter_tariffs": "Lista wspieranych taryf, pozostaw puste, jeśli tylko jedna taryfa jest potrzebna."
         }
