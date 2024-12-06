@@ -112,9 +112,10 @@ class MeasureUtil:
     def _measure_dummy_load(self, file_path: str) -> float:
         """Measure the dummy load and persist the value for future measurement session"""
         print()
-        print("Make sure your dummy load has a constant power consumption! Fully resistive loads are recommended.")
-        print("Only connect your dummy load to your smart plug, not the device which you want to measure!")
-        input("Press enter to start measuring the dummy load..")
+        print("Tip: Use a dummy load with constant power consumption. Stick to resistive loads for the best results!")
+        print("Important: Connect only the dummy load to your smart plug—not the device you're measuring.")
+        print("Preheat your dummy load until its temperature stabilizes. This usually takes about 2 hours.")
+        input("Ready to start? Press Enter to begin measuring the dummy load!")
         average = self.take_average_measurement(1)
         with open(file_path, "w") as f:
             f.write(str(average))
