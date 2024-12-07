@@ -14,7 +14,7 @@ from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
 from .loader.protocol import Loader
 from .loader.remote import RemoteLoader
-from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
+from .power_profile import PowerProfile, get_device_types_from_domain
 
 LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
@@ -70,8 +70,9 @@ class ProfileLibrary:
 
     async def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
         """Get listing of available manufacturers."""
-        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
-        manufacturers = await self._loader.get_manufacturer_listing(device_type)
+
+        device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
+        manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)
 
     async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
@@ -80,12 +81,12 @@ class ProfileLibrary:
         resolved_manufacturer = await self._loader.find_manufacturer(manufacturer)
         if not resolved_manufacturer:
             return []
-        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
-        cache_key = f"{resolved_manufacturer}/{device_type}"
+        device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
+        cache_key = f"{resolved_manufacturer}/{device_types}"
         cached_models = self._manufacturer_models.get(cache_key)
         if cached_models:
             return cached_models
-        models = await self._loader.get_model_listing(resolved_manufacturer, device_type)
+        models = await self._loader.get_model_listing(resolved_manufacturer, device_types)
         self._manufacturer_models[cache_key] = sorted(models)
         return self._manufacturer_models[cache_key]
 

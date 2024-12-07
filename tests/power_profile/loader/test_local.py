@@ -91,27 +91,27 @@ async def test_find_manufacturer(hass: HomeAssistant, manufacturer: str, expecte
 
 async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
-    assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "hidden-directories", "casing"}
-    assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.SMART_SWITCH)
-    assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.LIGHT)
-    assert "tp-link" not in await loader.get_manufacturer_listing(DeviceType.COVER)
+    assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "test", "hidden-directories", "casing"}
+    assert "tp-link" in await loader.get_manufacturer_listing({DeviceType.SMART_SWITCH})
+    assert "tp-link" in await loader.get_manufacturer_listing({DeviceType.LIGHT})
+    assert "tp-link" not in await loader.get_manufacturer_listing({DeviceType.COVER})
 
 
 async def test_get_model_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
-    assert "HS300" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
-    assert "light20" not in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
-    assert "light20" in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
+    assert "HS300" in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
+    assert "light20" not in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
+    assert "light20" in await loader.get_model_listing("tp-link", {DeviceType.LIGHT})
     assert {"HS300", "HS400", "hs500", "light20"} == await loader.get_model_listing("tp-link", None)
-    assert "HS400" in await loader.get_model_listing("tp-link", DeviceType.SMART_SWITCH)
-    assert "HS400" not in await loader.get_model_listing("tp-link", DeviceType.LIGHT)
-    assert "test" in await loader.get_model_listing("Tasmota", DeviceType.LIGHT)
-    assert ".test" not in await loader.get_model_listing("hidden-directories", DeviceType.LIGHT)
+    assert "HS400" in await loader.get_model_listing("tp-link", {DeviceType.SMART_SWITCH})
+    assert "HS400" not in await loader.get_model_listing("tp-link", {DeviceType.LIGHT})
+    assert "test" in await loader.get_model_listing("Tasmota", {DeviceType.LIGHT})
+    assert ".test" not in await loader.get_model_listing("hidden-directories", {DeviceType.LIGHT})
 
 
 async def test_get_model_listing_unknown_manufacturer(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
-    assert not await loader.get_model_listing("foo", DeviceType.LIGHT)
+    assert not await loader.get_model_listing("foo", {DeviceType.LIGHT})
 
 
 async def test_custom_model_directory(hass: HomeAssistant) -> None:

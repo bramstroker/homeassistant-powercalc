@@ -52,6 +52,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CALCULATION_STRATEGY_CONF_KEYS,
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
@@ -203,25 +204,27 @@ async def _get_power_profile(
 ) -> PowerProfile | None:
     """Retrieve the power profile based on auto-discovery or manual configuration."""
     discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    if is_manually_configured(sensor_config):
+        return None
+
     power_profile = None
-    if not is_manually_configured(sensor_config):
-        try:
-            model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
-            power_profile = await get_power_profile(
-                hass,
-                sensor_config,
-                model_info=model_info,
+    try:
+        model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
+        power_profile = await get_power_profile(
+            hass,
+            sensor_config,
+            model_info=model_info,
+        )
+        if power_profile and power_profile.sub_profile_select:
+            await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
+    except ModelNotSupportedError as err:
+        if not is_fully_configured(sensor_config):
+            _LOGGER.error(
+                "%s: Skipping sensor setup: %s",
+                source_entity.entity_id,
+                err,
             )
-            if power_profile and power_profile.sub_profile_select:
-                await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
-        except ModelNotSupportedError as err:
-            if not is_fully_configured(sensor_config):
-                _LOGGER.error(
-                    "%s: Skipping sensor setup: %s",
-                    source_entity.entity_id,
-                    err,
-                )
-                raise err
+            raise err
     return power_profile
 
 
@@ -293,6 +296,8 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
     """Check if the user manually configured the sensor.
     We need to skip loading a power profile to make.
     """
+    if CONF_CUSTOM_MODEL_DIRECTORY in sensor_config:
+        return False
     if CONF_MODEL in sensor_config:
         return False
     return any(key in sensor_config for key in CALCULATION_STRATEGY_CONF_KEYS)

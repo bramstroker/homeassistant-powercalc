@@ -32,7 +32,7 @@ from .errors import ModelNotSupportedError
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
+from .power_profile.power_profile import PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -208,12 +208,6 @@ class DiscoveryManager:
     def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
         """Do some validations on the registry entry to see if it qualifies for discovery."""
         if entity_entry.disabled:
-            return False
-
-        if entity_entry.domain not in DOMAIN_DEVICE_TYPE:
-            return False
-
-        if DOMAIN_DEVICE_TYPE[entity_entry.domain] == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
         if entity_entry.entity_category in [

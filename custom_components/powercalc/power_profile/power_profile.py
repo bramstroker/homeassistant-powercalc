@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from collections import defaultdict
 from enum import StrEnum
 from typing import NamedTuple, Protocol
 
@@ -37,6 +38,7 @@ class DeviceType(StrEnum):
     COVER = "cover"
     LIGHT = "light"
     PRINTER = "printer"
+    SMART_DIMMER = "smart_dimmer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
     NETWORK = "network"
@@ -50,16 +52,27 @@ class SubProfileMatcherType(StrEnum):
     INTEGRATION = "integration"
 
 
-DOMAIN_DEVICE_TYPE = {
-    CAMERA_DOMAIN: DeviceType.CAMERA,
-    COVER_DOMAIN: DeviceType.COVER,
-    LIGHT_DOMAIN: DeviceType.LIGHT,
-    SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
-    MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
-    BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
-    SENSOR_DOMAIN: DeviceType.PRINTER,
-    VACUUM_DOMAIN: DeviceType.VACUUM_ROBOT,
+DEVICE_TYPE_DOMAIN = {
+    DeviceType.CAMERA: CAMERA_DOMAIN,
+    DeviceType.COVER: COVER_DOMAIN,
+    DeviceType.LIGHT: LIGHT_DOMAIN,
+    DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
+    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
+    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
+    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
+    DeviceType.PRINTER: SENSOR_DOMAIN,
+    DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
+
+DOMAIN_TO_DEVICE_TYPE = {domain: device_type for device_type, domain in DEVICE_TYPE_DOMAIN.items()}
+
+DOMAIN_TO_DEVICE_TYPES = defaultdict(set)
+for device_type, domain in DEVICE_TYPE_DOMAIN.items():
+    DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
+
+
+def get_device_types_from_domain(search_domain: str) -> set[DeviceType]:
+    return set(DOMAIN_TO_DEVICE_TYPES.get(search_domain, {}))
 
 
 class PowerProfile:
@@ -180,6 +193,15 @@ class PowerProfile:
         ) and not self._json_data.get("fixed_config")
 
     @property
+    def needs_linear_config(self) -> bool:
+        """
+        Used for smart dimmers. This indicates the user must supply the power values in the config flow.
+        """
+        return self.is_strategy_supported(
+            CalculationStrategy.LINEAR,
+        ) and not self._json_data.get("linear_config")
+
+    @property
     def device_type(self) -> DeviceType | None:
         device_type = self._json_data.get("device_type")
         if not device_type:
@@ -261,16 +283,20 @@ class PowerProfile:
 
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
-        if (
-            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and entity_entry.domain == LIGHT_DOMAIN
-        ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-            return True
-
         if self.device_type is None:
             return False
 
-        entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
-        return entity_domain == entity_entry.domain
+        domain = entity_entry.domain
+
+        # see https://github.com/bramstroker/homeassistant-powercalc/issues/2529
+        if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
+            return False
+
+        # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
+        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue"] and domain == LIGHT_DOMAIN:
+            return True
+
+        return DEVICE_TYPE_DOMAIN.get(self.device_type) == domain
 
 
 class SubProfileSelector:
