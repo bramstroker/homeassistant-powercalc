@@ -286,15 +286,17 @@ class PowerProfile:
         if self.device_type is None:
             return False
 
-        if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:  # See: #2529
+        domain = entity_entry.domain
+
+        # see https://github.com/bramstroker/homeassistant-powercalc/issues/2529
+        if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
-        if (
-            self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and entity_entry.domain == LIGHT_DOMAIN
-        ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
+        # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
+        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue"] and domain == LIGHT_DOMAIN:
             return True
 
-        return DEVICE_TYPE_DOMAIN.get(self.device_type) == entity_entry.domain
+        return DEVICE_TYPE_DOMAIN.get(self.device_type) == domain
 
 
 class SubProfileSelector:
