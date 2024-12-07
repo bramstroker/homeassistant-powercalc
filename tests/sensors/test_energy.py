@@ -45,7 +45,7 @@ from custom_components.powercalc.const import (
     SERVICE_CALIBRATE_ENERGY,
     UnitPrefix,
 )
-from custom_components.powercalc.sensors.energy import VirtualEnergySensor
+from custom_components.powercalc.sensors.energy.energy import VirtualEnergySensor
 from tests.common import (
     create_input_boolean,
     get_simple_fixed_config,

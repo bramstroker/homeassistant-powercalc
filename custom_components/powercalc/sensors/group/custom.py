@@ -95,7 +95,7 @@ from custom_components.powercalc.sensors.abstract import (
     generate_power_sensor_entity_id,
     generate_power_sensor_name,
 )
-from custom_components.powercalc.sensors.energy import EnergySensor, VirtualEnergySensor
+from custom_components.powercalc.sensors.energy.energy import EnergySensor, VirtualEnergySensor
 from custom_components.powercalc.sensors.power import PowerSensor
 from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
