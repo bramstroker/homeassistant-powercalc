@@ -189,6 +189,15 @@ class PowerProfile:
         ) and not self._json_data.get("fixed_config")
 
     @property
+    def needs_linear_config(self) -> bool:
+        """
+        Used for smart dimmers. This indicates the user must supply the power values in the config flow.
+        """
+        return self.is_strategy_supported(
+            CalculationStrategy.LINEAR,
+        ) and not self._json_data.get("linear_config")
+
+    @property
     def device_type(self) -> DeviceType | None:
         device_type = self._json_data.get("device_type")
         if not device_type:

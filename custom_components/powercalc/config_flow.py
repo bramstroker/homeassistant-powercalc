@@ -940,6 +940,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if self.selected_profile and self.selected_profile.needs_fixed_config:
             return await self.async_step_fixed()
 
+        if self.selected_profile and self.selected_profile.needs_linear_config:
+            return await self.async_step_linear()
+
         if (
             self.selected_profile
             and self.selected_profile.device_type == DeviceType.SMART_SWITCH
@@ -1039,6 +1042,25 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         return self.async_show_form(
             step_id=Steps.FIXED,
             data_schema=SCHEMA_POWER_FIXED,
+            errors=errors,
+            last_step=False,
+        )
+
+    async def async_step_linear(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Handle the flow for fixed sensor."""
+        errors = {}
+        if user_input is not None:
+            self.sensor_config.update({CONF_LINEAR: user_input})
+            errors = await self.validate_strategy_config()
+            if not errors:
+                return await self.async_step_power_advanced()
+
+        return self.async_show_form(
+            step_id=Steps.LINEAR,
+            data_schema=SCHEMA_POWER_LINEAR,
             errors=errors,
             last_step=False,
         )
@@ -1613,8 +1635,8 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 {},
                 model_info,
             )
-            if self.selected_profile and self.selected_profile.needs_fixed_config:
-                self.strategy = CalculationStrategy.FIXED
+            if self.selected_profile and not self.strategy:
+                self.strategy = self.selected_profile.calculation_strategy
         except ModelNotSupportedError:
             return self.async_abort(reason="model_not_supported")
         return None
