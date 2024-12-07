@@ -15,6 +15,8 @@ from custom_components.powercalc.const import (
     CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_POWER,
@@ -82,8 +84,8 @@ class PowerCalculatorStrategyFactory:
         linear_config = config.get(CONF_LINEAR)
 
         if linear_config is None:
-            if power_profile and power_profile.linear_mode_config:
-                linear_config = power_profile.linear_mode_config
+            if power_profile:
+                linear_config = power_profile.linear_mode_config or {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
             else:
                 raise StrategyConfigurationError("No linear configuration supplied")
 

@@ -259,6 +259,7 @@ async def test_autodiscover_skips_diagnostics_entities(
 async def test_autodiscover_skips_printer_ink(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
 ) -> None:
     """Auto discovery should not consider printer entities with ink in the name"""
 
@@ -271,7 +272,7 @@ async def test_autodiscover_skips_printer_ink(
 
     await run_powercalc_setup(hass, {})
 
-    assert not hass.states.get("sensor.test_device_power")
+    assert len(mock_flow_init.mock_calls) == 0
 
 
 async def test_autodiscover_skips_unsupported_domains(

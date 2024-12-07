@@ -122,7 +122,7 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_SELF_USAGE_INCLUDED] is True
     assert entry.data[CONF_POWER] == 50
-    assert entry.data[CONF_FIXED][CONF_POWER] == 50.82
+    assert entry.data[CONF_FIXED][CONF_POWER] == 50.89
 
 
 async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> None:

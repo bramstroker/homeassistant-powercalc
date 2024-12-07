@@ -98,13 +98,13 @@ class RemoteLoader(Loader):
             _LOGGER.debug("Failed to download library.json, falling back to local copy")
             return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
 
-    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available manufacturers."""
 
         return {
             manufacturer["name"]
             for manufacturer in self.library_contents.get("manufacturers", [])
-            if not device_type or device_type in manufacturer.get("device_types", [])
+            if not device_types or any(device_type in manufacturer.get("device_types", []) for device_type in device_types)
         }
 
     async def find_manufacturer(self, search: str) -> str | None:
@@ -112,13 +112,13 @@ class RemoteLoader(Loader):
 
         return self.manufacturer_aliases.get(search, None)
 
-    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
         return {
             model["id"]
             for model in self.manufacturer_models.get(manufacturer, [])
-            if not device_type or device_type in model.get("device_type", DeviceType.LIGHT)
+            if not device_types or any(device_type in model.get("device_type", [DeviceType.LIGHT]) for device_type in device_types)
         }
 
     async def load_model(

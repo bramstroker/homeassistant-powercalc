@@ -128,13 +128,13 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
 
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
-    manufacturers = await remote_loader.get_manufacturer_listing(DeviceType.LIGHT)
+    manufacturers = await remote_loader.get_manufacturer_listing({DeviceType.LIGHT})
     assert "signify" in manufacturers
     assert len(manufacturers) > 40
 
 
 async def test_get_model_listing(remote_loader: RemoteLoader) -> None:
-    models = await remote_loader.get_model_listing("signify", DeviceType.LIGHT)
+    models = await remote_loader.get_model_listing("signify", {DeviceType.LIGHT})
     assert "LCT010" in models
     assert len(models) > 40
 
