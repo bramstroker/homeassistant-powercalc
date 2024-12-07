@@ -15,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry, DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.storage import STORAGE_DIR
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     mock_device_registry,
@@ -169,7 +170,9 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
 
 
 @pytest.fixture(autouse=True)
-def mock_remote_loader(request: SubRequest) -> Generator:
+def mock_remote_loader(request: SubRequest, hass: HomeAssistant) -> Generator:
+    shutil.rmtree(hass.config.path(STORAGE_DIR, "powercalc_profiles"))
+
     if "skip_remote_loader_mocking" in request.keywords:
         yield
         return

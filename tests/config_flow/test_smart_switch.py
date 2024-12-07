@@ -32,10 +32,10 @@ from tests.conftest import MockEntityWithModel
 @pytest.mark.parametrize(
     "user_input,expected_fixed_power",
     [
-        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: True}, 20.82),
+        ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: True}, 20.89),
         ({CONF_POWER: 20, CONF_SELF_USAGE_INCLUDED: False}, 20),
-        ({CONF_POWER: 20}, 20.82),
-        ({}, 0.82),
+        ({CONF_POWER: 20}, 20.89),
+        ({}, 0.89),
     ],
 )
 async def test_smart_switch_flow(
