@@ -120,7 +120,7 @@ from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DOMAIN_DEVICE_TYPE, DeviceType, PowerProfile
+from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
@@ -771,7 +771,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Create the entity selector for the source entity."""
         if self.is_library_flow:
             return selector.EntitySelector(
-                selector.EntitySelectorConfig(domain=list(DOMAIN_DEVICE_TYPE.keys())),
+                selector.EntitySelectorConfig(domain=list(DEVICE_TYPE_DOMAIN.values())),
             )
         return selector.EntitySelector()
 

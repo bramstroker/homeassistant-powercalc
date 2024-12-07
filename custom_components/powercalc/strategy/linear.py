@@ -198,7 +198,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                     ),
                     "linear_unsupported_domain",
                 )
-            if not self._config.get(CONF_MAX_POWER):
+            if CONF_MAX_POWER not in self._config:
                 raise StrategyConfigurationError(
                     "Linear strategy must have at least 'max power' or 'calibrate' defined",
                     "linear_mandatory",

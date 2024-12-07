@@ -37,6 +37,7 @@ class DeviceType(StrEnum):
     COVER = "cover"
     LIGHT = "light"
     PRINTER = "printer"
+    SMART_DIMMER = "smart_dimmer"
     SMART_SWITCH = "smart_switch"
     SMART_SPEAKER = "smart_speaker"
     NETWORK = "network"
@@ -50,16 +51,24 @@ class SubProfileMatcherType(StrEnum):
     INTEGRATION = "integration"
 
 
-DOMAIN_DEVICE_TYPE = {
-    CAMERA_DOMAIN: DeviceType.CAMERA,
-    COVER_DOMAIN: DeviceType.COVER,
-    LIGHT_DOMAIN: DeviceType.LIGHT,
-    SWITCH_DOMAIN: DeviceType.SMART_SWITCH,
-    MEDIA_PLAYER_DOMAIN: DeviceType.SMART_SPEAKER,
-    BINARY_SENSOR_DOMAIN: DeviceType.NETWORK,
-    SENSOR_DOMAIN: DeviceType.PRINTER,
-    VACUUM_DOMAIN: DeviceType.VACUUM_ROBOT,
+DEVICE_TYPE_DOMAIN = {
+    DeviceType.CAMERA: CAMERA_DOMAIN,
+    DeviceType.COVER: COVER_DOMAIN,
+    DeviceType.LIGHT: LIGHT_DOMAIN,
+    DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
+    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
+    DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
+    DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
+    DeviceType.PRINTER: SENSOR_DOMAIN,
+    DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
+
+
+def get_device_type_from_domain(domain: str) -> DeviceType | None:
+    for device_type, domain_list in DEVICE_TYPE_DOMAIN.items():
+        if domain in domain_list:
+            return device_type
+    return None
 
 
 class PowerProfile:
@@ -269,7 +278,9 @@ class PowerProfile:
         if self.device_type is None:
             return False
 
-        entity_domain = next(k for k, v in DOMAIN_DEVICE_TYPE.items() if v == self.device_type)
+        entity_domain = DEVICE_TYPE_DOMAIN.get(self.device_type)
+        if not entity_domain:
+            return False
         return entity_domain == entity_entry.domain
 
 
