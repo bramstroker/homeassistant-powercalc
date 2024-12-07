@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="../../misc/naming/">
-      
-      
-        <link rel="next" href="../structure/">
       
       
       <link rel="icon" href="../../img/logo.svg">
@@ -20,7 +16,7 @@
     
     
       
-        <title>Profile library - Powercalc documentation</title>
+        <title>Device types - Powercalc documentation</title>
       
     
     
@@ -72,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#profile-library" class="md-skip">
+        <a href="#device-types" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Profile library
+              Device types
             
           </span>
         </div>
@@ -326,13 +322,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../library/" class="md-tabs__link">
           
   
     
@@ -1291,10 +1285,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1305,22 +1297,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1331,7 +1320,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             Library
@@ -1342,30 +1331,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Profile library
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../library/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1374,44 +1343,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#custom-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      Custom models
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#disable-download-feature" class="md-nav__link">
-    <span class="md-ellipsis">
-      Disable download feature
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1782,7 +1713,7 @@
                   
 
   
-    <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/source/library/library.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/master/docs/source/library/device-types/index.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1790,49 +1721,10 @@
   
 
 
-<h1 id="profile-library">Profile library</h1>
-<p>Powercalc ships with a huge library of predefined power profiles for different devices.
-You can find the list of supported devices on the dedicated <a href="https://library.powercalc.nl">library viewer</a>.
-This library will keep extending by the effort of community users.</p>
-<p>At startup Powercalc will scan your HA installation and tries to match if any of them are in the library,
-when found it will provide a discovery flow for you to setup.
-You can also setup Powercalc sensors for a entity manually, see <a href="../../sensor-types/virtual-power-library/">Virtual power library</a>.</p>
-<p>Starting from version 1.12.0 all the power profiles are moved out of the component and are downloaded from the internet on demand.
-This way we can roll out updates to the library without the need to update the component.
-Also you only need to download the profiles you actually use, saving bandwidth and storage.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The library is hosted on GitHub, so you need an internet connection to download the profiles.
-When you prefer to have full local control, you can disable the library in the configuration. See [Disable download feature].</p>
-</div>
-<p>For more information about the library structure, See <a href="../structure/">structure</a>.</p>
-<p>To contribute see the <a href="../../contributing/measure/">measure</a> section.</p>
-<p>More information about how to setup specific device types can be found in the <a href="../device-types/">device types</a> section.</p>
-<h2 id="custom-models">Custom models</h2>
-<p>If you have a device that is not in the library, you can create a custom model.
-When it can be useful to share this model with the community, please consider submitting it to the library.</p>
-<p>Custom models are stored in the <code>config/powercalc/profiles</code> directory.</p>
-<p>You'll need to apply the same structure as the core library, with a subdirectory for the manufacturer and model id.</p>
-<p>For example:</p>
-<div class="highlight"><pre><span></span><code>config/
-├-powercalc/
-│ └-profiles/
-│   ├-tp-link/
-│   │ ├─HS100/
-│   │ │ ├─model.json
-│   │ └─...
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Custom models are loaded before the built-in library models, so you can override the library models by creating a custom model with the same manufacturer and model id.</p>
-</div>
-<h2 id="disable-download-feature">Disable download feature</h2>
-<p>If you want to disable the download feature, you can set the use the <code>disable_library_download</code> option in the configuration.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">powercalc</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">disable_library_download</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div>
-<p>This will prevent the component from downloading the library profiles from the internet.</p>
-<p>You will have to manage the library profiles yourself, by downloading them from the GitHub repository and placing them in the <code>config/powercalc/profiles</code> directory.</p>
+<h1 id="device-types">Device types</h1>
+<p>Here you can find information about how to setup specific device types for the library.</p>
+<h2 id="smart-dimmer"><a href="smart-dimmer/">Smart dimmer</a></h2>
+<p>Smart dimmers are devices that can control the brightness of a light. They are often used in combination with LED lights.</p>
 
 
 
@@ -1865,7 +1757,7 @@ When it can be useful to share this model with the community, please consider su
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 3, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 7, 2024</span>
   </span>
 
     
@@ -1897,44 +1789,6 @@ When it can be useful to share this model with the community, please consider su
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../../misc/naming/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sensor Naming">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Sensor Naming
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Library structure">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Library structure
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
