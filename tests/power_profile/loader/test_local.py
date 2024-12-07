@@ -91,7 +91,7 @@ async def test_find_manufacturer(hass: HomeAssistant, manufacturer: str, expecte
 
 async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:
     loader = await _create_loader(hass)
-    assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "hidden-directories", "casing"}
+    assert await loader.get_manufacturer_listing(None) == {"tp-link", "tasmota", "test", "hidden-directories", "casing"}
     assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.SMART_SWITCH)
     assert "tp-link" in await loader.get_manufacturer_listing(DeviceType.LIGHT)
     assert "tp-link" not in await loader.get_manufacturer_listing(DeviceType.COVER)
