@@ -1050,7 +1050,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Handle the flow for fixed sensor."""
+        """Handle the flow for linear sensor."""
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_LINEAR: user_input})
@@ -1060,7 +1060,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         return self.async_show_form(
             step_id=Steps.LINEAR,
-            data_schema=SCHEMA_POWER_LINEAR,
+            data_schema=self.create_schema_linear(self.source_entity_id),  # type: ignore
             errors=errors,
             last_step=False,
         )
@@ -1406,25 +1406,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             return await self.async_step_utility_meter_options()
         return self.persist_config_entry()
-
-    async def async_step_linear(
-        self,
-        user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
-        """Handle the flow for linear sensor."""
-        errors = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_LINEAR: user_input})
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
-
-        return self.async_show_form(
-            step_id=Steps.LINEAR,
-            data_schema=self.create_schema_linear(self.source_entity_id),  # type: ignore
-            errors=errors,
-            last_step=False,
-        )
 
     async def async_step_playbook(
         self,

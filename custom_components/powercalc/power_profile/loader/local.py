@@ -25,14 +25,14 @@ class LocalLoader(Loader):
         if not self._is_custom_directory:
             await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
 
-    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""
-        if device_type is None:
+        if device_types is None:
             return set(self._manufacturer_model_listing.keys())
 
         manufacturers: set[str] = set()
         for manufacturer in self._manufacturer_model_listing:
-            models = await self.get_model_listing(manufacturer, device_type)
+            models = await self.get_model_listing(manufacturer, device_types)
             if not models:
                 continue
             manufacturers.add(manufacturer)
@@ -49,7 +49,7 @@ class LocalLoader(Loader):
 
         return None
 
-    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer.
 
         param manufacturer: manufacturer always handled in lower case
@@ -65,7 +65,7 @@ class LocalLoader(Loader):
             return found_models
 
         for profile in models.values():
-            if device_type and device_type != profile.device_type:
+            if device_types and profile.device_type not in device_types:
                 continue
             found_models.add(profile.model)
 

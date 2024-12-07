@@ -207,6 +207,7 @@ async def _get_power_profile(
     if is_manually_configured(sensor_config):
         return None
 
+    power_profile = None
     try:
         model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
         power_profile = await get_power_profile(
@@ -216,7 +217,6 @@ async def _get_power_profile(
         )
         if power_profile and power_profile.sub_profile_select:
             await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
-        return power_profile
     except ModelNotSupportedError as err:
         if not is_fully_configured(sensor_config):
             _LOGGER.error(
@@ -225,7 +225,7 @@ async def _get_power_profile(
                 err,
             )
             raise err
-    return None
+    return power_profile
 
 
 async def _select_sub_profile(

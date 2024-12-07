@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+from collections import defaultdict
 from enum import StrEnum
 from typing import NamedTuple, Protocol
 
@@ -63,12 +64,15 @@ DEVICE_TYPE_DOMAIN = {
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
 
+DOMAIN_TO_DEVICE_TYPE = {domain: device_type for device_type, domain in DEVICE_TYPE_DOMAIN.items()}
 
-def get_device_type_from_domain(domain: str) -> DeviceType | None:
-    for device_type, domain_list in DEVICE_TYPE_DOMAIN.items():
-        if domain in domain_list:
-            return device_type
-    return None
+DOMAIN_TO_DEVICE_TYPES = defaultdict(set)
+for device_type, domain in DEVICE_TYPE_DOMAIN.items():
+    DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
+
+
+def get_device_types_from_domain(search_domain: str) -> set[DeviceType]:
+    return set(DOMAIN_TO_DEVICE_TYPES.get(search_domain, {}))
 
 
 class PowerProfile:
@@ -279,18 +283,18 @@ class PowerProfile:
 
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
+        if self.device_type is None:
+            return False
+
+        if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:  # See: #2529
+            return False
+
         if (
             self.device_type == DeviceType.SMART_SWITCH and entity_entry and entity_entry.platform in ["hue"] and entity_entry.domain == LIGHT_DOMAIN
         ):  # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
             return True
 
-        if self.device_type is None:
-            return False
-
-        entity_domain = DEVICE_TYPE_DOMAIN.get(self.device_type)
-        if not entity_domain:
-            return False
-        return entity_domain == entity_entry.domain
+        return DEVICE_TYPE_DOMAIN.get(self.device_type) == entity_entry.domain
 
 
 class SubProfileSelector:
