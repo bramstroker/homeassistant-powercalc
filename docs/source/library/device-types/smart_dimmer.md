@@ -12,7 +12,7 @@ Use the following model.json to configure a smart dimmer device type.
 }
 ```
 
-For smart dimmer devices the user can additionally supply [linear](../../linear.md) configuration to define the power consumption of the connected light.
+For smart dimmer devices the user can additionally supply [linear](../../strategies/linear.md) configuration to define the power consumption of the connected light.
 When not supplied, the power consumption is assumed to be 0.5W when the light is on and 0.3W when the light is off.
 
 To do this in YAML use the following configuration:
