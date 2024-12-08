@@ -10,8 +10,5 @@
     "VERSION": "v1.16.2:docker"
   },
   "name": "Philips Smart LED Bulb",
-  "standby_power": 0.9,
-  "aliases": [
-    "philips.light.hbulb"
-  ]
+  "standby_power": 0.9
 }
