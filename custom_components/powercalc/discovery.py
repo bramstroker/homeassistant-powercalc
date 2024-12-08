@@ -379,8 +379,10 @@ class DiscoveryManager:
                 self._extract_entity_ids(item, found_entity_ids)
 
     def _is_already_discovered(self, source_entity: SourceEntity, unique_id: str) -> bool:
-        unique_ids_to_check = [unique_id, source_entity.entity_id]
+        """Prevent duplicate discovery flows."""
+        unique_ids_to_check = [unique_id, source_entity.entity_id, source_entity.unique_id]
         if unique_id.startswith("pc_"):
             unique_ids_to_check.append(unique_id[3:])
+        unique_ids_to_check.extend([f"pc_{uid}" for uid in unique_ids_to_check])
 
         return any(unique_id in self.initialized_flows for unique_id in unique_ids_to_check)
