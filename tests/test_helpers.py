@@ -1,12 +1,14 @@
 from decimal import Decimal
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from homeassistant.const import CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
-from custom_components.powercalc.const import DUMMY_ENTITY_ID
+from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
 from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id
 
 
@@ -39,3 +41,15 @@ async def test_get_unique_id_from_config() -> None:
 async def test_get_unique_id_generated() -> None:
     unique_id = get_or_create_unique_id({}, SourceEntity("dummy", DUMMY_ENTITY_ID, "sensor"), None)
     assert len(unique_id) == 36
+
+
+async def test_wled_unique_id() -> None:
+    """Device id should be used as unique id for wled strategy."""
+    with patch("custom_components.powercalc.power_profile.power_profile.PowerProfile") as power_profile_mock:
+        mock_instance = power_profile_mock.return_value
+        type(mock_instance).calculation_strategy = PropertyMock(return_value=CalculationStrategy.WLED)
+
+        device_entry = DeviceEntry(id="123456")
+        source_entity = SourceEntity("wled", "light.wled", "light", device_entry=device_entry)
+        unique_id = get_or_create_unique_id({}, source_entity, mock_instance)
+        assert unique_id == "pc_123456"

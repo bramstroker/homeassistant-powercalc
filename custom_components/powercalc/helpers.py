@@ -54,9 +54,13 @@ def get_or_create_unique_id(
     if unique_id:
         return str(unique_id)
 
-    # For multi-switch strategy we need to use the device id as unique id
+    # For multi-switch and wled strategy we need to use the device id as unique id
     # As we don't want to start a discovery for each switch entity
-    if power_profile and power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH and source_entity.device_entry:
+    if (
+        source_entity.device_entry
+        and power_profile
+        and power_profile.calculation_strategy in [CalculationStrategy.WLED, CalculationStrategy.MULTI_SWITCH]
+    ):
         return f"pc_{source_entity.device_entry.id}"
 
     if source_entity and source_entity.entity_id != DUMMY_ENTITY_ID:
