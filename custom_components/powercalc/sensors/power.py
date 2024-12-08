@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any, cast
 
@@ -38,7 +38,6 @@ from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
     async_track_template_result,
-    async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
@@ -466,13 +465,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
-
-        @callback
-        def async_update(__: datetime | None = None) -> None:
-            """Update the entity."""
-            self.async_schedule_update_ha_state(True)
-
-        async_track_time_interval(self.hass, async_update, self._update_frequency)
 
     def init_calculation_enabled_condition(self) -> None:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
