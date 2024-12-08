@@ -1,0 +1,14 @@
+{
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plug S",
+  "measure_method": "script",
+  "name": "Hue White Ambiance E27 ST64 Filament Bulb",
+  "standby_power": 0.17,
+  "calculation_strategy": "lut",
+  "linked_lut": "signify/LTO001",
+  "aliases": [
+    "8719514301504"
+  ],
+  "created_at": "2023-08-25T12:06:28",
+  "author": "mariwing <mariwing@gmail.com>"
+}
