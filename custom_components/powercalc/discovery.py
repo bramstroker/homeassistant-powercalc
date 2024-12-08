@@ -155,11 +155,12 @@ class DiscoveryManager:
 
     async def init_wled_flow(self, model_info: ModelInfo, source_entity: SourceEntity) -> None:
         """Initialize the discovery flow for a WLED light."""
-        unique_id = get_or_create_unique_id({}, source_entity, None)
+        unique_id = f"pc_{source_entity.device_entry.id}" if source_entity.device_entry else get_or_create_unique_id({}, source_entity, None)
         if self._is_already_discovered(source_entity, unique_id):
             _LOGGER.debug(
-                "%s: Already setup with discovery, skipping new discovery",
+                "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
                 source_entity.entity_id,
+                unique_id,
             )
             return
 
@@ -180,6 +181,7 @@ class DiscoveryManager:
             model_info.manufacturer == MANUFACTURER_WLED
             and entity_entry.domain == LIGHT_DOMAIN
             and not re.search("master|segment", str(entity_entry.original_name), flags=re.IGNORECASE)
+            and not re.search("master|segment", str(entity_entry.entity_id), flags=re.IGNORECASE)
         )
 
     async def is_entity_supported(
