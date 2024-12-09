@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-08T14:20:08.100497",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "name": "Treatlife Smart Color Changing Light Bulb 9W 800LM",
+  "standby_power": 0.55
+}
