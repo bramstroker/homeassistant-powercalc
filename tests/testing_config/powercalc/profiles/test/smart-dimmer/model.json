@@ -1,0 +1,7 @@
+{
+  "name": "Some smart dimmer",
+  "standby_power": 0.3,
+  "standby_power_on": 0.5,
+  "device_type": "smart_dimmer",
+  "calculation_strategy": "linear"
+}

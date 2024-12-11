@@ -111,7 +111,6 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_HIDE_MEMBERS: False,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power"],
         CONF_FORCE_CALCULATE_GROUP_ENERGY: False,
-        CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
@@ -193,7 +192,6 @@ async def test_group_include_area(
         CONF_HIDE_MEMBERS: False,
         CONF_FORCE_CALCULATE_GROUP_ENERGY: False,
         CONF_AREA: area.id,
-        CONF_UNIQUE_ID: "My group sensor",
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: True,
@@ -327,7 +325,6 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         unique_id="abcdefg",
         data={
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-            CONF_UNIQUE_ID: "abcdefg",
             CONF_ENTITY_ID: "sensor.dummy",
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_FIXED: {CONF_POWER: 50},
@@ -349,7 +346,6 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
 
     user_input = {
         CONF_NAME: "My group sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
     }
     result = await hass.config_entries.flow.async_configure(
@@ -364,7 +360,6 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_FORCE_CALCULATE_GROUP_ENERGY: False,
         CONF_HIDE_MEMBERS: False,
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id],
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
@@ -389,7 +384,6 @@ async def test_real_power_entry_selectable_as_group_member(
         unique_id="abcdefg",
         data={
             CONF_SENSOR_TYPE: SensorType.REAL_POWER,
-            CONF_UNIQUE_ID: "abcdefg",
             CONF_ENTITY_ID: "sensor.real_power",
         },
         title="RealPower1",
@@ -409,7 +403,6 @@ async def test_real_power_entry_selectable_as_group_member(
 
     user_input = {
         CONF_NAME: "My group sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_GROUP_MEMBER_SENSORS: [config_entry_1.entry_id, config_entry_2.entry_id],
     }
     await hass.config_entries.flow.async_configure(
@@ -428,7 +421,7 @@ async def test_real_power_entry_selectable_as_group_member(
 
 async def test_group_error_mandatory(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.GROUP)
-    user_input = {CONF_NAME: "My group sensor", CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID}
+    user_input = {CONF_NAME: "My group sensor"}
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,
@@ -583,7 +576,6 @@ async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-            CONF_UNIQUE_ID: "abc",
             CONF_ENTITY_ID: "light.my_light",
             CONF_NAME: "Some light",
             CONF_MODE: CalculationStrategy.FIXED,
@@ -616,7 +608,6 @@ async def test_domain_group_flow(hass: HomeAssistant) -> None:
         CONF_GROUP_TYPE: GroupType.DOMAIN,
         CONF_NAME: "My group sensor",
         CONF_DOMAIN: Platform.LIGHT,
-        CONF_UNIQUE_ID: "powercalc_domaingroup_light",
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
     }

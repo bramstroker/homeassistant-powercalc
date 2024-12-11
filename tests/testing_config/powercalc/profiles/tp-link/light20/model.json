@@ -1,0 +1,12 @@
+{
+  "name": "IKEA Control outlet",
+  "device_type": "light",
+  "calculation_strategy": "multi_switch",
+  "multi_switch_config": {
+    "power": 0.82,
+    "power_off": 0.52
+  },
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power"
+  }
+}

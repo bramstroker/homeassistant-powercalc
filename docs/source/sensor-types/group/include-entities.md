@@ -5,7 +5,7 @@ In addition to that you can use filters to exclude certain entities.
 
 !!! note
 
-    Only entities will be included which are in the [supported models] list (these can be auto configured). You can combine `include` and `entities` to extend the group with custom configured entities.
+    Only entities will be included which are in the [supported models](https://library.powercalc.nl) list (these can be auto configured). You can combine `include` and `entities` to extend the group with custom configured entities.
 
 !!! important
 

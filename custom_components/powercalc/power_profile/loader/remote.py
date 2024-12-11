@@ -98,13 +98,13 @@ class RemoteLoader(Loader):
             _LOGGER.debug("Failed to download library.json, falling back to local copy")
             return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
 
-    async def get_manufacturer_listing(self, device_type: DeviceType | None) -> set[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available manufacturers."""
 
         return {
             manufacturer["name"]
             for manufacturer in self.library_contents.get("manufacturers", [])
-            if not device_type or device_type in manufacturer.get("device_types", [])
+            if not device_types or any(device_type in manufacturer.get("device_types", []) for device_type in device_types)
         }
 
     async def find_manufacturer(self, search: str) -> str | None:
@@ -112,13 +112,13 @@ class RemoteLoader(Loader):
 
         return self.manufacturer_aliases.get(search, None)
 
-    async def get_model_listing(self, manufacturer: str, device_type: DeviceType | None) -> set[str]:
+    async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
         return {
             model["id"]
             for model in self.manufacturer_models.get(manufacturer, [])
-            if not device_type or device_type in model.get("device_type", DeviceType.LIGHT)
+            if not device_types or any(device_type in model.get("device_type", [DeviceType.LIGHT]) for device_type in device_types)
         }
 
     async def load_model(
@@ -223,14 +223,17 @@ class RemoteLoader(Loader):
 
         return await self.hass.async_add_executor_job(_write)  # type: ignore
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> str | None:
+    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find the model in the library."""
 
         models = self.manufacturer_models.get(manufacturer, [])
-        return next(
-            (model.get("id") for model in models for string in search if string == model.get("id") or string in model.get("aliases", [])),
-            None,
-        )
+        result = []
+        for model in models:
+            model_id = model.get("id")
+            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
+                result.append(model_id)
+
+        return result
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:

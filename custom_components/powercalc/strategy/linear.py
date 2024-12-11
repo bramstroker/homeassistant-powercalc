@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
+from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -15,7 +16,6 @@ from homeassistant.components.media_player import (
 )
 from homeassistant.const import CONF_ATTRIBUTE
 from homeassistant.core import HomeAssistant, State
-from homeassistant.helpers.typing import ConfigType
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
@@ -48,7 +48,7 @@ _LOGGER = logging.getLogger(__name__)
 class LinearStrategy(PowerCalculationStrategyInterface):
     def __init__(
         self,
-        config: ConfigType,
+        config: dict[str, Any],
         hass: HomeAssistant,
         source_entity: SourceEntity,
         standby_power: float | None,
@@ -115,7 +115,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
             min_power = self._config.get(CONF_MIN_POWER) or self._standby_power or 0
             calibration_list.append((min_value, float(min_power)))
             calibration_list.append(
-                (max_value, float(self._config.get(CONF_MAX_POWER))),
+                (max_value, float(self._config.get(CONF_MAX_POWER))),  # type: ignore
             )
             return calibration_list
 
@@ -198,7 +198,7 @@ class LinearStrategy(PowerCalculationStrategyInterface):
                     ),
                     "linear_unsupported_domain",
                 )
-            if not self._config.get(CONF_MAX_POWER):
+            if CONF_MAX_POWER not in self._config:
                 raise StrategyConfigurationError(
                     "Linear strategy must have at least 'max power' or 'calibrate' defined",
                     "linear_mandatory",

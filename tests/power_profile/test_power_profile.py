@@ -126,10 +126,10 @@ async def test_unsupported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LCA007"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity("light.test", "test", "light"),
+        RegistryEntry(entity_id="light.test", platform="hue", unique_id="1234"),
     )
     assert not power_profile.is_entity_domain_supported(
-        SourceEntity("switch.test", "test", "switch"),
+        RegistryEntry(entity_id="switch.test", platform="bla", unique_id="1234"),
     )
 
 
@@ -139,16 +139,33 @@ async def test_hue_switch_supported_entity_domain(hass: HomeAssistant) -> None:
         ModelInfo("signify", "LOM001"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity(
-            "light.test",
-            "test",
-            "light",
-            entity_entry=RegistryEntry(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="hue",
-            ),
+        RegistryEntry(
+            entity_id="light.test",
+            unique_id="1234",
+            platform="hue",
         ),
+    )
+
+
+async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("roborock", "s6_maxv"),
+        get_test_profile_dir("vacuum"),
+    )
+    assert power_profile.is_entity_domain_supported(
+        SourceEntity("vacuum.test", "test", "vacuum"),
+    )
+
+
+async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        get_test_profile_dir("unknown-device-type"),
+    )
+    assert not power_profile.is_entity_domain_supported(
+        SourceEntity("switch.test", "test", "switch"),
     )
 
 

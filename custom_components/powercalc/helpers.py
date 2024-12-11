@@ -44,15 +44,23 @@ def get_library_json_path() -> str:
     return get_library_path("library.json")
 
 
-def get_or_create_unique_id(sensor_config: ConfigType, source_entity: SourceEntity, power_profile: PowerProfile | None) -> str:
+def get_or_create_unique_id(
+    sensor_config: ConfigType,
+    source_entity: SourceEntity,
+    power_profile: PowerProfile | None,
+) -> str:
     """Get or create the unique id."""
     unique_id = sensor_config.get(CONF_UNIQUE_ID)
     if unique_id:
         return str(unique_id)
 
-    # For multi-switch strategy we need to use the device id as unique id
+    # For multi-switch and wled strategy we need to use the device id as unique id
     # As we don't want to start a discovery for each switch entity
-    if power_profile and power_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH and source_entity.device_entry:
+    if (
+        source_entity.device_entry
+        and power_profile
+        and power_profile.calculation_strategy in [CalculationStrategy.WLED, CalculationStrategy.MULTI_SWITCH]
+    ):
         return f"pc_{source_entity.device_entry.id}"
 
     if source_entity and source_entity.entity_id != DUMMY_ENTITY_ID:

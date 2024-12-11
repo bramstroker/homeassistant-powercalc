@@ -1,13 +1,17 @@
 powerprofile:
-- changed-files:
-  - any-glob-to-any-file: profile_library/**
+  - changed-files:
+    - any-glob-to-any-file: profile_library/**
 
 documentation:
-- changed-files:
-  - any-glob-to-any-file: docs/**
+  - changed-files:
+    - any-glob-to-any-file: docs/**
 
 enhancement:
  - head-branch: ['^feat', 'feature']
 
 bug:
   - head-branch: ['^fix', 'fix']
+
+measure-tool:
+  - changed-files:
+      - any-glob-to-any-file: utils/measure/**

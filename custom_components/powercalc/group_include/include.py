@@ -56,7 +56,11 @@ async def resolve_include_entities(
             elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
-        if not resolved_entities and source_entity and await discovery_manager.is_entity_supported(source_entity):
+        if (
+            not resolved_entities
+            and source_entity
+            and await discovery_manager.is_entity_supported(source_entity, None, log_profile_loading_errors=False)
+        ):
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities
@@ -66,7 +70,7 @@ async def resolve_include_entities(
 def resolve_include_source_entities(
     hass: HomeAssistant,
     include_config: dict,
-) -> dict[str, entity_registry.RegistryEntry | None]:
+) -> dict[str, entity_registry.RegistryEntry]:
     entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
 
     entity_reg = entity_registry.async_get(hass)

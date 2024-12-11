@@ -29,7 +29,6 @@
           "name": "Nom",
           "on_time": "Temps de fonctionnement",
           "start_time": "Heure de début",
-          "unique_id": "Identifiant Unique",
           "unit_of_measurement": "Unité de mesure",
           "update_frequency": "Fréquence de mise à jour",
           "value": "Valeur",
@@ -123,8 +122,7 @@
           "hide_members": "Masquer les membres",
           "include_non_powercalc_sensors": "Include non powercalc sensors",
           "name": "Nom",
-          "sub_groups": "Sous-groupes",
-          "unique_id": "Identifiant unique"
+          "sub_groups": "Sous-groupes"
         },
         "data_description": {
           "area": "Ajoute tous les capteurs powercalc de la zone spécifiée",
@@ -148,6 +146,13 @@
         },
         "description": "Le fabricant \"{manufacturer}\" et le modèle \"{model}\" ont été automatiquement détectés pour votre appareil.{remarks}",
         "title": "Bibliothèque"
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Select model"
+        },
+        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
+        "title": "Library"
       },
       "linear": {
         "data": {
@@ -256,7 +261,6 @@
           "create_utility_meters": "Create utility meters",
           "entity_id": "Base entity",
           "name": "Name",
-          "unique_id": "Unique id",
           "subtract_entities": "Subtract entities"
         },
         "data_description": {
@@ -319,8 +323,7 @@
           "group": "Ajouter au groupe",
           "mode": "Stratégie de calcul",
           "name": "Nom",
-          "standby_power": "Consommation en veille",
-          "unique_id": "Identifiant unique"
+          "standby_power": "Consommation en veille"
         },
         "data_description": {
           "create_energy_sensor": "Si powercalc doit créer un capteur kWh",
@@ -328,8 +331,7 @@
           "entity_id": "Entité sur laquelle la puissance virtuelle est basée, le capteur de puissance écoutera les changements d'état de cette entité à mettre à jour",
           "group": "Fill in a custom group name to create a new group",
           "name": "Laisser vide prendra le nom de l'entité source",
-          "standby_power": "Définir la quantité d'énergie que l'appareil consomme lorsqu'il est à l'état OFF",
-          "unique_id": "Spécifiez un identifiant unique. Cela permettra de configurer plusieurs capteurs de puissance pour la même entité. Lorsqu'il n'est pas spécifié, il prendra l'identifiant unique de l'entité source"
+          "standby_power": "Définir la quantité d'énergie que l'appareil consomme lorsqu'il est à l'état OFF"
         },
         "description": "Voir le fichier readme pour plus d'informations sur les stratégies possibles et les options de configuration",
         "title": "Créer un capteur de puissance virtuel"

@@ -55,7 +55,7 @@ async def create_utility_meters(
 
     utility_meters = []
     for meter_type in meter_types:
-        unique_id = f"{energy_sensor.unique_id}_{meter_type}" if energy_sensor.unique_id else None
+        unique_id = f"{energy_sensor.unique_id}_{meter_type}" if energy_sensor.unique_id else None  # type: ignore
         if should_create_utility_meter(hass, unique_id, energy_sensor):
             utility_meters.extend(
                 await create_meters_for_type(
@@ -189,7 +189,7 @@ async def create_tariff_select(
     tariff_select = TariffSelect(
         name,
         tariffs,
-        select_unique_id,
+        unique_id=select_unique_id,
     )
 
     await select_component.async_add_entities([tariff_select])
@@ -252,14 +252,15 @@ class VirtualUtilityMeter(UtilityMeterSensor, BaseEntity):
     rounding_digits: int = DEFAULT_ENERGY_SENSOR_PRECISION
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # type: ignore[override]
         """Return the unique id."""
         return self._attr_unique_id
 
     @property
-    def native_value(self) -> Decimal | StateType:
+    def native_value(self) -> StateType | Decimal:  # type: ignore[override]
         """Return the state of the sensor."""
-        if self.rounding_digits and self._state is not None:
-            return round(self._state, self.rounding_digits)
+        value = self._state if hasattr(self, "_state") else self._attr_native_value  # pre HA 2024.12 value was stored in _state
+        if self.rounding_digits and value is not None:
+            return Decimal(round(value, self.rounding_digits))  # type: ignore
 
-        return self._state
+        return value  # type: ignore

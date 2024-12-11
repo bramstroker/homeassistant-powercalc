@@ -20,7 +20,6 @@ jobs:
       - uses: ./.github/workflows/poetry-composite-action
         with:
           directory: './utils/visualize'
-          python_version: '3.12'
           cache_dependencies: 'false'
       - name: Run visualization tool
         run: |

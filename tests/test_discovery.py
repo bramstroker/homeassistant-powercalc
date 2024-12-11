@@ -1,6 +1,6 @@
 import logging
 import uuid
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.light import (
@@ -28,9 +28,13 @@ from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_MANUFACTURER,
+    CONF_MODE,
     CONF_MODEL,
     CONF_POWER,
+    CONF_POWER_FACTOR,
     CONF_SENSOR_TYPE,
+    CONF_VOLTAGE,
+    CONF_WLED,
     DOMAIN,
     SensorType,
 )
@@ -255,6 +259,7 @@ async def test_autodiscover_skips_diagnostics_entities(
 async def test_autodiscover_skips_printer_ink(
     hass: HomeAssistant,
     mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
 ) -> None:
     """Auto discovery should not consider printer entities with ink in the name"""
 
@@ -267,7 +272,7 @@ async def test_autodiscover_skips_printer_ink(
 
     await run_powercalc_setup(hass, {})
 
-    assert not hass.states.get("sensor.test_device_power")
+    assert len(mock_flow_init.mock_calls) == 0
 
 
 async def test_autodiscover_skips_unsupported_domains(
@@ -283,6 +288,48 @@ async def test_autodiscover_skips_unsupported_domains(
     await run_powercalc_setup(hass, {})
 
     assert not hass.states.get("sensor.test_power")
+
+
+async def test_autodiscover_continues_when_one_entity_fails(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Auto discovery should continue when one entity fails to load model information"""
+
+    caplog.set_level(logging.ERROR)
+
+    mock_device_registry(
+        hass,
+        {
+            "signify-device": DeviceEntry(
+                id="signify-device",
+                manufacturer="signify",
+                model="LCT010",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test1": RegistryEntry(
+                entity_id="light.test1",
+                unique_id="1234",
+                platform="light",
+                device_id="signify-device",
+            ),
+            "light.test2": RegistryEntry(
+                entity_id="light.test2",
+                unique_id="1235",
+                platform="light",
+                device_id="signify-device",
+            ),
+        },
+    )
+    with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_manufacturer", new_callable=AsyncMock) as mock_find_models:
+        mock_find_models.side_effect = [Exception("Test exception"), "signify"]
+        await run_powercalc_setup(hass, {})
+        assert "Error during auto discovery" in caplog.text
 
 
 async def test_load_model_with_slashes(
@@ -306,68 +353,148 @@ async def test_load_model_with_slashes(
 
 
 @pytest.mark.parametrize(
-    "model_info,expected_manufacturer,expected_model",
+    "entity_id,model_info,expected_manufacturer,expected_model",
     [
         (
+            "light.test",
             ModelInfo("ikea", "IKEA FLOALT LED light panel, dimmable, white spectrum (30x90 cm) (L1528)"),
             "ikea",
             "L1528",
         ),
         (
+            "light.test",
             ModelInfo("IKEA", "LED1649C5"),
             "ikea",
             "LED1649C5",
         ),
         (
+            "light.test",
             ModelInfo("IKEA", "TRADFRI LED bulb GU10 400 lumen, dimmable (LED1650R5)"),
             "ikea",
             "LED1650R5",
         ),
         (
+            "light.test",
             ModelInfo("ikea", "TRADFRI bulb E14 W op/ch 400lm"),
             "ikea",
             "LED1649C5",
         ),
         (
+            "light.test",
             ModelInfo("MLI", "45317"),
             "mueller-licht",
             "45317",
         ),
         (
+            "switch.test",
             ModelInfo("TP-Link", "KP115(AU)"),
             "tp-link",
             "KP115",
         ),
         (
+            "media_player.test",
             ModelInfo("Apple", "HomePod (gen 2)"),
             "apple",
             "MQJ83",
         ),
         (
+            "light.test",
             ModelInfo("IKEA", "bladiebla", "LED1649C5"),
             "ikea",
             "LED1649C5",
         ),
+        (
+            "sensor.test",
+            ModelInfo("Signify Netherlands B.V.", "LLC020"),
+            None,
+            None,
+        ),
     ],
 )
-async def test_autodiscover_model_from_entity_entry(
+async def test_discover_entity(
     hass: HomeAssistant,
+    entity_id: str,
     model_info: ModelInfo,
-    expected_manufacturer: str,
-    expected_model: str,
+    expected_manufacturer: str | None,
+    expected_model: str | None,
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
     Test the autodiscovery lookup from the library by manufacturer and model information
     A given entity_entry is trying to be matched in the library and a PowerProfile instance returned when it is matched
     """
-    mock_entity_with_model_information("light.testa", model_info.manufacturer, model_info.model, model_info.model_id)
+    mock_entity_with_model_information(entity_id, model_info.manufacturer, model_info.model, model_info.model_id)
 
-    source_entity = await create_source_entity("light.testa", hass)
+    source_entity = await create_source_entity(entity_id, hass)
     power_profile = await get_power_profile_by_source_entity(hass, source_entity)
+
+    if not expected_manufacturer:
+        assert not power_profile
+        return
 
     assert power_profile.manufacturer == expected_manufacturer
     assert power_profile.model == expected_model
+
+
+async def test_same_entity_is_not_discovered_twice(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+        title="Test",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+    )
+    config_entry.add_to_hass(hass)
+
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 0
+
+
+async def test_wled_not_discovered_twice(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="pc_a848face92cd",
+        data={
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_ENTITY_ID: "light.test",
+            CONF_MANUFACTURER: "WLED",
+            CONF_MODE: "wled",
+            CONF_MODEL: "FOSS",
+            CONF_NAME: "Ledstrip TV boven",
+            CONF_UNIQUE_ID: "pc_a848face92cd",
+            CONF_WLED: {
+                CONF_POWER_FACTOR: 0.9,
+                CONF_VOLTAGE: 5.0,
+            },
+        },
+        title="Test",
+        source=SOURCE_INTEGRATION_DISCOVERY,
+    )
+    config_entry.add_to_hass(hass)
+
+    mock_entity_with_model_information("light.test", "WLED", "FOSS")
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 0
 
 
 async def test_get_power_profile_empty_manufacturer(

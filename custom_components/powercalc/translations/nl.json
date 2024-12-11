@@ -29,7 +29,6 @@
           "name": "Naam",
           "on_time": "Tijd aan per dag",
           "start_time": "Begintijd",
-          "unique_id": "Uniek id",
           "unit_of_measurement": "Eenheid",
           "update_frequency": "Update frequentie",
           "value": "Waarde",
@@ -123,8 +122,7 @@
           "hide_members": "Verberg onderliggende sensoren",
           "include_non_powercalc_sensors": "Niet-powercalc sensoren meenemen",
           "name": "Naam",
-          "sub_groups": "Sub groepen",
-          "unique_id": "Uniek id"
+          "sub_groups": "Sub groepen"
         },
         "data_description": {
           "area": "Voeg alle powercalc sensoren van de gespecificeerde ruimte toe",
@@ -148,6 +146,13 @@
         },
         "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
         "title": "Bibliotheek"
+      },
+      "library_multi_profile": {
+        "data": {
+          "model": "Select model"
+        },
+        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
+        "title": "Library"
       },
       "linear": {
         "data": {
@@ -256,7 +261,6 @@
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Basis entiteit",
           "name": "Naam",
-          "unique_id": "Uniek id",
           "subtract_entities": "Entiteiten aftrekken"
         },
         "data_description": {
@@ -319,8 +323,7 @@
           "group": "Aan groep toevoegen",
           "mode": "Calculatie strategie",
           "name": "Naam",
-          "standby_power": "Stand-by vermogen",
-          "unique_id": "Uniek id"
+          "standby_power": "Stand-by vermogen"
         },
         "data_description": {
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
@@ -328,8 +331,7 @@
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
           "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
-          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)",
-          "unique_id": "Specificeer een uniek id. Dit maakt het mogelijk meerdere virtuele energiemeters op te zetten voor dezelfde entiteit. Indien niet gedefinieerd wordt het uniek id van de bronentiteit overgenomen"
+          "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)"
         },
         "description": "Zie de readme voor meer information over de mogelijke strategieen en configuratie opties.",
         "title": "Creëer een virtuele energie meter"

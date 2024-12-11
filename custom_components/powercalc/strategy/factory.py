@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from decimal import Decimal
+from typing import cast
 
 from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
 from homeassistant.core import HomeAssistant
@@ -14,6 +15,8 @@ from custom_components.powercalc.const import (
     CONF_COMPOSITE,
     CONF_FIXED,
     CONF_LINEAR,
+    CONF_MAX_POWER,
+    CONF_MIN_POWER,
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_POWER,
@@ -81,8 +84,8 @@ class PowerCalculatorStrategyFactory:
         linear_config = config.get(CONF_LINEAR)
 
         if linear_config is None:
-            if power_profile and power_profile.linear_mode_config:
-                linear_config = power_profile.linear_mode_config
+            if power_profile:
+                linear_config = power_profile.linear_mode_config or {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
             else:
                 raise StrategyConfigurationError("No linear configuration supplied")
 
@@ -139,8 +142,9 @@ class PowerCalculatorStrategyFactory:
         if CONF_WLED not in config:
             raise StrategyConfigurationError("No WLED configuration supplied")
 
+        wled_config: dict = cast(dict, config.get(CONF_WLED))
         return WledStrategy(
-            config=config.get(CONF_WLED),
+            config=wled_config,
             light_entity=source_entity,
             hass=self._hass,
             standby_power=config.get(CONF_STANDBY_POWER),
@@ -150,7 +154,7 @@ class PowerCalculatorStrategyFactory:
         if CONF_PLAYBOOK not in config:
             raise StrategyConfigurationError("No Playbook configuration supplied")
 
-        playbook_config: dict = config.get(CONF_PLAYBOOK)
+        playbook_config: dict = cast(dict, config.get(CONF_PLAYBOOK))
         return PlaybookStrategy(self._hass, playbook_config)
 
     async def _create_composite(
@@ -159,7 +163,7 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
         source_entity: SourceEntity,
     ) -> CompositeStrategy:
-        sub_strategies = list(config.get(CONF_COMPOSITE))
+        sub_strategies = list(config.get(CONF_COMPOSITE))  # type: ignore
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 from typing import Any, cast
 
@@ -38,7 +38,6 @@ from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
     async_track_template_result,
-    async_track_time_interval,
 )
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, StateType
@@ -52,6 +51,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_ENTITY,
     CALCULATION_STRATEGY_CONF_KEYS,
     CONF_CALCULATION_ENABLED_CONDITION,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_STANDBY_POWER,
@@ -203,25 +203,27 @@ async def _get_power_profile(
 ) -> PowerProfile | None:
     """Retrieve the power profile based on auto-discovery or manual configuration."""
     discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    if is_manually_configured(sensor_config):
+        return None
+
     power_profile = None
-    if not is_manually_configured(sensor_config):
-        try:
-            model_info = await discovery_manager.autodiscover_model(source_entity.entity_entry)
-            power_profile = await get_power_profile(
-                hass,
-                sensor_config,
-                model_info=model_info,
+    try:
+        model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
+        power_profile = await get_power_profile(
+            hass,
+            sensor_config,
+            model_info=model_info,
+        )
+        if power_profile and power_profile.sub_profile_select:
+            await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
+    except ModelNotSupportedError as err:
+        if not is_fully_configured(sensor_config):
+            _LOGGER.error(
+                "%s: Skipping sensor setup: %s",
+                source_entity.entity_id,
+                err,
             )
-            if power_profile and power_profile.sub_profile_select:
-                await _select_sub_profile(hass, power_profile, power_profile.sub_profile_select, source_entity)
-        except ModelNotSupportedError as err:
-            if not is_fully_configured(sensor_config):
-                _LOGGER.error(
-                    "%s: Skipping sensor setup: %s",
-                    source_entity.entity_id,
-                    err,
-                )
-                raise err
+            raise err
     return power_profile
 
 
@@ -254,7 +256,7 @@ def _get_standby_power(
 
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER) is not None:
-            standby_power = sensor_config.get(CONF_STANDBY_POWER)
+            standby_power = sensor_config.get(CONF_STANDBY_POWER)  # type: ignore
             if not isinstance(standby_power, Template):
                 standby_power = Decimal(standby_power)
         elif power_profile is not None:
@@ -293,6 +295,8 @@ def is_manually_configured(sensor_config: ConfigType) -> bool:
     """Check if the user manually configured the sensor.
     We need to skip loading a power profile to make.
     """
+    if CONF_CUSTOM_MODEL_DIRECTORY in sensor_config:
+        return False
     if CONF_MODEL in sensor_config:
         return False
     return any(key in sensor_config for key in CALCULATION_STRATEGY_CONF_KEYS)
@@ -462,13 +466,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
 
-        @callback
-        def async_update(__: datetime | None = None) -> None:
-            """Update the entity."""
-            self.async_schedule_update_ha_state(True)
-
-        async_track_time_interval(self.hass, async_update, self._update_frequency)
-
     def init_calculation_enabled_condition(self) -> None:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
             return
@@ -593,9 +590,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     async def calculate_standby_power(self, state: State) -> Decimal:
         """Calculate the power of the device in OFF state."""
         assert self._strategy_instance is not None
-        sleep_power: ConfigType = self._sensor_config.get(CONF_SLEEP_POWER)
+        sleep_power: dict[str, float] = self._sensor_config.get(CONF_SLEEP_POWER)  # type: ignore
         if sleep_power:
-            delay = sleep_power.get(CONF_DELAY)
+            delay = sleep_power.get(CONF_DELAY) or 0
 
             @callback
             def _update_sleep_power(*_: Any) -> None:  # noqa: ANN401
@@ -638,12 +635,12 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:
+    def native_value(self) -> StateType:  # type: ignore[override]
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
     @property
-    def available(self) -> bool:
+    def available(self) -> bool:  # type: ignore[override]
         """Return True if entity is available."""
         return self._power is not None
 
@@ -727,6 +724,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:
+    def unique_id(self) -> str | None:  # type: ignore[override]
         """Return the unique_id of the sensor."""
         return self._unique_id

@@ -6,6 +6,7 @@ import os
 import shutil
 import time
 from functools import partial
+from unittest.mock import patch
 
 import pytest
 from aiohttp import ClientError
@@ -17,7 +18,7 @@ from custom_components.powercalc.helpers import get_library_json_path, get_libra
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
-from tests.common import get_test_profile_dir
+from tests.common import get_test_config_dir, get_test_profile_dir
 
 pytestmark = pytest.mark.skip_remote_loader_mocking
 
@@ -127,13 +128,13 @@ async def test_download_with_parenthesis(remote_loader: RemoteLoader, mock_aiore
 
 
 async def test_get_manufacturer_listing(remote_loader: RemoteLoader) -> None:
-    manufacturers = await remote_loader.get_manufacturer_listing(DeviceType.LIGHT)
+    manufacturers = await remote_loader.get_manufacturer_listing({DeviceType.LIGHT})
     assert "signify" in manufacturers
     assert len(manufacturers) > 40
 
 
 async def test_get_model_listing(remote_loader: RemoteLoader) -> None:
-    models = await remote_loader.get_model_listing("signify", DeviceType.LIGHT)
+    models = await remote_loader.get_model_listing("signify", {DeviceType.LIGHT})
     assert "LCT010" in models
     assert len(models) > 40
 
@@ -471,14 +472,36 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
         await remote_loader.load_model("apple", "HomePod Mini")
 
 
-async def test_find_model(remote_loader: RemoteLoader) -> None:
-    model = await remote_loader.find_model("apple", {"HomePod (gen 2)"})
-    assert model == "MQJ83"
+@pytest.mark.parametrize(
+    "manufacturer,phrases,expected_models,library_dir",
+    [
+        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
+        ("apple", {"Non existing model"}, [], None),
+        ("signify", {"LCA001", "LCT010"}, ["LCT010", "LCA001"], None),
+        ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi-profile"),
+    ],
+)
+@pytest.mark.skip_remote_loader_mocking
+async def test_find_model(
+    hass: HomeAssistant,
+    manufacturer: str,
+    phrases: set[str],
+    expected_models: list[str],
+    library_dir: str,
+) -> None:
+    with patch("custom_components.powercalc.power_profile.loader.remote.RemoteLoader.load_library_json") as mock_load_lib:
 
+        def load_library_json() -> dict:
+            library_path = get_test_config_dir(f"powercalc_profiles/{library_dir}/library.json") if library_dir else get_library_json_path()
+            with open(library_path) as f:
+                return json.load(f)
 
-async def test_find_model_returns_none(remote_loader: RemoteLoader) -> None:
-    model = await remote_loader.find_model("apple", {"Non existing model"})
-    assert model is None
+        mock_load_lib.side_effect = load_library_json
+
+        loader = RemoteLoader(hass)
+        loader.retry_timeout = 0
+        await loader.initialize()
+        assert await loader.find_model(manufacturer, phrases) == expected_models
 
 
 def clear_storage_dir(storage_path: str) -> None:

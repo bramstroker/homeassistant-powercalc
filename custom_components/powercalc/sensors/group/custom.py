@@ -479,7 +479,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         domain = self._sensor_config.get(CONF_DOMAIN)
         if domain == "all":
             entity_registry = er.async_get(self.hass)
-            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]
+            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]  # type: ignore
         else:
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(

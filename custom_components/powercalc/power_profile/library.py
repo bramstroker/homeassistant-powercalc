@@ -14,7 +14,7 @@ from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
 from .loader.protocol import Loader
 from .loader.remote import RemoteLoader
-from .power_profile import DOMAIN_DEVICE_TYPE, PowerProfile
+from .power_profile import PowerProfile, get_device_types_from_domain
 
 LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
@@ -70,8 +70,9 @@ class ProfileLibrary:
 
     async def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
         """Get listing of available manufacturers."""
-        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
-        manufacturers = await self._loader.get_manufacturer_listing(device_type)
+
+        device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
+        manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)
 
     async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
@@ -80,12 +81,12 @@ class ProfileLibrary:
         resolved_manufacturer = await self._loader.find_manufacturer(manufacturer)
         if not resolved_manufacturer:
             return []
-        device_type = DOMAIN_DEVICE_TYPE.get(entity_domain) if entity_domain else None
-        cache_key = f"{resolved_manufacturer}/{device_type}"
+        device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
+        cache_key = f"{resolved_manufacturer}/{device_types}"
         cached_models = self._manufacturer_models.get(cache_key)
         if cached_models:
             return cached_models
-        models = await self._loader.get_model_listing(resolved_manufacturer, device_type)
+        models = await self._loader.get_model_listing(resolved_manufacturer, device_types)
         self._manufacturer_models[cache_key] = sorted(models)
         return self._manufacturer_models[cache_key]
 
@@ -93,7 +94,7 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
-    ) -> PowerProfile | None:
+    ) -> PowerProfile:
         """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
         sub_profile = None
@@ -102,9 +103,6 @@ class ProfileLibrary:
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
         profile = await self.create_power_profile(model_info, custom_directory)
-
-        if not profile:
-            return None
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -115,47 +113,49 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
-    ) -> PowerProfile | None:
+    ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
 
-        try:
-            manufacturer = await self._resolve_manufacturer(model_info, custom_directory)
-            if not manufacturer:
-                return None
+        manufacturer = model_info.manufacturer
+        model = model_info.model
+        if not custom_directory:
+            manufacturer = await self.find_manufacturer(model_info)  # type: ignore
+            if manufacturer is None:
+                raise LibraryError(f"Manufacturer {model_info.manufacturer} not found")
 
-            model = await self._resolve_model(manufacturer, model_info, custom_directory)
-            if not model:
-                return None
+            models = await self.find_models(manufacturer, model_info)
+            if not models:
+                raise LibraryError(f"Model {manufacturer} {model} not found")
+            model = next(iter(models))
 
-            json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
-            if linked_profile := json_data.get("linked_lut"):
-                linked_manufacturer, linked_model = linked_profile.split("/")
-                _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
-
-        except LibraryError as e:
-            _LOGGER.error("Problem loading model: %s", e)
-            return None
+        json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
+        if linked_profile := json_data.get("linked_lut"):
+            linked_manufacturer, linked_model = linked_profile.split("/")
+            _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
         return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
 
-    async def _resolve_manufacturer(self, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+    async def find_manufacturer(self, model_info: ModelInfo) -> str | None:
         """Resolve the manufacturer, either from the model info or by loading it."""
-        if custom_directory:
-            return model_info.manufacturer
         return await self._loader.find_manufacturer(model_info.manufacturer)
 
-    async def _resolve_model(self, manufacturer: str, model_info: ModelInfo, custom_directory: str | None) -> str | None:
+    async def find_models(self, manufacturer: str, model_info: ModelInfo) -> set[str]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
-        if custom_directory:
-            return model_info.model_id or model_info.model
-
+        search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
             if model_identifier:
-                resolved_model = await self.find_model(manufacturer, model_identifier)
-                if resolved_model:
-                    return resolved_model
+                model_identifier = model_identifier.replace("#slash#", "/")
+                search.update(
+                    {
+                        model_identifier,
+                        model_identifier.lower(),
+                        re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model_identifier),
+                    },
+                )
+                if "/" in model_identifier:
+                    search.update(model_identifier.split("/"))
 
-        return None
+        return set(await self._loader.find_model(manufacturer, search))
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
@@ -180,21 +180,6 @@ class ProfileLibrary:
             await profile.select_sub_profile(profile.sub_profile_select.default)
 
         return profile
-
-    async def find_model(self, manufacturer: str, model: str) -> str | None:
-        """Check whether this power profile supports a given model ID.
-        Also looks at possible aliases.
-        """
-
-        search = {
-            model,
-            model.replace("#slash#", "/"),
-            model.lower(),
-            model.lower().replace("#slash#", "/"),
-            re.sub(r"^(.*)\(([^()]+)\)$", r"\2", model),
-        }
-
-        return await self._loader.find_model(manufacturer, search)
 
     def get_loader(self) -> Loader:
         return self._loader

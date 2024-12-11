@@ -6,7 +6,7 @@ authors = ["Bram Gerritsen <bgerritsen@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
 aiohttp = "^3.8"
 chardet = "^5.1"
 charset-normalizer = "^3.1"
@@ -26,7 +26,12 @@ pycryptodome = "*"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.2"
+pytest = "^8.3.3"
+pytest-cov = "^6.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "."

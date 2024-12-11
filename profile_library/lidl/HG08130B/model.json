@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-07T16:56:30.421959",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM Mini Gen3",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "master"
+  },
+  "name": "Livarno Home E14 6W CCT Candle Bulb",
+  "standby_power": 0.29,
+  "author": "RubenKelevra <cyrond@gmail.com>"
+}

@@ -243,3 +243,35 @@ async def test_sensor_is_created_without_providing_source_entity(hass: HomeAssis
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_nice_sensor_power")
     assert hass.states.get("sensor.my_nice_sensor_energy")
+
+
+async def test_setup_twice_for_same_entity(hass: HomeAssistant) -> None:
+    """
+    Test that we can set up two virtual power sensors for the same entity.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2684
+    """
+    result = await goto_virtual_power_strategy_step(
+        hass,
+        CalculationStrategy.FIXED,
+        user_input={CONF_NAME: "My nice sensor", CONF_ENTITY_ID: "light.test"},
+    )
+    await set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_POWER: 20},
+    )
+
+    result = await goto_virtual_power_strategy_step(
+        hass,
+        CalculationStrategy.FIXED,
+        user_input={CONF_NAME: "My nice sensor 2", CONF_ENTITY_ID: "light.test"},
+    )
+    await set_virtual_power_configuration(
+        hass,
+        result,
+        {CONF_POWER: 20},
+    )
+
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.my_nice_sensor_power")
+    assert hass.states.get("sensor.my_nice_sensor_2_power")

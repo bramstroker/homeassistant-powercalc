@@ -1,7 +1,9 @@
+import logging
+
 import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
@@ -135,7 +137,8 @@ async def test_exception_is_raised_when_no_estimated_current_entity_found(
         await strategy.find_estimated_current_entity()
 
 
-async def test_wled_autodiscovery_flow(hass: HomeAssistant) -> None:
+async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.ERROR)
     mock_device_registry(
         hass,
         {
@@ -169,6 +172,12 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant) -> None:
                 original_name="WLED Segment1",
                 device_id="wled-device",
             ),
+            "light.test_segment_1_2": RegistryEntry(
+                entity_id="light.test_segment_1_2",
+                unique_id="1234-segment",
+                platform="light",
+                device_id="wled-device",
+            ),
             "sensor.test_current": RegistryEntry(
                 entity_id="sensor.test_current",
                 unique_id="1234",
@@ -196,6 +205,10 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant) -> None:
         {CONF_VOLTAGE: 5},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
+    entry: ConfigEntry = result["result"]
+    assert entry.unique_id == "pc_wled-device"
+
+    assert len(caplog.records) == 0
 
 
 async def test_yaml_configuration(hass: HomeAssistant) -> None:

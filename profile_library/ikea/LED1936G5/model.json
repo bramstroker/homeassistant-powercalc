@@ -1,0 +1,16 @@
+{
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly Plus 1PM",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.0.3:docker"
+  },
+  "name": "TRADFRI LED bulb E27 470 lumen, dimmable, opal white",
+  "standby_power": 0.2,
+  "calculation_strategy": "lut",
+  "linked_lut": "ikea/LED1937T5_E27",
+  "created_at": "2024-12-08T10:13:50",
+  "author": "bramstroker <bgerritsen@gmail.com>"
+}
