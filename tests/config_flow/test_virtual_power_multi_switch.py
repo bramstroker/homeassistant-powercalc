@@ -10,7 +10,7 @@ from pytest_homeassistant_custom_component.common import mock_device_registry, m
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -75,7 +75,7 @@ async def test_discovery_flow(
     result = await initialize_discovery_flow(hass, source_entity, confirm_autodiscovered_model=True)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MULTI_SWITCH
+    assert result["step_id"] == Step.MULTI_SWITCH
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -159,7 +159,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.MULTI_SWITCH)
+    result = await initialize_options_flow(hass, entry, Step.MULTI_SWITCH)
 
     user_input = {CONF_POWER_OFF: 20, CONF_POWER: 5, CONF_ENTITIES: ["switch.a", "switch.c"]}
     result = await hass.config_entries.options.async_configure(

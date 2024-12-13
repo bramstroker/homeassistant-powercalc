@@ -6,7 +6,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_FIXED, CONF_POWER_TEMPLATE
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CREATE_UTILITY_METERS,
@@ -103,13 +103,13 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_ENTITY_ID: "light.test", CONF_CREATE_UTILITY_METERS: True},
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.FIXED)
+    result = await initialize_options_flow(hass, entry, Step.FIXED)
 
     user_input = {CONF_POWER: 50}
     await hass.config_entries.options.async_configure(
@@ -117,7 +117,7 @@ async def test_fixed_options_flow(hass: HomeAssistant) -> None:
         user_input=user_input,
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.ADVANCED_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.ADVANCED_OPTIONS)
     user_input = {CONF_IGNORE_UNAVAILABLE_STATE: True}
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
@@ -176,7 +176,7 @@ async def test_advanced_power_configuration_can_be_set(hass: HomeAssistant) -> N
 
 
 async def test_entity_selection_mandatory(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Step.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {
@@ -198,7 +198,7 @@ async def test_global_configuration_is_applied_to_field_default(
     }
     await run_powercalc_setup(hass, {}, global_config)
 
-    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Step.VIRTUAL_POWER)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_CREATE_UTILITY_METERS)].description == {
@@ -217,7 +217,7 @@ async def test_global_configuration_is_applied_to_field_default(
         {CONF_POWER: 50},
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.POWER_ADVANCED
+    assert result["step_id"] == Step.POWER_ADVANCED
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
     assert schema_keys[schema_keys.index(CONF_ENERGY_INTEGRATION_METHOD)].default() == ENERGY_INTEGRATION_METHOD_RIGHT
     assert schema_keys[schema_keys.index(CONF_IGNORE_UNAVAILABLE_STATE)].description == {"suggested_value": True}

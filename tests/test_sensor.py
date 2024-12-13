@@ -42,7 +42,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     ATTR_CALCULATION_MODE,
     ATTR_ENTITIES,
@@ -623,7 +623,7 @@ async def test_change_options_of_renamed_sensor(
 
     assert hass.states.get("sensor.test_energy_daily").name == "Renamed daily utility meter"
 
-    result = await initialize_options_flow(hass, entry, Steps.FIXED)
+    result = await initialize_options_flow(hass, entry, Step.FIXED)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_POWER: 100},
@@ -833,14 +833,14 @@ async def test_change_config_entry_entity_id(hass: HomeAssistant) -> None:
     assert power_state.state == "50.00"
 
     # Change the entity_id using the options flow
-    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_ENTITY_ID: new_light_id},
     )
     await hass.async_block_till_done()
 
-    result = await initialize_options_flow(hass, entry, Steps.FIXED)
+    result = await initialize_options_flow(hass, entry, Step.FIXED)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_POWER: 100},

@@ -15,7 +15,7 @@ from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     DOMAIN,
-    Steps,
+    Step,
 )
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -40,8 +40,8 @@ DEFAULT_UNIQUE_ID = "7c009ef6829f"
 
 async def select_menu_item(
     hass: HomeAssistant,
-    menu_item: Steps,
-    next_step_id: Steps | None = None,
+    menu_item: Step,
+    next_step_id: Step | None = None,
 ) -> FlowResult:
     """Select a sensor type from the menu"""
     result = await hass.config_entries.flow.async_init(
@@ -54,7 +54,7 @@ async def select_menu_item(
         {"next_step_id": menu_item},
     )
 
-    if menu_item == Steps.MENU_GROUP:
+    if menu_item == Step.MENU_GROUP:
         assert result["type"] == data_entry_flow.FlowResultType.MENU
     else:
         assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -73,7 +73,7 @@ async def select_menu_item(
 async def initialize_options_flow(
     hass: HomeAssistant,
     entry: config_entries.ConfigEntry,
-    selected_menu_item: Steps,
+    selected_menu_item: Step,
 ) -> FlowResult:
     if entry.state != config_entries.ConfigEntryState.LOADED:
         await hass.config_entries.async_setup(entry.entry_id)
@@ -84,7 +84,7 @@ async def initialize_options_flow(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.MENU
-    assert result["step_id"] == Steps.INIT
+    assert result["step_id"] == Step.INIT
     assert selected_menu_item in result["menu_options"]
 
     return await hass.config_entries.options.async_configure(
@@ -159,7 +159,7 @@ async def goto_virtual_power_strategy_step(
     elif CONF_MODE not in user_input:
         user_input[CONF_MODE] = strategy
 
-    result = await select_menu_item(hass, Steps.VIRTUAL_POWER)
+    result = await select_menu_item(hass, Step.VIRTUAL_POWER)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input,

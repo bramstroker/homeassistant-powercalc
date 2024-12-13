@@ -10,7 +10,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DAILY_FIXED_ENERGY,
@@ -31,7 +31,7 @@ from tests.config_flow.common import (
 
 
 async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
+    result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
     user_input = {CONF_NAME: "My daily energy sensor"}
     result = await hass.config_entries.flow.async_configure(
@@ -44,7 +44,7 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -
 
 
 async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
+    result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -83,7 +83,7 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.DAILY_ENERGY)
+    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
 
     user_input = {CONF_VALUE: 75, CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT}
     result = await hass.config_entries.options.async_configure(
@@ -97,7 +97,7 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
 
 
 async def test_on_time_option(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
+    result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -123,7 +123,7 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
 
 
 async def test_utility_meter_options(hass: HomeAssistant) -> None:
-    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
+    result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -146,7 +146,7 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
     config_entry: ConfigEntry = result["result"]
     assert config_entry.data[CONF_DAILY_FIXED_ENERGY][CONF_VALUE] == 10
 
-    result = await initialize_options_flow(hass, config_entry, Steps.UTILITY_METER_OPTIONS)
+    result = await initialize_options_flow(hass, config_entry, Step.UTILITY_METER_OPTIONS)
 
     user_input = {
         CONF_UTILITY_METER_TARIFFS: ["peak"],
@@ -171,7 +171,7 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await select_menu_item(hass, Steps.DAILY_ENERGY)
+    result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
     user_input = {
         CONF_NAME: "My daily energy sensor",
@@ -201,7 +201,7 @@ async def test_can_set_basic_options(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_CREATE_UTILITY_METERS: True},
@@ -211,7 +211,7 @@ async def test_can_set_basic_options(hass: HomeAssistant) -> None:
     assert entry.data[CONF_CREATE_UTILITY_METERS]
 
     # Make sure the value is not overwritten when using other option dialog
-    result = await initialize_options_flow(hass, entry, Steps.DAILY_ENERGY)
+    result = await initialize_options_flow(hass, entry, Step.DAILY_ENERGY)
     await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_VALUE: 75},

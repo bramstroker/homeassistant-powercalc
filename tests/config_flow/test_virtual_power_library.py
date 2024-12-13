@@ -6,7 +6,7 @@ from homeassistant.helpers.selector import SelectSelector
 
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
-    Steps,
+    Step,
 )
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
@@ -40,9 +40,9 @@ async def test_manually_setup_from_library(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    result = await select_menu_item(hass, Steps.MENU_LIBRARY)
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.VIRTUAL_POWER
+    assert result["step_id"] == Step.VIRTUAL_POWER
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -50,7 +50,7 @@ async def test_manually_setup_from_library(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.LIBRARY
+    assert result["step_id"] == Step.LIBRARY
 
     result = await set_virtual_power_configuration(
         hass,
@@ -73,9 +73,9 @@ async def test_manual_setup_from_library_skips_to_manufacturer_step(
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
-    result = await select_menu_item(hass, Steps.MENU_LIBRARY)
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.VIRTUAL_POWER
+    assert result["step_id"] == Step.VIRTUAL_POWER
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -83,7 +83,7 @@ async def test_manual_setup_from_library_skips_to_manufacturer_step(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MANUFACTURER
+    assert result["step_id"] == Step.MANUFACTURER
 
 
 async def test_manufacturer_listing_is_filtered_by_entity_domain(
@@ -95,7 +95,7 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain(
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LUT)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MANUFACTURER
+    assert result["step_id"] == Step.MANUFACTURER
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
@@ -116,7 +116,7 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MANUFACTURER
+    assert result["step_id"] == Step.MANUFACTURER
     data_schema: vol.Schema = result["data_schema"]
     manufacturer_select: SelectSelector = data_schema.schema["manufacturer"]
     manufacturer_options = manufacturer_select.config["options"]
@@ -157,7 +157,7 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.LIBRARY_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
@@ -165,7 +165,7 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MANUFACTURER
+    assert result["step_id"] == Step.MANUFACTURER
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
@@ -173,7 +173,7 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.MODEL
+    assert result["step_id"] == Step.MODEL
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],

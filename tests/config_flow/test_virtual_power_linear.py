@@ -2,7 +2,7 @@ from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_LINEAR,
     CONF_MAX_POWER,
@@ -61,7 +61,7 @@ async def test_linear_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.LINEAR)
+    result = await initialize_options_flow(hass, entry, Step.LINEAR)
 
     user_input = {CONF_MAX_POWER: 50}
     result = await hass.config_entries.options.async_configure(
@@ -84,7 +84,7 @@ async def test_linear_options_flow_error(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.LINEAR)
+    result = await initialize_options_flow(hass, entry, Step.LINEAR)
 
     user_input = {CONF_MIN_POWER: 55, CONF_MAX_POWER: 50}
     result = await hass.config_entries.options.async_configure(

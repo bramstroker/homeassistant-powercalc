@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
-          "group": "Dodaj do grupy",
+          "group_custom": "Dodaj do grupy",
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Moment uruchomienia",
@@ -35,13 +35,13 @@
           "value_template": "Szablon wartości"
         },
         "data_description": {
-          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
+          "group_custom": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień = zawsze włączone",
           "update_frequency": "Czas w sekundach między aktualizacjami stanu sensora"
         },
         "title": "Utwórz dzienny czujnik stały"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Nazwa",
           "create_energy_sensor": "Utwórz czujnik energii",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Typy licznika mediów"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Obszar",
           "create_energy_sensor": "Utwórz czujnik energii",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standardowa grupa",
-          "domain_group": "Grupa oparta na domenie"
+          "group_custom": "Standardowa grupa",
+          "group_domain": "Grupa oparta na domenie"
         },
         "title": "Wybierz typ grupy",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -255,7 +255,7 @@
         "description": "Obecnie określone ustawienia można konfigurować wyłącznie globalnie",
         "title": "Utwórz sensor energii dla istniejącego sensora mocy"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Utwórz czujnik energii",
           "create_utility_meters": "Utwórz liczniki mediów",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Dzienna energia",
-          "group": "Grupa",
+          "group_custom": "Grupa",
           "menu_library": "Moc wirtualna (biblioteka)",
           "real_power": "Energia z rzeczywistego sensora mocy",
           "virtual_power": "Moc wirtualna (ręcznie)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Utwórz sensor energii",
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
           "entity_id": "Encja źródłowa",
-          "group": "Dodaj do grupy",
+          "group_custom": "Dodaj do grupy",
           "mode": "Strategia obliczeniowa",
           "name": "Nazwa",
           "standby_power": "Moc w trybie czuwania"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
           "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp.",
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
-          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
+          "group_custom": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
           "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)"
         },
@@ -477,7 +477,7 @@
           "utility_meter_types": "Typy licznika mediów"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Opcje grupy",
         "data": {
           "area": "Obszar",
@@ -507,12 +507,12 @@
           "basic_options": "Opcje podstawowe",
           "daily_energy": "Dzienne opcje energii",
           "fixed": "Opcje stałe",
-          "group": "Opcje grupy",
+          "group_custom": "Opcje grupy",
           "linear": "Opcje liniowe",
           "playbook": "Opcje playbook",
           "multi_switch": "Opcje wieloprzełącznika",
           "real_power": "Opcje rzeczywistej mocy",
-          "subtract_group": "Opcje grupy",
+          "group_subtract": "Opcje grupy",
           "utility_meter_options": "Opcje licznika mediów",
           "wled": "Opcje WLED"
         }
@@ -572,7 +572,7 @@
           "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Główny obiekt",
           "subtract_entities": "Odejmujące obiekty"

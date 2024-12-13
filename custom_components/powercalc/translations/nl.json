@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creëer utiliteit meters",
-          "group": "Aan groep toevoegen",
+          "group_custom": "Aan groep toevoegen",
           "name": "Naam",
           "on_time": "Tijd aan per dag",
           "start_time": "Begintijd",
@@ -35,13 +35,13 @@
           "value_template": "Waarde template"
         },
         "data_description": {
-          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "group_custom": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
           "update_frequency": "tijd in seconden tussen status updates van de sensor"
         },
         "title": "Maak een dagelijkse energieverbruik sensor"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Naam",
           "create_energy_sensor": "Creëer energie sensoren",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Nutsmeter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Ruimte",
           "create_energy_sensor": "Creëer energie sensoren",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standaard groep",
-          "domain_group": "Domein gebaseerde groep"
+          "group_custom": "Standaard groep",
+          "group_domain": "Domein gebaseerde groep"
         },
         "title": "Kies het type groep",
         "description": "Selecteer het type groepssensor dat je wilt aanmaken. Kies een domein gebaseerde groep als u alle entiteiten van een specifiek domein wilt groeperen of een sensor opsomming wilt maken van al uw energie sensoren."
@@ -255,7 +255,7 @@
         "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
         "title": "Maak een energiesensor voor een bestaande stroomsensor"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Dagelijkse energie",
-          "group": "Groep",
+          "group_custom": "Groep",
           "menu_library": "Virtueel vermogen (bibliotheek)",
           "real_power": "Energie gebaseerd op bestaande vermogen sensor",
           "virtual_power": "Virtueel vermogen (handmatig)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Bron entiteit",
-          "group": "Aan groep toevoegen",
+          "group_custom": "Aan groep toevoegen",
           "mode": "Calculatie strategie",
           "name": "Naam",
           "standby_power": "Stand-by vermogen"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
-          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "group_custom": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
           "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)"
         },
@@ -477,7 +477,7 @@
           "utility_meter_types": "Nutsmeter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Groep opties",
         "data": {
           "area": "Ruimte",
@@ -507,12 +507,12 @@
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
           "fixed": "Fixed opties",
-          "group": "Groep opties",
+          "group_custom": "Groep opties",
           "linear": "Lineaire opties",
           "playbook": "Playbook opties",
           "multi_switch": "Multi switch opties",
           "real_power": "Real power opties",
-          "subtract_group": "Groep opties",
+          "group_subtract": "Groep opties",
           "utility_meter_options": "Nutsmeter opties",
           "wled": "WLED opties"
         }
@@ -572,7 +572,7 @@
           "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Basis entiteit",
           "subtract_entities": "Entiteiten aftrekken"

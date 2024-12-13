@@ -4,7 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, async_setup_entry
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
+from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_LINEAR,
@@ -114,14 +114,14 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     flows = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     flow = flows[0]
 
-    assert flow["step_id"] == Steps.LIBRARY
+    assert flow["step_id"] == Step.LIBRARY
     result = await hass.config_entries.flow.async_configure(
         flow["flow_id"],
         {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
     # After confirming the manufacturer/model we must be directed to the linear config step
-    assert result["step_id"] == Steps.LINEAR
+    assert result["step_id"] == Step.LINEAR
     result = await hass.config_entries.flow.async_configure(
         flow["flow_id"],
         {CONF_MIN_POWER: 2, CONF_MAX_POWER: 50},
@@ -149,7 +149,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     assert hass.states.get(power_sensor_id).state == "0.30"
 
     # Change the power value via the options
-    result = await initialize_options_flow(hass, config_entry, Steps.LINEAR)
+    result = await initialize_options_flow(hass, config_entry, Step.LINEAR)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         user_input={CONF_MIN_POWER: 4, CONF_MAX_POWER: 40},

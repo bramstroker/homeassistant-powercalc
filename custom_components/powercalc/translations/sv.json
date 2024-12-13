@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Skapa bruksmätare",
-          "group": "Lägg till i grupp",
+          "group_custom": "Lägg till i grupp",
           "name": "Namn",
           "on_time": "Igång tid",
           "start_time": "Starttid",
@@ -35,13 +35,13 @@
           "value_template": "Värdesmall"
         },
         "data_description": {
-          "group": "Fyll i ett eget gruppnamn för att skapa en ny grupp",
+          "group_custom": "Fyll i ett eget gruppnamn för att skapa en ny grupp",
           "on_time": "Om lämnas tomt är standard 1 dag. Alltid på",
           "update_frequency": "Tid i sekunder mellan uppdatering av sensor"
         },
         "title": "Skapar en fast daglig sensor"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Namn",
           "create_energy_sensor": "Skapa energisensor",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Område",
           "create_energy_sensor": "Skapa energisensor",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standardgrupp",
-          "domain_group": "Domänbaserad grupp"
+          "group_custom": "Standardgrupp",
+          "group_domain": "Domänbaserad grupp"
         },
         "title": "Välj grupptyp",
         "description": "Välj vilken typ av gruppsensor du vill skapa. Välj domänbaserad grupp om du vill gruppera alla enheter i en specifik domän eller skapa en sensor som summerar all din energisensor. Välj standardgrupp annars"
@@ -255,7 +255,7 @@
         "description": "Nuvarande specifik inställning kan bara konfigureras globalt",
         "title": "Skapa en energisensor för en befintlig effektsensor"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Daglig energi",
-          "group": "Grupp",
+          "group_custom": "Grupp",
           "menu_library": "Virtuell effekt (bibliotek)",
           "real_power": "Energi från riktig effektsensor",
           "virtual_power": "Virtuell effekt (manuell)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
           "entity_id": "Källentitet",
-          "group": "Lägg till i grupp",
+          "group_custom": "Lägg till i grupp",
           "mode": "Beräkningsstrategi",
           "name": "Namn",
           "standby_power": "Standby effekt"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Ska powercalc skapa en kWh sensor",
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykel dag, timme etc.",
           "entity_id": "Entitet den virtuella effekten är baserad på, effektsensorn kommer lyssna på förändringar på denna entitet",
-          "group": "Fill in a custom group name to create a new group",
+          "group_custom": "Fill in a custom group name to create a new group",
           "name": "Lämnas tom kommer namn tas från källentiteten",
           "standby_power": "Ange effekten som enheten förbrukar i avstängt läge"
         },
@@ -477,7 +477,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Group options",
         "data": {
           "area": "Område",
@@ -507,12 +507,12 @@
           "basic_options": "Grundläggande inställningar",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
-          "group": "Group options",
+          "group_custom": "Group options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "subtract_group": "Group options",
+          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED alternativ"
         }
@@ -572,7 +572,7 @@
           "device": "Add the created energy sensor to an specific device"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Basentiteten",
           "subtract_entities": "Subtract entities"
