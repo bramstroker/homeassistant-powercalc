@@ -41,7 +41,7 @@
         },
         "title": "Create a daily fixed sensor"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Name",
           "create_energy_sensor": "Create energy sensor",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Area",
           "create_energy_sensor": "Create energy sensor",
@@ -184,8 +184,9 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standard group",
-          "domain_group": "Domain based group"
+          "group_custom": "Standard",
+          "group_domain": "Domain based",
+          "group_subtract": "Subtract"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
@@ -255,7 +256,7 @@
         "description": "Currently specific settings can only be configured globally",
         "title": "Create an energy sensor for an existing power sensor"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
@@ -294,7 +295,9 @@
         },
         "menu_options": {
           "daily_energy": "Daily energy",
-          "group": "Group",
+          "group": "group",
+          "global_configuration": "Global configuration",
+          "menu_group": "Group",
           "menu_library": "Virtual power (library)",
           "real_power": "Energy from real power sensor",
           "virtual_power": "Virtual power (manual)"
@@ -477,7 +480,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Group options",
         "data": {
           "area": "Area",
@@ -512,7 +515,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "subtract_group": "Group options",
+          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -572,7 +575,7 @@
           "device": "Add the created energy sensor to an specific device"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Base entity",
           "subtract_entities": "Subtract entities"

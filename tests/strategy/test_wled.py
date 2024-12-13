@@ -17,7 +17,7 @@ from pytest_homeassistant_custom_component.common import (
 
 import custom_components.test.sensor as test_sensor_platform
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_POWER_FACTOR,
     CONF_VOLTAGE,
@@ -198,7 +198,7 @@ async def test_wled_autodiscovery_flow(hass: HomeAssistant, caplog: pytest.LogCa
     flow = flows[0]
     context = flow["context"]
     assert context["source"] == SOURCE_INTEGRATION_DISCOVERY
-    assert flow["step_id"] == Steps.WLED
+    assert flow["step_id"] == Step.WLED
 
     result = await hass.config_entries.flow.async_configure(
         flow["flow_id"],

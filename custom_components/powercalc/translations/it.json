@@ -41,7 +41,7 @@
         },
         "title": "Crea un sensore fisso giornaliero"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Nome",
           "create_energy_sensor": "Crea report energetico",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Area",
           "create_energy_sensor": "Crea sensore di energia",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Gruppo standard",
-          "domain_group": "Domain based group"
+          "group_custom": "Gruppo standard",
+          "group_domain": "Domain based group"
         },
         "title": "Scegli il tipo di gruppo",
         "description": "Seleziona il tipo di sensore di gruppo che vuoi creare. Scegliere un gruppo basato sul dominio se si desidera raggruppare tutte le entità di un dominio specifico, o creare un sensore che sommi tutti i sensori di energia. Scegli il gruppo standard altrimenti"
@@ -255,7 +255,7 @@
         "description": "Currently specific settings can only be configured globally",
         "title": "Crea un sensore di energia per un sensore di potenza esistente"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Crea sensore di energia",
           "create_utility_meters": "Crea contatori (utility meters)",
@@ -477,7 +477,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Opzioni gruppo",
         "data": {
           "area": "Area",
@@ -512,7 +512,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "subtract_group": "Group options",
+          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -572,7 +572,7 @@
           "device": "Aggiungi il sensore di energia creato a un dispositivo specifico"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Base entity",
           "subtract_entities": "Subtract entities"

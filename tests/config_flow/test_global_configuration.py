@@ -9,7 +9,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_DOMAIN_GROUPS,
     CONF_CREATE_ENERGY_SENSORS,
@@ -64,7 +64,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     """Test full configuration flow."""
     await run_powercalc_setup(hass, {}, {})
 
-    result = await select_menu_item(hass, Steps.GLOBAL_CONFIGURATION)
+    result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -78,7 +78,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.GLOBAL_CONFIGURATION_ENERGY
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_ENERGY
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -88,7 +88,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.GLOBAL_CONFIGURATION_UTILITY_METER
+    assert result["step_id"] == Step.GLOBAL_CONFIGURATION_UTILITY_METER
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -134,15 +134,15 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize(
     "user_input,expected_step",
     [
-        ({CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: True}, Steps.GLOBAL_CONFIGURATION_UTILITY_METER),
-        ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: True}, Steps.GLOBAL_CONFIGURATION_ENERGY),
-        ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: False}, Steps.GLOBAL_CONFIGURATION_ENERGY),
+        ({CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: True}, Step.GLOBAL_CONFIGURATION_UTILITY_METER),
+        ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: True}, Step.GLOBAL_CONFIGURATION_ENERGY),
+        ({CONF_CREATE_ENERGY_SENSORS: True, CONF_CREATE_UTILITY_METERS: False}, Step.GLOBAL_CONFIGURATION_ENERGY),
         ({CONF_CREATE_ENERGY_SENSORS: False, CONF_CREATE_UTILITY_METERS: False}, None),
     ],
 )
-async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_input: dict[str, Any], expected_step: Steps | None) -> None:
+async def test_energy_and_utility_options_skipped(hass: HomeAssistant, user_input: dict[str, Any], expected_step: Step | None) -> None:
     """Test the energy and utility_meter options are only shown when relevant."""
-    result = await select_menu_item(hass, Steps.GLOBAL_CONFIGURATION)
+    result = await select_menu_item(hass, Step.GLOBAL_CONFIGURATION)
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -165,7 +165,7 @@ async def test_initialize_options_succeeds_with_yaml_sensors_in_config(hass: Hom
 
     await run_powercalc_setup(hass, get_simple_fixed_config("input_boolean.test", 50), {})
 
-    result = await initialize_options_flow(hass, entry, Steps.GLOBAL_CONFIGURATION)
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
 
@@ -180,7 +180,7 @@ async def test_global_configuration_can_only_be_configured_once(hass: HomeAssist
         DOMAIN,
         context={"source": config_entries.SOURCE_USER},
     )
-    assert Steps.GLOBAL_CONFIGURATION not in result["menu_options"]
+    assert Step.GLOBAL_CONFIGURATION not in result["menu_options"]
 
 
 async def test_basic_options_flow(hass: HomeAssistant) -> None:
@@ -190,7 +190,7 @@ async def test_basic_options_flow(hass: HomeAssistant) -> None:
         {},
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.GLOBAL_CONFIGURATION)
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION)
 
     user_input = {
         CONF_POWER_SENSOR_PRECISION: 4,
@@ -236,7 +236,7 @@ async def test_energy_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.GLOBAL_CONFIGURATION_ENERGY)
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_ENERGY)
 
     user_input = {
         CONF_ENERGY_INTEGRATION_METHOD: ENERGY_INTEGRATION_METHOD_TRAPEZODIAL,
@@ -266,7 +266,7 @@ async def test_utility_meter_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.GLOBAL_CONFIGURATION_UTILITY_METER)
+    result = await initialize_options_flow(hass, entry, Step.GLOBAL_CONFIGURATION_UTILITY_METER)
 
     user_input = {
         CONF_UTILITY_METER_TYPES: [DAILY],
@@ -328,7 +328,7 @@ async def test_entities_are_reloaded_reflecting_changes(hass: HomeAssistant) -> 
 
     assert hass.states.get("sensor.test_power").state == "50.00"
 
-    result = await initialize_options_flow(hass, global_config_entry, Steps.GLOBAL_CONFIGURATION)
+    result = await initialize_options_flow(hass, global_config_entry, Step.GLOBAL_CONFIGURATION)
 
     user_input = {
         CONF_POWER_SENSOR_PRECISION: 4,

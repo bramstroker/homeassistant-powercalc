@@ -41,7 +41,7 @@
         },
         "title": "Vytvorte denný pevný snímač"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Name",
           "create_energy_sensor": "Create energy sensor",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Oblasť",
           "create_energy_sensor": "Vytvoriť snímač energie",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standard group",
-          "domain_group": "Domain based group"
+          "group_custom": "Standard group",
+          "group_domain": "Domain based group"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -255,7 +255,7 @@
         "description": "V súčasnosti možno špecifické nastavenia konfigurovať len globálne",
         "title": "Vytvorenie snímača energie pre existujúci snímač energie"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Create energy sensor",
           "create_utility_meters": "Create utility meters",
@@ -477,7 +477,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Group options",
         "data": {
           "area": "Oblasť",
@@ -512,7 +512,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "subtract_group": "Group options",
+          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -572,7 +572,7 @@
           "device": "Add the created energy sensor to an specific device"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Base entity",
           "subtract_entities": "Subtract entities"

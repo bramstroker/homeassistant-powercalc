@@ -8,7 +8,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.config_flow import Steps
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -25,7 +25,7 @@ from tests.config_flow.common import (
 
 async def test_subtract_group_flow(hass: HomeAssistant) -> None:
     """Test the subtract group flow."""
-    result = await select_menu_item(hass, Steps.MENU_GROUP, Steps.SUBTRACT_GROUP)
+    result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_SUBTRACT)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     user_input = {
@@ -59,9 +59,9 @@ async def test_subtract_group_flow(hass: HomeAssistant) -> None:
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.MENU
-    assert Steps.BASIC_OPTIONS in result["menu_options"]
-    assert Steps.GROUP not in result["menu_options"]
-    assert Steps.UTILITY_METER_OPTIONS not in result["menu_options"]
+    assert Step.BASIC_OPTIONS in result["menu_options"]
+    assert Step.GROUP_CUSTOM not in result["menu_options"]
+    assert Step.UTILITY_METER_OPTIONS not in result["menu_options"]
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:
@@ -76,7 +76,7 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.SUBTRACT_GROUP)
+    result = await initialize_options_flow(hass, entry, Step.GROUP_SUBTRACT)
 
     user_input = {
         CONF_ENTITY_ID: "sensor.outlet2",

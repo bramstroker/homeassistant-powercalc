@@ -41,7 +41,7 @@
         },
         "title": "Utwórz dzienny czujnik stały"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Nazwa",
           "create_energy_sensor": "Utwórz czujnik energii",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Typy licznika mediów"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Obszar",
           "create_energy_sensor": "Utwórz czujnik energii",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standardowa grupa",
-          "domain_group": "Grupa oparta na domenie"
+          "group_custom": "Standardowa grupa",
+          "group_domain": "Grupa oparta na domenie"
         },
         "title": "Wybierz typ grupy",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -255,7 +255,7 @@
         "description": "Obecnie określone ustawienia można konfigurować wyłącznie globalnie",
         "title": "Utwórz sensor energii dla istniejącego sensora mocy"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Utwórz czujnik energii",
           "create_utility_meters": "Utwórz liczniki mediów",
@@ -477,7 +477,7 @@
           "utility_meter_types": "Typy licznika mediów"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Opcje grupy",
         "data": {
           "area": "Obszar",
@@ -512,7 +512,7 @@
           "playbook": "Opcje playbook",
           "multi_switch": "Opcje wieloprzełącznika",
           "real_power": "Opcje rzeczywistej mocy",
-          "subtract_group": "Opcje grupy",
+          "group_subtract": "Opcje grupy",
           "utility_meter_options": "Opcje licznika mediów",
           "wled": "Opcje WLED"
         }
@@ -572,7 +572,7 @@
           "device": "Dodaj utworzony czujnik energii do konkretnego urządzenia"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Główny obiekt",
           "subtract_entities": "Odejmujące obiekty"

@@ -6,7 +6,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.common import create_source_entity
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Steps
+from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_MANUFACTURER,
@@ -90,7 +90,7 @@ async def test_discovery_flow_with_subprofile_selection(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Steps.SUB_PROFILE
+    assert result["step_id"] == Step.SUB_PROFILE
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {CONF_SUB_PROFILE: "length_6"},
@@ -125,7 +125,7 @@ async def test_discovery_flow_multi_profiles(
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 
-    assert result["step_id"] == Steps.LIBRARY_MULTI_PROFILE
+    assert result["step_id"] == Step.LIBRARY_MULTI_PROFILE
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     data_schema: vol.Schema = result["data_schema"]
@@ -166,7 +166,7 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
         config_entries.SOURCE_INTEGRATION_DISCOVERY,
     )
 
-    result = await initialize_options_flow(hass, entry, Steps.BASIC_OPTIONS)
+    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     user_input = {CONF_CREATE_ENERGY_SENSOR: False}

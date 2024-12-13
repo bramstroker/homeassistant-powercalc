@@ -41,7 +41,7 @@
         },
         "title": "Skapar en fast daglig sensor"
       },
-      "domain_group": {
+      "group_domain": {
         "data": {
           "name": "Namn",
           "create_energy_sensor": "Skapa energisensor",
@@ -109,7 +109,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "data": {
           "area": "Område",
           "create_energy_sensor": "Skapa energisensor",
@@ -184,8 +184,8 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standardgrupp",
-          "domain_group": "Domänbaserad grupp"
+          "group_custom": "Standardgrupp",
+          "group_domain": "Domänbaserad grupp"
         },
         "title": "Välj grupptyp",
         "description": "Välj vilken typ av gruppsensor du vill skapa. Välj domänbaserad grupp om du vill gruppera alla enheter i en specifik domän eller skapa en sensor som summerar all din energisensor. Välj standardgrupp annars"
@@ -255,7 +255,7 @@
         "description": "Nuvarande specifik inställning kan bara konfigureras globalt",
         "title": "Skapa en energisensor för en befintlig effektsensor"
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
@@ -477,7 +477,7 @@
           "utility_meter_types": "Utility meter types"
         }
       },
-      "group": {
+      "group_custom": {
         "title": "Group options",
         "data": {
           "area": "Område",
@@ -512,7 +512,7 @@
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "subtract_group": "Group options",
+          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED alternativ"
         }
@@ -572,7 +572,7 @@
           "device": "Add the created energy sensor to an specific device"
         }
       },
-      "subtract_group": {
+      "group_subtract": {
         "data": {
           "entity_id": "Basentiteten",
           "subtract_entities": "Subtract entities"
