@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creëer utiliteit meters",
-          "group_custom": "Aan groep toevoegen",
+          "group": "Aan groep toevoegen",
           "name": "Naam",
           "on_time": "Tijd aan per dag",
           "start_time": "Begintijd",
@@ -35,7 +35,7 @@
           "value_template": "Waarde template"
         },
         "data_description": {
-          "group_custom": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
           "update_frequency": "tijd in seconden tussen status updates van de sensor"
         },
@@ -184,7 +184,7 @@
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Standaard groep",
+          "group": "Standaard groep",
           "group_domain": "Domein gebaseerde groep"
         },
         "title": "Kies het type groep",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Dagelijkse energie",
-          "group_custom": "Groep",
+          "group": "Groep",
           "menu_library": "Virtueel vermogen (bibliotheek)",
           "real_power": "Energie gebaseerd op bestaande vermogen sensor",
           "virtual_power": "Virtueel vermogen (handmatig)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Bron entiteit",
-          "group_custom": "Aan groep toevoegen",
+          "group": "Aan groep toevoegen",
           "mode": "Calculatie strategie",
           "name": "Naam",
           "standby_power": "Stand-by vermogen"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
-          "group_custom": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
+          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
           "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)"
         },
@@ -507,7 +507,7 @@
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
           "fixed": "Fixed opties",
-          "group_custom": "Groep opties",
+          "group": "Groep opties",
           "linear": "Lineaire opties",
           "playbook": "Playbook opties",
           "multi_switch": "Multi switch opties",

@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crea contatori (utility meters)",
-          "group_custom": "Aggiungi al gruppo",
+          "group": "Aggiungi al gruppo",
           "name": "Nome",
           "on_time": "On time",
           "start_time": "Orario d'inizio",
@@ -35,7 +35,7 @@
           "value_template": "Value template"
         },
         "data_description": {
-          "group_custom": "Inserisci un nome personalizzato per creare un nuovo gruppo",
+          "group": "Inserisci un nome personalizzato per creare un nuovo gruppo",
           "on_time": "Quando lasciato vuoto predefinito a 1 giorno. Sempre acceso",
           "update_frequency": "tempo in secondi tra gli aggiornamenti di stato del sensore"
         },
@@ -184,7 +184,7 @@
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Gruppo standard",
+          "group": "Gruppo standard",
           "group_domain": "Domain based group"
         },
         "title": "Scegli il tipo di gruppo",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Energia giornaliera",
-          "group_custom": "Gruppo",
+          "group": "Gruppo",
           "menu_library": "Virtual power (library)",
           "real_power": "Energia da sensore di potenza reale",
           "virtual_power": "Potenza virtuale (manuale)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Crea sensore di energia",
           "create_utility_meters": "Crea contatori (utility meters)",
           "entity_id": "Source entity",
-          "group_custom": "Aggiungi al gruppo",
+          "group": "Aggiungi al gruppo",
           "mode": "Calculation strategy",
           "name": "Nome",
           "standby_power": "Potenza in standby"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "group_custom": "Fill in a custom group name to create a new group",
+          "group": "Fill in a custom group name to create a new group",
           "name": "Lasciando vuoto prenderà il nome dal dispositivo di origine",
           "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF"
         },
@@ -507,7 +507,7 @@
           "basic_options": "Opzioni di base",
           "daily_energy": "Opzioni energetiche giornaliere",
           "fixed": "Fixed options",
-          "group_custom": "Opzioni del gruppo",
+          "group": "Opzioni del gruppo",
           "linear": "Opzioni lineari",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",

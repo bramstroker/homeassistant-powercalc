@@ -25,7 +25,7 @@
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creați contoare",
-          "group_custom": "Add to group",
+          "group": "Add to group",
           "name": "Nume",
           "on_time": "Timp pornit",
           "start_time": "Timpul de pornire",
@@ -35,7 +35,7 @@
           "value_template": "Șablon de valoare"
         },
         "data_description": {
-          "group_custom": "Fill in a custom group name to create a new group",
+          "group": "Fill in a custom group name to create a new group",
           "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
           "update_frequency": "timpul în secunde între actualizările stării senzorului"
         },
@@ -184,7 +184,7 @@
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Standard group",
+          "group": "Standard group",
           "group_domain": "Domain based group"
         },
         "title": "Choose the group type",
@@ -294,7 +294,7 @@
         },
         "menu_options": {
           "daily_energy": "Energie zilnică",
-          "group_custom": "Grup",
+          "group": "Grup",
           "menu_library": "Putere virtuală (biblioteca)",
           "real_power": "Energie de la senzorul de putere reală",
           "virtual_power": "Putere virtuală (manual)"
@@ -320,7 +320,7 @@
           "create_energy_sensor": "Creați un senzor de energie",
           "create_utility_meters": "Creați contoare",
           "entity_id": "Entitatea sursă",
-          "group_custom": "Adăugați la grup",
+          "group": "Adăugați la grup",
           "mode": "Strategia de calcul",
           "name": "Nume",
           "standby_power": "Putere in Standby"
@@ -329,7 +329,7 @@
           "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
           "create_utility_meters": "Lăsați powercalc să creeze contoare, cu ciclu zilnic, pe oră etc.",
           "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
-          "group_custom": "Fill in a custom group name to create a new group",
+          "group": "Fill in a custom group name to create a new group",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
           "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT"
         },
@@ -507,7 +507,7 @@
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
-          "group_custom": "Group options",
+          "group": "Group options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",

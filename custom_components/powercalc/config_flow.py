@@ -6,10 +6,11 @@ import copy
 import logging
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from datetime import timedelta
 from enum import StrEnum
-from typing import Any, Callable, Coroutine, cast
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.components.sensor import SensorDeviceClass
@@ -32,7 +33,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
-from homeassistant.helpers.schema_config_entry_flow import SchemaCommonFlowHandler, SchemaFlowError, SchemaFlowFormStep
+from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .common import SourceEntity, create_source_entity
@@ -66,17 +67,14 @@ from .const import (
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
     CONF_MODEL,
-    CONF_MULTI_SWITCH,
     CONF_MULTIPLY_FACTOR,
     CONF_MULTIPLY_FACTOR_STANDBY,
     CONF_ON_TIME,
-    CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_OFF,
@@ -103,7 +101,6 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
-    CONF_WLED,
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
@@ -526,12 +523,11 @@ GROUP_SCHEMAS = {
 
 
 @dataclass(slots=True)
-class PowercalcFormStep(SchemaFlowFormStep):
+class PowercalcFormStep:
     schema: (
         vol.Schema
         | Callable[[], Coroutine[Any, Any, vol.Schema | None]]
-        | None
-    ) = None
+    )
 
     validate_user_input: (
         Callable[
@@ -579,7 +575,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             await strategy.validate_config()
         except StrategyConfigurationError as error:
             _LOGGER.error(str(error))
-            raise SchemaFlowError(error.get_config_flow_translate_key() or "unknown")
+            raise SchemaFlowError(error.get_config_flow_translate_key() or "unknown") from error
 
     @staticmethod
     def validate_group_input(user_input: dict[str, Any] | None = None) -> None:
@@ -592,7 +588,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             CONF_AREA,
         }
 
-        if not any(key in user_input or {} for key in required_keys):
+        if not any(key in (user_input or {}) for key in required_keys):
             raise SchemaFlowError("group_mandatory")
 
     def create_strategy_schema(self, strategy: CalculationStrategy, source_entity_id: str) -> vol.Schema:
@@ -839,7 +835,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                     return await self.async_step_utility_meter_options()
                 return self.persist_config_entry()
 
-            return await getattr(self, f"async_step_{form_step.next_step}")()
+            return await getattr(self, f"async_step_{form_step.next_step}")()  # type: ignore
 
         return await self._show_form(form_step)
 
@@ -861,9 +857,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             **(form_step.form_kwarg or {}),
         )
 
-    async def _get_schema(self, form_step: PowercalcFormStep) -> vol.Schema | None:
-        if form_step.schema is None:
-            return None
+    async def _get_schema(self, form_step: PowercalcFormStep) -> vol.Schema:
         if isinstance(form_step.schema, vol.Schema):
             return form_step.schema
         return await form_step.schema()
@@ -985,10 +979,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     ) -> FlowResult:
         """Handle the flow for sub profile selection."""
 
-        async def _validate(input: dict[str, Any]) -> dict[str, str]:
-            input[CONF_MODEL] = f"{self.sensor_config.get(CONF_MODEL)}/{input.get(CONF_SUB_PROFILE)}"
-            del input[CONF_SUB_PROFILE]
-            return user_input
+        async def _validate(user_input: dict[str, Any]) -> dict[str, str]:
+            return {CONF_MODEL: f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"}
 
         async def _create_schema(
             model_info: ModelInfo,
@@ -1076,7 +1068,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 next_step=Step.POWER_ADVANCED,
                 form_kwarg={"description_placeholders": {"self_usage_power": str(self_usage_on)}},
             ),
-            user_input
+            user_input,
         )
 
     async def handle_strategy_step(
@@ -1091,7 +1083,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             await self.validate_strategy_config({strategy: user_input})
             return {strategy: user_input}
 
-        schema = self.create_strategy_schema(strategy, self.source_entity_id)
+        schema = self.create_strategy_schema(strategy, self.source_entity_id)  # type: ignore
 
         return await self.handle_form_step(
             PowercalcFormStep(
@@ -1130,8 +1122,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     ) -> FlowResult:
         """Handle the flow for playbook sensor."""
 
-        def _validate(user_input):
-            if user_input.get(CONF_PLAYBOOKS) is None or len(user_input.get(CONF_PLAYBOOKS)) == 0:
+        def _validate(user_input: dict[str, Any]) -> None:
+            if user_input.get(CONF_PLAYBOOKS) is None or len(user_input.get(CONF_PLAYBOOKS)) == 0:  # type: ignore
                 raise SchemaFlowError("playbook_mandatory")
 
         return await self.handle_strategy_step(CalculationStrategy.PLAYBOOK, user_input, _validate)
@@ -1139,7 +1131,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     async def async_step_wled(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> ConfigFlowResult:
+    ) -> FlowResult:
         """Handle the flow for WLED sensor."""
         return await self.handle_strategy_step(CalculationStrategy.WLED, user_input)
 
@@ -1364,13 +1356,13 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle the flow for daily energy sensor."""
         self.selected_sensor_type = SensorType.DAILY_ENERGY
 
-        schema = SCHEMA_DAILY_ENERGY.extend(  # type: ignore
+        schema = SCHEMA_DAILY_ENERGY.extend(
             {
                 vol.Optional(CONF_GROUP): self.create_group_selector(),
             },
         )
 
-        async def _validate(user_input):
+        async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             if CONF_VALUE not in user_input and CONF_VALUE_TEMPLATE not in user_input:
                 raise SchemaFlowError("daily_energy_mandatory")
             return self.build_daily_energy_config(user_input, schema)
@@ -1380,9 +1372,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 step=Step.DAILY_ENERGY,
                 schema=schema,
                 validate_user_input=_validate,
-                continue_utility_meter_options_step=True
+                continue_utility_meter_options_step=True,
             ),
-            user_input
+            user_input,
         )
 
     async def async_step_menu_group(
@@ -1419,9 +1411,9 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 step=GROUP_STEP_MAPPING[group_type],
                 schema=schema or GROUP_SCHEMAS[group_type],
                 validate_user_input=_validate,
-                continue_utility_meter_options_step=True
+                continue_utility_meter_options_step=True,
             ),
-            user_input
+            user_input,
         )
 
     async def async_step_group_custom(
