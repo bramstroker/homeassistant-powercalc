@@ -296,6 +296,8 @@
         "menu_options": {
           "daily_energy": "Daily energy",
           "group": "group",
+          "global_configuration": "Global configuration",
+          "menu_group": "Group",
           "menu_library": "Virtual power (library)",
           "real_power": "Energy from real power sensor",
           "virtual_power": "Virtual power (manual)"

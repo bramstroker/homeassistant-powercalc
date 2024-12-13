@@ -162,27 +162,27 @@ class Step(StrEnum):
     GLOBAL_CONFIGURATION_UTILITY_METER = "global_configuration_utility_meter"
 
 
-MENU_SENSOR_TYPE = {
-    Step.VIRTUAL_POWER: "Virtual power (manual)",
-    Step.MENU_LIBRARY: "Virtual power (library)",
-    Step.MENU_GROUP: "Group",
-    Step.DAILY_ENERGY: "Daily energy",
-    Step.REAL_POWER: "Energy from real power sensor",
-}
+MENU_SENSOR_TYPE = [
+    Step.VIRTUAL_POWER,
+    Step.MENU_LIBRARY,
+    Step.MENU_GROUP,
+    Step.DAILY_ENERGY,
+    Step.REAL_POWER,
+]
 
-MENU_GROUP = {
-    Step.GROUP_CUSTOM: "Standard group",
-    Step.GROUP_DOMAIN: "Domain based group",
-    Step.GROUP_SUBTRACT: "Subtract group",
-}
+MENU_GROUP = [
+    Step.GROUP_CUSTOM,
+    Step.GROUP_DOMAIN,
+    Step.GROUP_SUBTRACT,
+]
 
-MENU_OPTIONS = {
-    Step.FIXED: "Fixed options",
-    Step.LINEAR: "Linear options",
-    Step.MULTI_SWITCH: "Multi switch options",
-    Step.PLAYBOOK: "Playbook options",
-    Step.WLED: "WLED options",
-}
+MENU_OPTIONS = [
+    Step.FIXED,
+    Step.LINEAR,
+    Step.MULTI_SWITCH,
+    Step.PLAYBOOK,
+    Step.WLED,
+]
 
 LIBRARY_URL = "https://library.powercalc.nl"
 
@@ -1252,14 +1252,13 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle the initial step."""
 
-        menu = MENU_SENSOR_TYPE
-
         global_config_entry = self.hass.config_entries.async_entry_for_domain_unique_id(
             DOMAIN,
             ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
         )
+        menu = MENU_SENSOR_TYPE.copy()
         if not global_config_entry:
-            menu = {Step.GLOBAL_CONFIGURATION: "Global configuration", **menu}
+            menu.insert(0, Step.GLOBAL_CONFIGURATION)
 
         await self.async_set_unique_id(str(uuid.uuid4()))
 
@@ -1602,31 +1601,29 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu[Step.GLOBAL_CONFIGURATION_UTILITY_METER] = "Utility meter options"
         return menu
 
-    def build_menu(self) -> dict[Step, str]:
+    def build_menu(self) -> list[Step]:
         """Build the options menu."""
-        menu = {
-            Step.BASIC_OPTIONS: "Basic options",
-        }
+        menu = [Step.BASIC_OPTIONS]
         if self.sensor_type == SensorType.VIRTUAL_POWER:
             if self.strategy and self.strategy != CalculationStrategy.LUT:
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
-                menu[strategy_step] = MENU_OPTIONS[strategy_step]
+                menu.append(strategy_step)
             if self.selected_profile:
-                menu[Step.LIBRARY_OPTIONS] = "Library options"
-            menu[Step.ADVANCED_OPTIONS] = "Advanced options"
+                menu.append(Step.LIBRARY_OPTIONS)
+            menu.append(Step.ADVANCED_OPTIONS)
         if self.sensor_type == SensorType.DAILY_ENERGY:
-            menu[Step.DAILY_ENERGY] = "Daily energy options"
+            menu.append(Step.DAILY_ENERGY)
         if self.sensor_type == SensorType.REAL_POWER:
-            menu[Step.REAL_POWER] = "Real power options"
+            menu.append(Step.REAL_POWER)
         if self.sensor_type == SensorType.GROUP:
             group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
             if group_type == GroupType.CUSTOM:
-                menu[Step.GROUP_CUSTOM] = "Group options"
+                menu.append(Step.GROUP_CUSTOM)
             if group_type == GroupType.SUBTRACT:
-                menu[Step.GROUP_SUBTRACT] = "Group options"
+                menu.append(Step.GROUP_SUBTRACT)
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
-            menu[Step.UTILITY_METER_OPTIONS] = "Utility meter options"
+            menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
 
