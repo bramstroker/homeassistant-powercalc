@@ -6,11 +6,13 @@ import copy
 import logging
 import uuid
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import timedelta
 from enum import StrEnum
-from typing import Any, cast
+from typing import Any, Callable, Coroutine, cast
 
 import voluptuous as vol
+from homeassistant.components.random.config_flow import validate_user_input
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, ConfigFlow, ConfigFlowResult, OptionsFlow
@@ -30,7 +32,9 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import SchemaCommonFlowHandler, SchemaFlowError, SchemaFlowFormStep
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from .common import SourceEntity, create_source_entity
@@ -508,8 +512,15 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
     },
 )
 
+@dataclass(slots=True)
+class PowercalcFormStep(SchemaFlowFormStep):
+    step: Steps = None
 
-class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
+    extra_form_args: dict[str, Any] = None
+
+
+class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
+
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
@@ -526,13 +537,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def persist_config_entry(self) -> FlowResult:
         pass  # pragma: no cover
 
-    async def validate_strategy_config(self) -> dict:
+    async def validate_strategy_config(self, user_input: dict[str, Any] | None = None) -> None:
         """Validate the strategy config."""
         strategy_name = CalculationStrategy(
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
-        strategy = await factory.create(self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
+        strategy = await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         try:
             await strategy.validate_config()
         except StrategyConfigurationError as error:
@@ -540,8 +551,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             if translation is None:
                 translation = "unknown"
             _LOGGER.error(str(error))
-            return {"base": translation}
-        return {}
+            raise SchemaFlowError(translation)
+            #return {"base": translation}
+        #return {}
 
     @staticmethod
     def validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
@@ -876,23 +888,49 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             power += self_usage_on
         return {CONF_POWER: power}
 
+    async def handle_form_step(
+        self,
+        form_step: PowercalcFormStep,
+        user_input: dict[str, Any] | None = None,
+    ):
+        """Handle the current step."""
+        if user_input is not None:
+            if form_step.validate_user_input is not None:
+                try:
+                    user_input = await form_step.validate_user_input(self, user_input)
+                except SchemaFlowError as exc:
+                    return await self._show_form(form_step, exc)
+
+            self.sensor_config.update(user_input)
+            return await getattr(self, f"async_step_{form_step.next_step}")()
+
+        return await self._show_form(form_step)
+
+    async def _show_form(self, form_step: PowercalcFormStep, error: SchemaFlowError | None = None) -> ConfigFlowResult:
+        # Show form for next step
+        last_step = None
+        if not callable(form_step.next_step):
+            last_step = form_step.next_step is None
+
+        return self.async_show_form(
+            step_id=form_step.step,
+            data_schema=form_step.schema,
+            errors={"base": str(error)} if error else {},
+            last_step=last_step,
+        )
+
     async def async_step_manufacturer(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Ask the user to select the manufacturer."""
-        if user_input is not None:
-            self.sensor_config.update(
-                {CONF_MANUFACTURER: user_input.get(CONF_MANUFACTURER)},
-            )
-            return await self.async_step_model()
-
-        schema = await self.create_schema_manufacturer()
-        return self.async_show_form(
-            step_id=Steps.MANUFACTURER,
-            data_schema=schema,
-            errors={},
-            last_step=False,
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Steps.MANUFACTURER,
+                schema=await self.create_schema_manufacturer(),
+                next_step=Steps.MODEL,
+            ),
+            user_input,
         )
 
     async def async_step_model(
@@ -900,31 +938,30 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Ask the user to select the model."""
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_MODEL: user_input.get(CONF_MODEL)})
+
+        async def _validate(_, user_input: dict[str, Any]) -> dict[str, str]:
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(
                 ModelInfo(
                     str(self.sensor_config.get(CONF_MANUFACTURER)),
-                    str(self.sensor_config.get(CONF_MODEL)),
+                    str(user_input.get(CONF_MODEL)),
                 ),
             )
             self.selected_profile = profile
             if self.selected_profile and not await self.selected_profile.has_sub_profiles:
-                errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_post_library()
+                await self.validate_strategy_config()
+            return user_input
 
-        return self.async_show_form(
-            step_id=Steps.MODEL,
-            data_schema=await self.create_schema_model(),
-            description_placeholders={
-                "supported_models_link": LIBRARY_URL,
-            },
-            errors=errors,
-            last_step=False,
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Steps.MODEL,
+                schema=await self.create_schema_model(),
+                next_step="post_library",
+                validate_user_input=_validate
+            ),
+            user_input,
         )
+
 
     async def async_step_post_library(
         self,
@@ -960,21 +997,25 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the flow for sub profile selection."""
-        if user_input is not None:
-            # Append the sub profile to the model
-            model = f"{self.sensor_config.get(CONF_MODEL)}/{user_input.get(CONF_SUB_PROFILE)}"
-            self.sensor_config[CONF_MODEL] = model
-            return await self.async_step_power_advanced()
 
-        model_info = ModelInfo(
-            str(self.sensor_config.get(CONF_MANUFACTURER)),
-            str(self.sensor_config.get(CONF_MODEL)),
-        )
-        return self.async_show_form(
-            step_id=Steps.SUB_PROFILE,
-            data_schema=await self.create_schema_sub_profile(model_info),
-            errors={},
-            last_step=False,
+        async def _validate(_, input: dict[str, Any]) -> dict[str, str]:
+            input[CONF_MODEL] = f"{self.sensor_config.get(CONF_MODEL)}/{input.get(CONF_SUB_PROFILE)}"
+            del(input[CONF_SUB_PROFILE])
+            return user_input
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Steps.SUB_PROFILE,
+                schema=await self.create_schema_sub_profile(
+                    ModelInfo(
+                        str(self.sensor_config.get(CONF_MANUFACTURER)),
+                        str(self.sensor_config.get(CONF_MODEL)),
+                    ),
+                ),
+                next_step=Steps.POWER_ADVANCED,
+                validate_user_input=_validate,
+            ),
+            user_input
         )
 
     async def async_step_power_advanced(
@@ -1032,18 +1073,20 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the flow for fixed sensor."""
-        errors = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_FIXED: user_input})
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
 
-        return self.async_show_form(
-            step_id=Steps.FIXED,
-            data_schema=SCHEMA_POWER_FIXED,
-            errors=errors,
-            last_step=False,
+        async def validate(_, user_input):
+            user_input = {CONF_FIXED: user_input}
+            await self.validate_strategy_config(user_input)
+            return user_input
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Steps.FIXED,
+                schema=SCHEMA_POWER_FIXED,
+                next_step=Steps.POWER_ADVANCED,
+                validate_user_input=validate,
+            ),
+            user_input
         )
 
     async def async_step_linear(
@@ -1051,18 +1094,20 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the flow for linear sensor."""
-        errors = {}
-        if user_input is not None:
-            self.sensor_config.update({CONF_LINEAR: user_input})
-            errors = await self.validate_strategy_config()
-            if not errors:
-                return await self.async_step_power_advanced()
 
-        return self.async_show_form(
-            step_id=Steps.LINEAR,
-            data_schema=self.create_schema_linear(self.source_entity_id),  # type: ignore
-            errors=errors,
-            last_step=False,
+        async def validate(_, user_input):
+            user_input = {CONF_LINEAR: user_input}
+            await self.validate_strategy_config(user_input)
+            return user_input
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Steps.LINEAR,
+                schema=self.create_schema_linear(self.source_entity_id),
+                next_step=Steps.POWER_ADVANCED,
+                validate_user_input=validate,
+            ),
+            user_input
         )
 
     async def async_step_multi_switch(
@@ -1073,7 +1118,10 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         errors = {}
         if user_input is not None:
             self.sensor_config.update({CONF_MULTI_SWITCH: user_input})
-            errors = await self.validate_strategy_config()
+            try:
+                await self.validate_strategy_config()
+            except SchemaFlowError as exc:
+                errors["base"] = str(exc)
             if not errors:
                 return await self.async_step_power_advanced()
 
@@ -1438,7 +1486,10 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             self.sensor_config.update({CONF_WLED: user_input})
-            errors = await self.validate_strategy_config()
+            try:
+                await self.validate_strategy_config()
+            except SchemaFlowError as exc:
+                errors["base"] = str(exc)
             if not errors:
                 return cast(ConfigFlowResult, await self.async_step_power_advanced())
 
@@ -1833,7 +1884,10 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             if self.strategy != CalculationStrategy.LUT:
                 self.sensor_config.update({str(self.strategy): strategy_options})
 
-            return await self.validate_strategy_config()
+            try:
+                await self.validate_strategy_config()
+            except SchemaFlowError as exc:
+                return {"base": str(exc)}
 
         self._process_user_input(user_input, schema)
 
