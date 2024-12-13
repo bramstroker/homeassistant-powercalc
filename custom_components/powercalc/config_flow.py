@@ -9,10 +9,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import timedelta
 from enum import StrEnum
-from typing import Any, Callable, Coroutine, cast
+from typing import Any, cast
 
 import voluptuous as vol
-from homeassistant.components.random.config_flow import validate_user_input
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, ConfigFlow, ConfigFlowResult, OptionsFlow
@@ -32,7 +31,6 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaCommonFlowHandler, SchemaFlowError, SchemaFlowFormStep
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -512,6 +510,7 @@ SCHEMA_GLOBAL_CONFIGURATION_ENERGY_SENSOR = vol.Schema(
     },
 )
 
+
 @dataclass(slots=True)
 class PowercalcFormStep(SchemaFlowFormStep):
     step: Steps = None
@@ -520,7 +519,6 @@ class PowercalcFormStep(SchemaFlowFormStep):
 
 
 class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
-
     def __init__(self) -> None:
         """Initialize options flow."""
         self.sensor_config: ConfigType = {}
@@ -552,8 +550,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
                 translation = "unknown"
             _LOGGER.error(str(error))
             raise SchemaFlowError(translation)
-            #return {"base": translation}
-        #return {}
+            # return {"base": translation}
+        # return {}
 
     @staticmethod
     def validate_group_input(user_input: dict[str, Any] | None = None) -> dict:
@@ -957,11 +955,10 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
                 step=Steps.MODEL,
                 schema=await self.create_schema_model(),
                 next_step="post_library",
-                validate_user_input=_validate
+                validate_user_input=_validate,
             ),
             user_input,
         )
-
 
     async def async_step_post_library(
         self,
@@ -1000,7 +997,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
 
         async def _validate(_, input: dict[str, Any]) -> dict[str, str]:
             input[CONF_MODEL] = f"{self.sensor_config.get(CONF_MODEL)}/{input.get(CONF_SUB_PROFILE)}"
-            del(input[CONF_SUB_PROFILE])
+            del input[CONF_SUB_PROFILE]
             return user_input
 
         return await self.handle_form_step(
@@ -1015,7 +1012,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
                 next_step=Steps.POWER_ADVANCED,
                 validate_user_input=_validate,
             ),
-            user_input
+            user_input,
         )
 
     async def async_step_power_advanced(
@@ -1086,7 +1083,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
                 next_step=Steps.POWER_ADVANCED,
                 validate_user_input=validate,
             ),
-            user_input
+            user_input,
         )
 
     async def async_step_linear(
@@ -1107,7 +1104,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow, SchemaCommonFlowHandler):
                 next_step=Steps.POWER_ADVANCED,
                 validate_user_input=validate,
             ),
-            user_input
+            user_input,
         )
 
     async def async_step_multi_switch(
