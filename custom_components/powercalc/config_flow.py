@@ -524,10 +524,7 @@ GROUP_SCHEMAS = {
 
 @dataclass(slots=True)
 class PowercalcFormStep:
-    schema: (
-        vol.Schema
-        | Callable[[], Coroutine[Any, Any, vol.Schema | None]]
-    )
+    schema: vol.Schema | Callable[[], Coroutine[Any, Any, vol.Schema | None]]
 
     validate_user_input: (
         Callable[
@@ -569,8 +566,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             self.sensor_config.get(CONF_MODE) or self.selected_profile.calculation_strategy,  # type: ignore
         )
         factory = PowerCalculatorStrategyFactory(self.hass)
-        strategy = await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile,
-                                        self.source_entity)  # type: ignore
+        strategy = await factory.create(user_input or self.sensor_config, strategy_name, self.selected_profile, self.source_entity)  # type: ignore
         try:
             await strategy.validate_config()
         except StrategyConfigurationError as error:
@@ -622,8 +618,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             selector.SelectOptionDict(value=config_entry.entry_id, label=config_entry.title)
             for config_entry in self.hass.config_entries.async_entries(DOMAIN)
             if config_entry.data.get(CONF_SENSOR_TYPE) in [SensorType.VIRTUAL_POWER, SensorType.REAL_POWER]
-               and config_entry.unique_id is not None
-               and config_entry.title is not None
+            and config_entry.unique_id is not None
+            and config_entry.title is not None
         ]
         member_sensor_selector = selector.SelectSelector(
             selector.SelectSelectorConfig(
@@ -724,7 +720,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             )
             for config_entry in self.hass.config_entries.async_entries(DOMAIN)
             if config_entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP
-               and (current_entry is None or config_entry.entry_id != current_entry.entry_id)
+            and (current_entry is None or config_entry.entry_id != current_entry.entry_id)
         ]
 
         return selector.SelectSelector(
@@ -805,8 +801,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Get the fixed power config for smart switch."""
         if self.selected_profile is None:
             return {CONF_POWER: 0}  # pragma: no cover
-        self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER,
-                                                                    0) if self.selected_profile.fixed_mode_config else 0
+        self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER, 0) if self.selected_profile.fixed_mode_config else 0
         power = user_input.get(CONF_POWER, 0)
         self_usage_included = user_input.get(CONF_SELF_USAGE_INCLUDED, True)
         if self_usage_included:
@@ -877,8 +872,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             ]
             return vol.Schema(
                 {
-                    vol.Required(CONF_MANUFACTURER,
-                                 default=self.sensor_config.get(CONF_MANUFACTURER)): selector.SelectSelector(
+                    vol.Required(CONF_MANUFACTURER, default=self.sensor_config.get(CONF_MANUFACTURER)): selector.SelectSelector(
                         selector.SelectSelectorConfig(
                             options=manufacturers,
                             mode=selector.SelectSelectorMode.DROPDOWN,
@@ -988,8 +982,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create sub profile schema."""
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(model_info)
-            sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in
-                            await profile.get_sub_profiles()]
+            sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
             return vol.Schema(
                 {
                     vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
@@ -1168,8 +1161,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             errors={},
         )
 
-    async def async_step_global_configuration_utility_meter(self,
-                                                            user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_global_configuration_utility_meter(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
 
         if user_input is not None:
@@ -1314,8 +1306,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 user_input.get(CONF_MODE) or CalculationStrategy.LUT,
             )
             entity_id = user_input.get(CONF_ENTITY_ID)
-            if selected_strategy is not CalculationStrategy.PLAYBOOK and user_input.get(
-                CONF_NAME) is None and entity_id is None:
+            if selected_strategy is not CalculationStrategy.PLAYBOOK and user_input.get(CONF_NAME) is None and entity_id is None:
                 errors[CONF_ENTITY_ID] = "entity_mandatory"
 
             if not errors:
@@ -1765,8 +1756,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         schema = self.fill_schema_defaults(schema, merged_options)
         return await self.async_handle_options_step(user_input, schema, step)
 
-    async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema,
-                                        step: Step) -> FlowResult:
+    async def async_handle_options_step(self, user_input: dict[str, Any] | None, schema: vol.Schema, step: Step) -> FlowResult:
         """
         Generic handler for all the option steps.
         processes user input against the select schema.
@@ -1781,8 +1771,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def persist_config_entry(self) -> FlowResult:
         """Persist changed options on the config entry."""
-        data = (
-                   self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config) or self.sensor_config
+        data = (self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config) or self.sensor_config
 
         self.hass.config_entries.async_update_entry(
             self.config_entry,
