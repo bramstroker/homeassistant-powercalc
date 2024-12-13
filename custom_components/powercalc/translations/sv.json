@@ -185,7 +185,8 @@
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardgrupp",
-          "group_domain": "Domänbaserad grupp"
+          "group_domain": "Domänbaserad grupp",
+          "group_subtract": "Subtract"
         },
         "title": "Välj grupptyp",
         "description": "Välj vilken typ av gruppsensor du vill skapa. Välj domänbaserad grupp om du vill gruppera alla enheter i en specifik domän eller skapa en sensor som summerar all din energisensor. Välj standardgrupp annars"
@@ -295,6 +296,8 @@
         "menu_options": {
           "daily_energy": "Daglig energi",
           "group": "Grupp",
+          "global_configuration": "Global configuration",
+          "menu_group": "Group",
           "menu_library": "Virtuell effekt (bibliotek)",
           "real_power": "Energi från riktig effektsensor",
           "virtual_power": "Virtuell effekt (manuell)"
@@ -508,6 +511,7 @@
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
           "group": "Group options",
+          "library_options": "Library options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",

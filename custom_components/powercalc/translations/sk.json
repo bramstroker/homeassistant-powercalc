@@ -185,7 +185,8 @@
       "menu_group": {
         "menu_options": {
           "group_custom": "Standard group",
-          "group_domain": "Domain based group"
+          "group_domain": "Domain based group",
+          "group_subtract": "Subtract"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -295,6 +296,8 @@
         "menu_options": {
           "daily_energy": "Denná energia",
           "group": "Skupiny",
+          "global_configuration": "Global configuration",
+          "menu_group": "Group",
           "menu_library": "Virtuálny výkon (knižnica)",
           "real_power": "Energia zo snímača skutočného výkonu",
           "virtual_power": "Virtuálne napájanie (manuálne)"
@@ -508,6 +511,7 @@
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
           "group": "Group options",
+          "library_options": "Library options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
