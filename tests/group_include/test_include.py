@@ -796,6 +796,56 @@ async def test_power_group_does_not_include_binary_sensors(
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
 
+async def test_energy_group_does_not_include_utility_meters(
+    hass: HomeAssistant,
+    area_registry: AreaRegistry,
+) -> None:
+    area = area_registry.async_get_or_create("Bathroom")
+    await hass.async_block_till_done()
+
+    mock_registry(
+        hass,
+        {
+            "sensor.test": RegistryEntry(
+                entity_id="sensor.test",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "sensor.test_daily": RegistryEntry(
+                entity_id="sensor.test_daily",
+                unique_id="2222",
+                platform="utility_meter",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+            "sensor.test_hourly": RegistryEntry(
+                entity_id="sensor.test_hourly",
+                unique_id="3333",
+                platform="utility_meter",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_AREA: "bathroom",
+            },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_energy")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
+
+
 async def test_include_by_wildcard(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
