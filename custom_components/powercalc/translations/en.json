@@ -511,6 +511,7 @@
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
           "group": "Group options",
+          "library_options": "Library options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
