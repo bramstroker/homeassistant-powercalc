@@ -185,7 +185,8 @@
       "menu_group": {
         "menu_options": {
           "group_custom": "Standardowa grupa",
-          "group_domain": "Grupa oparta na domenie"
+          "group_domain": "Grupa oparta na domenie",
+          "group_subtract": "Subtract"
         },
         "title": "Wybierz typ grupy",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -295,6 +296,8 @@
         "menu_options": {
           "daily_energy": "Dzienna energia",
           "group": "Grupa",
+          "global_configuration": "Global configuration",
+          "menu_group": "Group",
           "menu_library": "Moc wirtualna (biblioteka)",
           "real_power": "Energia z rzeczywistego sensora mocy",
           "virtual_power": "Moc wirtualna (ręcznie)"
@@ -508,6 +511,7 @@
           "daily_energy": "Dzienne opcje energii",
           "fixed": "Opcje stałe",
           "group": "Opcje grupy",
+          "library_options": "Library options",
           "linear": "Opcje liniowe",
           "playbook": "Opcje playbook",
           "multi_switch": "Opcje wieloprzełącznika",
