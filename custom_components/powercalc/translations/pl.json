@@ -184,7 +184,7 @@
       },
       "menu_group": {
         "menu_options": {
-          "group": "Standardowa grupa",
+          "group_custom": "Standardowa grupa",
           "group_domain": "Grupa oparta na domenie"
         },
         "title": "Wybierz typ grupy",
