@@ -93,6 +93,10 @@ class LutRegistry:
             _LOGGER.debug("Loading LUT data file: %s", gzip_path)
             return gzip.open(gzip_path, "rt")
 
+        if os.path.exists(path):
+            _LOGGER.debug("Loading LUT data file: %s", path)
+            return open(path)
+
         raise LutFileNotFoundError("Data file not found: %s")
 
     async def get_supported_color_modes(self, power_profile: PowerProfile) -> set[ColorMode]:
@@ -102,8 +106,9 @@ class LutRegistry:
         if supported_color_modes is None:
             supported_color_modes = set()
             for file in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
-                if file.endswith(".csv.gz"):
-                    color_mode = ColorMode(file.removesuffix(".csv.gz"))
+                if file.endswith((".csv.gz", ".csv")):
+                    base_name = file.split(".", 1)[0]
+                    color_mode = ColorMode(base_name)
                     if color_mode in LUT_COLOR_MODES:
                         supported_color_modes.add(color_mode)
             self._supported_color_modes[cache_key] = supported_color_modes
