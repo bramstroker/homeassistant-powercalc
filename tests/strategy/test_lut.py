@@ -287,8 +287,11 @@ async def test_fallback_to_non_gzipped_file(hass: HomeAssistant) -> None:
         "test",
         custom_profile_dir=get_test_config_dir("powercalc_profiles/lut-non-gzipped"),
     )
-    state = _create_light_color_temp_state(1, 153)
-    assert await strategy.calculate(state) == 0.96
+    await _calculate_and_assert_power(
+        strategy,
+        state=_create_light_color_temp_state(1, 153),
+        expected_power=0.96,
+    )
 
 
 async def _create_lut_strategy(
