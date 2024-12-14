@@ -10,6 +10,7 @@ exclude-contributors:
   - 'pre-commit-ci'
   - 'pre-commit-ci[bot]'
   - 'bramstroker'
+  - 'crowdin-bot'
 exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
