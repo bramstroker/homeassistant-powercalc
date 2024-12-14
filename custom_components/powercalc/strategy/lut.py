@@ -107,7 +107,7 @@ class LutRegistry:
             supported_color_modes = set()
             for file in await self._hass.async_add_executor_job(os.listdir, power_profile.get_model_directory()):
                 if file.endswith((".csv.gz", ".csv")):
-                    base_name = file.split('.', 1)[0]
+                    base_name = file.split(".", 1)[0]
                     color_mode = ColorMode(base_name)
                     if color_mode in LUT_COLOR_MODES:
                         supported_color_modes.add(color_mode)
