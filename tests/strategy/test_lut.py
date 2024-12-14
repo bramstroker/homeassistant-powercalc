@@ -21,7 +21,7 @@ from custom_components.powercalc.strategy.factory import PowerCalculatorStrategy
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
-from tests.common import run_powercalc_setup
+from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.strategy.common import create_source_entity
 
 
@@ -276,11 +276,27 @@ async def test_warning_is_logged_when_color_mode_is_none(hass: HomeAssistant, ca
     assert "color mode unknown" in caplog.text
 
 
+async def test_fallback_to_non_gzipped_file(hass: HomeAssistant) -> None:
+    """
+    Test that a fallback is done when a gzipped file is not available.
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2798
+    """
+    strategy = await _create_lut_strategy(
+        hass,
+        "test",
+        "test",
+        custom_profile_dir=get_test_config_dir("powercalc_profiles/lut-non-gzipped"),
+    )
+    state = _create_light_color_temp_state(1, 153)
+    assert await strategy.calculate(state) == 0.96
+
+
 async def _create_lut_strategy(
     hass: HomeAssistant,
     manufacturer: str,
     model: str,
     source_entity: SourceEntity | None = None,
+    custom_profile_dir: str | None = None,
 ) -> PowerCalculationStrategyInterface:
     if not source_entity:
         source_entity = create_source_entity(LIGHT_DOMAIN)
@@ -288,6 +304,7 @@ async def _create_lut_strategy(
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo(manufacturer, model),
+        custom_directory=custom_profile_dir,
     )
     return await strategy_factory.create(
         config={},
