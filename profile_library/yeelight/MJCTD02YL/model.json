@@ -1,7 +1,8 @@
 {
   "calculation_strategy": "lut",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "NOUS A1T with ESPHome 2024.3.1",
+  "measure_device": "Nous A1T",
+  "measure_device_firmware": "ESPHome 2024.3.1",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,

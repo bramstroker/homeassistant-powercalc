@@ -2,7 +2,7 @@
   "calculation_strategy": "lut",
   "created_at": "2024-06-28T05:13:51.976848",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "fluke, 87",
+  "measure_device": "Fluke 87",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 1,

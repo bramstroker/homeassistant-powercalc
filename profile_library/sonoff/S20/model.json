@@ -1,7 +1,8 @@
 {
   "measure_description": "Measured with utils/measure script (5min average)",
   "measure_method": "script",
-  "measure_device": "NOUS A1T with ESPHome 2023.10.3",
+  "measure_device": "Nous A1T",
+  "measure_device_firmware": "ESPHome 2023.10.3",
   "name": "Sonoff S20",
   "standby_power": 0.29,
   "sensor_config": {

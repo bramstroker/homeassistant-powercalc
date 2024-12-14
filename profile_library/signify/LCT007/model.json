@@ -1,5 +1,6 @@
 {
-  "measure_device": "Nous A1 with TASMOTA 9.5.0",
+  "measure_device": "Nous A1",
+  "measure_device_firmware": "TASMOTA 9.5.0",
   "measure_method": "script",
   "measure_description": "Used script in utils/measure from repository",
   "measure_setting": {

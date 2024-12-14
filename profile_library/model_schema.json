@@ -53,6 +53,10 @@
       "type": "string",
       "description": "Device which was used to measure"
     },
+    "measure_device_firmware": {
+      "type": "string",
+      "description": "Firmware version of the device used to measure"
+    },
     "measure_description": {
       "type": "string",
       "description": "Add more information about how you measured the device or any remarks"
