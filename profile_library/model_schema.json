@@ -163,6 +163,18 @@
         }
       }
     },
+    "composite_config": {
+      "type": "array",
+      "description": "Configuration for composite calculation mode",
+      "items": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "$ref": "#/definitions/condition"
+          }
+        }
+      }
+    },
     "config_flow_discovery_remarks": {
       "type": "string",
       "description": "Some remarks to show in the GUI config flow on first step of discovery"
@@ -219,6 +231,33 @@
           "description": "List of matchers which will be checked"
         }
       }
+    }
+  },
+  "definitions": {
+    "condition": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or",
+            "state",
+            "numeric_state",
+            "template"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        }
+      },
+      "required": [
+        "condition"
+      ],
+      "additionalProperties": true
     }
   }
 }
