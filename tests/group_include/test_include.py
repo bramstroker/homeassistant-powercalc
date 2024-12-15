@@ -25,6 +25,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
+from custom_components.powercalc import CONF_CREATE_UTILITY_METERS
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     CONF_ALL,
@@ -786,6 +787,7 @@ async def test_power_group_does_not_include_binary_sensors(
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom",
+                CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
             },
             CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
@@ -796,54 +798,59 @@ async def test_power_group_does_not_include_binary_sensors(
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
 
-async def test_energy_group_does_not_include_utility_meters(
-    hass: HomeAssistant,
-    area_registry: AreaRegistry,
-) -> None:
-    area = area_registry.async_get_or_create("Bathroom")
-    await hass.async_block_till_done()
-
+async def test_energy_group_does_not_include_utility_meters(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1111",
+                platform="light",
+            ),
             "sensor.test": RegistryEntry(
                 entity_id="sensor.test",
-                unique_id="1111",
+                unique_id="2222",
                 platform="sensor",
                 device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
             ),
             "sensor.test_daily": RegistryEntry(
                 entity_id="sensor.test_daily",
-                unique_id="2222",
-                platform="utility_meter",
-                device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
-            ),
-            "sensor.test_hourly": RegistryEntry(
-                entity_id="sensor.test_hourly",
                 unique_id="3333",
                 platform="utility_meter",
                 device_class=SensorDeviceClass.ENERGY,
-                area_id=area.id,
+            ),
+            "sensor.test_hourly": RegistryEntry(
+                entity_id="sensor.test_hourly",
+                unique_id="4444",
+                platform="utility_meter",
+                device_class=SensorDeviceClass.ENERGY,
             ),
         },
     )
 
     await run_powercalc_setup(
         hass,
-        {
-            CONF_CREATE_GROUP: "Test include",
-            CONF_INCLUDE: {
-                CONF_AREA: "bathroom",
+        [
+            {
+                CONF_ENTITY_ID: "light.test",
+                CONF_UNIQUE_ID: "5555",
+                CONF_NAME: "Test powercalc",
+                CONF_FIXED: {CONF_POWER: 50},
+                CONF_CREATE_UTILITY_METERS: True,
             },
-            CONF_IGNORE_UNAVAILABLE_STATE: True,
-        },
+            {
+                CONF_CREATE_GROUP: "Test include",
+                CONF_INCLUDE: {
+                    CONF_ALL: None,
+                },
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+            },
+        ],
     )
 
     group_state = hass.states.get("sensor.test_include_energy")
     assert group_state
-    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test", "sensor.test_powercalc_energy"}
 
 
 async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssistant) -> None:
