@@ -16,11 +16,11 @@ def validate_model(model_path: str, schema: dict) -> None:
     try:
         model = load_json(model_path)
         validate(instance=model, schema=schema)
-        print(f"VALID: {model_path}")
+        print(f"VALID: {model_path}")  # noqa: T201
     except ValidationError as e:
         print(f"INVALID: {model_path}\nError: {e.message}")  # noqa: T201
-    except Exception as e:
-        print(f"ERROR: {model_path}\nError: {e}")
+    except Exception as e:  # noqa: BLE001
+        print(f"ERROR: {model_path}\nError: {e}")  # noqa: T201
 
 
 def validate_models_with_glob(directory: str, schema_path: str) -> None:
@@ -32,8 +32,7 @@ def validate_models_with_glob(directory: str, schema_path: str) -> None:
 
 
 if __name__ == "__main__":
-    # directory = os.path.join(os.path.dirname(__file__), "../../profile_library")
-    directory = os.path.join(os.path.dirname(__file__), "../../tests/testing_config")
+    directory = os.path.join(os.path.dirname(__file__), "../../profile_library")
     schema_file_path = os.path.join(os.path.dirname(__file__), "../../profile_library/model_schema.json")
 
     validate_models_with_glob(directory, schema_file_path)
