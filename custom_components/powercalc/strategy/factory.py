@@ -13,18 +13,12 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
-    CONF_FIXED,
-    CONF_LINEAR,
-    CONF_MAX_POWER,
-    CONF_MIN_POWER,
     CONF_MULTI_SWITCH,
-    CONF_PLAYBOOK,
     CONF_POWER,
     CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
-    CONF_WLED,
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
@@ -62,12 +56,12 @@ class PowerCalculatorStrategyFactory:
             CalculationStrategy.FIXED: lambda: self._create_fixed(source_entity, config, power_profile),
             CalculationStrategy.LUT: lambda: self._create_lut(source_entity, power_profile),
             CalculationStrategy.MULTI_SWITCH: lambda: self._create_multi_switch(config, power_profile),
-            CalculationStrategy.PLAYBOOK: lambda: self._create_playbook(config),
+            CalculationStrategy.PLAYBOOK: lambda: self._create_playbook(config, power_profile),
             CalculationStrategy.WLED: lambda: self._create_wled(source_entity, config),
         }
 
         if strategy == CalculationStrategy.COMPOSITE:
-            return await self._create_composite(config, power_profile, source_entity)
+            return await self._create_composite(config, source_entity, power_profile)
 
         if strategy in strategy_mapping:
             return strategy_mapping[strategy]()
@@ -81,13 +75,7 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
     ) -> LinearStrategy:
         """Create the linear strategy."""
-        linear_config = config.get(CONF_LINEAR)
-
-        if linear_config is None:
-            if power_profile:
-                linear_config = power_profile.linear_config or {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
-            else:
-                raise StrategyConfigurationError("No linear configuration supplied")
+        linear_config = self._get_strategy_config(CalculationStrategy.LINEAR, config, power_profile)
 
         return LinearStrategy(
             linear_config,
@@ -103,12 +91,7 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
     ) -> FixedStrategy:
         """Create the fixed strategy."""
-        fixed_config: dict | None = config.get(CONF_FIXED)
-        if fixed_config is None:
-            if power_profile and power_profile.fixed_config:
-                fixed_config = power_profile.fixed_config
-            else:
-                raise StrategyConfigurationError("No fixed configuration supplied")
+        fixed_config = self._get_strategy_config(CalculationStrategy.FIXED, config, power_profile)
 
         power = fixed_config.get(CONF_POWER)
         if power is None:
@@ -139,10 +122,7 @@ class PowerCalculatorStrategyFactory:
 
     def _create_wled(self, source_entity: SourceEntity, config: dict) -> WledStrategy:
         """Create the WLED strategy."""
-        if CONF_WLED not in config:
-            raise StrategyConfigurationError("No WLED configuration supplied")
-
-        wled_config: dict = cast(dict, config.get(CONF_WLED))
+        wled_config = self._get_strategy_config(CalculationStrategy.WLED, config, None)
         return WledStrategy(
             config=wled_config,
             light_entity=source_entity,
@@ -150,27 +130,29 @@ class PowerCalculatorStrategyFactory:
             standby_power=config.get(CONF_STANDBY_POWER),
         )
 
-    def _create_playbook(self, config: ConfigType) -> PlaybookStrategy:
-        if CONF_PLAYBOOK not in config:
-            raise StrategyConfigurationError("No Playbook configuration supplied")
+    def _create_playbook(self, config: ConfigType, power_profile: PowerProfile | None) -> PlaybookStrategy:
+        playbook_config = self._get_strategy_config(CalculationStrategy.PLAYBOOK, config, power_profile)
 
-        playbook_config: dict = cast(dict, config.get(CONF_PLAYBOOK))
-        return PlaybookStrategy(self._hass, playbook_config)
+        directory = None
+        if power_profile and power_profile.calculation_strategy == CalculationStrategy.PLAYBOOK:
+            directory = power_profile.get_model_directory()
+
+        return PlaybookStrategy(self._hass, playbook_config, directory)
 
     async def _create_composite(
         self,
         config: ConfigType,
-        power_profile: PowerProfile | None,
         source_entity: SourceEntity,
+        power_profile: PowerProfile | None,
     ) -> CompositeStrategy:
-        composite_config: dict | None = config.get(CONF_COMPOSITE)
+        composite_config: list | None = config.get(CONF_COMPOSITE)
         if composite_config is None:
             if power_profile and power_profile.composite_config:
                 composite_config = power_profile.composite_config
             else:
                 raise StrategyConfigurationError("No composite configuration supplied")
 
-        sub_strategies = list(composite_config)
+        sub_strategies = composite_config
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
@@ -220,3 +202,19 @@ class PowerCalculatorStrategyFactory:
             on_power=Decimal(on_power),
             off_power=Decimal(off_power),
         )
+
+    @staticmethod
+    def _get_strategy_config(
+        strategy: CalculationStrategy,
+        config: ConfigType,
+        power_profile: PowerProfile | None,
+    ) -> ConfigType:
+        """Get the strategy configuration."""
+        if strategy in config:
+            return cast(ConfigType, config[strategy])
+
+        prop = f"{strategy}_config"
+        if power_profile and getattr(power_profile, prop):
+            return cast(ConfigType, getattr(power_profile, prop))
+
+        raise StrategyConfigurationError(f"No {strategy} configuration supplied")

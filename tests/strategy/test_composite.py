@@ -390,17 +390,6 @@ async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
 
 
 async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> None:
-    mock_registry(
-        hass,
-        {
-            "light.test": RegistryEntry(
-                entity_id="light.test",
-                unique_id="1234",
-                platform="light",
-            ),
-        },
-    )
-
     await run_powercalc_setup(
         hass,
         {

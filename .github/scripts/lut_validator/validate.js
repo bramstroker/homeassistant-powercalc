@@ -23,6 +23,7 @@ const validColorModeCombinations = [
     'brightness,color_temp'
 ]
 
+const pattern = /(\/|^)(hs|color_temp|brightness)\.csv\.gz$/;
 const main = async () => {
     const dataDirectory = path.join(__dirname, '../../../profile_library')
     let errors = []
@@ -33,6 +34,9 @@ const main = async () => {
         console.log('Processing model directory ' + model_dir.path)
         let colorModes = new Set()
         for await (const file of readdirp(model_dir.fullPath, {fileFilter: '*.csv.gz'})) {
+            if (!pattern.test(file.fullPath)) {
+                continue
+            }
             const colorMode = file.basename.substring(0, file.basename.indexOf('.csv.gz'))
             colorModes.add(colorMode)
             console.log('Checking ' + file.path)

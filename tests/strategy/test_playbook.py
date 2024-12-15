@@ -16,8 +16,10 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
+from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE
 from custom_components.powercalc.const import (
     CONF_AUTOSTART,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MULTIPLY_FACTOR,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
@@ -35,6 +37,7 @@ from custom_components.powercalc.strategy.playbook import PlaybookStrategy
 from tests.common import (
     get_simple_fixed_config,
     get_test_config_dir,
+    get_test_profile_dir,
     run_powercalc_setup,
 )
 
@@ -407,6 +410,19 @@ async def test_state_trigger(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get(POWER_SENSOR_ID).state == "0.00"
+
+
+async def test_playbook_strategy_from_library_profile(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "vacuum.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("playbook"),
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    await elapse_and_assert_power(hass, 3, "20.00")
 
 
 async def elapse_and_assert_power(

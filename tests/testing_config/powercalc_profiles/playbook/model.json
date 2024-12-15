@@ -1,0 +1,14 @@
+{
+  "measure_method": "manual",
+  "measure_device": "Test",
+  "name": "Test",
+  "device_type": "vacuum_robot",
+  "calculation_strategy": "playbook",
+  "playbook_config": {
+    "playbooks": {
+      "playbook1": "playbook1.csv",
+      "playbook2": "playbook2.csv"
+    },
+    "autostart": "playbook1"
+  }
+}

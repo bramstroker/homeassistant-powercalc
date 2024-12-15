@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 import logging
 import os
 from collections import deque
@@ -68,11 +69,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
         self._autostart: str | None = config.get(CONF_AUTOSTART)
         self._power = Decimal(0)
         self._states_trigger: dict[str, str] | None = config.get(CONF_STATE_TRIGGER, config.get(CONF_STATES_TRIGGER))
-        if not playbook_directory:
-            self._playbook_directory: str = os.path.join(
-                hass.config.config_dir,
-                "powercalc/playbooks",
-            )
+        self._playbook_directory = playbook_directory or os.path.join(hass.config.config_dir, "powercalc/playbooks")
 
     def set_update_callback(self, update_callback: Callable[[Decimal], None]) -> None:
         """
@@ -177,23 +174,24 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
             )
 
         file_path = os.path.join(self._playbook_directory, playbooks[playbook_id])
-        if not os.path.exists(file_path):
+        if not (os.path.exists(file_path) or os.path.exists(f"{file_path}.gz")):
             raise StrategyConfigurationError(
                 f"Playbook file '{file_path}' does not exist",
             )
 
         def _load_playbook_entries() -> list[PlaybookEntry]:
-            """Load playbook entries from CSV file"""
-            with open(file_path) as csv_file:
+            """Load playbook entries from a CSV file, with support for gzipped files"""
+            actual_path = file_path if os.path.exists(file_path) else f"{file_path}.gz"
+            open_func = gzip.open if actual_path.endswith(".gz") else open
+            with open_func(actual_path, mode="rt") as csv_file:
                 csv_reader = csv.reader(csv_file)
                 entries = []
                 for row in csv_reader:
                     if len(row) != 2:
                         raise StrategyConfigurationError(
-                            f"Playbook file '{file_path}' has invalid structure, please see the documentation.",
+                            f"Playbook file '{actual_path}' has invalid structure, please see the documentation.",
                         )
                     entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
-
                 return entries
 
         playbook_entries = await self._hass.async_add_executor_job(_load_playbook_entries)  # type: ignore
