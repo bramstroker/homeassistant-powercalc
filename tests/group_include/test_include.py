@@ -17,7 +17,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
+from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry, RegistryEntryDisabler
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -846,6 +846,59 @@ async def test_energy_group_does_not_include_utility_meters(
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
 
+async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.test_energy": RegistryEntry(
+                entity_id="sensor.test_energy",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+            ),
+            "sensor.test_disabled_energy": RegistryEntry(
+                entity_id="sensor.test_disabled_energy",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+                disabled_by=RegistryEntryDisabler.USER,
+            ),
+            "sensor.test_power": RegistryEntry(
+                entity_id="sensor.test_power",
+                unique_id="3333",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+            ),
+            "sensor.test_disabled_power": RegistryEntry(
+                entity_id="sensor.test_disabled_power",
+                unique_id="4444",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                disabled_by=RegistryEntryDisabler.USER,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_ALL: None,
+            },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_power"}
+
+    group_state = hass.states.get("sensor.test_include_energy")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
+
+
 async def test_include_by_wildcard(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
@@ -1074,7 +1127,7 @@ async def test_include_by_area_combined_with_domain_filter(hass: HomeAssistant, 
     }
 
 
-async def test_include_all(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+async def test_include_all(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
@@ -1121,7 +1174,7 @@ async def test_include_all(hass: HomeAssistant, area_registry: AreaRegistry) -> 
     }
 
 
-async def test_exclude_non_powercalc_sensors(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+async def test_exclude_non_powercalc_sensors(hass: HomeAssistant) -> None:
     mock_registry(
         hass,
         {
