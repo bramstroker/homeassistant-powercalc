@@ -48,10 +48,10 @@ async def test_load_fixed_profile(hass: HomeAssistant) -> None:
     )
     assert power_profile.calculation_strategy == CalculationStrategy.FIXED
     assert power_profile.standby_power == 0.5
-    assert power_profile.fixed_mode_config == {CONF_POWER: 50}
+    assert power_profile.fixed_config == {CONF_POWER: 50}
 
     with pytest.raises(UnsupportedStrategyError):
-        _ = power_profile.linear_mode_config
+        _ = power_profile.linear_config
 
 
 async def test_load_linear_profile(hass: HomeAssistant) -> None:
@@ -62,10 +62,10 @@ async def test_load_linear_profile(hass: HomeAssistant) -> None:
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LINEAR
     assert power_profile.standby_power == 0.5
-    assert power_profile.linear_mode_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
+    assert power_profile.linear_config == {CONF_MIN_POWER: 10, CONF_MAX_POWER: 30}
 
     with pytest.raises(UnsupportedStrategyError):
-        _ = power_profile.fixed_mode_config
+        _ = power_profile.fixed_config
 
 
 async def test_load_linked_profile(hass: HomeAssistant) -> None:

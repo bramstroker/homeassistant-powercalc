@@ -150,22 +150,27 @@ class PowerProfile:
         return self._json_data.get("aliases") or []
 
     @property
-    def linear_mode_config(self) -> ConfigType | None:
+    def linear_config(self) -> ConfigType | None:
         """Get configuration to setup linear strategy."""
         return self.get_strategy_config(CalculationStrategy.LINEAR)
 
     @property
-    def multi_switch_mode_config(self) -> ConfigType | None:
+    def multi_switch_config(self) -> ConfigType | None:
         """Get configuration to setup linear strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property
-    def fixed_mode_config(self) -> ConfigType | None:
+    def fixed_config(self) -> ConfigType | None:
         """Get configuration to setup fixed strategy."""
         config = self.get_strategy_config(CalculationStrategy.FIXED)
         if config is None and self.standby_power_on:
             config = {CONF_POWER: 0}
         return config
+
+    @property
+    def composite_config(self) -> ConfigType | None:
+        """Get configuration to setup composite strategy."""
+        return self.get_strategy_config(CalculationStrategy.COMPOSITE)
 
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
         if not self.is_strategy_supported(strategy):
