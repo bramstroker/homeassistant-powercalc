@@ -32,7 +32,7 @@ def validate_models_with_glob(directory: str, schema_path: str) -> None:
 
 
 if __name__ == "__main__":
-    #directory = os.path.join(os.path.dirname(__file__), "../../profile_library")
+    # directory = os.path.join(os.path.dirname(__file__), "../../profile_library")
     directory = os.path.join(os.path.dirname(__file__), "../../tests/testing_config")
     schema_file_path = os.path.join(os.path.dirname(__file__), "../../profile_library/model_schema.json")
 
