@@ -133,7 +133,11 @@ class PowerCalculatorStrategyFactory:
     def _create_playbook(self, config: ConfigType, power_profile: PowerProfile | None) -> PlaybookStrategy:
         playbook_config = self._get_strategy_config(CalculationStrategy.PLAYBOOK, config, power_profile)
 
-        return PlaybookStrategy(self._hass, playbook_config)
+        directory = None
+        if power_profile and power_profile.calculation_strategy == CalculationStrategy.PLAYBOOK:
+            directory = power_profile.get_model_directory()
+
+        return PlaybookStrategy(self._hass, playbook_config, directory)
 
     async def _create_composite(
         self,
