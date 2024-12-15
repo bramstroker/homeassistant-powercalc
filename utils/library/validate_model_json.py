@@ -16,7 +16,7 @@ def validate_model(model_path: str, schema: dict) -> None:
     try:
         model = load_json(model_path)
         validate(instance=model, schema=schema)
-        # print(f"VALID: {model_path}")
+        print(f"VALID: {model_path}")
     except ValidationError as e:
         print(f"INVALID: {model_path}\nError: {e.message}")  # noqa: T201
 
