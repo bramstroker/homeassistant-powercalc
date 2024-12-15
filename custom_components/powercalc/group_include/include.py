@@ -1,6 +1,5 @@
 import logging
 
-from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry
@@ -42,14 +41,11 @@ async def resolve_include_entities(
             "Found possible include entities: %s",
             list(source_entities.keys()),
         )
-    for source_entity in source_entities.values():
-        resolved_entities.extend(
-            hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id, []),
-        )
 
-        # When we are dealing with a non powercalc sensor, and it's a power or energy sensor,
-        # we can include that in the group
-        if include_non_powercalc and source_entity and source_entity.domain == sensor.DOMAIN:
+    for source_entity in source_entities.values():
+        entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id, [])
+        resolved_entities.extend(entities)
+        if not entities and source_entity.platform != DOMAIN and include_non_powercalc:
             device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
