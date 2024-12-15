@@ -5,15 +5,20 @@ from typing import Any
 
 import requests
 
-from measure.powermeter.errors import PowerMeterError
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
+from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
 
 
 class TasmotaPowerMeter(PowerMeter):
     def __init__(self, device_ip: str) -> None:
         self._device_ip = device_ip
 
-    def get_power(self) -> PowerMeasurementResult:
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+        """Get a new power reading from the Tasmota device. Optionally include voltage (FIXME: not yet implemented)."""
+        if include_voltage:
+            # FIXME: Not yet implemented
+            raise UnsupportedFeatureError("Voltage measurement is not yet implemented for Tasmota devices.")
+
         r = requests.get(
             f"http://{self._device_ip}/cm?cmnd=STATUS+8",
             timeout=10,
