@@ -37,6 +37,7 @@ from custom_components.powercalc.const import (
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_LABEL,
     CONF_OR,
     CONF_POWER,
     CONF_SENSOR_TYPE,
@@ -904,6 +905,43 @@ async def test_include_group_does_not_include_disabled_sensors(hass: HomeAssista
     group_state = hass.states.get("sensor.test_include_energy")
     assert group_state
     assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test_energy"}
+
+
+async def test_include_by_label(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "sensor.test": RegistryEntry(
+                entity_id="sensor.test",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                labels=["my_label"],
+            ),
+            "sensor.test2": RegistryEntry(
+                entity_id="sensor.test",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                labels=["other_label"],
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_CREATE_GROUP: "Test include",
+            CONF_INCLUDE: {
+                CONF_LABEL: "my_label",
+            },
+            CONF_IGNORE_UNAVAILABLE_STATE: True,
+        },
+    )
+
+    group_state = hass.states.get("sensor.test_include_power")
+    assert group_state
+    assert group_state.attributes.get(CONF_ENTITIES) == {"sensor.test"}
 
 
 async def test_include_by_wildcard(hass: HomeAssistant) -> None:

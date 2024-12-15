@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
     CONF_AREA,
     CONF_FILTER,
     CONF_GROUP,
+    CONF_LABEL,
     CONF_OR,
     CONF_TEMPLATE,
     CONF_WILDCARD,
@@ -66,6 +67,7 @@ def create_filter(
     filter_mapping: dict[str, Callable[[], IncludeEntityFilter]] = {
         CONF_DOMAIN: lambda: DomainFilter(filter_config),  # type: ignore
         CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
+        CONF_LABEL: lambda: LabelFilter(filter_config),  # type: ignore
         CONF_WILDCARD: lambda: WildcardFilter(filter_config),  # type: ignore
         CONF_GROUP: lambda: GroupFilter(hass, filter_config),  # type: ignore
         CONF_TEMPLATE: lambda: TemplateFilter(hass, filter_config),  # type: ignore
@@ -192,6 +194,14 @@ class TemplateFilter(IncludeEntityFilter):
 
     def is_valid(self, entity: RegistryEntry) -> bool:
         return entity.entity_id in self.entity_ids
+
+
+class LabelFilter(IncludeEntityFilter):
+    def __init__(self, label: str) -> None:
+        self.label = label
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return self.label in entity.labels
 
 
 class AreaFilter(IncludeEntityFilter):

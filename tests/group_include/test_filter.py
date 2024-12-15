@@ -12,6 +12,7 @@ from custom_components.powercalc.group_include.filter import (
     CompositeFilter,
     DomainFilter,
     FilterOperator,
+    LabelFilter,
     NullFilter,
     WildcardFilter,
     create_composite_filter,
@@ -67,6 +68,18 @@ async def test_domain_filter(domain: str | list, expected_result: bool) -> None:
 )
 async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
     assert WildcardFilter(pattern).is_valid(_create_registry_entry()) == expected_result
+
+
+@pytest.mark.parametrize(
+    "label,expected_result",
+    [
+        ("test", True),
+        ("test2", False),
+    ],
+)
+async def test_label_filter(label: str, expected_result: bool) -> None:
+    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test", labels=["test"])
+    assert LabelFilter(label).is_valid(entry) == expected_result
 
 
 async def test_null_filter() -> None:
