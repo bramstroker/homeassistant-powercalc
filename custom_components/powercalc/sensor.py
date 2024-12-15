@@ -74,6 +74,7 @@ from .const import (
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_LABEL,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -162,8 +163,9 @@ FILTER_CONFIG = vol.Schema(
         vol.Optional(CONF_ALL): None,
         vol.Optional(CONF_AREA): cv.string,
         vol.Optional(CONF_GROUP): cv.entity_id,
-        vol.Optional(CONF_TEMPLATE): cv.template,
         vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
+        vol.Optional(CONF_LABEL): cv.string,
+        vol.Optional(CONF_TEMPLATE): cv.template,
         vol.Optional(CONF_WILDCARD): cv.string,
     },
 )

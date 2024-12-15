@@ -71,6 +71,18 @@ powercalc:
             - switch
 ```
 
+### Label
+
+Filters entities by a [label](https://www.home-assistant.io/docs/organizing/labels/).
+
+```yaml
+powercalc:
+  sensors:
+    - create_group: All bluetooth proxy
+      include:
+        label: bluetooth_proxy
+```
+
 ### Wildcard
 
 Match certain entity id's by a wildcard pattern
@@ -131,6 +143,18 @@ powercalc:
         area: outdoor
         filter:
           domain: light
+```
+
+To exclude sensors based on a label:
+
+```yaml
+powercalc:
+  sensors:
+    - create_group: All lights
+      include:
+        domain: light
+        filter:
+          label: excludePowercalc
 ```
 
 ### AND/OR
