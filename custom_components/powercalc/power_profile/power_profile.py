@@ -172,6 +172,11 @@ class PowerProfile:
         """Get configuration to setup composite strategy."""
         return self.get_strategy_config(CalculationStrategy.COMPOSITE)
 
+    @property
+    def playbook_config(self) -> ConfigType | None:
+        """Get configuration to setup playbook strategy."""
+        return self.get_strategy_config(CalculationStrategy.PLAYBOOK)
+
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
         if not self.is_strategy_supported(strategy):
             raise UnsupportedStrategyError(

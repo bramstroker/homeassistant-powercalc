@@ -99,7 +99,7 @@
     },
     "linear_config": {
       "type": "object",
-      "description": "Configuration for linear calculation mode",
+      "description": "Configuration for linear calculation strategy",
       "properties": {
         "min_power": {
           "type": "number"
@@ -117,7 +117,7 @@
     },
     "fixed_config": {
       "type": "object",
-      "description": "Configuration for fixed calculation mode",
+      "description": "Configuration for fixed calculation strategy",
       "properties": {
         "power": {
           "type": "number"
@@ -166,9 +166,33 @@
         }
       }
     },
+    "playbook_config": {
+      "type": "object",
+      "description": "Configuration for playbook calculation strategy",
+      "properties": {
+        "playbooks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value pairs where the key is a playbook ID and the value is the filename."
+        },
+        "autostart": {
+          "type": "string",
+          "description": "The playbook ID to autostart."
+        },
+        "repeat": {
+          "type": "boolean",
+          "description": "Indicates if the playbook should repeat."
+        }
+      },
+      "required": [
+        "playbooks"
+      ]
+    },
     "composite_config": {
       "type": "array",
-      "description": "Configuration for composite calculation mode",
+      "description": "Configuration for composite calculation strategy",
       "items": {
         "type": "object",
         "properties": {
