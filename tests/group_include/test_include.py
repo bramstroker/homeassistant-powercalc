@@ -787,8 +787,8 @@ async def test_power_group_does_not_include_binary_sensors(
             CONF_CREATE_GROUP: "Test include",
             CONF_INCLUDE: {
                 CONF_AREA: "bathroom",
+                CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
             },
-            CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
             CONF_IGNORE_UNAVAILABLE_STATE: True,
         },
     )
