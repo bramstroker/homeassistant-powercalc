@@ -42,6 +42,7 @@ async def test_exception_raised_when_no_power_profile_passed_lut_strategy(
         CalculationStrategy.LINEAR,
         CalculationStrategy.WLED,
         CalculationStrategy.PLAYBOOK,
+        CalculationStrategy.COMPOSITE,
     ],
 )
 async def test_exception_raised_when_strategy_config_not_provided(

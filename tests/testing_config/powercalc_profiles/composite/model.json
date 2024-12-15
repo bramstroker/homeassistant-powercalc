@@ -1,0 +1,24 @@
+{
+  "name": "IKEA Control outlet",
+  "measure_method": "manual",
+  "measure_device": "IKEA Control outlet",
+  "device_type": "smart_switch",
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition": "state",
+        "entity_id": "light.test",
+        "state": "on"
+      },
+      "fixed": {
+        "power": 0.82
+      }
+    },
+    {
+      "fixed": {
+        "power": 0.52
+      }
+    }
+  ]
+}

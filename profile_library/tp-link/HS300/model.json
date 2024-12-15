@@ -2,6 +2,8 @@
   "name": "Kasa Smart Wi-Fi Power Strip",
   "device_type": "smart_switch",
   "calculation_strategy": "multi_switch",
+  "measure_method": "manual",
+  "measure_device": "unknown",
   "multi_switch_config": {
     "power": 0.725,
     "power_off": 0.225

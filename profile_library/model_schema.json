@@ -37,9 +37,11 @@
       "enum": [
         "lut",
         "linear",
-        "fixed"
+        "fixed",
+        "multi_switch",
+        "composite"
       ],
-      "description": "Supported calculation modes"
+      "description": "Supported calculation strategies"
     },
     "measure_method": {
       "type": "string",
@@ -76,6 +78,7 @@
         "cover",
         "light",
         "printer",
+        "smart_dimmer",
         "smart_switch",
         "smart_speaker",
         "network",
@@ -163,6 +166,18 @@
         }
       }
     },
+    "composite_config": {
+      "type": "array",
+      "description": "Configuration for composite calculation mode",
+      "items": {
+        "type": "object",
+        "properties": {
+          "condition": {
+            "$ref": "#/definitions/condition"
+          }
+        }
+      }
+    },
     "config_flow_discovery_remarks": {
       "type": "string",
       "description": "Some remarks to show in the GUI config flow on first step of discovery"
@@ -219,6 +234,30 @@
           "description": "List of matchers which will be checked"
         }
       }
+    }
+  },
+  "definitions": {
+    "condition": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "type": "string",
+          "enum": [
+            "and",
+            "or",
+            "state",
+            "numeric_state",
+            "template"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        }
+      },
+      "additionalProperties": true
     }
   }
 }

@@ -801,7 +801,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Get the fixed power config for smart switch."""
         if self.selected_profile is None:
             return {CONF_POWER: 0}  # pragma: no cover
-        self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER, 0) if self.selected_profile.fixed_mode_config else 0
+        self_usage_on = self.selected_profile.fixed_config.get(CONF_POWER, 0) if self.selected_profile.fixed_config else 0
         power = user_input.get(CONF_POWER, 0)
         self_usage_included = user_input.get(CONF_SELF_USAGE_INCLUDED, True)
         if self_usage_included:
@@ -1051,8 +1051,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             }
 
         self_usage_on = 0
-        if self.selected_profile and self.selected_profile.fixed_mode_config:
-            self_usage_on = self.selected_profile.fixed_mode_config.get(CONF_POWER, 0)
+        if self.selected_profile and self.selected_profile.fixed_config:
+            self_usage_on = self.selected_profile.fixed_config.get(CONF_POWER, 0)
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.SMART_SWITCH,

@@ -72,7 +72,7 @@ class PowerCalculatorStrategyFactory:
         if strategy in strategy_mapping:
             return strategy_mapping[strategy]()
 
-        raise UnsupportedStrategyError("Invalid calculation mode", strategy)
+        raise UnsupportedStrategyError("Invalid calculation strategy", strategy)
 
     def _create_linear(
         self,
@@ -85,7 +85,7 @@ class PowerCalculatorStrategyFactory:
 
         if linear_config is None:
             if power_profile:
-                linear_config = power_profile.linear_mode_config or {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
+                linear_config = power_profile.linear_config or {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
             else:
                 raise StrategyConfigurationError("No linear configuration supplied")
 
@@ -105,8 +105,8 @@ class PowerCalculatorStrategyFactory:
         """Create the fixed strategy."""
         fixed_config: dict | None = config.get(CONF_FIXED)
         if fixed_config is None:
-            if power_profile and power_profile.fixed_mode_config:
-                fixed_config = power_profile.fixed_mode_config
+            if power_profile and power_profile.fixed_config:
+                fixed_config = power_profile.fixed_config
             else:
                 raise StrategyConfigurationError("No fixed configuration supplied")
 
@@ -163,12 +163,21 @@ class PowerCalculatorStrategyFactory:
         power_profile: PowerProfile | None,
         source_entity: SourceEntity,
     ) -> CompositeStrategy:
-        sub_strategies = list(config.get(CONF_COMPOSITE))  # type: ignore
+        composite_config: dict | None = config.get(CONF_COMPOSITE)
+        if composite_config is None:
+            if power_profile and power_profile.composite_config:
+                composite_config = power_profile.composite_config
+            else:
+                raise StrategyConfigurationError("No composite configuration supplied")
+
+        sub_strategies = list(composite_config)
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
+                if condition_config.get(CONF_CONDITION) == "state":
+                    condition_config = condition.state_validate_config(self._hass, condition_config)
                 condition_instance = await condition.async_from_config(
                     self._hass,
                     condition_config,
@@ -189,8 +198,8 @@ class PowerCalculatorStrategyFactory:
     def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
         """Create instance of multi switch strategy."""
         multi_switch_config: ConfigType = {}
-        if power_profile and power_profile.multi_switch_mode_config:
-            multi_switch_config = power_profile.multi_switch_mode_config
+        if power_profile and power_profile.multi_switch_config:
+            multi_switch_config = power_profile.multi_switch_config
         multi_switch_config.update(config.get(CONF_MULTI_SWITCH, {}))
 
         if not multi_switch_config:
