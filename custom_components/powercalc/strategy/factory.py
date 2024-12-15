@@ -170,12 +170,14 @@ class PowerCalculatorStrategyFactory:
             else:
                 raise StrategyConfigurationError("No composite configuration supplied")
 
-        sub_strategies = list(composite_config)  # type: ignore
+        sub_strategies = list(composite_config)
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
+                if condition_config.get(CONF_CONDITION) == "state":
+                    condition_config = condition.state_validate_config(self._hass, condition_config)
                 condition_instance = await condition.async_from_config(
                     self._hass,
                     condition_config,

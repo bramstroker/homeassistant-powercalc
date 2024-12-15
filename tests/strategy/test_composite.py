@@ -18,6 +18,7 @@ from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
+    CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_FIXED,
     CONF_LINEAR,
     CONF_MAX_POWER,
@@ -31,6 +32,7 @@ from custom_components.powercalc.const import (
 )
 from tests.common import (
     get_test_config_dir,
+    get_test_profile_dir,
     run_powercalc_setup,
 )
 
@@ -385,3 +387,29 @@ async def test_calculate_standby_power2(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "1.00"
+
+
+async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> None:
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("composite"),
+        },
+    )
+
+    hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "0.82"
