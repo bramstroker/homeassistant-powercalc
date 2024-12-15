@@ -46,12 +46,7 @@ async def resolve_include_entities(
     for source_entity in source_entities.values():
         entities = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].get(source_entity.entity_id, [])
         resolved_entities.extend(entities)
-        if (
-            not entities
-            and source_entity.domain == sensor.DOMAIN
-            and source_entity.platform != DOMAIN
-            and include_non_powercalc
-        ):
+        if not entities and source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and include_non_powercalc:
             device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
