@@ -1,7 +1,8 @@
 {
   "calculation_strategy": "lut",
   "measure_description": "Measured with utils/measure script",
-  "measure_device": "Gosund SP1 Tasmota",
+  "measure_device": "Gosund SP1",
+  "measure_device_firmware": "Tasmota",
   "measure_method": "script",
   "measure_settings": {
     "SAMPLE_COUNT": 2,
