@@ -38,6 +38,7 @@
         "lut",
         "linear",
         "fixed",
+        "multi_switch",
         "composite"
       ],
       "description": "Supported calculation strategies"

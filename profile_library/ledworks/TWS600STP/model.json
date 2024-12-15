@@ -8,6 +8,7 @@
     "SLEEP_TIME": 3,
     "VERSION": "v1.15.5:docker"
   },
+  "calculation_strategy": "fixed",
   "name": "Twinkly 600 String Lights",
   "standby_power": 2.2,
   "fixed_config": {
