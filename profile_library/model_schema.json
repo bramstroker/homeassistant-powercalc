@@ -184,6 +184,13 @@
         "repeat": {
           "type": "boolean",
           "description": "Indicates if the playbook should repeat."
+        },
+        "state_trigger": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Start given playbook when entity state changes to given value."
         }
       },
       "required": [
