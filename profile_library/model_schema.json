@@ -37,9 +37,10 @@
       "enum": [
         "lut",
         "linear",
-        "fixed"
+        "fixed",
+        "composite"
       ],
-      "description": "Supported calculation modes"
+      "description": "Supported calculation strategies"
     },
     "measure_method": {
       "type": "string",
@@ -76,6 +77,7 @@
         "cover",
         "light",
         "printer",
+        "smart_dimmer",
         "smart_switch",
         "smart_speaker",
         "network",

@@ -24,6 +24,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           json_schema: ./profile_library/model_schema.json
-          json_path_pattern: .*/data/([^/]+/)?([^/]+/)?model.json$
+          json_path_pattern: model.json$
           send_comment: true
           clear_comments: true

@@ -1,0 +1,23 @@
+{
+  "name": "IKEA Control outlet",
+  "standby_power": 0.52,
+  "standby_power_on": 0.82,
+  "device_type": "smart_switch",
+  "calculation_strategy": "composite",
+  "composite_config": [
+    {
+      "condition": {
+        "condition_type": "state",
+        "entity_id": "switch.ikea_control_outlet",
+      },
+      "fixed_config": {
+        "power": 0.82
+      }
+    },
+    {
+      "fixed_config": {
+        "power": 0.52
+      }
+    }
+  ]
+}
