@@ -10,5 +10,5 @@
     "VERSION": "v1.16.2:docker"
   },
   "name": "Play Gradient Lightstrip 65 Inch",
-  "standby_power": -0.55
+  "standby_power": 0.50
 }
