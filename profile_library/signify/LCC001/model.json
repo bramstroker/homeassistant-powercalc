@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-15T16:41:00.827603",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "ikea inspelning",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 1,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.16.5:docker"
+  },
+  "name": "Hue Flourish Ceiling Light",
+  "standby_power": 0.5
+}
