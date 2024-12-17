@@ -470,6 +470,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         new_state = event.data.get("new_state")
         if not new_state:  # pragma: no cover
             return
+        _LOGGER.debug("Group sensor %s. State change for %s: %s", self.entity_id, new_state.entity_id, new_state)
         calculated_new_state = self.calculate_new_state(new_state)
         self.set_new_state(calculated_new_state)
 
