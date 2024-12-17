@@ -107,7 +107,7 @@ homeassistant-stubs = "*"
 pytest-homeassistant-custom-component = "0.13.193"
 types-pytz = "^2024.1"
 types-croniter = "^2.0"
-croniter = "^5.0.0"
+croniter = "^6.0.0"
 pytest-cov = "^6.0"
 # Requirements below are needed since HA 2023.9.3, not sure why
 psutil_home_assistant = "*"
