@@ -9,8 +9,8 @@
     "error": {
       "daily_energy_mandatory": "Debes proveer al menos un valor o valor en plantilla",
       "entity_mandatory": "El sensor ya está configurado, especifique un identificador único (\"unique_id\")",
-      "fixed_mandatory": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
-      "fixed_states_power_only": "",
+      "fixed_mandatory": "Deber proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
+      "fixed_states_power_only": "Esta entidad solamente funciona con \"states_power\" y no con \"power\"",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
       "linear_min_higher_as_max": "La potencia máxima no puede ser menos que la potencia mínima",
@@ -24,7 +24,7 @@
     "step": {
       "daily_energy": {
         "data": {
-          "create_utility_meters": "",
+          "create_utility_meters": "Crear contadores eléctricos",
           "group": "Añadir a un grupo",
           "name": "Nombre",
           "on_time": "Tiempo encendido",
@@ -86,7 +86,7 @@
           "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
           "disable_library_download": "Deshabilitar la función de descarga de la biblioteca de Powercalc",
           "force_update_frequency": "Intervalo en el que se actualiza el estado del sensor, incluso cuando el valor de energía permanece igual. En segundos",
-          "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad fuente no esté disponible",
+          "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
           "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos"
         }
       },
@@ -214,7 +214,7 @@
         "data_description": {
           "autostart": "Indique para iniciar una reproducción cuando comience HA. Por ejemplo, 'programa1'",
           "playbooks": "Introduzca un libro de reproducción en cada línea. Ejemplo\n\nprograma1: lavadora/programa1.csv",
-          "repeat": "Se requiere seleccionar una entidad para cualquier estrategia que no sea libro de reproducción  \"playbook\"",
+          "repeat": "Alternar cuando quieras seguir repitiendo la reproducción una vez completada",
           "states_trigger": "Dispara una reproducción basada en un cambio de estado. Ejemplo\n\nreproduciendo: programa1"
         },
         "title": "Configuración de Reproducciones"
@@ -284,9 +284,9 @@
         },
         "data_description": {
           "power": "Un valor de energía fijo en Vatios (W) para el dispositivo conectado",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "self_usage_included": "Si el valor de energía incluye la potencia consumida por el interruptor inteligente mismo. Cuando lo omites, Powercalc añadirá el uso del interruptor inteligente al valor de energía, que es {self_usage_power}W"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
+        "description": "Definir el consumo de energía del dispositivo conectado. Cuando no utilice una cantidad fija de potencia puede omitir este paso. Powercalc configurará un sensor de alimentación para el uso del interruptor inteligente en sí mismo",
         "title": "Configuración del interruptor inteligente"
       },
       "user": {
@@ -336,7 +336,7 @@
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",
           "standby_power": "Definir la cantidad de energía que consume el dispositivo cuando está apagado"
         },
-        "description": "Vea el léame para obtener más información sobre las posibles estrategias y opciones de configuración. Se requiere entidad fuente o nombre o ambos.",
+        "description": "Vea el léame para obtener más información sobre las posibles estrategias y opciones de configuración. Se requiere entidad original o nombre o ambos.",
         "title": "Crear un sensor de potencia virtual"
       },
       "wled": {
@@ -360,7 +360,7 @@
       "model_not_support": "Modelo no soportado"
     },
     "error": {
-      "fixed_mandatory": "You must supply at least one of Power, Power template or States power",
+      "fixed_mandatory": "Debe suministrar al menos uno de: potencia, plantilla de potencia o estados de potencia",
       "fixed_states_power_only": "Esta entidad sólo puede funcionar con 'states_power' no 'power'",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
@@ -380,8 +380,8 @@
           "unavailable_power": "Potencia no disponible"
         },
         "data_description": {
-          "calculation_enabled_condition": "The configured power calculation strategy will only be executed when this template evaluates to true or 1, otherwise the power sensor will display 0",
-          "ignore_unavailable_state": "Toggle this setting when you want the power sensor to stay available even if the source entity is unavailable",
+          "calculation_enabled_condition": "La estrategia de cálculo de potencia configurada solo se ejecutará cuando esta plantilla se evalúe a verdadero o 1, de lo contrario el sensor de energía mostrará 0",
+          "ignore_unavailable_state": "Cambiar esta opción cuando desea que el sensor de potencia permanezca disponible incluso si la entidad original no está disponible",
           "multiply_factor": "Multiplica la potencia calculada por esta proporción. Puede ser útil para grupos de luces",
           "multiply_factor_standby": "Si también se aplica el factor de multiplicación a la potencia en modo de espera",
           "unavailable_power": "Potencia en W para grabar cuando la entidad origen tiene un estado no disponible"
@@ -399,9 +399,9 @@
         "data_description": {
           "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
-          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+          "entity_id": "entidad en la que se basa la potencia virtual, el sensor de potencia escuchará los cambios de estado de esta entidad para ser actualizada",
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "standby_power": "Definir la cantidad de potencia que consume el dispositivo cuando está apagado"
         }
       },
       "daily_energy": {
@@ -429,10 +429,10 @@
           "states_power": "Estados de potencia"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
-          "power_template": "Template will be evaluated to get the power value in W",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "One 'state: power' pair on each row, see example above"
+          "power": "Un valor de potencia fijo en Vatios (W) cuando la entidad está ENCENDIDA",
+          "power_template": "La plantilla será evaluada para obtener el valor de potencia en Vatios (W)",
+          "self_usage_included": "Si el valor de potencia incluye la energía consumida por el interruptor inteligente mismo.",
+          "states_power": "Un par \"estado: potencia\" en cada fila. Ver ejemplo arriba"
         }
       },
       "global_configuration": {
@@ -452,10 +452,10 @@
         "data_description": {
           "create_energy_sensors": "Si powercalc necesita crear sensores kWh",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
+          "disable_extended_attributes": "Deshabilitar todos los atributos extras que powercalc añade a la potencia, energía y estados de entidad de grupo. Esto ayudará a mantener la base de datos pequeña",
           "disable_library_download": "Deshabilitar la función de descarga de la biblioteca de Powercalc",
           "force_update_frequency": "Intervalo en el que se actualiza el estado del sensor, incluso cuando el valor de energía permanece igual. En segundos",
-          "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad fuente no esté disponible",
+          "ignore_unavailable_state": "Mantener los sensores de Powercalc disponibles, incluso cuando la entidad original no esté disponible",
           "include_non_powercalc_sensors": "Controlar si quieres incluir sensores no powercalc en grupos"
         }
       },
@@ -490,7 +490,7 @@
           "group_member_sensors": "Sensores miembros de powercalc",
           "group_power_entities": "Entidades de potencia adicionales",
           "hide_members": "Ocultar miembros",
-          "include_non_powercalc_sensors": "Incluye sensores no powercalc",
+          "include_non_powercalc_sensors": "Incluye sensores que no son de  powercalc",
           "sub_groups": "Subgrupos"
         },
         "data_description": {
