@@ -8,8 +8,8 @@ from inquirer.questions import Question
 
 class PowerMeter(ABC):
     @abstractmethod
-    def get_power(self) -> PowerMeasurementResult:
-        """Get a power measurement from the meter"""
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+        """Get a power measurement from the meter. Optionally include voltage readings."""
 
     def get_questions(self) -> list[Question]:
         """Get questions to ask for the chosen powermeter"""
@@ -22,4 +22,10 @@ class PowerMeter(ABC):
 
 class PowerMeasurementResult(NamedTuple):
     power: float
+    updated: float
+
+
+class ExtendedPowerMeasurementResult(NamedTuple):
+    power: float
+    voltage: float
     updated: float

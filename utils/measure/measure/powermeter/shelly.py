@@ -7,8 +7,8 @@ from typing import Any
 
 import requests
 
-from measure.powermeter.errors import ApiConnectionError
-from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
+from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
+from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 
@@ -76,6 +76,13 @@ class ShellyApiGen2Plus(ShellyApi):
 
         return True
 
+    def parse_json_with_voltage(self, json: dict) -> ExtendedPowerMeasurementResult:
+        return ExtendedPowerMeasurementResult(
+            power=float(json["apower"]),
+            voltage=float(json["voltage"]),
+            updated=time.time(),
+        )
+
 
 class ShellyPowerMeter(PowerMeter):
     def __init__(self, shelly_ip: str, timeout: int = 5) -> None:
@@ -88,8 +95,8 @@ class ShellyPowerMeter(PowerMeter):
             self.api = ShellyApiGen2Plus(self.ip_address, self.timeout)
             self.api.check_gen2_plus_endpoints()
 
-    def get_power(self) -> PowerMeasurementResult:
-        """Get a new power reading from the Shelly device"""
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+        """Get a new power reading from the Shelly device. Optionally include voltage."""
         try:
             r = requests.get(
                 f"http://{self.ip_address}{self.api.endpoint}",
@@ -100,6 +107,13 @@ class ShellyPowerMeter(PowerMeter):
             raise ApiConnectionError("Could not connect to Shelly Plug") from e
 
         json = r.json()
+
+        if include_voltage:
+            if isinstance(self.api, ShellyApiGen1):
+                raise UnsupportedFeatureError("Voltage measurement is not supported on Shelly Gen1 devices")
+            if isinstance(self.api, ShellyApiGen2Plus):
+                return self.api.parse_json_with_voltage(json)
+
         return self.api.parse_json(json)
 
     def _detect_api_version(self) -> int:
