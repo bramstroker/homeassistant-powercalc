@@ -9,7 +9,7 @@ from statistics import mean
 import numpy as np
 
 from measure.config import MeasureConfig
-from measure.const import PROJECT_DIR
+from measure.const import PROJECT_DIR, Trend
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
@@ -262,7 +262,7 @@ class MeasureUtil:
                 _LOGGER.error("Error during measurement: No trend could be calculated")
                 exit(1)
 
-            if trend == "steady":
+            if trend == Trend.STEADY:
                 break
 
             print(f"Dummy load resistance has not yet stablized and is {trend}, repeating.")
@@ -275,7 +275,7 @@ class MeasureUtil:
             f.write(str(average))
         return average
 
-    def _check_trend(self, averages: list[float]) -> str | None:
+    def _check_trend(self, averages: list[float]) -> Trend | None:
         """
         Checks if the resistance readings of a dummy load are increasing, decreasing, or steady (fluctuating).
 
@@ -301,19 +301,19 @@ class MeasureUtil:
         first_trend = calc_trend(first_half)
         second_trend = calc_trend(second_half)
 
-        def trend_direction(slope: float, threshold: float = 0.01) -> str:
+        def trend_direction(slope: float, threshold: float = 0.01) -> Trend:
             if slope > threshold:
-                return "increasing"
+                return Trend.INCREASING
             if slope < -threshold:
-                return "decreasing"
-            return "steady"
+                return Trend.DECREASING
+            return Trend.STEADY
 
         first_trend = trend_direction(first_trend)
         second_trend = trend_direction(second_trend)
 
-        if first_trend == second_trend and first_trend != "steady":
+        if first_trend == second_trend and first_trend != Trend.STEADY:
             return first_trend
-        return "steady"
+        return Trend.STEADY
 
     def _validate_voltage_support(self) -> None:
         """Check if the power meter supports voltage readings."""

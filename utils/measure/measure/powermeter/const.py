@@ -14,3 +14,9 @@ class PowerMeterType(str, Enum):
 
 
 QUESTION_POWERMETER_ENTITY_ID = "powermeter_entity_id"
+
+
+class Trend(StrEnum):
+    INCREASING = "increasing"
+    DECREASING = "decreasing"
+    STEADY = "steady"
