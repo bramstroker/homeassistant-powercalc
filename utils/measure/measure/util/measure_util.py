@@ -85,7 +85,7 @@ class MeasureUtil:
 
                 resistance = round((voltage**2) / power, 4)
                 readings.append(resistance)
-                _LOGGER.info(
+                _LOGGER.debug(
                     "Measured resistance: %.2f Ω; measured power: %.2f W, voltage: %.2f",
                     resistance,
                     power,
