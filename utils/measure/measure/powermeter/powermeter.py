@@ -11,6 +11,10 @@ class PowerMeter(ABC):
     def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
         """Get a power measurement from the meter. Optionally include voltage readings."""
 
+    @abstractmethod
+    def has_voltage_support(self) -> bool:
+        """Returns bool depending on the powermeter capabilities to act as a voltmeter."""
+
     def get_questions(self) -> list[Question]:
         """Get questions to ask for the chosen powermeter"""
         return []

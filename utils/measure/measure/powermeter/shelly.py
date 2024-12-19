@@ -135,5 +135,12 @@ class ShellyPowerMeter(PowerMeter):
         _LOGGER.debug("Shelly API version %d detected", gen)
         return int(gen)
 
+    def has_voltage_support(self) -> bool:
+        if isinstance(self.api, ShellyApiGen1):
+            return False
+        if isinstance(self.api, ShellyApiGen2Plus):
+            return True
+        return False
+
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass

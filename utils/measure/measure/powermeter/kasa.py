@@ -28,5 +28,8 @@ class KasaPowerMeter(PowerMeter):
         await self._smartplug.update()
         return self._smartplug.emeter_realtime["power"]
 
+    def has_voltage_support(self) -> bool:
+        return False
+
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass
