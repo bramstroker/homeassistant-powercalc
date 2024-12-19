@@ -79,7 +79,7 @@ class HassPowerMeter(PowerMeter):
                 name=QUESTION_VOLTAGEMETER_ENTITY_ID,
                 message="Select the voltage sensor",
                 choices=voltage_sensor_list,
-            )
+            ),
         ]
 
     def get_questions(self) -> list[inquirer.questions.Question]:

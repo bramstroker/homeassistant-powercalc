@@ -13,7 +13,6 @@ from measure.const import PROJECT_DIR, Trend, dummy_load_measurement_count, dumm
 from measure.powermeter.errors import (
     OutdatedMeasurementError,
     PowerMeterError,
-    UnsupportedFeatureError,
     ZeroReadingError,
 )
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
@@ -245,7 +244,7 @@ class MeasureUtil:
 
         print(
             "Measuring and checking dummy load... this will take at least %.0f minutes."
-            % (dummy_load_measurement_count / 60 * dummy_load_measurements_duration)
+            % (dummy_load_measurement_count / 60 * dummy_load_measurements_duration),
         )
 
         # Validate power meter is capable of measuring voltage
