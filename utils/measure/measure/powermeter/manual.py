@@ -3,17 +3,17 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class ManualPowerMeter(PowerMeter):
-    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Manually enter power readings. Optionally enter voltage readings as well."""
         if include_voltage:
             power = input("Input power measurement: ")
             voltage = input("Input voltage measurement: ")
 
-            return ExtendedPowerMeasurementResult(
+            return PowerMeasurementResult(
                 power=float(power),
                 voltage=float(voltage),
                 updated=time.time(),

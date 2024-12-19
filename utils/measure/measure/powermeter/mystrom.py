@@ -6,14 +6,14 @@ from typing import Any
 import requests
 
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
-from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class MyStromPowerMeter(PowerMeter):
     def __init__(self, device_ip: str) -> None:
         self._device_ip = device_ip
 
-    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Get a new power reading from the MyStrom device. Optionally include voltage (FIXME: not yet implemented)."""
         if include_voltage:
             # FIXME: Not yet implemented
