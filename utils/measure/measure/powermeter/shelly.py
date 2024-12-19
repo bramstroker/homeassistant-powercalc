@@ -8,7 +8,7 @@ from typing import Any
 import requests
 
 from measure.powermeter.errors import ApiConnectionError, UnsupportedFeatureError
-from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 _LOGGER = logging.getLogger("measure")
 
@@ -42,7 +42,9 @@ class ShellyApiGen2Plus(ShellyApi):
     def endpoint(self) -> str:
         return self._endpoint
 
-    def parse_json(self, json: dict) -> PowerMeasurementResult:
+    def parse_json(self, json: dict, include_voltage: bool = False) -> PowerMeasurementResult:
+        if include_voltage:
+            return PowerMeasurementResult(power=float(json["apower"]), voltage=float(json["voltage"]), updated=time.time())
         return PowerMeasurementResult(float(json["apower"]), time.time())
 
     def check_gen2_plus_endpoints(self) -> None:
@@ -76,13 +78,6 @@ class ShellyApiGen2Plus(ShellyApi):
 
         return True
 
-    def parse_json_with_voltage(self, json: dict) -> ExtendedPowerMeasurementResult:
-        return ExtendedPowerMeasurementResult(
-            power=float(json["apower"]),
-            voltage=float(json["voltage"]),
-            updated=time.time(),
-        )
-
 
 class ShellyPowerMeter(PowerMeter):
     def __init__(self, shelly_ip: str, timeout: int = 5) -> None:
@@ -95,7 +90,7 @@ class ShellyPowerMeter(PowerMeter):
             self.api = ShellyApiGen2Plus(self.ip_address, self.timeout)
             self.api.check_gen2_plus_endpoints()
 
-    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Get a new power reading from the Shelly device. Optionally include voltage."""
         try:
             r = requests.get(
@@ -112,7 +107,7 @@ class ShellyPowerMeter(PowerMeter):
             if isinstance(self.api, ShellyApiGen1):
                 raise UnsupportedFeatureError("Voltage measurement is not supported on Shelly Gen1 devices")
             if isinstance(self.api, ShellyApiGen2Plus):
-                return self.api.parse_json_with_voltage(json)
+                return self.api.parse_json(json, include_voltage=True)
 
         return self.api.parse_json(json)
 

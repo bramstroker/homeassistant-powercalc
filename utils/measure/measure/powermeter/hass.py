@@ -8,7 +8,7 @@ from homeassistant_api import Client
 
 from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
-from measure.powermeter.powermeter import ExtendedPowerMeasurementResult, PowerMeasurementResult, PowerMeter
+from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
 
 class HassPowerMeter(PowerMeter):
@@ -21,7 +21,7 @@ class HassPowerMeter(PowerMeter):
         except Exception as e:
             raise PowerMeterError(f"Failed to connect to HA API: {e}") from e
 
-    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult | ExtendedPowerMeasurementResult:
+    def get_power(self, include_voltage: bool = False) -> PowerMeasurementResult:
         """Get a new power reading from Hass-API. Optionally include voltage."""
         if self._call_update_entity:
             self.client.trigger_service(
@@ -48,7 +48,7 @@ class HassPowerMeter(PowerMeter):
                 raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
 
             voltage_value = float(voltage_state.state)
-            return ExtendedPowerMeasurementResult(power_value, voltage_value, last_updated)
+            return PowerMeasurementResult(power_value, voltage_value, last_updated)
 
         return PowerMeasurementResult(power_value, last_updated)
 
