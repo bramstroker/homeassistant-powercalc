@@ -6,7 +6,7 @@ from typing import Any
 import inquirer
 from homeassistant_api import Client
 
-from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID
+from measure.powermeter.const import QUESTION_POWERMETER_ENTITY_ID, QUESTION_VOLTAGEMETER_ENTITY_ID
 from measure.powermeter.errors import PowerMeterError, UnsupportedFeatureError
 from measure.powermeter.powermeter import PowerMeasurementResult, PowerMeter
 
@@ -66,7 +66,21 @@ class HassPowerMeter(PowerMeter):
     def find_voltage_entity(self) -> str | None:
         """Try to find a matching voltage entity for the current power entity."""
         matched_sensors = self.match_power_and_voltage_sensors()
+
+        if not matched_sensors:
+            return self.get_voltage_question(self.get_voltage_sensors())
+
         return matched_sensors.get(self._entity_id)
+
+    def get_voltage_question(self, voltage_sensor_list: list[str]) -> str | None:
+        """Return a question to select a voltage sensor."""
+        return [
+            inquirer.List(
+                name=QUESTION_VOLTAGEMETER_ENTITY_ID,
+                message="Select the voltage sensor",
+                choices=voltage_sensor_list,
+            )
+        ]
 
     def get_questions(self) -> list[inquirer.questions.Question]:
         power_sensor_list = self.get_power_sensors()
@@ -108,3 +122,4 @@ class HassPowerMeter(PowerMeter):
 
     def process_answers(self, answers: dict[str, Any]) -> None:
         self._entity_id = answers[QUESTION_POWERMETER_ENTITY_ID]
+        self._voltage_entity_id = answers[QUESTION_VOLTAGEMETER_ENTITY_ID]
