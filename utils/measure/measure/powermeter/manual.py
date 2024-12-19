@@ -22,5 +22,8 @@ class ManualPowerMeter(PowerMeter):
         power = input("Input power measurement: ")
         return PowerMeasurementResult(float(power), time.time())
 
+    def has_voltage_support(self) -> bool:
+        return True
+
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass

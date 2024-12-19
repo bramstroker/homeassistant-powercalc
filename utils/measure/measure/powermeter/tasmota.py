@@ -32,5 +32,8 @@ class TasmotaPowerMeter(PowerMeter):
 
         return PowerMeasurementResult(float(power), time.time())
 
+    def has_voltage_support(self) -> bool:
+        return False
+
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass

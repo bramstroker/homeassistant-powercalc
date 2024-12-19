@@ -94,12 +94,10 @@ class MeasureUtil:
                 continue
 
             if self.dummy_load_value:  # measurement with dummy load
-                try:
-                    result = self.power_meter.get_power(include_voltage=True)
-                except UnsupportedFeatureError as e:
-                    _LOGGER.error("Error during measurement: %s", e)
-                    print("The selected power meter does not support voltage measurements, required to measure with dummy loads.")
-                    exit(1)
+                # Validate power meter is capable of measuring voltage
+                self._validate_voltage_support()
+
+                result = self.power_meter.get_power(include_voltage=True)
 
                 power, voltage = result.power, result.voltage
 
@@ -319,9 +317,7 @@ class MeasureUtil:
 
     def _validate_voltage_support(self) -> None:
         """Check if the power meter supports voltage readings."""
-        try:
-            self.take_average_measurement(1, measure_resistance=True)
-        except UnsupportedFeatureError as e:
-            _LOGGER.error("Error during measurement: %s", e)
+
+        if not self.power_meter.has_voltage_support:
             print("The selected power meter does not support voltage measurements, required to measure dummy loads.")
             exit(1)

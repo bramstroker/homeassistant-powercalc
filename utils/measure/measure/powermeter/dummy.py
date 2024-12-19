@@ -12,5 +12,8 @@ class DummyPowerMeter(PowerMeter):
             return ExtendedPowerMeasurementResult(20.5, 233.0, time.time())
         return PowerMeasurementResult(20.5, time.time())
 
+    def has_voltage_support(self) -> bool:
+        return True
+
     def process_answers(self, answers: dict[str, Any]) -> None:
         pass

@@ -52,6 +52,17 @@ class HassPowerMeter(PowerMeter):
 
         return PowerMeasurementResult(power_value, last_updated)
 
+    def has_voltage_support(self) -> bool:
+        if not self._voltage_entity_id:
+            self._voltage_entity_id = self.find_voltage_entity()
+            if not self._voltage_entity_id:
+                return False
+
+        voltage_state = self.client.get_state(entity_id=self._voltage_entity_id)
+        if voltage_state == "unavailable":
+            raise PowerMeterError(f"Voltage sensor {self._voltage_entity_id} unavailable")
+        return True
+
     def find_voltage_entity(self) -> str | None:
         """Try to find a matching voltage entity for the current power entity."""
         matched_sensors = self.match_power_and_voltage_sensors()
