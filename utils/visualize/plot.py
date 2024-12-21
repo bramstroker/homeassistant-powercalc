@@ -153,10 +153,7 @@ def main() -> None:
     args = parser.parse_args()
 
     file_path = resolve_absolute_file_path(args.file)
-    output_path = args.output
-    if output_path == "auto":
-        output_path = os.path.splitext(file_path)[0].replace('.csv', '') + '.png'
-    create_plot_for_csv_file(file_path, output_path)
+    create_plot_for_csv_file(file_path, args.output)
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
