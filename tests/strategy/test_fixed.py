@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from homeassistant.components import input_number
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON
@@ -251,6 +253,41 @@ async def test_template_power_combined_with_multiply_factor(
     state = hass.states.get("sensor.test_power")
     assert state
     assert state.state == "2050.00"
+
+
+async def test_duplicate_tracking_is_prevented(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """
+    Make sure the source entity is only tracked once, when it is referenced both in template and entity_id.
+    see: https://github.com/bramstroker/homeassistant-powercalc/issues/2802
+    """
+
+    caplog.set_level(logging.DEBUG)
+
+    template = """
+      {% if state_attr('remote.harmony57', 'current_activity') == 'PowerOff' %}
+        12.0
+      {% elif state_attr('remote.harmony57', 'current_activity') == 'Listen Radio' %}
+        60.0
+      {% else %}
+        160.0
+      {% endif %}
+    """
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "remote.harmony57",
+            CONF_FIXED: {CONF_POWER: template},
+        },
+    )
+
+    hass.states.async_set("remote.harmony57", STATE_ON, {"current_activity": "PowerOff"})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.harmony57_power").state == "12.00"
+
+    state_change_logs = [record for record in caplog.records if 'State changed to "on". Power:12.00' in record.message]
+    assert len(state_change_logs) == 1, "Expected only one state change log"
 
 
 async def _create_strategy(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from copy import copy
 from datetime import timedelta
 from decimal import Decimal
 from typing import Any, cast
@@ -413,7 +414,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         async def initial_update(hass: HomeAssistant) -> None:
             if self._strategy_instance:
                 await self._strategy_instance.on_start(hass)
-            for entity_id in self._track_entities:
+
+            entities = self._track_entities
+            if self._source_entity.entity_id == DUMMY_ENTITY_ID:
+                entities.append(DUMMY_ENTITY_ID)
+            for entity_id in entities:
                 new_state = self.hass.states.get(entity_id)
                 await self._handle_source_entity_state_change(
                     entity_id,
@@ -422,31 +427,19 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 async_dispatcher_send(self.hass, SIGNAL_POWER_SENSOR_STATE_CHANGE)
 
         """Add listeners and get initial state."""
-        entities_to_track = self._strategy_instance.get_entities_to_track()
+        entities_to_track = self._get_tracking_entities()
 
-        track_entities = [entity for entity in entities_to_track if isinstance(entity, str)]
-        if not track_entities:
-            track_entities = [self._source_entity.entity_id]
-
-        if self._power_profile and self._power_profile.sub_profile_select:
-            self._sub_profile_selector = SubProfileSelector(
-                self.hass,
-                self._power_profile.sub_profile_select,
-                self._source_entity,
-            )
-            track_entities.extend(self._sub_profile_selector.get_tracking_entities())
-
-        self._track_entities = track_entities
+        self._track_entities = [entity for entity in entities_to_track if isinstance(entity, str)]
+        track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
 
         self.async_on_remove(
             async_track_state_change_event(
                 self.hass,
-                track_entities,
+                self._track_entities,
                 appliance_state_listener,
             ),
         )
 
-        track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
         if isinstance(self._standby_power, Template):
             self._standby_power.hass = self.hass
             track_templates.append(TrackTemplate(self._standby_power, None, None))
@@ -465,6 +458,29 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         if hasattr(self._strategy_instance, "set_update_callback"):
             self._strategy_instance.set_update_callback(self._update_power_sensor)
+
+    def _get_tracking_entities(self) -> list[str | TrackTemplate]:
+        """Return entities and templates that should be tracked."""
+        entities_to_track = copy(self._strategy_instance.get_entities_to_track()) if self._strategy_instance else []
+
+        if self._power_profile and self._power_profile.sub_profile_select:
+            self._sub_profile_selector = SubProfileSelector(
+                self.hass,
+                self._power_profile.sub_profile_select,
+                self._source_entity,
+            )
+            entities_to_track.extend(self._sub_profile_selector.get_tracking_entities())
+
+        source_entity_included = [
+            entity
+            for entity in entities_to_track
+            if entity == self._source_entity.entity_id
+            or (isinstance(entity, TrackTemplate) and self._source_entity.entity_id in entity.template.template)
+        ]
+        if not source_entity_included and self._source_entity.entity_id != DUMMY_ENTITY_ID:
+            entities_to_track.append(self._source_entity.entity_id)
+
+        return entities_to_track
 
     def init_calculation_enabled_condition(self) -> None:
         if CONF_CALCULATION_ENABLED_CONDITION not in self._sensor_config:
