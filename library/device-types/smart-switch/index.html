@@ -2004,13 +2004,17 @@ Depending on the capabilities of the smart switch, select the appropriate config
 Assuming the user provides a value of 50W the following power values will be calculated:
 - ON: 50.7W
 - OFF: 0.3W</p>
-<p>... note::
-    During the configuration flow the user als has the option to toggle <code>self_usage_included</code> on or off.
-    When toggled on the power when ON will be 50W instead of 50.7W, in the example above.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>During the configuration flow the user als has the option to toggle <code>self_usage_included</code> on or off.
+When toggled on the power when ON will be 50W instead of 50.7W, in the example above.</p>
+</div>
 <h2 id="smart-switch-with-built-in-powermeter">Smart switch with built-in powermeter</h2>
-<p>... note::
-    In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
-    As the smart switch itself already measures the connected appliance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
+As the smart switch itself already measures the connected appliance.</p>
+</div>
 <p>Note the sensor_naming configuration which will make sure the entities are named different than the power entities already provided, so they don't conflict.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;measure_method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;manual&quot;</span><span class="p">,</span>
