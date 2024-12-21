@@ -82,8 +82,9 @@ nav:
       - 'library/structure.md'
       - 'Device types':
           - 'library/device-types/index.md'
-          - 'library/device-types/smart_dimmer.md'
-          - 'library/device-types/smart_switch.md'
+          - 'library/device-types/power-meter.md'
+          - 'library/device-types/smart-dimmer.md'
+          - 'library/device-types/smart-switch.md'
   - 'Troubleshooting':
       - 'troubleshooting/faq.md'
       - 'troubleshooting/debug-logging.md'
