@@ -3,7 +3,7 @@ name: LUT file validation
 on:
   pull_request_target:
     paths:
-       - '**/(hs|color_temp|brightness).csv.gz'
+       - '**/*.csv.gz'
        - '.github/scripts/lut_validator/**'
 
 permissions:
