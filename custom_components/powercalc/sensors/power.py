@@ -65,6 +65,7 @@ from custom_components.powercalc.const import (
     CONF_POWER_SENSOR_CATEGORY,
     CONF_POWER_SENSOR_ID,
     CONF_POWER_SENSOR_PRECISION,
+    CONF_SELF_USAGE_INCLUDED,
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
@@ -254,6 +255,8 @@ def _get_standby_power(
     """Retrieve standby power settings from sensor config or power profile."""
     standby_power: Template | Decimal = Decimal(0)
     standby_power_on = Decimal(0)
+    if sensor_config.get(CONF_SELF_USAGE_INCLUDED, False):
+        return standby_power, standby_power_on
 
     if not sensor_config.get(CONF_DISABLE_STANDBY_POWER):
         if sensor_config.get(CONF_STANDBY_POWER) is not None:

@@ -37,6 +37,7 @@ class DeviceType(StrEnum):
     CAMERA = "camera"
     COVER = "cover"
     LIGHT = "light"
+    POWER_METER = "power_meter"
     PRINTER = "printer"
     SMART_DIMMER = "smart_dimmer"
     SMART_SWITCH = "smart_switch"
@@ -56,6 +57,7 @@ DEVICE_TYPE_DOMAIN = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
+    DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
     DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
