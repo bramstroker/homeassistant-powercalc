@@ -77,6 +77,7 @@
         "camera",
         "cover",
         "light",
+        "power_meter",
         "printer",
         "smart_dimmer",
         "smart_switch",
@@ -208,10 +209,6 @@
           }
         }
       }
-    },
-    "has_built_in_powermeter": {
-      "type": "boolean",
-      "description": "Indicates if the device has a built-in powermeter"
     },
     "config_flow_discovery_remarks": {
       "type": "string",
