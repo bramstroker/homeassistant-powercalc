@@ -153,7 +153,10 @@ def main() -> None:
     args = parser.parse_args()
 
     file_path = resolve_absolute_file_path(args.file)
-    create_plot_for_csv_file(file_path, args.output)
+    output_path = args.output
+    if output_path == "auto":
+        output_path = os.path.splitext(file_path)[0].replace('.csv', '') + '.png'
+    create_plot_for_csv_file(file_path, output_path)
 
 
 def resolve_absolute_file_path(file_path: str) -> str:
@@ -165,7 +168,7 @@ def resolve_absolute_file_path(file_path: str) -> str:
         "../../profile_library",
         file_path
     )
-    if os.path.exists(file_path):
+    if os.path.exists(library_path):
         return library_path
 
     raise FileNotFoundError(f"File not found: {file_path}")
