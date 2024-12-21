@@ -24,13 +24,15 @@ Assuming the user provides a value of 50W the following power values will be cal
 - ON: 50.7W
 - OFF: 0.3W
 
-... note::
+!!! note
+
     During the configuration flow the user als has the option to toggle `self_usage_included` on or off.
     When toggled on the power when ON will be 50W instead of 50.7W, in the example above.
 
 ## Smart switch with built-in powermeter
 
-... note::
+!!! note
+
     In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
     As the smart switch itself already measures the connected appliance.
 
