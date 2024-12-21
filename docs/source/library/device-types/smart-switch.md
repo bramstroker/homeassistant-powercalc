@@ -3,7 +3,7 @@
 Below are different examples of how to configure a smart switch device in the library.
 Depending on the capabilities of the smart switch, select the appropriate configuration.
 
-## Smart switch with relay (without built-in powermeter)
+## Smart switch without built-in powermeter
 
 The profile will provide self-usage measurements for the smart switch itself, and will ask the user to provide the power consumption of the connected device.
 
@@ -28,41 +28,13 @@ Assuming the user provides a value of 50W the following power values will be cal
     During the configuration flow the user als has the option to toggle `self_usage_included` on or off.
     When toggled on the power when ON will be 50W instead of 50.7W, in the example above.
 
-## Smart switch with relay (with built-in powermeter)
+## Smart switch with built-in powermeter
 
 ... note::
     In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
     As the smart switch itself already measures the connected appliance.
 
 Note the sensor_naming configuration which will make sure the entities are named different than the power entities already provided, so they don't conflict.
-
-```json
-{
-  "measure_method": "manual",
-  "measure_device": "Some device",
-  "name": "Some smart switch",
-  "standby_power": 0.3,
-  "standby_power_on": 0.7,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
-  "has_built_in_powermeter": true,
-  "device_type": "smart_switch",
-  "calculation_strategy": "fixed"
-}
-```
-
-Following the example above, the following power values will be calculated:
-- ON: 0.7W
-- OFF: 0.3W
-
-## Smart switch without relay (Power meter only)
-
-... note::
-    In this scenario Powercalc will only provide the self-usage measurements for the smart switch itself.
-
-Smart switches that can only measure power consumption, but don't have a relay to toggle the power, can be configured as follows:
 
 ```json
 {
@@ -77,14 +49,14 @@ Smart switches that can only measure power consumption, but don't have a relay t
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
   "fixed_config": {
-    "power": 0.3
+    "power": 0.7
   }
 }
 ```
 
-In this scenario, the user will NOT be asked to provide the power consumption of the connected device.
-
-Following the example above the power for this device will always be 0.3W.
+Following the example above, the following power values will be calculated:
+- ON: 0.7W
+- OFF: 0.3W
 
 ## Measure
 
