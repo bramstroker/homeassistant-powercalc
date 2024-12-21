@@ -16,16 +16,6 @@ sys.path.insert(
     ),
 )
 
-DEVICE_TYPES = [
-    ("light", "Lights"),
-    ("smart_speaker", "Smart speakers"),
-    ("smart_switch", "Smart switches / plugs"),
-    ("camera", "Cameras"),
-    ("cover", "Covers"),
-    ("printer", "Printers"),
-    ("network", "Networking"),
-]
-
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.abspath(__file__), "../../../../"))
 DATA_DIR = f"{PROJECT_ROOT}/profile_library"
 
