@@ -1,4 +1,4 @@
-# Smart dimmer
+# Smart switch
 
 Below are different examples of how to configure a smart switch device in the library.
 Depending on the capabilities of the smart switch, select the appropriate configuration.
