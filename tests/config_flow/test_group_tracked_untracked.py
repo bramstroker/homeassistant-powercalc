@@ -10,10 +10,10 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
-    CONF_CREATE_ENERGY_SENSOR,
-    CONF_CREATE_UTILITY_METERS,
-    CONF_GROUP_TRACKED_AUTO, CONF_GROUP_TYPE,
-    CONF_MAIN_POWER_SENSOR, CONF_SUBTRACT_ENTITIES,
+    CONF_GROUP_TRACKED_AUTO,
+    CONF_GROUP_TYPE,
+    CONF_MAIN_POWER_SENSOR,
+    CONF_SUBTRACT_ENTITIES,
     GroupType,
 )
 from tests.config_flow.common import (
