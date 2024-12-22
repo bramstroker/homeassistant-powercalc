@@ -63,11 +63,13 @@ from .const import (
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
-    CONF_GROUP_TRACKED_AUTO, CONF_GROUP_TYPE,
+    CONF_GROUP_TRACKED_AUTO,
+    CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_MAIN_POWER_SENSOR, CONF_MANUFACTURER,
+    CONF_MAIN_POWER_SENSOR,
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
@@ -457,7 +459,7 @@ SCHEMA_GROUP_TRACKED_UNTRACKED = vol.Schema(
         vol.Required(CONF_MAIN_POWER_SENSOR): selector.EntitySelector(
             selector.EntitySelectorConfig(
                 domain=Platform.SENSOR,
-                device_class=SensorDeviceClass.POWER
+                device_class=SensorDeviceClass.POWER,
             ),
         ),
         vol.Required(CONF_GROUP_TRACKED_AUTO): selector.BooleanSelector(),

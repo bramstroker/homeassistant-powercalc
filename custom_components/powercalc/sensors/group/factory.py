@@ -50,7 +50,7 @@ async def create_group_sensors(
     if group_type == GroupType.TRACKED_UNTRACKED:
         return await tracked_untracked.create_tracked_untracked_group_sensors(
             hass=hass,
-            config=sensor_config
+            config=sensor_config,
         )
 
     raise SensorConfigurationError(f"Group type {group_type} invalid")  # pragma: no cover
