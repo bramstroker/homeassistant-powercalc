@@ -940,13 +940,12 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
         if (
             self.selected_profile
-            # and not self.selected_profile.fixed_config
             and self.selected_profile.device_type == DeviceType.SMART_SWITCH
             and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED
         ):
             return await self.async_step_smart_switch()
 
-        if self.selected_profile and self.selected_profile.needs_fixed_config:
+        if self.selected_profile and self.selected_profile.needs_fixed_config:  # pragma: no cover
             return await self.async_step_fixed()
 
         if self.selected_profile and self.selected_profile.needs_linear_config:
