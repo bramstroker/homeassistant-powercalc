@@ -224,7 +224,7 @@ class PowerProfile:
         try:
             return DeviceType(device_type)
         except ValueError:
-            _LOGGER.error("Unknown device type: %s", device_type)
+            _LOGGER.warning("Unknown device type: %s", device_type)
             return None
 
     @property
