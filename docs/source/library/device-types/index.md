@@ -2,9 +2,9 @@
 
 Here you can find information about how to setup specific device types for the library.
 
-## [Light](light.md)
+## [Camera](camera.md)
 
-Smart lights. Powercalc profiles can be used to define the power consumption of the light.
+## [Light](light.md)
 
 ## [Power meter](power-meter.md)
 
