@@ -24,12 +24,12 @@ from tests.config_flow.common import (
 
 
 async def test_config_flow(hass: HomeAssistant) -> None:
-    """Test the subtract group flow."""
+    """Test the tracked/untracked group flow."""
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_TRACKED_UNTRACKED)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
     user_input = {
-        CONF_MAIN_POWER_SENSOR: "sensor.outlet_power",
+        CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
         CONF_GROUP_TRACKED_AUTO: True,
     }
     result = await hass.config_entries.flow.async_configure(
@@ -41,19 +41,21 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         CONF_SENSOR_TYPE: SensorType.GROUP,
         CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
         CONF_NAME: "Tracked / Untracked",
-        CONF_MAIN_POWER_SENSOR: "sensor.outlet_power",
+        CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
         CONF_GROUP_TRACKED_AUTO: True,
     }
-    config_entry: ConfigEntry = result["result"]
 
+    hass.states.async_set("sensor.mains_power", "100")
     hass.states.async_set("sensor.1_power", "10")
     await hass.async_block_till_done()
 
     tracked_power_state = hass.states.get("sensor.tracked_power")
     assert tracked_power_state
+    assert not tracked_power_state == "10.00"
 
     untracked_power_state = hass.states.get("sensor.untracked_power")
     assert untracked_power_state
+    assert not untracked_power_state == "90.00"
     #
     # result = await hass.config_entries.options.async_init(
     #     config_entry.entry_id,

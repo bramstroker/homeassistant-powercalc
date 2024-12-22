@@ -456,9 +456,7 @@ def save_entity_ids_on_config_entry(
     if power_entities:
         new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
 
-    if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
-        CONF_CREATE_ENERGY_SENSOR,
-    ):
+    if bool(config_entry.data.get(CONF_CREATE_ENERGY_SENSOR, False)):
         energy_entities = [e.entity_id for e in entities.all() if isinstance(e, EnergySensor)]
         if not energy_entities:
             raise SensorConfigurationError(  # pragma: no cover
