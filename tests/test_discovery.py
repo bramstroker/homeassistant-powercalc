@@ -497,6 +497,62 @@ async def test_wled_not_discovered_twice(
     assert len(mock_calls) == 0
 
 
+async def test_govee_segment_lights_skipped(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """
+    Govee segment lights should be skipped
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2834
+    """
+    mock_device_registry(
+        hass,
+        {
+            "govee-device": DeviceEntry(
+                id="govee-device",
+                manufacturer="Govee",
+                model="H6076",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "light.floor_lamp_livingroom": RegistryEntry(
+                entity_id="light.floor_lamp_livingroom",
+                unique_id="gv2mqtt-F23DD0C844866B65",
+                platform="mqtt",
+                device_id="govee-device",
+            ),
+            "light.floor_lamp_livingroom_segment_001": RegistryEntry(
+                entity_id="light.floor_lamp_livingroom_segment_001",
+                unique_id="gv2mqtt-F23DD0C844866B65-0",
+                platform="mqtt",
+                device_id="govee-device",
+            ),
+            "light.floor_lamp_livingroom_segment_002": RegistryEntry(
+                entity_id="light.floor_lamp_livingroom_segment_002",
+                unique_id="gv2mqtt-F23DD0C844866B65-1",
+                platform="mqtt",
+                device_id="govee-device",
+            ),
+            "light.floor_lamp_livingroom_segment_003": RegistryEntry(
+                entity_id="light.floor_lamp_livingroom_segment_003",
+                unique_id="gv2mqtt-F23DD0C844866B65-2",
+                platform="mqtt",
+                device_id="govee-device",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
+
+
 async def test_get_power_profile_empty_manufacturer(
     hass: HomeAssistant,
     caplog: pytest.LogCaptureFixture,

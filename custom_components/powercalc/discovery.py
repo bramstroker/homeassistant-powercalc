@@ -218,6 +218,9 @@ class DiscoveryManager:
         ]:
             return False
 
+        if entity_entry.platform == "mqtt" and "segment" in entity_entry.entity_id:
+            return False
+
         has_user_config = self._is_user_configured(entity_entry.entity_id)
         if has_user_config:
             _LOGGER.debug(
