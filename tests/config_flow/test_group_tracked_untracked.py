@@ -1,5 +1,4 @@
 from homeassistant import data_entry_flow
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -51,11 +50,11 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 
     tracked_power_state = hass.states.get("sensor.tracked_power")
     assert tracked_power_state
-    assert not tracked_power_state == "10.00"
+    assert tracked_power_state != "10.00"
 
     untracked_power_state = hass.states.get("sensor.untracked_power")
     assert untracked_power_state
-    assert not untracked_power_state == "90.00"
+    assert untracked_power_state != "90.00"
     #
     # result = await hass.config_entries.options.async_init(
     #     config_entry.entry_id,
