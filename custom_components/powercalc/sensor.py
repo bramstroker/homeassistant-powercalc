@@ -137,6 +137,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
+from .group_include.filter import FilterOperator, create_composite_filter
 from .group_include.include import resolve_include_entities
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
@@ -742,7 +743,9 @@ async def add_discovered_entities(
     """Add discovered entities based on include configuration."""
     if CONF_INCLUDE in config:
         include_config: dict = cast(dict, config[CONF_INCLUDE])
-        found_entities, discoverable_entities = await resolve_include_entities(hass, include_config)
+        include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
+        entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
+        found_entities, discoverable_entities = await resolve_include_entities(hass, entity_filter, include_non_powercalc)
         entities_to_add.existing.extend(found_entities)
         for entity_id in discoverable_entities:
             sensor_configs[entity_id] = {CONF_ENTITY_ID: entity_id}

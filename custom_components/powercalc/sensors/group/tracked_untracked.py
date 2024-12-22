@@ -14,9 +14,11 @@ from custom_components.powercalc.const import (
     GroupType,
 )
 from custom_components.powercalc.errors import SensorConfigurationError
+from custom_components.powercalc.group_include.include import resolve_include_entities
 from custom_components.powercalc.sensors.abstract import generate_power_sensor_entity_id
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
+from custom_components.powercalc.sensors.power import PowerSensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,31 +29,28 @@ async def create_tracked_untracked_group_sensors(
 ) -> list[Entity]:
     """Create subtract group sensors."""
 
-    # validate_config(config)
+    unique_id = str(config.get(CONF_UNIQUE_ID))
     main_power_sensor = str(config.get(CONF_MAIN_POWER_SENSOR))
     auto_mode = bool(config.get(CONF_GROUP_TRACKED_AUTO))
     tracked_entities = set()
     if auto_mode:
-        tracked_entities = await resolve_tracked_entities()
+        entities, _ = await resolve_include_entities(hass)
+        tracked_entities = {entity.entity_id for entity in entities if isinstance(entity, PowerSensor)}
 
-    # tracked_name = generate_power_sensor_name(config, "Tracked")
-    tracked_unique_id = config.get(CONF_UNIQUE_ID) + "_tracked"
     tracked_entity_id = generate_power_sensor_entity_id(
         hass,
         config,
         name="Tracked",
-        unique_id=tracked_unique_id,
+        unique_id=unique_id + "_tracked",
     )
-    # untracked_name = generate_power_sensor_name(config, "Untracked")
-    untracked_unique_id = config.get(CONF_UNIQUE_ID) + "_untracked"
     untracked_entity_id = generate_power_sensor_entity_id(
         hass,
         config,
         name="Untracked",
-        unique_id=untracked_unique_id,
+        unique_id=unique_id + "_untracked",
     )
 
-    # _LOGGER.debug("Creating grouped power sensor: %s (entity_id=%s)", name, entity_id)
+    _LOGGER.debug("Creating tracked grouped power sensor")
 
     sensors: list[Entity] = []
     tracked_sensor = GroupedPowerSensor(
@@ -61,14 +60,14 @@ async def create_tracked_untracked_group_sensors(
         group_type=GroupType.TRACKED_UNTRACKED,
         entities=tracked_entities,
         entity_id=tracked_entity_id,
-        name="Tracked",
+        name="Tracked power",
     )
     sensors.append(tracked_sensor)
 
     untracked_sensor = SubtractGroupSensor(
         hass,
         entity_id=untracked_entity_id,
-        name="Untracked",
+        name="Untracked power",
         sensor_config=config,
         base_entity_id=main_power_sensor,
         subtract_entities=[tracked_sensor.entity_id],
@@ -76,11 +75,6 @@ async def create_tracked_untracked_group_sensors(
     sensors.append(untracked_sensor)
 
     return sensors
-
-
-async def resolve_tracked_entities() -> set[str]:
-    """Resolve tracked entities."""
-    return set("sensor.1_power")
 
 
 def generate_unique_id(sensor_config: ConfigType) -> str:

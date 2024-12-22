@@ -87,6 +87,7 @@ from custom_components.powercalc.const import (
     UnitPrefix,
 )
 from custom_components.powercalc.device_binding import get_device_info
+from custom_components.powercalc.group_include.filter import AreaFilter
 from custom_components.powercalc.group_include.include import resolve_include_entities
 from custom_components.powercalc.sensors.abstract import (
     BaseEntity,
@@ -267,12 +268,11 @@ async def resolve_entity_ids_recursively(
         if CONF_AREA not in entry.data:
             return
 
+        entity_filter = AreaFilter(hass, entry.data[CONF_AREA])
         resolved_area_entities, _ = await resolve_include_entities(
             hass,
-            {
-                CONF_AREA: entry.data[CONF_AREA],
-                CONF_INCLUDE_NON_POWERCALC_SENSORS: entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS),
-            },
+            entity_filter,
+            bool(entry.data.get(CONF_INCLUDE_NON_POWERCALC_SENSORS)),
         )
         area_entities = [
             entity.entity_id

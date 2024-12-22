@@ -8,7 +8,6 @@ from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
-    CONF_INCLUDE_NON_POWERCALC_SENSORS,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DOMAIN,
@@ -16,27 +15,24 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import (
-    FilterOperator,
-    create_composite_filter,
-)
+from .filter import IncludeEntityFilter, NullFilter
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def resolve_include_entities(
     hass: HomeAssistant,
-    include_config: dict,
+    entity_filter: IncludeEntityFilter | None = None,
+    include_non_powercalc: bool = True,
 ) -> tuple[list[Entity], list[str]]:
     """ "
     For a given include configuration fetch all power and energy sensors from the HA instance
     """
     discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
 
-    include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
-    source_entities = resolve_include_source_entities(hass, include_config)
+    source_entities = resolve_include_source_entities(hass, entity_filter or NullFilter())
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug(
             "Found possible include entities: %s",
@@ -66,9 +62,7 @@ async def resolve_include_entities(
 @callback
 def resolve_include_source_entities(
     hass: HomeAssistant,
-    include_config: dict,
+    entity_filter: IncludeEntityFilter,
 ) -> dict[str, entity_registry.RegistryEntry]:
-    entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
-
     entity_reg = entity_registry.async_get(hass)
     return {entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry) and not entry.disabled}
