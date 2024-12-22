@@ -63,11 +63,11 @@ from .const import (
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
-    CONF_GROUP_TYPE,
+    CONF_GROUP_TRACKED_AUTO, CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_MANUFACTURER,
+    CONF_MAIN_POWER_SENSOR, CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
@@ -135,6 +135,7 @@ class Step(StrEnum):
     GROUP_CUSTOM = "group_custom"
     GROUP_DOMAIN = "group_domain"
     GROUP_SUBTRACT = "group_subtract"
+    GROUP_TRACKED_UNTRACKED = "group_tracked_untracked"
     LIBRARY = "library"
     POST_LIBRARY = "post_library"
     LIBRARY_MULTI_PROFILE = "library_multi_profile"
@@ -174,6 +175,7 @@ MENU_GROUP = [
     Step.GROUP_CUSTOM,
     Step.GROUP_DOMAIN,
     Step.GROUP_SUBTRACT,
+    Step.GROUP_TRACKED_UNTRACKED,
 ]
 
 MENU_OPTIONS = [
@@ -199,6 +201,7 @@ GROUP_STEP_MAPPING = {
     GroupType.DOMAIN: Step.GROUP_DOMAIN,
     GroupType.STANDBY: Step.GROUP_DOMAIN,
     GroupType.SUBTRACT: Step.GROUP_SUBTRACT,
+    GroupType.TRACKED_UNTRACKED: Step.GROUP_TRACKED_UNTRACKED,
 }
 
 SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
@@ -449,6 +452,18 @@ SCHEMA_GROUP_SUBTRACT = vol.Schema(
     },
 )
 
+SCHEMA_GROUP_TRACKED_UNTRACKED = vol.Schema(
+    {
+        vol.Required(CONF_MAIN_POWER_SENSOR): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER
+            ),
+        ),
+        vol.Required(CONF_GROUP_TRACKED_AUTO): selector.BooleanSelector(),
+    },
+)
+
 SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
     {
         vol.Required(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
@@ -519,6 +534,7 @@ GROUP_SCHEMAS = {
     GroupType.CUSTOM: SCHEMA_GROUP,
     GroupType.DOMAIN: SCHEMA_GROUP_DOMAIN,
     GroupType.SUBTRACT: SCHEMA_GROUP_SUBTRACT,
+    GroupType.TRACKED_UNTRACKED: SCHEMA_GROUP_TRACKED_UNTRACKED,
 }
 
 
@@ -1411,6 +1427,14 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for subtract group sensor."""
         return await self.handle_group_step(GroupType.SUBTRACT, user_input)
+
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        await self.async_set_unique_id("pc_tracked_untracked")
+        self._abort_if_unique_id_configured()
+        if user_input is not None:
+            user_input[CONF_NAME] = "Tracked / Untracked"
+        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input)
 
     async def async_step_library_multi_profile(
         self,
