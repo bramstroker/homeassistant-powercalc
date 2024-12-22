@@ -907,6 +907,9 @@ def update_registries(
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: entities_to_add},
     )
+    if "test_entities" not in hass.data[DOMAIN]:
+        hass.data[DOMAIN]["test_entities"] = {}
+    hass.data[DOMAIN]["test_entities"].update({entity.entity_id: entity for entity in entities_to_add})
 
     domain_entities = hass.data[DOMAIN][DATA_DOMAIN_ENTITIES].setdefault(source_entity.domain, [])
     domain_entities.extend(entities_to_add)

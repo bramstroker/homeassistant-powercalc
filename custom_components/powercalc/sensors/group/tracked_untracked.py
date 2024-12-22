@@ -37,17 +37,22 @@ async def create_tracked_untracked_group_sensors(
         entities, _ = await resolve_include_entities(hass)
         tracked_entities = {entity.entity_id for entity in entities if isinstance(entity, PowerSensor)}
 
+    if main_power_sensor in tracked_entities:
+        tracked_entities.remove(main_power_sensor)
+
+    tracked_unique_id = unique_id + "_tracked"
     tracked_entity_id = generate_power_sensor_entity_id(
         hass,
         config,
         name="Tracked",
-        unique_id=unique_id + "_tracked",
+        unique_id=tracked_unique_id,
     )
+    untracked_unique_id = unique_id + "_untracked"
     untracked_entity_id = generate_power_sensor_entity_id(
         hass,
         config,
         name="Untracked",
-        unique_id=unique_id + "_untracked",
+        unique_id=untracked_unique_id,
     )
 
     _LOGGER.debug("Creating tracked grouped power sensor")
@@ -61,6 +66,7 @@ async def create_tracked_untracked_group_sensors(
         entities=tracked_entities,
         entity_id=tracked_entity_id,
         name="Tracked power",
+        unique_id=tracked_unique_id,
     )
     sensors.append(tracked_sensor)
 
@@ -71,6 +77,7 @@ async def create_tracked_untracked_group_sensors(
         sensor_config=config,
         base_entity_id=main_power_sensor,
         subtract_entities=[tracked_sensor.entity_id],
+        unique_id=untracked_unique_id,
     )
     sensors.append(untracked_sensor)
 

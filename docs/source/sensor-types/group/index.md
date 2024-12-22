@@ -18,6 +18,10 @@ Create a group for all the power entities of a given domain. For example all lig
 
 Use this group to subtract the power of one or more entities from another entity.
 
+- [Tracked/Untracked group](tracked-untracked.md)
+
+This group is used to get a sum of all tracked or untracked power sensors.
+
 - Standby group
 
 This group is created by default and sum all power when devices are in standby mode.
