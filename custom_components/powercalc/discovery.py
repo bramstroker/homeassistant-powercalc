@@ -29,6 +29,7 @@ from .const import (
     CalculationStrategy,
 )
 from .errors import ModelNotSupportedError
+from .group_include.filter import CategoryFilter, CompositeFilter, FilterOperator, LambdaFilter, NotFilter, get_filtered_entity_list
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -72,8 +73,7 @@ class DiscoveryManager:
                 self.initialized_flows.update({entry.unique_id, str(entry.data.get(CONF_ENTITY_ID))})
 
         _LOGGER.debug("Start auto discovering entities")
-        entity_registry = er.async_get(self.hass)
-        for entity_entry in list(entity_registry.entities.values()):
+        for entity_entry in await self.get_entities():
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
             try:
                 model_info = await self.extract_model_info_from_entity(source_entity.entity_entry)
@@ -191,9 +191,6 @@ class DiscoveryManager:
         power_profile: PowerProfile | None = None,
         log_profile_loading_errors: bool = True,
     ) -> bool:
-        if not self.should_process_entity(entity_entry):
-            return False
-
         if not model_info:
             model_info = await self.extract_model_info_from_entity(entity_entry)
         if not model_info or not model_info.manufacturer or not model_info.model:
@@ -207,26 +204,32 @@ class DiscoveryManager:
 
         return power_profile.is_entity_domain_supported(entity_entry) if power_profile else False
 
-    def should_process_entity(self, entity_entry: er.RegistryEntry) -> bool:
-        """Do some validations on the registry entry to see if it qualifies for discovery."""
-        if entity_entry.disabled:
-            return False
+    async def get_entities(self) -> list[er.RegistryEntry]:
+        """Get all entities from entity registry which qualifies for discovery."""
 
-        if entity_entry.entity_category in [
-            EntityCategory.CONFIG,
-            EntityCategory.DIAGNOSTIC,
-        ]:
-            return False
+        def _check_already_configured(entity: er.RegistryEntry) -> bool:
+            has_user_config = self._is_user_configured(entity.entity_id)
+            if has_user_config:
+                _LOGGER.debug(
+                    "%s: Entity is manually configured, skipping auto configuration",
+                    entity.entity_id,
+                )
+            return has_user_config
 
-        has_user_config = self._is_user_configured(entity_entry.entity_id)
-        if has_user_config:
-            _LOGGER.debug(
-                "%s: Entity is manually configured, skipping auto configuration",
-                entity_entry.entity_id,
-            )
-            return False
-
-        return True
+        entity_filter = CompositeFilter(
+            [
+                CategoryFilter(
+                    [
+                        EntityCategory.CONFIG,
+                        EntityCategory.DIAGNOSTIC,
+                    ],
+                ),
+                LambdaFilter(_check_already_configured),
+                LambdaFilter(lambda entity: entity.device_id is None),
+            ],
+            FilterOperator.OR,
+        )
+        return await get_filtered_entity_list(self.hass, NotFilter(entity_filter))
 
     async def extract_model_info_from_entity(self, entity_entry: er.RegistryEntry | None) -> ModelInfo | None:
         """Try to auto discover manufacturer and model from the known device information."""

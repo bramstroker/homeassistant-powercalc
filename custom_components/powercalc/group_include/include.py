@@ -2,8 +2,7 @@ import logging
 
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_registry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 
 from custom_components.powercalc import DiscoveryManager
@@ -16,7 +15,7 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import EntityFilter, NullFilter
+from .filter import EntityFilter, NullFilter, get_filtered_entity_list
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,16 +33,13 @@ async def resolve_include_entities(
 
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
-    source_entities = resolve_include_source_entities(hass, entity_filter or NullFilter())
+    source_entities = await get_filtered_entity_list(hass, entity_filter or NullFilter())
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
-        _LOGGER.debug(
-            "Found possible include entities: %s",
-            list(source_entities.keys()),
-        )
+        _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
 
     source_entity_powercalc_entity_map: dict[str, list] = domain_data[DATA_CONFIGURED_ENTITIES]
     powercalc_entities: dict[str, Entity] = domain_data[DATA_ENTITIES]
-    for source_entity in source_entities.values():
+    for source_entity in source_entities:
         if source_entity.entity_id in source_entity_powercalc_entity_map:
             resolved_entities.extend(source_entity_powercalc_entity_map[source_entity.entity_id])
             continue
@@ -63,12 +59,3 @@ async def resolve_include_entities(
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities
-
-
-@callback
-def resolve_include_source_entities(
-    hass: HomeAssistant,
-    entity_filter: EntityFilter,
-) -> dict[str, entity_registry.RegistryEntry]:
-    entity_reg = entity_registry.async_get(hass)
-    return {entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry) and not entry.disabled}

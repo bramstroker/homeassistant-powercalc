@@ -7,7 +7,7 @@ from typing import Protocol, cast
 
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
-from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN
+from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
 from homeassistant.const import __version__ as HA_VERSION  # noqa
 from homeassistant.core import HomeAssistant, split_entity_id
 from homeassistant.helpers import area_registry, device_registry, entity_registry
@@ -77,6 +77,15 @@ def create_filter(
     }
 
     return filter_mapping.get(filter_type, lambda: NullFilter())()
+
+
+async def get_filtered_entity_list(
+    hass: HomeAssistant,
+    entity_filter: EntityFilter,
+) -> list[entity_registry.RegistryEntry]:
+    """Get a listing of entities from HA registry based on the given filter."""
+    entity_reg = entity_registry.async_get(hass)
+    return [entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry) and not entry.disabled]
 
 
 class EntityFilter(Protocol):
@@ -204,6 +213,22 @@ class LabelFilter(EntityFilter):
         return self.label in entity.labels
 
 
+class CategoryFilter(EntityFilter):
+    def __init__(self, categories: list[EntityCategory]) -> None:
+        self.categories = categories
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return entity.entity_category in self.categories
+
+
+class LambdaFilter(EntityFilter):
+    def __init__(self, func: Callable[[RegistryEntry], bool]) -> None:
+        self.func = func
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return self.func(entity)
+
+
 class AreaFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, area_id_or_name: str) -> None:
         area_reg = area_registry.async_get(hass)
@@ -229,7 +254,7 @@ class CompositeFilter(EntityFilter):
     def __init__(
         self,
         filters: list[EntityFilter],
-        operator: FilterOperator,
+        operator: FilterOperator = FilterOperator.AND,
     ) -> None:
         self.filters = filters
         self.operator = operator
@@ -240,3 +265,11 @@ class CompositeFilter(EntityFilter):
             return any(evaluations)
 
         return all(evaluations)
+
+
+class NotFilter(EntityFilter):
+    def __init__(self, entity_filter: EntityFilter) -> None:
+        self.entity_filter = entity_filter
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return not self.entity_filter.is_valid(entity)
