@@ -10,5 +10,5 @@
     "VERSION": "v1.16.6:docker"
   },
   "name": "Emos GoSmart A65 14W",
-  "standby_power": 0
+  "standby_power": 0.5
 }
