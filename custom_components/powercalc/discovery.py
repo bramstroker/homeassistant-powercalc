@@ -208,10 +208,7 @@ class DiscoveryManager:
         """Get all entities from entity registry which qualifies for discovery."""
 
         def _check_already_configured(entity: er.RegistryEntry) -> bool:
-            if entity_entry.platform == "mqtt" and "segment" in entity_entry.entity_id:
-            return False
-
-        has_user_config = self._is_user_configured(entity.entity_id)
+            has_user_config = self._is_user_configured(entity.entity_id)
             if has_user_config:
                 _LOGGER.debug(
                     "%s: Entity is manually configured, skipping auto configuration",
@@ -229,6 +226,7 @@ class DiscoveryManager:
                 ),
                 LambdaFilter(_check_already_configured),
                 LambdaFilter(lambda entity: entity.device_id is None),
+                LambdaFilter(lambda entity: entity.platform == "mqtt" and "segment" in entity.entity_id),
             ],
             FilterOperator.OR,
         )
