@@ -1,3 +1,4 @@
+import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -127,6 +128,9 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
     )
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.GROUP_TRACKED_UNTRACKED_MANUAL
+
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_GROUP_TRACKED_POWER_ENTITIES)].description == {"suggested_value": ["sensor.1_power", "sensor.2_power"]}
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],

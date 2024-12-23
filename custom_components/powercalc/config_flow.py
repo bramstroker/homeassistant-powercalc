@@ -1463,20 +1463,20 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 return Step.GROUP_TRACKED_UNTRACKED_MANUAL
             return None
 
-        schema = SCHEMA_GROUP_TRACKED_UNTRACKED
+        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input, schema=SCHEMA_GROUP_TRACKED_UNTRACKED, next_step=_next_step)
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
         if not user_input:
             entities, _ = await resolve_include_entities(self.hass)
             tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
             schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
 
-        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input, schema=schema, next_step=_next_step)
-
-    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for tracked/untracked group sensor."""
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.GROUP_TRACKED_UNTRACKED_MANUAL,
-                schema=SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL,
+                schema=schema,
                 continue_utility_meter_options_step=True,
             ),
             user_input,

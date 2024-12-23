@@ -151,6 +151,13 @@
         "description": "Create a group sensor for all tracked and untracked power",
         "title": "Create a tracked power sensor"
       },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
+        "title": "Select power entities"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Confirm model"
@@ -200,7 +207,8 @@
         "menu_options": {
           "group_custom": "Standard",
           "group_domain": "Domain based",
-          "group_subtract": "Subtract"
+          "group_subtract": "Subtract",
+          "group_tracked_untracked": "Tracked/untracked power"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensor. Choose standard group otherwise"
