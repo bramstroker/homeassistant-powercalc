@@ -40,9 +40,9 @@ def create_composite_filter(
     filter_configs: ConfigType | list[ConfigType],
     hass: HomeAssistant,
     filter_operator: FilterOperator,
-) -> IncludeEntityFilter:
+) -> EntityFilter:
     """Create filter class."""
-    filters: list[IncludeEntityFilter] = []
+    filters: list[EntityFilter] = []
 
     if CONF_FILTER in filter_configs and isinstance(filter_configs, dict):
         filter_configs.update(filter_configs[CONF_FILTER])
@@ -63,8 +63,8 @@ def create_filter(
     filter_type: str,
     filter_config: ConfigType | str | list | Template,
     hass: HomeAssistant,
-) -> IncludeEntityFilter:
-    filter_mapping: dict[str, Callable[[], IncludeEntityFilter]] = {
+) -> EntityFilter:
+    filter_mapping: dict[str, Callable[[], EntityFilter]] = {
         CONF_DOMAIN: lambda: DomainFilter(filter_config),  # type: ignore
         CONF_AREA: lambda: AreaFilter(hass, filter_config),  # type: ignore
         CONF_LABEL: lambda: LabelFilter(filter_config),  # type: ignore
@@ -79,12 +79,12 @@ def create_filter(
     return filter_mapping.get(filter_type, lambda: NullFilter())()
 
 
-class IncludeEntityFilter(Protocol):
+class EntityFilter(Protocol):
     def is_valid(self, entity: RegistryEntry) -> bool:
         """Return True when the entity should be included, False when it should be discarded."""
 
 
-class DomainFilter(IncludeEntityFilter):
+class DomainFilter(EntityFilter):
     def __init__(self, domain: str | list) -> None:
         self.domain = domain
 
@@ -94,7 +94,7 @@ class DomainFilter(IncludeEntityFilter):
         return entity.domain == self.domain
 
 
-class GroupFilter(IncludeEntityFilter):
+class GroupFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         domain = split_entity_id(group_id)[0]
         self.filter = LightGroupFilter(hass, group_id) if domain == LIGHT_DOMAIN else StandardGroupFilter(hass, group_id)
@@ -103,7 +103,7 @@ class GroupFilter(IncludeEntityFilter):
         return self.filter.is_valid(entity)
 
 
-class StandardGroupFilter(IncludeEntityFilter):
+class StandardGroupFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         entity_reg = entity_registry.async_get(hass)
         entity_reg.async_get(group_id)
@@ -116,7 +116,7 @@ class StandardGroupFilter(IncludeEntityFilter):
         return entity.entity_id in self.entity_ids
 
 
-class LightGroupFilter(IncludeEntityFilter):
+class LightGroupFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, group_id: str) -> None:
         light_component = cast(EntityComponent, hass.data.get(LIGHT_DOMAIN))
         light_group = next(
@@ -168,12 +168,12 @@ class LightGroupFilter(IncludeEntityFilter):
         return all_entity_ids
 
 
-class NullFilter(IncludeEntityFilter):
+class NullFilter(EntityFilter):
     def is_valid(self, entity: RegistryEntry) -> bool:
         return True
 
 
-class WildcardFilter(IncludeEntityFilter):
+class WildcardFilter(EntityFilter):
     def __init__(self, pattern: str) -> None:
         self.regex = self.create_regex(pattern)
 
@@ -187,7 +187,7 @@ class WildcardFilter(IncludeEntityFilter):
         return "^" + pattern + "$"
 
 
-class TemplateFilter(IncludeEntityFilter):
+class TemplateFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, template: Template) -> None:
         template.hass = hass
         self.entity_ids = template.async_render()
@@ -196,7 +196,7 @@ class TemplateFilter(IncludeEntityFilter):
         return entity.entity_id in self.entity_ids
 
 
-class LabelFilter(IncludeEntityFilter):
+class LabelFilter(EntityFilter):
     def __init__(self, label: str) -> None:
         self.label = label
 
@@ -204,7 +204,7 @@ class LabelFilter(IncludeEntityFilter):
         return self.label in entity.labels
 
 
-class AreaFilter(IncludeEntityFilter):
+class AreaFilter(EntityFilter):
     def __init__(self, hass: HomeAssistant, area_id_or_name: str) -> None:
         area_reg = area_registry.async_get(hass)
         area = area_reg.async_get_area(area_id_or_name)
@@ -225,10 +225,10 @@ class AreaFilter(IncludeEntityFilter):
         return entity.area_id == self.area.id or entity.device_id in self.area_devices
 
 
-class CompositeFilter(IncludeEntityFilter):
+class CompositeFilter(EntityFilter):
     def __init__(
         self,
-        filters: list[IncludeEntityFilter],
+        filters: list[EntityFilter],
         operator: FilterOperator,
     ) -> None:
         self.filters = filters

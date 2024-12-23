@@ -15,14 +15,14 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import IncludeEntityFilter, NullFilter
+from .filter import EntityFilter, NullFilter
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def resolve_include_entities(
     hass: HomeAssistant,
-    entity_filter: IncludeEntityFilter | None = None,
+    entity_filter: EntityFilter | None = None,
     include_non_powercalc: bool = True,
 ) -> tuple[list[Entity], list[str]]:
     """ "
@@ -66,7 +66,7 @@ async def resolve_include_entities(
 @callback
 def resolve_include_source_entities(
     hass: HomeAssistant,
-    entity_filter: IncludeEntityFilter,
+    entity_filter: EntityFilter,
 ) -> dict[str, entity_registry.RegistryEntry]:
     entity_reg = entity_registry.async_get(hass)
     return {entry.entity_id: entry for entry in entity_reg.entities.values() if entity_filter.is_valid(entry) and not entry.disabled}
