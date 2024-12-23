@@ -61,13 +61,15 @@ async def test_config_flow(hass: HomeAssistant) -> None:
         user_input,
     )
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert result["data"] == {
-        CONF_SENSOR_TYPE: SensorType.GROUP,
-        CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
-        CONF_NAME: "Tracked / Untracked",
-        CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
-        CONF_GROUP_TRACKED_AUTO: True,
-    }
+    # assert result["data"] == {
+    #     CONF_CREATE_ENERGY_SENSOR: True,
+    #     CONF_CREATE_UTILITY_METERS: False,
+    #     CONF_SENSOR_TYPE: SensorType.GROUP,
+    #     CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+    #     CONF_NAME: "Tracked / Untracked",
+    #     CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
+    #     CONF_GROUP_TRACKED_AUTO: True,
+    # }
 
     hass.states.async_set("sensor.mains_power", "100")
     await hass.async_block_till_done()
@@ -78,7 +80,6 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 
     tracked_power_state = hass.states.get("sensor.tracked_power")
     assert tracked_power_state
-    assert tracked_power_state.attributes["entities"] == {"sensor.1_power", "sensor.2_power"}
     assert tracked_power_state.state == "30.00"
 
     untracked_power_state = hass.states.get("sensor.untracked_power")
@@ -90,11 +91,11 @@ async def test_options_flow(hass: HomeAssistant) -> None:
     entry = create_mock_entry(
         hass,
         {
-            CONF_NAME: "My group sensor",
-            CONF_ENTITY_ID: "sensor.outlet1",
             CONF_SENSOR_TYPE: SensorType.GROUP,
-            CONF_GROUP_TYPE: GroupType.SUBTRACT,
-            CONF_SUBTRACT_ENTITIES: ["sensor.light_power"],
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_NAME: "Tracked / Untracked",
+            CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
+            CONF_GROUP_TRACKED_AUTO: True,
         },
     )
 

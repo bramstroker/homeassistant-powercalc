@@ -399,7 +399,6 @@ SCHEMA_POWER_ADVANCED = vol.Schema(
 SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
@@ -447,7 +446,6 @@ SCHEMA_GROUP_SUBTRACT_OPTIONS = vol.Schema(
 SCHEMA_GROUP_SUBTRACT = vol.Schema(
     {
         vol.Required(CONF_NAME): selector.TextSelector(),
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         **SCHEMA_GROUP_SUBTRACT_OPTIONS.schema,
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
@@ -456,13 +454,15 @@ SCHEMA_GROUP_SUBTRACT = vol.Schema(
 
 SCHEMA_GROUP_TRACKED_UNTRACKED = vol.Schema(
     {
-        vol.Required(CONF_MAIN_POWER_SENSOR): selector.EntitySelector(
+        vol.Optional(CONF_MAIN_POWER_SENSOR): selector.EntitySelector(
             selector.EntitySelectorConfig(
                 domain=Platform.SENSOR,
                 device_class=SensorDeviceClass.POWER,
             ),
         ),
         vol.Required(CONF_GROUP_TRACKED_AUTO): selector.BooleanSelector(),
+        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )
 
