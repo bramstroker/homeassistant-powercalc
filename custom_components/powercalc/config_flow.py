@@ -1676,16 +1676,28 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if self.sensor_type == SensorType.REAL_POWER:
             menu.append(Step.REAL_POWER)
         if self.sensor_type == SensorType.GROUP:
-            group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
-            if group_type == GroupType.CUSTOM:
-                menu.append(Step.GROUP_CUSTOM)
-            if group_type == GroupType.SUBTRACT:
-                menu.append(Step.GROUP_SUBTRACT)
+            menu.extend(self.build_group_menu())
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
+
+    def build_group_menu(self) -> list[Step]:
+        """Build the group options menu."""
+        group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
+        if group_type == GroupType.CUSTOM:
+            return [Step.GROUP_CUSTOM]
+
+        if group_type == GroupType.SUBTRACT:
+            return [Step.GROUP_SUBTRACT]
+
+        if group_type == GroupType.TRACKED_UNTRACKED:
+            return [Step.GROUP_TRACKED_UNTRACKED] + (
+                [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True) else []
+            )
+
+        return []
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
@@ -1758,6 +1770,22 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Step.GROUP_SUBTRACT)
+
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_TRACKED_UNTRACKED,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED)
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED_MANUAL)
 
     async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""
