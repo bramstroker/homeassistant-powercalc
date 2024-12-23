@@ -15,6 +15,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_TRACKED_AUTO,
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_MAIN_POWER_SENSOR,
+    CONF_UTILITY_METER_NET_CONSUMPTION,
     GroupType,
     UnitPrefix,
 )
@@ -29,6 +30,7 @@ from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
 from custom_components.powercalc.sensors.power import PowerSensor
+from custom_components.powercalc.sensors.utility_meter import create_utility_meters
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -64,7 +66,15 @@ async def create_tracked_untracked_group_sensors(
     tracked_sensor = await create_tracked_power_sensor(hass, SensorType.TRACKED, unique_id, config, tracked_entities)
     entities.append(tracked_sensor)
     if should_create_energy_sensor:
-        entities.append(await create_energy_sensor(hass, SensorType.TRACKED, config, tracked_sensor))
+        energy_sensor = await create_energy_sensor(hass, SensorType.TRACKED, config, tracked_sensor)
+        entities.append(energy_sensor)
+        entities.extend(
+            await create_utility_meters(
+                hass,
+                energy_sensor,
+                {CONF_UTILITY_METER_NET_CONSUMPTION: True, **config},
+            ),
+        )
 
     if main_power_sensor:
         untracked_sensor = await create_untracked_power_sensor(
@@ -77,7 +87,15 @@ async def create_tracked_untracked_group_sensors(
         )
         entities.append(untracked_sensor)
         if should_create_energy_sensor:
-            entities.append(await create_energy_sensor(hass, SensorType.UNTRACKED, config, untracked_sensor))
+            energy_sensor = await create_energy_sensor(hass, SensorType.UNTRACKED, config, untracked_sensor)
+            entities.append(energy_sensor)
+            entities.extend(
+                await create_utility_meters(
+                    hass,
+                    energy_sensor,
+                    {CONF_UTILITY_METER_NET_CONSUMPTION: True, **config},
+                ),
+            )
 
     return entities
 
@@ -144,5 +162,5 @@ async def create_energy_sensor(
         name=name,
         unique_id=unique_id,
         sensor_config=config,
-        unit_prefix=config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.NONE),
+        unit_prefix=config.get(CONF_ENERGY_SENSOR_UNIT_PREFIX, UnitPrefix.KILO),
     )

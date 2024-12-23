@@ -564,6 +564,10 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         if write_state:
             self.async_write_ha_state()
 
+    @property
+    def entities(self) -> set[str]:
+        return self._entities
+
     @abstractmethod
     def calculate_initial_state(
         self,
