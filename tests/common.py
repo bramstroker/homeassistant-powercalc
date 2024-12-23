@@ -90,14 +90,15 @@ def create_discoverable_light(
 
 async def run_powercalc_setup(
     hass: HomeAssistant,
-    sensor_config: list[ConfigType] | ConfigType,
+    sensor_config: list[ConfigType] | ConfigType | None = None,
     domain_config: ConfigType | None = None,
 ) -> None:
     config = {DOMAIN: domain_config or {}}
-    if sensor_config:
-        if not isinstance(sensor_config, list):
-            sensor_config = [sensor_config]
-        config[DOMAIN][CONF_SENSORS] = sensor_config
+    if not sensor_config:
+        sensor_config = {}
+    if not isinstance(sensor_config, list):
+        sensor_config = [sensor_config]
+    config[DOMAIN][CONF_SENSORS] = sensor_config
 
     assert await async_setup_component(hass, DOMAIN, config)
     await hass.async_block_till_done()

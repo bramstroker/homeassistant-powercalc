@@ -64,6 +64,7 @@ from .const import (
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
+    CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
@@ -119,10 +120,12 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
+from .group_include.include import resolve_include_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from .sensors.power import PowerSensor
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -138,6 +141,7 @@ class Step(StrEnum):
     GROUP_DOMAIN = "group_domain"
     GROUP_SUBTRACT = "group_subtract"
     GROUP_TRACKED_UNTRACKED = "group_tracked_untracked"
+    GROUP_TRACKED_UNTRACKED_MANUAL = "group_tracked_untracked_manual"
     LIBRARY = "library"
     POST_LIBRARY = "post_library"
     LIBRARY_MULTI_PROFILE = "library_multi_profile"
@@ -466,6 +470,18 @@ SCHEMA_GROUP_TRACKED_UNTRACKED = vol.Schema(
     },
 )
 
+SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL = vol.Schema(
+    {
+        vol.Required(CONF_GROUP_TRACKED_POWER_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
+                multiple=True,
+            ),
+        ),
+    },
+)
+
 SCHEMA_UTILITY_METER_OPTIONS = vol.Schema(
     {
         vol.Required(CONF_UTILITY_METER_TYPES): selector.SelectSelector(
@@ -552,7 +568,7 @@ class PowercalcFormStep:
         | None
     ) = None
 
-    next_step: Step | None = None
+    next_step: Step | Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None
     step: Step | None = None
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
@@ -783,7 +799,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     @staticmethod
     def fill_schema_defaults(
         data_schema: vol.Schema,
-        options: dict[str, str],
+        options: dict[str, Any],
     ) -> vol.Schema:
         """Make a copy of the schema with suggested values set to saved options."""
         schema = {}
@@ -832,12 +848,15 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 self.name = user_input[CONF_NAME]
             self.sensor_config.update(user_input)
 
-            if not form_step.next_step:
+            next_step = form_step.next_step
+            if callable(form_step.next_step):
+                next_step = await form_step.next_step(user_input)
+            if not next_step:
                 if form_step.continue_utility_meter_options_step and self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                     return await self.async_step_utility_meter_options()
                 return self.persist_config_entry()
 
-            return await getattr(self, f"async_step_{form_step.next_step}")()  # type: ignore
+            return await getattr(self, f"async_step_{next_step}")()  # type: ignore
 
         return await self._show_form(form_step)
 
@@ -1387,6 +1406,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         group_type: GroupType,
         user_input: dict[str, Any] | None = None,
         schema: vol.Schema | None = None,
+        next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
     ) -> FlowResult:
         """Generic step to handle different group types."""
 
@@ -1410,6 +1430,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 schema=schema or GROUP_SCHEMAS[group_type],
                 validate_user_input=_validate,
                 continue_utility_meter_options_step=True,
+                next_step=next_step,
             ),
             user_input,
         )
@@ -1436,7 +1457,30 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         if user_input is not None:
             user_input[CONF_NAME] = "Tracked / Untracked"
-        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input)
+
+        async def _next_step(user_input: dict[str, Any]) -> Step | None:
+            if not bool(user_input.get(CONF_GROUP_TRACKED_AUTO, True)):
+                return Step.GROUP_TRACKED_UNTRACKED_MANUAL
+            return None
+
+        schema = SCHEMA_GROUP_TRACKED_UNTRACKED
+        if not user_input:
+            entities, _ = await resolve_include_entities(self.hass)
+            tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
+            schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
+
+        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input, schema=schema, next_step=_next_step)
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GROUP_TRACKED_UNTRACKED_MANUAL,
+                schema=SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL,
+                continue_utility_meter_options_step=True,
+            ),
+            user_input,
+        )
 
     async def async_step_library_multi_profile(
         self,

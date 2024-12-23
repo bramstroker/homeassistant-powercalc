@@ -10,6 +10,7 @@ from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
+    DATA_ENTITIES,
     DOMAIN,
 )
 from custom_components.powercalc.sensors.energy import RealEnergySensor
@@ -28,7 +29,8 @@ async def resolve_include_entities(
     """ "
     Based on given entity filter fetch all power and energy sensors from the HA instance
     """
-    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    domain_data = hass.data.get(DOMAIN, {})
+    discovery_manager: DiscoveryManager = domain_data.get(DATA_DISCOVERY_MANAGER)
 
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
@@ -39,8 +41,8 @@ async def resolve_include_entities(
             list(source_entities.keys()),
         )
 
-    source_entity_powercalc_entity_map: dict[str, list] = hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES]
-    powercalc_entities: dict[str, Entity] = hass.data[DOMAIN]["test_entities"]
+    source_entity_powercalc_entity_map: dict[str, list] = domain_data[DATA_CONFIGURED_ENTITIES]
+    powercalc_entities: dict[str, Entity] = domain_data[DATA_ENTITIES]
     for source_entity in source_entities.values():
         if source_entity.entity_id in source_entity_powercalc_entity_map:
             resolved_entities.extend(source_entity_powercalc_entity_map[source_entity.entity_id])

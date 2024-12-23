@@ -66,6 +66,7 @@ from .const import (
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
+    DATA_ENTITIES,
     DATA_STANDBY_POWER_SENSORS,
     DATA_USED_UNIQUE_IDS,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
@@ -218,7 +219,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         DOMAIN_CONFIG: global_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
-        "test_entities": {},
+        DATA_ENTITIES: {},
         DATA_USED_UNIQUE_IDS: [],
         DATA_STANDBY_POWER_SENSORS: {},
     }

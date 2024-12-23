@@ -13,6 +13,7 @@ from custom_components.powercalc.const import (
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_ENERGY_SENSOR_UNIT_PREFIX,
     CONF_GROUP_TRACKED_AUTO,
+    CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_MAIN_POWER_SENSOR,
     GroupType,
     UnitPrefix,
@@ -52,7 +53,7 @@ async def create_tracked_untracked_group_sensors(
         entities, _ = await resolve_include_entities(hass)
         tracked_entities = {entity.entity_id for entity in entities if isinstance(entity, PowerSensor)}
     else:
-        tracked_entities = set()
+        tracked_entities = set(config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
 
     if main_power_sensor and main_power_sensor in tracked_entities:
         tracked_entities.remove(main_power_sensor)
