@@ -96,9 +96,11 @@ async def run_powercalc_setup(
     config = {DOMAIN: domain_config or {}}
     if not sensor_config:
         sensor_config = {}
-    if not isinstance(sensor_config, list):
+    if sensor_config and not isinstance(sensor_config, list):
         sensor_config = [sensor_config]
-    config[DOMAIN][CONF_SENSORS] = sensor_config
+
+    if sensor_config:
+        config[DOMAIN][CONF_SENSORS] = sensor_config
 
     assert await async_setup_component(hass, DOMAIN, config)
     await hass.async_block_till_done()
