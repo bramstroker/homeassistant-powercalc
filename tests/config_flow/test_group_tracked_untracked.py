@@ -2,7 +2,6 @@ import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
-    CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SENSOR_TYPE,
     UnitOfPower,
@@ -20,7 +19,6 @@ from custom_components.powercalc.const import (
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_MAIN_POWER_SENSOR,
-    CONF_SUBTRACT_ENTITIES,
     GroupType,
 )
 from tests.common import run_powercalc_setup
@@ -179,17 +177,22 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         },
     )
 
-    result = await initialize_options_flow(hass, entry, Step.GROUP_SUBTRACT)
+    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED)
 
-    user_input = {
-        CONF_ENTITY_ID: "sensor.outlet2",
-        CONF_SUBTRACT_ENTITIES: ["sensor.light_power", "sensor.light_power2"],
-    }
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input=user_input,
+        user_input={CONF_GROUP_TRACKED_AUTO: False},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert entry.data[CONF_SUBTRACT_ENTITIES] == ["sensor.light_power", "sensor.light_power2"]
-    assert entry.data[CONF_ENTITY_ID] == "sensor.outlet2"
+    assert not entry.data[CONF_GROUP_TRACKED_AUTO]
+
+    result = await initialize_options_flow(hass, entry, Step.GROUP_TRACKED_UNTRACKED_MANUAL)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_GROUP_TRACKED_POWER_ENTITIES: ["sensor.1_power", "sensor.2_power"]},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_GROUP_TRACKED_POWER_ENTITIES] == ["sensor.1_power", "sensor.2_power"]
