@@ -331,7 +331,6 @@ def create_grouped_power_sensor(
         entities=power_sensor_ids,
         unique_id=unique_id,
         sensor_config=sensor_config,
-        rounding_digits=int(sensor_config.get(CONF_POWER_SENSOR_PRECISION) or DEFAULT_POWER_SENSOR_PRECISION),
         group_type=group_type,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
@@ -383,7 +382,6 @@ def create_grouped_energy_sensor(
         entities=energy_sensor_ids,
         unique_id=energy_unique_id,
         sensor_config=sensor_config,
-        rounding_digits=int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION) or DEFAULT_ENERGY_SENSOR_PRECISION),
         group_type=group_type,
         entity_id=entity_id,
         device_id=sensor_config.get(CONF_DEVICE),
@@ -407,7 +405,6 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
-        rounding_digits: int,
         group_type: GroupType,
         unique_id: str | None = None,
         device_id: str | None = None,
@@ -416,7 +413,10 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         # Remove own entity from entities, when it happens to be there. To prevent recursion
         entities.discard(entity_id)
         self._entities = entities
-        self._rounding_digits = rounding_digits
+        if isinstance(self, GroupedEnergySensor):
+            self._rounding_digits = int(sensor_config.get(CONF_ENERGY_SENSOR_PRECISION, DEFAULT_ENERGY_SENSOR_PRECISION))
+        else:
+            self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
         self._sensor_config = sensor_config
         if unique_id:
             self._attr_unique_id = unique_id
@@ -625,7 +625,6 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
         entities: set[str],
         entity_id: str,
         sensor_config: dict[str, Any],
-        rounding_digits: int,
         group_type: GroupType,
         unique_id: str | None = None,
         device_id: str | None = None,
@@ -636,7 +635,6 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             entities,
             entity_id,
             sensor_config,
-            rounding_digits,
             group_type,
             unique_id,
             device_id,
