@@ -1,0 +1,14 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-12-20T04:02:58.540764",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "TP-Link Kasa KP125M",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 3,
+    "SLEEP_TIME": 5,
+    "VERSION": "v1.16.5:docker"
+  },
+  "name": "ZEN22 Dimmer Switch",
+  "standby_power": 0.3
+}
