@@ -1428,6 +1428,8 @@
       
         
       
+        
+      
     
     
       
@@ -1548,6 +1550,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    <span class="md-ellipsis">
+      JSON
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Measure
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#lut-data-files" class="md-nav__link">
     <span class="md-ellipsis">
       LUT data files
@@ -1613,6 +1633,27 @@
   
   <span class="md-ellipsis">
     Smart switch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smart-speaker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Smart speaker
   </span>
   
 
@@ -2007,9 +2048,8 @@
 
 <h1 id="light">Light</h1>
 <p>Lights are integrated by using the <a href="../../../strategies/lut/">LUT</a> (Look Up Table) strategy.
-This strategy is used to calculate the power consumption of the light based on the brightness / color levels.
-To generate a LUT you'll need to use the <a href="../../../contributing/measure/">measure utility</a>.
-This will fully automate the process and generate the required CSV files and model.json.</p>
+This strategy is used to calculate the power consumption of the light based on the brightness / color levels.</p>
+<h2 id="json">JSON</h2>
 <p>Example model.json:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hue White and Color Ambiance A19 E26 (Gen 5)&quot;</span><span class="p">,</span>
@@ -2019,6 +2059,9 @@ This will fully automate the process and generate the required CSV files and mod
 <span class="w">    </span><span class="nt">&quot;measure_device&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Shelly Plug S&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
+<h2 id="measure">Measure</h2>
+<p>To generate a LUT you'll need to use the <a href="../../../contributing/measure/">measure utility</a>.
+This will fully automate the process and generate the required CSV files and model.json.</p>
 <h2 id="lut-data-files">LUT data files</h2>
 <p>Depending on the supported color modes of the light the integration expects one or more CSV files.
 You can check the supported modes in HA Developer Tools.</p>
@@ -2083,7 +2126,7 @@ When your light supports <code>xy</code> color mode, you just need to provide th
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 22, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 24, 2024</span>
   </span>
 
     
