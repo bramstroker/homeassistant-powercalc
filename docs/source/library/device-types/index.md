@@ -2,28 +2,28 @@
 
 Here you can find information about how to setup specific device types for the library.
 
-## [Camera](camera.md)
+## :material-camera: [Camera](camera.md)
 
-## Cover
+## :material-blinds-horizontal: Cover
 
-## [Light](light.md)
+## :material-lightbulb: [Light](light.md)
 
-## [Power meter](power-meter.md)
+## :material-meter-electric: [Power meter](power-meter.md)
 
 Smart power meter. Powercalc profiles can be used to define the self usage of the IoT device itself.
 
-## Printer
+## :material-printer: Printer
 
-## [Smart dimmer](smart-dimmer.md)
+## :material-arrow-up-down-bold: [Smart dimmer](smart-dimmer.md)
 
 Smart dimmers are devices that can control the brightness of a light. They are often used in combination with LED lights.
 
-## [Smart switch](smart-switch.md)
+## :material-electric-switch: [Smart switch](smart-switch.md)
 
 Used for smart plugs / smart switches which can toggle a connected device on or off.
 
-## [Smart Speaker](smart-speaker.md)
+## :material-speaker: [Smart Speaker](smart-speaker.md)
 
-## Network
+## :material-ip-network: Network
 
-## Vacuum robot
+## :material-robot-vacuum: Vacuum robot

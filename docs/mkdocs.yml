@@ -100,7 +100,9 @@ nav:
   - 'Contributing':
       - 'contributing/index.md'
       - 'contributing/integration-development.md'
-      - 'contributing/measure.md'
+      - 'Measure':
+        - 'contributing/measure.md'
+        - 'contributing/measure-ocr.md'
       - 'contributing/translating.md'
   - 'Tutorials':
       - 'community/tutorials.md'
