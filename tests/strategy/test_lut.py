@@ -5,13 +5,14 @@ import pytest
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
     ATTR_HS_COLOR,
     ColorMode,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import CONF_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
+from homeassistant.util import color as color_util
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CalculationStrategy
@@ -227,7 +228,7 @@ async def test_sensor_unavailable_for_unsupported_color_mode(hass: HomeAssistant
 async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     """
     Test fallback is done when no color_temp.csv is available, but a hs.csv is.
-    Fixes issue where HUE bridge is falsly reporting color_temp as color_mode.
+    Fixes issue where HUE bridge is falsy reporting color_temp as color_mode.
     See: https://github.com/bramstroker/homeassistant-powercalc/issues/2247
     """
 
@@ -243,7 +244,7 @@ async def test_fallback_color_temp_to_hs(hass: HomeAssistant) -> None:
     hass.states.async_set(
         "light.test",
         STATE_ON,
-        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP: 500},
+        {ATTR_COLOR_MODE: ColorMode.COLOR_TEMP, ATTR_BRIGHTNESS: 100, ATTR_COLOR_TEMP_KELVIN: 500},
     )
     await hass.async_block_till_done()
 
@@ -335,7 +336,7 @@ def _create_light_color_temp_state(brightness: int, color_temp: int) -> State:
         {
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
             ATTR_BRIGHTNESS: brightness,
-            ATTR_COLOR_TEMP: color_temp,
+            ATTR_COLOR_TEMP_KELVIN: color_util.color_temperature_mired_to_kelvin(color_temp),
         },
     )
 
