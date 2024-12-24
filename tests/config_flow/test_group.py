@@ -9,7 +9,6 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
     CONF_SENSOR_TYPE,
-    CONF_UNIQUE_ID,
     Platform,
 )
 from homeassistant.core import HomeAssistant
@@ -57,7 +56,6 @@ from tests.common import (
     setup_config_entry,
 )
 from tests.config_flow.common import (
-    DEFAULT_UNIQUE_ID,
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
@@ -70,7 +68,6 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
     user_input = {
         CONF_NAME: "My group sensor",
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
     }
     result = await hass.config_entries.flow.async_configure(
@@ -85,7 +82,6 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_FORCE_CALCULATE_GROUP_ENERGY: False,
         CONF_GROUP_POWER_ENTITIES: ["sensor.balcony_power", "sensor.bedroom1_power"],
         CONF_GROUP_TYPE: GroupType.CUSTOM,
-        CONF_UNIQUE_ID: DEFAULT_UNIQUE_ID,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,

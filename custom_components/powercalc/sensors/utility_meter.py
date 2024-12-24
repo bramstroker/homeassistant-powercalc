@@ -8,6 +8,7 @@ from typing import cast
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.select import DOMAIN as SELECT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
+from homeassistant.components.utility_meter import DEFAULT_OFFSET
 from homeassistant.components.utility_meter.const import (
     DATA_TARIFF_SENSORS,
     DATA_UTILITY,
@@ -221,7 +222,7 @@ async def create_utility_meter(
         "source_entity": source_entity,
         "name": name,
         "meter_type": meter_type,
-        "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET),
+        "meter_offset": sensor_config.get(CONF_UTILITY_METER_OFFSET, DEFAULT_OFFSET),
         "net_consumption": bool(sensor_config.get(CONF_UTILITY_METER_NET_CONSUMPTION, False)),
         "tariff": tariff,
         "tariff_entity": tariff_entity,

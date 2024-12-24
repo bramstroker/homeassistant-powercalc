@@ -49,6 +49,7 @@ from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from tests.common import (
     create_input_boolean,
     get_simple_fixed_config,
+    mock_sensors_in_registry,
     run_powercalc_setup,
 )
 
@@ -244,17 +245,7 @@ async def test_disable_extended_attributes(hass: HomeAssistant) -> None:
 async def test_real_energy_sensor(hass: HomeAssistant) -> None:
     """Test user can refer an existing real energy sensor to create utility meters for it or add to group with YAML"""
 
-    mock_registry(
-        hass,
-        {
-            "sensor.existing_energy": RegistryEntry(
-                entity_id="sensor.existing_energy",
-                unique_id="12345",
-                platform="sensor",
-                device_class=SensorDeviceClass.ENERGY,
-            ),
-        },
-    )
+    mock_sensors_in_registry(hass, energy_entities=["sensor.existing_energy"])
 
     await hass.async_block_till_done()
 
