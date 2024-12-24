@@ -38,6 +38,7 @@ from homeassistant.helpers.issue_registry import IssueSeverity, async_create_iss
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from . import DATA_GROUP_ENTITIES
 from .common import (
     SourceEntity,
     create_source_entity,
@@ -148,7 +149,9 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group.config_entry_utils import add_to_associated_group
+from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
+from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -384,6 +387,11 @@ async def _async_setup_entities(
         return
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
+    for entity in entities_to_add:
+        if isinstance(entity, GroupedSensor | StandbyPowerSensor):
+            hass.data[DOMAIN][DATA_GROUP_ENTITIES][entity.entity_id] = entity
+        else:
+            hass.data[DOMAIN][DATA_ENTITIES][entity.entity_id] = entity
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
@@ -916,7 +924,6 @@ def update_registries(
     hass.data[DOMAIN][DATA_CONFIGURED_ENTITIES].update(
         {source_entity.entity_id: entities_to_add},
     )
-    hass.data[DOMAIN][DATA_ENTITIES].update({entity.entity_id: entity for entity in entities_to_add})
 
     domain_entities = hass.data[DOMAIN][DATA_DOMAIN_ENTITIES].setdefault(source_entity.domain, [])
     domain_entities.extend(entities_to_add)

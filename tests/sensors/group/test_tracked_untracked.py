@@ -1,10 +1,10 @@
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
+from homeassistant.helpers import entity_registry as er
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_FIXED, CONF_UTILITY_METER_TYPES
+from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_FIXED, CONF_UTILITY_METER_TYPES, DATA_GROUP_ENTITIES
 from custom_components.powercalc.const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_GROUP_TRACKED_AUTO,
@@ -21,14 +21,16 @@ from custom_components.powercalc.const import (
 from custom_components.powercalc.sensors.energy import VirtualEnergySensor
 from custom_components.powercalc.sensors.group.custom import GroupedPowerSensor
 from custom_components.powercalc.sensors.group.subtract import SubtractGroupSensor
-from custom_components.powercalc.sensors.group.tracked_untracked import create_tracked_untracked_group_sensors
+from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 from custom_components.powercalc.sensors.utility_meter import VirtualUtilityMeter
-from tests.common import run_powercalc_setup
+from tests.common import mock_sensors_in_registry, run_powercalc_setup
+from tests.config_flow.common import create_mock_entry
 
 
 async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) -> None:
-    sensors = await create_tracked_untracked_group_sensors(
+    factory = TrackedPowerSensorFactory(
         hass,
+        MockConfigEntry(),
         {
             CONF_UNIQUE_ID: "abc",
             CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
@@ -36,6 +38,7 @@ async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) 
             CONF_MAIN_POWER_SENSOR: "sensor.main_power",
         },
     )
+    sensors = await factory.create_tracked_untracked_group_sensors()
 
     assert len(sensors) == 2
     tracked_sensor = sensors[0]
@@ -49,8 +52,9 @@ async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) 
 
 
 async def test_energy_sensors_and_utility_meters_created(hass: HomeAssistant) -> None:
-    sensors = await create_tracked_untracked_group_sensors(
+    factory = TrackedPowerSensorFactory(
         hass,
+        MockConfigEntry,
         {
             CONF_UNIQUE_ID: "abc",
             CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
@@ -61,6 +65,7 @@ async def test_energy_sensors_and_utility_meters_created(hass: HomeAssistant) ->
             CONF_UTILITY_METER_TYPES: ["daily"],
         },
     )
+    sensors = await factory.create_tracked_untracked_group_sensors()
 
     assert len(sensors) == 6
     assert isinstance(sensors[0], GroupedPowerSensor)
@@ -79,18 +84,7 @@ async def test_energy_sensors_and_utility_meters_created(hass: HomeAssistant) ->
 
 async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
     """Test both entities from powercalc and other HA power entities are added."""
-    mock_registry(
-        hass,
-        {
-            "sensor.test1_power": RegistryEntry(
-                entity_id="sensor.test1_power",
-                name="Test1",
-                unique_id="1111",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-            ),
-        },
-    )
+    mock_sensors_in_registry(hass, ["sensor.test1_power"])
 
     config_entry = MockConfigEntry(
         domain=DOMAIN,
@@ -118,8 +112,9 @@ async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
 
     await run_powercalc_setup(hass)
 
-    sensors = await create_tracked_untracked_group_sensors(
+    factory = TrackedPowerSensorFactory(
         hass,
+        MockConfigEntry(),
         {
             CONF_UNIQUE_ID: "abc",
             CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
@@ -129,8 +124,54 @@ async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: False,
         },
     )
+    sensors = await factory.create_tracked_untracked_group_sensors()
 
     assert len(sensors) == 2
     tracked_sensor = sensors[0]
     assert isinstance(tracked_sensor, GroupedPowerSensor)
     assert tracked_sensor.entities == {"sensor.test1_power", "sensor.test3_power"}
+
+
+async def test_entity_registry_updates(hass: HomeAssistant) -> None:
+    """Test that the tracked power sensor is updated when power sensors are added or removed to the system"""
+    mock_sensors_in_registry(hass, ["sensor.test1_power", "sensor.test2_power"])
+    entity_registry = er.async_get(hass)
+    create_mock_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_NAME: "Tracked / Untracked",
+            CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
+            CONF_GROUP_TRACKED_AUTO: True,
+        },
+    )
+    await run_powercalc_setup(hass)
+
+    hass.states.async_set("sensor.test1_power", "10")
+    hass.states.async_set("sensor.test2_power", "5")
+    await hass.async_block_till_done()
+
+    tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
+    assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test2_power"}
+    assert hass.states.get("sensor.tracked_power").state == "15.00"
+
+    # Remove one of the tracked entities from registry
+    entity_registry.async_remove("sensor.test2_power")
+
+    tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
+    assert tracked_power_sensor.entities == {"sensor.test1_power"}
+    assert hass.states.get("sensor.tracked_power").state == "10.00"
+
+    # Add a new power entity to registry
+    entity_registry.async_get_or_create(
+        "sensor",
+        "sensor",
+        "aaa",
+        suggested_object_id="test3_power",
+        original_device_class=SensorDeviceClass.POWER,
+    )
+
+    tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
+    assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test3_power"}
+    assert hass.states.get("sensor.tracked_power").state == "10.00"

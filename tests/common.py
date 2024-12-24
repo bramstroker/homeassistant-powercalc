@@ -4,6 +4,7 @@ import homeassistant.helpers.area_registry as ar
 from homeassistant import config_entries
 from homeassistant.components import input_boolean, input_number, light
 from homeassistant.components.light import ColorMode
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -15,10 +16,11 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.entity_registry import RegistryEntry
 from homeassistant.helpers.normalized_name_base_registry import NormalizedNameBaseRegistryItems
 from homeassistant.helpers.typing import ConfigType, StateType
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
 
 import custom_components.test.light as test_light_platform
 from custom_components.powercalc.const import (
@@ -231,6 +233,31 @@ def mock_area_registry(
 
     hass.data[ar.DATA_REGISTRY] = registry
     return registry
+
+
+def mock_sensors_in_registry(
+    hass: HomeAssistant,
+    power_entities: list[str] | None = None,
+    energy_entities: list[str] | None = None,
+) -> None:
+    entries = {}
+    for entity_id in power_entities or []:
+        entries[entity_id] = RegistryEntry(
+            entity_id=entity_id,
+            name=entity_id,
+            unique_id=entity_id,
+            platform="sensor",
+            device_class=SensorDeviceClass.POWER,
+        )
+    for entity_id in energy_entities or []:
+        entries[entity_id] = RegistryEntry(
+            entity_id=entity_id,
+            name=entity_id,
+            unique_id=entity_id,
+            platform="sensor",
+            device_class=SensorDeviceClass.ENERGY,
+        )
+    mock_registry(hass, entries)
 
 
 def assert_entity_state(

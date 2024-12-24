@@ -1,14 +1,10 @@
 import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     CONF_NAME,
     CONF_SENSOR_TYPE,
-    UnitOfPower,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_registry import RegistryEntry
-from pytest_homeassistant_custom_component.common import mock_registry
 
 from custom_components.powercalc import SensorType
 from custom_components.powercalc.config_flow import Step
@@ -21,7 +17,7 @@ from custom_components.powercalc.const import (
     CONF_MAIN_POWER_SENSOR,
     GroupType,
 )
-from tests.common import run_powercalc_setup
+from tests.common import mock_sensors_in_registry, run_powercalc_setup
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
@@ -33,25 +29,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
     """Test the tracked/untracked group flow."""
 
     await run_powercalc_setup(hass)
-    mock_registry(
-        hass,
-        {
-            "sensor.1_power": RegistryEntry(
-                entity_id="sensor.1_power",
-                unique_id="4444",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                unit_of_measurement=UnitOfPower.WATT,
-            ),
-            "sensor.2_power": RegistryEntry(
-                entity_id="sensor.2_power",
-                unique_id="2222",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                unit_of_measurement=UnitOfPower.WATT,
-            ),
-        },
-    )
+    mock_sensors_in_registry(hass, ["sensor.1_power", "sensor.2_power"])
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_TRACKED_UNTRACKED)
     assert result["type"] == data_entry_flow.FlowResultType.FORM
@@ -94,25 +72,7 @@ async def test_config_flow(hass: HomeAssistant) -> None:
 async def test_config_flow_manual(hass: HomeAssistant) -> None:
     """Test the tracked/untracked group flow."""
     await run_powercalc_setup(hass)
-    mock_registry(
-        hass,
-        {
-            "sensor.1_power": RegistryEntry(
-                entity_id="sensor.1_power",
-                unique_id="4444",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                unit_of_measurement=UnitOfPower.WATT,
-            ),
-            "sensor.2_power": RegistryEntry(
-                entity_id="sensor.2_power",
-                unique_id="2222",
-                platform="sensor",
-                device_class=SensorDeviceClass.POWER,
-                unit_of_measurement=UnitOfPower.WATT,
-            ),
-        },
-    )
+    mock_sensors_in_registry(hass, ["sensor.1_power", "sensor.2_power"])
 
     result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_TRACKED_UNTRACKED)
     assert result["type"] == data_entry_flow.FlowResultType.FORM

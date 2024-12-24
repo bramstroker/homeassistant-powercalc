@@ -9,7 +9,7 @@ import custom_components.powercalc.sensors.group.standby as standby_group
 import custom_components.powercalc.sensors.group.subtract as subtract_group
 from custom_components.powercalc.const import CONF_GROUP_TYPE, GroupType
 from custom_components.powercalc.errors import SensorConfigurationError
-from custom_components.powercalc.sensors.group import tracked_untracked
+from custom_components.powercalc.sensors.group.tracked_untracked import TrackedPowerSensorFactory
 
 
 async def create_group_sensors(
@@ -47,10 +47,8 @@ async def create_group_sensors(
             config=sensor_config,
         )
 
-    if group_type == GroupType.TRACKED_UNTRACKED:
-        return await tracked_untracked.create_tracked_untracked_group_sensors(
-            hass=hass,
-            config=sensor_config,
-        )
+    if group_type == GroupType.TRACKED_UNTRACKED and config_entry:
+        factory = TrackedPowerSensorFactory(hass, config_entry, sensor_config)
+        return await factory.create_tracked_untracked_group_sensors()
 
     raise SensorConfigurationError(f"Group type {group_type} invalid")  # pragma: no cover
