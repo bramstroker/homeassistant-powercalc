@@ -57,29 +57,15 @@ class TrackedPowerSensorFactory:
 
         unique_id = str(self.config.get(CONF_UNIQUE_ID))
         main_power_sensor = str(self.config.get(CONF_MAIN_POWER_SENSOR)) if self.config.get(CONF_MAIN_POWER_SENSOR) else None
-        auto_mode = bool(self.config.get(CONF_GROUP_TRACKED_AUTO))
         self.config[CONF_DISABLE_EXTENDED_ATTRIBUTES] = True  # prevent adding all entities in the state attributes
 
-        if auto_mode:
-            entities, _ = await resolve_include_entities(self.hass)
-            self.tracked_entities = {
-                entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)
-            }
-
-            @callback
-            def _start_entity_registry_listener(_: Any) -> None:  # noqa ANN401
-                self.hass.bus.async_listen(EVENT_ENTITY_REGISTRY_UPDATED, self._handle_entity_registry_updated)
-
-            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)
-        else:
-            self.tracked_entities = set(self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
-
+        self.tracked_entities = await self.get_tracked_power_entities()
         if main_power_sensor and main_power_sensor in self.tracked_entities:
             self.tracked_entities.remove(main_power_sensor)
 
         should_create_energy_sensor = bool(self.config.get(CONF_CREATE_ENERGY_SENSOR, False))
 
-        entities = []
+        entities: list[Entity] = []
         tracked_sensor = await self.create_tracked_power_sensor(SensorType.TRACKED, unique_id, self.tracked_entities)
         entities.append(tracked_sensor)
         if should_create_energy_sensor:
@@ -114,22 +100,40 @@ class TrackedPowerSensorFactory:
 
         return entities
 
+    async def get_tracked_power_entities(self) -> set[str]:
+        """Get all power entities which are part of the tracked sensor group"""
+        if bool(self.config.get(CONF_GROUP_TRACKED_AUTO, False)):
+
+            @callback
+            def _start_entity_registry_listener(_: Any) -> None:  # noqa ANN401
+                self.hass.bus.async_listen(EVENT_ENTITY_REGISTRY_UPDATED, self._handle_entity_registry_updated)
+
+            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)
+
+            entities, _ = await resolve_include_entities(self.hass)
+            return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
+
+        return set(self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
+
     async def _handle_entity_registry_updated(
         self,
         event: Event[EventEntityRegistryUpdatedData],
     ) -> None:
+        """Listen to all entity registry updates and reload the config entry if a power sensor is added/removed."""
         entity_id = event.data["entity_id"]
         action = event.data["action"]
-        if action == "remove" and entity_id in self.tracked_entities:
-            self.tracked_entities.remove(entity_id)
-            await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+
+        if action == "update":
             return
-        registry = er.async_get(self.hass)
-        entity_entry = registry.async_get(entity_id)
-        if entity_entry and entity_entry.original_device_class == SensorDeviceClass.POWER:
-            await self.hass.config_entries.async_reload(self.config_entry.entry_id)
+        if action == "remove" and entity_id not in self.tracked_entities:
             return
-        return
+        if action == "create":
+            registry = er.async_get(self.hass)
+            entity_entry = registry.async_get(entity_id)
+            if entity_entry and entity_entry.original_device_class != SensorDeviceClass.POWER:
+                return
+
+        await self.hass.config_entries.async_reload(self.config_entry.entry_id)
 
     async def create_tracked_power_sensor(
         self,
