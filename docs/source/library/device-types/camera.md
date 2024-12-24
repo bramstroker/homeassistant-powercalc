@@ -1,5 +1,9 @@
 # Camera
 
+IP camera, webcam, or other camera devices.
+
+## JSON
+
 ```json
 {
   "measure_description": "Used measure tool - used average for 2 hours for each state",
@@ -16,5 +20,5 @@
 
 ## Measure
 
-You can use the measure tool average mode.
+You can use the [measure tool](../../contributing/measure.md) average mode.
 Suggest to measure for 2 hours.

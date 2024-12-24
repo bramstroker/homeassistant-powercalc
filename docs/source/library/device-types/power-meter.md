@@ -1,5 +1,9 @@
 # Power meter
 
+Smart power meter. Powercalc profiles can be used to define the self usage of the IoT device itself.
+
+## JSON
+
 ```json
 {
   "measure_method": "manual",

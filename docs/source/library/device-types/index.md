@@ -22,7 +22,7 @@ Smart dimmers are devices that can control the brightness of a light. They are o
 
 Used for smart plugs / smart switches which can toggle a connected device on or off.
 
-## Smart speaker
+## [Smart Speaker](smart-speaker.md)
 
 ## Network
 

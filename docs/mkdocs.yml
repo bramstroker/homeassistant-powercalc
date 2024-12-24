@@ -88,7 +88,7 @@ nav:
           #- 'library/device-types/printer.md'
           - 'library/device-types/smart-dimmer.md'
           - 'library/device-types/smart-switch.md'
-          #- 'library/device-types/smart-speaker.md'
+          - 'library/device-types/smart-speaker.md'
           #- 'library/device-types/network.md'
           #- 'library/device-types/vacuum-robot.md'
   - 'Troubleshooting':
