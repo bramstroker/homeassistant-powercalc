@@ -1,5 +1,9 @@
 # Smart dimmer
 
+Smart dimmers are devices that can control the brightness of a light. They are often used in combination with LED lights.
+
+## JSON
+
 Use the following model.json to configure a smart dimmer device type.
 
 ```json

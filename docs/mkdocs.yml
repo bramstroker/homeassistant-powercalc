@@ -85,10 +85,11 @@ nav:
           - 'library/device-types/camera.md'
           #- 'library/device-types/cover.md'
           - 'library/device-types/light.md'
-          #- 'library/device-types/printer.md'
+          - 'library/device-types/power-meter.md'
+          - 'library/device-types/printer.md'
           - 'library/device-types/smart-dimmer.md'
           - 'library/device-types/smart-switch.md'
-          #- 'library/device-types/smart-speaker.md'
+          - 'library/device-types/smart-speaker.md'
           #- 'library/device-types/network.md'
           #- 'library/device-types/vacuum-robot.md'
   - 'Troubleshooting':
@@ -99,7 +100,9 @@ nav:
   - 'Contributing':
       - 'contributing/index.md'
       - 'contributing/integration-development.md'
-      - 'contributing/measure.md'
+      - 'Measure':
+        - 'contributing/measure.md'
+        - 'contributing/measure-ocr.md'
       - 'contributing/translating.md'
   - 'Tutorials':
       - 'community/tutorials.md'

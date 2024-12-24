@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import time
 from typing import Any
 
@@ -45,8 +46,9 @@ class HassLightController(LightController):
 
     def get_light_info(self) -> LightInfo:
         state = self.client.get_state(entity_id=self._entity_id)
-        min_mired = state.attributes.get("min_mireds") or MIN_MIRED
-        max_mired = state.attributes.get("max_mireds") or MAX_MIRED
+        attrs = state.attributes
+        min_mired = self.kelvin_to_mired(attrs.get("max_color_temp_kelvin")) or MIN_MIRED
+        max_mired = self.kelvin_to_mired(attrs.get("min_color_temp_kelvin")) or MAX_MIRED
         return LightInfo(self._model_id, min_mired, max_mired)
 
     def get_questions(self) -> list[inquirer.questions.Question]:
@@ -89,3 +91,8 @@ class HassLightController(LightController):
 
     def build_bri_json_body(self, bri: int) -> dict:
         return {"entity_id": self._entity_id, "transition": self._transition_time, "brightness": bri}
+
+    @staticmethod
+    def kelvin_to_mired(kelvin_temperature: float) -> int:
+        """Convert degrees kelvin to mired shift."""
+        return math.floor(1000000 / kelvin_temperature)

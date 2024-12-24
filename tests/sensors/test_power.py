@@ -6,7 +6,7 @@ import pytest
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
-    ATTR_COLOR_TEMP,
+    ATTR_COLOR_TEMP_KELVIN,
     ColorMode,
 )
 from homeassistant.components.utility_meter.sensor import SensorDeviceClass
@@ -759,7 +759,7 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
         {
             ATTR_BRIGHTNESS: 20,
             ATTR_COLOR_MODE: ColorMode.COLOR_TEMP,
-            ATTR_COLOR_TEMP: 20,
+            ATTR_COLOR_TEMP_KELVIN: 50000,
         },
     )
 

@@ -2,8 +2,8 @@
 
 Lights are integrated by using the [LUT](../../strategies/lut.md) (Look Up Table) strategy.
 This strategy is used to calculate the power consumption of the light based on the brightness / color levels.
-To generate a LUT you'll need to use the [measure utility](../../contributing/measure.md).
-This will fully automate the process and generate the required CSV files and model.json.
+
+## JSON
 
 Example model.json:
 
@@ -16,6 +16,11 @@ Example model.json:
     "measure_device": "Shelly Plug S"
 }
 ```
+
+## Measure
+
+To generate a LUT you'll need to use the [measure utility](../../contributing/measure.md).
+This will fully automate the process and generate the required CSV files and model.json.
 
 ## LUT data files
 
