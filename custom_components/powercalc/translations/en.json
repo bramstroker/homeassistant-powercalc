@@ -706,6 +706,10 @@
       "description": "Get current running playbook",
       "name": "Get active playbook"
     },
+    "get_group_entities": {
+      "description": "Retrieve all entity id's of a group energy or power sensor",
+      "name": "Get group entities"
+    },
     "increase_daily_energy": {
       "description": "Increases the sensor with a given amount.",
       "fields": {
@@ -734,9 +738,5 @@
       },
       "name": "Switch to another sub profile"
     }
-  },
-  "get_group_entities": {
-    "description": "Retrieve all entity id's of a group energy or power sensor",
-    "name": "Get group entities"
   }
 }
