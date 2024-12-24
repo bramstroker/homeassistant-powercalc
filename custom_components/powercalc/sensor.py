@@ -122,6 +122,7 @@ from .const import (
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_GET_ACTIVE_PLAYBOOK,
+    SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
@@ -525,6 +526,13 @@ def register_entity_services() -> None:
         SERVICE_SWITCH_SUB_PROFILE,
         {vol.Required("profile"): cv.string},
         "async_switch_sub_profile",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_GET_GROUP_ENTITIES,
+        {},
+        "get_group_entities",
+        supports_response=SupportsResponse.ONLY,
     )
 
 

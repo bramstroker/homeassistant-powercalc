@@ -734,5 +734,9 @@
       },
       "name": "Switch to another sub profile"
     }
+  },
+  "get_group_entities": {
+    "description": "Retrieve all entity id's of a group energy or power sensor",
+    "name": "Get group entities"
   }
 }

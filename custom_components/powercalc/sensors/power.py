@@ -682,7 +682,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         await strategy_instance.stop_playbook()
 
     def get_active_playbook(self) -> dict[str, str]:
-        """Stop an active playbook"""
+        """Get the active playbook"""
         strategy_instance = self._ensure_playbook_strategy()
         playbook = strategy_instance.get_active_playbook()
         if not playbook:

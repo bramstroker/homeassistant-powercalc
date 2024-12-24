@@ -568,6 +568,9 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
     def entities(self) -> set[str]:
         return self._entities
 
+    def get_group_entities(self) -> dict[str, set[str]]:
+        return {ATTR_ENTITIES: self._entities}
+
     @abstractmethod
     def calculate_initial_state(
         self,

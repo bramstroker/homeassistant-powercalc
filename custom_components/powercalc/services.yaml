@@ -110,3 +110,10 @@ change_gui_config:
       required: true
       selector:
         text:
+get_group_entities:
+  name: Get group entities
+  description: Get child entities of a Powercalc power or energy group
+  target:
+    entity:
+      domain: sensor
+      integration: powercalc
