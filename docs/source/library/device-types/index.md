@@ -24,6 +24,6 @@ Used for smart plugs / smart switches which can toggle a connected device on or 
 
 ## :material-speaker: [Smart Speaker](smart-speaker.md)
 
-## :material-ip-network: Network
+## :material-ip-network: [Network](network.md)
 
 ## :material-robot-vacuum: Vacuum robot
