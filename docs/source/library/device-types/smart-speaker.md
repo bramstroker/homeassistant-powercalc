@@ -28,12 +28,12 @@ Example model.json
       "0 -> 1.63"
     ]
   },
-  "measure_device": "xx",
-  "measure_method": "script",
-  "name": "Amazon Alexa Echo Dot Gen 4",
   "standby_power": 0.9
 }
 ```
+
+!!! note
+    Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
 
 ## Measure
 

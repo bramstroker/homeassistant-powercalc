@@ -9,13 +9,13 @@ Example model.json:
 
 ```json
 {
-    "name": "Hue White and Color Ambiance A19 E26 (Gen 5)",
     "standby_power": 0.4,
-    "calculation_strategy": "lut",
-    "measure_method": "script",
-    "measure_device": "Shelly Plug S"
+    "calculation_strategy": "lut"
 }
 ```
+
+!!! note
+    Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
 
 ## Measure
 

@@ -1,23 +1,18 @@
-# Camera
+# Network
 
-IP camera, webcam, or other camera devices.
+Generic device type for network devices. Can be used for routers, switches, access points, etc.
 
 ## JSON
 
 ```json
 {
-  "device_type": "camera",
+  "device_type": "network",
   "calculation_strategy": "fixed",
   "fixed_config": {
-    "power": 2.5
+    "power": 3.0
   }
 }
 ```
 
 !!! note
     Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
-
-## Measure
-
-You can use the [measure tool](../../contributing/measure.md) average mode.
-Suggest to measure for 2 hours.

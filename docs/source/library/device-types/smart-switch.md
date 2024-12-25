@@ -13,15 +13,15 @@ The profile will provide self-usage measurements for the smart switch itself, an
 
 ```json
 {
-  "measure_method": "manual",
-  "measure_device": "Some device",
-  "name": "Some smart switch",
   "standby_power": 0.3,
   "standby_power_on": 0.7,
   "device_type": "smart_switch",
   "calculation_strategy": "fixed"
 }
 ```
+
+!!! note
+    Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
 
 When this profile is discovered, the user will be asked to provide the power consumption of the connected device.
 Assuming the user provides a value of 50W the following power values will be calculated:
@@ -44,9 +44,6 @@ Note the sensor_naming configuration which will make sure the entities are named
 
 ```json
 {
-  "measure_method": "manual",
-  "measure_device": "Some device",
-  "name": "Some smart switch",
   "standby_power": 0.3,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",

@@ -7,7 +7,15 @@ Each power profile has it's own subdirectory `{manufacturer}/{modelid}`. i.e. si
 Every profile MUST contain a `model.json` file which defines the supported calculation modes and other configuration.
 See the [json schema](https://github.com/bramstroker/homeassistant-powercalc/blob/master/profile_library/model_schema.json) how the file must be structured.
 
-Examples for different device types can be found in the [device types](device-types/index.md) section.
+Required fields are:
+
+- `name`: The name of the device (this is only used in the [Library](https://library.powercalc.nl))
+- `device_type`: The type of the device. See the [device types](device-types/index.md) section for more information.
+- `calculation_strategy`: The calculation strategy to use. See the [strategies](../strategies/index.md) section for more information.
+- `measure_method`: The method used to measure the device. This can be `manual` or `script`.
+- `measure_device`: The device used to measure the power usage. (For example `Shelly PM Gen 3`)
+- `created_at`: The date when the profile was created. (ISO 8601 format, i.e. `2023-06-19T08:02:31`)
+- `author`: The author of the profile.
 
 You can use `aliases` to define alternative model names, which will be used during discovery.
 This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.

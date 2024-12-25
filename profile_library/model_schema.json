@@ -4,9 +4,11 @@
   "type": "object",
   "required": [
     "name",
+    "device_type",
     "measure_method",
     "measure_device",
-    "calculation_strategy"
+    "calculation_strategy",
+    "created_at"
   ],
   "properties": {
     "created_at": {

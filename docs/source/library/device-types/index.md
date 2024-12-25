@@ -12,7 +12,7 @@ Here you can find information about how to setup specific device types for the l
 
 Smart power meter. Powercalc profiles can be used to define the self usage of the IoT device itself.
 
-## :material-printer: Printer
+## :material-printer: [Printer](printer.md)
 
 ## :material-arrow-up-down-bold: [Smart dimmer](smart-dimmer.md)
 

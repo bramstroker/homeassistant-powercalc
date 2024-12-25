@@ -6,9 +6,6 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
 
 ```json
 {
-  "measure_method": "manual",
-  "measure_device": "Some device",
-  "name": "Some power meter",
   "standby_power": 0.3,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
@@ -21,5 +18,8 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
   }
 }
 ```
+
+!!! note
+    Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
 
 Following the example above the power for this device will always be 0.3W.
