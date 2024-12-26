@@ -39,15 +39,15 @@ class LocalLoader(Loader):
 
         return manufacturers
 
-    async def find_manufacturer(self, search: str) -> str | None:
+    async def find_manufacturers(self, search: str) -> set[str]:
         """Check if a manufacturer is available."""
 
         _search = search.lower()
         manufacturer_list = self._manufacturer_model_listing.keys()
         if _search in manufacturer_list:
-            return _search
+            return {_search}
 
-        return None
+        return set()
 
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer.

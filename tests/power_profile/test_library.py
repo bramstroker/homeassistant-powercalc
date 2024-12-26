@@ -47,8 +47,8 @@ async def test_model_listing(hass: HomeAssistant, manufacturer: str, expected_mo
 )
 async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_models: set[str]) -> None:
     library = await ProfileLibrary.factory(hass)
-    models = await library.find_models(model_info.manufacturer, model_info)
-    assert models == expected_models
+    models = await library.find_models(model_info)
+    assert {model.model for model in models} == expected_models
 
 
 async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
@@ -130,7 +130,7 @@ async def test_create_power_profile_raises_library_error(hass: HomeAssistant) ->
     """When no loader is able to load the model, a LibraryError should be raised."""
     mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
-    mock_loader.find_manufacturer = AsyncMock(return_value="signify")
+    mock_loader.find_manufacturers = AsyncMock(return_value="signify")
     mock_loader.find_model = AsyncMock(return_value=ModelInfo("signify", "LCT010"))
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
@@ -142,7 +142,7 @@ async def test_create_power_raise_library_error_when_model_not_found(hass: HomeA
     """When model is not found in library a LibraryError should be raised"""
     mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
-    mock_loader.find_manufacturer = AsyncMock(return_value="signify")
+    mock_loader.find_manufacturers = AsyncMock(return_value="signify")
     mock_loader.find_model = AsyncMock(return_value=[])
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
@@ -154,7 +154,7 @@ async def test_create_power_raise_library_error_when_manufacturer_not_found(hass
     """When model is not found in library a LibraryError should be raised"""
     mock_loader = LocalLoader(hass, "")
     mock_loader.load_model = AsyncMock(return_value=None)
-    mock_loader.find_manufacturer = AsyncMock(return_value=None)
+    mock_loader.find_manufacturers = AsyncMock(return_value=None)
     library = ProfileLibrary(hass, loader=mock_loader)
     await library.initialize()
     with pytest.raises(LibraryError):

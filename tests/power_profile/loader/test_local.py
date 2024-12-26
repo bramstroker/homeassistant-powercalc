@@ -79,14 +79,14 @@ async def test_load_model_returns_none_when_model_not_found(hass: HomeAssistant)
 @pytest.mark.parametrize(
     "manufacturer,expected",
     [
-        ["tp-link", "tp-link"],
-        ["TP-Link", "tp-link"],
-        ["foo", None],
+        ["tp-link", {"tp-link"}],
+        ["TP-Link", {"tp-link"}],
+        ["foo", set()],
     ],
 )
-async def test_find_manufacturer(hass: HomeAssistant, manufacturer: str, expected: str | None) -> None:
+async def test_find_manufacturers(hass: HomeAssistant, manufacturer: str, expected: str | None) -> None:
     loader = await _create_loader(hass)
-    assert expected == await loader.find_manufacturer(manufacturer)
+    assert expected == await loader.find_manufacturers(manufacturer)
 
 
 async def test_get_manufacturer_listing(hass: HomeAssistant) -> None:

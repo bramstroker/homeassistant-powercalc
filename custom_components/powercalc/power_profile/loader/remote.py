@@ -107,10 +107,13 @@ class RemoteLoader(Loader):
             if not device_types or any(device_type in manufacturer.get("device_types", []) for device_type in device_types)
         }
 
-    async def find_manufacturer(self, search: str) -> str | None:
+    async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
 
-        return self.manufacturer_aliases.get(search, None)
+        manufacturer = self.manufacturer_aliases.get(search, None)
+        if manufacturer:
+            return {manufacturer}
+        return set()
 
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""

@@ -78,17 +78,22 @@ class ProfileLibrary:
     async def get_model_listing(self, manufacturer: str, entity_domain: str | None = None) -> list[str]:
         """Get listing of available models for a given manufacturer."""
 
-        resolved_manufacturer = await self._loader.find_manufacturer(manufacturer)
-        if not resolved_manufacturer:
+        resolved_manufacturers = await self._loader.find_manufacturers(manufacturer)
+        if not resolved_manufacturers:
             return []
         device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
-        cache_key = f"{resolved_manufacturer}/{device_types}"
-        cached_models = self._manufacturer_models.get(cache_key)
-        if cached_models:
-            return cached_models
-        models = await self._loader.get_model_listing(resolved_manufacturer, device_types)
-        self._manufacturer_models[cache_key] = sorted(models)
-        return self._manufacturer_models[cache_key]
+        all_models: list[str] = []
+        for manufacturer in resolved_manufacturers:
+            cache_key = f"{manufacturer}/{device_types}"
+            cached_models = self._manufacturer_models.get(cache_key)
+            if cached_models:
+                all_models.extend(cached_models)
+                continue
+            models = await self._loader.get_model_listing(manufacturer, device_types)
+            self._manufacturer_models[cache_key] = sorted(models)
+            all_models.extend(models)
+
+        return all_models
 
     async def get_profile(
         self,
@@ -116,30 +121,24 @@ class ProfileLibrary:
     ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
 
-        manufacturer = model_info.manufacturer
-        model = model_info.model
         if not custom_directory:
-            manufacturer = await self.find_manufacturer(model_info)  # type: ignore
-            if manufacturer is None:
-                raise LibraryError(f"Manufacturer {model_info.manufacturer} not found")
-
-            models = await self.find_models(manufacturer, model_info)
+            models = await self.find_models(model_info)
             if not models:
-                raise LibraryError(f"Model {manufacturer} {model} not found")
-            model = next(iter(models))
+                raise LibraryError(f"Model {model_info.manufacturer} {model_info.model} not found")
+            model_info = next(iter(models))
 
-        json_data, directory = await self._load_model_data(manufacturer, model, custom_directory)
+        json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
         if linked_profile := json_data.get("linked_lut"):
             linked_manufacturer, linked_model = linked_profile.split("/")
             _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
-        return await self._create_power_profile_instance(manufacturer, model, directory, json_data)
+        return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
 
-    async def find_manufacturer(self, model_info: ModelInfo) -> str | None:
+    async def find_manufacturers(self, model_info: ModelInfo) -> set[str]:
         """Resolve the manufacturer, either from the model info or by loading it."""
-        return await self._loader.find_manufacturer(model_info.manufacturer)
+        return await self._loader.find_manufacturers(model_info.manufacturer)
 
-    async def find_models(self, manufacturer: str, model_info: ModelInfo) -> set[str]:
+    async def find_models(self, model_info: ModelInfo) -> set[ModelInfo]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
         search: set[str] = set()
         for model_identifier in (model_info.model_id, model_info.model):
@@ -155,7 +154,17 @@ class ProfileLibrary:
                 if "/" in model_identifier:
                     search.update(model_identifier.split("/"))
 
-        return set(await self._loader.find_model(manufacturer, search))
+        manufacturers = await self._loader.find_manufacturers(model_info.manufacturer)
+        found_models: set[ModelInfo] = set()
+        if not manufacturers:
+            return found_models
+
+        for manufacturer in manufacturers:
+            models = await self._loader.find_model(manufacturer, search)
+            if models:
+                found_models.update(ModelInfo(manufacturer, model) for model in models)
+
+        return found_models
 
     async def _load_model_data(self, manufacturer: str, model: str, custom_directory: str | None) -> tuple[dict, str]:
         """Load the model data from the appropriate directory."""
