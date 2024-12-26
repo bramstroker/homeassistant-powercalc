@@ -130,7 +130,11 @@ async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
 
 async def test_entity_registry_updates(hass: HomeAssistant) -> None:
     """Test that the tracked power sensor is updated when power sensors are added or removed to the system"""
-    mock_sensors_in_registry(hass, ["sensor.test1_power", "sensor.test2_power"])
+    mock_sensors_in_registry(
+        hass,
+        ["sensor.test1_power", "sensor.test2_power", "sensor.test3_power"],
+        ["sensor.test1_energy"],
+    )
     entity_registry = er.async_get(hass)
     create_mock_entry(
         hass,
@@ -146,17 +150,22 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
 
     hass.states.async_set("sensor.test1_power", "10")
     hass.states.async_set("sensor.test2_power", "5")
+    hass.states.async_set("sensor.test3_power", "10")
     await hass.async_block_till_done()
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
-    assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test2_power"}
-    assert hass.states.get("sensor.tracked_power").state == "15.00"
+    assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test2_power", "sensor.test3_power"}
+    assert hass.states.get("sensor.tracked_power").state == "25.00"
 
     # Remove one of the tracked entities from registry
     entity_registry.async_remove("sensor.test2_power")
+    entity_registry.async_remove("sensor.test1_energy")  # for coverage
+    # Change the entity_id of one of the tracked entities
+    entity_registry.async_update_entity("sensor.test1_power", new_entity_id="sensor.test1_power_new")
+    entity_registry.async_update_entity("sensor.test3_power", icon="mdi:power")  # irrelevant change for coverage
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
-    assert tracked_power_sensor.entities == {"sensor.test1_power"}
+    assert tracked_power_sensor.entities == {"sensor.test1_power_new", "sensor.test3_power"}
     assert hass.states.get("sensor.tracked_power").state == "10.00"
 
     # Add a new power entity to registry
@@ -164,10 +173,10 @@ async def test_entity_registry_updates(hass: HomeAssistant) -> None:
         "sensor",
         "sensor",
         "aaa",
-        suggested_object_id="test3_power",
+        suggested_object_id="test4_power",
         original_device_class=SensorDeviceClass.POWER,
     )
 
     tracked_power_sensor = hass.data[DOMAIN][DATA_GROUP_ENTITIES]["sensor.tracked_power"]
-    assert tracked_power_sensor.entities == {"sensor.test1_power", "sensor.test3_power"}
+    assert tracked_power_sensor.entities == {"sensor.test1_power_new", "sensor.test3_power", "sensor.test4_power"}
     assert hass.states.get("sensor.tracked_power").state == "10.00"

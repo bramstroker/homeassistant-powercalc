@@ -126,16 +126,23 @@ class TrackedPowerSensorFactory:
         entity_id = event.data["entity_id"]
         action = event.data["action"]
 
-        if action == "update":
-            return
-        if action == "remove" and entity_id not in self.tracked_entities:
-            return
+        if action == "update" and "old_entity_id" in event.data:
+            if event.data["old_entity_id"] in self.tracked_entities:
+                return await self.reload()
+            return None
+
+        if action == "remove" and entity_id in self.tracked_entities:
+            return await self.reload()
+
         if action == "create":
             registry = er.async_get(self.hass)
             entity_entry = registry.async_get(entity_id)
-            if entity_entry and entity_entry.original_device_class != SensorDeviceClass.POWER:
-                return
+            if entity_entry and entity_entry.original_device_class == SensorDeviceClass.POWER:
+                return await self.reload()
+        return None
 
+    async def reload(self) -> None:
+        """Reload the config entry."""
         await self.hass.config_entries.async_reload(self.config_entry.entry_id)
 
     async def create_tracked_power_sensor(
