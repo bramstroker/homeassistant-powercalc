@@ -124,12 +124,8 @@ async def test_auto_tracking_entities(hass: HomeAssistant) -> None:
             CONF_CREATE_UTILITY_METERS: False,
         },
     )
-    sensors = await factory.create_tracked_untracked_group_sensors()
-
-    assert len(sensors) == 2
-    tracked_sensor = sensors[0]
-    assert isinstance(tracked_sensor, GroupedPowerSensor)
-    assert tracked_sensor.entities == {"sensor.test1_power", "sensor.test3_power"}
+    entities = await factory.get_tracked_power_entities()
+    assert entities == {"sensor.test1_power", "sensor.test3_power"}
 
 
 async def test_entity_registry_updates(hass: HomeAssistant) -> None:
