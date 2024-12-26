@@ -15,6 +15,7 @@ from aiohttp import ClientError
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import STORAGE_DIR
 
+from custom_components.powercalc.helpers import async_cache
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
 from custom_components.powercalc.power_profile.loader.protocol import Loader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
@@ -98,6 +99,7 @@ class RemoteLoader(Loader):
             _LOGGER.debug("Failed to download library.json, falling back to local copy")
             return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
 
+    @async_cache
     async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available manufacturers."""
 
@@ -107,6 +109,7 @@ class RemoteLoader(Loader):
             if not device_types or any(device_type in manufacturer.get("device_types", []) for device_type in device_types)
         }
 
+    @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
 
@@ -115,6 +118,7 @@ class RemoteLoader(Loader):
             return {manufacturer}
         return set()
 
+    @async_cache
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
 
@@ -124,6 +128,7 @@ class RemoteLoader(Loader):
             if not device_types or any(device_type in model.get("device_type", [DeviceType.LIGHT]) for device_type in device_types)
         }
 
+    @async_cache
     async def load_model(
         self,
         manufacturer: str,
@@ -226,6 +231,7 @@ class RemoteLoader(Loader):
 
         return await self.hass.async_add_executor_job(_write)  # type: ignore
 
+    @async_cache
     async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
         """Find the model in the library."""
 
