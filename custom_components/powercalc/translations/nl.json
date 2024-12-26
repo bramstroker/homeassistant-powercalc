@@ -137,6 +137,43 @@
         },
         "title": "Creëer een groep sensor"
       },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "Creëer energie sensoren",
+          "create_utility_meters": "Creëer utiliteit meters",
+          "entity_id": "Basis entiteit",
+          "name": "Naam",
+          "subtract_entities": "Entiteiten aftrekken"
+        },
+        "data_description": {
+          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
+          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
+        },
+        "title": "Groepssensor aftrekken"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Mains power sensor",
+          "group_tracked_auto": "Entities auto added",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
+          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        },
+        "description": "Create a group sensor for all tracked and untracked power",
+        "title": "Create a tracked power sensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
+        "title": "Select power entities"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Bevestig model ID"
@@ -186,7 +223,8 @@
         "menu_options": {
           "group_custom": "Standaard groep",
           "group_domain": "Domein gebaseerde groep",
-          "group_subtract": "Aftrekken"
+          "group_subtract": "Aftrekken",
+          "group_tracked_untracked": "Tracked/untracked power"
         },
         "title": "Kies het type groep",
         "description": "Selecteer het type groepssensor dat je wilt aanmaken. Kies een domein gebaseerde groep als u alle entiteiten van een specifiek domein wilt groeperen of een sensor opsomming wilt maken van al uw energie sensoren."
@@ -255,20 +293,6 @@
         },
         "description": "Momenteel kunnen specifieke instellingen alleen globaal worden geconfigureerd",
         "title": "Maak een energiesensor voor een bestaande stroomsensor"
-      },
-      "group_subtract": {
-        "data": {
-          "create_energy_sensor": "Creëer energie sensoren",
-          "create_utility_meters": "Creëer utiliteit meters",
-          "entity_id": "Basis entiteit",
-          "name": "Naam",
-          "subtract_entities": "Entiteiten aftrekken"
-        },
-        "data_description": {
-          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
-          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
-        },
-        "title": "Groepssensor aftrekken"
       },
       "sub_profile": {
         "data": {
@@ -504,6 +528,39 @@
           "sub_groups": "Alle onderliggende sensoren van de geselecteerde sub-groepen worden ook automatisch aan deze groep toegevoegd."
         }
       },
+      "group_subtract": {
+        "data": {
+          "entity_id": "Basis entiteit",
+          "subtract_entities": "Entiteiten aftrekken"
+        },
+        "data_description": {
+          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
+          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
+        },
+        "title": "Groep opties"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Mains power sensor",
+          "group_tracked_auto": "Entities auto added",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Creëer utiliteit meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Selecteer de vermogenssensor die uw totale energieverbruik bevat. Indien leeg wordt alleen een bijgehouden groep gemaakt",
+          "group_tracked_auto": "Powercalc voegt automatisch alle vermogen sensoren toe aan de bijgehouden groep, slaat Powercalc groepen over. Schakel deze uit als u handmatig de bijgehouden entiteiten wilt definiëren.",
+          "create_energy_sensor": "Laat Powercalc een kWh meter maken",
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc."
+        },
+        "description": "Maak een groepssensor aan voor alle bijgehouden en niet bijgehouden energie",
+        "title": "Maak een bijgehouden vermogensensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Bijgehouden entiteiten"
+        },
+        "title": "Selecteer vermogensentiteiten"
+      },
       "init": {
         "menu_options": {
           "advanced_options": "Geavanceerde opties",
@@ -511,12 +568,14 @@
           "daily_energy": "Dagelijkse energie opties",
           "fixed": "Fixed opties",
           "group": "Groep opties",
+          "group_subtract": "Groep opties",
+          "group_tracked_untracked": "Groep opties",
+          "group_tracked_untracked_manual": "Bijgehouden entiteiten",
           "library_options": "Bibliotheek opties",
           "linear": "Lineaire opties",
           "playbook": "Playbook opties",
           "multi_switch": "Multi switch opties",
           "real_power": "Real power opties",
-          "group_subtract": "Groep opties",
           "utility_meter_options": "Nutsmeter opties",
           "wled": "WLED opties"
         }
@@ -575,17 +634,6 @@
         "data_description": {
           "device": "Voeg de gecreëerde energiesensor toe aan een specifiek apparaat"
         }
-      },
-      "group_subtract": {
-        "data": {
-          "entity_id": "Basis entiteit",
-          "subtract_entities": "Entiteiten aftrekken"
-        },
-        "data_description": {
-          "entity_id": "De basis entiteit waarvan het vermogen wordt afgetrokken",
-          "subtract_entities": "Selecteer alle entiteiten die u wilt aftrekken van de basis entiteit"
-        },
-        "title": "Groep opties"
       },
       "utility_meter_options": {
         "title": "Nutsmeter opties",
@@ -657,6 +705,10 @@
     "get_active_playbook": {
       "description": "Laad huidige actieve playbook",
       "name": "Laad actieve playbook"
+    },
+    "get_group_entities": {
+      "description": "Haal alle entiteit id's op van een groep energie of stroomsensor",
+      "name": "Toon entiteiten van groep"
     },
     "increase_daily_energy": {
       "description": "Verhoog de sensor.",

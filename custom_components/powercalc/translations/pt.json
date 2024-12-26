@@ -137,6 +137,43 @@
         },
         "title": "Criar um sensor de grupo"
       },
+      "group_subtract": {
+        "data": {
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters",
+          "entity_id": "Base entity",
+          "name": "Name",
+          "subtract_entities": "Subtract entities"
+        },
+        "data_description": {
+          "entity_id": "The base entity to subtract the power from",
+          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+        },
+        "title": "Subtract group sensor"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Mains power sensor",
+          "group_tracked_auto": "Entities auto added",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
+          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        },
+        "description": "Create a group sensor for all tracked and untracked power",
+        "title": "Create a tracked power sensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
+        "title": "Select power entities"
+      },
       "library": {
         "data": {
           "confirm_autodisovered_model": "Confirmar modelo"
@@ -186,7 +223,8 @@
         "menu_options": {
           "group_custom": "Standard group",
           "group_domain": "Domain based group",
-          "group_subtract": "Subtract"
+          "group_subtract": "Subtract",
+          "group_tracked_untracked": "Tracked/untracked power"
         },
         "title": "Choose the group type",
         "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
@@ -255,20 +293,6 @@
         },
         "description": "As definições especificadas só podem ser configuradas globalmente",
         "title": "Criar um sensor de energia a partir de um sensor de potência existente"
-      },
-      "group_subtract": {
-        "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
-        },
-        "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
-        },
-        "title": "Subtract group sensor"
       },
       "sub_profile": {
         "data": {
@@ -504,6 +528,39 @@
           "sub_groups": "Todos os sensores que contêm os subgrupos selecionados também serão adicionados a este grupo"
         }
       },
+      "group_subtract": {
+        "data": {
+          "entity_id": "Base entity",
+          "subtract_entities": "Subtract entities"
+        },
+        "data_description": {
+          "entity_id": "The base entity to subtract the power from",
+          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+        },
+        "title": "Group options"
+      },
+      "group_tracked_untracked": {
+        "data": {
+          "main_power_sensor": "Mains power sensor",
+          "group_tracked_auto": "Entities auto added",
+          "create_energy_sensor": "Create energy sensor",
+          "create_utility_meters": "Create utility meters"
+        },
+        "data_description": {
+          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
+          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
+          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
+          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+        },
+        "description": "Create a group sensor for all tracked and untracked power",
+        "title": "Create a tracked power sensor"
+      },
+      "group_tracked_untracked_manual": {
+        "data": {
+          "group_tracked_entities": "Tracked entities"
+        },
+        "title": "Select power entities"
+      },
       "init": {
         "menu_options": {
           "advanced_options": "Advanced options",
@@ -511,12 +568,14 @@
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
           "group": "Group options",
+          "group_subtract": "Group options",
+          "group_tracked_untracked": "Group options",
+          "group_tracked_untracked_manual": "Tracked entities",
           "library_options": "Library options",
           "linear": "Linear options",
           "playbook": "Playbook options",
           "multi_switch": "Multi switch options",
           "real_power": "Real power options",
-          "group_subtract": "Group options",
           "utility_meter_options": "Utility meter options",
           "wled": "WLED options"
         }
@@ -575,17 +634,6 @@
         "data_description": {
           "device": "Add the created energy sensor to an specific device"
         }
-      },
-      "group_subtract": {
-        "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
-        },
-        "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
-        },
-        "title": "Group options"
       },
       "utility_meter_options": {
         "title": "Utility meter options",
@@ -657,6 +705,10 @@
     "get_active_playbook": {
       "description": "Get current running playbook",
       "name": "Get active playbook"
+    },
+    "get_group_entities": {
+      "description": "Retrieve all entity id's of a group energy or power sensor",
+      "name": "Get group entities"
     },
     "increase_daily_energy": {
       "description": "Aumenta o valor do sensor por um valor.",
