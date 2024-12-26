@@ -112,11 +112,7 @@ class RemoteLoader(Loader):
     @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
-
-        manufacturer = self.manufacturer_aliases.get(search, None)
-        if manufacturer:
-            return {manufacturer}
-        return set()
+        return {self.manufacturer_aliases[search]} if search in self.manufacturer_aliases else set()
 
     @async_cache
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
@@ -129,6 +125,19 @@ class RemoteLoader(Loader):
         }
 
     @async_cache
+    async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
+        """Find the model in the library."""
+
+        models = self.manufacturer_models.get(manufacturer, [])
+        result = set()
+        for model in models:
+            model_id = model.get("id")
+            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
+                result.add(model_id)
+
+        return result
+
+    @async_cache
     async def load_model(
         self,
         manufacturer: str,
@@ -137,12 +146,12 @@ class RemoteLoader(Loader):
         retry_count: int = 0,
     ) -> tuple[dict, str] | None:
         """Load a model, downloading it if necessary, with retry logic."""
-        model_info = self._get_model_info(manufacturer.lower(), model)
-        storage_path = self.get_storage_path(manufacturer.lower(), model)
+        model_info = self._get_model_info(manufacturer, model)
+        storage_path = self.get_storage_path(manufacturer, model)
         model_path = os.path.join(storage_path, "model.json")
 
         if await self._needs_update(model_info, model_path, force_update):
-            await self._download_profile_with_retry(manufacturer.lower(), model, storage_path, model_path)
+            await self._download_profile_with_retry(manufacturer, model, storage_path, model_path)
 
         try:
             json_data = await self._load_model_json(model_path)
@@ -230,19 +239,6 @@ class RemoteLoader(Loader):
                 f.write(str(time))
 
         return await self.hass.async_add_executor_job(_write)  # type: ignore
-
-    @async_cache
-    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
-        """Find the model in the library."""
-
-        models = self.manufacturer_models.get(manufacturer, [])
-        result = []
-        for model in models:
-            model_id = model.get("id")
-            if model_id and (model_id in search or any(alias in search for alias in model.get("aliases", []))):
-                result.append(model_id)
-
-        return result
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:

@@ -117,7 +117,6 @@ class DiscoveryManager:
     ) -> list[PowerProfile] | None:
         """Discover a single entity in Powercalc library and start the discovery flow if supported."""
 
-        library = await self._get_library()
         if source_entity.entity_entry is None:  # pragma: no cover
             return None
 
@@ -125,6 +124,7 @@ class DiscoveryManager:
             await self.init_wled_flow(model_info, source_entity)
             return None
 
+        library = await self._get_library()
         models = await library.find_models(model_info)
         if not models:
             _LOGGER.debug(

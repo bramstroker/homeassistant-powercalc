@@ -475,10 +475,10 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 @pytest.mark.parametrize(
     "manufacturer,phrases,expected_models,library_dir",
     [
-        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
-        ("apple", {"Non existing model"}, [], None),
-        ("signify", {"LCA001", "LCT010"}, ["LCT010", "LCA001"], None),
-        ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi-profile"),
+        ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
+        ("apple", {"Non existing model"}, set(), None),
+        ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
+        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi-profile"),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking
