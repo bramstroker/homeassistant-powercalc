@@ -120,7 +120,7 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
-from .group_include.include import resolve_include_entities
+from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile
@@ -1474,7 +1474,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle the flow for tracked/untracked group sensor."""
         schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
         if not user_input:
-            entities, _ = await resolve_include_entities(self.hass)
+            entities, _ = await find_entities(self.hass)
             tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
             schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
 

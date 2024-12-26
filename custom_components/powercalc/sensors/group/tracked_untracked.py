@@ -24,7 +24,7 @@ from custom_components.powercalc.const import (
     GroupType,
     UnitPrefix,
 )
-from custom_components.powercalc.group_include.include import resolve_include_entities
+from custom_components.powercalc.group_include.include import find_entities
 from custom_components.powercalc.sensors.abstract import (
     generate_energy_sensor_entity_id,
     generate_energy_sensor_name,
@@ -101,19 +101,22 @@ class TrackedPowerSensorFactory:
         return entities
 
     async def get_tracked_power_entities(self) -> set[str]:
-        """Get all power entities which are part of the tracked sensor group"""
-        if bool(self.config.get(CONF_GROUP_TRACKED_AUTO, False)):
+        """
+        Get all power entities which are part of the tracked sensor group
+        """
+        if not bool(self.config.get(CONF_GROUP_TRACKED_AUTO, False)):
+            return set(self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
 
-            @callback
-            def _start_entity_registry_listener(_: Any) -> None:  # noqa ANN401
-                self.hass.bus.async_listen(EVENT_ENTITY_REGISTRY_UPDATED, self._handle_entity_registry_updated)
+        # For auto mode, we also want to listen for any changes in the entity registry
+        # Dynamically add/remove power sensors from the tracked group
+        @callback
+        def _start_entity_registry_listener(_: Any) -> None:  # noqa ANN401
+            self.hass.bus.async_listen(EVENT_ENTITY_REGISTRY_UPDATED, self._handle_entity_registry_updated)
 
-            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)
+        self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _start_entity_registry_listener)
 
-            entities, _ = await resolve_include_entities(self.hass)
-            return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
-
-        return set(self.config.get(CONF_GROUP_TRACKED_POWER_ENTITIES))  # type: ignore
+        entities, _ = await find_entities(self.hass)
+        return {entity.entity_id for entity in entities if isinstance(entity, PowerSensor) and not isinstance(entity, GroupedSensor)}
 
     async def _handle_entity_registry_updated(
         self,

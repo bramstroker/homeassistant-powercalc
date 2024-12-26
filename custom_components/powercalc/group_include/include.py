@@ -20,7 +20,7 @@ from .filter import EntityFilter, NullFilter, get_filtered_entity_list
 _LOGGER = logging.getLogger(__name__)
 
 
-async def resolve_include_entities(
+async def find_entities(
     hass: HomeAssistant,
     entity_filter: EntityFilter | None = None,
     include_non_powercalc: bool = True,
