@@ -2118,9 +2118,11 @@ Just toggle these options in the configuration screen.</p>
 </div>
 <h2 id="auto-mode">Auto mode</h2>
 <p>The <code>Tracked/Untracked</code> group can be configured in <code>auto</code> mode.
-This will try to automatically add all power sensors to the tracked group from you HA instance.
-- All enabled power sensors with a <code>device_class</code> of <code>power</code> will be added to the tracked group.
-- Excluding powercalc groups and the <code>main_power_sensor</code> if specified.</p>
+This will try to automatically add all power sensors to the tracked group from you HA instance.</p>
+<ul>
+<li>All enabled power sensors with a <code>device_class</code> of <code>power</code> will be added to the tracked group.</li>
+<li>Excluding powercalc groups and the <code>main_power_sensor</code> if specified.</li>
+</ul>
 <p>Whenever a new power sensor is added or removed to your HA instance, the tracked group will update accordingly.</p>
 <p>If you prefer more granular control, you can disable auto mode and manually manage the sensors in the tracked group.
 During configuration, the list of sensors will initially match the auto mode setup, but you’ll be able to modify it as needed.</p>
