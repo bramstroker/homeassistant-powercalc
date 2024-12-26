@@ -34,6 +34,7 @@ Select `Group` -> `Tracked/Untracked` and follow the instructions.
 
 The `Tracked/Untracked` group can be configured in `auto` mode.
 This will try to automatically add all power sensors to the tracked group from you HA instance.
+
 - All enabled power sensors with a `device_class` of `power` will be added to the tracked group.
 - Excluding powercalc groups and the `main_power_sensor` if specified.
 
