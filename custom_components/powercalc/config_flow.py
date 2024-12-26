@@ -1463,8 +1463,8 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             user_input[CONF_NAME] = "Tracked / Untracked"
 
-        async def _next_step(user_input: dict[str, Any]) -> Step | None:
-            if not bool(user_input.get(CONF_GROUP_TRACKED_AUTO, True)):
+        async def _next_step(user_data: dict[str, Any]) -> Step | None:
+            if not bool(user_data.get(CONF_GROUP_TRACKED_AUTO, True)):
                 return Step.GROUP_TRACKED_UNTRACKED_MANUAL
             return None
 
