@@ -29,3 +29,19 @@ Select `Group` -> `Tracked/Untracked` and follow the instructions.
 !!! note
 
     Powercalc will only allow a single instance of this group in your installation
+
+## Auto mode
+
+The `Tracked/Untracked` group can be configured in `auto` mode.
+This will try to automatically add all power sensors to the tracked group from you HA instance.
+- All enabled power sensors with a `device_class` of `power` will be added to the tracked group.
+- Excluding powercalc groups and the `main_power_sensor` if specified.
+
+Whenever a new power sensor is added or removed to your HA instance, the tracked group will update accordingly.
+
+If you prefer more granular control, you can disable auto mode and manually manage the sensors in the tracked group.
+During configuration, the list of sensors will initially match the auto mode setup, but you’ll be able to modify it as needed.
+
+!!! note
+
+    In manual mode, you must update the group manually whenever power sensors are added or removed from your system.
