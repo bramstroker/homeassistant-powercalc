@@ -6,8 +6,9 @@ import re
 from typing import NamedTuple
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.singleton import singleton
 
-from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DATA_PROFILE_LIBRARY, DOMAIN, DOMAIN_CONFIG
+from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -34,19 +35,13 @@ class ProfileLibrary:
         await self._loader.initialize()
 
     @staticmethod
+    @singleton("powercalc_library")
     async def factory(hass: HomeAssistant) -> ProfileLibrary:
         """Creates and loads the profile library
         Makes sure it is only loaded once and instance is saved in hass data registry.
         """
-        if DOMAIN not in hass.data:
-            hass.data[DOMAIN] = {}
-
-        if DATA_PROFILE_LIBRARY in hass.data[DOMAIN]:
-            return hass.data[DOMAIN][DATA_PROFILE_LIBRARY]  # type: ignore
-
         library = ProfileLibrary(hass, ProfileLibrary.create_loader(hass))
         await library.initialize()
-        hass.data[DOMAIN][DATA_PROFILE_LIBRARY] = library
         return library
 
     @staticmethod
@@ -61,7 +56,8 @@ class ProfileLibrary:
             if os.path.exists(data_dir)
         ]
 
-        global_config = hass.data[DOMAIN].get(DOMAIN_CONFIG, {})
+        domain_config = hass.data.get(DOMAIN, {})
+        global_config = domain_config.get(DOMAIN_CONFIG, {})
         disable_library_download: bool = bool(global_config.get(CONF_DISABLE_LIBRARY_DOWNLOAD, False))
         if not disable_library_download:
             loaders.append(RemoteLoader(hass))
