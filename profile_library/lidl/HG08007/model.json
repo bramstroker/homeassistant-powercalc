@@ -10,5 +10,6 @@
     "VERSION": "v1.14.0:docker"
   },
   "name": "Livarno Home outdoor LED band",
-  "standby_power": 0.2
+  "standby_power": 0.2,
+  "author": "bragra <bragragithub@gradussen.com>"
 }

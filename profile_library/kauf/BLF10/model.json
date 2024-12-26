@@ -10,5 +10,6 @@
     "VERSION": "v1.14.4:docker"
   },
   "name": "Kauf A21 RGBWW",
-  "standby_power": 0.5
+  "standby_power": 0.5,
+  "author": "nwalk7800 <1247667+nwalk7800@users.noreply.github.com>"
 }

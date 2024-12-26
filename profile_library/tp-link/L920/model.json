@@ -10,5 +10,6 @@
     "VERSION": "v1.14.10:docker"
   },
   "name": "TP-Link L920-5",
-  "standby_power": 0.53
+  "standby_power": 0.53,
+  "author": "Ed Kutuev <ed@napych.com>"
 }

@@ -10,5 +10,6 @@
     "VERSION": "master"
   },
   "name": "Treatlife Smart Color Changing Light Bulb 9W 800LM",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author": "Benjamin Pearce <gitlab@bcpearce.com>"
 }

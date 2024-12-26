@@ -10,5 +10,6 @@
     "VERSION": "v1.14.8:docker"
   },
   "name": "Hue Iris",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author": "Morpheus361 <marco.morpheus@kabelmail.de>"
 }
