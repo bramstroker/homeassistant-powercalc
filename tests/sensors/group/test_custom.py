@@ -66,6 +66,7 @@ from custom_components.powercalc.const import (
     DUMMY_ENTITY_ID,
     ENTRY_DATA_ENERGY_ENTITY,
     SERVICE_CALIBRATE_ENERGY,
+    SERVICE_GET_GROUP_ENTITIES,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
     SensorType,
@@ -1643,6 +1644,48 @@ async def test_energy_entity_attribute_is_unset_correctly(hass: HomeAssistant) -
 
     member_entry = hass.config_entries.async_get_entry(member_entry.entry_id)
     assert ENTRY_DATA_ENERGY_ENTITY not in member_entry.data
+
+
+async def test_get_group_entities_action(hass: HomeAssistant) -> None:
+    """
+    Test that the get_group_entities action returns the correct entities
+    """
+    await run_powercalc_setup(
+        hass,
+        [
+            {
+                CONF_CREATE_GROUP: "TestGroup",
+                CONF_IGNORE_UNAVAILABLE_STATE: True,
+                CONF_ENTITIES: [
+                    {
+                        CONF_ENTITY_ID: "switch.test1",
+                        CONF_FIXED: {CONF_POWER: 50},
+                    },
+                    {
+                        CONF_ENTITY_ID: "switch.test2",
+                        CONF_FIXED: {CONF_POWER: 50},
+                    },
+                    {
+                        CONF_ENTITY_ID: "switch.test3",
+                        CONF_FIXED: {CONF_POWER: 50},
+                    },
+                ],
+            },
+        ],
+    )
+    await hass.async_block_till_done()
+
+    res = await hass.services.async_call(
+        DOMAIN,
+        SERVICE_GET_GROUP_ENTITIES,
+        {
+            ATTR_ENTITY_ID: "sensor.testgroup_energy",
+        },
+        blocking=True,
+        return_response=True,
+    )
+    await hass.async_block_till_done()
+    assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {"sensor.test1_energy", "sensor.test2_energy", "sensor.test3_energy"}
 
 
 async def _create_energy_group(

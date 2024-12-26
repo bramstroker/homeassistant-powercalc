@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from homeassistant.const import CONF_DOMAIN
+from homeassistant.const import CONF_DOMAIN, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -9,10 +9,13 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from custom_components.powercalc.const import CONF_AND, CONF_AREA, CONF_FILTER, CONF_OR, CONF_WILDCARD
 from custom_components.powercalc.group_include.filter import (
     AreaFilter,
+    CategoryFilter,
     CompositeFilter,
     DomainFilter,
     FilterOperator,
     LabelFilter,
+    LambdaFilter,
+    NotFilter,
     NullFilter,
     WildcardFilter,
     create_composite_filter,
@@ -84,6 +87,32 @@ async def test_label_filter(label: str, expected_result: bool) -> None:
 
 async def test_null_filter() -> None:
     assert NullFilter().is_valid(_create_registry_entry()) is True
+
+
+@pytest.mark.parametrize(
+    "category,filter_categories,expected_result",
+    [
+        (EntityCategory.DIAGNOSTIC, [EntityCategory.DIAGNOSTIC], True),
+        (EntityCategory.DIAGNOSTIC, [EntityCategory.CONFIG], False),
+    ],
+)
+async def test_category_filter(category: EntityCategory, filter_categories: list[EntityCategory], expected_result: bool) -> None:
+    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test", entity_category=category)
+    assert CategoryFilter(filter_categories).is_valid(entry) == expected_result
+
+
+async def test_lambda_filter() -> None:
+    entity_filter = LambdaFilter(lambda entity: entity.entity_id == "sensor.test")
+
+    entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test")
+    assert entity_filter.is_valid(entry) is True
+
+    entry = RegistryEntry(entity_id="sensor.test2", unique_id="abc", platform="test")
+    assert entity_filter.is_valid(entry) is False
+
+
+async def test_not_filter() -> None:
+    assert NotFilter(NullFilter()).is_valid(_create_registry_entry()) is False
 
 
 @pytest.mark.parametrize(

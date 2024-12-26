@@ -63,10 +63,13 @@ from .const import (
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_TRACKED_AUTO,
+    CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
+    CONF_MAIN_POWER_SENSOR,
     CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
@@ -117,10 +120,12 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
+from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
 from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
+from .sensors.power import PowerSensor
 from .strategy.factory import PowerCalculatorStrategyFactory
 from .strategy.wled import CONFIG_SCHEMA as SCHEMA_POWER_WLED
 
@@ -135,6 +140,8 @@ class Step(StrEnum):
     GROUP_CUSTOM = "group_custom"
     GROUP_DOMAIN = "group_domain"
     GROUP_SUBTRACT = "group_subtract"
+    GROUP_TRACKED_UNTRACKED = "group_tracked_untracked"
+    GROUP_TRACKED_UNTRACKED_MANUAL = "group_tracked_untracked_manual"
     LIBRARY = "library"
     POST_LIBRARY = "post_library"
     LIBRARY_MULTI_PROFILE = "library_multi_profile"
@@ -174,6 +181,7 @@ MENU_GROUP = [
     Step.GROUP_CUSTOM,
     Step.GROUP_DOMAIN,
     Step.GROUP_SUBTRACT,
+    Step.GROUP_TRACKED_UNTRACKED,
 ]
 
 MENU_OPTIONS = [
@@ -185,6 +193,7 @@ MENU_OPTIONS = [
 ]
 
 LIBRARY_URL = "https://library.powercalc.nl"
+UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
 
 STRATEGY_STEP_MAPPING = {
     CalculationStrategy.FIXED: Step.FIXED,
@@ -199,6 +208,7 @@ GROUP_STEP_MAPPING = {
     GroupType.DOMAIN: Step.GROUP_DOMAIN,
     GroupType.STANDBY: Step.GROUP_DOMAIN,
     GroupType.SUBTRACT: Step.GROUP_SUBTRACT,
+    GroupType.TRACKED_UNTRACKED: Step.GROUP_TRACKED_UNTRACKED,
 }
 
 SCHEMA_UTILITY_METER_TOGGLE = vol.Schema(
@@ -394,7 +404,6 @@ SCHEMA_POWER_ADVANCED = vol.Schema(
 SCHEMA_GROUP = vol.Schema(
     {
         vol.Required(CONF_NAME): str,
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         vol.Optional(CONF_DEVICE): selector.DeviceSelector(),
     },
 )
@@ -442,10 +451,35 @@ SCHEMA_GROUP_SUBTRACT_OPTIONS = vol.Schema(
 SCHEMA_GROUP_SUBTRACT = vol.Schema(
     {
         vol.Required(CONF_NAME): selector.TextSelector(),
-        vol.Optional(CONF_UNIQUE_ID): selector.TextSelector(),
         **SCHEMA_GROUP_SUBTRACT_OPTIONS.schema,
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GROUP_TRACKED_UNTRACKED = vol.Schema(
+    {
+        vol.Optional(CONF_MAIN_POWER_SENSOR): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
+            ),
+        ),
+        vol.Required(CONF_GROUP_TRACKED_AUTO): selector.BooleanSelector(),
+        **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+        **SCHEMA_UTILITY_METER_TOGGLE.schema,
+    },
+)
+
+SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL = vol.Schema(
+    {
+        vol.Required(CONF_GROUP_TRACKED_POWER_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=Platform.SENSOR,
+                device_class=SensorDeviceClass.POWER,
+                multiple=True,
+            ),
+        ),
     },
 )
 
@@ -519,6 +553,7 @@ GROUP_SCHEMAS = {
     GroupType.CUSTOM: SCHEMA_GROUP,
     GroupType.DOMAIN: SCHEMA_GROUP_DOMAIN,
     GroupType.SUBTRACT: SCHEMA_GROUP_SUBTRACT,
+    GroupType.TRACKED_UNTRACKED: SCHEMA_GROUP_TRACKED_UNTRACKED,
 }
 
 
@@ -534,7 +569,7 @@ class PowercalcFormStep:
         | None
     ) = None
 
-    next_step: Step | None = None
+    next_step: Step | Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None
     step: Step | None = None
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
@@ -765,7 +800,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     @staticmethod
     def fill_schema_defaults(
         data_schema: vol.Schema,
-        options: dict[str, str],
+        options: dict[str, Any],
     ) -> vol.Schema:
         """Make a copy of the schema with suggested values set to saved options."""
         schema = {}
@@ -814,12 +849,15 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 self.name = user_input[CONF_NAME]
             self.sensor_config.update(user_input)
 
-            if not form_step.next_step:
+            next_step = form_step.next_step
+            if callable(form_step.next_step):
+                next_step = await form_step.next_step(user_input)
+            if not next_step:
                 if form_step.continue_utility_meter_options_step and self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                     return await self.async_step_utility_meter_options()
                 return self.persist_config_entry()
 
-            return await getattr(self, f"async_step_{form_step.next_step}")()  # type: ignore
+            return await getattr(self, f"async_step_{next_step}")()  # type: ignore
 
         return await self._show_form(form_step)
 
@@ -1362,13 +1400,18 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the group choice step."""
-        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=MENU_GROUP)
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
 
     async def handle_group_step(
         self,
         group_type: GroupType,
         user_input: dict[str, Any] | None = None,
         schema: vol.Schema | None = None,
+        next_step: Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None,
     ) -> FlowResult:
         """Generic step to handle different group types."""
 
@@ -1392,6 +1435,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 schema=schema or GROUP_SCHEMAS[group_type],
                 validate_user_input=_validate,
                 continue_utility_meter_options_step=True,
+                next_step=next_step,
             ),
             user_input,
         )
@@ -1411,6 +1455,37 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
     async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for subtract group sensor."""
         return await self.handle_group_step(GroupType.SUBTRACT, user_input)
+
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        await self.async_set_unique_id(UNIQUE_ID_TRACKED_UNTRACKED)
+        self._abort_if_unique_id_configured()
+        if user_input is not None:
+            user_input[CONF_NAME] = "Tracked / Untracked"
+
+        async def _next_step(user_data: dict[str, Any]) -> Step | None:
+            if not bool(user_data.get(CONF_GROUP_TRACKED_AUTO, True)):
+                return Step.GROUP_TRACKED_UNTRACKED_MANUAL
+            return None
+
+        return await self.handle_group_step(GroupType.TRACKED_UNTRACKED, user_input, schema=SCHEMA_GROUP_TRACKED_UNTRACKED, next_step=_next_step)
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for tracked/untracked group sensor."""
+        schema = SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL
+        if not user_input:
+            entities, _ = await find_entities(self.hass)
+            tracked_entities = [entity.entity_id for entity in entities if isinstance(entity, PowerSensor)]
+            schema = self.fill_schema_defaults(schema, {CONF_GROUP_TRACKED_POWER_ENTITIES: tracked_entities})
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.GROUP_TRACKED_UNTRACKED_MANUAL,
+                schema=schema,
+                continue_utility_meter_options_step=True,
+            ),
+            user_input,
+        )
 
     async def async_step_library_multi_profile(
         self,
@@ -1606,16 +1681,28 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if self.sensor_type == SensorType.REAL_POWER:
             menu.append(Step.REAL_POWER)
         if self.sensor_type == SensorType.GROUP:
-            group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
-            if group_type == GroupType.CUSTOM:
-                menu.append(Step.GROUP_CUSTOM)
-            if group_type == GroupType.SUBTRACT:
-                menu.append(Step.GROUP_SUBTRACT)
+            menu.extend(self.build_group_menu())
 
         if self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
+
+    def build_group_menu(self) -> list[Step]:
+        """Build the group options menu."""
+        group_type = self.sensor_config.get(CONF_GROUP_TYPE, GroupType.CUSTOM)
+        if group_type == GroupType.CUSTOM:
+            return [Step.GROUP_CUSTOM]
+
+        if group_type == GroupType.SUBTRACT:
+            return [Step.GROUP_SUBTRACT]
+
+        if group_type == GroupType.TRACKED_UNTRACKED:
+            return [Step.GROUP_TRACKED_UNTRACKED] + (
+                [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True) else []
+            )
+
+        return []
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
@@ -1688,6 +1775,22 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Step.GROUP_SUBTRACT)
+
+    async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_TRACKED_UNTRACKED,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED)
+
+    async def async_step_group_tracked_untracked_manual(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_TRACKED_UNTRACKED_MANUAL,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_TRACKED_UNTRACKED_MANUAL)
 
     async def async_step_fixed(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the basic options flow."""

@@ -38,6 +38,7 @@ from homeassistant.helpers.issue_registry import IssueSeverity, async_create_iss
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+from . import DATA_GROUP_ENTITIES
 from .common import (
     SourceEntity,
     create_source_entity,
@@ -107,6 +108,7 @@ from .const import (
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
+    DATA_ENTITIES,
     DATA_USED_UNIQUE_IDS,
     DISCOVERY_TYPE,
     DOMAIN,
@@ -121,6 +123,7 @@ from .const import (
     SERVICE_CALIBRATE_ENERGY,
     SERVICE_CALIBRATE_UTILITY_METER,
     SERVICE_GET_ACTIVE_PLAYBOOK,
+    SERVICE_GET_GROUP_ENTITIES,
     SERVICE_INCREASE_DAILY_ENERGY,
     SERVICE_RESET_ENERGY,
     SERVICE_STOP_PLAYBOOK,
@@ -137,7 +140,8 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .group_include.include import resolve_include_entities
+from .group_include.filter import FilterOperator, create_composite_filter
+from .group_include.include import find_entities
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
     create_daily_fixed_energy_power_sensor,
@@ -145,7 +149,9 @@ from .sensors.daily_energy import (
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
 from .sensors.group.config_entry_utils import add_to_associated_group
+from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
+from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
@@ -188,7 +194,7 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
     vol.Optional(CONF_WLED): WLED_SCHEMA,
     vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,
+    vol.Optional(CONF_DAILY_FIXED_ENERGY): DAILY_FIXED_ENERGY_SCHEMA,  # type: ignore
     vol.Optional(CONF_CREATE_ENERGY_SENSOR): cv.boolean,
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
@@ -381,6 +387,11 @@ async def _async_setup_entities(
         return
 
     entities_to_add = [entity for entity in entities.new if isinstance(entity, SensorEntity)]
+    for entity in entities_to_add:
+        if isinstance(entity, GroupedSensor | StandbyPowerSensor):
+            hass.data[DOMAIN][DATA_GROUP_ENTITIES][entity.entity_id] = entity
+        else:
+            hass.data[DOMAIN][DATA_ENTITIES][entity.entity_id] = entity
 
     # See: https://github.com/bramstroker/homeassistant-powercalc/issues/1454
     # Remove entities which are disabled because of a disabled device from the list of entities to add
@@ -456,9 +467,7 @@ def save_entity_ids_on_config_entry(
     if power_entities:
         new_data.update({ENTRY_DATA_POWER_ENTITY: power_entities[0]})
 
-    if CONF_CREATE_ENERGY_SENSOR not in config_entry.data or config_entry.data.get(
-        CONF_CREATE_ENERGY_SENSOR,
-    ):
+    if bool(config_entry.data.get(CONF_CREATE_ENERGY_SENSOR, False)):
         energy_entities = [e.entity_id for e in entities.all() if isinstance(e, EnergySensor)]
         if not energy_entities:
             raise SensorConfigurationError(  # pragma: no cover
@@ -525,6 +534,13 @@ def register_entity_services() -> None:
         SERVICE_SWITCH_SUB_PROFILE,
         {vol.Required("profile"): cv.string},
         "async_switch_sub_profile",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_GET_GROUP_ENTITIES,
+        {},
+        "get_group_entities",
+        supports_response=SupportsResponse.ONLY,
     )
 
 
@@ -744,7 +760,9 @@ async def add_discovered_entities(
     """Add discovered entities based on include configuration."""
     if CONF_INCLUDE in config:
         include_config: dict = cast(dict, config[CONF_INCLUDE])
-        found_entities, discoverable_entities = await resolve_include_entities(hass, include_config)
+        include_non_powercalc: bool = include_config.get(CONF_INCLUDE_NON_POWERCALC_SENSORS, True)
+        entity_filter = create_composite_filter(include_config, hass, FilterOperator.AND)
+        found_entities, discoverable_entities = await find_entities(hass, entity_filter, include_non_powercalc)
         entities_to_add.existing.extend(found_entities)
         for entity_id in discoverable_entities:
             sensor_configs[entity_id] = {CONF_ENTITY_ID: entity_id}
