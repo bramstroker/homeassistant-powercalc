@@ -94,6 +94,7 @@ nav:
           #- 'library/device-types/vacuum-robot.md'
   - 'Troubleshooting':
       - 'troubleshooting/faq.md'
+      - 'troubleshooting/data-correction.md'
       - 'troubleshooting/debug-logging.md'
       - 'troubleshooting/install-master.md'
       - 'troubleshooting/yeelight.md'
