@@ -10,5 +10,6 @@
     "VERSION": "v1.14.8:docker"
   },
   "name": "Paulmann Licht GmbH RGBW Bulb E27 1055lm 11W",
-  "standby_power": 0.35
+  "standby_power": 0.35,
+  "author": "71820SM01 <141442191+71820SM01@users.noreply.github.com>"
 }
