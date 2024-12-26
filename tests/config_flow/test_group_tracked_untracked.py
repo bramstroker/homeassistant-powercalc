@@ -1,5 +1,5 @@
 import voluptuous as vol
-from homeassistant import data_entry_flow
+from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import (
     CONF_NAME,
     CONF_SENSOR_TYPE,
@@ -7,7 +7,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import SensorType
-from custom_components.powercalc.config_flow import Step
+from custom_components.powercalc.config_flow import UNIQUE_ID_TRACKED_UNTRACKED, Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -15,6 +15,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_TRACKED_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_MAIN_POWER_SENSOR,
+    DOMAIN,
     GroupType,
 )
 from tests.common import mock_sensors_in_registry, run_powercalc_setup
@@ -123,6 +124,34 @@ async def test_config_flow_manual(hass: HomeAssistant) -> None:
     untracked_power_state = hass.states.get("sensor.untracked_power")
     assert untracked_power_state
     assert untracked_power_state.state == "70.00"
+
+
+async def test_only_single_instance(hass: HomeAssistant) -> None:
+    """Only one instance of tracked/untracked allowed. Check if it is removed from the menu"""
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,
+            CONF_NAME: "Tracked / Untracked",
+            CONF_MAIN_POWER_SENSOR: "sensor.mains_power",
+            CONF_GROUP_TRACKED_AUTO: True,
+        },
+        unique_id=UNIQUE_ID_TRACKED_UNTRACKED,
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_USER},
+    )
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {"next_step_id": Step.MENU_GROUP},
+    )
+    menu_items = result["menu_options"]
+    assert Step.GROUP_TRACKED_UNTRACKED not in menu_items
 
 
 async def test_options_flow(hass: HomeAssistant) -> None:

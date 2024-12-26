@@ -54,7 +54,7 @@ async def test_main_power_is_removed_from_tracked_entities(hass: HomeAssistant) 
 async def test_energy_sensors_and_utility_meters_created(hass: HomeAssistant) -> None:
     factory = TrackedPowerSensorFactory(
         hass,
-        MockConfigEntry,
+        MockConfigEntry(),
         {
             CONF_UNIQUE_ID: "abc",
             CONF_GROUP_TYPE: GroupType.TRACKED_UNTRACKED,

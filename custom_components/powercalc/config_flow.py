@@ -193,6 +193,7 @@ MENU_OPTIONS = [
 ]
 
 LIBRARY_URL = "https://library.powercalc.nl"
+UNIQUE_ID_TRACKED_UNTRACKED = "pc_tracked_untracked"
 
 STRATEGY_STEP_MAPPING = {
     CalculationStrategy.FIXED: Step.FIXED,
@@ -1399,7 +1400,11 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle the group choice step."""
-        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=MENU_GROUP)
+        menu = MENU_GROUP.copy()
+        if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, UNIQUE_ID_TRACKED_UNTRACKED):
+            menu.remove(Step.GROUP_TRACKED_UNTRACKED)
+
+        return self.async_show_menu(step_id=Step.MENU_GROUP, menu_options=menu)
 
     async def handle_group_step(
         self,
@@ -1453,7 +1458,7 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
 
     async def async_step_group_tracked_untracked(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for tracked/untracked group sensor."""
-        await self.async_set_unique_id("pc_tracked_untracked")
+        await self.async_set_unique_id(UNIQUE_ID_TRACKED_UNTRACKED)
         self._abort_if_unique_id_configured()
         if user_input is not None:
             user_input[CONF_NAME] = "Tracked / Untracked"
