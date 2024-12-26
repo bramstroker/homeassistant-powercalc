@@ -29,7 +29,6 @@ DATA_DOMAIN_ENTITIES = "domain_entities"
 DATA_ENTITIES = "entities"
 DATA_GROUP_ENTITIES = "group_entities"
 DATA_USED_UNIQUE_IDS = "used_unique_ids"
-DATA_PROFILE_LIBRARY = "profile_library"
 DATA_STANDBY_POWER_SENSORS = "standby_power_sensors"
 
 ENTRY_DATA_ENERGY_ENTITY = "_energy_entity"

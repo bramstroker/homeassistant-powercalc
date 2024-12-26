@@ -37,8 +37,9 @@ class ProfileLibrary:
     @staticmethod
     @singleton("powercalc_library")
     async def factory(hass: HomeAssistant) -> ProfileLibrary:
-        """Creates and loads the profile library
-        Makes sure it is only loaded once and instance is saved in hass data registry.
+        """
+        Creates and loads the profile library.
+        Make sure we have a single instance throughout the application.
         """
         library = ProfileLibrary(hass, ProfileLibrary.create_loader(hass))
         await library.initialize()
