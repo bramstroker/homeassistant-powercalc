@@ -2243,10 +2243,12 @@ When it can be useful to share this model with the community, please consider su
 <p>During startup, Powercalc will scan your Home Assistant installation for entities that match the library profiles.
 Only entities which have a device attached will be considered for discovery.
 Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in <code>config/.storage/core.device_registry</code>.</p>
-<p>Each device in HA has the following properties:
-- manufacturer
-- model
-- model_id (optional)</p>
+<p>Each device in HA has the following properties:</p>
+<ul>
+<li>manufacturer</li>
+<li>model</li>
+<li>model_id (optional)</li>
+</ul>
 <p>This information is tried to match again the built-in library and your custom model directory.
 When a match in custom models is found, the built-in library loading is skipped.</p>
 <p>starting with the manufacturer. Both manufacturer name and aliases are matched.
