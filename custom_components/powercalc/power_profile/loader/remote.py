@@ -35,7 +35,7 @@ class RemoteLoader(Loader):
         self.library_contents: dict = {}
         self.model_infos: dict[str, dict] = {}
         self.manufacturer_models: dict[str, list[dict]] = {}
-        self.manufacturer_aliases: dict[str, str] = {}
+        self.manufacturer_aliases: dict[str, set[str]] = {}
         self.last_update_time: float | None = None
 
     async def initialize(self) -> None:
@@ -44,20 +44,20 @@ class RemoteLoader(Loader):
         self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
 
         # Load contents of library JSON into memory
-        manufacturers: list[dict] = self.library_contents.get("manufacturers", [])
-        for manufacturer in manufacturers:
-            models: list[dict] = manufacturer.get("models", [])
-            manufacturer_name = str(manufacturer.get("name"))
-            for model in models:
-                model_id = str(model.get("id"))
-                self.model_infos[f"{manufacturer_name}/{model_id}"] = model
-                if manufacturer_name not in self.manufacturer_models:
-                    self.manufacturer_models[manufacturer_name] = []
-                self.manufacturer_models[manufacturer_name].append(model)
+        manufacturers = self.library_contents.get("manufacturers", [])
 
-            self.manufacturer_aliases[manufacturer_name.lower()] = manufacturer_name
+        for manufacturer in manufacturers:
+            manufacturer_name = str(manufacturer.get("name"))
+            models = manufacturer.get("models", [])
+
+            # Store model info and group models by manufacturer
+            self.model_infos.update({f"{manufacturer_name}/{model.get('id')!s}": model for model in models})
+            self.manufacturer_models.setdefault(manufacturer_name, []).extend(models)
+
+            # Map manufacturer aliases
+            self.manufacturer_aliases[manufacturer_name.lower()] = {manufacturer_name}
             for alias in manufacturer.get("aliases", []):
-                self.manufacturer_aliases[alias.lower()] = manufacturer_name
+                self.manufacturer_aliases.setdefault(alias.lower(), set()).add(manufacturer_name)
 
     async def load_library_json(self) -> dict[str, Any]:
         """Load library.json file"""
@@ -112,7 +112,7 @@ class RemoteLoader(Loader):
     @async_cache
     async def find_manufacturers(self, search: str) -> set[str]:
         """Find the manufacturer in the library."""
-        return {self.manufacturer_aliases[search]} if search in self.manufacturer_aliases else set()
+        return self.manufacturer_aliases.get(search, set())
 
     @async_cache
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:

@@ -131,9 +131,9 @@ class ProfileLibrary:
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
 
-    async def find_manufacturers(self, model_info: ModelInfo) -> set[str]:
+    async def find_manufacturers(self, manufacturer: str) -> set[str]:
         """Resolve the manufacturer, either from the model info or by loading it."""
-        return await self._loader.find_manufacturers(model_info.manufacturer)
+        return await self._loader.find_manufacturers(manufacturer)
 
     async def find_models(self, model_info: ModelInfo) -> set[ModelInfo]:
         """Resolve the model identifier, searching for it if no custom directory is provided."""
