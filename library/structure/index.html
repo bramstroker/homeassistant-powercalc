@@ -12,7 +12,7 @@
         <link rel="prev" href="../library/">
       
       
-        <link rel="next" href="../device-types/">
+        <link rel="next" href="../sub-profiles/">
       
       
       <link rel="icon" href="../../img/logo.svg">
@@ -1327,6 +1327,8 @@
       
         
       
+        
+      
     
     
       
@@ -1469,6 +1471,27 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../sub-profiles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sub profiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -1507,7 +1530,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_4" >
         
           
           
@@ -1523,14 +1546,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_7_3" id="__nav_7_3_label" tabindex="">
+              <label class="md-nav__link " for="__nav_7_4" id="__nav_7_4_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_4">
             <span class="md-nav__icon md-icon"></span>
             Device types
           </label>
@@ -2208,15 +2231,7 @@ See the <a href="https://github.com/bramstroker/homeassistant-powercalc/blob/mas
 This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.</p>
 <h2 id="sub-profiles">Sub profiles</h2>
 <p>Some profiles might have multiple profiles. This is useful when a device has different power consumption based on the state of the device.
-This can be used for example for different infrared modes of a light.</p>
-<p>Each sub profile has it's own subdirectory <code>{manufacturer}/{modelid}/{subprofile}</code>, which contains a <code>model.json</code> file.
-You can also define <code>sub_profile_select</code> in the main <code>model.json</code> to automatically select the sub profile based on the state of the device.
-When no <code>sub_profile_select</code> is defined, the user will be asked to select the sub profile during discovery.</p>
-<p>Examples:</p>
-<ul>
-<li><a href="https://github.com/bramstroker/homeassistant-powercalc/tree/master/profile_library/lifx/LIFX%20A19%20Night%20Vision">lifx/LIFX A19 Night Vision</a></li>
-<li><a href="https://github.com/bramstroker/homeassistant-powercalc/tree/master/profile_library/eufy/T8400">eufy/T8400</a></li>
-</ul>
+See <a href="../sub-profiles/">sub profiles</a> for more information.</p>
 
 
 
@@ -2303,13 +2318,13 @@ When no <code>sub_profile_select</code> is defined, the user will be asked to se
         
         
           
-          <a href="../device-types/" class="md-footer__link md-footer__link--next" aria-label="Next: Device types">
+          <a href="../sub-profiles/" class="md-footer__link md-footer__link--next" aria-label="Next: Sub profiles">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Device types
+                Sub profiles
               </div>
             </div>
             <div class="md-footer__button md-icon">
