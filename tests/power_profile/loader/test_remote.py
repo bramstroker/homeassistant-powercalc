@@ -16,6 +16,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
+from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_config_dir, get_test_profile_dir
@@ -508,3 +509,47 @@ def clear_storage_dir(storage_path: str) -> None:
     if not os.path.exists(storage_path):
         return
     shutil.rmtree(storage_path, ignore_errors=True)
+
+
+async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "manufacturer1",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+                {
+                    "name": "manufacturer2",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    library = await ProfileLibrary.factory(hass)
+
+    manufacturers = await library.find_manufacturers("my-alias")
+    assert manufacturers == {"manufacturer1", "manufacturer2"}
+
+    model_listing = await library.get_model_listing("my-alias", "light")
+    assert len(model_listing) == 2
+
+    models = await library.find_models(ModelInfo("my-alias", "model1"))
+    assert models == {ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")}
