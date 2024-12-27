@@ -68,6 +68,7 @@ Only entities which have a device attached will be considered for discovery.
 Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in `config/.storage/core.device_registry`.
 
 Each device in HA has the following properties:
+
 - manufacturer
 - model
 - model_id (optional)
