@@ -567,7 +567,7 @@
           "basic_options": "Opções básicas",
           "daily_energy": "Opções de consumo diário",
           "fixed": "Opções de Fixo",
-          "group": "Opções de grupo",
+          "group_custom": "Opções de grupo",
           "group_subtract": "Opções de grupo",
           "group_tracked_untracked": "Group options",
           "group_tracked_untracked_manual": "Tracked entities",
