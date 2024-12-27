@@ -567,7 +567,7 @@
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
           "fixed": "Fixed opties",
-          "group": "Groep opties",
+          "group_custom": "Groep opties",
           "group_subtract": "Groep opties",
           "group_tracked_untracked": "Groep opties",
           "group_tracked_untracked_manual": "Bijgehouden entiteiten",

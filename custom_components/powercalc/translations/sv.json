@@ -567,7 +567,7 @@
           "basic_options": "Grundläggande inställningar",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
-          "group": "Group options",
+          "group_custom": "Group options",
           "group_subtract": "Group options",
           "group_tracked_untracked": "Group options",
           "group_tracked_untracked_manual": "Tracked entities",
