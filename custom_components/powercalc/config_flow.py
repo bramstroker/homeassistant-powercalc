@@ -961,6 +961,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 schema=_create_schema,
                 next_step=Step.POST_LIBRARY,
                 validate_user_input=_validate,
+                form_kwarg={"description_placeholders": {"supported_models_link": LIBRARY_URL}},
             ),
             user_input,
         )
