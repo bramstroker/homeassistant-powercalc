@@ -326,8 +326,8 @@ async def test_autodiscover_continues_when_one_entity_fails(
             ),
         },
     )
-    with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_manufacturer", new_callable=AsyncMock) as mock_find_models:
-        mock_find_models.side_effect = [Exception("Test exception"), "signify"]
+    with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_models", new_callable=AsyncMock) as mock_find_models:
+        mock_find_models.side_effect = [Exception("Test exception"), {ModelInfo("signify", "LCT010")}]
         await run_powercalc_setup(hass, {})
         assert "Error during auto discovery" in caplog.text
 
