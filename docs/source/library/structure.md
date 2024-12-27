@@ -1,5 +1,7 @@
 # Library structure
 
+The library is structured in a multi level tree structure. The top level is the manufacturer, followed by the model id and optionally sub profiles.
+Manufacturer directory must hae a `manufacturer.json` file which contains the manufacturer name and optionally aliases.
 Each power profile has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010, containing a `model.json` file and optionally CSV files for the LUT calculation strategy.
 
 ## model.json
