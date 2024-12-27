@@ -308,7 +308,7 @@ class PowerProfile:
             return False
 
         # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue"] and domain == LIGHT_DOMAIN:
+        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue", "osramlightify"] and domain == LIGHT_DOMAIN:
             return True
 
         return DEVICE_TYPE_DOMAIN.get(self.device_type) == domain
