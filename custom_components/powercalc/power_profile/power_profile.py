@@ -46,6 +46,11 @@ class DeviceType(StrEnum):
     VACUUM_ROBOT = "vacuum_robot"
 
 
+class DiscoveryType(StrEnum):
+    DEVICE = "device"
+    ENTITY = "entity"
+
+
 class SubProfileMatcherType(StrEnum):
     ATTRIBUTE = "attribute"
     ENTITY_ID = "entity_id"
@@ -226,6 +231,10 @@ class PowerProfile:
         except ValueError:
             _LOGGER.warning("Unknown device type: %s", device_type)
             return None
+
+    @property
+    def discovery_type(self) -> DiscoveryType:
+        return DiscoveryType(self._json_data.get("discovery_type", DiscoveryType.ENTITY))
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:

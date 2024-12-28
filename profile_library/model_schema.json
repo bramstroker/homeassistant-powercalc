@@ -24,6 +24,14 @@
       "type": "string",
       "description": "A short description of the device"
     },
+    "discovery_type": {
+      "type": "string",
+      "enum": [
+        "device",
+        "entity"
+      ],
+      "description": "Whether to discover the profile by device or entity"
+    },
     "standby_power": {
       "type": "number",
       "minimum": 0.05,
