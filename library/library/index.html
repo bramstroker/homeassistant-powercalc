@@ -1444,6 +1444,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#updating-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the library
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2277,6 +2286,15 @@ When a match in custom models is found, the built-in library loading is skipped.
 <p>starting with the manufacturer. Both manufacturer name and aliases are matched.
 If a match is found, the model id is matched. Both the directory_name (model id) and additional aliases (from model.json) are matched.</p>
 <p>You can enable <a href="../../troubleshooting/debug-logging/">debug logging</a> to debug the matching process.</p>
+<h2 id="updating-the-library">Updating the library</h2>
+<p>The library is updated automatically in the background under the following conditions.
+Once the update process is complete, a discovery routine will be initiated to potentially discover new supported entities on your system.</p>
+<ul>
+<li><em>At Each Startup</em>: The library checks for updates whenever the system is started.</li>
+<li><em>Every Two Hours</em>: Updates are scheduled to run automatically every two hours.</li>
+<li><em>Manual Trigger</em>: Updates can also be initiated manually by invoking the action Powercalc: update library.</li>
+</ul>
+<p>This ensures that you always have the latest power profiles available, without the need to restart HA.</p>
 
 
 
@@ -2299,7 +2317,7 @@ If a match is found, the model id is matched. Both the directory_name (model id)
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 27, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 28, 2024</span>
   </span>
 
     
