@@ -94,7 +94,9 @@ class DiscoveryManager:
 
         for entry in self.hass.config_entries.async_entries(DOMAIN):
             if entry.unique_id:
-                self.initialized_flows.update({entry.unique_id, str(entry.data.get(CONF_ENTITY_ID))})
+                self.initialized_flows.add(entry.unique_id)
+                if str(entry.data.get(CONF_ENTITY_ID)) != DUMMY_ENTITY_ID:
+                    self.initialized_flows.add(str(entry.data.get(CONF_ENTITY_ID)))
 
         _LOGGER.debug("Start auto discovery")
 
@@ -110,8 +112,7 @@ class DiscoveryManager:
         discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
-        sources = await source_provider()
-        for source in sources:
+        for source in await source_provider():
             try:
                 model_info = await self.extract_model_info_from_device_info(source)
                 if not model_info:
@@ -127,7 +128,7 @@ class DiscoveryManager:
                     )
                     continue
 
-                unique_id = self.get_unique_id(
+                unique_id = self.create_unique_id(
                     source_entity,
                     discovery_type,
                     power_profiles[0] if power_profiles else None,
@@ -176,10 +177,13 @@ class DiscoveryManager:
         )
 
     @staticmethod
-    def get_unique_id(source: SourceEntity, discovery_type: DiscoveryBy, power_profile: PowerProfile | None) -> str:
+    def create_unique_id(source: SourceEntity, discovery_type: DiscoveryBy, power_profile: PowerProfile | None) -> str:
         """Generate a unique ID based on source and type."""
         if discovery_type == DiscoveryBy.DEVICE:
-            return f"pc_{source.device_entry.id if source.device_entry else source.object_id}"
+            device_id = source.object_id
+            if source.device_entry:
+                device_id = source.device_entry.primary_config_entry or source.device_entry.id
+            return f"pc_{device_id}"
 
         return get_or_create_unique_id({}, source, power_profile)
 
@@ -390,7 +394,9 @@ class DiscoveryManager:
         if extra_discovery_data:
             discovery_data.update(extra_discovery_data)
 
-        self.initialized_flows.update({unique_id, source_entity.entity_id})
+        self.initialized_flows.add(unique_id)
+        if source_entity.entity_id != DUMMY_ENTITY_ID:
+            self.initialized_flows.add(source_entity.entity_id)
 
         _LOGGER.debug("%s: Initiating discovery flow, unique_id=%s", source_entity.entity_id, unique_id)
 
