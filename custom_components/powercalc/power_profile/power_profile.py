@@ -46,7 +46,7 @@ class DeviceType(StrEnum):
     VACUUM_ROBOT = "vacuum_robot"
 
 
-class DiscoveryType(StrEnum):
+class DiscoveryBy(StrEnum):
     DEVICE = "device"
     ENTITY = "entity"
 
@@ -233,8 +233,8 @@ class PowerProfile:
             return None
 
     @property
-    def discovery_type(self) -> DiscoveryType:
-        return DiscoveryType(self._json_data.get("discovery_type", DiscoveryType.ENTITY))
+    def discovery_by(self) -> DiscoveryBy:
+        return DiscoveryBy(self._json_data.get("discovery_by", DiscoveryBy.ENTITY))
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:

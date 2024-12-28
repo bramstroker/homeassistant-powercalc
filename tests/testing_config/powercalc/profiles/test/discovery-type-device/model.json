@@ -2,7 +2,7 @@
   "measure_method": "manual",
   "measure_device": "Some device",
   "name": "Some smart switch",
-  "discovery_type": "device",
+  "discovery_by": "device",
   "standby_power": 0.3,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",

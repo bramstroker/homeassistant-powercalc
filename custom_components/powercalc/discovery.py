@@ -37,7 +37,7 @@ from .group_include.filter import CategoryFilter, CompositeFilter, FilterOperato
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DiscoveryType, PowerProfile
+from .power_profile.power_profile import DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -98,8 +98,8 @@ class DiscoveryManager:
 
         _LOGGER.debug("Start auto discovery")
 
-        await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryType.ENTITY)  # type: ignore[arg-type]
-        await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryType.DEVICE)  # type: ignore[arg-type]
+        await self.perform_discovery(self.get_entities, self.create_entity_source, DiscoveryBy.ENTITY)  # type: ignore[arg-type]
+        await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)  # type: ignore[arg-type]
 
         _LOGGER.debug("Done auto discovery")
 
@@ -107,7 +107,7 @@ class DiscoveryManager:
         self,
         source_provider: Callable[[], Awaitable[list]],
         source_creator: Callable[[er.RegistryEntry | dr.DeviceEntry], Awaitable[SourceEntity]],
-        discovery_type: DiscoveryType,
+        discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
         sources = await source_provider()
@@ -152,7 +152,7 @@ class DiscoveryManager:
         self,
         source_entity: SourceEntity,
         model_info: ModelInfo,
-        discovery_type: DiscoveryType = DiscoveryType.ENTITY,
+        discovery_type: DiscoveryBy = DiscoveryBy.ENTITY,
     ) -> list[PowerProfile] | None:
         if source_entity.entity_entry and self.is_wled_light(model_info, source_entity.entity_entry):
             await self.init_wled_flow(model_info, source_entity)
@@ -176,9 +176,9 @@ class DiscoveryManager:
         )
 
     @staticmethod
-    def get_unique_id(source: SourceEntity, discovery_type: DiscoveryType, power_profile: PowerProfile | None) -> str:
+    def get_unique_id(source: SourceEntity, discovery_type: DiscoveryBy, power_profile: PowerProfile | None) -> str:
         """Generate a unique ID based on source and type."""
-        if discovery_type == DiscoveryType.DEVICE:
+        if discovery_type == DiscoveryBy.DEVICE:
             return f"pc_{source.device_entry.id if source.device_entry else source.object_id}"
 
         return get_or_create_unique_id({}, source, power_profile)
@@ -187,7 +187,7 @@ class DiscoveryManager:
         self,
         model_info: ModelInfo,
         source_entity: SourceEntity,
-        discovery_type: DiscoveryType,
+        discovery_type: DiscoveryBy,
     ) -> list[PowerProfile] | None:
         """Find power profiles for a given entity."""
         library = await self._get_library()
@@ -198,9 +198,9 @@ class DiscoveryManager:
         power_profiles = []
         for model_info in models:
             profile = await get_power_profile(self.hass, {}, model_info=model_info)
-            if not profile or profile.discovery_type != discovery_type:  # pragma: no cover
+            if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
-            if discovery_type == DiscoveryType.ENTITY and not await self.is_entity_supported(
+            if discovery_type == DiscoveryBy.ENTITY and not await self.is_entity_supported(
                 source_entity.entity_entry,  # type: ignore[arg-type]
                 model_info,
                 profile,

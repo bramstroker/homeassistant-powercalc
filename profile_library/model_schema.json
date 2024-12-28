@@ -24,7 +24,7 @@
       "type": "string",
       "description": "A short description of the device"
     },
-    "discovery_type": {
+    "discovery_by": {
       "type": "string",
       "enum": [
         "device",
