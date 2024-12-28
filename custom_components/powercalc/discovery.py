@@ -80,7 +80,7 @@ class DiscoveryManager:
         async_track_time_interval(
             self.hass,
             _rediscover,
-            timedelta(hours=2),
+            timedelta(minutes=1),
         )
 
     async def start_discovery(self) -> None:

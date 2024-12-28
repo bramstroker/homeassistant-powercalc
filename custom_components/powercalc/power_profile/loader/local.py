@@ -110,7 +110,6 @@ class LocalLoader(Loader):
 
         models = self._manufacturer_model_listing.get(_manufacturer)
         if not models:
-            _LOGGER.info("Manufacturer does not exist in custom library: %s", _manufacturer)
             return set()
 
         search_lower = {phrase.lower() for phrase in search}
@@ -130,6 +129,7 @@ class LocalLoader(Loader):
             _LOGGER.error("Custom library directory does not exist: %s", base_path)
             return
 
+        self._manufacturer_model_listing.clear()
         for manufacturer_dir in next(os.walk(base_path))[1]:
             manufacturer_path = os.path.join(base_path, manufacturer_dir)
 

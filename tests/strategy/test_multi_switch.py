@@ -10,10 +10,10 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import PowerCalculatorStrategyFactory
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF, CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.multi_switch import MultiSwitchStrategy
 from tests.common import run_powercalc_setup
 

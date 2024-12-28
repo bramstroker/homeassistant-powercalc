@@ -43,7 +43,11 @@ class RemoteLoader(Loader):
         self.library_contents = await self.load_library_json()
         self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
 
-        # Load contents of library JSON into memory
+        self.model_infos.clear()
+        self.manufacturer_models.clear()
+        self.manufacturer_aliases.clear()
+
+        # Load contents of library JSON into several dictionaries for easy access
         manufacturers = self.library_contents.get("manufacturers", [])
 
         for manufacturer in manufacturers:
