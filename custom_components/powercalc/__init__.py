@@ -296,7 +296,7 @@ def register_services(hass: HomeAssistant) -> None:
         schema=SERVICE_SCHEMA,
     )
 
-    async def _handle_update_library_service(call: ServiceCall) -> None:
+    async def _handle_update_library_service(_: ServiceCall) -> None:
         discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
         await discovery_manager.update_library_and_rediscover()
 
