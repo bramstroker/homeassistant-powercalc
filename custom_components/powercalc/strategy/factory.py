@@ -7,6 +7,7 @@ from typing import cast
 from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition
+from homeassistant.helpers.singleton import singleton
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
 
@@ -42,6 +43,11 @@ class PowerCalculatorStrategyFactory:
     def __init__(self, hass: HomeAssistant) -> None:
         self._hass = hass
         self._lut_registry = LutRegistry(hass)
+
+    @staticmethod
+    @singleton("powercalc_strategy_factory")
+    def get_instance(hass: HomeAssistant) -> PowerCalculatorStrategyFactory:
+        return PowerCalculatorStrategyFactory(hass)
 
     async def create(
         self,

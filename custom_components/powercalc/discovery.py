@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import timedelta
 from typing import Any
 
 import homeassistant.helpers.device_registry as dr
@@ -13,6 +14,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery_flow
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
 from .common import SourceEntity, create_source_entity
@@ -65,6 +67,26 @@ class DiscoveryManager:
         self.initialized_flows: set[str] = set()
         self.library: ProfileLibrary | None = None
 
+    async def setup(self) -> None:
+        """Setup the discovery manager. Start initial discovery and setup interval based rediscovery."""
+        await self.start_discovery()
+
+        async def _rediscover(_: Any) -> None:  # noqa: ANN401
+            """Rediscover entities."""
+            await self.update_library_and_rediscover()
+
+        async_track_time_interval(
+            self.hass,
+            _rediscover,
+            timedelta(hours=2),
+        )
+
+    async def update_library_and_rediscover(self) -> None:
+        """Update the library and rediscover entities."""
+        library = await self._get_library()
+        await library.initialize()
+        await self.start_discovery()
+
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
 
@@ -72,7 +94,7 @@ class DiscoveryManager:
             if entry.unique_id:
                 self.initialized_flows.update({entry.unique_id, str(entry.data.get(CONF_ENTITY_ID))})
 
-        _LOGGER.debug("Start auto discovering entities")
+        _LOGGER.debug("Start auto discovery")
         for entity_entry in await self.get_entities():
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
             try:
@@ -102,7 +124,7 @@ class DiscoveryManager:
                     source_entity.entity_id,
                 )
 
-        _LOGGER.debug("Done auto discovering entities")
+        _LOGGER.debug("Done auto discovery")
 
     async def _get_library(self) -> ProfileLibrary:
         """Get the powercalc library instance."""

@@ -62,7 +62,6 @@ from .const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
-    DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
@@ -87,6 +86,7 @@ from .const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
+    SERVICE_UPDATE_LIBRARY,
     PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
@@ -99,7 +99,6 @@ from .sensors.group.config_entry_utils import (
     remove_power_sensor_from_associated_groups,
 )
 from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
-from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
 
@@ -215,8 +214,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
-        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
+        DATA_DISCOVERY_MANAGER: discovery_manager,
         DOMAIN_CONFIG: global_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
@@ -229,7 +227,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     await hass.async_add_executor_job(register_services, hass)
 
     if global_config.get(CONF_ENABLE_AUTODISCOVERY):
-        await discovery_manager.start_discovery()
+        await discovery_manager.setup()
 
     await setup_yaml_sensors(hass, config, global_config)
 
@@ -288,14 +286,24 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
 def register_services(hass: HomeAssistant) -> None:
     """Register generic services"""
 
-    async def handle_service(call: ServiceCall) -> None:
+    async def _handle_change_gui_service(call: ServiceCall) -> None:
         await change_gui_configuration(hass, call)
 
     hass.services.register(
         DOMAIN,
         SERVICE_CHANGE_GUI_CONFIGURATION,
-        handle_service,
+        _handle_change_gui_service,
         schema=SERVICE_SCHEMA,
+    )
+
+    async def _handle_update_library_service(_: ServiceCall) -> None:
+        discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+        await discovery_manager.update_library_and_rediscover()
+
+    hass.services.register(
+        DOMAIN,
+        SERVICE_UPDATE_LIBRARY,
+        _handle_update_library_service,
     )
 
 

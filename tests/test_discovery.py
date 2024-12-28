@@ -1,5 +1,6 @@
 import logging
 import uuid
+from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -16,13 +17,15 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.util import dt
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
+    async_fire_time_changed,
     mock_device_registry,
     mock_registry,
 )
 
-from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc import SERVICE_UPDATE_LIBRARY, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
@@ -660,3 +663,44 @@ async def test_get_model_information(
     mock_registry(hass, {str(entity_entry.id): entity_entry})
     discovery_manager = DiscoveryManager(hass, {})
     assert await discovery_manager.get_model_information(entity_entry) == model_info
+
+
+async def test_interval_based_rediscovery(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {}, {CONF_ENABLE_AUTODISCOVERY: True})
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await hass.async_block_till_done(True)
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await hass.async_block_till_done(True)
+
+    assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 3
+
+
+async def test_update_profile_service(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {})
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_UPDATE_LIBRARY,
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 2
