@@ -6,7 +6,7 @@ Here you can find information about how to setup specific device types for the l
 
 ## :material-blinds-horizontal: Cover
 
-Generic IoT
+## :material-access-point: Generic IoT
 
 ## :material-lightbulb: [Light](light.md)
 
