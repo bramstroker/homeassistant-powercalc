@@ -25,7 +25,7 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc import SERVICE_UPDATE_LIBRARY, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     CONF_ENABLE_AUTODISCOVERY,
@@ -665,11 +665,42 @@ async def test_get_model_information(
     assert await discovery_manager.get_model_information(entity_entry) == model_info
 
 
-async def test_interval_based_rediscovery(hass: HomeAssistant, mock_entity_with_model_information: MockEntityWithModel) -> None:
+async def test_interval_based_rediscovery(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+
     mock_entity_with_model_information("light.test", "signify", "LCT010")
 
     await run_powercalc_setup(hass, {}, {CONF_ENABLE_AUTODISCOVERY: True})
 
-    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=3))
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await hass.async_block_till_done(True)
+
+    async_fire_time_changed(hass, dt.utcnow() + timedelta(hours=2))
+    await hass.async_block_till_done(True)
+
+    assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 3
+
+
+async def test_update_profile_service(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    mock_entity_with_model_information("light.test", "signify", "LCT010")
+
+    await run_powercalc_setup(hass, {})
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_UPDATE_LIBRARY,
+        blocking=True,
+    )
     await hass.async_block_till_done()
-    await hass.async_block_till_done()
+
+    assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 2

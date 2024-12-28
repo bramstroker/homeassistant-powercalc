@@ -80,3 +80,14 @@ starting with the manufacturer. Both manufacturer name and aliases are matched.
 If a match is found, the model id is matched. Both the directory_name (model id) and additional aliases (from model.json) are matched.
 
 You can enable [debug logging](../troubleshooting/debug-logging.md) to debug the matching process.
+
+## Updating the library
+
+The library is updated automatically in the background under the following conditions.
+Once the update process is complete, a discovery routine will be initiated to potentially discover new supported entities on your system.
+
+- *At Each Startup*: The library checks for updates whenever the system is started.
+- *Every Two Hours*: Updates are scheduled to run automatically every two hours.
+- *Manual Trigger*: Updates can also be initiated manually by invoking the action Powercalc: update library.
+
+This ensures that you always have the latest power profiles available, without the need to restart HA.

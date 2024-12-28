@@ -9,6 +9,7 @@
     "increase_daily_energy": "mdi:numeric",
     "reset_energy": "mdi:restore",
     "stop_playbook": "mdi:stop",
-    "switch_sub_profile": "mdi:toggle-switch"
+    "switch_sub_profile": "mdi:toggle-switch",
+    "update_library": "mdi:cloud-download"
   }
 }

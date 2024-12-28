@@ -86,6 +86,7 @@ from .const import (
     ENTRY_GLOBAL_CONFIG_UNIQUE_ID,
     MIN_HA_VERSION,
     SERVICE_CHANGE_GUI_CONFIGURATION,
+    SERVICE_UPDATE_LIBRARY,
     PowercalcDiscoveryType,
     SensorType,
     UnitPrefix,
@@ -285,14 +286,24 @@ def get_global_gui_configuration(config_entry: ConfigEntry) -> ConfigType:
 def register_services(hass: HomeAssistant) -> None:
     """Register generic services"""
 
-    async def handle_service(call: ServiceCall) -> None:
+    async def _handle_change_gui_service(call: ServiceCall) -> None:
         await change_gui_configuration(hass, call)
 
     hass.services.register(
         DOMAIN,
         SERVICE_CHANGE_GUI_CONFIGURATION,
-        handle_service,
+        _handle_change_gui_service,
         schema=SERVICE_SCHEMA,
+    )
+
+    async def _handle_update_library_service(call: ServiceCall) -> None:
+        discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+        await discovery_manager.update_library_and_rediscover()
+
+    hass.services.register(
+        DOMAIN,
+        SERVICE_UPDATE_LIBRARY,
+        _handle_update_library_service,
     )
 
 

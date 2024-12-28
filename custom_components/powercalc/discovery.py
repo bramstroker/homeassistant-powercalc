@@ -73,15 +73,19 @@ class DiscoveryManager:
 
         async def _rediscover(_: Any) -> None:  # noqa: ANN401
             """Rediscover entities."""
-            library = await self._get_library()
-            await library.initialize()  # Redownload library
-            await self.start_discovery()
+            await self.update_library_and_rediscover()
 
         async_track_time_interval(
             self.hass,
             _rediscover,
-            timedelta(minutes=1),
+            timedelta(hours=2),
         )
+
+    async def update_library_and_rediscover(self) -> None:
+        """Update the library and rediscover entities."""
+        library = await self._get_library()
+        await library.initialize()
+        await self.start_discovery()
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
@@ -90,7 +94,7 @@ class DiscoveryManager:
             if entry.unique_id:
                 self.initialized_flows.update({entry.unique_id, str(entry.data.get(CONF_ENTITY_ID))})
 
-        _LOGGER.debug("Start auto discovering entities")
+        _LOGGER.debug("Start auto discovery")
         for entity_entry in await self.get_entities():
             source_entity = await create_source_entity(entity_entry.entity_id, self.hass)
             try:
@@ -120,7 +124,7 @@ class DiscoveryManager:
                     source_entity.entity_id,
                 )
 
-        _LOGGER.debug("Done auto discovering entities")
+        _LOGGER.debug("Done auto discovery")
 
     async def _get_library(self) -> ProfileLibrary:
         """Get the powercalc library instance."""

@@ -198,6 +198,7 @@ SERVICE_INCREASE_DAILY_ENERGY = "increase_daily_energy"
 SERVICE_RESET_ENERGY = "reset_energy"
 SERVICE_STOP_PLAYBOOK = "stop_playbook"
 SERVICE_SWITCH_SUB_PROFILE = "switch_sub_profile"
+SERVICE_UPDATE_LIBRARY = "update_library"
 
 SIGNAL_POWER_SENSOR_STATE_CHANGE = "powercalc_power_sensor_state_change"
 
