@@ -62,7 +62,6 @@ from .const import (
     CONF_UTILITY_METER_OFFSET,
     CONF_UTILITY_METER_TARIFFS,
     CONF_UTILITY_METER_TYPES,
-    DATA_CALCULATOR_FACTORY,
     DATA_CONFIGURED_ENTITIES,
     DATA_DISCOVERY_MANAGER,
     DATA_DOMAIN_ENTITIES,
@@ -99,7 +98,6 @@ from .sensors.group.config_entry_utils import (
     remove_power_sensor_from_associated_groups,
 )
 from .service.gui_configuration import SERVICE_SCHEMA, change_gui_configuration
-from .strategy.factory import PowerCalculatorStrategyFactory
 
 PLATFORMS = [Platform.SENSOR]
 
@@ -215,7 +213,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
-        DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
         DATA_DISCOVERY_MANAGER: discovery_manager,
         DOMAIN_CONFIG: global_config,
         DATA_CONFIGURED_ENTITIES: {},

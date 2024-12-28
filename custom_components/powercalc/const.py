@@ -22,7 +22,6 @@ MIN_HA_VERSION = "2024.4"
 DOMAIN = "powercalc"
 DOMAIN_CONFIG = "config"
 
-DATA_CALCULATOR_FACTORY = "calculator_factory"
 DATA_CONFIGURED_ENTITIES = "configured_entities"
 DATA_DISCOVERY_MANAGER = "discovery_manager"
 DATA_DOMAIN_ENTITIES = "domain_entities"
