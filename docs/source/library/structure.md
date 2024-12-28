@@ -22,6 +22,12 @@ Required fields are:
 You can use `aliases` to define alternative model names, which will be used during discovery.
 This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.
 
+By default Powercalc discovers on a "per entity" basis.
+This can cause issues when a device has multiple entities, causing multiple discoveries for the same device.
+When a profile does not have to be bound to a specific entity (light, switch etc.), you can set `discovery_by` to `device`.
+This will cause Powercalc to discover on a "per device" basis, which is more reliable.
+This setting is recommended for device types which map to `sensor` domain entities, these are: `network`, `power_meter` and `generic_iot`.
+
 ## Sub profiles
 
 Some profiles might have multiple profiles. This is useful when a device has different power consumption based on the state of the device.

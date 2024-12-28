@@ -86,6 +86,7 @@
       "enum": [
         "camera",
         "cover",
+        "generic_iot",
         "light",
         "power_meter",
         "printer",

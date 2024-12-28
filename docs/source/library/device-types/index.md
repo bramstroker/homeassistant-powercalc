@@ -6,6 +6,8 @@ Here you can find information about how to setup specific device types for the l
 
 ## :material-blinds-horizontal: Cover
 
+Generic IoT
+
 ## :material-lightbulb: [Light](light.md)
 
 ## :material-meter-electric: [Power meter](power-meter.md)

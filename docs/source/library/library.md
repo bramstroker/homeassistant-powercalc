@@ -63,7 +63,7 @@ You will have to manage the library profiles yourself, by downloading them from 
 
 ## Discovery
 
-During startup, Powercalc will scan your Home Assistant installation for entities that match the library profiles.
+During startup, Powercalc will scan your Home Assistant installation for entities and devices that match the library profiles.
 Only entities which have a device attached will be considered for discovery.
 Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in `config/.storage/core.device_registry`.
 

@@ -11,8 +11,9 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "device_type": "smart_switch",
+  "device_type": "power_meter",
   "calculation_strategy": "fixed",
+  "discovery_by": "device",
   "fixed_config": {
     "power": 0.3
   }
