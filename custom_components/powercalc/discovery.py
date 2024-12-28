@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import timedelta
 from typing import Any
 
 import homeassistant.helpers.device_registry as dr
@@ -13,6 +14,7 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery_flow
 from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType
 
 from .common import SourceEntity, create_source_entity
@@ -64,6 +66,22 @@ class DiscoveryManager:
         self.manually_configured_entities: list[str] | None = None
         self.initialized_flows: set[str] = set()
         self.library: ProfileLibrary | None = None
+
+    async def setup(self) -> None:
+        """Setup the discovery manager. Start initial discovery and setup interval based rediscovery."""
+        await self.start_discovery()
+
+        async def _rediscover(_: Any) -> None:  # noqa: ANN401
+            """Rediscover entities."""
+            library = await self._get_library()
+            await library.initialize()  # Redownload library
+            await self.start_discovery()
+
+        async_track_time_interval(
+            self.hass,
+            _rediscover,
+            timedelta(hours=2),
+        )
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""

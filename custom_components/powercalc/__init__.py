@@ -216,7 +216,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     discovery_manager = DiscoveryManager(hass, config)
     hass.data[DOMAIN] = {
         DATA_CALCULATOR_FACTORY: PowerCalculatorStrategyFactory(hass),
-        DATA_DISCOVERY_MANAGER: DiscoveryManager(hass, config),
+        DATA_DISCOVERY_MANAGER: discovery_manager,
         DOMAIN_CONFIG: global_config,
         DATA_CONFIGURED_ENTITIES: {},
         DATA_DOMAIN_ENTITIES: {},
@@ -229,7 +229,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     await hass.async_add_executor_job(register_services, hass)
 
     if global_config.get(CONF_ENABLE_AUTODISCOVERY):
-        await discovery_manager.start_discovery()
+        await discovery_manager.setup()
 
     await setup_yaml_sensors(hass, config, global_config)
 
