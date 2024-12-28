@@ -8,11 +8,14 @@
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "device_type": "smart_switch",
+  "device_type": "energy_meter",
   "calculation_strategy": "fixed",
   "fixed_config": {
     "power": 1.22
   },
+  "aliases": [
+    "SHEM-3"
+  ],
   "created_at": "2024-12-01T18:27:00",
   "author": "RubenKelevra <cyrond@gmail.com>"
 }
