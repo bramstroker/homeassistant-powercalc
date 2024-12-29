@@ -85,6 +85,7 @@ nav:
           - 'library/device-types/index.md'
           - 'library/device-types/camera.md'
           #- 'library/device-types/cover.md'
+          - 'library/device-types/generic-iot.md'
           - 'library/device-types/light.md'
           - 'library/device-types/power-meter.md'
           - 'library/device-types/printer.md'
