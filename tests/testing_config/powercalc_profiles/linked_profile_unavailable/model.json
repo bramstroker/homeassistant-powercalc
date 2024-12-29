@@ -2,5 +2,5 @@
   "name": "Linked profile",
   "standby_power": 0.4,
   "calculation_strategy": "lut",
-  "linked_lut": "foo/bar"
+  "linked_profile": "foo/bar"
 }

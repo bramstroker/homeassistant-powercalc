@@ -110,8 +110,8 @@ def get_model_list() -> list[dict]:
 
 
 def get_color_modes(model_directory: str, data_dir: str, model_data: dict) -> set:
-    if "linked_lut" in model_data:
-        model_directory = os.path.join(data_dir, model_data["linked_lut"])
+    if "linked_profile" in model_data:
+        model_directory = os.path.join(data_dir, model_data["linked_profile"])
 
     color_modes = set()
     for path in glob.glob(f"{model_directory}/**/*.csv.gz", recursive=True):

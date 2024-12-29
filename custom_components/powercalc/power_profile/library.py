@@ -125,7 +125,7 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
-        if linked_profile := json_data.get("linked_lut"):
+        if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
             _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
