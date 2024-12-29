@@ -12,7 +12,7 @@ Powercalc profiles can be used to define the self usage of the IoT device itself
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
-  "device_type": "power_meter",
+  "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "discovery_by": "device",
   "fixed_config": {
