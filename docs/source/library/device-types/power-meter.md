@@ -14,9 +14,7 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
   "device_type": "power_meter",
   "calculation_strategy": "fixed",
   "discovery_by": "device",
-  "fixed_config": {
-    "power": 0.3
-  }
+  "only_self_usage": true
 }
 ```
 

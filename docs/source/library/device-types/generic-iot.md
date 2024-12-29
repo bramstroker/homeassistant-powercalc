@@ -15,9 +15,7 @@ Powercalc profiles can be used to define the self usage of the IoT device itself
   "device_type": "generic_iot",
   "calculation_strategy": "fixed",
   "discovery_by": "device",
-  "fixed_config": {
-    "power": 0.3
-  }
+  "only_self_usage": true
 }
 ```
 

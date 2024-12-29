@@ -51,9 +51,7 @@ Note the sensor_naming configuration which will make sure the entities are named
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.7
-  }
+  "only_self_usage": true
 }
 ```
 
