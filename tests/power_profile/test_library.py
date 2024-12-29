@@ -176,7 +176,7 @@ async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
     assert not has_remote_loader
 
 
-async def test_linked_lut_loading(hass: HomeAssistant) -> None:
+async def test_linked_profile_loading(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("signify", "LCA007"))
     assert profile.linked_profile == "signify/LCA006"
@@ -199,7 +199,7 @@ async def test_linked_profile_loading_failed(hass: HomeAssistant) -> None:
             return {
                 "manufacturer": "signify",
                 "model": "LCA001",
-                "linked_lut": "foo/bar",
+                "linked_profile": "foo/bar",
             }, ""
 
         mock_load_model.side_effect = async_load_model_patch
