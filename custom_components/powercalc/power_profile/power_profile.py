@@ -36,6 +36,7 @@ _LOGGER = logging.getLogger(__name__)
 class DeviceType(StrEnum):
     CAMERA = "camera"
     COVER = "cover"
+    GENERIC_IOT = "generic_iot"
     LIGHT = "light"
     POWER_METER = "power_meter"
     PRINTER = "printer"
@@ -44,6 +45,11 @@ class DeviceType(StrEnum):
     SMART_SPEAKER = "smart_speaker"
     NETWORK = "network"
     VACUUM_ROBOT = "vacuum_robot"
+
+
+class DiscoveryBy(StrEnum):
+    DEVICE = "device"
+    ENTITY = "entity"
 
 
 class SubProfileMatcherType(StrEnum):
@@ -56,6 +62,7 @@ class SubProfileMatcherType(StrEnum):
 DEVICE_TYPE_DOMAIN = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
+    DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
@@ -226,6 +233,10 @@ class PowerProfile:
         except ValueError:
             _LOGGER.warning("Unknown device type: %s", device_type)
             return None
+
+    @property
+    def discovery_by(self) -> DiscoveryBy:
+        return DiscoveryBy(self._json_data.get("discovery_by", DiscoveryBy.ENTITY))
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:

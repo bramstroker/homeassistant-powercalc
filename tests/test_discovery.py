@@ -11,7 +11,7 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_SOURCE, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -39,13 +39,14 @@ from custom_components.powercalc.const import (
     CONF_VOLTAGE,
     CONF_WLED,
     DOMAIN,
+    DUMMY_ENTITY_ID,
     SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 
-from .common import create_mock_light_entity, run_powercalc_setup
+from .common import create_mock_light_entity, get_test_config_dir, run_powercalc_setup
 from .conftest import MockEntityWithModel
 
 DEFAULT_UNIQUE_ID = "7c009ef6829f"
@@ -130,7 +131,7 @@ async def test_autodiscovery_skipped_for_lut_with_subprofiles(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     """
-    Lights which can be autodiscovered and have sub profiles need to de skipped
+    Lights which can be autodiscovered and have sub profiles need to be skipped
     User needs to configure this because we cannot know which sub profile to select
     No power sensor should be created and no error should appear in the logs
     """
@@ -332,7 +333,7 @@ async def test_autodiscover_continues_when_one_entity_fails(
     with patch("custom_components.powercalc.power_profile.library.ProfileLibrary.find_models", new_callable=AsyncMock) as mock_find_models:
         mock_find_models.side_effect = [Exception("Test exception"), {ModelInfo("signify", "LCT010")}]
         await run_powercalc_setup(hass, {})
-        assert "Error during auto discovery" in caplog.text
+        assert "Error during entity discovery" in caplog.text
 
 
 async def test_load_model_with_slashes(
@@ -605,7 +606,7 @@ async def test_no_power_sensors_are_created_for_ignored_config_entries(
     await run_powercalc_setup(hass, {})
 
     assert not hass.states.get("sensor.test_power")
-    assert "Already setup with discovery, skipping new discovery" in caplog.text
+    assert "Already setup with discovery, skipping" in caplog.text
 
 
 @pytest.mark.parametrize(
@@ -662,7 +663,7 @@ async def test_get_model_information(
         mock_device_registry(hass, {str(device_entry.id): device_entry})
     mock_registry(hass, {str(entity_entry.id): entity_entry})
     discovery_manager = DiscoveryManager(hass, {})
-    assert await discovery_manager.get_model_information(entity_entry) == model_info
+    assert await discovery_manager.get_model_information_from_entity(entity_entry) == model_info
 
 
 async def test_interval_based_rediscovery(
@@ -704,3 +705,32 @@ async def test_update_profile_service(
     await hass.async_block_till_done()
 
     assert len([record for record in caplog.records if "Start auto discovery" in record.message]) == 2
+
+
+async def test_discovery_by_device(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    hass.config.config_dir = get_test_config_dir()
+
+    mock_device_registry(
+        hass,
+        {
+            "youless-device": DeviceEntry(
+                id="ABC123",
+                manufacturer="test",
+                model="discovery-type-device",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert mock_calls[0][1] == (DOMAIN,)
+    assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
+    assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
+    assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery-type-device"
+    assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
+    assert len(mock_calls) == 1

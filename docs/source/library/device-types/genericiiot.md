@@ -1,6 +1,7 @@
 # Power meter
 
-Smart power meter. Powercalc profiles can be used to define the self usage of the IoT device itself.
+Generic IoT device.
+Powercalc profiles can be used to define the self usage of the IoT device itself.
 
 ## JSON
 
@@ -22,5 +23,8 @@ Smart power meter. Powercalc profiles can be used to define the self usage of th
 
 !!! note
     Required fields are omitted in this example for brevity. For the full list of required fields see the [model structure](../structure.md)
+
+!!! note
+    The `discovery_by` field is set to `device` to prevent multiple discoveries for the same device.
 
 Following the example above the power for this device will always be 0.3W.
