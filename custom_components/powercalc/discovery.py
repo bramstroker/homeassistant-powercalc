@@ -92,11 +92,13 @@ class DiscoveryManager:
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
 
+        # Build a list of config entries which are already setup, to prevent duplicate discovery flows
         for entry in self.hass.config_entries.async_entries(DOMAIN):
             if entry.unique_id:
                 self.initialized_flows.add(entry.unique_id)
-                if str(entry.data.get(CONF_ENTITY_ID)) != DUMMY_ENTITY_ID:
-                    self.initialized_flows.add(str(entry.data.get(CONF_ENTITY_ID)))
+                entity_id = str(entry.data.get(CONF_ENTITY_ID))
+                if entity_id != DUMMY_ENTITY_ID:
+                    self.initialized_flows.add(entity_id)
 
         _LOGGER.debug("Start auto discovery")
 
