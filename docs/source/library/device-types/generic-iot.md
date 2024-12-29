@@ -1,4 +1,4 @@
-# Power meter
+Generic IoT
 
 Generic IoT device.
 Powercalc profiles can be used to define the self usage of the IoT device itself.
