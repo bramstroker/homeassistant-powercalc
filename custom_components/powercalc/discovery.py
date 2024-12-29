@@ -337,8 +337,9 @@ class DiscoveryManager:
         )
         return model_info
 
-    async def get_model_information_from_device(self, device_entry: dr.DeviceEntry) -> ModelInfo | None:
-        """See if we have enough information in device registry to automatically setup the power sensor."""
+    @staticmethod
+    async def get_model_information_from_device(device_entry: dr.DeviceEntry) -> ModelInfo | None:
+        """See if we have enough information in device registry to automatically set up the power sensor."""
         if device_entry.manufacturer is None or device_entry.model is None:
             return None
 

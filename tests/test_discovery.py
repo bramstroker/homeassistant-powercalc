@@ -11,7 +11,7 @@ from homeassistant.components.light import (
     ColorMode,
 )
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_INTEGRATION_DISCOVERY
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_UNIQUE_ID, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_SOURCE, CONF_UNIQUE_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -39,6 +39,7 @@ from custom_components.powercalc.const import (
     CONF_VOLTAGE,
     CONF_WLED,
     DOMAIN,
+    DUMMY_ENTITY_ID,
     SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
@@ -716,7 +717,7 @@ async def test_discovery_by_device(
         hass,
         {
             "youless-device": DeviceEntry(
-                id="youless-device",
+                id="ABC123",
                 manufacturer="test",
                 model="discovery-type-device",
             ),
@@ -726,4 +727,10 @@ async def test_discovery_by_device(
     await run_powercalc_setup(hass, {})
 
     mock_calls = mock_flow_init.mock_calls
+    assert mock_calls[0][1] == (DOMAIN,)
+    assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
+    assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
+    assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
+    assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery-type-device"
+    assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
