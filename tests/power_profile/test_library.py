@@ -179,7 +179,7 @@ async def test_download_feature_can_be_disabled(hass: HomeAssistant) -> None:
 async def test_linked_lut_loading(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("signify", "LCA007"))
-    assert profile.linked_lut == "signify/LCA006"
+    assert profile.linked_profile == "signify/LCA006"
 
     assert profile.get_model_directory().endswith("signify/LCA006")
 

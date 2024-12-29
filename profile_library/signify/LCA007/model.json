@@ -6,7 +6,7 @@
   "name": "Hue White and Color Ambiance A19 E26 1100lm",
   "standby_power": 0.4,
   "calculation_strategy": "lut",
-  "linked_lut": "signify/LCA006",
+  "linked_profile": "signify/LCA006",
   "aliases": [
     "9290024687"
   ],

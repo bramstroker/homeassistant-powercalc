@@ -111,56 +111,65 @@ class PowerProfile:
 
     @property
     def manufacturer(self) -> str:
+        """Get the manufacturer of this profile."""
         return self._manufacturer
 
     @property
     def model(self) -> str:
+        """Get the model of this profile."""
         return self._model
 
     @property
     def unique_id(self) -> str:
+        """Get the unique id of this profile."""
         return self._json_data.get("unique_id") or f"{self._manufacturer}_{self._model}"
 
     @property
     def name(self) -> str:
+        """Get the name of this profile."""
         return self._json_data.get("name") or ""
 
     @property
     def json_data(self) -> ConfigType:
+        """Get the raw json data."""
         return self._json_data
 
     @property
     def standby_power(self) -> float:
+        """Get the standby power when the device is off."""
         return self._json_data.get("standby_power") or 0
 
     @property
     def standby_power_on(self) -> float:
-        return self._json_data.get("standby_power_on") or 0
+        """Get the standby power (self usage) when the device is on."""
+        standby_power_on = self._json_data.get("standby_power_on")
+        if standby_power_on is None and self.only_self_usage:
+            return self.standby_power
+        return standby_power_on or 0
 
     @property
     def calculation_strategy(self) -> CalculationStrategy:
-        """Get the calculation strategy this profile provides.
-        supported modes is here for BC purposes.
-        """
-        if "calculation_strategy" in self._json_data:
-            return CalculationStrategy(str(self._json_data.get("calculation_strategy")))
-        return CalculationStrategy.LUT
+        """Get the calculation strategy this profile provides"""
+        return CalculationStrategy(str(self._json_data.get("calculation_strategy", CalculationStrategy.LUT)))
 
     @property
-    def linked_lut(self) -> str | None:
-        return self._json_data.get("linked_lut")
+    def linked_profile(self) -> str | None:
+        """Get the linked profile."""
+        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))  # type: ignore[no-any-return]
 
     @property
     def calculation_enabled_condition(self) -> str | None:
+        """Get the condition to enable the calculation."""
         return self._json_data.get("calculation_enabled_condition")
 
     @property
     def aliases(self) -> list[str]:
+        """Get a list of aliases for this model."""
         return self._json_data.get("aliases") or []
 
     @property
     def linear_config(self) -> ConfigType | None:
-        """Get configuration to setup linear strategy."""
+        """Get configuration to set up linear strategy."""
         config = self.get_strategy_config(CalculationStrategy.LINEAR)
         if config is None:
             return {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
@@ -168,12 +177,12 @@ class PowerProfile:
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
-        """Get configuration to setup linear strategy."""
+        """Get configuration to set up linear strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property
     def fixed_config(self) -> ConfigType | None:
-        """Get configuration to setup fixed strategy."""
+        """Get configuration to set up fixed strategy."""
         config = self.get_strategy_config(CalculationStrategy.FIXED)
         if config is None and self.standby_power_on:
             return {CONF_POWER: 0}
@@ -181,15 +190,16 @@ class PowerProfile:
 
     @property
     def composite_config(self) -> list | None:
-        """Get configuration to setup composite strategy."""
+        """Get configuration to set up composite strategy."""
         return cast(list, self._json_data.get("composite_config"))
 
     @property
     def playbook_config(self) -> ConfigType | None:
-        """Get configuration to setup playbook strategy."""
+        """Get configuration to set up playbook strategy."""
         return self.get_strategy_config(CalculationStrategy.PLAYBOOK)
 
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
+        """Get configuration for a certain strategy."""
         if not self.is_strategy_supported(strategy):
             raise UnsupportedStrategyError(
                 f"Strategy {strategy} is not supported by model: {self._model}",
@@ -210,9 +220,13 @@ class PowerProfile:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
         """
-        return self.is_strategy_supported(
-            CalculationStrategy.FIXED,
-        ) and not self._json_data.get("fixed_config")
+        return (
+            self.is_strategy_supported(
+                CalculationStrategy.FIXED,
+            )
+            and not self._json_data.get("fixed_config")
+            and not self.only_self_usage
+        )
 
     @property
     def needs_linear_config(self) -> bool:
@@ -225,6 +239,7 @@ class PowerProfile:
 
     @property
     def device_type(self) -> DeviceType | None:
+        """Get the device type of this profile."""
         device_type = self._json_data.get("device_type")
         if not device_type:
             return DeviceType.LIGHT
@@ -239,7 +254,13 @@ class PowerProfile:
         return DiscoveryBy(self._json_data.get("discovery_by", DiscoveryBy.ENTITY))
 
     @property
+    def only_self_usage(self) -> bool:
+        """Whether this profile only provides self usage."""
+        return bool(self._json_data.get("only_self_usage", False))
+
+    @property
     def config_flow_discovery_remarks(self) -> str | None:
+        """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")
         if not remarks and self.device_type == DeviceType.SMART_SWITCH:
             translations = translation.async_get_cached_translations(
@@ -267,6 +288,7 @@ class PowerProfile:
 
     @property
     async def has_sub_profiles(self) -> bool:
+        """Check whether this profile has sub profiles."""
         return len(await self.get_sub_profiles()) > 0
 
     @property
