@@ -2233,7 +2233,7 @@
 You can find the list of supported devices on the dedicated <a href="https://library.powercalc.nl">library viewer</a>.
 This library will keep extending by the effort of community users.</p>
 <p>At startup Powercalc will scan your HA installation and tries to match if any of them are in the library,
-when found it will provide a discovery flow for you to setup.
+when found it will provide a discovery flow for you to setup. More info about the discovery process can be found <a href="#discovery">here</a>.
 You can also setup Powercalc sensors for a entity manually, see <a href="../../sensor-types/virtual-power-library/">Virtual power library</a>.</p>
 <p>Starting from version 1.12.0 all the power profiles are moved out of the component and are downloaded from the internet on demand.
 This way we can roll out updates to the library without the need to update the component.
@@ -2244,7 +2244,7 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 When you prefer to have full local control, you can disable the library in the configuration. See [Disable download feature].</p>
 </div>
 <p>For more information about the library structure, See <a href="../structure/">structure</a>.</p>
-<p>To contribute see the <a href="../../contributing/measure/">measure</a> section.</p>
+<p>To contribute new profiles see the <a href="../../contributing/measure/">measure</a> section.</p>
 <p>More information about how to setup specific device types can be found in the <a href="../device-types/">device types</a> section.</p>
 <h2 id="custom-models">Custom models</h2>
 <p>If you have a device that is not in the library, you can create a custom model.
@@ -2272,7 +2272,7 @@ When it can be useful to share this model with the community, please consider su
 <p>This will prevent the component from downloading the library profiles from the internet.</p>
 <p>You will have to manage the library profiles yourself, by downloading them from the GitHub repository and placing them in the <code>config/powercalc/profiles</code> directory.</p>
 <h2 id="discovery">Discovery</h2>
-<p>During startup, Powercalc will scan your Home Assistant installation for entities that match the library profiles.
+<p>During startup, Powercalc will scan your Home Assistant installation for entities and devices that match the library profiles.
 Only entities which have a device attached will be considered for discovery.
 Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in <code>config/.storage/core.device_registry</code>.</p>
 <p>Each device in HA has the following properties:</p>
@@ -2317,7 +2317,7 @@ Once the update process is complete, a discovery routine will be initiated to po
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 28, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 29, 2024</span>
   </span>
 
     
