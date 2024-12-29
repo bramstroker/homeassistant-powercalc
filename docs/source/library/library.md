@@ -5,7 +5,7 @@ You can find the list of supported devices on the dedicated [library viewer](htt
 This library will keep extending by the effort of community users.
 
 At startup Powercalc will scan your HA installation and tries to match if any of them are in the library,
-when found it will provide a discovery flow for you to setup.
+when found it will provide a discovery flow for you to setup. More info about the discovery process can be found [here](#discovery).
 You can also setup Powercalc sensors for a entity manually, see [Virtual power library](../sensor-types/virtual-power-library.md).
 
 Starting from version 1.12.0 all the power profiles are moved out of the component and are downloaded from the internet on demand.
@@ -19,7 +19,7 @@ Also you only need to download the profiles you actually use, saving bandwidth a
 
 For more information about the library structure, See [structure](structure.md).
 
-To contribute see the [measure](../contributing/measure.md) section.
+To contribute new profiles see the [measure](../contributing/measure.md) section.
 
 More information about how to setup specific device types can be found in the [device types](device-types/index.md) section.
 
