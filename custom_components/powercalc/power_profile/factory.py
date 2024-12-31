@@ -6,6 +6,7 @@ import os
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
+    CONF_CUSTOM_FIELDS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
@@ -53,6 +54,7 @@ async def get_power_profile(
         profile = await library.get_profile(
             ModelInfo(manufacturer or "", model or "", model_id),
             custom_model_directory,
+            config.get(CONF_CUSTOM_FIELDS),
         )
     except LibraryError as err:
         if log_errors:

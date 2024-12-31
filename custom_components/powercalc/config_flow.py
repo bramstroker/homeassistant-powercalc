@@ -45,6 +45,7 @@ from .const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
+    CONF_CUSTOM_FIELDS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
@@ -120,6 +121,7 @@ from .const import (
 )
 from .discovery import get_power_profile_by_source_entity
 from .errors import ModelNotSupportedError, StrategyConfigurationError
+from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
@@ -144,6 +146,7 @@ class Step(StrEnum):
     GROUP_TRACKED_UNTRACKED_MANUAL = "group_tracked_untracked_manual"
     LIBRARY = "library"
     POST_LIBRARY = "post_library"
+    LIBRARY_CUSTOM_FIELDS = "library_custom_fields"
     LIBRARY_MULTI_PROFILE = "library_multi_profile"
     LIBRARY_OPTIONS = "library_options"
     VIRTUAL_POWER = "virtual_power"
@@ -932,7 +935,11 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
             )
             self.selected_profile = profile
-            if self.selected_profile and not await self.selected_profile.has_sub_profiles:
+            if (
+                self.selected_profile
+                and not await self.selected_profile.has_sub_profiles
+                and self.selected_profile.calculation_strategy != CalculationStrategy.COMPOSITE
+            ):
                 await self.validate_strategy_config()
             return user_input
 
@@ -974,26 +981,44 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         Handles the logic after the user either selected manufacturer/model himself or confirmed autodiscovered.
         Forwards to the next step in the flow.
         """
-        if self.selected_profile and await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
+        if not self.selected_profile:
+            return self.async_abort(reason="model_not_supported")
+
+        if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_CUSTOM_FIELDS):
+            return await self.async_step_library_custom_fields()
+
+        if await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
             return await self.async_step_sub_profile()
 
-        if (
-            self.selected_profile
-            and self.selected_profile.device_type == DeviceType.SMART_SWITCH
-            and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED
-        ):
+        if self.selected_profile.device_type == DeviceType.SMART_SWITCH and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED:
             return await self.async_step_smart_switch()
 
-        if self.selected_profile and self.selected_profile.needs_fixed_config:  # pragma: no cover
+        if self.selected_profile.needs_fixed_config:  # pragma: no cover
             return await self.async_step_fixed()
 
-        if self.selected_profile and self.selected_profile.needs_linear_config:
+        if self.selected_profile.needs_linear_config:
             return await self.async_step_linear()
 
-        if self.selected_profile and self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+        if self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
             return await self.async_step_multi_switch()
 
         return await self.async_step_power_advanced()
+
+    async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for custom fields."""
+
+        async def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
+            return {CONF_CUSTOM_FIELDS: user_input}
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.LIBRARY_CUSTOM_FIELDS,
+                schema=build_dynamic_field_schema(self.selected_profile),  # type: ignore
+                # next_step=Step.POST_LIBRARY,
+                validate_user_input=_process_user_input,
+            ),
+            user_input,
+        )
 
     async def async_step_sub_profile(
         self,

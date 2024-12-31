@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
 
 from custom_components.powercalc.const import CONF_DISABLE_LIBRARY_DOWNLOAD, DOMAIN, DOMAIN_CONFIG
+from custom_components.powercalc.helpers import replace_placeholders
 
 from .error import LibraryError
 from .loader.composite import CompositeLoader
@@ -96,6 +97,7 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
+        variables: dict[str, str] | None = None,
     ) -> PowerProfile:
         """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
@@ -104,7 +106,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        profile = await self.create_power_profile(model_info, custom_directory)
+        profile = await self.create_power_profile(model_info, custom_directory, variables)
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -115,6 +117,7 @@ class ProfileLibrary:
         self,
         model_info: ModelInfo,
         custom_directory: str | None = None,
+        variables: dict[str, str] | None = None,
     ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
 
@@ -125,6 +128,8 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
+        if variables:
+            json_data = cast(dict, replace_placeholders(json_data, variables))
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
             _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)

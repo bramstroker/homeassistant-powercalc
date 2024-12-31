@@ -5,8 +5,9 @@ import logging
 import os
 import re
 from collections import defaultdict
+from dataclasses import dataclass
 from enum import StrEnum
-from typing import NamedTuple, Protocol, cast
+from typing import Any, NamedTuple, Protocol, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
@@ -57,6 +58,14 @@ class SubProfileMatcherType(StrEnum):
     ENTITY_ID = "entity_id"
     ENTITY_STATE = "entity_state"
     INTEGRATION = "integration"
+
+
+@dataclass(frozen=True)
+class CustomField:
+    key: str
+    name: str
+    description: str
+    selector: dict[str, Any]
 
 
 DEVICE_TYPE_DOMAIN = {
@@ -257,6 +266,16 @@ class PowerProfile:
     def only_self_usage(self) -> bool:
         """Whether this profile only provides self usage."""
         return bool(self._json_data.get("only_self_usage", False))
+
+    @property
+    def has_custom_fields(self) -> bool:
+        """Whether this profile has custom fields."""
+        return bool(self._json_data.get("fields"))
+
+    @property
+    def custom_fields(self) -> list[CustomField]:
+        """Get the custom fields of this profile."""
+        return [CustomField(key=key, **field) for key, field in self._json_data.get("fields", {}).items()]
 
     @property
     def config_flow_discovery_remarks(self) -> str | None:
