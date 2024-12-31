@@ -19,7 +19,6 @@ from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_NAME,
@@ -46,9 +45,7 @@ from .common import (
     validate_name_pattern,
 )
 from .const import (
-    CONF_ALL,
     CONF_AND,
-    CONF_AREA,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_COMPOSITE,
@@ -68,13 +65,11 @@ from .const import (
     CONF_FIXED,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_FORCE_ENERGY_SENSOR_CREATION,
-    CONF_GROUP,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_INCLUDE,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
-    CONF_LABEL,
     CONF_LINEAR,
     CONF_MANUFACTURER,
     CONF_MODE,
@@ -95,7 +90,6 @@ from .const import (
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
     CONF_SUBTRACT_ENTITIES,
-    CONF_TEMPLATE,
     CONF_UNAVAILABLE_POWER,
     CONF_UTILITY_METER_NET_CONSUMPTION,
     CONF_UTILITY_METER_OFFSET,
@@ -103,7 +97,6 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
-    CONF_WILDCARD,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
@@ -139,7 +132,7 @@ from .errors import (
     SensorAlreadyConfiguredError,
     SensorConfigurationError,
 )
-from .group_include.filter import FilterOperator, create_composite_filter
+from .group_include.filter import FILTER_CONFIG, FilterOperator, create_composite_filter
 from .group_include.include import find_entities
 from .sensors.daily_energy import (
     DAILY_FIXED_ENERGY_SCHEMA,
@@ -164,18 +157,6 @@ _LOGGER = logging.getLogger(__name__)
 
 MAX_GROUP_NESTING_LEVEL = 5
 
-FILTER_CONFIG = vol.Schema(
-    {
-        vol.Optional(CONF_ALL): None,
-        vol.Optional(CONF_AREA): cv.string,
-        vol.Optional(CONF_GROUP): cv.entity_id,
-        vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
-        vol.Optional(CONF_LABEL): cv.string,
-        vol.Optional(CONF_TEMPLATE): cv.template,
-        vol.Optional(CONF_WILDCARD): cv.string,
-    },
-)
-
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
@@ -199,15 +180,8 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_CREATE_UTILITY_METERS): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_NET_CONSUMPTION): cv.boolean,
     vol.Optional(CONF_UTILITY_METER_TARIFFS): vol.All(cv.ensure_list, [cv.string]),
-    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(
-        cv.ensure_list,
-        [vol.In(METER_TYPES)],
-    ),
-    vol.Optional(CONF_UTILITY_METER_OFFSET): vol.All(
-        cv.time_period,
-        cv.positive_timedelta,
-        max_28_days,
-    ),
+    vol.Optional(CONF_UTILITY_METER_TYPES): vol.All(cv.ensure_list, [vol.In(METER_TYPES)]),
+    vol.Optional(CONF_UTILITY_METER_OFFSET): vol.All(cv.time_period, cv.positive_timedelta, max_28_days),
     vol.Optional(CONF_MULTIPLY_FACTOR): vol.Coerce(float),
     vol.Optional(CONF_MULTIPLY_FACTOR_STANDBY): cv.boolean,
     vol.Optional(CONF_POWER_SENSOR_NAMING): validate_name_pattern,
@@ -216,13 +190,9 @@ SENSOR_CONFIG = {
     vol.Optional(CONF_ENERGY_SENSOR_NAMING): validate_name_pattern,
     vol.Optional(CONF_ENERGY_SENSOR_CATEGORY): vol.In(ENTITY_CATEGORIES),
     vol.Optional(CONF_ENERGY_INTEGRATION_METHOD): vol.In(ENERGY_INTEGRATION_METHODS),
-    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): vol.In(
-        [cls.value for cls in UnitPrefix],
-    ),
+    vol.Optional(CONF_ENERGY_SENSOR_UNIT_PREFIX): vol.In([cls.value for cls in UnitPrefix]),
     vol.Optional(CONF_CREATE_GROUP): cv.string,
-    vol.Optional(CONF_GROUP_TYPE): vol.In(
-        [cls.value for cls in GroupType],
-    ),
+    vol.Optional(CONF_GROUP_TYPE): vol.In([cls.value for cls in GroupType]),
     vol.Optional(CONF_SUBTRACT_ENTITIES): vol.All(cv.ensure_list, [cv.entity_id]),
     vol.Optional(CONF_HIDE_MEMBERS): cv.boolean,
     vol.Optional(CONF_INCLUDE): vol.Schema(

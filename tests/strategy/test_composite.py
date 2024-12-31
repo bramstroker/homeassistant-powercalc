@@ -533,3 +533,37 @@ async def test_state_omit_entity_id(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "1000.00"
+
+
+async def test_state_attribute_entity_id(hass: HomeAssistant) -> None:
+    hass.states.async_set("media_player.test", STATE_PLAYING, {"source": "HDMI2"})
+
+    sensor_config = {
+        CONF_ENTITY_ID: "media_player.test",
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "attribute": "source",
+                    "state": "HDMI1",
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 20,
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 2,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    assert hass.states.get("sensor.test_power").state == "2.00"
+
+    hass.states.async_set("media_player.test", STATE_PLAYING, {"source": "HDMI1"})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "20.00"

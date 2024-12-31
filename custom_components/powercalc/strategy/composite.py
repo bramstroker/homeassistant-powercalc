@@ -60,7 +60,7 @@ def get_state_condition_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN
 def get_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
     """Validate a state condition."""
     if not isinstance(value, dict):
-        raise vol.Invalid("Expected a dictionary")
+        raise vol.Invalid("Expected a dictionary")  # pragma: no cover
 
     if CONF_ATTRIBUTE in value:
         validated: dict[str, Any] = get_state_condition_attribute_schema(value)
