@@ -19,7 +19,6 @@ from homeassistant.components.utility_meter import max_28_days
 from homeassistant.components.utility_meter.const import METER_TYPES
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONF_CONDITION,
     CONF_DOMAIN,
     CONF_ENTITIES,
     CONF_ENTITY_ID,
@@ -154,6 +153,7 @@ from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
 from .sensors.power import PowerSensor, VirtualPowerSensor, create_power_sensor
 from .sensors.utility_meter import create_utility_meters
+from .strategy.composite import CONFIG_SCHEMA as COMPOSITE_SCHEMA
 from .strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
 from .strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
 from .strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
@@ -247,21 +247,7 @@ SENSOR_CONFIG = {
         },
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
-    vol.Optional(CONF_COMPOSITE): vol.All(
-        cv.ensure_list,
-        [
-            vol.Schema(
-                {
-                    vol.Optional(CONF_CONDITION): cv.CONDITION_SCHEMA,
-                    vol.Optional(CONF_FIXED): FIXED_SCHEMA,
-                    vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
-                    vol.Optional(CONF_WLED): WLED_SCHEMA,
-                    vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
-                    vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
-                },
-            ),
-        ],
-    ),
+    vol.Optional(CONF_COMPOSITE): COMPOSITE_SCHEMA,
 }
 
 

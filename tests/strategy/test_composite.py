@@ -8,6 +8,8 @@ from homeassistant.const import (
     CONF_NAME,
     STATE_OFF,
     STATE_ON,
+    STATE_PAUSED,
+    STATE_PLAYING,
     STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
@@ -23,13 +25,16 @@ from custom_components.powercalc.const import (
     CONF_LINEAR,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
+    CONF_MODE,
     CONF_MULTI_SWITCH,
     CONF_PLAYBOOK,
     CONF_PLAYBOOKS,
     CONF_POWER,
     CONF_POWER_OFF,
     CONF_STANDBY_POWER,
+    CONF_STRATEGIES,
 )
+from custom_components.powercalc.strategy.composite import CompositeMode
 from tests.common import (
     get_test_config_dir,
     get_test_profile_dir,
@@ -402,3 +407,109 @@ async def test_composite_strategy_from_library_profile(hass: HomeAssistant) -> N
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "0.82"
+
+
+async def test_composite_mode_sum(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.test", 50)
+
+    sensor_config = {
+        CONF_ENTITY_ID: "light.test",
+        CONF_COMPOSITE: {
+            CONF_MODE: CompositeMode.SUM_ALL,
+            CONF_STRATEGIES: [
+                {
+                    CONF_FIXED: {
+                        CONF_POWER: 10,
+                    },
+                },
+                {
+                    CONF_FIXED: {
+                        CONF_POWER: 20,
+                    },
+                },
+                {
+                    CONF_CONDITION: {
+                        "condition": "numeric_state",
+                        "entity_id": "sensor.test",
+                        "above": 100,
+                    },
+                    CONF_FIXED: {
+                        CONF_POWER: 30,
+                    },
+                },
+            ],
+        },
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    hass.states.async_set("light.test", STATE_ON, {ATTR_BRIGHTNESS: 200})
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "30.00"
+
+
+async def test_numeric_state_omit_entity_id(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.test", 2000)
+
+    sensor_config = {
+        CONF_ENTITY_ID: "sensor.test",
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "numeric_state",
+                    "above": 100,
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 1000,
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 500,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    assert hass.states.get("sensor.test_power").state == "1000.00"
+
+    hass.states.async_set("sensor.test", 100)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "500.00"
+
+
+async def test_state_omit_entity_id(hass: HomeAssistant) -> None:
+    hass.states.async_set("media_player.test", STATE_PAUSED)
+
+    sensor_config = {
+        CONF_ENTITY_ID: "media_player.test",
+        CONF_COMPOSITE: [
+            {
+                CONF_CONDITION: {
+                    "condition": "state",
+                    "state": STATE_PLAYING,
+                },
+                CONF_FIXED: {
+                    CONF_POWER: 1000,
+                },
+            },
+            {
+                CONF_FIXED: {
+                    CONF_POWER: 500,
+                },
+            },
+        ],
+    }
+
+    await run_powercalc_setup(hass, sensor_config, {})
+
+    assert hass.states.get("sensor.test_power").state == "500.00"
+
+    hass.states.async_set("media_player.test", STATE_PLAYING)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "1000.00"
