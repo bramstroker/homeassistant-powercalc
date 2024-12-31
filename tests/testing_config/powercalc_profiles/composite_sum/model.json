@@ -1,0 +1,26 @@
+{
+  "name": "My device",
+  "measure_method": "manual",
+  "measure_device": "xx",
+  "device_type": "generic_iot",
+  "calculation_strategy": "composite",
+  "composite_config": {
+    "mode": "sum_all",
+    "strategies": [
+      {
+        "condition": {
+          "condition": "numeric_state",
+          "above": 70
+        },
+        "fixed": {
+          "power": 20
+        }
+      },
+      {
+        "fixed": {
+          "power": 2
+        }
+      }
+    ]
+  }
+}

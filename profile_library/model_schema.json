@@ -34,16 +34,44 @@
       "description": "Supported calculation strategies"
     },
     "composite_config": {
-      "type": "array",
-      "description": "Configuration for composite calculation strategy",
-      "items": {
-        "type": "object",
-        "properties": {
-          "condition": {
-            "$ref": "#/definitions/condition"
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "Configuration for composite calculation strategy",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "$ref": "#/definitions/condition"
+              }
+            }
           }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string"
+            },
+            "strategies": {
+              "type": "array",
+              "description": "Configuration for composite calculation strategy",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "condition": {
+                    "$ref": "#/definitions/condition"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "mode",
+            "strategies"
+          ]
         }
-      }
+      ]
     },
     "config_flow_discovery_remarks": {
       "type": "string",

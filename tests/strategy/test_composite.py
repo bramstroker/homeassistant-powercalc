@@ -449,6 +449,26 @@ async def test_composite_mode_sum(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.test_power").state == "30.00"
 
 
+async def test_sum_mode_from_library_profile(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.test",
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("composite_sum"),
+        },
+    )
+
+    hass.states.async_set("sensor.test", "100")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "22.00"
+
+    hass.states.async_set("sensor.test", "20")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "2.00"
+
+
 async def test_numeric_state_omit_entity_id(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.test", 2000)
 
