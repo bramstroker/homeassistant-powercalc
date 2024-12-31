@@ -51,7 +51,8 @@
           "type": "object",
           "properties": {
             "mode": {
-              "type": "string"
+              "type": "string",
+              "enum": ["sum_all", "stop_at_first"]
             },
             "strategies": {
               "type": "array",
