@@ -4,7 +4,7 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import cast
 
-from homeassistant.const import CONF_CONDITION, CONF_ENTITIES
+from homeassistant.const import CONF_CONDITION, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import condition
 from homeassistant.helpers.singleton import singleton
@@ -14,12 +14,14 @@ from homeassistant.helpers.typing import ConfigType
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import (
     CONF_COMPOSITE,
+    CONF_MODE,
     CONF_MULTI_SWITCH,
     CONF_POWER,
     CONF_POWER_OFF,
     CONF_POWER_TEMPLATE,
     CONF_STANDBY_POWER,
     CONF_STATES_POWER,
+    CONF_STRATEGIES,
     CalculationStrategy,
 )
 from custom_components.powercalc.errors import (
@@ -28,7 +30,7 @@ from custom_components.powercalc.errors import (
 )
 from custom_components.powercalc.power_profile.power_profile import PowerProfile
 
-from .composite import CompositeStrategy, SubStrategy
+from .composite import DEFAULT_MODE, CompositeStrategy, SubStrategy
 from .fixed import FixedStrategy
 from .linear import LinearStrategy
 from .lut import LutRegistry, LutStrategy
@@ -151,7 +153,7 @@ class PowerCalculatorStrategyFactory:
         source_entity: SourceEntity,
         power_profile: PowerProfile | None,
     ) -> CompositeStrategy:
-        composite_config: list | None = config.get(CONF_COMPOSITE)
+        composite_config: list | dict | None = config.get(CONF_COMPOSITE)
         if composite_config is None:
             if power_profile and power_profile.composite_config:
                 composite_config = power_profile.composite_config
@@ -159,12 +161,19 @@ class PowerCalculatorStrategyFactory:
                 raise StrategyConfigurationError("No composite configuration supplied")
 
         sub_strategies = composite_config
+        mode = DEFAULT_MODE
+        if isinstance(composite_config, dict):
+            mode = composite_config.get(CONF_MODE, DEFAULT_MODE)
+            sub_strategies = composite_config.get(CONF_STRATEGIES)  # type: ignore
 
         async def _create_sub_strategy(strategy_config: ConfigType) -> SubStrategy:
             condition_instance = None
             condition_config = strategy_config.get(CONF_CONDITION)
             if condition_config:
-                if condition_config.get(CONF_CONDITION) == "state":
+                condition_type = condition_config.get(CONF_CONDITION)
+                if condition_type in ["state", "numeric_state"] and CONF_ENTITY_ID not in condition_config:
+                    condition_config[CONF_ENTITY_ID] = [source_entity.entity_id]
+                if condition_type == "state":
                     condition_config = condition.state_validate_config(self._hass, condition_config)
                 condition_instance = await condition.async_from_config(
                     self._hass,
@@ -181,7 +190,7 @@ class PowerCalculatorStrategyFactory:
             return SubStrategy(condition_config, condition_instance, strategy_instance)
 
         strategies = [await _create_sub_strategy(config) for config in sub_strategies]
-        return CompositeStrategy(self._hass, strategies)
+        return CompositeStrategy(self._hass, strategies, mode)
 
     def _create_multi_switch(self, config: ConfigType, power_profile: PowerProfile | None) -> MultiSwitchStrategy:
         """Create instance of multi switch strategy."""
