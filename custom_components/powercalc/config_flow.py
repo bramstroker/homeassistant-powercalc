@@ -1014,7 +1014,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             PowercalcFormStep(
                 step=Step.LIBRARY_CUSTOM_FIELDS,
                 schema=build_dynamic_field_schema(self.selected_profile),  # type: ignore
-                # next_step=Step.POST_LIBRARY,
+                next_step=Step.POST_LIBRARY,
                 validate_user_input=_process_user_input,
             ),
             user_input,

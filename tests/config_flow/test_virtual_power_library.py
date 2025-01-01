@@ -7,7 +7,12 @@ from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
 
-from custom_components.powercalc import CONF_CREATE_ENERGY_SENSOR, CONF_CREATE_UTILITY_METERS
+from custom_components.powercalc import (
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
+)
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     Step,
@@ -229,10 +234,18 @@ async def test_profile_with_custom_fields(
         {"some_entity": "sensor.foobar"},
     )
 
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.POWER_ADVANCED
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
         CONF_ENTITY_ID: "sensor.test",
         CONF_NAME: "test",
         CONF_MANUFACTURER: "test",
