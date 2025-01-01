@@ -1,6 +1,7 @@
 import decimal
 import logging
 import os.path
+import re
 import uuid
 from collections.abc import Callable, Coroutine
 from decimal import Decimal
@@ -115,3 +116,21 @@ def async_cache(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., Co
         return result
 
     return wrapper
+
+
+def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[str, str]) -> list | str | dict[str, Any]:
+    """Replace placeholders in a dictionary with values from a replacement dictionary."""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            data[key] = replace_placeholders(value, replacements)
+    elif isinstance(data, list):
+        for i in range(len(data)):
+            data[i] = replace_placeholders(data[i], replacements)
+    elif isinstance(data, str):
+        # Adjust regex to match [[variable]]
+        matches = re.findall(r"\[\[\s*(\w+)\s*\]\]", data)
+        for match in matches:
+            if match in replacements:
+                # Replace [[variable]] with its value
+                data = data.replace(f"[[{match}]]", replacements[match])
+    return data

@@ -5,8 +5,9 @@ import logging
 import os
 import re
 from collections import defaultdict
+from dataclasses import dataclass
 from enum import StrEnum
-from typing import NamedTuple, Protocol, cast
+from typing import Any, NamedTuple, Protocol, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
@@ -57,6 +58,14 @@ class SubProfileMatcherType(StrEnum):
     ENTITY_ID = "entity_id"
     ENTITY_STATE = "entity_state"
     INTEGRATION = "integration"
+
+
+@dataclass(frozen=True)
+class CustomField:
+    key: str
+    label: str
+    selector: dict[str, Any]
+    description: str | None = None
 
 
 DEVICE_TYPE_DOMAIN = {
@@ -177,7 +186,7 @@ class PowerProfile:
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
-        """Get configuration to set up linear strategy."""
+        """Get configuration to set up multi_switch strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property
@@ -259,6 +268,16 @@ class PowerProfile:
         return bool(self._json_data.get("only_self_usage", False))
 
     @property
+    def has_custom_fields(self) -> bool:
+        """Whether this profile has custom fields."""
+        return bool(self._json_data.get("fields"))
+
+    @property
+    def custom_fields(self) -> list[CustomField]:
+        """Get the custom fields of this profile."""
+        return [CustomField(key=key, **field) for key, field in self._json_data.get("fields", {}).items()]
+
+    @property
     def config_flow_discovery_remarks(self) -> str | None:
         """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")
@@ -328,6 +347,20 @@ class PowerProfile:
             await self._hass.async_add_executor_job(_load_json)  # type: ignore
 
         self.sub_profile = sub_profile
+
+    @property
+    async def needs_user_configuration(self) -> bool:
+        """Check whether this profile needs user configuration."""
+        if self.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return True
+
+        if self.needs_fixed_config or self.needs_linear_config:
+            return True
+
+        if self.has_custom_fields:
+            return True
+
+        return await self.has_sub_profiles and not self.sub_profile_select
 
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""

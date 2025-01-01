@@ -22,7 +22,7 @@ from custom_components.powercalc.strategy.factory import PowerCalculatorStrategy
 from custom_components.powercalc.strategy.strategy_interface import (
     PowerCalculationStrategyInterface,
 )
-from tests.common import get_test_config_dir, run_powercalc_setup
+from tests.common import get_test_profile_dir, run_powercalc_setup
 from tests.strategy.common import create_source_entity
 
 
@@ -286,7 +286,7 @@ async def test_fallback_to_non_gzipped_file(hass: HomeAssistant) -> None:
         hass,
         "test",
         "test",
-        custom_profile_dir=get_test_config_dir("powercalc_profiles/lut-non-gzipped"),
+        custom_profile_dir=get_test_profile_dir("lut-non-gzipped"),
     )
     await _calculate_and_assert_power(
         strategy,

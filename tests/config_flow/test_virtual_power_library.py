@@ -1,9 +1,18 @@
+import logging
+
+import pytest
 import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.selector import SelectSelector
 
+from custom_components.powercalc import (
+    CONF_CREATE_ENERGY_SENSOR,
+    CONF_CREATE_UTILITY_METERS,
+    CONF_ENERGY_INTEGRATION_METHOD,
+    DEFAULT_ENERGY_INTEGRATION_METHOD,
+)
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     Step,
@@ -13,11 +22,12 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
+    CONF_VARIABLES,
     CalculationStrategy,
     SensorType,
 )
 from custom_components.test.light import MockLight
-from tests.common import create_mock_light_entity
+from tests.common import create_mock_light_entity, get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     create_mock_entry,
@@ -183,3 +193,67 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_MANUFACTURER] == "signify"
     assert entry.data[CONF_MODEL] == "LWB010"
+
+
+async def test_profile_with_custom_fields(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.ERROR)
+
+    hass.config.config_dir = get_test_config_dir()
+    mock_entity_with_model_information(
+        "sensor.test",
+        "test",
+        "custom-fields",
+        unique_id=DEFAULT_UNIQUE_ID,
+    )
+
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.VIRTUAL_POWER
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "sensor.test"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.LIBRARY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {"some_entity": "sensor.foobar"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.POWER_ADVANCED
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_CREATE_ENERGY_SENSOR: True,
+        CONF_CREATE_UTILITY_METERS: False,
+        CONF_ENERGY_INTEGRATION_METHOD: DEFAULT_ENERGY_INTEGRATION_METHOD,
+        CONF_ENTITY_ID: "sensor.test",
+        CONF_NAME: "test",
+        CONF_MANUFACTURER: "test",
+        CONF_MODEL: "custom-fields",
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_VARIABLES: {
+            "some_entity": "sensor.foobar",
+        },
+    }
+
+    assert not caplog.records

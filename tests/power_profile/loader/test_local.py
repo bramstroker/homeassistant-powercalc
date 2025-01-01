@@ -12,21 +12,21 @@ from tests.common import get_test_config_dir, get_test_profile_dir, run_powercal
 
 
 async def test_broken_lib_by_identical_model_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/double-model"))
+    loader = LocalLoader(hass, get_test_profile_dir("double-model"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
     assert "Double entry manufacturer/model in custom library:" in caplog.text
 
 
 async def test_broken_lib_by_identical_alias_alias(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/double-alias"))
+    loader = LocalLoader(hass, get_test_profile_dir("double-alias"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
         assert "Double entry manufacturer/model in custom library" in caplog.text
 
 
 async def test_broken_lib_by_missing_model_json(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
-    loader = LocalLoader(hass, get_test_config_dir("powercalc_profiles/missing-model-json"))
+    loader = LocalLoader(hass, get_test_profile_dir("missing-model-json"))
     with caplog.at_level(logging.ERROR):
         await loader.initialize()
         assert "model.json should exist in" in caplog.text

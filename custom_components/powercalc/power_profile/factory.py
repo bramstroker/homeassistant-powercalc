@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 import os
 
+from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_VARIABLES,
     MANUFACTURER_WLED,
 )
 from custom_components.powercalc.errors import ModelNotSupportedError
@@ -25,6 +27,7 @@ async def get_power_profile(
     config: dict,
     model_info: ModelInfo | None = None,
     log_errors: bool = True,
+    process_variables: bool = True,
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
@@ -50,9 +53,15 @@ async def get_power_profile(
 
     library = await ProfileLibrary.factory(hass)
     try:
+        variables = config.get(CONF_VARIABLES, {}).copy()
+        if CONF_ENTITY_ID in config:
+            variables["entity"] = config[CONF_ENTITY_ID]
+
         profile = await library.get_profile(
             ModelInfo(manufacturer or "", model or "", model_id),
             custom_model_directory,
+            variables,
+            process_variables,
         )
     except LibraryError as err:
         if log_errors:

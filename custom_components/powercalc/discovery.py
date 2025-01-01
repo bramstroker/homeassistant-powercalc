@@ -32,7 +32,6 @@ from .const import (
     MANUFACTURER_WLED,
     CalculationStrategy,
 )
-from .errors import ModelNotSupportedError
 from .group_include.filter import CategoryFilter, CompositeFilter, FilterOperator, LambdaFilter, NotFilter, get_filtered_entity_list
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
@@ -51,7 +50,7 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
     model_info = await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
     if not model_info:
         return None
-    profiles = await discovery_manager.discover_entity(source_entity, model_info)
+    profiles = await discovery_manager.find_power_profiles(model_info, source_entity, DiscoveryBy.ENTITY)
     return profiles[0] if profiles else None
 
 
@@ -203,13 +202,11 @@ class DiscoveryManager:
 
         power_profiles = []
         for model_info in models:
-            profile = await get_power_profile(self.hass, {}, model_info=model_info)
+            profile = await get_power_profile(self.hass, {}, model_info=model_info, process_variables=False)
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
-            if discovery_type == DiscoveryBy.ENTITY and not await self.is_entity_supported(
+            if discovery_type == DiscoveryBy.ENTITY and not profile.is_entity_domain_supported(
                 source_entity.entity_entry,  # type: ignore[arg-type]
-                model_info,
-                profile,
             ):
                 continue
             power_profiles.append(profile)
@@ -246,31 +243,6 @@ class DiscoveryManager:
             and not re.search("master|segment", str(entity_entry.original_name), flags=re.IGNORECASE)
             and not re.search("master|segment", str(entity_entry.entity_id), flags=re.IGNORECASE)
         )
-
-    async def is_entity_supported(
-        self,
-        entity_entry: er.RegistryEntry,
-        model_info: ModelInfo | None = None,
-        power_profile: PowerProfile | None = None,
-        log_profile_loading_errors: bool = True,
-    ) -> bool:
-        if not model_info:
-            model_info = await self.extract_model_info_from_device_info(entity_entry)
-        if not model_info or not model_info.manufacturer or not model_info.model:
-            return False
-
-        if not power_profile:
-            try:
-                power_profile = await get_power_profile(
-                    self.hass,
-                    {},
-                    model_info,
-                    log_errors=log_profile_loading_errors,
-                )
-            except ModelNotSupportedError:
-                return False
-
-        return power_profile.is_entity_domain_supported(entity_entry) if power_profile else False
 
     async def get_entities(self) -> list[er.RegistryEntry]:
         """Get all entities from entity registry which qualifies for discovery."""

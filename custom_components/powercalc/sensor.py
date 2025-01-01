@@ -97,6 +97,7 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
+    CONF_VARIABLES,
     CONF_WLED,
     DATA_CONFIGURED_ENTITIES,
     DATA_DOMAIN_ENTITIES,
@@ -218,6 +219,7 @@ SENSOR_CONFIG = {
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
     vol.Optional(CONF_COMPOSITE): COMPOSITE_SCHEMA,
+    vol.Optional(CONF_VARIABLES): vol.Schema({cv.string: cv.string}),
 }
 
 
