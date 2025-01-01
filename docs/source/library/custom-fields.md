@@ -12,7 +12,7 @@ You can add one or more custom fields to a profile by adding a `fields` section 
 {
   "fields": {
     "switch_entity": {
-      "name": "Switch entity",
+      "label": "Switch entity",
       "description": "Select the switch entity for your device",
       "selector": {
         "entity": {
@@ -27,7 +27,7 @@ You can add one or more custom fields to a profile by adding a `fields` section 
 The key `switch_entity` is the key of the field. This can be referenced in the profile configuration using the `{{ switch_entity }}` syntax.
 After setup Powercalc will replace this with the value the user provided.
 
-`name` is the name of the field that will be shown to the user.
+`label` is the label of the field that will be shown to the user.
 `description` is optional and is shown to the user below the field.
 `selector` is the type of field. The configuration is similar to [HA Blueprints](https://www.home-assistant.io/docs/blueprint/selectors/).
 
@@ -44,7 +44,7 @@ The profile then calculates the power usage based on the number provided.
   "calculation_strategy": "composite",
   "fields": {
     "num_switches": {
-      "name": "Number of switches",
+      "label": "Number of switches",
       "description": "Enter some number",
       "selector": {
         "number": {
@@ -71,7 +71,7 @@ The profile then calculates the power usage based on the state of the binary sen
   "calculation_strategy": "composite",
   "fields": {
     "some_entity": {
-      "name": "Some entity",
+      "label": "Some entity",
       "description": "Select some entity",
       "selector": {
         "entity": {
