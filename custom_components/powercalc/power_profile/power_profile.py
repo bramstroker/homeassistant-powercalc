@@ -186,7 +186,7 @@ class PowerProfile:
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
-        """Get configuration to set up linear strategy."""
+        """Get configuration to set up multi_switch strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property

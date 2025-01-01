@@ -141,6 +141,17 @@
                     "type": "string"
                   }
                 }
+              },
+              "number": {
+                "type": "object",
+                "properties": {
+                  "min": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  }
+                }
               }
             }
           }
