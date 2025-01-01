@@ -22,7 +22,7 @@ async def test_power_meter(
         hass,
         {
             CONF_ENTITY_ID: sensor_id,
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power-meter"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power_meter"),
         },
     )
 
@@ -48,7 +48,7 @@ async def test_power_meter_legacy(
         hass,
         {
             CONF_ENTITY_ID: sensor_id,
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power-meter-legacy"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("power_meter_legacy"),
         },
     )
 

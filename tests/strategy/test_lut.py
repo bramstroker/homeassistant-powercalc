@@ -286,7 +286,7 @@ async def test_fallback_to_non_gzipped_file(hass: HomeAssistant) -> None:
         hass,
         "test",
         "test",
-        custom_profile_dir=get_test_profile_dir("lut-non-gzipped"),
+        custom_profile_dir=get_test_profile_dir("lut_non_gzipped"),
     )
     await _calculate_and_assert_power(
         strategy,

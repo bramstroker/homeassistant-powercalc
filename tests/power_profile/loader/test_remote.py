@@ -76,7 +76,7 @@ async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> lis
     )
 
     for remote_file in remote_files:
-        with open(get_test_profile_dir("signify-LCA001") + f"/{remote_file['path']}", "rb") as f:
+        with open(get_test_profile_dir("signify_LCA001") + f"/{remote_file['path']}", "rb") as f:
             mock_aioresponse.get(
                 remote_file["url"],
                 status=200,
@@ -479,7 +479,7 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
         ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
         ("apple", {"Non existing model"}, set(), None),
         ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
-        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi-profile"),
+        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi_profile"),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking

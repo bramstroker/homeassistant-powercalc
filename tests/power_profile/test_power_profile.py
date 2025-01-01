@@ -30,7 +30,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> No
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
-        get_test_profile_dir("signify-LCA001"),
+        get_test_profile_dir("signify_LCA001"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -164,7 +164,7 @@ async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssis
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir("unknown-device-type"),
+        get_test_profile_dir("unknown_device_type"),
     )
     assert not power_profile.is_entity_domain_supported(
         SourceEntity("switch.test", "test", "switch"),

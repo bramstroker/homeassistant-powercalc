@@ -122,7 +122,7 @@ async def test_exception_is_raised_when_no_model_json_present(
     with pytest.raises(LibraryLoadingError):
         await library.create_power_profile(
             ModelInfo("foo", "bar"),
-            get_test_profile_dir("no-model-json"),
+            get_test_profile_dir("no_model_json"),
         )
 
 

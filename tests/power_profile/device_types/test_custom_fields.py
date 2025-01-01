@@ -98,7 +98,7 @@ async def test_custom_fields_with_template(hass: HomeAssistant) -> None:
         hass,
         {
             CONF_ENTITY_ID: "switch.test",
-            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("custom-fields-template"),
+            CONF_CUSTOM_MODEL_DIRECTORY: get_test_profile_dir("custom_fields_template"),
             CONF_VARIABLES: {
                 "num_switches": 4,
             },
