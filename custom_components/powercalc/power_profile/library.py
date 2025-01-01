@@ -130,9 +130,11 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
-        if json_data.get("fields") and process_variables:
-            self.validate_variables(json_data, variables or {})
+        if process_variables:
+            if json_data.get("fields"):  # When custom fields in profile are defined, make sure all variables are passed
+                self.validate_variables(json_data, variables or {})
             json_data = cast(dict, replace_placeholders(json_data, variables or {}))
+
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
             _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
@@ -145,7 +147,7 @@ class ProfileLibrary:
 
         # Check if all variables are valid for the model
         for variable in variables:
-            if variable not in fields:
+            if variable not in fields and variable != "entity":
                 raise LibraryError(f"Variable {variable} is not valid for this model")
 
         # Check if all fields have corresponding variables
