@@ -15,7 +15,7 @@ PowerCalc is a custom component for Home Assistant to estimate the power consump
 
 Also a measure utility is included which allows user to measure their lights and other devices and contribute power profiles to the PowerCalc library.
 
-![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/assets/preview.gif)
+![Preview](https://raw.githubusercontent.com/bramstroker/homeassistant-powercalc/master/docs/source/img/preview.gif)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/bramski)
 
