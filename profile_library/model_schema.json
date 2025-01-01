@@ -115,6 +115,38 @@
       ],
       "description": "Whether to discover the profile by device or entity"
     },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the field"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the field"
+          },
+          "selector": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "object",
+                "properties": {
+                  "domain": {
+                    "type": "string"
+                  },
+                  "device_class": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "fixed_config": {
       "type": "object",
       "description": "Configuration for fixed calculation strategy",
