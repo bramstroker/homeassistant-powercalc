@@ -1034,7 +1034,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         ) -> vol.Schema:
             """Create sub profile schema."""
             library = await ProfileLibrary.factory(self.hass)
-            profile = await library.get_profile(model_info)
+            profile = await library.get_profile(model_info, process_variables=False)
             sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
             return vol.Schema(
                 {

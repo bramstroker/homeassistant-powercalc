@@ -52,6 +52,7 @@ from .const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_GROUP,
     CONF_CREATE_UTILITY_METERS,
+    CONF_CUSTOM_FIELDS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DELAY,
@@ -218,6 +219,7 @@ SENSOR_CONFIG = {
     ),
     vol.Optional(CONF_UNAVAILABLE_POWER): vol.Coerce(float),
     vol.Optional(CONF_COMPOSITE): COMPOSITE_SCHEMA,
+    vol.Optional(CONF_CUSTOM_FIELDS): vol.Schema({cv.string: cv.string}),
 }
 
 

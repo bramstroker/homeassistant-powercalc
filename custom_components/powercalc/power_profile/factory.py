@@ -26,6 +26,7 @@ async def get_power_profile(
     config: dict,
     model_info: ModelInfo | None = None,
     log_errors: bool = True,
+    process_variables: bool = True,
 ) -> PowerProfile | None:
     manufacturer = config.get(CONF_MANUFACTURER)
     model = config.get(CONF_MODEL)
@@ -55,6 +56,7 @@ async def get_power_profile(
             ModelInfo(manufacturer or "", model or "", model_id),
             custom_model_directory,
             config.get(CONF_CUSTOM_FIELDS),
+            process_variables,
         )
     except LibraryError as err:
         if log_errors:

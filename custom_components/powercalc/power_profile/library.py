@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import NamedTuple, cast
+from typing import Any, NamedTuple, cast
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.singleton import singleton
@@ -98,6 +98,7 @@ class ProfileLibrary:
         model_info: ModelInfo,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
+        process_variables: bool = True,
     ) -> PowerProfile:
         """Get a power profile for a given manufacturer and model."""
         # Support multiple LUT in subdirectories
@@ -106,7 +107,7 @@ class ProfileLibrary:
             (model, sub_profile) = model_info.model.split("/", 1)
             model_info = ModelInfo(model_info.manufacturer, model, model_info.model_id)
 
-        profile = await self.create_power_profile(model_info, custom_directory, variables)
+        profile = await self.create_power_profile(model_info, custom_directory, variables, process_variables)
 
         if sub_profile:
             await profile.select_sub_profile(sub_profile)
@@ -118,6 +119,7 @@ class ProfileLibrary:
         model_info: ModelInfo,
         custom_directory: str | None = None,
         variables: dict[str, str] | None = None,
+        process_variables: bool = True,
     ) -> PowerProfile:
         """Create a power profile object from the model JSON data."""
 
@@ -128,13 +130,28 @@ class ProfileLibrary:
             model_info = next(iter(models))
 
         json_data, directory = await self._load_model_data(model_info.manufacturer, model_info.model, custom_directory)
-        if variables:
-            json_data = cast(dict, replace_placeholders(json_data, variables))
+        if json_data.get("fields") and process_variables:
+            self.validate_variables(json_data, variables or {})
+            json_data = cast(dict, replace_placeholders(json_data, variables or {}))
         if linked_profile := json_data.get("linked_profile", json_data.get("linked_lut")):
             linked_manufacturer, linked_model = linked_profile.split("/")
             _, directory = await self._load_model_data(linked_manufacturer, linked_model, custom_directory)
 
         return await self._create_power_profile_instance(model_info.manufacturer, model_info.model, directory, json_data)
+
+    @staticmethod
+    def validate_variables(json_data: dict[str, Any], variables: dict[str, str]) -> None:
+        fields = json_data.get("fields", {}).keys()
+
+        # Check if all variables are valid for the model
+        for variable in variables:
+            if variable not in fields:
+                raise LibraryError(f"Variable {variable} is not valid for this model")
+
+        # Check if all fields have corresponding variables
+        missing_fields = [field for field in fields if field not in variables]
+        if missing_fields:
+            raise LibraryError(f"Missing variables for fields: {', '.join(missing_fields)}")
 
     async def find_manufacturers(self, manufacturer: str) -> set[str]:
         """Resolve the manufacturer, either from the model info or by loading it."""

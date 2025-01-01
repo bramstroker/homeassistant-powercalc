@@ -51,7 +51,7 @@ async def get_power_profile_by_source_entity(hass: HomeAssistant, source_entity:
     model_info = await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
     if not model_info:
         return None
-    profiles = await discovery_manager.discover_entity(source_entity, model_info)
+    profiles = await discovery_manager.find_power_profiles(model_info, source_entity, DiscoveryBy.ENTITY)
     return profiles[0] if profiles else None
 
 
@@ -203,7 +203,7 @@ class DiscoveryManager:
 
         power_profiles = []
         for model_info in models:
-            profile = await get_power_profile(self.hass, {}, model_info=model_info)
+            profile = await get_power_profile(self.hass, {}, model_info=model_info, process_variables=False)
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
             if discovery_type == DiscoveryBy.ENTITY and not await self.is_entity_supported(
@@ -266,6 +266,7 @@ class DiscoveryManager:
                     {},
                     model_info,
                     log_errors=log_profile_loading_errors,
+                    process_variables=False,
                 )
             except ModelNotSupportedError:
                 return False
