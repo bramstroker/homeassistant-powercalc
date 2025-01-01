@@ -11,7 +11,7 @@
 
 # <img src="https://docs.powercalc.nl/img/logo2_light.svg" width="400">
 
-*PowerCalc* is a versatile custom component for Home Assistant that estimates power consumption for devices like lights, fans, smart speakers, and more—especially those without built-in power meters. 
+**PowerCalc** is a versatile custom component for Home Assistant that estimates power consumption for devices like lights, fans, smart speakers, and more—especially those without built-in power meters. 
 It acts as a virtual energy monitor, using advanced strategies to calculate power usage. For light entities, PowerCalc analyzes factors such as brightness, hue, saturation, and color temperature to deliver accurate consumption estimates. For other devices, it offers extensive configuration possibilities.
 
 Additionally, PowerCalc includes a powerful measurement utility, enabling users to assess their devices' power usage and contribute custom power profiles to the growing PowerCalc library.
