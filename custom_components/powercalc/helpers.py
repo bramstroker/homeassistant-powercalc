@@ -127,8 +127,10 @@ def replace_placeholders(data: list | str | dict[str, Any], replacements: dict[s
         for i in range(len(data)):
             data[i] = replace_placeholders(data[i], replacements)
     elif isinstance(data, str):
-        matches = re.findall(r"{{\s*(\w+)\s*}}", data)
+        # Adjust regex to match [[variable]]
+        matches = re.findall(r"\[\[\s*(\w+)\s*\]\]", data)
         for match in matches:
             if match in replacements:
-                data = data.replace(f"{{{{ {match} }}}}", replacements[match])
+                # Replace [[variable]] with its value
+                data = data.replace(f"[[{match}]]", replacements[match])
     return data

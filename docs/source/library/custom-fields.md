@@ -24,7 +24,7 @@ You can add one or more custom fields to a profile by adding a `fields` section 
 }
 ```
 
-The key `switch_entity` is the key of the field. This can be referenced in the profile configuration using the `{{ switch_entity }}` syntax.
+The key `switch_entity` is the key of the field. This can be referenced in the profile configuration using the `[[switch_entity]]` syntax.
 After setup Powercalc will replace this with the value the user provided.
 
 `label` is the label of the field that will be shown to the user.
@@ -41,7 +41,7 @@ The profile then calculates the power usage based on the number provided.
 
 ```json
 {
-  "calculation_strategy": "composite",
+  "calculation_strategy": "fixed",
   "fields": {
     "num_switches": {
       "label": "Number of switches",
@@ -56,10 +56,12 @@ The profile then calculates the power usage based on the number provided.
     }
   },
   "fixed_config": {
-    "power": "{{ some_number }}"
+    "power": "{{ [[num_switches]] * 0.20 }}"
   }
 }
 ```
+
+When the user provides the number `2`, the template will be ``{{ 2 * 0.20 }}`` which will result in `0.40`.
 
 ### Example entity selector
 
@@ -84,7 +86,7 @@ The profile then calculates the power usage based on the state of the binary sen
     {
       "condition": {
         "condition": "state",
-        "entity_id": "{{ some_entity }}",
+        "entity_id": "[[some_entity]]",
         "state": "on"
       },
       "fixed": {

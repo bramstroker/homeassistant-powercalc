@@ -19,7 +19,7 @@
     {
       "condition": {
         "condition": "state",
-        "entity_id": "{{ some_entity }}",
+        "entity_id": "[[some_entity]]",
         "state": "on"
       },
       "fixed": {

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from decimal import Decimal
-from typing import cast
+from typing import Any, cast
 
 from homeassistant.const import CONF_CONDITION, CONF_ENTITIES, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
@@ -104,14 +104,11 @@ class PowerCalculatorStrategyFactory:
         power = fixed_config.get(CONF_POWER)
         if power is None:
             power = fixed_config.get(CONF_POWER_TEMPLATE)
-        if isinstance(power, Template):
-            power.hass = self._hass
+        power = self._resolve_template(power)
 
         states_power = fixed_config.get(CONF_STATES_POWER)
         if states_power:
-            for p in states_power.values():
-                if isinstance(p, Template):
-                    p.hass = self._hass
+            states_power = {state: self._resolve_template(value) for state, value in states_power.items()}
 
         return FixedStrategy(source_entity, power, states_power)
 
@@ -217,6 +214,20 @@ class PowerCalculatorStrategyFactory:
             on_power=Decimal(on_power),
             off_power=Decimal(off_power),
         )
+
+    def _resolve_template(self, value: Any) -> Any:  # noqa: ANN401
+        """
+        Process the input to ensure it is a Template if applicable.
+        Otherwise, return the original value.
+        """
+        if isinstance(value, str) and value.startswith("{{"):
+            template = Template(value)
+            template.hass = self._hass
+            return template
+        if isinstance(value, Template):
+            value.hass = self._hass
+            return value
+        return value
 
     @staticmethod
     def _get_strategy_config(
