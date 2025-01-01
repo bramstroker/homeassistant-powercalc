@@ -982,7 +982,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         Forwards to the next step in the flow.
         """
         if not self.selected_profile:
-            return self.async_abort(reason="model_not_supported")
+            return self.async_abort(reason="model_not_supported")  # pragma: no cover
 
         if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_CUSTOM_FIELDS):
             return await self.async_step_library_custom_fields()
