@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
@@ -309,3 +311,73 @@ async def test_device_type(hass: HomeAssistant) -> None:
     )
 
     assert power_profile.device_type == DeviceType.SMART_SPEAKER
+
+
+@pytest.mark.parametrize(
+    "json_data,expected_result",
+    [
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.COMPOSITE,
+                "fields": {
+                    "foo": {
+                        "label": "Foo",
+                        "selector": {"entity": {}},
+                    },
+                },
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+                "fixed_config": {
+                    "power": 50,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "linear_config": {
+                    "min_power": 50,
+                    "max_power": 100,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.MULTI_SWITCH,
+                "multi_switch_config": {
+                    "power": 0.725,
+                    "power_off": 0.225,
+                },
+            },
+            True,
+        ),
+    ],
+)
+async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str, Any], expected_result: bool) -> None:
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("media_player"),
+        json_data=json_data,
+    )
+
+    assert await power_profile.needs_user_configuration == expected_result

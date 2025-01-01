@@ -351,6 +351,9 @@ class PowerProfile:
     @property
     async def needs_user_configuration(self) -> bool:
         """Check whether this profile needs user configuration."""
+        if self.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return True
+
         if self.needs_fixed_config or self.needs_linear_config:
             return True
 
