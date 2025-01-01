@@ -23,4 +23,4 @@ Additionally, PowerCalc includes a powerful measurement utility, enabling users 
 Go to the [Quick Start](https://docs.powercalc.nl/quick-start/) for installation instruction.
 
 - [Full Documentation](https://docs.powercalc.nl)
-- [Supported model listing](https://library.powercalc.nl)
+- [Profile library](https://library.powercalc.nl)
