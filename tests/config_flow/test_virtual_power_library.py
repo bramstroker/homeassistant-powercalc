@@ -206,7 +206,7 @@ async def test_profile_with_custom_fields(
     mock_entity_with_model_information(
         "sensor.test",
         "test",
-        "custom-fields",
+        "custom_fields",
         unique_id=DEFAULT_UNIQUE_ID,
     )
 
@@ -249,7 +249,7 @@ async def test_profile_with_custom_fields(
         CONF_ENTITY_ID: "sensor.test",
         CONF_NAME: "test",
         CONF_MANUFACTURER: "test",
-        CONF_MODEL: "custom-fields",
+        CONF_MODEL: "custom_fields",
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_VARIABLES: {
             "some_entity": "sensor.foobar",

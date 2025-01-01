@@ -98,7 +98,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     hass.config.config_dir = get_test_config_dir()
     light_entity_id = "light.test"
     manufacturer = "test"
-    model = "smart-dimmer"
+    model = "smart_dimmer"
 
     mock_entity_with_model_information(
         entity_id=light_entity_id,

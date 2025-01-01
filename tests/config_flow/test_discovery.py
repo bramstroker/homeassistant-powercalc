@@ -190,7 +190,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         name="FooBar",
         id="youless-device",
         manufacturer="test",
-        model="discovery-type-device",
+        model="discovery_type_device",
     )
     source_entity = SourceEntity(
         object_id=device_entry.name,
@@ -200,7 +200,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         device_entry=device_entry,
     )
     power_profiles = [
-        await get_power_profile(hass, {}, ModelInfo("test", "discovery-type-device")),
+        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 
@@ -215,7 +215,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "test",
-        CONF_MODEL: "discovery-type-device",
+        CONF_MODEL: "discovery_type_device",
         CONF_NAME: "FooBar",
     }
 

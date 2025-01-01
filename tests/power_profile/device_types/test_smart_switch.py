@@ -127,7 +127,7 @@ async def test_gui_smart_switch_without_builtin_powermeter(
         mock_entity_with_model_information,
         switch_id,
         manufacturer="test",
-        model="smart-switch-without-pm",
+        model="smart_switch_without_pm",
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step
@@ -183,7 +183,7 @@ async def test_gui_smart_switch_with_builtin_powermeter(
         mock_entity_with_model_information,
         switch_id,
         manufacturer="test",
-        model="smart-switch-with-pm",
+        model="smart_switch_with_pm",
     )
 
     # After confirming the manufacturer/model we must be directed to the fixed config step

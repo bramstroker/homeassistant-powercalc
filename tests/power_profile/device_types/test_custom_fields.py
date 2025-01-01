@@ -24,7 +24,7 @@ async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, capl
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "Test",
             CONF_MANUFACTURER: "test",
-            CONF_MODEL: "custom-fields",
+            CONF_MODEL: "custom_fields",
             CONF_VARIABLES: {
                 "some_entity": "sensor.test",
             },
@@ -47,7 +47,7 @@ async def test_validation_fails_when_not_all_variables_passed(hass: HomeAssistan
             CONF_ENTITY_ID: DUMMY_ENTITY_ID,
             CONF_NAME: "Test",
             CONF_MANUFACTURER: "test",
-            CONF_MODEL: "custom-fields",
+            CONF_MODEL: "custom_fields",
             CONF_VARIABLES: {},
         },
     )

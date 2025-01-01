@@ -719,7 +719,7 @@ async def test_discovery_by_device(
             "youless-device": DeviceEntry(
                 id="ABC123",
                 manufacturer="test",
-                model="discovery-type-device",
+                model="discovery_type_device",
             ),
         },
     )
@@ -731,6 +731,6 @@ async def test_discovery_by_device(
     assert mock_calls[0][2]["context"] == {CONF_SOURCE: SOURCE_INTEGRATION_DISCOVERY}
     assert mock_calls[0][2]["data"][CONF_ENTITY_ID] == DUMMY_ENTITY_ID
     assert mock_calls[0][2]["data"][CONF_MANUFACTURER] == "test"
-    assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery-type-device"
+    assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
