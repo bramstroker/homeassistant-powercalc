@@ -6,10 +6,10 @@ import os
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc.const import (
-    CONF_CUSTOM_FIELDS,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_MANUFACTURER,
     CONF_MODEL,
+    CONF_VARIABLES,
     MANUFACTURER_WLED,
 )
 from custom_components.powercalc.errors import ModelNotSupportedError
@@ -55,7 +55,7 @@ async def get_power_profile(
         profile = await library.get_profile(
             ModelInfo(manufacturer or "", model or "", model_id),
             custom_model_directory,
-            config.get(CONF_CUSTOM_FIELDS),
+            config.get(CONF_VARIABLES),
             process_variables,
         )
     except LibraryError as err:

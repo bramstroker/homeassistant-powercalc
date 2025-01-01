@@ -18,11 +18,11 @@ from custom_components.powercalc.config_flow import (
     Step,
 )
 from custom_components.powercalc.const import (
-    CONF_CUSTOM_FIELDS,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
+    CONF_VARIABLES,
     CalculationStrategy,
     SensorType,
 )
@@ -251,7 +251,7 @@ async def test_profile_with_custom_fields(
         CONF_MANUFACTURER: "test",
         CONF_MODEL: "custom-fields",
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_CUSTOM_FIELDS: {
+        CONF_VARIABLES: {
             "some_entity": "sensor.foobar",
         },
     }

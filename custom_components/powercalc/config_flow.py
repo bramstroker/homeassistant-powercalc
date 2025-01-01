@@ -45,7 +45,6 @@ from .const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_UTILITY_METERS,
-    CONF_CUSTOM_FIELDS,
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
@@ -105,6 +104,7 @@ from .const import (
     CONF_UTILITY_METER_TYPES,
     CONF_VALUE,
     CONF_VALUE_TEMPLATE,
+    CONF_VARIABLES,
     DISCOVERY_POWER_PROFILES,
     DISCOVERY_SOURCE_ENTITY,
     DOMAIN,
@@ -984,7 +984,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not self.selected_profile:
             return self.async_abort(reason="model_not_supported")  # pragma: no cover
 
-        if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_CUSTOM_FIELDS):
+        if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_VARIABLES):
             return await self.async_step_library_custom_fields()
 
         if await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
@@ -1008,7 +1008,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for custom fields."""
 
         async def _process_user_input(user_input: dict[str, Any]) -> dict[str, Any]:
-            return {CONF_CUSTOM_FIELDS: user_input}
+            return {CONF_VARIABLES: user_input}
 
         return await self.handle_form_step(
             PowercalcFormStep(

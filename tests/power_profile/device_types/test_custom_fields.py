@@ -4,7 +4,7 @@ import pytest
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.const import CONF_CUSTOM_FIELDS, CONF_MANUFACTURER, CONF_MODEL, DUMMY_ENTITY_ID
+from custom_components.powercalc.const import CONF_MANUFACTURER, CONF_MODEL, CONF_VARIABLES, DUMMY_ENTITY_ID
 from custom_components.powercalc.power_profile.error import LibraryError
 from custom_components.powercalc.power_profile.library import ProfileLibrary
 from tests.common import get_test_config_dir, run_powercalc_setup
@@ -25,7 +25,7 @@ async def test_custom_field_variables_from_yaml_config(hass: HomeAssistant, capl
             CONF_NAME: "Test",
             CONF_MANUFACTURER: "test",
             CONF_MODEL: "custom-fields",
-            CONF_CUSTOM_FIELDS: {
+            CONF_VARIABLES: {
                 "some_entity": "sensor.test",
             },
         },
@@ -48,7 +48,7 @@ async def test_validation_fails_when_not_all_variables_passed(hass: HomeAssistan
             CONF_NAME: "Test",
             CONF_MANUFACTURER: "test",
             CONF_MODEL: "custom-fields",
-            CONF_CUSTOM_FIELDS: {},
+            CONF_VARIABLES: {},
         },
     )
 
