@@ -935,10 +935,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
             )
             self.selected_profile = profile
-            if (
-                self.selected_profile
-                and not await self.selected_profile.needs_user_configuration
-            ):
+            if self.selected_profile and not await self.selected_profile.needs_user_configuration:
                 await self.validate_strategy_config()
             return user_input
 
