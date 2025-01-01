@@ -348,6 +348,17 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
+    @property
+    async def needs_user_configuration(self) -> bool:
+        """Check whether this profile needs user configuration."""
+        if self.needs_fixed_config or self.needs_linear_config:
+            return True
+
+        if self.has_custom_fields:
+            return True
+
+        return await self.has_sub_profiles and not self.sub_profile_select
+
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
         if self.device_type is None:

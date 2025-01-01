@@ -5,13 +5,13 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import Entity
 
-from custom_components.powercalc import DiscoveryManager
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
     DATA_CONFIGURED_ENTITIES,
-    DATA_DISCOVERY_MANAGER,
     DATA_ENTITIES,
     DOMAIN,
 )
+from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
@@ -29,7 +29,6 @@ async def find_entities(
     Based on given entity filter fetch all power and energy sensors from the HA instance
     """
     domain_data = hass.data.get(DOMAIN, {})
-    discovery_manager: DiscoveryManager = domain_data.get(DATA_DISCOVERY_MANAGER)
 
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
@@ -55,7 +54,11 @@ async def find_entities(
             elif device_class == SensorDeviceClass.ENERGY and source_entity.platform != "utility_meter":
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
-        if source_entity and await discovery_manager.is_entity_supported(source_entity, None, log_profile_loading_errors=False):
+        power_profile = await get_power_profile_by_source_entity(
+            hass,
+            await create_source_entity(source_entity.entity_id, hass),
+        )
+        if power_profile and not await power_profile.needs_user_configuration and power_profile.is_entity_domain_supported(source_entity):
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities
