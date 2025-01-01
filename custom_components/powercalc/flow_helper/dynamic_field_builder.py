@@ -7,5 +7,9 @@ from custom_components.powercalc.power_profile.power_profile import PowerProfile
 def build_dynamic_field_schema(profile: PowerProfile) -> vol.Schema:
     schema = {}
     for field in profile.custom_fields:
-        schema[vol.Required(field.key)] = selector(field.selector)
+        field_description = field.description
+        if not field_description:
+            field_description = field.name
+        key = vol.Required(field.key, description=field_description)
+        schema[key] = selector(field.selector)
     return vol.Schema(schema)
