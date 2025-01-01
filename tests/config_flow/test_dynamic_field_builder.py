@@ -49,6 +49,27 @@ def test_build_schema(hass: HomeAssistant) -> None:
     assert test2.config == {"min": 0, "max": 60, "step": 1, "unit_of_measurement": "minutes", "mode": "slider"}
 
 
+def test_omit_description(hass: HomeAssistant) -> None:
+    profile = create_power_profile(
+        hass,
+        {
+            "test1": {
+                "name": "Test 1",
+                "selector": {
+                    "entity": {
+                        "multiple": True,
+                        "device_class": "power",
+                    },
+                },
+            },
+        },
+    )
+    schema = build_dynamic_field_schema(profile)
+
+    schema_keys = list(schema.schema.keys())
+    assert schema_keys[schema_keys.index("test1")].description == "Test 1"
+
+
 def create_power_profile(hass: HomeAssistant, fields: dict[str, Any]) -> PowerProfile:
     return PowerProfile(
         hass,

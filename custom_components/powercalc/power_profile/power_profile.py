@@ -64,8 +64,8 @@ class SubProfileMatcherType(StrEnum):
 class CustomField:
     key: str
     name: str
-    description: str
     selector: dict[str, Any]
+    description: str | None = None
 
 
 DEVICE_TYPE_DOMAIN = {
