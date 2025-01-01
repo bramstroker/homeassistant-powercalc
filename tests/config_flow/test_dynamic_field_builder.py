@@ -12,7 +12,7 @@ def test_build_schema(hass: HomeAssistant) -> None:
         hass,
         {
             "test1": {
-                "name": "Test 1",
+                "label": "Test 1",
                 "description": "Test 1",
                 "selector": {
                     "entity": {
@@ -22,7 +22,7 @@ def test_build_schema(hass: HomeAssistant) -> None:
                 },
             },
             "test2": {
-                "name": "Test 2",
+                "label": "Test 2",
                 "description": "Test 2",
                 "selector": {
                     "number": {
@@ -54,7 +54,7 @@ def test_omit_description(hass: HomeAssistant) -> None:
         hass,
         {
             "test1": {
-                "name": "Test 1",
+                "label": "Test 1",
                 "selector": {
                     "entity": {
                         "multiple": True,

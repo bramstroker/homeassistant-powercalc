@@ -6,7 +6,7 @@
   "calculation_strategy": "composite",
   "fields": {
     "some_entity": {
-      "name": "Some entity",
+      "label": "Some entity",
       "description": "Select some entity",
       "selector": {
         "entity": {

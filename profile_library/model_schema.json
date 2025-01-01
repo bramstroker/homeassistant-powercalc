@@ -124,9 +124,9 @@
             "type": "string",
             "description": "Description of the field"
           },
-          "name": {
+          "label": {
             "type": "string",
-            "description": "Name of the field"
+            "description": "Label of the field"
           },
           "selector": {
             "type": "object",

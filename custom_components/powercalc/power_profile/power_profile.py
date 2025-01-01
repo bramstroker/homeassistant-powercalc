@@ -63,7 +63,7 @@ class SubProfileMatcherType(StrEnum):
 @dataclass(frozen=True)
 class CustomField:
     key: str
-    name: str
+    label: str
     selector: dict[str, Any]
     description: str | None = None
 
