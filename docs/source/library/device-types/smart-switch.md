@@ -71,6 +71,7 @@ Examples of this type of smart switch are:
 ```json
 {
   "calculation_strategy": "multi_switch",
+  "discovery_by": "device",
   "multi_switch_config": {
     "power": 0.8,
     "power_off": 0.25

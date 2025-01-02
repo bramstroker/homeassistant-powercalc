@@ -1,6 +1,7 @@
 {
   "name": "Kasa Smart Wi-Fi Power Strip",
   "device_type": "smart_switch",
+  "discovery_by": "device",
   "calculation_strategy": "multi_switch",
   "measure_method": "manual",
   "measure_device": "Kill-a-Watt",
@@ -14,5 +15,6 @@
   "aliases": [
     "HS300(US)"
   ],
+  "only_self_usage": true,
   "author": "Bram Gerritsen <bgerritsen@gmail.com>"
 }
