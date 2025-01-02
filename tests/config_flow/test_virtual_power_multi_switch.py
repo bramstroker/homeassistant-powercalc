@@ -1,15 +1,17 @@
 from unittest.mock import AsyncMock
 
+import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc import DiscoveryManager
-from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
@@ -19,9 +21,12 @@ from custom_components.powercalc.const import (
     CONF_POWER,
     CONF_POWER_OFF,
     CONF_SENSOR_TYPE,
+    DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.power_profile.library import ModelInfo
 from tests.common import get_test_config_dir, run_powercalc_setup
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
@@ -62,49 +67,55 @@ async def test_discovery_flow(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     hass.config.config_dir = get_test_config_dir()
-    manufacturer = "tp-link"
-    model = "HS300"
-    mock_entity_with_model_information(
-        "switch.test",
-        manufacturer,
-        model,
-        unique_id=DEFAULT_UNIQUE_ID,
-    )
+    device_entry = mock_device_with_switches(hass, 2, "tp-link", "HS300")
 
-    source_entity = await create_source_entity("switch.test", hass)
-    result = await initialize_discovery_flow(hass, source_entity, confirm_autodiscovered_model=True)
+    result = await initialize_device_discovery_flow(hass, device_entry)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MULTI_SWITCH
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_ENTITIES: ["switch.a", "switch.b"]},
+        {CONF_ENTITIES: ["switch.test1", "switch.test2"]},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
-        CONF_ENTITY_ID: "switch.test",
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_MANUFACTURER: manufacturer,
-        CONF_MODEL: model,
-        CONF_NAME: "test",
+        CONF_MANUFACTURER: "tp-link",
+        CONF_MODEL: "HS300",
+        CONF_NAME: "Test",
         CONF_MULTI_SWITCH: {
-            CONF_ENTITIES: ["switch.a", "switch.b"],
+            CONF_ENTITIES: ["switch.test1", "switch.test2"],
         },
     }
 
     assert hass.states.get("sensor.test_device_power")
 
-    hass.states.async_set("switch.a", STATE_ON)
+    hass.states.async_set("switch.test1", STATE_ON)
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_device_power").state == "0.82"
 
-    hass.states.async_set("switch.b", STATE_ON)
+    hass.states.async_set("switch.test2", STATE_ON)
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_device_power").state == "1.64"
+
+
+async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:
+    """When setting up multi switch, the switch entities should be automatically populated from the device."""
+    device_entry = mock_device_with_switches(hass, 4, "tp-link", "HS300")
+
+    result = await initialize_device_discovery_flow(hass, device_entry)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MULTI_SWITCH
+
+    schema_keys: list[vol.Marker] = list(result["data_schema"].schema.keys())
+    field_desc = schema_keys[schema_keys.index(vol.Marker(CONF_ENTITIES))].description
+    assert field_desc == {"suggested_value": ["switch.test1", "switch.test2", "switch.test3", "switch.test4"]}
 
 
 async def test_discovery_flow_once_per_unique_device(
@@ -113,34 +124,7 @@ async def test_discovery_flow_once_per_unique_device(
 ) -> None:
     hass.config.config_dir = get_test_config_dir()
 
-    device_id = "abcdef"
-    mock_device_registry(
-        hass,
-        {
-            device_id: DeviceEntry(
-                id=device_id,
-                manufacturer="tp-link",
-                model="HS300",
-            ),
-        },
-    )
-
-    entities: dict[str, RegistryEntry] = {}
-    for i in range(6):
-        entity_id = f"switch.test{i}"
-        entry = RegistryEntry(
-            id=entity_id,
-            entity_id=entity_id,
-            unique_id=f"{device_id}{i}",
-            device_id=device_id,
-            platform="switch",
-        )
-        entities[entity_id] = entry
-
-    mock_registry(
-        hass,
-        entities,
-    )
+    mock_device_with_switches(hass, 6, "tp-link", "HS300")
 
     discovery_manager = DiscoveryManager(hass, {})
     await discovery_manager.start_discovery()
@@ -204,3 +188,62 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
 
     assert hass.states.get("sensor.foo_bar_power")
     assert hass.states.get("sensor.foo_bar_energy")
+
+
+async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: DeviceEntry) -> FlowResult:
+    source_entity = SourceEntity(
+        object_id=device_entry.name,
+        name=device_entry.name,
+        entity_id=DUMMY_ENTITY_ID,
+        domain="sensor",
+        device_entry=device_entry,
+    )
+
+    power_profiles = [
+        await get_power_profile(
+            hass,
+            {},
+            ModelInfo(device_entry.manufacturer, device_entry.model),
+        ),
+    ]
+    return await initialize_discovery_flow(
+        hass,
+        source_entity,
+        power_profiles,
+        confirm_autodiscovered_model=True,
+    )
+
+
+def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufacturer: str = "test", model: str = "test") -> DeviceEntry:
+    device_id = "abcdef"
+    device_entry = DeviceEntry(
+        id=device_id,
+        manufacturer=manufacturer,
+        model=model,
+        name="Test",
+    )
+    mock_device_registry(
+        hass,
+        {
+            device_id: device_entry,
+        },
+    )
+
+    entities: dict[str, RegistryEntry] = {}
+    for i in range(num_switches):
+        entity_id = f"switch.test{i + 1}"
+        entry = RegistryEntry(
+            id=entity_id,
+            entity_id=entity_id,
+            unique_id=f"{device_id}{i + 1}",
+            device_id=device_id,
+            platform="switch",
+        )
+        entities[entity_id] = entry
+
+    mock_registry(
+        hass,
+        entities,
+    )
+
+    return device_entry
