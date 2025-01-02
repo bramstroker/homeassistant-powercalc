@@ -59,6 +59,30 @@ Following the example above, the following power values will be calculated:
 - ON: 0.7W
 - OFF: 0.3W
 
+## Smart switch with multiple relays
+
+Some smart switches have multiple relays, each controlling a different device.
+To integrate this you can utilize the [multi_switch](../../strategies/multi-switch.md) calculation strategy.
+
+Examples of this type of smart switch are:
+
+- TP-Link Kasa HS300
+
+```json
+{
+  "calculation_strategy": "multi_switch",
+  "multi_switch_config": {
+    "power": 0.8,
+    "power_off": 0.25
+  },
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "only_self_usage": true
+}
+```
+
 ## Measure
 
 Start by disconnecting the device from the smart switch, as we need to measure the power consumption of the smart switch itself, not the device it controls.
