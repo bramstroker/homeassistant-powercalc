@@ -156,7 +156,11 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
         get_test_profile_dir("vacuum"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity("vacuum.test", "test", "vacuum"),
+        RegistryEntry(
+            entity_id="vacuum.test",
+            unique_id="1234",
+            platform="xiaomi_miio",
+        ),
     )
 
 

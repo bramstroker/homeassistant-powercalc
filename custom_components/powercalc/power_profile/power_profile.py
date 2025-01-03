@@ -93,6 +93,14 @@ def get_device_types_from_domain(search_domain: str) -> set[DeviceType]:
     return set(DOMAIN_TO_DEVICE_TYPES.get(search_domain, {}))
 
 
+def get_entity_device_types(domain: str, entity_entry: RegistryEntry | None) -> set[DeviceType]:
+    device_types = get_device_types_from_domain(domain)
+    # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
+    if entity_entry and entity_entry.platform in ["hue", "osramlightify"] and entity_entry.domain == LIGHT_DOMAIN:
+        device_types.add(DeviceType.SMART_SWITCH)
+    return device_types
+
+
 class PowerProfile:
     def __init__(
         self,
@@ -373,11 +381,7 @@ class PowerProfile:
         if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
-        # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue", "osramlightify"] and domain == LIGHT_DOMAIN:
-            return True
-
-        return DEVICE_TYPE_DOMAIN.get(self.device_type) == domain
+        return self.device_type in get_entity_device_types(domain, entity_entry)
 
 
 class SubProfileSelector:
