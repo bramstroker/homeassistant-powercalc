@@ -9,6 +9,7 @@
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "power_meter",
+  "discovery_by": "device",
   "calculation_strategy": "fixed",
   "fixed_config": {
     "power": 0.642
