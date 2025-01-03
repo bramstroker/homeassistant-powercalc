@@ -548,7 +548,7 @@ async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aiorespon
     manufacturers = await library.find_manufacturers("my-alias")
     assert manufacturers == {"manufacturer1", "manufacturer2"}
 
-    model_listing = await library.get_model_listing("my-alias", "light")
+    model_listing = await library.get_model_listing("my-alias", {DeviceType.LIGHT})
     assert len(model_listing) == 2
 
     models = await library.find_models(ModelInfo("my-alias", "model1"))

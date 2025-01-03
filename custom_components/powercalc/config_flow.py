@@ -126,7 +126,7 @@ from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile
+from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile, get_entity_device_types
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .sensors.power import PowerSensor
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -987,10 +987,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create model schema."""
             manufacturer = str(self.sensor_config.get(CONF_MANUFACTURER))
             library = await ProfileLibrary.factory(self.hass)
-            models = [
-                selector.SelectOptionDict(value=model, label=model)
-                for model in await library.get_model_listing(manufacturer, self.source_entity.domain)  # type: ignore
-            ]
+            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
+            models = [selector.SelectOptionDict(value=model, label=model) for model in await library.get_model_listing(manufacturer, device_types)]
             return vol.Schema(
                 {
                     vol.Required(CONF_MODEL, default=self.sensor_config.get(CONF_MODEL)): selector.SelectSelector(

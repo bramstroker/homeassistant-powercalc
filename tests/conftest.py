@@ -138,7 +138,7 @@ def mock_entity_with_model_information(hass: HomeAssistant) -> MockEntityWithMod
 
         platform = "foo"
         if "platform" in entity_reg_kwargs:
-            unique_id = entity_reg_kwargs["platform"]
+            platform = entity_reg_kwargs["platform"]
             del entity_reg_kwargs["platform"]
 
         mock_registry(
