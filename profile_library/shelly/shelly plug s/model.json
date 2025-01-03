@@ -13,6 +13,9 @@
   "fixed_config": {
     "power": 0.89
   },
+  "aliases": [
+    "SHPLG-S"
+  ],
   "created_at": "2024-12-01T18:15:00",
   "author": "RubenKelevra <cyrond@gmail.com>"
 }
