@@ -61,4 +61,4 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         return self.switch_entities  # type: ignore
 
     def can_calculate_standby(self) -> bool:
-        return False
+        return self.off_power is not None

@@ -576,7 +576,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             standby_power = await self.calculate_standby_power(entity_state)
             self._standby_sensors[self.entity_id] = standby_power
 
-            if self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
+            if self._strategy_instance.can_calculate_standby() or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
                 return standby_power
 
         # Calculate actual power using configured strategy
