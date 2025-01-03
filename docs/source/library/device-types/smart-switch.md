@@ -67,14 +67,15 @@ To integrate this you can utilize the [multi_switch](../../strategies/multi-swit
 Examples of this type of smart switch are:
 
 - TP-Link Kasa HS300
+- Shelly 2.5
 
 ```json
 {
   "calculation_strategy": "multi_switch",
   "discovery_by": "device",
+  "standby_power": 0.25,
   "multi_switch_config": {
-    "power": 0.8,
-    "power_off": 0.25
+    "power": 0.8
   },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
@@ -83,6 +84,10 @@ Examples of this type of smart switch are:
   "only_self_usage": true
 }
 ```
+
+This configuration will set the self usage of the switch to 0.25W, for each relay which is activated 0.8W will be added.
+So assuming switch with 4 relays, and 2 are activated the following power values will be calculated:
+2 * 0.8 + 0.25 = 1.85W
 
 ## Measure
 
