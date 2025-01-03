@@ -205,14 +205,14 @@ class PowerCalculatorStrategyFactory:
 
         on_power: Decimal | None = multi_switch_config.get(CONF_POWER)
         off_power: Decimal | None = multi_switch_config.get(CONF_POWER_OFF)
-        if off_power is None or on_power is None:
+        if on_power is None:
             raise StrategyConfigurationError("No power configuration supplied")
 
         return MultiSwitchStrategy(
             self._hass,
             entities,
             on_power=Decimal(on_power),
-            off_power=Decimal(off_power),
+            off_power=Decimal(off_power) if off_power else None,
         )
 
     def _resolve_template(self, value: Any) -> Any:  # noqa: ANN401
