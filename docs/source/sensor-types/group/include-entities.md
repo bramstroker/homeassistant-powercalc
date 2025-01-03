@@ -11,6 +11,10 @@ In addition to that you can use filters to exclude certain entities.
 
     Powercalc will include any power sensors found in your HA installation matching the include rules. When you don't want that see [Exclude non powercalc sensors]
 
+Currently Powercalc will not dynamically reload the group when entities are added or removed from your HA installation.
+When you created the group using the GUI you can use the `Reload` button on the integration page for the corresponding config entry.
+If you used YAML you need to restart Home Assistant fully to reload the group.
+
 ## Include
 
 ### Area
