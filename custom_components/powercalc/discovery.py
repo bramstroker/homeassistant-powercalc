@@ -113,6 +113,7 @@ class DiscoveryManager:
         discovery_type: DiscoveryBy,
     ) -> None:
         """Generalized discovery procedure for entities and devices."""
+        _LOGGER.debug("Start discovery for %s", discovery_type)
         for source in await source_provider():
             try:
                 model_info = await self.extract_model_info_from_device_info(source)
@@ -203,6 +204,8 @@ class DiscoveryManager:
         power_profiles = []
         for model_info in models:
             profile = await get_power_profile(self.hass, {}, model_info=model_info, process_variables=False)
+            if profile:
+                _LOGGER.debug("Found power profile: %s/%s, discovery_by: %s", profile.manufacturer, profile.model, profile.discovery_by)
             if not profile or profile.discovery_by != discovery_type:  # pragma: no cover
                 continue
             if discovery_type == DiscoveryBy.ENTITY and not profile.is_entity_domain_supported(
