@@ -16,7 +16,7 @@ from .loader.composite import CompositeLoader
 from .loader.local import LocalLoader
 from .loader.protocol import Loader
 from .loader.remote import RemoteLoader
-from .power_profile import DeviceType, PowerProfile, get_device_types_from_domain
+from .power_profile import DeviceType, PowerProfile
 
 LEGACY_CUSTOM_DATA_DIRECTORY = "powercalc-custom-models"
 CUSTOM_DATA_DIRECTORY = "powercalc/profiles"
@@ -66,10 +66,8 @@ class ProfileLibrary:
 
         return CompositeLoader(loaders)
 
-    async def get_manufacturer_listing(self, entity_domain: str | None = None) -> list[str]:
+    async def get_manufacturer_listing(self, device_types: set[DeviceType] | None = None) -> list[str]:
         """Get listing of available manufacturers."""
-
-        device_types = get_device_types_from_domain(entity_domain) if entity_domain else None
         manufacturers = await self._loader.get_manufacturer_listing(device_types)
         return sorted(manufacturers)
 

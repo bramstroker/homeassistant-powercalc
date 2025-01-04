@@ -940,9 +940,10 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         async def _create_schema() -> vol.Schema:
             """Create manufacturer schema."""
             library = await ProfileLibrary.factory(self.hass)
+            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
             manufacturers = [
                 selector.SelectOptionDict(value=manufacturer, label=manufacturer)
-                for manufacturer in await library.get_manufacturer_listing(self.source_entity.domain)  # type: ignore
+                for manufacturer in await library.get_manufacturer_listing(device_types)
             ]
             return vol.Schema(
                 {

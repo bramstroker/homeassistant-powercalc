@@ -87,13 +87,9 @@ for device_type, domain in DEVICE_TYPE_DOMAIN.items():
     DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
 
 
-def get_device_types_from_domain(search_domain: str) -> set[DeviceType]:
-    return set(DOMAIN_TO_DEVICE_TYPES.get(search_domain, {}))
-
-
 def get_entity_device_types(entity_domain: str, entity_entry: RegistryEntry | None) -> set[DeviceType]:
     """Get the device types for a given entity domain."""
-    device_types = get_device_types_from_domain(entity_domain)
+    device_types = set(DOMAIN_TO_DEVICE_TYPES.get(entity_domain, {}))
     # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
     if entity_entry and entity_entry.platform in ["hue", "osramlightify"] and entity_domain == LIGHT_DOMAIN:
         device_types.add(DeviceType.SMART_SWITCH)
