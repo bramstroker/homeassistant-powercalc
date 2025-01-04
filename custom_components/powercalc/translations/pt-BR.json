@@ -69,16 +69,16 @@
         "title": "Configuração global",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
+          "create_energy_sensors": "Criar sensor de consumo",
           "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Desativar atributos estendidos",
           "disable_library_download": "Desativar download da biblioteca remota",
           "force_update_frequency": "Force update frequency",
           "ignore_unavailable_state": "Ignorar estado indisponível",
           "include_non_powercalc_sensors": "Incluir sensores não powercalc",
-          "power_sensor_category": "Power sensor category",
+          "power_sensor_category": "Categoria do sensor de energia",
           "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "power_sensor_naming": "Padrão de nome do sensor de energia"
         },
         "data_description": {
           "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
@@ -96,13 +96,13 @@
           "energy_integration_method": "Energy integration method",
           "energy_sensor_category": "Energy sensor category",
           "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
+          "energy_sensor_naming": "Padrão de nome do sensor de energia",
+          "energy_sensor_precision": "Precisão do sensor de energia",
           "energy_sensor_unit_prefix": "Energy sensor unit prefix"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "Opções do medidor de utilidade",
         "data": {
           "utility_meter_net_consumption": "Utility meter net consumption",
           "utility_meter_tariffs": "Utility meter tariffs",
@@ -155,8 +155,8 @@
         "data": {
           "main_power_sensor": "Mains power sensor",
           "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "create_energy_sensor": "Criar sensor de consumo",
+          "create_utility_meters": "Criar medidores de utilidade"
         },
         "data_description": {
           "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
@@ -169,7 +169,7 @@
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Entidades monitoradas"
         },
         "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
         "title": "Select power entities"
@@ -223,7 +223,7 @@
         "menu_options": {
           "group_custom": "Grupo padrão",
           "group_domain": "Grupo baseado em domínio",
-          "group_subtract": "Subtract",
+          "group_subtract": "Subtrair",
           "group_tracked_untracked": "Tracked/untracked power"
         },
         "title": "Escolha o tipo de grupo",
@@ -320,8 +320,8 @@
         "menu_options": {
           "daily_energy": "Consumo diário",
           "group": "Grupo",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
+          "global_configuration": "Configuração global",
+          "menu_group": "Grupo",
           "menu_library": "Potência virtual (biblioteca)",
           "real_power": "Consumo de um sensor de potência real",
           "virtual_power": "Potência virtual (manual)"
@@ -462,8 +462,8 @@
       "global_configuration": {
         "title": "Opções básicas",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
+          "create_energy_sensors": "Criar sensor de consumo",
+          "create_utility_meters": "Criar medidores de utilidade",
           "disable_extended_attributes": "Disable extended attributes",
           "disable_library_download": "Disable remote library download",
           "force_update_frequency": "Force update frequency",
