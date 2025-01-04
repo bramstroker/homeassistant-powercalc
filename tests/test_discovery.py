@@ -734,3 +734,44 @@ async def test_discovery_by_device(
     assert mock_calls[0][2]["data"][CONF_MODEL] == "discovery_type_device"
     assert mock_calls[0][2]["data"][CONF_UNIQUE_ID] == "pc_ABC123"
     assert len(mock_calls) == 1
+
+
+async def test_powercalc_sensors_are_ignored_for_discovery(
+    hass: HomeAssistant,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Powercalc sensors should not be considered for discovery"""
+    hass.config.config_dir = get_test_config_dir()
+
+    mock_device_registry(
+        hass,
+        {
+            "my-device": DeviceEntry(
+                id="my-device",
+                manufacturer="test",
+                model="generic-iot",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "sensor.test_powercalc": RegistryEntry(
+                entity_id="sensor.test_powercalc",
+                unique_id="1111",
+                platform="powercalc",
+                device_id="my-device",
+            ),
+            "sensor.test_other": RegistryEntry(
+                entity_id="sensor.test_other",
+                unique_id="2222",
+                platform="other-platform",
+                device_id="my-device",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(hass, {})
+
+    mock_calls = mock_flow_init.mock_calls
+    assert len(mock_calls) == 1
