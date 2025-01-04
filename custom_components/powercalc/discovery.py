@@ -114,7 +114,7 @@ class DiscoveryManager:
             if entity and entity.device_entry:
                 self.initialized_flows.add(f"pc_{entity.device_entry.primary_config_entry}")
                 self.initialized_flows.add(f"pc_{entity.device_entry.id}")
-            self.initialized_flows.add(entity.entity_id)
+            self.initialized_flows.add(entity_id)
 
     async def perform_discovery(
         self,
