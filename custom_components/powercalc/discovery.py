@@ -90,14 +90,7 @@ class DiscoveryManager:
 
     async def start_discovery(self) -> None:
         """Start the discovery procedure."""
-
-        # Build a list of config entries which are already setup, to prevent duplicate discovery flows
-        for entry in self.hass.config_entries.async_entries(DOMAIN):
-            if entry.unique_id:
-                self.initialized_flows.add(entry.unique_id)
-                entity_id = str(entry.data.get(CONF_ENTITY_ID))
-                if entity_id != DUMMY_ENTITY_ID:
-                    self.initialized_flows.add(entity_id)
+        await self.initialize_existing_entries()
 
         _LOGGER.debug("Start auto discovery")
 
@@ -105,6 +98,23 @@ class DiscoveryManager:
         await self.perform_discovery(self.get_devices, self.create_device_source, DiscoveryBy.DEVICE)  # type: ignore[arg-type]
 
         _LOGGER.debug("Done auto discovery")
+
+    async def initialize_existing_entries(self) -> None:
+        """Build a list of config entries which are already setup, to prevent duplicate discovery flows"""
+        for entry in self.hass.config_entries.async_entries(DOMAIN):
+            if not entry.unique_id:
+                continue
+
+            self.initialized_flows.add(entry.unique_id)
+            entity_id = entry.data.get(CONF_ENTITY_ID)
+            if not entity_id or entity_id == DUMMY_ENTITY_ID:
+                continue
+
+            entity = await create_source_entity(str(entity_id), self.hass)
+            if entity and entity.device_entry:
+                self.initialized_flows.add(f"pc_{entity.device_entry.primary_config_entry}")
+                self.initialized_flows.add(f"pc_{entity.device_entry.id}")
+            self.initialized_flows.add(entity.entity_id)
 
     async def perform_discovery(
         self,
