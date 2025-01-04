@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_SENSOR_TYPE,
     CONF_VARIABLES,
+    DUMMY_ENTITY_ID,
     CalculationStrategy,
     SensorType,
 )
@@ -193,6 +194,24 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_MANUFACTURER] == "signify"
     assert entry.data[CONF_MODEL] == "LWB010"
+
+
+async def test_source_entity_not_visible_in_options_when_discovery_by_device(hass: HomeAssistant) -> None:
+    """When discovery mode was by device, source entity should not be visible in options."""
+    hass.config.config_dir = get_test_config_dir()
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "discovery_type_device",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.BASIC_OPTIONS)
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert CONF_ENTITY_ID not in result["data_schema"].schema
 
 
 async def test_profile_with_custom_fields(
