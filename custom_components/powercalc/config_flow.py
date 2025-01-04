@@ -2000,6 +2000,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 },
             )
 
+        if self.source_entity_id == DUMMY_ENTITY_ID:
+            return SCHEMA_POWER_OPTIONS
+
         return vol.Schema(  # type: ignore
             {
                 vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
