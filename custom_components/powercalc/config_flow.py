@@ -630,8 +630,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not self.strategy:
             raise ValueError("No strategy selected")  # pragma: no cover
 
-        if hasattr(self, f"create_schema_{self.strategy.value.lower()}"):
-            return getattr(self, f"create_schema_{self.strategy.value.lower()}")()  # type: ignore
+        if hasattr(self, f"create_schema_{self.strategy.lower()}"):
+            return getattr(self, f"create_schema_{self.strategy.lower()}")()  # type: ignore
 
         return STRATEGY_SCHEMAS[self.strategy]
 
