@@ -12,10 +12,11 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
+from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
-from .filter import EntityFilter, NullFilter, get_filtered_entity_list
+from .filter import CompositeFilter, DomainFilter, EntityFilter, LambdaFilter, get_filtered_entity_list
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,12 +33,12 @@ async def find_entities(
 
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
-    source_entities = await get_filtered_entity_list(hass, entity_filter or NullFilter())
+    source_entities = await get_filtered_entity_list(hass, _build_filter(entity_filter))
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
 
-    source_entity_powercalc_entity_map: dict[str, list] = domain_data[DATA_CONFIGURED_ENTITIES]
-    powercalc_entities: dict[str, Entity] = domain_data[DATA_ENTITIES]
+    source_entity_powercalc_entity_map: dict[str, list] = domain_data.get(DATA_CONFIGURED_ENTITIES, {})
+    powercalc_entities: dict[str, Entity] = domain_data.get(DATA_ENTITIES, {})
     for source_entity in source_entities:
         if source_entity.entity_id in source_entity_powercalc_entity_map:
             resolved_entities.extend(source_entity_powercalc_entity_map[source_entity.entity_id])
@@ -51,7 +52,7 @@ async def find_entities(
             device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
-            elif device_class == SensorDeviceClass.ENERGY and source_entity.platform != "utility_meter":
+            elif device_class == SensorDeviceClass.ENERGY:
                 resolved_entities.append(RealEnergySensor(source_entity.entity_id))
 
         power_profile = await get_power_profile_by_source_entity(
@@ -62,3 +63,16 @@ async def find_entities(
             discoverable_entities.append(source_entity.entity_id)
 
     return resolved_entities, discoverable_entities
+
+
+def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
+    base_filter = CompositeFilter(
+        [
+            DomainFilter(DEVICE_TYPE_DOMAIN.values()),
+            LambdaFilter(lambda entity: entity.platform != "utility_meter"),
+        ],
+    )
+    if not entity_filter:
+        return base_filter
+
+    return CompositeFilter([base_filter, entity_filter])

@@ -775,3 +775,56 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
 
     mock_calls = mock_flow_init.mock_calls
     assert len(mock_calls) == 1
+
+
+@pytest.mark.parametrize(
+    "entity_entries,expected_entities",
+    [
+        (
+            [
+                RegistryEntry(
+                    entity_id="switch.test",
+                    unique_id="1111",
+                    platform="hue",
+                    device_id="hue-device",
+                ),
+            ],
+            ["switch.test"],
+        ),
+        # Entity domains that are not supported must be ignored
+        (
+            [
+                RegistryEntry(
+                    entity_id="scene.test",
+                    unique_id="1111",
+                    platform="hue",
+                    device_id="hue-device",
+                ),
+                RegistryEntry(
+                    entity_id="event.test",
+                    unique_id="2222",
+                    platform="hue",
+                    device_id="hue-device",
+                ),
+            ],
+            [],
+        ),
+        # Powercalc sensors should not be considered for discovery
+        (
+            [
+                RegistryEntry(
+                    entity_id="sensor.test",
+                    unique_id="1111",
+                    platform="powercalc",
+                    device_id="some-device",
+                ),
+            ],
+            [],
+        ),
+    ],
+)
+async def test_get_entities(hass: HomeAssistant, entity_entries: list[RegistryEntry], expected_entities: list[str]) -> None:
+    mock_registry(hass, {entity_entry.entity_id: entity_entry for entity_entry in entity_entries})
+    discovery_manager = DiscoveryManager(hass, {})
+    entity_ids = [entity.entity_id for entity in await discovery_manager.get_entities()]
+    assert entity_ids == expected_entities

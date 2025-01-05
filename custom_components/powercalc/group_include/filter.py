@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from enum import StrEnum
 from typing import Protocol, cast
 
@@ -109,11 +109,11 @@ class EntityFilter(Protocol):
 
 
 class DomainFilter(EntityFilter):
-    def __init__(self, domain: str | list) -> None:
-        self.domain = domain
+    def __init__(self, domain: str | Iterable[str]) -> None:
+        self.domain = domain if isinstance(domain, str) else set(domain)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        if isinstance(self.domain, list):
+        if isinstance(self.domain, set):
             return entity.domain in self.domain
         return entity.domain == self.domain
 
