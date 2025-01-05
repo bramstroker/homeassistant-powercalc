@@ -43,7 +43,10 @@ async def test_create_linear_sensor_entry(hass: HomeAssistant) -> None:
 
 async def test_create_linear_sensor_error_mandatory_fields(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.LINEAR)
-    result = await set_virtual_power_configuration(hass, result, {CONF_MIN_POWER: 20})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_MIN_POWER: 20},
+    )
 
     assert result["errors"]
     assert result["errors"]["base"] == "linear_mandatory"

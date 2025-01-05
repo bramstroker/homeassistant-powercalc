@@ -64,6 +64,9 @@ async def test_lut_manual_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
 
+    # Assign group step
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
     # Advanced options step
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
 

@@ -901,6 +901,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             if callable(form_step.next_step):
                 next_step = await form_step.next_step(user_input)
             if not next_step:
+                if form_step.continue_advanced_step:
+                    return await self.async_step_power_advanced()
                 if form_step.continue_utility_meter_options_step and self.sensor_config.get(CONF_CREATE_UTILITY_METERS):
                     return await self.async_step_utility_meter_options()
                 return self.persist_config_entry()
@@ -1042,7 +1044,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
             return await self.async_step_multi_switch()
 
-        return await self.async_step_power_advanced()
+        return await self.async_step_assign_groups()
 
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for custom fields."""
@@ -1098,6 +1100,20 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
+            ),
+            user_input,
+        )
+
+    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for assigning groups."""
+        schema = vol.Schema({vol.Optional(CONF_GROUP): self.create_group_selector(multiple=True)})
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.ASSIGN_GROUPS,
+                schema=schema,
+                continue_advanced_step=True,
+                #continue_utility_meter_options_step=True,
             ),
             user_input,
         )
@@ -1178,7 +1194,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             PowercalcFormStep(
                 step=STRATEGY_STEP_MAPPING[strategy],
                 schema=schema,
-                next_step=Step.POWER_ADVANCED,
+                next_step=Step.ASSIGN_GROUPS,
                 validate_user_input=_validate,
             ),
             user_input,
@@ -1453,19 +1469,6 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
                 schema=SCHEMA_DAILY_ENERGY,
                 validate_user_input=_validate,
                 next_step=Step.ASSIGN_GROUPS,
-            ),
-            user_input,
-        )
-
-    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
-        """Handle the flow for assigning groups."""
-        schema = vol.Schema({vol.Optional(CONF_GROUP): self.create_group_selector(multiple=True)})
-
-        return await self.handle_form_step(
-            PowercalcFormStep(
-                step=Step.ASSIGN_GROUPS,
-                schema=schema,
-                continue_utility_meter_options_step=True,
             ),
             user_input,
         )
