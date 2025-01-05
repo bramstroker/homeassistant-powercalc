@@ -115,7 +115,6 @@ class DiscoveryManager:
 
             entity = await create_source_entity(str(entity_id), self.hass)
             if entity and entity.device_entry:
-                self.initialized_flows.add(f"pc_{entity.device_entry.primary_config_entry}")
                 self.initialized_flows.add(f"pc_{entity.device_entry.id}")
             self.initialized_flows.add(entity_id)
 
@@ -147,7 +146,11 @@ class DiscoveryManager:
                 )
 
                 if self._is_already_discovered(source_entity, unique_id):
-                    _LOGGER.debug("%s: Already setup with discovery, skipping", log_identifier)
+                    _LOGGER.debug(
+                        "%s: Already setup with discovery, skipping new discovery (unique_id=%s)",
+                        log_identifier,
+                        unique_id,
+                    )
                     continue
 
                 self._init_entity_discovery(model_info, unique_id, source_entity, log_identifier, power_profiles, {})
@@ -192,7 +195,7 @@ class DiscoveryManager:
         if discovery_type == DiscoveryBy.DEVICE:
             device_id = source.object_id
             if source.device_entry:
-                device_id = source.device_entry.primary_config_entry or source.device_entry.id
+                device_id = source.device_entry.id
             return f"pc_{device_id}"
 
         return get_or_create_unique_id({}, source, power_profile)
