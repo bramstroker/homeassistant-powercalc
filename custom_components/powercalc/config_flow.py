@@ -139,6 +139,7 @@ CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
 
 class Step(StrEnum):
     ADVANCED_OPTIONS = "advanced_options"
+    ASSIGN_GROUPS = "assign_groups"
     BASIC_OPTIONS = "basic_options"
     GROUP_CUSTOM = "group_custom"
     GROUP_DOMAIN = "group_domain"
@@ -1441,22 +1442,29 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Handle the flow for daily energy sensor."""
         self.selected_sensor_type = SensorType.DAILY_ENERGY
 
-        schema = SCHEMA_DAILY_ENERGY.extend(
-            {
-                vol.Optional(CONF_GROUP): self.create_group_selector(),
-            },
-        )
-
         async def _validate(user_input: dict[str, Any]) -> dict[str, Any]:
             if CONF_VALUE not in user_input and CONF_VALUE_TEMPLATE not in user_input:
                 raise SchemaFlowError("daily_energy_mandatory")
-            return self.build_daily_energy_config(user_input, schema)
+            return self.build_daily_energy_config(user_input, SCHEMA_DAILY_ENERGY)
 
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.DAILY_ENERGY,
-                schema=schema,
+                schema=SCHEMA_DAILY_ENERGY,
                 validate_user_input=_validate,
+                next_step=Step.ASSIGN_GROUPS,
+            ),
+            user_input,
+        )
+
+    async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for assigning groups."""
+        schema = vol.Schema({vol.Optional(CONF_GROUP): self.create_group_selector(multiple=True)})
+
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.ASSIGN_GROUPS,
+                schema=schema,
                 continue_utility_meter_options_step=True,
             ),
             user_input,

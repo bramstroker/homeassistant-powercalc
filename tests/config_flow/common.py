@@ -178,6 +178,27 @@ async def goto_virtual_power_strategy_step(
     return result
 
 
+async def process_config_flow(
+    hass: HomeAssistant,
+    result: FlowResult | None,
+    user_inputs: dict[Step, dict],
+) -> dict:
+    if not result:
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_USER},
+        )
+
+    for step, user_input in user_inputs.items():
+        assert result["type"] == data_entry_flow.FlowResultType.FORM
+        assert result["step_id"] == step
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            user_input,
+        )
+    return result
+
+
 async def set_virtual_power_configuration(
     hass: HomeAssistant,
     previous_result: FlowResult,

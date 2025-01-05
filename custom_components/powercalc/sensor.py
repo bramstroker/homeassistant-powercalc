@@ -141,7 +141,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
-from .sensors.group.config_entry_utils import add_to_associated_group
+from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
@@ -324,7 +324,7 @@ async def async_setup_entry(
     )
 
     # Add entry to an existing group
-    await add_to_associated_group(hass, entry)
+    await add_to_associated_groups(hass, entry)
 
 
 async def _async_setup_entities(

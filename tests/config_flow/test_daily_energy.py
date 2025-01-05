@@ -26,6 +26,7 @@ from custom_components.powercalc.const import (
 from tests.config_flow.common import (
     create_mock_entry,
     initialize_options_flow,
+    process_config_flow,
     select_menu_item,
 )
 
@@ -46,15 +47,18 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -
 async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
-    user_input = {
-        CONF_NAME: "My daily energy sensor",
-        CONF_VALUE: 0.5,
-        CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
-        CONF_CREATE_UTILITY_METERS: False,
-    }
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input,
+    result = await process_config_flow(
+        hass,
+        result,
+        {
+            Step.DAILY_ENERGY: {
+                CONF_NAME: "My daily energy sensor",
+                CONF_VALUE: 0.5,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+                CONF_CREATE_UTILITY_METERS: False,
+            },
+            Step.ASSIGN_GROUPS: {},
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -99,19 +103,22 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
 async def test_on_time_option(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
-    user_input = {
-        CONF_NAME: "My daily energy sensor",
-        CONF_VALUE: 10,
-        CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
-        CONF_ON_TIME: {
-            "hours": 10,
-            "minutes": 20,
-            "seconds": 30,
+    result = await process_config_flow(
+        hass,
+        result,
+        {
+            Step.DAILY_ENERGY: {
+                CONF_NAME: "My daily energy sensor",
+                CONF_VALUE: 10,
+                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+                CONF_ON_TIME: {
+                    "hours": 10,
+                    "minutes": 20,
+                    "seconds": 30,
+                },
+            },
+            Step.ASSIGN_GROUPS: {},
         },
-    }
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input,
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -125,21 +132,20 @@ async def test_on_time_option(hass: HomeAssistant) -> None:
 async def test_utility_meter_options(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
-    user_input = {
-        CONF_NAME: "My daily energy sensor",
-        CONF_VALUE: 10,
-        CONF_CREATE_UTILITY_METERS: True,
-    }
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input,
-    )
-
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await process_config_flow(
+        hass,
+        result,
         {
-            CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
-            CONF_UTILITY_METER_TYPES: [DAILY],
+            Step.DAILY_ENERGY: {
+                CONF_NAME: "My daily energy sensor",
+                CONF_VALUE: 10,
+                CONF_CREATE_UTILITY_METERS: True,
+            },
+            Step.ASSIGN_GROUPS: {},
+            Step.UTILITY_METER_OPTIONS: {
+                CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
+                CONF_UTILITY_METER_TYPES: [DAILY],
+            },
         },
     )
 
@@ -173,17 +179,22 @@ async def test_add_to_group(hass: HomeAssistant) -> None:
 
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
 
-    user_input = {
-        CONF_NAME: "My daily energy sensor",
-        CONF_VALUE: 10,
-        CONF_GROUP: group_entry.entry_id,
-    }
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input,
+    result = await process_config_flow(
+        hass,
+        result,
+        {
+            Step.DAILY_ENERGY: {
+                CONF_NAME: "My daily energy sensor",
+                CONF_VALUE: 10,
+            },
+            Step.ASSIGN_GROUPS: {
+                CONF_GROUP: [group_entry.entry_id],
+            },
+        },
     )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_GROUP] == group_entry.entry_id
+    assert result["data"][CONF_GROUP] == [group_entry.entry_id]
     config_entry: ConfigEntry = result["result"]
 
     group_entry = hass.config_entries.async_get_entry(group_entry.entry_id)

@@ -50,7 +50,7 @@ async def remove_group_from_power_sensor_entry(
     return entries_to_update
 
 
-async def add_to_associated_group(
+async def add_to_associated_groups(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
 ) -> ConfigEntry | None:
@@ -64,7 +64,28 @@ async def add_to_associated_group(
     if CONF_GROUP not in config_entry.data or not config_entry.data.get(CONF_GROUP):
         return None
 
-    group_entry_id = str(config_entry.data.get(CONF_GROUP))
+    groups: list[str] | str = config_entry.data.get(CONF_GROUP)
+    if not isinstance(groups, list):
+        groups = [groups]
+
+    for group_entry_id in groups:
+        group_entry = await add_to_associated_group(hass, config_entry, group_entry_id)
+        if group_entry:
+            _LOGGER.debug(
+                "ConfigEntry %s: Added to group %s.",
+                config_entry.title,
+                group_entry.title,
+            )
+
+
+async def add_to_associated_group(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    group_entry_id: str,
+) -> ConfigEntry | None:
+    """When the user has set a group on a virtual power config entry,
+    we need to add this config entry to the group members sensors and update the group.
+    """
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
 
     # When we are not dealing with a uuid, the user has set a group name manually
