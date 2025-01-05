@@ -32,6 +32,9 @@ async def find_entities(
 
     resolved_entities: list[Entity] = []
     discoverable_entities: list[str] = []
+    # new_filter = DomainFilter(DEVICE_TYPE_DOMAIN.values())
+    # if entity_filter:
+    #     new_filter = CompositeFilter([new_filter, entity_filter], FilterOperator.OR)
     source_entities = await get_filtered_entity_list(hass, entity_filter or NullFilter())
     if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
         _LOGGER.debug("Found possible include entities: %s", [entity.entity_id for entity in source_entities])
