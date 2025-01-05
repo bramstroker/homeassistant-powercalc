@@ -34,7 +34,8 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
-    process_config_flow, select_menu_item,
+    process_config_flow,
+    select_menu_item,
     set_virtual_power_configuration,
 )
 from tests.conftest import MockEntityWithModel
@@ -245,7 +246,7 @@ async def test_profile_with_custom_fields(
             },
             Step.ASSIGN_GROUPS: {},
             Step.POWER_ADVANCED: {},
-        }
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

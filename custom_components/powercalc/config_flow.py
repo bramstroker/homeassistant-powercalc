@@ -1113,7 +1113,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 step=Step.ASSIGN_GROUPS,
                 schema=schema,
                 continue_advanced_step=True,
-                #continue_utility_meter_options_step=True,
+                # continue_utility_meter_options_step=True,
             ),
             user_input,
         )

@@ -27,7 +27,8 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
-    process_config_flow, select_menu_item,
+    process_config_flow,
+    select_menu_item,
     set_virtual_power_configuration,
 )
 
