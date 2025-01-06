@@ -13,6 +13,7 @@ from enum import StrEnum
 from typing import Any, cast
 
 import voluptuous as vol
+from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, ConfigFlow, ConfigFlowResult, OptionsFlow
@@ -29,6 +30,8 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
+)
+from homeassistant.const import (
     __version__ as HAVERSION,
 )
 from homeassistant.core import callback
@@ -37,7 +40,6 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from awesomeversion import AwesomeVersion
 
 from .common import SourceEntity, create_source_entity
 from .const import (
@@ -1677,7 +1679,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         super().__init__()
-        if AwesomeVersion(HAVERSION) < '2024.12':
+        if AwesomeVersion(HAVERSION) < "2024.12":
             self.config_entry = config_entry
         self.sensor_config = dict(config_entry.data)
         self.sensor_type: SensorType = self.sensor_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
