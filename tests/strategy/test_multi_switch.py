@@ -10,10 +10,10 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.powercalc import PowerCalculatorStrategyFactory
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import CONF_MULTI_SWITCH, CONF_POWER, CONF_POWER_OFF, CalculationStrategy
 from custom_components.powercalc.errors import StrategyConfigurationError
+from custom_components.powercalc.strategy.factory import PowerCalculatorStrategyFactory
 from custom_components.powercalc.strategy.multi_switch import MultiSwitchStrategy
 from tests.common import run_powercalc_setup
 
@@ -34,6 +34,22 @@ async def test_calculate_sum(hass: HomeAssistant) -> None:
     assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal(0.50)
     assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal(1.00)
     assert await strategy.calculate(State(switch3, STATE_ON)) == Decimal(1.50)
+
+
+async def test_calculate_sum_without_off_power(hass: HomeAssistant) -> None:
+    switch1 = "switch.test1"
+    switch2 = "switch.test2"
+
+    strategy = MultiSwitchStrategy(
+        hass,
+        [switch1, switch2],
+        on_power=Decimal(0.5),
+    )
+
+    assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal(0.50)
+    assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal(1.00)
+    assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal(0.50)
+    assert await strategy.calculate(State(switch2, STATE_OFF)) == Decimal(0.00)
 
 
 async def test_setup_using_yaml(hass: HomeAssistant) -> None:
@@ -72,17 +88,6 @@ async def test_setup_using_yaml(hass: HomeAssistant) -> None:
             CONF_MULTI_SWITCH: {
                 CONF_POWER: 0.5,
                 CONF_POWER_OFF: 1,
-            },
-        },
-        {
-            CONF_NAME: "My sensor",
-            CONF_MULTI_SWITCH: {
-                CONF_POWER: 0.5,
-                CONF_ENTITIES: [
-                    "switch.test1",
-                    "switch.test2",
-                    "switch.test3",
-                ],
             },
         },
         {

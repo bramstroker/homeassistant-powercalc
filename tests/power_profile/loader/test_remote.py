@@ -16,6 +16,7 @@ from homeassistant.helpers.storage import STORAGE_DIR
 
 from custom_components.powercalc.helpers import get_library_json_path, get_library_path
 from custom_components.powercalc.power_profile.error import LibraryLoadingError, ProfileDownloadError
+from custom_components.powercalc.power_profile.library import ModelInfo, ProfileLibrary
 from custom_components.powercalc.power_profile.loader.remote import ENDPOINT_DOWNLOAD, ENDPOINT_LIBRARY, RemoteLoader
 from custom_components.powercalc.power_profile.power_profile import DeviceType
 from tests.common import get_test_config_dir, get_test_profile_dir
@@ -75,7 +76,7 @@ async def mock_download_profile_endpoints(mock_aioresponse: aioresponses) -> lis
     )
 
     for remote_file in remote_files:
-        with open(get_test_profile_dir("signify-LCA001") + f"/{remote_file['path']}", "rb") as f:
+        with open(get_test_profile_dir("signify_LCA001") + f"/{remote_file['path']}", "rb") as f:
             mock_aioresponse.get(
                 remote_file["url"],
                 status=200,
@@ -475,10 +476,10 @@ async def test_profile_redownloaded_when_model_json_corrupt_retry_limit(
 @pytest.mark.parametrize(
     "manufacturer,phrases,expected_models,library_dir",
     [
-        ("apple", {"HomePod (gen 2)"}, ["MQJ83"], None),
-        ("apple", {"Non existing model"}, [], None),
-        ("signify", {"LCA001", "LCT010"}, ["LCT010", "LCA001"], None),
-        ("test_manu", {"CCT Light"}, ["model1", "model2"], "multi-profile"),
+        ("apple", {"HomePod (gen 2)"}, {"MQJ83"}, None),
+        ("apple", {"Non existing model"}, set(), None),
+        ("signify", {"LCA001", "LCT010"}, {"LCT010", "LCA001"}, None),
+        ("test_manu", {"CCT Light"}, {"model1", "model2"}, "multi_profile"),
     ],
 )
 @pytest.mark.skip_remote_loader_mocking
@@ -508,3 +509,47 @@ def clear_storage_dir(storage_path: str) -> None:
     if not os.path.exists(storage_path):
         return
     shutil.rmtree(storage_path, ignore_errors=True)
+
+
+async def test_multiple_manufacturer_aliases(hass: HomeAssistant, mock_aioresponse: aioresponses) -> None:
+    mock_aioresponse.get(
+        ENDPOINT_LIBRARY,
+        status=200,
+        payload={
+            "manufacturers": [
+                {
+                    "name": "manufacturer1",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+                {
+                    "name": "manufacturer2",
+                    "aliases": ["my-alias"],
+                    "models": [
+                        {
+                            "id": "model1",
+                            "device_type": "light",
+                            "updated_at": "2021-01-01T00:00:00",
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+
+    library = await ProfileLibrary.factory(hass)
+
+    manufacturers = await library.find_manufacturers("my-alias")
+    assert manufacturers == {"manufacturer1", "manufacturer2"}
+
+    model_listing = await library.get_model_listing("my-alias", {DeviceType.LIGHT})
+    assert len(model_listing) == 2
+
+    models = await library.find_models(ModelInfo("my-alias", "model1"))
+    assert models == {ModelInfo("manufacturer1", "model1"), ModelInfo("manufacturer2", "model1")}

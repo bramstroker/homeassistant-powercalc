@@ -4,23 +4,132 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import StrEnum
+from typing import Any
 
-from homeassistant.const import CONF_ENTITY_ID, STATE_OFF
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
+from homeassistant.const import CONF_ATTRIBUTE, CONF_CONDITION, CONF_ENTITY_ID, STATE_OFF
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.condition import ConditionCheckerType
 from homeassistant.helpers.event import TrackTemplate
 from homeassistant.helpers.template import Template
 
-from .playbook import PlaybookStrategy
-from .strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.const import CONF_FIXED, CONF_LINEAR, CONF_MODE, CONF_MULTI_SWITCH, CONF_PLAYBOOK, CONF_STRATEGIES, CONF_WLED
+from custom_components.powercalc.strategy.fixed import CONFIG_SCHEMA as FIXED_SCHEMA
+from custom_components.powercalc.strategy.linear import CONFIG_SCHEMA as LINEAR_SCHEMA
+from custom_components.powercalc.strategy.multi_switch import CONFIG_SCHEMA as MULTI_SWITCH_SCHEMA
+from custom_components.powercalc.strategy.playbook import CONFIG_SCHEMA as PLAYBOOK_SCHEMA
+from custom_components.powercalc.strategy.playbook import PlaybookStrategy
+from custom_components.powercalc.strategy.strategy_interface import PowerCalculationStrategyInterface
+from custom_components.powercalc.strategy.wled import CONFIG_SCHEMA as WLED_SCHEMA
 
 _LOGGER = logging.getLogger(__name__)
 
 
+class CompositeMode(StrEnum):
+    STOP_AT_FIRST = "stop_at_first"
+    SUM_ALL = "sum_all"
+
+
+DEFAULT_MODE = CompositeMode.STOP_AT_FIRST
+
+
+def make_entity_id_optional(schema: vol.Schema) -> vol.Schema:
+    """Make entity_id optional in schema."""
+    schema = schema.schema
+    schema[vol.Optional(CONF_ENTITY_ID)] = schema.pop(vol.Required(CONF_ENTITY_ID))  # type: ignore
+    return vol.Schema(schema)
+
+
+def get_numeric_state_schema() -> vol.Schema:
+    """Return the numeric state condition schema. We need to modify it to make entity_id optional."""
+    return make_entity_id_optional(cv.NUMERIC_STATE_CONDITION_SCHEMA.validators[0])
+
+
+def get_state_condition_attribute_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+    """Return the state attribute condition schema. We need to modify it to make entity_id optional."""
+    return make_entity_id_optional(cv.STATE_CONDITION_ATTRIBUTE_SCHEMA)(value)  # type: ignore
+
+
+def get_state_condition_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+    """Return the state condition schema. We need to modify it to make entity_id optional."""
+    return make_entity_id_optional(cv.STATE_CONDITION_STATE_SCHEMA)(value)  # type: ignore
+
+
+def get_state_schema(value: Any) -> dict[str, Any]:  # noqa: ANN401
+    """Validate a state condition."""
+    if not isinstance(value, dict):
+        raise vol.Invalid("Expected a dictionary")  # pragma: no cover
+
+    if CONF_ATTRIBUTE in value:
+        validated: dict[str, Any] = get_state_condition_attribute_schema(value)
+    else:
+        validated = get_state_condition_state_schema(value)
+
+    return cv.key_dependency("for", "state")(validated)
+
+
+CONDITION_SCHEMA: vol.Schema = vol.Schema(
+    vol.Any(
+        vol.All(
+            cv.expand_condition_shorthand,
+            cv.key_value_schemas(
+                CONF_CONDITION,
+                {
+                    "and": cv.AND_CONDITION_SCHEMA,
+                    "device": cv.DEVICE_CONDITION_SCHEMA,
+                    "not": cv.NOT_CONDITION_SCHEMA,
+                    "numeric_state": get_numeric_state_schema(),
+                    "or": cv.OR_CONDITION_SCHEMA,
+                    "state": get_state_schema,
+                    "sun": cv.SUN_CONDITION_SCHEMA,
+                    "template": cv.TEMPLATE_CONDITION_SCHEMA,
+                    "zone": cv.ZONE_CONDITION_SCHEMA,
+                },
+            ),
+        ),
+        cv.dynamic_template_condition_action,
+    ),
+)
+
+ITEM_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_CONDITION): CONDITION_SCHEMA,
+        vol.Optional(CONF_FIXED): FIXED_SCHEMA,
+        vol.Optional(CONF_LINEAR): LINEAR_SCHEMA,
+        vol.Optional(CONF_WLED): WLED_SCHEMA,
+        vol.Optional(CONF_PLAYBOOK): PLAYBOOK_SCHEMA,
+        vol.Optional(CONF_MULTI_SWITCH): MULTI_SWITCH_SCHEMA,
+    },
+)
+
+CONFIG_SCHEMA = vol.Any(
+    vol.All(
+        cv.ensure_list,
+        [
+            ITEM_SCHEMA,
+        ],
+    ),
+    vol.Schema(
+        {
+            vol.Optional(CONF_MODE, default=DEFAULT_MODE): vol.In([cls.value for cls in CompositeMode]),
+            vol.Optional(CONF_STRATEGIES): vol.All(
+                cv.ensure_list,
+                [
+                    ITEM_SCHEMA,
+                ],
+            ),
+        },
+    ),
+)
+
+
 class CompositeStrategy(PowerCalculationStrategyInterface):
-    def __init__(self, hass: HomeAssistant, strategies: list[SubStrategy]) -> None:
+    def __init__(self, hass: HomeAssistant, strategies: list[SubStrategy], mode: CompositeMode) -> None:
         self.hass = hass
         self.strategies = strategies
+        self.mode = mode
         self.playbook_strategies: list[PlaybookStrategy] = [
             strategy.strategy for strategy in self.strategies if isinstance(strategy.strategy, PlaybookStrategy)
         ]
@@ -29,6 +138,7 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
         """Calculate power consumption based on entity state."""
         await self.stop_active_playbooks()
 
+        total = Decimal(0)
         for sub_strategy in self.strategies:
             strategy = sub_strategy.strategy
 
@@ -38,13 +148,14 @@ class CompositeStrategy(PowerCalculationStrategyInterface):
             if isinstance(strategy, PlaybookStrategy):
                 await self.activate_playbook(strategy)
 
-            if entity_state.state == STATE_OFF and strategy.can_calculate_standby():
-                return await strategy.calculate(entity_state)
+            if (entity_state.state == STATE_OFF and strategy.can_calculate_standby()) or entity_state.state != STATE_OFF:
+                value = await strategy.calculate(entity_state)
+                if value is not None:
+                    if self.mode == CompositeMode.STOP_AT_FIRST:
+                        return value
+                    total += value
 
-            if entity_state.state != STATE_OFF:
-                return await strategy.calculate(entity_state)
-
-        return None
+        return total if self.mode == CompositeMode.SUM_ALL else None
 
     async def stop_active_playbooks(self) -> None:
         """Stop any active playbooks from sub strategies."""

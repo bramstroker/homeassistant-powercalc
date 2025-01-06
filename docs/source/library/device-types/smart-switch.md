@@ -51,15 +51,43 @@ Note the sensor_naming configuration which will make sure the entities are named
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.7
-  }
+  "only_self_usage": true
 }
 ```
 
 Following the example above, the following power values will be calculated:
 - ON: 0.7W
 - OFF: 0.3W
+
+## Smart switch with multiple relays
+
+Some smart switches have multiple relays, each controlling a different device.
+To integrate this you can utilize the [multi_switch](../../strategies/multi-switch.md) calculation strategy.
+
+Examples of this type of smart switch are:
+
+- TP-Link Kasa HS300
+- Shelly 2.5
+
+```json
+{
+  "calculation_strategy": "multi_switch",
+  "discovery_by": "device",
+  "standby_power": 0.25,
+  "multi_switch_config": {
+    "power": 0.8
+  },
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "only_self_usage": true
+}
+```
+
+This configuration will set the self usage of the switch to 0.25W, for each relay which is activated 0.8W will be added.
+So assuming switch with 4 relays, and 2 are activated the following power values will be calculated:
+2 * 0.8 + 0.25 = 1.85W
 
 ## Measure
 

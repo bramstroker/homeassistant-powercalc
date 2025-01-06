@@ -60,7 +60,7 @@
         "data_description": {
           "power": "A fixed power value in Watts when the entity is ON",
           "power_template": "Template will be evaluated to get the power value in W",
-          "states_power": "One 'state: power' pair on each row, see example above"
+          "states_power": "One 'state: power' pair on each row, see [docs](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
         },
         "description": "Define a fixed power value for your entity. Alternatively you can define a power value per state. For example:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Fixed config"
@@ -355,7 +355,7 @@
         "data_description": {
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "group": "Fill in a custom group name to create a new group",
           "name": "Leaving blank will take the name from the source entity",
           "standby_power": "Define the amount of power the device is consuming when in an OFF state"
@@ -423,7 +423,7 @@
         "data_description": {
           "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
+          "entity_id": "Entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
           "name": "Leaving blank will take the name from the source entity",
           "standby_power": "Define the amount of power the device is consuming when in an OFF state"
         }
@@ -456,7 +456,7 @@
           "power": "A fixed power value in Watts when the entity is ON",
           "power_template": "Template will be evaluated to get the power value in W",
           "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
-          "states_power": "One 'state: power' pair on each row, see example above"
+          "states_power": "One 'state: power' pair on each row, see [docs](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
         }
       },
       "global_configuration": {
@@ -567,7 +567,7 @@
           "basic_options": "Basic options",
           "daily_energy": "Daily energy options",
           "fixed": "Fixed options",
-          "group": "Group options",
+          "group_custom": "Group options",
           "group_subtract": "Group options",
           "group_tracked_untracked": "Group options",
           "group_tracked_untracked_manual": "Tracked entities",

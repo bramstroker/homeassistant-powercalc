@@ -1,5 +1,7 @@
 # Library structure
 
+The library is structured in a multi level tree structure. The top level is the manufacturer, followed by the model id and optionally sub profiles.
+Manufacturer directory must hae a `manufacturer.json` file which contains the manufacturer name and optionally aliases.
 Each power profile has it's own subdirectory `{manufacturer}/{modelid}`. i.e. signify/LCT010, containing a `model.json` file and optionally CSV files for the LUT calculation strategy.
 
 ## model.json
@@ -20,16 +22,13 @@ Required fields are:
 You can use `aliases` to define alternative model names, which will be used during discovery.
 This can be helpful when same model is reported differently depending on the integration. For example, the same light bulb could be reported differently by the Hue integration compared to the deCONZ integration.
 
+By default Powercalc discovers on a "per entity" basis.
+This can cause issues when a device has multiple entities, causing multiple discoveries for the same device.
+When a profile does not have to be bound to a specific entity (light, switch etc.), you can set `discovery_by` to `device`.
+This will cause Powercalc to discover on a "per device" basis, which is more reliable.
+This setting is recommended for device types which map to `sensor` domain entities, these are: `network`, `power_meter` and `generic_iot`.
+
 ## Sub profiles
 
 Some profiles might have multiple profiles. This is useful when a device has different power consumption based on the state of the device.
-This can be used for example for different infrared modes of a light.
-
-Each sub profile has it's own subdirectory `{manufacturer}/{modelid}/{subprofile}`, which contains a `model.json` file.
-You can also define `sub_profile_select` in the main `model.json` to automatically select the sub profile based on the state of the device.
-When no `sub_profile_select` is defined, the user will be asked to select the sub profile during discovery.
-
-Examples:
-
-- [lifx/LIFX A19 Night Vision](https://github.com/bramstroker/homeassistant-powercalc/tree/master/profile_library/lifx/LIFX%20A19%20Night%20Vision)
-- [eufy/T8400](https://github.com/bramstroker/homeassistant-powercalc/tree/master/profile_library/eufy/T8400)
+See [sub profiles](sub-profiles.md) for more information.

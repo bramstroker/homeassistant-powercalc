@@ -4,8 +4,9 @@ import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 
-from custom_components.powercalc.common import create_source_entity
+from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -13,11 +14,13 @@ from custom_components.powercalc.const import (
     CONF_MODEL,
     CONF_SENSOR_TYPE,
     CONF_SUB_PROFILE,
+    DUMMY_ENTITY_ID,
     SensorType,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.library import ModelInfo
+from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
@@ -178,3 +181,42 @@ async def test_autodiscovered_option_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert not entry.data[CONF_CREATE_ENERGY_SENSOR]
+
+
+async def test_discovery_by_device(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+
+    device_entry = DeviceEntry(
+        name="FooBar",
+        id="youless-device",
+        manufacturer="test",
+        model="discovery_type_device",
+    )
+    source_entity = SourceEntity(
+        object_id=device_entry.name,
+        name=device_entry.name,
+        entity_id=DUMMY_ENTITY_ID,
+        domain="sensor",
+        device_entry=device_entry,
+    )
+    power_profiles = [
+        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
+    ]
+    result = await initialize_discovery_flow(hass, source_entity, power_profiles)
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+        CONF_MANUFACTURER: "test",
+        CONF_MODEL: "discovery_type_device",
+        CONF_NAME: "FooBar",
+    }
+
+    assert hass.states.get("sensor.foobar_device_power")

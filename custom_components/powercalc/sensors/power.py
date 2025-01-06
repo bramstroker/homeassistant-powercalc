@@ -69,7 +69,6 @@ from custom_components.powercalc.const import (
     CONF_SLEEP_POWER,
     CONF_STANDBY_POWER,
     CONF_UNAVAILABLE_POWER,
-    DATA_CALCULATOR_FACTORY,
     DATA_DISCOVERY_MANAGER,
     DATA_STANDBY_POWER_SENSORS,
     DEFAULT_POWER_SENSOR_PRECISION,
@@ -88,6 +87,7 @@ from custom_components.powercalc.errors import (
 from custom_components.powercalc.helpers import evaluate_power
 from custom_components.powercalc.power_profile.factory import get_power_profile
 from custom_components.powercalc.power_profile.power_profile import (
+    DiscoveryBy,
     PowerProfile,
     SubProfileSelectConfig,
     SubProfileSelector,
@@ -156,9 +156,9 @@ async def create_virtual_power_sensor(
         )
         entity_category: str | None = sensor_config.get(CONF_POWER_SENSOR_CATEGORY) or None
         strategy = detect_calculation_strategy(sensor_config, power_profile)
-        calculation_strategy_factory: PowerCalculatorStrategyFactory = hass.data[DOMAIN][DATA_CALCULATOR_FACTORY]
+        calculation_strategy_factory = PowerCalculatorStrategyFactory.get_instance(hass)
 
-        standby_power, standby_power_on = _get_standby_power(sensor_config, power_profile)
+        standby_power, standby_power_on = _get_standby_power(sensor_config, strategy, power_profile)
 
         _LOGGER.debug(
             "Creating power sensor (entity_id=%s entity_category=%s, sensor_name=%s strategy=%s manufacturer=%s model=%s unique_id=%s)",
@@ -210,7 +210,7 @@ async def _get_power_profile(
 
     power_profile = None
     try:
-        model_info = await discovery_manager.extract_model_info_from_entity(source_entity.entity_entry)
+        model_info = await discovery_manager.extract_model_info_from_device_info(source_entity.entity_entry)
         power_profile = await get_power_profile(
             hass,
             sensor_config,
@@ -250,6 +250,7 @@ async def _select_sub_profile(
 
 def _get_standby_power(
     sensor_config: ConfigType,
+    strategy: CalculationStrategy,
     power_profile: PowerProfile | None,
 ) -> tuple[Template | Decimal, Decimal]:
     """Retrieve standby power settings from sensor config or power profile."""
@@ -491,7 +492,6 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
         template: Template | str = self._sensor_config.get(CONF_CALCULATION_ENABLED_CONDITION)  # type: ignore
         if isinstance(template, str):
-            template = template.replace("[[entity]]", self.source_entity)
             template = Template(template, self.hass)
 
         self._calculation_enabled_condition = template
@@ -507,7 +507,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             self._sleep_power_timer()
             self._sleep_power_timer = None
 
-        if self.source_entity == DUMMY_ENTITY_ID:
+        discovery_by = self._power_profile.discovery_by if self._power_profile else DiscoveryBy.ENTITY
+        if self.source_entity == DUMMY_ENTITY_ID and discovery_by == DiscoveryBy.ENTITY:
             state = State(self.source_entity, STATE_ON)
 
         if not state or not self._has_valid_state(state):
@@ -551,6 +552,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
 
     async def calculate_power(self, state: State) -> Decimal | None:
         """Calculate power consumption using configured strategy."""
+        assert self._strategy_instance is not None
+
+        # Resolve the relevant entity state
         entity_state = state
         if (
             self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
@@ -559,31 +563,41 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         ):
             return None
 
+        # Handle unavailable power
         unavailable_power = self._sensor_config.get(CONF_UNAVAILABLE_POWER)
         if entity_state.state == STATE_UNAVAILABLE and unavailable_power is not None:
             return Decimal(unavailable_power)
 
-        is_calculation_enabled = await self.is_calculation_enabled()
-        if entity_state.state in OFF_STATES or not is_calculation_enabled:
+        # Handle standby power
+        standby_power = None
+        if entity_state.state in OFF_STATES or not await self.is_calculation_enabled():
             if isinstance(self._strategy_instance, PlaybookStrategy):
                 await self._strategy_instance.stop_playbook()
             standby_power = await self.calculate_standby_power(entity_state)
             self._standby_sensors[self.entity_id] = standby_power
-            return standby_power
 
-        assert self._strategy_instance is not None
+            if self._strategy_instance.can_calculate_standby() or self._calculation_strategy != CalculationStrategy.MULTI_SWITCH:
+                return standby_power
+
+        # Calculate actual power using configured strategy
         power = await self._strategy_instance.calculate(entity_state)
         if power is None:
             return None
 
+        # Add standby power if available
+        if standby_power:
+            power += standby_power
+
+        # Apply multiply factor to power
         if self._multiply_factor:
             power *= Decimal(self._multiply_factor)
 
-        if self._standby_power_on:
-            standby_power = self._standby_power_on
+        # Add standby power-on adjustments if applicable
+        if self._standby_power_on and not standby_power:
+            additional_standby_power = self._standby_power_on
             if self._multiply_factor_standby and self._multiply_factor:
-                standby_power *= Decimal(self._multiply_factor)
-            power += standby_power
+                additional_standby_power *= Decimal(self._multiply_factor)
+            power += additional_standby_power
 
         return Decimal(power)
 

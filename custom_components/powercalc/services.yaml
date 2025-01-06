@@ -117,3 +117,6 @@ get_group_entities:
     entity:
       domain: sensor
       integration: powercalc
+update_library:
+  name: Update profile library
+  description: Update the profile library and reinitialize discovery

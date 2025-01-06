@@ -29,12 +29,9 @@ jobs:
           python -m pip install -r ${{ github.workspace }}/.github/scripts/profile_library/requirements.txt
       - name: Pull again
         run: git pull || true
-      - name: Generate library.json
+      - name: Update library.json, authors and translations
         run: |
-          python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library-json.py
-      - name: Update authors
-        run: |
-          python3 ${{ github.workspace }}/.github/scripts/profile_library/update-authors.py
+          python3 ${{ github.workspace }}/.github/scripts/profile_library/update-library.py
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/master'
         with:

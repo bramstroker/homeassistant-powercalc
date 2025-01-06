@@ -5,8 +5,9 @@ import logging
 import os
 import re
 from collections import defaultdict
+from dataclasses import dataclass
 from enum import StrEnum
-from typing import NamedTuple, Protocol, cast
+from typing import Any, NamedTuple, Protocol, cast
 
 from homeassistant.components.binary_sensor import DOMAIN as BINARY_SENSOR_DOMAIN
 from homeassistant.components.camera import DOMAIN as CAMERA_DOMAIN
@@ -36,6 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 class DeviceType(StrEnum):
     CAMERA = "camera"
     COVER = "cover"
+    GENERIC_IOT = "generic_iot"
     LIGHT = "light"
     POWER_METER = "power_meter"
     PRINTER = "printer"
@@ -46,6 +48,11 @@ class DeviceType(StrEnum):
     VACUUM_ROBOT = "vacuum_robot"
 
 
+class DiscoveryBy(StrEnum):
+    DEVICE = "device"
+    ENTITY = "entity"
+
+
 class SubProfileMatcherType(StrEnum):
     ATTRIBUTE = "attribute"
     ENTITY_ID = "entity_id"
@@ -53,9 +60,18 @@ class SubProfileMatcherType(StrEnum):
     INTEGRATION = "integration"
 
 
+@dataclass(frozen=True)
+class CustomField:
+    key: str
+    label: str
+    selector: dict[str, Any]
+    description: str | None = None
+
+
 DEVICE_TYPE_DOMAIN = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
+    DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
@@ -66,15 +82,18 @@ DEVICE_TYPE_DOMAIN = {
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
 
-DOMAIN_TO_DEVICE_TYPE = {domain: device_type for device_type, domain in DEVICE_TYPE_DOMAIN.items()}
-
 DOMAIN_TO_DEVICE_TYPES = defaultdict(set)
 for device_type, domain in DEVICE_TYPE_DOMAIN.items():
     DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
 
 
-def get_device_types_from_domain(search_domain: str) -> set[DeviceType]:
-    return set(DOMAIN_TO_DEVICE_TYPES.get(search_domain, {}))
+def get_entity_device_types(entity_domain: str, entity_entry: RegistryEntry | None) -> set[DeviceType]:
+    """Get the device types for a given entity domain."""
+    device_types = set(DOMAIN_TO_DEVICE_TYPES.get(entity_domain, {}))
+    # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
+    if entity_entry and entity_entry.platform in ["hue", "osramlightify"] and entity_domain == LIGHT_DOMAIN:
+        device_types.add(DeviceType.SMART_SWITCH)
+    return device_types
 
 
 class PowerProfile:
@@ -104,56 +123,65 @@ class PowerProfile:
 
     @property
     def manufacturer(self) -> str:
+        """Get the manufacturer of this profile."""
         return self._manufacturer
 
     @property
     def model(self) -> str:
+        """Get the model of this profile."""
         return self._model
 
     @property
     def unique_id(self) -> str:
+        """Get the unique id of this profile."""
         return self._json_data.get("unique_id") or f"{self._manufacturer}_{self._model}"
 
     @property
     def name(self) -> str:
+        """Get the name of this profile."""
         return self._json_data.get("name") or ""
 
     @property
     def json_data(self) -> ConfigType:
+        """Get the raw json data."""
         return self._json_data
 
     @property
     def standby_power(self) -> float:
+        """Get the standby power when the device is off."""
         return self._json_data.get("standby_power") or 0
 
     @property
     def standby_power_on(self) -> float:
-        return self._json_data.get("standby_power_on") or 0
+        """Get the standby power (self usage) when the device is on."""
+        standby_power_on = self._json_data.get("standby_power_on")
+        if standby_power_on is None and self.only_self_usage:
+            return self.standby_power
+        return standby_power_on or 0
 
     @property
     def calculation_strategy(self) -> CalculationStrategy:
-        """Get the calculation strategy this profile provides.
-        supported modes is here for BC purposes.
-        """
-        if "calculation_strategy" in self._json_data:
-            return CalculationStrategy(str(self._json_data.get("calculation_strategy")))
-        return CalculationStrategy.LUT
+        """Get the calculation strategy this profile provides"""
+        return CalculationStrategy(str(self._json_data.get("calculation_strategy", CalculationStrategy.LUT)))
 
     @property
-    def linked_lut(self) -> str | None:
-        return self._json_data.get("linked_lut")
+    def linked_profile(self) -> str | None:
+        """Get the linked profile."""
+        return self._json_data.get("linked_profile", self._json_data.get("linked_lut"))  # type: ignore[no-any-return]
 
     @property
     def calculation_enabled_condition(self) -> str | None:
+        """Get the condition to enable the calculation."""
         return self._json_data.get("calculation_enabled_condition")
 
     @property
     def aliases(self) -> list[str]:
+        """Get a list of aliases for this model."""
         return self._json_data.get("aliases") or []
 
     @property
     def linear_config(self) -> ConfigType | None:
-        """Get configuration to setup linear strategy."""
+        """Get configuration to set up linear strategy."""
         config = self.get_strategy_config(CalculationStrategy.LINEAR)
         if config is None:
             return {CONF_MIN_POWER: 0, CONF_MAX_POWER: 0}
@@ -161,12 +189,12 @@ class PowerProfile:
 
     @property
     def multi_switch_config(self) -> ConfigType | None:
-        """Get configuration to setup linear strategy."""
+        """Get configuration to set up multi_switch strategy."""
         return self.get_strategy_config(CalculationStrategy.MULTI_SWITCH)
 
     @property
     def fixed_config(self) -> ConfigType | None:
-        """Get configuration to setup fixed strategy."""
+        """Get configuration to set up fixed strategy."""
         config = self.get_strategy_config(CalculationStrategy.FIXED)
         if config is None and self.standby_power_on:
             return {CONF_POWER: 0}
@@ -174,15 +202,16 @@ class PowerProfile:
 
     @property
     def composite_config(self) -> list | None:
-        """Get configuration to setup composite strategy."""
+        """Get configuration to set up composite strategy."""
         return cast(list, self._json_data.get("composite_config"))
 
     @property
     def playbook_config(self) -> ConfigType | None:
-        """Get configuration to setup playbook strategy."""
+        """Get configuration to set up playbook strategy."""
         return self.get_strategy_config(CalculationStrategy.PLAYBOOK)
 
     def get_strategy_config(self, strategy: CalculationStrategy) -> ConfigType | None:
+        """Get configuration for a certain strategy."""
         if not self.is_strategy_supported(strategy):
             raise UnsupportedStrategyError(
                 f"Strategy {strategy} is not supported by model: {self._model}",
@@ -203,9 +232,13 @@ class PowerProfile:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
         """
-        return self.is_strategy_supported(
-            CalculationStrategy.FIXED,
-        ) and not self._json_data.get("fixed_config")
+        return (
+            self.is_strategy_supported(
+                CalculationStrategy.FIXED,
+            )
+            and not self._json_data.get("fixed_config")
+            and not self.only_self_usage
+        )
 
     @property
     def needs_linear_config(self) -> bool:
@@ -218,6 +251,7 @@ class PowerProfile:
 
     @property
     def device_type(self) -> DeviceType | None:
+        """Get the device type of this profile."""
         device_type = self._json_data.get("device_type")
         if not device_type:
             return DeviceType.LIGHT
@@ -228,7 +262,27 @@ class PowerProfile:
             return None
 
     @property
+    def discovery_by(self) -> DiscoveryBy:
+        return DiscoveryBy(self._json_data.get("discovery_by", DiscoveryBy.ENTITY))
+
+    @property
+    def only_self_usage(self) -> bool:
+        """Whether this profile only provides self usage."""
+        return bool(self._json_data.get("only_self_usage", False))
+
+    @property
+    def has_custom_fields(self) -> bool:
+        """Whether this profile has custom fields."""
+        return bool(self._json_data.get("fields"))
+
+    @property
+    def custom_fields(self) -> list[CustomField]:
+        """Get the custom fields of this profile."""
+        return [CustomField(key=key, **field) for key, field in self._json_data.get("fields", {}).items()]
+
+    @property
     def config_flow_discovery_remarks(self) -> str | None:
+        """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")
         if not remarks and self.device_type == DeviceType.SMART_SWITCH:
             translations = translation.async_get_cached_translations(
@@ -256,6 +310,7 @@ class PowerProfile:
 
     @property
     async def has_sub_profiles(self) -> bool:
+        """Check whether this profile has sub profiles."""
         return len(await self.get_sub_profiles()) > 0
 
     @property
@@ -296,6 +351,20 @@ class PowerProfile:
 
         self.sub_profile = sub_profile
 
+    @property
+    async def needs_user_configuration(self) -> bool:
+        """Check whether this profile needs user configuration."""
+        if self.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+            return True
+
+        if self.needs_fixed_config or self.needs_linear_config:
+            return True
+
+        if self.has_custom_fields:
+            return True
+
+        return await self.has_sub_profiles and not self.sub_profile_select
+
     def is_entity_domain_supported(self, entity_entry: RegistryEntry) -> bool:
         """Check whether this power profile supports a given entity domain."""
         if self.device_type is None:
@@ -307,11 +376,7 @@ class PowerProfile:
         if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
-        # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-        if self.device_type == DeviceType.SMART_SWITCH and entity_entry.platform in ["hue"] and domain == LIGHT_DOMAIN:
-            return True
-
-        return DEVICE_TYPE_DOMAIN.get(self.device_type) == domain
+        return self.device_type in get_entity_device_types(domain, entity_entry)
 
 
 class SubProfileSelector:

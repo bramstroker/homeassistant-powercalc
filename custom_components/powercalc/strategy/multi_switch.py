@@ -31,7 +31,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         hass: HomeAssistant,
         switch_entities: list[str],
         on_power: Decimal,
-        off_power: Decimal,
+        off_power: Decimal | None = None,
     ) -> None:
         self.hass = hass
         self.switch_entities = switch_entities
@@ -53,7 +53,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
                 return Decimal(0)
             if state == STATE_ON:
                 return self.on_power
-            return self.off_power
+            return self.off_power or Decimal(0)
 
         return Decimal(sum(_get_power(state) for state in self.known_states.values()))
 
@@ -61,4 +61,4 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         return self.switch_entities  # type: ignore
 
     def can_calculate_standby(self) -> bool:
-        return True
+        return self.off_power is not None

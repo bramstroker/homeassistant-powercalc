@@ -18,16 +18,17 @@ class CompositeLoader(Loader):
 
         return {manufacturer for loader in self.loaders for manufacturer in await loader.get_manufacturer_listing(device_types)}
 
-    async def find_manufacturer(self, search: str) -> str | None:
+    async def find_manufacturers(self, search: str) -> set[str]:
         """Check if a manufacturer is available. Also must check aliases."""
 
         search = search.lower()
+        found_manufacturers = set()
         for loader in self.loaders:
-            manufacturer = await loader.find_manufacturer(search)
-            if manufacturer:
-                return manufacturer
+            manufacturers = await loader.find_manufacturers(search)
+            if manufacturers:
+                found_manufacturers.update(manufacturers)
 
-        return None
+        return found_manufacturers
 
     async def get_model_listing(self, manufacturer: str, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of available models for a given manufacturer."""
@@ -42,11 +43,11 @@ class CompositeLoader(Loader):
 
         return None
 
-    async def find_model(self, manufacturer: str, search: set[str]) -> list[str]:
+    async def find_model(self, manufacturer: str, search: set[str]) -> set[str]:
         """Find the model in the library."""
 
-        models = []
+        models = set()
         for loader in self.loaders:
-            models.extend(await loader.find_model(manufacturer, search))
+            models.update(await loader.find_model(manufacturer, search))
 
         return models

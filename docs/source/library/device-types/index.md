@@ -4,7 +4,9 @@ Here you can find information about how to setup specific device types for the l
 
 ## :material-camera: [Camera](camera.md)
 
-## :material-blinds-horizontal: Cover
+## :material-blinds-horizontal: [Cover](cover.md)
+
+## :material-access-point: [Generic IoT](generic-iot.md)
 
 ## :material-lightbulb: [Light](light.md)
 

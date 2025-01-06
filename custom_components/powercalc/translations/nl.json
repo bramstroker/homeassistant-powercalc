@@ -60,7 +60,7 @@
         "data_description": {
           "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
           "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
-          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
+          "states_power": "Eén 'status: vermogen' paar op elke rij, zie [documentatie](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
         },
         "description": "Definieer een vast vermogen (in W) voor je entiteit. Eventueel kan je ook een vermogen per status instellen. Bijvoorbeeld:\n\n`playing: 8.3`\n`paused: 2.25`",
         "title": "Gefixeerde configuratie"
@@ -456,7 +456,7 @@
           "power": "Een vastgestelde vermogen in Watt wanneer de gekoppelde entiteit AAN is",
           "power_template": "Template die geëvalueerd wordt om het vermogen (W) te bepalen",
           "self_usage_included": "Of het opgegeven vermogen ook het energieverbruik omvat dat door de slimme schakelaar zelf wordt verbruikt.",
-          "states_power": "Eén 'status: vermogen' paar op elke rij, zie het voorbeeld boven"
+          "states_power": "Eén 'status: vermogen' paar op elke rij, zie [documentatie](https://docs.powercalc.nl/strategies/fixed/#power-per-state)"
         }
       },
       "global_configuration": {
@@ -567,7 +567,7 @@
           "basic_options": "Basisopties",
           "daily_energy": "Dagelijkse energie opties",
           "fixed": "Fixed opties",
-          "group": "Groep opties",
+          "group_custom": "Groep opties",
           "group_subtract": "Groep opties",
           "group_tracked_untracked": "Groep opties",
           "group_tracked_untracked_manual": "Bijgehouden entiteiten",

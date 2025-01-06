@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from enum import StrEnum
 from typing import Protocol, cast
 
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.components.group import DOMAIN as GROUP_DOMAIN
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID, CONF_DOMAIN, EntityCategory
@@ -34,6 +36,19 @@ from custom_components.powercalc.errors import SensorConfigurationError
 class FilterOperator(StrEnum):
     AND = "and"
     OR = "or"
+
+
+FILTER_CONFIG = vol.Schema(
+    {
+        vol.Optional(CONF_ALL): None,
+        vol.Optional(CONF_AREA): cv.string,
+        vol.Optional(CONF_GROUP): cv.entity_id,
+        vol.Optional(CONF_DOMAIN): vol.Any(vol.All(cv.ensure_list, [cv.string]), cv.string),
+        vol.Optional(CONF_LABEL): cv.string,
+        vol.Optional(CONF_TEMPLATE): cv.template,
+        vol.Optional(CONF_WILDCARD): cv.string,
+    },
+)
 
 
 def create_composite_filter(
@@ -94,11 +109,11 @@ class EntityFilter(Protocol):
 
 
 class DomainFilter(EntityFilter):
-    def __init__(self, domain: str | list) -> None:
-        self.domain = domain
+    def __init__(self, domain: str | Iterable[str]) -> None:
+        self.domain = domain if isinstance(domain, str) else set(domain)
 
     def is_valid(self, entity: RegistryEntry) -> bool:
-        if isinstance(self.domain, list):
+        if isinstance(self.domain, set):
             return entity.domain in self.domain
         return entity.domain == self.domain
 

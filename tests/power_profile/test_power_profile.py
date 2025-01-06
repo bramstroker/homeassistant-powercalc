@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant, State
@@ -28,7 +30,7 @@ async def test_load_lut_profile_from_custom_directory(hass: HomeAssistant) -> No
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("signify", "LCA001"),
-        get_test_profile_dir("signify-LCA001"),
+        get_test_profile_dir("signify_LCA001"),
     )
     assert power_profile.calculation_strategy == CalculationStrategy.LUT
     assert power_profile.manufacturer == "signify"
@@ -154,7 +156,11 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
         get_test_profile_dir("vacuum"),
     )
     assert power_profile.is_entity_domain_supported(
-        SourceEntity("vacuum.test", "test", "vacuum"),
+        RegistryEntry(
+            entity_id="vacuum.test",
+            unique_id="1234",
+            platform="xiaomi_miio",
+        ),
     )
 
 
@@ -162,7 +168,7 @@ async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssis
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
         ModelInfo("test", "test"),
-        get_test_profile_dir("unknown-device-type"),
+        get_test_profile_dir("unknown_device_type"),
     )
     assert not power_profile.is_entity_domain_supported(
         SourceEntity("switch.test", "test", "switch"),
@@ -309,3 +315,73 @@ async def test_device_type(hass: HomeAssistant) -> None:
     )
 
     assert power_profile.device_type == DeviceType.SMART_SPEAKER
+
+
+@pytest.mark.parametrize(
+    "json_data,expected_result",
+    [
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.COMPOSITE,
+                "fields": {
+                    "foo": {
+                        "label": "Foo",
+                        "selector": {"entity": {}},
+                    },
+                },
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.FIXED,
+                "fixed_config": {
+                    "power": 50,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "linear_config": {
+                    "min_power": 50,
+                    "max_power": 100,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.MULTI_SWITCH,
+                "multi_switch_config": {
+                    "power": 0.725,
+                    "power_off": 0.225,
+                },
+            },
+            True,
+        ),
+    ],
+)
+async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str, Any], expected_result: bool) -> None:
+    power_profile = PowerProfile(
+        hass,
+        manufacturer="test",
+        model="test",
+        directory=get_test_profile_dir("media_player"),
+        json_data=json_data,
+    )
+
+    assert await power_profile.needs_user_configuration == expected_result

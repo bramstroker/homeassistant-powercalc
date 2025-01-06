@@ -49,6 +49,7 @@ from custom_components.powercalc.const import (
     ENTRY_DATA_POWER_ENTITY,
     SensorType,
 )
+from custom_components.powercalc.group_include.include import find_entities
 from custom_components.test.light import MockLight
 from tests.common import (
     create_discoverable_light,
@@ -1285,6 +1286,50 @@ async def test_include_logs_warning(hass: HomeAssistant, caplog: pytest.LogCaptu
     error_messages = [record for record in caplog.records if record.levelno == logging.ERROR]
     assert len(error_messages) == 0
     assert "Could not resolve any entities in group" in caplog.text
+
+
+async def test_irrelevant_entity_domains_are_skipped(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.DEBUG)
+
+    mock_device_registry(
+        hass,
+        {
+            "device-a": DeviceEntry(
+                id="device-a",
+                manufacturer="Signify",
+                model="LCT012",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="2222",
+                platform="hue",
+                device_id="device-a",
+            ),
+            "scene.test": RegistryEntry(
+                entity_id="scene.test",
+                unique_id="3333",
+                platform="hue",
+                device_id="device-a",
+            ),
+            "event.test": RegistryEntry(
+                entity_id="event.test",
+                unique_id="4444",
+                platform="hue",
+                device_id="device-a",
+            ),
+        },
+    )
+    _, discoverable_entities = await find_entities(hass)
+    assert len(discoverable_entities) == 1
+    assert "light.test" in discoverable_entities
+
+    assert "scene.test" not in caplog.text
+    assert "event.test" not in caplog.text
 
 
 def _create_powercalc_config_entry(

@@ -1,0 +1,15 @@
+{
+  "calculation_strategy": "lut",
+  "created_at": "2024-11-01T13:42:17.382127",
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Shelly PM1 Mini",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.14.10:docker"
+  },
+  "name": "tint GU10 spot white+color",
+  "standby_power": 1.27,
+  "author": "Amjad Saadeh <amjad@saadeh.dev>"
+}

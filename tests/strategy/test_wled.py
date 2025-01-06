@@ -4,7 +4,7 @@ import pytest
 from homeassistant.components import sensor
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, ConfigEntry
-from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_ON
+from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.device_registry import DeviceEntry
@@ -268,3 +268,47 @@ async def test_yaml_configuration(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.test_power").state == "0.25"
+
+
+async def test_estimated_current_sensor_unavailable(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Test that a warning is logged when estimated current sensor is unavailable."""
+
+    caplog.set_level(logging.WARNING)
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1234",
+                platform="light",
+                device_id="wled-device-id",
+            ),
+            "sensor.test_current": RegistryEntry(
+                entity_id="sensor.test_current",
+                unique_id="1234",
+                platform="sensor",
+                device_id="wled-device-id",
+                unit_of_measurement="mA",
+                original_device_class=SensorDeviceClass.CURRENT,
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.test",
+            CONF_WLED: {
+                CONF_VOLTAGE: 5,
+                CONF_POWER_FACTOR: 1,
+            },
+        },
+    )
+
+    hass.states.async_set("sensor.test_current", STATE_UNAVAILABLE)
+    hass.states.async_set("light.test", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert "light.test: Estimated current entity sensor.test_current is not available" in caplog.text
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE

@@ -9,7 +9,7 @@ from homeassistant.helpers.template import Template
 
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.const import DUMMY_ENTITY_ID, CalculationStrategy
-from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id
+from custom_components.powercalc.helpers import evaluate_power, get_or_create_unique_id, make_hashable
 
 
 @pytest.mark.parametrize(
@@ -53,3 +53,15 @@ async def test_wled_unique_id() -> None:
         source_entity = SourceEntity("wled", "light.wled", "light", device_entry=device_entry)
         unique_id = get_or_create_unique_id({}, source_entity, mock_instance)
         assert unique_id == "pc_123456"
+
+
+@pytest.mark.parametrize(
+    "value,output",
+    [
+        ({"a", "b", "c"}, frozenset({"a", "b", "c"})),
+        (["a", "b", "c"], ("a", "b", "c")),
+        ({"a": 1, "b": 2}, frozenset([("a", 1), ("b", 2)])),
+    ],
+)
+async def test_make_hashable(value: set | list | dict, output: tuple | frozenset) -> None:
+    assert make_hashable(value) == output

@@ -11,28 +11,16 @@
     "created_at"
   ],
   "properties": {
-    "created_at": {
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Aliases for this model"
+    },
+    "calculation_enabled_condition": {
       "type": "string",
-      "format": "date-time",
-      "description": "Creation date of the profile"
-    },
-    "name": {
-      "type": "string",
-      "description": "The full name"
-    },
-    "description": {
-      "type": "string",
-      "description": "A short description of the device"
-    },
-    "standby_power": {
-      "type": "number",
-      "minimum": 0.05,
-      "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
-    },
-    "standby_power_on": {
-      "type": "number",
-      "minimum": 0.05,
-      "description": "Power draw when the device is turned on."
+      "description": "Template which can be evaluated."
     },
     "calculation_strategy": {
       "type": "string",
@@ -45,39 +33,69 @@
       ],
       "description": "Supported calculation strategies"
     },
-    "measure_method": {
-      "type": "string",
-      "enum": [
-        "manual",
-        "script"
-      ],
-      "description": "How the device was measured"
+    "composite_config": {
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "Configuration for composite calculation strategy",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": {
+                "$ref": "#/definitions/condition"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "sum_all",
+                "stop_at_first"
+              ]
+            },
+            "strategies": {
+              "type": "array",
+              "description": "Configuration for composite calculation strategy",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "condition": {
+                    "$ref": "#/definitions/condition"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "mode",
+            "strategies"
+          ]
+        }
+      ]
     },
-    "measure_device": {
+    "config_flow_discovery_remarks": {
       "type": "string",
-      "description": "Device which was used to measure"
+      "description": "Some remarks to show in the GUI config flow on first step of discovery"
     },
-    "measure_device_firmware": {
+    "created_at": {
       "type": "string",
-      "description": "Firmware version of the device used to measure"
+      "format": "date-time",
+      "description": "Creation date of the profile"
     },
-    "measure_description": {
+    "description": {
       "type": "string",
-      "description": "Add more information about how you measured the device or any remarks"
-    },
-    "measure_settings": {
-      "type": "object",
-      "description": "Settings used for measure script"
-    },
-    "linked_lut": {
-      "type": "string",
-      "description": "Use LUT data files from another model"
+      "description": "A short description of the device"
     },
     "device_type": {
       "type": "string",
       "enum": [
         "camera",
         "cover",
+        "generic_iot",
         "light",
         "power_meter",
         "printer",
@@ -89,31 +107,53 @@
       ],
       "description": "Type of device"
     },
-    "calculation_enabled_condition": {
+    "discovery_by": {
       "type": "string",
-      "description": "Template which can be evaluated."
+      "enum": [
+        "device",
+        "entity"
+      ],
+      "description": "Whether to discover the profile by device or entity"
     },
-    "aliases": {
+    "fields": {
       "type": "array",
       "items": {
-        "type": "string"
-      },
-      "description": "Aliases for this model"
-    },
-    "linear_config": {
-      "type": "object",
-      "description": "Configuration for linear calculation strategy",
-      "properties": {
-        "min_power": {
-          "type": "number"
-        },
-        "max_power": {
-          "type": "number"
-        },
-        "calibrate": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Description of the field"
+          },
+          "label": {
+            "type": "string",
+            "description": "Label of the field"
+          },
+          "selector": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": "object",
+                "properties": {
+                  "domain": {
+                    "type": "string"
+                  },
+                  "device_class": {
+                    "type": "string"
+                  }
+                }
+              },
+              "number": {
+                "type": "object",
+                "properties": {
+                  "min": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -169,6 +209,65 @@
         }
       }
     },
+    "name": {
+      "type": "string",
+      "description": "The full name"
+    },
+    "measure_method": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "script"
+      ],
+      "description": "How the device was measured"
+    },
+    "measure_description": {
+      "type": "string",
+      "description": "Add more information about how you measured the device or any remarks"
+    },
+    "measure_device": {
+      "type": "string",
+      "description": "Device which was used to measure"
+    },
+    "measure_device_firmware": {
+      "type": "string",
+      "description": "Firmware version of the device used to measure"
+    },
+    "measure_settings": {
+      "type": "object",
+      "description": "Settings used for measure script"
+    },
+    "linear_config": {
+      "type": "object",
+      "description": "Configuration for linear calculation strategy",
+      "properties": {
+        "min_power": {
+          "type": "number"
+        },
+        "max_power": {
+          "type": "number"
+        },
+        "calibrate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "linked_lut": {
+      "type": "string",
+      "description": "Use LUT data files from another model",
+      "deprecated": true
+    },
+    "linked_profile": {
+      "type": "string",
+      "description": "Use data from another model"
+    },
+    "only_self_usage": {
+      "type": "boolean",
+      "description": "Indicates if profile only provides power usage for the device itself"
+    },
     "playbook_config": {
       "type": "object",
       "description": "Configuration for playbook calculation strategy",
@@ -200,25 +299,19 @@
         "playbooks"
       ]
     },
-    "composite_config": {
-      "type": "array",
-      "description": "Configuration for composite calculation strategy",
-      "items": {
-        "type": "object",
-        "properties": {
-          "condition": {
-            "$ref": "#/definitions/condition"
-          }
-        }
-      }
-    },
-    "config_flow_discovery_remarks": {
-      "type": "string",
-      "description": "Some remarks to show in the GUI config flow on first step of discovery"
-    },
     "sensor_config": {
       "type": "object",
       "description": "Sensor configuration options. See the README"
+    },
+    "standby_power": {
+      "type": "number",
+      "minimum": 0.05,
+      "description": "Power draw when the device is turned off. When you are not able to measure set to 0.4 for lights"
+    },
+    "standby_power_on": {
+      "type": "number",
+      "minimum": 0.05,
+      "description": "Power draw when the device is turned on."
     },
     "sub_profile_select": {
       "type": "object",
