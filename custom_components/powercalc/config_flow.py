@@ -32,7 +32,7 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.const import (
-    __version__ as HAVERSION,
+    __version__ as HAVERSION,      #noqa
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
