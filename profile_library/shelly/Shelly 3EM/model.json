@@ -11,9 +11,7 @@
   "calculation_strategy": "fixed",
   "only_self_usage": false,
   "standby_power": 1.22,
-  "fixed_config": {
-    "power": 1.22
-  },
+  "standby_power_on": 1.22,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"

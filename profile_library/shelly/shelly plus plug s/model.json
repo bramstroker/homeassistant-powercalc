@@ -10,12 +10,10 @@
   ],
   "discovery_by": "entity",
   "device_type": "smart_switch",
-  "only_self_usage": false,
+  "only_self_usage": true,
   "calculation_strategy": "fixed",
   "standby_power": 0.74,
-  "fixed_config": {
-    "power": 1.01
-  },
+  "standby_power_on": 1.01,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
