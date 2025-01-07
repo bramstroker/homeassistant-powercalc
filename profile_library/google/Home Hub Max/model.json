@@ -1,0 +1,31 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2025-01-07T12:48:09.002487",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 7.0",
+      "20 -> 7.0",
+      "30 -> 7.0",
+      "40 -> 6.2",
+      "50 -> 5.4",
+      "60 -> 6.0",
+      "70 -> 6.0",
+      "80 -> 7.2",
+      "90 -> 8.6",
+      "100 -> 10.4",
+      "0 -> 5.4"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "SmartThings F-APP-UK-V2",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.16.7:docker"
+  },
+  "name": "Google Home Hub Max",
+  "standby_power": 3.0
+}
