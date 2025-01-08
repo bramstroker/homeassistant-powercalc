@@ -27,5 +27,6 @@
     "VERSION": "v1.16.7:docker"
   },
   "name": "Google Nest Hub Max",
-  "standby_power": 2.0
+  "standby_power": 2.0,
+  "author": "Greg Hesp <greg.hesp@gmail.com>"
 }
