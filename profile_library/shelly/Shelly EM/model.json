@@ -13,7 +13,7 @@
   ],
   "discovery_by": "entity",
   "device_type": "smart_switch",
-  "only_self_usage": true,
+  "only_self_usage": false,
   "calculation_strategy": "fixed",
   "standby_power": 0.598,
   "standby_power_on": 0.923,
