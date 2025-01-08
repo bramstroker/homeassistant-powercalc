@@ -71,6 +71,26 @@ async def select_menu_item(
     return result
 
 
+async def select_manufacturer_and_model(
+    hass: HomeAssistant,
+    prev_result: FlowResult,
+    manufacturer: str,
+    model: str,
+) -> FlowResult:
+    assert prev_result["step_id"] == Step.MANUFACTURER
+    result = await hass.config_entries.flow.async_configure(
+        prev_result["flow_id"],
+        {CONF_MANUFACTURER: manufacturer},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MODEL
+
+    return await hass.config_entries.flow.async_configure(
+        prev_result["flow_id"],
+        {CONF_MODEL: model},
+    )
+
+
 async def initialize_options_flow(
     hass: HomeAssistant,
     entry: config_entries.ConfigEntry,
