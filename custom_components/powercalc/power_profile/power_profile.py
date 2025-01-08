@@ -232,19 +232,21 @@ class PowerProfile:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
         """
-        return (
-            self.is_strategy_supported(
-                CalculationStrategy.FIXED,
-            )
-            and not self._json_data.get("fixed_config")
-            and not self.only_self_usage
-        )
+        if self.only_self_usage:
+            return False
+
+        return self.is_strategy_supported(
+            CalculationStrategy.FIXED,
+        ) and not self._json_data.get("fixed_config")
 
     @property
     def needs_linear_config(self) -> bool:
         """
         Used for smart dimmers. This indicates the user must supply the power values in the config flow.
         """
+        if self.only_self_usage:
+            return False
+
         return self.is_strategy_supported(
             CalculationStrategy.LINEAR,
         ) and not self._json_data.get("linear_config")
