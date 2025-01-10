@@ -5,6 +5,7 @@ import logging
 import os
 import re
 from collections import defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, NamedTuple, Protocol, cast
@@ -68,32 +69,34 @@ class CustomField:
     description: str | None = None
 
 
-DEVICE_TYPE_DOMAIN = {
+DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
     DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
-    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
+    DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
     DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
 
-DOMAIN_TO_DEVICE_TYPES = defaultdict(set)
-for device_type, domain in DEVICE_TYPE_DOMAIN.items():
-    DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
+SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
 
 
-def get_entity_device_types(entity_domain: str, entity_entry: RegistryEntry | None) -> set[DeviceType]:
+def _build_domain_device_type_mapping() -> Mapping[str, set[DeviceType]]:
     """Get the device types for a given entity domain."""
-    device_types = set(DOMAIN_TO_DEVICE_TYPES.get(entity_domain, {}))
-    # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-    if entity_entry and entity_entry.platform in ["hue", "osramlightify"] and entity_domain == LIGHT_DOMAIN:
-        device_types.add(DeviceType.SMART_SWITCH)
-    return device_types
+    domain_to_device_type: defaultdict[str, set[DeviceType]] = defaultdict(set)
+    for device_type, domains in DEVICE_TYPE_DOMAIN.items():
+        domain_set = domains if isinstance(domains, set) else {domains}
+        for domain in domain_set:
+            domain_to_device_type[domain].add(device_type)
+    return domain_to_device_type
+
+
+DOMAIN_DEVICE_TYPE_MAPPING: Mapping[str, set[DeviceType]] = _build_domain_device_type_mapping()
 
 
 class PowerProfile:
@@ -232,19 +235,21 @@ class PowerProfile:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
         """
-        return (
-            self.is_strategy_supported(
-                CalculationStrategy.FIXED,
-            )
-            and not self._json_data.get("fixed_config")
-            and not self.only_self_usage
-        )
+        if self.only_self_usage:
+            return False
+
+        return self.is_strategy_supported(
+            CalculationStrategy.FIXED,
+        ) and not self._json_data.get("fixed_config")
 
     @property
     def needs_linear_config(self) -> bool:
         """
         Used for smart dimmers. This indicates the user must supply the power values in the config flow.
         """
+        if self.only_self_usage:
+            return False
+
         return self.is_strategy_supported(
             CalculationStrategy.LINEAR,
         ) and not self._json_data.get("linear_config")
@@ -376,7 +381,7 @@ class PowerProfile:
         if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
-        return self.device_type in get_entity_device_types(domain, entity_entry)
+        return self.device_type in DOMAIN_DEVICE_TYPE_MAPPING[domain]
 
 
 class SubProfileSelector:

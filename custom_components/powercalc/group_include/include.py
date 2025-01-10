@@ -12,7 +12,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from custom_components.powercalc.discovery import get_power_profile_by_source_entity
-from custom_components.powercalc.power_profile.power_profile import DEVICE_TYPE_DOMAIN
+from custom_components.powercalc.power_profile.power_profile import SUPPORTED_DOMAINS
 from custom_components.powercalc.sensors.energy import RealEnergySensor
 from custom_components.powercalc.sensors.power import RealPowerSensor
 
@@ -68,7 +68,7 @@ async def find_entities(
 def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
     base_filter = CompositeFilter(
         [
-            DomainFilter(DEVICE_TYPE_DOMAIN.values()),
+            DomainFilter(SUPPORTED_DOMAINS),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
         ],
     )

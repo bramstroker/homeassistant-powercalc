@@ -34,6 +34,7 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
+    select_manufacturer_and_model,
     process_config_flow,
     select_menu_item,
     set_virtual_power_configuration,
@@ -134,6 +135,17 @@ async def test_manufacturer_listing_is_filtered_by_entity_domain2(
     manufacturer_options = manufacturer_select.config["options"]
     assert {"value": "sonos", "label": "sonos"} not in manufacturer_options
     assert {"value": "shelly", "label": "shelly"} in manufacturer_options
+
+
+async def test_fixed_power_is_skipped_when_only_self_usage_true(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "switch.test"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "smart_switch_with_pm_new")
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
 
 
 async def test_library_options_flow_raises_error_on_non_existing_power_profile(

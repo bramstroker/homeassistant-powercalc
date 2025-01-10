@@ -43,6 +43,7 @@ def generate_library_json(model_listing: list[dict]) -> None:
             "model": "id",
             "name": "name",
             "device_type": "device_type",
+            "discovery_by": "discovery_by",
             "aliases": "aliases",
             "updated_at": "updated_at",
             "color_modes": "color_modes",

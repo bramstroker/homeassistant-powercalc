@@ -13,6 +13,7 @@ from enum import StrEnum
 from typing import Any, cast
 
 import voluptuous as vol
+from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.utility_meter import CONF_METER_TYPE, METER_TYPES
 from homeassistant.config_entries import ConfigEntry, ConfigEntryBaseFlow, ConfigFlow, ConfigFlowResult, OptionsFlow
@@ -29,6 +30,9 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTime,
+)
+from homeassistant.const import (
+    __version__ as HAVERSION,  # noqa
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
@@ -126,7 +130,7 @@ from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile, get_entity_device_types
+from .power_profile.power_profile import DOMAIN_DEVICE_TYPE_MAPPING, SUPPORTED_DOMAINS, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .sensors.power import PowerSensor
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -631,8 +635,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not self.strategy:
             raise ValueError("No strategy selected")  # pragma: no cover
 
-        if hasattr(self, f"create_schema_{self.strategy.value.lower()}"):
-            return getattr(self, f"create_schema_{self.strategy.value.lower()}")()  # type: ignore
+        if hasattr(self, f"create_schema_{self.strategy.lower()}"):
+            return getattr(self, f"create_schema_{self.strategy.lower()}")()  # type: ignore
 
         return STRATEGY_SCHEMAS[self.strategy]
 
@@ -788,7 +792,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Create the entity selector for the source entity."""
         if self.is_library_flow:
             return selector.EntitySelector(
-                selector.EntitySelectorConfig(domain=list(DEVICE_TYPE_DOMAIN.values())),
+                selector.EntitySelectorConfig(domain=list(SUPPORTED_DOMAINS)),
             )
         return selector.EntitySelector()
 
@@ -943,7 +947,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         async def _create_schema() -> vol.Schema:
             """Create manufacturer schema."""
             library = await ProfileLibrary.factory(self.hass)
-            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
+            device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             manufacturers = [
                 selector.SelectOptionDict(value=manufacturer, label=manufacturer)
                 for manufacturer in await library.get_manufacturer_listing(device_types)
@@ -991,7 +995,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create model schema."""
             manufacturer = str(self.sensor_config.get(CONF_MANUFACTURER))
             library = await ProfileLibrary.factory(self.hass)
-            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
+            device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             models = [selector.SelectOptionDict(value=model, label=model) for model in await library.get_model_listing(manufacturer, device_types)]
             return vol.Schema(
                 {
@@ -1686,7 +1690,8 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         super().__init__()
-        self._config_entry = config_entry
+        if AwesomeVersion(HAVERSION) < "2024.12":
+            self.config_entry = config_entry  # pragma: no cover
         self.sensor_config = dict(config_entry.data)
         self.sensor_type: SensorType = self.sensor_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         self.source_entity_id: str = self.sensor_config.get(CONF_ENTITY_ID)  # type: ignore
@@ -1697,11 +1702,11 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
         """Handle options flow."""
-        if self._config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
+        if self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID:
             self.global_config = self.get_global_powercalc_config()
             return self.async_show_menu(step_id=Step.INIT, menu_options=self.build_global_config_menu())
 
-        self.sensor_config = dict(self._config_entry.data)
+        self.sensor_config = dict(self.config_entry.data)
         if self.source_entity_id:
             self.source_entity = await create_source_entity(
                 self.source_entity_id,
@@ -1841,7 +1846,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
     async def async_step_group_custom(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
         schema = self.fill_schema_defaults(
-            self.create_schema_group_custom(self._config_entry, True),
+            self.create_schema_group_custom(self.config_entry, True),
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Step.GROUP_CUSTOM)
@@ -1939,10 +1944,10 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
 
     def persist_config_entry(self) -> FlowResult:
         """Persist changed options on the config entry."""
-        data = (self._config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config) or self.sensor_config
+        data = (self.config_entry.unique_id == ENTRY_GLOBAL_CONFIG_UNIQUE_ID and self.global_config) or self.sensor_config
 
         self.hass.config_entries.async_update_entry(
-            self._config_entry,
+            self.config_entry,
             data=data,
         )
         return self.async_create_entry(title="", data={})
