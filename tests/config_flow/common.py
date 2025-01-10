@@ -234,11 +234,11 @@ async def set_virtual_power_configuration(
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.ASSIGN_GROUPS
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        group_options or {},
-    )
+    if result["step_id"] == Step.ASSIGN_GROUPS:
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            group_options or {},
+        )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.POWER_ADVANCED

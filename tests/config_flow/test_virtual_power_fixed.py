@@ -217,7 +217,6 @@ async def test_global_configuration_is_applied_to_field_default(
             Step.FIXED: {
                 CONF_POWER: 20,
             },
-            Step.ASSIGN_GROUPS: {},
         },
     )
 

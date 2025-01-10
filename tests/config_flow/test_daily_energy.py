@@ -46,18 +46,13 @@ async def test_daily_energy_mandatory_fields_not_supplied(hass: HomeAssistant) -
 
 async def test_create_daily_energy_entry(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
-
-    result = await process_config_flow(
-        hass,
-        result,
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
         {
-            Step.DAILY_ENERGY: {
-                CONF_NAME: "My daily energy sensor",
-                CONF_VALUE: 0.5,
-                CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
-                CONF_CREATE_UTILITY_METERS: False,
-            },
-            Step.ASSIGN_GROUPS: {},
+            CONF_NAME: "My daily energy sensor",
+            CONF_VALUE: 0.5,
+            CONF_UNIT_OF_MEASUREMENT: UnitOfPower.WATT,
+            CONF_CREATE_UTILITY_METERS: False,
         },
     )
 
@@ -102,22 +97,17 @@ async def test_daily_energy_options_flow(hass: HomeAssistant) -> None:
 
 async def test_on_time_option(hass: HomeAssistant) -> None:
     result = await select_menu_item(hass, Step.DAILY_ENERGY)
-
-    result = await process_config_flow(
-        hass,
-        result,
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
         {
-            Step.DAILY_ENERGY: {
-                CONF_NAME: "My daily energy sensor",
-                CONF_VALUE: 10,
-                CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
-                CONF_ON_TIME: {
-                    "hours": 10,
-                    "minutes": 20,
-                    "seconds": 30,
-                },
+            CONF_NAME: "My daily energy sensor",
+            CONF_VALUE: 10,
+            CONF_UNIT_OF_MEASUREMENT: UnitOfEnergy.KILO_WATT_HOUR,
+            CONF_ON_TIME: {
+                "hours": 10,
+                "minutes": 20,
+                "seconds": 30,
             },
-            Step.ASSIGN_GROUPS: {},
         },
     )
 
@@ -141,7 +131,6 @@ async def test_utility_meter_options(hass: HomeAssistant) -> None:
                 CONF_VALUE: 10,
                 CONF_CREATE_UTILITY_METERS: True,
             },
-            Step.ASSIGN_GROUPS: {},
             Step.UTILITY_METER_OPTIONS: {
                 CONF_UTILITY_METER_TARIFFS: ["peak", "offpeak"],
                 CONF_UTILITY_METER_TYPES: [DAILY],

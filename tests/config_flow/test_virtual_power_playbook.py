@@ -104,14 +104,14 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
 async def test_playbooks_mandatory(hass: HomeAssistant) -> None:
     result = await goto_virtual_power_strategy_step(hass, CalculationStrategy.PLAYBOOK)
-    result = await set_virtual_power_configuration(
-        hass,
-        result,
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
         {
             CONF_REPEAT: True,
             CONF_AUTOSTART: "playbook1",
         },
     )
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["errors"] == {"base": "playbook_mandatory"}
 

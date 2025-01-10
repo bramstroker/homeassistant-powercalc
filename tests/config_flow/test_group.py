@@ -35,6 +35,7 @@ from custom_components.powercalc.const import (
     CONF_HIDE_MEMBERS,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MODE,
+    CONF_NEW_GROUP,
     CONF_POWER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
@@ -538,19 +539,30 @@ async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistant) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+        },
+        title="TestGroup",
+    )
+    config_entry.add_to_hass(hass)
+
     result = await goto_virtual_power_strategy_step(
         hass,
         CalculationStrategy.FIXED,
         user_input={
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_NAME: "My power sensor",
-            CONF_GROUP: "New group",
         },
     )
     result = await set_virtual_power_configuration(
         hass,
         result,
         {CONF_POWER: 20},
+        group_options={CONF_NEW_GROUP: "New group"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -563,7 +575,7 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
     # Prevent regression by checking if group is not already created and added twice, see #2366
     await add_to_associated_groups(hass, config_entry)
     entries = hass.config_entries.async_entries(DOMAIN)
-    assert len(entries) == 2
+    assert len(entries) == 3
 
 
 async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:

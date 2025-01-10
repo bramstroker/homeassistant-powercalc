@@ -256,7 +256,6 @@ async def test_profile_with_custom_fields(
             Step.LIBRARY_CUSTOM_FIELDS: {
                 "some_entity": "sensor.foobar",
             },
-            Step.ASSIGN_GROUPS: {},
             Step.POWER_ADVANCED: {},
         },
     )
