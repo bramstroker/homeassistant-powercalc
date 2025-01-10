@@ -1,4 +1,5 @@
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
@@ -458,3 +459,46 @@ async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any],
     )
 
     assert await power_profile.needs_user_configuration == expected_result
+
+
+@pytest.mark.parametrize(
+    "test_profile,expected_translation_key",
+    [
+        (
+            "smart_switch",
+            "component.powercalc.common.remarks_smart_switch",
+        ),
+        (
+            "smart_switch_with_pm",
+            None,
+        ),
+        (
+            "smart_dimmer",
+            "component.powercalc.common.remarks_smart_dimmer",
+        ),
+        (
+            "smart_dimmer_with_pm",
+            None,
+        ),
+        (
+            "media_player",
+            None,
+        ),
+    ],
+)
+async def test_discovery_flow_remarks(hass: HomeAssistant, test_profile: str, expected_translation_key: str | None) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("test", "test"),
+        get_test_profile_dir(test_profile),
+    )
+
+    translations_keys = [
+        "component.powercalc.common.remarks_smart_dimmer",
+        "component.powercalc.common.remarks_smart_switch",
+    ]
+    with patch(
+        "homeassistant.helpers.translation.async_get_cached_translations",
+        return_value={key: key for key in translations_keys},
+    ):
+        assert power_profile.config_flow_discovery_remarks == expected_translation_key

@@ -37,7 +37,7 @@ async def test_smart_switch_with_yaml(
         model=model,
     )
 
-    power_sensor_id = "sensor.oven_device_power"
+    power_sensor_id = "sensor.oven_power"
 
     await run_powercalc_setup(
         hass,
@@ -83,7 +83,7 @@ async def test_smart_switch_power_input_yaml(
         model=model,
     )
 
-    power_sensor_id = "sensor.heater_device_power"
+    power_sensor_id = "sensor.heater_power"
 
     await run_powercalc_setup(
         hass,
