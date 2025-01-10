@@ -34,8 +34,8 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
-    select_manufacturer_and_model,
     process_config_flow,
+    select_manufacturer_and_model,
     select_menu_item,
     set_virtual_power_configuration,
 )
