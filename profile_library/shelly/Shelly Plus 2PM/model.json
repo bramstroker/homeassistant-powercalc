@@ -17,8 +17,8 @@
   "calculation_strategy": "multi_switch",
   "standby_power": 0.326,
   "multi_switch_config": {
-      "power": 0.356,
-      "power_off": 0
+    "power": 0.356,
+    "power_off": 0
   },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
