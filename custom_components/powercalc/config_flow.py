@@ -130,7 +130,7 @@ from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DeviceType, PowerProfile, get_entity_device_types
+from .power_profile.power_profile import DOMAIN_DEVICE_TYPE_MAPPING, SUPPORTED_DOMAINS, DeviceType, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .sensors.power import PowerSensor
 from .strategy.factory import PowerCalculatorStrategyFactory
@@ -791,7 +791,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Create the entity selector for the source entity."""
         if self.is_library_flow:
             return selector.EntitySelector(
-                selector.EntitySelectorConfig(domain=list(DEVICE_TYPE_DOMAIN.values())),
+                selector.EntitySelectorConfig(domain=list(SUPPORTED_DOMAINS)),
             )
         return selector.EntitySelector()
 
@@ -944,7 +944,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         async def _create_schema() -> vol.Schema:
             """Create manufacturer schema."""
             library = await ProfileLibrary.factory(self.hass)
-            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
+            device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             manufacturers = [
                 selector.SelectOptionDict(value=manufacturer, label=manufacturer)
                 for manufacturer in await library.get_manufacturer_listing(device_types)
@@ -992,7 +992,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create model schema."""
             manufacturer = str(self.sensor_config.get(CONF_MANUFACTURER))
             library = await ProfileLibrary.factory(self.hass)
-            device_types = get_entity_device_types(self.source_entity.domain, self.source_entity.entity_entry) if self.source_entity else None
+            device_types = DOMAIN_DEVICE_TYPE_MAPPING.get(self.source_entity.domain, set()) if self.source_entity else None
             models = [selector.SelectOptionDict(value=model, label=model) for model in await library.get_model_listing(manufacturer, device_types)]
             return vol.Schema(
                 {
@@ -1680,7 +1680,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Initialize options flow."""
         super().__init__()
         if AwesomeVersion(HAVERSION) < "2024.12":
-            self.config_entry = config_entry
+            self.config_entry = config_entry  # pragma: no cover
         self.sensor_config = dict(config_entry.data)
         self.sensor_type: SensorType = self.sensor_config.get(CONF_SENSOR_TYPE) or SensorType.VIRTUAL_POWER
         self.source_entity_id: str = self.sensor_config.get(CONF_ENTITY_ID)  # type: ignore

@@ -36,7 +36,7 @@ from .group_include.filter import CategoryFilter, CompositeFilter, DomainFilter,
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DiscoveryBy, PowerProfile
+from .power_profile.power_profile import SUPPORTED_DOMAINS, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -281,7 +281,7 @@ class DiscoveryManager:
                 LambdaFilter(lambda entity: entity.device_id is None),
                 LambdaFilter(lambda entity: entity.platform == "mqtt" and "segment" in entity.entity_id),
                 LambdaFilter(lambda entity: entity.platform == "powercalc"),
-                NotFilter(DomainFilter(DEVICE_TYPE_DOMAIN.values())),
+                NotFilter(DomainFilter(SUPPORTED_DOMAINS)),
             ],
             FilterOperator.OR,
         )
