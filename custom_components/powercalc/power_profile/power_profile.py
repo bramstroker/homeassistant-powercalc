@@ -289,17 +289,26 @@ class PowerProfile:
     def config_flow_discovery_remarks(self) -> str | None:
         """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")
-        if not remarks and self.device_type == DeviceType.SMART_SWITCH:
-            translations = translation.async_get_cached_translations(
-                self._hass,
-                self._hass.config.language,
-                "common",
-                DOMAIN,
-            )
-            translation_key = f"component.{DOMAIN}.common.remarks_smart_switch"
-            return translations.get(translation_key)
+        if not remarks:
+            translation_key = self.get_default_discovery_remarks_translation_key()
+            if translation_key:
+                translations = translation.async_get_cached_translations(
+                    self._hass,
+                    self._hass.config.language,
+                    "common",
+                    DOMAIN,
+                )
+                return translations.get(f"component.{DOMAIN}.common.{translation_key}")
 
         return remarks
+
+    def get_default_discovery_remarks_translation_key(self) -> str | None:
+        """When no remarks are provided in the profile, see if we need to show a default remark."""
+        if self.device_type == DeviceType.SMART_SWITCH and self.needs_fixed_config:
+            return "remarks_smart_switch"
+        if self.device_type == DeviceType.SMART_DIMMER and self.needs_linear_config:
+            return "remarks_smart_dimmer"
+        return None
 
     async def get_sub_profiles(self) -> list[str]:
         """Get listing of possible sub profiles."""
