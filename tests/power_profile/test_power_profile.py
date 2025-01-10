@@ -164,6 +164,17 @@ async def test_vacuum_entity_domain_supported(hass: HomeAssistant) -> None:
     )
 
 
+async def test_light_domain_supported_for_smart_switch_device_type(hass: HomeAssistant) -> None:
+    library = await ProfileLibrary.factory(hass)
+    power_profile = await library.get_profile(
+        ModelInfo("dummy", "dummy"),
+        get_test_profile_dir("smart_switch"),
+    )
+    assert power_profile.is_entity_domain_supported(
+        SourceEntity("light.test", "test", "light"),
+    )
+
+
 async def test_discovery_does_not_break_when_unknown_device_type(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     power_profile = await library.get_profile(
