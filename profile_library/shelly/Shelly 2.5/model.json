@@ -11,14 +11,13 @@
   "aliases": [
     "SHSW-25"
   ],
-  "discovery_by": "entity",
+  "discovery_by": "device",
   "device_type": "smart_switch",
   "only_self_usage": true,
   "calculation_strategy": "multi_switch",
   "standby_power": 0.676,
   "multi_switch_config": {
-    "power": 0.323,
-    "power_off": 0
+    "power": 0.323
   },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
