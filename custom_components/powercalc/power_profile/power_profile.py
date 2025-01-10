@@ -319,7 +319,7 @@ class PowerProfile:
         def _get_sub_dirs() -> list[str]:
             return next(os.walk(self.get_model_directory(True)))[1]
 
-        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))  # type: ignore
+        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))
         return self._sub_profiles
 
     @property
@@ -361,7 +361,7 @@ class PowerProfile:
                 with open(file_path) as json_file:
                     self._json_data = {**self._json_data, **json.load(json_file)}
 
-            await self._hass.async_add_executor_job(_load_json)  # type: ignore
+            await self._hass.async_add_executor_job(_load_json)
 
         self.sub_profile = sub_profile
 
