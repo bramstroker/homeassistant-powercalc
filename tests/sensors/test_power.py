@@ -576,7 +576,7 @@ async def test_multiply_factor_standby_power_on(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.test", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "1.64"
+    assert hass.states.get("sensor.test_power").state == "1.64"
 
 
 async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:

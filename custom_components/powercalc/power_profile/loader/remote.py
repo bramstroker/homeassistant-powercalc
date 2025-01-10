@@ -41,7 +41,7 @@ class RemoteLoader(Loader):
     async def initialize(self) -> None:
         """Initialize the loader."""
         self.library_contents = await self.load_library_json()
-        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)  # type: ignore
+        self.last_update_time = await self.hass.async_add_executor_job(self.get_last_update_time)
 
         self.model_infos.clear()
         self.manufacturer_models.clear()
@@ -101,7 +101,7 @@ class RemoteLoader(Loader):
             return cast(dict[str, Any], await self.download_with_retry(_download_remote_library_json))
         except ProfileDownloadError:
             _LOGGER.debug("Failed to download library.json, falling back to local copy")
-            return await self.hass.async_add_executor_job(_load_local_library_json)  # type: ignore
+            return await self.hass.async_add_executor_job(_load_local_library_json)
 
     @async_cache
     async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
@@ -203,7 +203,7 @@ class RemoteLoader(Loader):
             with open(model_path) as f:
                 return cast(dict[str, Any], json.load(f))
 
-        return await self.hass.async_add_executor_job(_load_json)  # type: ignore
+        return await self.hass.async_add_executor_job(_load_json)
 
     async def _handle_json_decode_error(
         self,
@@ -242,7 +242,7 @@ class RemoteLoader(Loader):
             with open(path, "w") as f:
                 f.write(str(time))
 
-        return await self.hass.async_add_executor_job(_write)  # type: ignore
+        return await self.hass.async_add_executor_job(_write)
 
     @staticmethod
     def _get_remote_modification_time(model_info: dict) -> float:
@@ -294,7 +294,7 @@ class RemoteLoader(Loader):
                         raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}")
                     resources = await resp.json()
 
-                await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))  # type: ignore
+                await self.hass.async_add_executor_job(lambda: os.makedirs(storage_path, exist_ok=True))
 
                 # Download the files
                 for resource in resources:
@@ -304,6 +304,6 @@ class RemoteLoader(Loader):
                             raise ProfileDownloadError(f"Failed to download github URL: {url}")
 
                         contents = await resp.read()
-                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))  # type: ignore
+                        await self.hass.async_add_executor_job(_save_file, contents, resource.get("path"))
             except aiohttp.ClientError as e:
                 raise ProfileDownloadError(f"Failed to download profile: {manufacturer}/{model}") from e
