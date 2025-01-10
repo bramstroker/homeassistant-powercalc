@@ -11,14 +11,13 @@
   "aliases": [
     "SNSW-102P16EU"
   ],
-  "discovery_by": "entity",
+  "discovery_by": "device",
   "device_type": "smart_switch",
   "only_self_usage": true,
   "calculation_strategy": "multi_switch",
   "standby_power": 0.326,
   "multi_switch_config": {
-    "power": 0.356,
-    "power_off": 0
+    "power": 0.356
   },
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
