@@ -412,6 +412,29 @@ async def test_needs_user_configuration(hass: HomeAssistant, json_data: dict[str
             },
             False,
         ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "linear_config": {
+                    "min_power": 50,
+                    "max_power": 100,
+                },
+            },
+            False,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+            },
+            True,
+        ),
+        (
+            {
+                "calculation_strategy": CalculationStrategy.LINEAR,
+                "only_self_usage": True,
+            },
+            False,
+        ),
     ],
 )
 async def test_needs_fixed_power(hass: HomeAssistant, json_data: dict[str, Any], expected_result: bool) -> None:
