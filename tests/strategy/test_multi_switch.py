@@ -26,14 +26,14 @@ async def test_calculate_sum(hass: HomeAssistant) -> None:
     strategy = MultiSwitchStrategy(
         hass,
         [switch1, switch2, switch3],
-        on_power=Decimal(0.5),
-        off_power=Decimal(0.25),
+        on_power=Decimal("0.5"),
+        off_power=Decimal("0.25"),
     )
 
-    assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal(0.25)
-    assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal(0.50)
-    assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal(1.00)
-    assert await strategy.calculate(State(switch3, STATE_ON)) == Decimal(1.50)
+    assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal("0.25")
+    assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal("0.50")
+    assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal("1.00")
+    assert await strategy.calculate(State(switch3, STATE_ON)) == Decimal("1.50")
 
 
 async def test_calculate_sum_without_off_power(hass: HomeAssistant) -> None:
@@ -43,13 +43,13 @@ async def test_calculate_sum_without_off_power(hass: HomeAssistant) -> None:
     strategy = MultiSwitchStrategy(
         hass,
         [switch1, switch2],
-        on_power=Decimal(0.5),
+        on_power=Decimal("0.5"),
     )
 
-    assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal(0.50)
-    assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal(1.00)
-    assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal(0.50)
-    assert await strategy.calculate(State(switch2, STATE_OFF)) == Decimal(0.00)
+    assert await strategy.calculate(State(switch1, STATE_ON)) == Decimal("0.50")
+    assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal("1.00")
+    assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal("0.50")
+    assert await strategy.calculate(State(switch2, STATE_OFF)) == Decimal("0.00")
 
 
 async def test_setup_using_yaml(hass: HomeAssistant) -> None:
