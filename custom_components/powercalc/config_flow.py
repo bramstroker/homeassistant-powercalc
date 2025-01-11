@@ -937,7 +937,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             step_id=form_step.step,
             data_schema=self.fill_schema_defaults(
                 schema,
-                self.get_global_powercalc_config(),
+                {**self.sensor_config, **self.get_global_powercalc_config()},
             ),
             errors={"base": str(error)} if error else {},
             last_step=last_step,
