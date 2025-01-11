@@ -34,6 +34,7 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
+    process_config_flow,
     select_manufacturer_and_model,
     select_menu_item,
     set_virtual_power_configuration,
@@ -242,34 +243,21 @@ async def test_profile_with_custom_fields(
     )
 
     result = await select_menu_item(hass, Step.MENU_LIBRARY)
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.VIRTUAL_POWER
-
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_ENTITY_ID: "sensor.test"},
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.LIBRARY
-
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.LIBRARY_CUSTOM_FIELDS
-
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {"some_entity": "sensor.foobar"},
-    )
-
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.POWER_ADVANCED
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {},
+    result = await process_config_flow(
+        hass,
+        result,
+        {
+            Step.VIRTUAL_POWER: {
+                CONF_ENTITY_ID: "sensor.test",
+            },
+            Step.LIBRARY: {
+                CONF_CONFIRM_AUTODISCOVERED_MODEL: True,
+            },
+            Step.LIBRARY_CUSTOM_FIELDS: {
+                "some_entity": "sensor.foobar",
+            },
+            Step.POWER_ADVANCED: {},
+        },
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

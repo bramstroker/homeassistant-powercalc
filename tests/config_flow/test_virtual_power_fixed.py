@@ -27,6 +27,7 @@ from tests.config_flow.common import (
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
+    process_config_flow,
     select_menu_item,
     set_virtual_power_configuration,
 )
@@ -205,17 +206,20 @@ async def test_global_configuration_is_applied_to_field_default(
         "suggested_value": True,
     }
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
+    result = await process_config_flow(
+        hass,
+        result,
         {
-            CONF_ENTITY_ID: "light.test",
-            CONF_MODE: CalculationStrategy.FIXED,
+            Step.VIRTUAL_POWER: {
+                CONF_MODE: CalculationStrategy.FIXED,
+                CONF_ENTITY_ID: "light.test",
+            },
+            Step.FIXED: {
+                CONF_POWER: 20,
+            },
         },
     )
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_POWER: 50},
-    )
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.POWER_ADVANCED
     schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())

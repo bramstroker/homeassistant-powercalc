@@ -198,11 +198,33 @@ async def goto_virtual_power_strategy_step(
     return result
 
 
+async def process_config_flow(
+    hass: HomeAssistant,
+    result: FlowResult | None,
+    user_inputs: dict[Step, dict],
+) -> dict:
+    if not result:
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": config_entries.SOURCE_USER},
+        )
+
+    for step, user_input in user_inputs.items():
+        assert result["type"] == data_entry_flow.FlowResultType.FORM
+        assert result["step_id"] == step, f"Expected step {step}, got {result['step_id']}"
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            user_input,
+        )
+    return result
+
+
 async def set_virtual_power_configuration(
     hass: HomeAssistant,
     previous_result: FlowResult,
     basic_options: dict[str, Any] | None = None,
     advanced_options: dict[str, Any] | None = None,
+    group_options: dict[str, Any] | None = None,
 ) -> FlowResult:
     if basic_options is None:
         basic_options = {}
@@ -210,12 +232,19 @@ async def set_virtual_power_configuration(
         previous_result["flow_id"],
         basic_options,
     )
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    if advanced_options is None:
-        advanced_options = {}
+    if result["step_id"] == Step.ASSIGN_GROUPS:
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            group_options or {},
+        )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.POWER_ADVANCED
     return await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        advanced_options,
+        advanced_options or {},
     )
 
 
