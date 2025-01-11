@@ -5,13 +5,16 @@ from homeassistant.core import HomeAssistant
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_LINEAR,
+    CONF_MANUFACTURER,
     CONF_MAX_POWER,
     CONF_MIN_POWER,
     CONF_MODE,
+    CONF_MODEL,
     CONF_SENSOR_TYPE,
     CalculationStrategy,
     SensorType,
 )
+from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     assert_default_virtual_power_entry_data,
     create_mock_entry,
@@ -74,6 +77,37 @@ async def test_linear_options_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert entry.data[CONF_LINEAR][CONF_MAX_POWER] == 50
+
+
+async def test_linear_options_hidden_from_menu_for_self_usage_profiles(hass: HomeAssistant) -> None:
+    """
+    Fixed options should be hidden from the menu for self usage profiles
+    See: https://github.com/bramstroker/homeassistant-powercalc/issues/2935
+    """
+    hass.config.config_dir = get_test_config_dir()
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MODE: CalculationStrategy.LINEAR,
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "smart_dimmer_with_pm",
+        },
+    )
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    result = await hass.config_entries.options.async_init(
+        entry.entry_id,
+        data=None,
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.MENU
+    assert result["step_id"] == Step.INIT
+    menu_options = result["menu_options"]
+    assert Step.LINEAR not in menu_options
 
 
 async def test_linear_options_flow_error(hass: HomeAssistant) -> None:
