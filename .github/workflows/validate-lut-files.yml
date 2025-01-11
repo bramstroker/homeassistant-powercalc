@@ -72,15 +72,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const octokit = require('@octokit/rest')({
-              auth: process.env.PAT_TOKEN
-            });
-
-            const { context } = require('@actions/github');
-
+            const octokit = github.getOctokit(process.env.PAT_TOKEN);
+            
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo;
-
+            
             await octokit.issues.createComment({
               owner: repo.owner,
               repo: repo.repo,
