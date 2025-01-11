@@ -1163,7 +1163,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for advanced options."""
 
         if self.is_options_flow:
-            return self.persist_config_entry()
+            return self.persist_config_entry()  # pragma: no cover
 
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})

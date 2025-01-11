@@ -324,11 +324,7 @@ class PowerProfile:
                 json_path = os.path.join(base_dir, sub_dir, "model.json")
                 if os.path.isfile(json_path):
                     with open(json_path, encoding="utf-8") as f:
-                        try:
-                            json_data = json.load(f)
-                        except json.JSONDecodeError:
-                            _LOGGER.error("Failed to load JSON file: %s", json_path)
-                            json_data = {}
+                        json_data = json.load(f)
                 else:
                     json_data = {}
                 result.append((sub_dir, json_data))
