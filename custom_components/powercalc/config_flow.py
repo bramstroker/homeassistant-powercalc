@@ -1786,7 +1786,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Build the options menu."""
         menu = [Step.BASIC_OPTIONS]
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            if self.strategy and self.strategy != CalculationStrategy.LUT:
+            if self.strategy and self.should_add_strategy_option_to_menu():
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
                 menu.append(strategy_step)
             if self.selected_profile:
@@ -1803,6 +1803,20 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
+
+    def should_add_strategy_option_to_menu(self) -> bool:
+        """Check whether the strategy option should be added to the menu."""
+        if not self.strategy or self.strategy == CalculationStrategy.LUT:
+            return False
+
+        if self.selected_profile:
+            if self.strategy == CalculationStrategy.FIXED and not self.selected_profile.needs_fixed_config:
+                return False
+
+            if self.strategy == CalculationStrategy.LINEAR and not self.selected_profile.needs_linear_config:
+                return False
+
+        return True
 
     def build_group_menu(self) -> list[Step]:
         """Build the group options menu."""
