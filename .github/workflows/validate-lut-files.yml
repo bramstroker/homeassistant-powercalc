@@ -4,10 +4,10 @@ on:
   pull_request_target:
     paths:
        - '**/*.csv.gz'
-       - '.github/scripts/lut_validator/**'
 
 permissions:
-   pull-requests: write
+  pull-requests: write
+  contents: read
 
 jobs:
   validate-lut:
@@ -71,12 +71,35 @@ jobs:
             echo "![Image](${url})" >> $GITHUB_OUTPUT
           done
           echo 'EOF' >> $GITHUB_OUTPUT
-      - name: Add comment to PR
-        uses: mshick/add-pr-comment@v2
+      - name: Post Comment on PR
+        uses: actions/github-script@v6
         with:
-          message: |
-            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-      - name: add label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: lightmodel
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo;
+            const prMessage = process.env.PR_MESSAGE;
+            
+            const comments = await github.rest.issues.listComments({
+              owner: repo.owner,
+              repo: repo.repo,
+              issue_number: prNumber
+            });
+
+            const existingComment = comments.data.find(comment => comment.body.includes('Thank you for submitting'));
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: repo.owner,
+                repo: repo.repo,
+                comment_id: existingComment.id,
+                body: prMessage
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: repo.owner,
+                repo: repo.repo,
+                issue_number: prNumber,
+                body: prMessage
+              });
+            }
+        env:
+          PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
