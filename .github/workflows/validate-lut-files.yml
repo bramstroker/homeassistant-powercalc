@@ -6,9 +6,6 @@ on:
        - '**/*.csv.gz'
        - '.github/scripts/lut_validator/**'
 
-#permissions:
-#   pull-requests: write
-
 jobs:
   validate-lut:
     name: Validate LUT CSV files
@@ -92,12 +89,3 @@ jobs:
             });
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-#      - name: Add comment to PR
-#        uses: mshick/add-pr-comment@v2
-#        with:
-#          message: |
-#            ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-      - name: add label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: lightmodel
