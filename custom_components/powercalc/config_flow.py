@@ -661,7 +661,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             entities = [
                 entity.entity_id
                 for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
-                if entity.domain == Platform.SWITCH
+                if entity.domain in (Platform.SWITCH, Platform.LIGHT)
             ]
 
         # pre-populate the entity selector with the switches from the device
