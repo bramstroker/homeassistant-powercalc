@@ -1,6 +1,7 @@
 {
   "common": {
-    "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione"
+    "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione",
+    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
   "config": {
     "abort": {
