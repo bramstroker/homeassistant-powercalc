@@ -74,10 +74,13 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo;
+            const prMessage = process.env.PR_MESSAGE;
             
             await github.rest.issues.createComment({
               owner: repo.owner,
               repo: repo.repo,
               issue_number: prNumber,
-              body: "${{ steps.build-pr-message.outputs.PR_MESSAGE }}"
+              body: prMessage
             });
+        env:
+          PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
