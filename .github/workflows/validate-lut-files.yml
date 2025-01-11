@@ -78,7 +78,7 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo;
             const prMessage = process.env.PR_MESSAGE;
-            
+
             const comments = await github.rest.issues.listComments({
               owner: repo.owner,
               repo: repo.repo,
