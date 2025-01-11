@@ -717,7 +717,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 "This is only supported for sensors having sub profiles, and no automatic profile selection",
             )
 
-        if profile not in await self._power_profile.get_sub_profiles():
+        known_profiles = [profile[0] for profile in await self._power_profile.get_sub_profiles()]
+        if profile not in known_profiles:
             raise HomeAssistantError(f"{profile} is not a possible sub profile")
 
         await self._select_new_sub_profile(profile)

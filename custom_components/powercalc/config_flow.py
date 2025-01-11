@@ -1092,7 +1092,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create sub profile schema."""
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(model_info, process_variables=False)
-            sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
+            sub_profiles = [
+                selector.SelectOptionDict(
+                    value=sub_profile[0],
+                    label=sub_profile[1]["name"] if "name" in sub_profile[1] else sub_profile[0],
+                )
+                for sub_profile in await profile.get_sub_profiles()
+            ]
             return vol.Schema(
                 {
                     vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
@@ -1157,7 +1163,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for advanced options."""
 
         if self.is_options_flow:
-            return self.persist_config_entry()
+            return self.persist_config_entry()  # pragma: no cover
 
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
