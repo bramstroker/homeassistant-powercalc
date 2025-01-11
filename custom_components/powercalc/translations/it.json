@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crea contatori (utility meters)",
-          "group": "Aggiungi al gruppo",
           "name": "Nome",
           "on_time": "On time",
           "start_time": "Orario d'inizio",
@@ -36,7 +45,6 @@
           "value_template": "Value template"
         },
         "data_description": {
-          "group": "Inserisci un nome personalizzato per creare un nuovo gruppo",
           "on_time": "Quando lasciato vuoto predefinito a 1 giorno. Sempre acceso",
           "update_frequency": "tempo in secondi tra gli aggiornamenti di stato del sensore"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Crea sensore di energia",
           "create_utility_meters": "Crea contatori (utility meters)",
           "entity_id": "Source entity",
-          "group": "Aggiungi al gruppo",
           "mode": "Calculation strategy",
           "name": "Nome",
           "standby_power": "Potenza in standby"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Lasciando vuoto prenderà il nome dal dispositivo di origine",
           "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF"
         },

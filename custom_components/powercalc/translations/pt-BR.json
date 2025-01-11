@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Criar medidores de utilidade",
-          "group": "Adicionar ao grupo",
           "name": "Nome",
           "on_time": "Na hora",
           "start_time": "Hora de início",
@@ -36,7 +45,6 @@
           "value_template": "Modelo de valor"
         },
         "data_description": {
-          "group": "Preencha um nome de grupo personalizado para criar um novo grupo",
           "on_time": "Quando deixado vazio, o padrão é 1 dia. sempre",
           "update_frequency": "tempo em segundos entre as atualizações de estado do sensor"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Criar sensor de consumo",
           "create_utility_meters": "Criar medidores de utilidade",
           "entity_id": "Entidade de origem",
-          "group": "Adicionar ao grupo",
           "mode": "Estratégia de cálculo",
           "name": "Nome",
           "standby_power": "Potência em standby"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Se o powercalc precisa criar um sensor kWh",
           "create_utility_meters": "Deixe o powercalc criar medidores de utilidade que ciclam diariamente, de hora em hora etc.",
           "entity_id": "entidade na qual a energia virtual é baseada, o sensor de energia escutará as mudanças de estado desta entidade para serem atualizadas",
-          "group": "Preencha um nome de grupo personalizado para criar um novo grupo",
           "name": "Deixar em branco levará o nome da entidade de origem",
           "standby_power": "Defina a quantidade de potência que o dispositivo está consumindo quando estiver DESLIGADO"
         },

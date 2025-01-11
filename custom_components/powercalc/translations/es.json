@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crear contadores eléctricos",
-          "group": "Añadir a un grupo",
           "name": "Nombre",
           "on_time": "Tiempo encendido",
           "start_time": "Hora de inicio",
@@ -36,7 +45,6 @@
           "value_template": "Plantilla de valor"
         },
         "data_description": {
-          "group": "Rellena un nombre de grupo customizado para crear un nuevo grupo",
           "on_time": "Cuando se deja vacío es 1 día por defecto. Siempre encendido",
           "update_frequency": "tiempo en segundos entre actualizaciones del estado del sensor"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Crear sensor de energía",
           "create_utility_meters": "Crear contadores eléctricos",
           "entity_id": "Entidad original",
-          "group": "Añadir al Grupo",
           "mode": "Estrategia de cálculo",
           "name": "Nombre",
           "standby_power": "Potencia en espera (standby)"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
           "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc.",
           "entity_id": "entidad en la que se basa la potencia virtual, el sensor de energía escuchará los cambios de estado de esta entidad para ser actualizada",
-          "group": "Rellena un nombre de grupo personalizado para crear un nuevo grupo",
           "name": "Dejar en blanco utilizará el nombre del dispositivo original",
           "standby_power": "Definir la cantidad de energía que consume el dispositivo cuando está apagado"
         },

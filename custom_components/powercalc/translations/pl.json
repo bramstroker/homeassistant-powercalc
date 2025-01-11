@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
-          "group": "Dodaj do grupy",
           "name": "Nazwa",
           "on_time": "Sumaryczny czas włączenia",
           "start_time": "Moment uruchomienia",
@@ -36,7 +45,6 @@
           "value_template": "Szablon wartości"
         },
         "data_description": {
-          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "on_time": "Gdy pole pozostanie puste, to wartość domyślna wyniesie 1 dzień = zawsze włączone",
           "update_frequency": "Czas w sekundach między aktualizacjami stanu sensora"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Utwórz sensor energii",
           "create_utility_meters": "Utwórz liczniki mediów (utility meter)",
           "entity_id": "Encja źródłowa",
-          "group": "Dodaj do grupy",
           "mode": "Strategia obliczeniowa",
           "name": "Nazwa",
           "standby_power": "Moc w trybie czuwania"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Czy Powercalc musi utworzyć sensor kWh",
           "create_utility_meters": "Pozwól Powercalc stworzyć liczniki mediów, które pracują w cyklach dziennych, godzinowych itp.",
           "entity_id": "Encja źródłowa, na której opiera się wirtualna moc; sensor mocy, który ma być aktualizowany będzie nasłuchiwał zmian stanu tej encji",
-          "group": "Wpisz własną nazwę grupy, aby utworzyć nową grupę",
           "name": "Pozostawienie pustego pola spowoduje pobranie nazwy z encji źródłowej",
           "standby_power": "Określ ilość energii zużywanej przez urządzenie w trybie czuwania (standby)"
         },
