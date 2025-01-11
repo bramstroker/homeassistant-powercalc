@@ -1095,7 +1095,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             sub_profiles = [
                 selector.SelectOptionDict(
                     value=sub_profile[0],
-                    label=sub_profile[1]["label"] if "label" in sub_profile[1] else sub_profile[0],
+                    label=sub_profile[1]["name"] if "name" in sub_profile[1] else sub_profile[0],
                 )
                 for sub_profile in await profile.get_sub_profiles()
             ]

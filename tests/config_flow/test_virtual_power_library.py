@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
+    CONF_SUB_PROFILE,
     CONF_VARIABLES,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -276,3 +277,30 @@ async def test_profile_with_custom_fields(
     }
 
     assert not caplog.records
+
+
+async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "sensor.dummy"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile")
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.SUB_PROFILE
+
+    data_schema: vol.Schema = result["data_schema"]
+    sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]
+    options = sub_profile_selector.config["options"]
+    assert options == [{"label": "Name A", "value": "a"}, {"label": "Name B", "value": "b"}]
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_SUB_PROFILE: "a"},
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
