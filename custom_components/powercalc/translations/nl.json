@@ -1,6 +1,7 @@
 {
   "common": {
-    "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow"
+    "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
+    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
   "config": {
     "abort": {
