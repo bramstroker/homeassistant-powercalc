@@ -72,16 +72,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const octokit = github.getOctokit(process.env.PAT_TOKEN);
-            
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo;
             
-            await octokit.issues.createComment({
+            await github.rest.issues.createComment({
               owner: repo.owner,
               repo: repo.repo,
               issue_number: prNumber,
               body: "Thank you for your PR! We will review it soon."
             });
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
