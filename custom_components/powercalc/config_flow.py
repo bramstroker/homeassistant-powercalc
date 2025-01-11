@@ -1092,7 +1092,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create sub profile schema."""
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(model_info, process_variables=False)
-            sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
+            sub_profiles = [
+                selector.SelectOptionDict(
+                    value=sub_profile[0],
+                    label=sub_profile[1]["label"] if "label" in sub_profile[1] else sub_profile[0],
+                )
+                for sub_profile in await profile.get_sub_profiles()
+            ]
             return vol.Schema(
                 {
                     vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
