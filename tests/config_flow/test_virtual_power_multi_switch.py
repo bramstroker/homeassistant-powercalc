@@ -1,3 +1,4 @@
+from selectors import SelectSelector
 from unittest.mock import AsyncMock
 
 import voluptuous as vol
@@ -188,6 +189,53 @@ async def test_regression_2612(hass: HomeAssistant, mock_entity_with_model_infor
 
     assert hass.states.get("sensor.foo_bar_power")
     assert hass.states.get("sensor.foo_bar_energy")
+
+
+async def test_light_switches_selectable(hass: HomeAssistant) -> None:
+    """
+    Some integrations allow you to change the type of a switch to light.
+    Make sure that light entities are also selectable in the multi switch setup
+    """
+    hass.config.config_dir = get_test_config_dir()
+
+    device_id = "abcdef"
+    device_entry = DeviceEntry(
+        id=device_id,
+        manufacturer="test",
+        model="multi_switch",
+        name="Test",
+    )
+    mock_device_registry(
+        hass,
+        {
+            device_id: device_entry,
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "switch.test1": RegistryEntry(
+                id="switch.test1",
+                entity_id="switch.test1",
+                unique_id=f"{device_id}1",
+                device_id=device_id,
+                platform="switch",
+            ),
+            "light.test2": RegistryEntry(
+                id="light.test2",
+                entity_id="light.test2",
+                unique_id=f"{device_id}2",
+                device_id=device_id,
+                platform="light",
+            ),
+        },
+    )
+
+    result = await initialize_device_discovery_flow(hass, device_entry)
+    data_schema: vol.Schema = result["data_schema"]
+    entities_select: SelectSelector = data_schema.schema["entities"]
+    options = entities_select.config["include_entities"]
+    assert options == ["switch.test1", "light.test2"]
 
 
 async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: DeviceEntry) -> FlowResult:
