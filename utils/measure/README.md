@@ -20,7 +20,9 @@ The recommended way is with docker as all the needed dependencies are bundled.
 
 Go to the directory you created in a command line and run:
 
-`docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest`
+```
+docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
+```
 
 If running Docker on Windows, replace `$(pwd)` with `%CD%`.
 
@@ -30,7 +32,9 @@ After the measurements are finished you will find the files in `export` director
 
 To update to the latest version of the script:
 
-`docker pull bramgerritsen/powercalc-measure`
+```
+docker pull bramgerritsen/powercalc-measure
+```
 
 ### Native
 
