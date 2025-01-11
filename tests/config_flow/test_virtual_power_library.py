@@ -210,6 +210,53 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert entry.data[CONF_MODEL] == "LWB010"
 
 
+async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MANUFACTURER
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_MANUFACTURER)].description == {
+        "suggested_value": "signify",
+    }
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: "signify"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MODEL
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_MODEL)].description == {
+        "suggested_value": "LCT010",
+    }
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MODEL: "LCA001"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MANUFACTURER] == "signify"
+    assert entry.data[CONF_MODEL] == "LCA001"
+
+
 async def test_source_entity_not_visible_in_options_when_discovery_by_device(hass: HomeAssistant) -> None:
     """When discovery mode was by device, source entity should not be visible in options."""
     hass.config.config_dir = get_test_config_dir()
