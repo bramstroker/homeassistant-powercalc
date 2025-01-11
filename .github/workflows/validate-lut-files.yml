@@ -79,5 +79,5 @@ jobs:
               owner: repo.owner,
               repo: repo.repo,
               issue_number: prNumber,
-              body: "Thank you for your PR! We will review it soon."
+              body: "${{ steps.build-pr-message.outputs.PR_MESSAGE }}"
             });
