@@ -655,13 +655,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def create_schema_multi_switch(self) -> vol.Schema:
         """Create the config schema for multi switch strategy."""
 
+        switch_domains = [str(Platform.SWITCH), str(Platform.LIGHT)]
         entity_registry = er.async_get(self.hass)
         entities: list[str] = []
         if self.source_entity and self.source_entity.device_entry:
             entities = [
                 entity.entity_id
                 for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
-                if entity.domain in (Platform.SWITCH, Platform.LIGHT)
+                if entity.domain in switch_domains
             ]
 
         # pre-populate the entity selector with the switches from the device
@@ -673,7 +674,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                         description={"suggested_value": entities},
                     ): selector.EntitySelector(
                         selector.EntitySelectorConfig(
-                            domain=Platform.SWITCH,
+                            domain=switch_domains,
                             multiple=True,
                             include_entities=entities,
                         ),
@@ -685,7 +686,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 {
                     vol.Required(CONF_ENTITIES): selector.EntitySelector(
                         selector.EntitySelectorConfig(
-                            domain=Platform.SWITCH,
+                            domain=switch_domains,
                             multiple=True,
                         ),
                     ),

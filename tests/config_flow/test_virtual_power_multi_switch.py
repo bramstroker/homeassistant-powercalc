@@ -237,6 +237,12 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     options = entities_select.config["include_entities"]
     assert options == ["switch.test1", "light.test2"]
 
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITIES: ["switch.test1", "light.test2"]},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
 
 async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: DeviceEntry) -> FlowResult:
     source_entity = SourceEntity(
