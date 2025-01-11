@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Skapa bruksmätare",
-          "group": "Lägg till i grupp",
           "name": "Namn",
           "on_time": "Igång tid",
           "start_time": "Starttid",
@@ -36,7 +45,6 @@
           "value_template": "Värdesmall"
         },
         "data_description": {
-          "group": "Fyll i ett eget gruppnamn för att skapa en ny grupp",
           "on_time": "Om lämnas tomt är standard 1 dag. Alltid på",
           "update_frequency": "Tid i sekunder mellan uppdatering av sensor"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Skapa energisensor",
           "create_utility_meters": "Skapa bruksmätare",
           "entity_id": "Källentitet",
-          "group": "Lägg till i grupp",
           "mode": "Beräkningsstrategi",
           "name": "Namn",
           "standby_power": "Standby effekt"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Ska powercalc skapa en kWh sensor",
           "create_utility_meters": "Låt powercalc skapa bruksmätare, vilken cykel dag, timme etc.",
           "entity_id": "Entitet den virtuella effekten är baserad på, effektsensorn kommer lyssna på förändringar på denna entitet",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Lämnas tom kommer namn tas från källentiteten",
           "standby_power": "Ange effekten som enheten förbrukar i avstängt läge"
         },

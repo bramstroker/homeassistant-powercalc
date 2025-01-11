@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creëer utiliteit meters",
-          "group": "Aan groep toevoegen",
           "name": "Naam",
           "on_time": "Tijd aan per dag",
           "start_time": "Begintijd",
@@ -36,7 +45,6 @@
           "value_template": "Waarde template"
         },
         "data_description": {
-          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "on_time": "Standaard 1 dag indien niet gedefinieerd. altijd aan",
           "update_frequency": "tijd in seconden tussen status updates van de sensor"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Creëer energie sensoren",
           "create_utility_meters": "Creëer utiliteit meters",
           "entity_id": "Bron entiteit",
-          "group": "Aan groep toevoegen",
           "mode": "Calculatie strategie",
           "name": "Naam",
           "standby_power": "Stand-by vermogen"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Laat Powercalc een kWh meter maken",
           "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc.",
           "entity_id": "entiteit waarop de virtuele energie sensor is gebaseerd, de energiesensor update zichzelf wanneer deze entiteit van status wijzigt",
-          "group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken",
           "name": "Indien dit leeg gelaten wordt dan wordt de naam van de bron entiteit overgenomen",
           "standby_power": "Definieer het vermogen wanneer het apparaat uit staat (OFF status in Home Assistant)"
         },

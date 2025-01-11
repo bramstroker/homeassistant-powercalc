@@ -23,10 +23,19 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Créer des compteurs de services publics",
-          "group": "Add to group",
           "name": "Nom",
           "on_time": "Temps de fonctionnement",
           "start_time": "Heure de début",
@@ -36,7 +45,6 @@
           "value_template": "Modèle de valeur"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
           "on_time": "Lorsqu'il est laissé vide, la valeur par défaut est 1 jour. Toujours allumé",
           "update_frequency": "Temps en secondes entre les mises à jour d'état du capteur"
         },
@@ -348,7 +356,6 @@
           "create_energy_sensor": "Créer un capteur d'énergie",
           "create_utility_meters": "Créer un compteur d'électricité",
           "entity_id": "Entité source",
-          "group": "Ajouter au groupe",
           "mode": "Stratégie de calcul",
           "name": "Nom",
           "standby_power": "Consommation en veille"
@@ -357,7 +364,6 @@
           "create_energy_sensor": "Si powercalc doit créer un capteur kWh",
           "create_utility_meters": "Laissez powercalc créer des compteurs de services publics, qui effectuent un cycle quotidien, horaire, etc.",
           "entity_id": "Entité sur laquelle la puissance virtuelle est basée, le capteur de puissance écoutera les changements d'état de cette entité à mettre à jour",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Laisser vide prendra le nom de l'entité source",
           "standby_power": "Définir la quantité d'énergie que l'appareil consomme lorsqu'il est à l'état OFF"
         },
