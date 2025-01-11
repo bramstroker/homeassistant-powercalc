@@ -13,14 +13,14 @@ The recommended way is with docker as all the needed dependencies are bundled.
 - Install docker engine, see https://docs.docker.com/get-docker/
 - Start up the command line and verify docker is running: `docker version`
 - Create a new directory. for example `powercalc-measure`
-- Go to this directory and copy the `.env.dist` file from [here](https://github.com/bramstroker/homeassistant-powercalc/blob/master/utils/measure/.env.dist) into the directory and rename it to `.env`. 
+- Go to this directory and copy the `.env.dist` file from [here](https://github.com/bramstroker/homeassistant-powercalc/blob/master/utils/measure/.env.dist) into the directory and rename it to `.env`.
 - Modify the `.env` file to your needs. Selecting the `POWER_METER` and `LIGHT_CONTROLLER` here is mandatory
 
 #### Start measurements
 
-Go to the directory you created in a command line. 
+Go to the directory you created in a command line.
 
-##### Linux and MacOS 
+##### Linux and MacOS
 ```
 docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $(pwd)/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
@@ -28,7 +28,7 @@ docker run --rm --name=measure --env-file=.env -v $(pwd)/export:/app/export -v $
 ```
 docker run --rm --name=measure --env-file=.env -v %CD%/export:/app/export -v %CD%/.persistent:/app/.persistent -it bramgerritsen/powercalc-measure:latest
 ```
-Note: if you use PowerShell instead of the Windows command line tool, you must use the full paths instead of relative paths. 
+Note: if you use PowerShell instead of the Windows command line tool, you must use the full paths instead of relative paths.
 
 The script will ask you a few questions, than proceed taking measurements.
 
