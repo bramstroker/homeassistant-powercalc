@@ -662,7 +662,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
     def create_schema_multi_switch(self) -> vol.Schema:
         """Create the config schema for multi switch strategy."""
 
-        switch_domains = [str(Platform.SWITCH), str(Platform.LIGHT)]
+        switch_domains = [str(Platform.SWITCH), str(Platform.LIGHT), str(Platform.COVER)]
         if self.source_entity and self.source_entity.device_entry:
             entity_selector = self.create_device_entity_selector(switch_domains, multiple=True)
         else:

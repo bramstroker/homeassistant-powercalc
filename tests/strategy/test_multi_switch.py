@@ -4,8 +4,11 @@ import pytest
 from homeassistant.const import (
     CONF_ENTITIES,
     CONF_NAME,
+    STATE_CLOSED,
+    STATE_CLOSING,
     STATE_OFF,
     STATE_ON,
+    STATE_OPENING,
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.typing import ConfigType
@@ -50,6 +53,23 @@ async def test_calculate_sum_without_off_power(hass: HomeAssistant) -> None:
     assert await strategy.calculate(State(switch2, STATE_ON)) == Decimal("1.00")
     assert await strategy.calculate(State(switch1, STATE_OFF)) == Decimal("0.50")
     assert await strategy.calculate(State(switch2, STATE_OFF)) == Decimal("0.00")
+
+
+async def test_cover_entities(hass: HomeAssistant) -> None:
+    cover1 = "cover.test1"
+    cover2 = "cover.test2"
+    switch3 = "switch.test3"
+
+    strategy = MultiSwitchStrategy(
+        hass,
+        [cover1, cover2, switch3],
+        on_power=Decimal("0.5"),
+    )
+
+    assert await strategy.calculate(State(cover1, STATE_OPENING)) == Decimal("0.50")
+    assert await strategy.calculate(State(cover1, STATE_CLOSED)) == Decimal("0.00")
+    assert await strategy.calculate(State(cover2, STATE_CLOSING)) == Decimal("0.50")
+    assert await strategy.calculate(State(switch3, STATE_ON)) == Decimal("1.00")
 
 
 async def test_setup_using_yaml(hass: HomeAssistant) -> None:
