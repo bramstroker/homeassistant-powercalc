@@ -1077,7 +1077,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 schema=vol.Schema(
                     {
                         vol.Optional(CONF_AVAILABILITY_ENTITY, default=first_entity): entity_selector,
-                    }
+                    },
                 ),
                 next_step=Step.POST_LIBRARY,
             ),
