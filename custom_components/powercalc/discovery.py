@@ -288,7 +288,7 @@ class DiscoveryManager:
                 LambdaFilter(_check_already_configured),
                 LambdaFilter(lambda entity: entity.device_id is None),
                 LambdaFilter(lambda entity: entity.platform == "mqtt" and "segment" in entity.entity_id),
-                LambdaFilter(lambda entity: entity.platform == "powercalc"),
+                LambdaFilter(lambda entity: entity.platform in ["powercalc", "switch_as_x"]),
                 NotFilter(DomainFilter(SUPPORTED_DOMAINS)),
             ],
             FilterOperator.OR,

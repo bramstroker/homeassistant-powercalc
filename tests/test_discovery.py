@@ -821,6 +821,24 @@ async def test_powercalc_sensors_are_ignored_for_discovery(
             ],
             [],
         ),
+        # SwitchAsX entities should be ignored
+        (
+            [
+                RegistryEntry(
+                    entity_id="switch.test",
+                    unique_id="1111",
+                    platform="mqtt",
+                    device_id="some-device",
+                ),
+                RegistryEntry(
+                    entity_id="light.test",
+                    unique_id="2222",
+                    platform="switch_as_x",
+                    device_id="some-device",
+                ),
+            ],
+            ["switch.test"],
+        ),
     ],
 )
 async def test_get_entities(hass: HomeAssistant, entity_entries: list[RegistryEntry], expected_entities: list[str]) -> None:
