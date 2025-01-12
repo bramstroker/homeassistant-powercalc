@@ -777,7 +777,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     def create_device_entity_selector(self, domains: list[str], multiple: bool = False) -> selector.EntitySelector:
         entity_registry = er.async_get(self.hass)
-        if self.source_entity.device_entry:
+        if self.source_entity and self.source_entity.device_entry:
             entities = [
                 entity.entity_id
                 for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
@@ -1063,7 +1063,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for availability entity."""
-        domains = DEVICE_TYPE_DOMAIN[self.selected_profile.device_type]
+        domains = DEVICE_TYPE_DOMAIN[self.selected_profile.device_type]  # type: ignore
         entity_selector = self.create_device_entity_selector(
             list(domains) if isinstance(domains, set) else [domains],
         )
@@ -1077,7 +1077,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 schema=vol.Schema(
                     {
                         vol.Optional(CONF_AVAILABILITY_ENTITY, default=first_entity): entity_selector,
-                    }
+                    },
                 ),
                 next_step=Step.POST_LIBRARY,
             ),

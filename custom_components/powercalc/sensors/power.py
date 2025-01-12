@@ -682,7 +682,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Return True if entity is available."""
         if self._availability_entity:
             state = self.hass.states.get(self._availability_entity)
-            return state and state.state != STATE_UNAVAILABLE
+            return bool(state and state.state != STATE_UNAVAILABLE)
 
         return self._power is not None
 
