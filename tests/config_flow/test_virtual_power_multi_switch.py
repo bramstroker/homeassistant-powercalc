@@ -15,6 +15,7 @@ from custom_components.powercalc import DiscoveryManager
 from custom_components.powercalc.common import SourceEntity
 from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_AVAILABILITY_ENTITY,
     CONF_MANUFACTURER,
     CONF_MODE,
     CONF_MODEL,
@@ -73,6 +74,13 @@ async def test_discovery_flow(
     result = await initialize_device_discovery_flow(hass, device_entry)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test1"},
+    )
+
     assert result["step_id"] == Step.MULTI_SWITCH
 
     result = await hass.config_entries.flow.async_configure(
@@ -82,6 +90,7 @@ async def test_discovery_flow(
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
+        CONF_AVAILABILITY_ENTITY: "switch.test1",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "tp-link",
@@ -233,6 +242,12 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     )
 
     result = await initialize_device_discovery_flow(hass, device_entry)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test1"},
+    )
+
     data_schema: vol.Schema = result["data_schema"]
     entities_select: SelectSelector = data_schema.schema["entities"]
     options = entities_select.config["include_entities"]
