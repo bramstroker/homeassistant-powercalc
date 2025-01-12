@@ -461,6 +461,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
 
 async def async_remove_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
     """Called after a config entry is removed."""
+    discovery_manager: DiscoveryManager = hass.data[DOMAIN][DATA_DISCOVERY_MANAGER]
+    discovery_manager.remove_initialized_flow(config_entry)
+
     updated_entries: list[ConfigEntry] = []
 
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
