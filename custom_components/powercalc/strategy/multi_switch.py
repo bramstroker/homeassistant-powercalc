@@ -6,7 +6,7 @@ from decimal import Decimal
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
-from homeassistant.const import CONF_ENTITIES, STATE_ON, STATE_UNAVAILABLE
+from homeassistant.const import CONF_ENTITIES, STATE_CLOSING, STATE_ON, STATE_OPENING, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers.event import TrackTemplate
 
@@ -23,6 +23,8 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+ON_STATES = [STATE_ON, STATE_OPENING, STATE_CLOSING]
 
 
 class MultiSwitchStrategy(PowerCalculationStrategyInterface):
@@ -51,7 +53,7 @@ class MultiSwitchStrategy(PowerCalculationStrategyInterface):
         def _get_power(state: str) -> Decimal:
             if state == STATE_UNAVAILABLE:
                 return Decimal(0)
-            if state == STATE_ON:
+            if state in ON_STATES:
                 return self.on_power
             return self.off_power or Decimal(0)
 
