@@ -21,6 +21,7 @@ from tests.common import create_mock_light_entity
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
     assert_default_virtual_power_entry_data,
+    confirm_auto_discovered_model,
     create_mock_entry,
     goto_virtual_power_strategy_step,
     initialize_options_flow,
@@ -160,10 +161,7 @@ async def test_lut_autodiscover_flow_not_confirmed(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.LIBRARY
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False},
-    )
+    result = await confirm_auto_discovered_model(hass, result, confirmed=False)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MANUFACTURER

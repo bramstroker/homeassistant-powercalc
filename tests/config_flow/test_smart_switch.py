@@ -7,7 +7,7 @@ from homeassistant.const import CONF_ENTITY_ID, STATE_ON
 from homeassistant.core import HomeAssistant
 
 from custom_components.powercalc import CONF_POWER
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_UTILITY_METERS,
@@ -23,6 +23,7 @@ from custom_components.powercalc.const import (
 from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     create_mock_entry,
     initialize_options_flow,
     select_menu_item,
@@ -67,10 +68,7 @@ async def test_smart_switch_flow(
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.LIBRARY
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.SMART_SWITCH

@@ -572,7 +572,7 @@ STRATEGY_SCHEMAS: dict[CalculationStrategy, vol.Schema] = {
 @dataclass(slots=True)
 class PowercalcFormStep:
     schema: vol.Schema | Callable[[], Coroutine[Any, Any, vol.Schema | None]]
-
+    step: Step
     validate_user_input: (
         Callable[
             [dict[str, Any]],
@@ -582,7 +582,6 @@ class PowercalcFormStep:
     ) = None
 
     next_step: Step | Callable[[dict[str, Any]], Coroutine[Any, Any, Step | None]] | None = None
-    step: Step | None = None
     continue_utility_meter_options_step: bool = False
     continue_advanced_step: bool = False
     form_kwarg: dict[str, Any] | None = None
@@ -602,6 +601,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         self.is_options_flow: bool = isinstance(self, OptionsFlow)
         self.strategy: CalculationStrategy | None = None
         self.name: str | None = None
+        self.handled_steps: list[Step] = []
         super().__init__()
 
     @abstractmethod
@@ -898,6 +898,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 self.name = user_input[CONF_NAME]
             self.sensor_config.update(user_input)
 
+            self.handled_steps.append(form_step.step)
             next_step = form_step.next_step
             if callable(form_step.next_step):
                 next_step = await form_step.next_step(user_input)
@@ -1038,30 +1039,40 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not self.selected_profile:
             return self.async_abort(reason="model_not_supported")  # pragma: no cover
 
-        if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_VARIABLES):
+        if Step.LIBRARY_CUSTOM_FIELDS not in self.handled_steps and self.selected_profile.has_custom_fields:
             return await self.async_step_library_custom_fields()
 
-        if self.selected_profile.discovery_by == DiscoveryBy.DEVICE and not self.sensor_config.get(CONF_AVAILABILITY_ENTITY):
-            return await self.async_step_availability_entity()
+        if Step.AVAILABILITY_ENTITY not in self.handled_steps and self.selected_profile.discovery_by == DiscoveryBy.DEVICE:
+            result = await self.async_step_availability_entity()
+            if result:
+                return result
 
-        if await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
+        if (
+            Step.SUB_PROFILE not in self.handled_steps
+            and await self.selected_profile.has_sub_profiles
+            and not self.selected_profile.sub_profile_select
+        ):
             return await self.async_step_sub_profile()
 
-        if self.selected_profile.device_type == DeviceType.SMART_SWITCH and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED:
+        if (
+            Step.SMART_SWITCH not in self.handled_steps
+            and self.selected_profile.device_type == DeviceType.SMART_SWITCH
+            and self.selected_profile.calculation_strategy == CalculationStrategy.FIXED
+        ):
             return await self.async_step_smart_switch()
 
-        if self.selected_profile.needs_fixed_config:  # pragma: no cover
+        if Step.FIXED not in self.handled_steps and self.selected_profile.needs_fixed_config:  # pragma: no cover
             return await self.async_step_fixed()
 
-        if self.selected_profile.needs_linear_config:
+        if Step.LINEAR not in self.handled_steps and self.selected_profile.needs_linear_config:
             return await self.async_step_linear()
 
-        if self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
+        if Step.MULTI_SWITCH not in self.handled_steps and self.selected_profile.calculation_strategy == CalculationStrategy.MULTI_SWITCH:
             return await self.async_step_multi_switch()
 
         return await self.async_step_assign_groups()
 
-    async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult | None:
         """Handle the flow for availability entity."""
         domains = DEVICE_TYPE_DOMAIN[self.selected_profile.device_type]  # type: ignore
         entity_selector = self.create_device_entity_selector(
@@ -1070,7 +1081,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         try:
             first_entity = entity_selector.config["include_entities"][0]
         except IndexError:
-            first_entity = None
+            # Skip step if no entities are available
+            self.handled_steps.append(Step.AVAILABILITY_ENTITY)
+            return None
         return await self.handle_form_step(
             PowercalcFormStep(
                 step=Step.AVAILABILITY_ENTITY,

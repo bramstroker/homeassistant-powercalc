@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_registry import RegistryEntry
 from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
@@ -27,6 +27,7 @@ from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     create_mock_entry,
     initialize_discovery_flow,
     initialize_options_flow,
@@ -49,11 +50,7 @@ async def test_discovery_flow(
     result = await initialize_discovery_flow(hass, source_entity)
 
     # Confirm selected manufacturer/model
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
@@ -89,11 +86,7 @@ async def test_discovery_flow_with_subprofile_selection(
 
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.SUB_PROFILE
@@ -224,11 +217,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.AVAILABILITY_ENTITY

@@ -5,7 +5,9 @@ import voluptuous as vol
 from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.selector import SelectSelector
+from pytest_homeassistant_custom_component.common import mock_device_registry
 
 from custom_components.powercalc import (
     CONF_CREATE_ENERGY_SENSOR,
@@ -13,6 +15,7 @@ from custom_components.powercalc import (
     CONF_ENERGY_INTEGRATION_METHOD,
     DEFAULT_ENERGY_INTEGRATION_METHOD,
 )
+from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.config_flow import (
     CONF_CONFIRM_AUTODISCOVERED_MODEL,
     Step,
@@ -28,12 +31,16 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     SensorType,
 )
+from custom_components.powercalc.power_profile.factory import get_power_profile
+from custom_components.powercalc.power_profile.library import ModelInfo
 from custom_components.test.light import MockLight
 from tests.common import create_mock_light_entity, get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     create_mock_entry,
     goto_virtual_power_strategy_step,
+    initialize_discovery_flow,
     initialize_options_flow,
     process_config_flow,
     select_manufacturer_and_model,
@@ -350,4 +357,26 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
         result["flow_id"],
         {},
     )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+
+
+async def test_availability_entity_step_skipped(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    mock_device_registry(
+        hass,
+        {
+            "test-device": DeviceEntry(
+                manufacturer="test",
+                name="Test Device",
+                model="discovery_type_device",
+            ),
+        },
+    )
+
+    source_entity = await create_source_entity(DUMMY_ENTITY_ID, hass)
+    power_profiles = [
+        await get_power_profile(hass, {}, ModelInfo("test", "discovery_type_device")),
+    ]
+    result = await initialize_discovery_flow(hass, source_entity, power_profiles)
+    result = await confirm_auto_discovered_model(hass, result)
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

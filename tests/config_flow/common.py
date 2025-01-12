@@ -91,6 +91,18 @@ async def select_manufacturer_and_model(
     )
 
 
+async def confirm_auto_discovered_model(
+    hass: HomeAssistant,
+    prev_result: FlowResult,
+    confirmed: bool = True,
+) -> FlowResult:
+    assert prev_result["step_id"] == Step.LIBRARY
+    return await hass.config_entries.flow.async_configure(
+        prev_result["flow_id"],
+        {CONF_CONFIRM_AUTODISCOVERED_MODEL: confirmed},
+    )
+
+
 async def initialize_options_flow(
     hass: HomeAssistant,
     entry: config_entries.ConfigEntry,
@@ -155,11 +167,7 @@ async def initialize_discovery_flow(
     if not confirm_autodiscovered_model:
         return result
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    return await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    return await confirm_auto_discovered_model(hass, result)
 
 
 async def goto_virtual_power_strategy_step(

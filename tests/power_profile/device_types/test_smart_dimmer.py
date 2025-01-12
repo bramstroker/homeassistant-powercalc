@@ -4,7 +4,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.powercalc import CONF_IGNORE_UNAVAILABLE_STATE, async_setup_entry
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_LINEAR,
@@ -13,7 +13,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
-from tests.config_flow.common import initialize_options_flow
+from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
 
@@ -115,10 +115,7 @@ async def test_smart_dimmer_power_input_gui_config_flow(
     flow = flows[0]
 
     assert flow["step_id"] == Step.LIBRARY
-    result = await hass.config_entries.flow.async_configure(
-        flow["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, flow)
 
     # After confirming the manufacturer/model we must be directed to the linear config step
     assert result["step_id"] == Step.LINEAR
