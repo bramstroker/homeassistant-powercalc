@@ -46,6 +46,7 @@ from .common import (
 )
 from .const import (
     CONF_AND,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_COMPOSITE,
@@ -161,6 +162,7 @@ MAX_GROUP_NESTING_LEVEL = 5
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
+    vol.Optional(CONF_AVAILABILITY_ENTITY): cv.entity_id,
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,

@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CALCULATION_STRATEGY_CONF_KEYS,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
@@ -375,6 +376,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
         self.calculation_strategy_factory = calculation_strategy_factory
         self._strategy_instance: PowerCalculationStrategyInterface | None = None
+        self._availability_entity: str | None = sensor_config.get(CONF_AVAILABILITY_ENTITY)
         self._config_entry = config_entry
 
     async def validate(self) -> None:
@@ -483,6 +485,9 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         ]
         if not source_entity_included and self._source_entity.entity_id != DUMMY_ENTITY_ID:
             entities_to_track.append(self._source_entity.entity_id)
+
+        if self._availability_entity and self._availability_entity not in entities_to_track:
+            entities_to_track.append(self._availability_entity)
 
         return entities_to_track
 
@@ -675,6 +680,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
+        if self._availability_entity:
+            state = self.hass.states.get(self._availability_entity)
+            return bool(state and state.state != STATE_UNAVAILABLE)
+
         return self._power is not None
 
     def set_energy_sensor_attribute(self, entity_id: str) -> None:
