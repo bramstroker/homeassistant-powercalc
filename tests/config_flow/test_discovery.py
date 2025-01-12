@@ -5,10 +5,13 @@ from homeassistant import config_entries, data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
 from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
 from custom_components.powercalc.const import (
+    CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_MANUFACTURER,
     CONF_MODEL,
@@ -192,6 +195,23 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         manufacturer="test",
         model="discovery_type_device",
     )
+    mock_device_registry(
+        hass,
+        {
+            device_entry.id: device_entry,
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="54543",
+                device_id=device_entry.id,
+                platform="youless",
+            ),
+        },
+    )
     source_entity = SourceEntity(
         object_id=device_entry.name,
         name=device_entry.name,
@@ -210,8 +230,16 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
     )
 
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test"},
+    )
+
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
+        CONF_AVAILABILITY_ENTITY: "switch.test",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "test",

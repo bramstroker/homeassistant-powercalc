@@ -335,7 +335,12 @@ async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
     )
     result = await select_manufacturer_and_model(hass, result, "test", "sub_profile")
     assert result["type"] == data_entry_flow.FlowResultType.FORM
-    assert result["step_id"] == Step.SUB_PROFILE
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
 
     data_schema: vol.Schema = result["data_schema"]
     sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]

@@ -114,9 +114,10 @@ async def test_switch_entities_automatically_populated_from_device(hass: HomeAss
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MULTI_SWITCH
 
-    schema_keys: list[vol.Marker] = list(result["data_schema"].schema.keys())
-    field_desc = schema_keys[schema_keys.index(vol.Marker(CONF_ENTITIES))].description
-    assert field_desc == {"suggested_value": ["switch.test1", "switch.test2", "switch.test3", "switch.test4"]}
+    data_schema: vol.Schema = result["data_schema"]
+    select: SelectSelector = data_schema.schema[CONF_ENTITIES]
+    include_entities = select.config["include_entities"]
+    assert include_entities == ["switch.test1", "switch.test2", "switch.test3", "switch.test4"]
 
 
 async def test_discovery_flow_once_per_unique_device(

@@ -46,6 +46,7 @@ from .common import SourceEntity, create_source_entity
 from .const import (
     CONF_AREA,
     CONF_AUTOSTART,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_ENERGY_SENSOR,
@@ -132,7 +133,7 @@ from .flow_helper.dynamic_field_builder import build_dynamic_field_schema
 from .group_include.include import find_entities
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DOMAIN_DEVICE_TYPE_MAPPING, SUPPORTED_DOMAINS, DeviceType, PowerProfile
+from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DOMAIN_DEVICE_TYPE_MAPPING, SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
 from .sensors.daily_energy import DEFAULT_DAILY_UPDATE_FREQUENCY
 from .sensors.group.config_entry_utils import get_group_entries
 from .sensors.power import PowerSensor
@@ -147,6 +148,7 @@ CONF_CONFIRM_AUTODISCOVERED_MODEL = "confirm_autodisovered_model"
 class Step(StrEnum):
     ADVANCED_OPTIONS = "advanced_options"
     ASSIGN_GROUPS = "assign_groups"
+    AVAILABILITY_ENTITY = "availability_entity"
     BASIC_OPTIONS = "basic_options"
     GROUP_CUSTOM = "group_custom"
     GROUP_DOMAIN = "group_domain"
@@ -661,42 +663,18 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Create the config schema for multi switch strategy."""
 
         switch_domains = [str(Platform.SWITCH), str(Platform.LIGHT)]
-        entity_registry = er.async_get(self.hass)
-        entities: list[str] = []
         if self.source_entity and self.source_entity.device_entry:
-            entities = [
-                entity.entity_id
-                for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
-                if entity.domain in switch_domains
-            ]
-
-        # pre-populate the entity selector with the switches from the device
-        if entities:
-            schema = vol.Schema(
-                {
-                    vol.Required(
-                        CONF_ENTITIES,
-                        description={"suggested_value": entities},
-                    ): selector.EntitySelector(
-                        selector.EntitySelectorConfig(
-                            domain=switch_domains,
-                            multiple=True,
-                            include_entities=entities,
-                        ),
-                    ),
-                },
-            )
+            entity_selector = self.create_device_entity_selector(switch_domains, multiple=True)
         else:
-            schema = vol.Schema(
-                {
-                    vol.Required(CONF_ENTITIES): selector.EntitySelector(
-                        selector.EntitySelectorConfig(
-                            domain=switch_domains,
-                            multiple=True,
-                        ),
-                    ),
-                },
+            entity_selector = selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=switch_domains,
+                    multiple=True,
+                ),
             )
+
+        schema = vol.Schema({vol.Required(CONF_ENTITIES): entity_selector})
+
         if not self.is_library_flow:
             schema = schema.extend(SCHEMA_POWER_MULTI_SWITCH_MANUAL.schema)
 
@@ -796,6 +774,25 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 selector.EntitySelectorConfig(domain=list(SUPPORTED_DOMAINS)),
             )
         return selector.EntitySelector()
+
+    def create_device_entity_selector(self, domains: list[str], multiple: bool = False) -> selector.EntitySelector:
+        entity_registry = er.async_get(self.hass)
+        if self.source_entity.device_entry:
+            entities = [
+                entity.entity_id
+                for entity in entity_registry.entities.get_entries_for_device_id(self.source_entity.device_entry.id)
+                if entity.domain in domains
+            ]
+        else:
+            entities = []
+
+        return selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=domains,
+                multiple=multiple,
+                include_entities=entities,
+            ),
+        )
 
     def create_group_selector(
         self,
@@ -1044,6 +1041,9 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if self.selected_profile.has_custom_fields and not self.sensor_config.get(CONF_VARIABLES):
             return await self.async_step_library_custom_fields()
 
+        if self.selected_profile.discovery_by == DiscoveryBy.DEVICE and not self.sensor_config.get(CONF_AVAILABILITY_ENTITY):
+            return await self.async_step_availability_entity()
+
         if await self.selected_profile.has_sub_profiles and not self.selected_profile.sub_profile_select:
             return await self.async_step_sub_profile()
 
@@ -1060,6 +1060,29 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             return await self.async_step_multi_switch()
 
         return await self.async_step_assign_groups()
+
+    async def async_step_availability_entity(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the flow for availability entity."""
+        domains = DEVICE_TYPE_DOMAIN[self.selected_profile.device_type]
+        entity_selector = self.create_device_entity_selector(
+            list(domains) if isinstance(domains, set) else [domains],
+        )
+        try:
+            first_entity = entity_selector.config["include_entities"][0]
+        except IndexError:
+            first_entity = None
+        return await self.handle_form_step(
+            PowercalcFormStep(
+                step=Step.AVAILABILITY_ENTITY,
+                schema=vol.Schema(
+                    {
+                        vol.Optional(CONF_AVAILABILITY_ENTITY, default=first_entity): entity_selector,
+                    }
+                ),
+                next_step=Step.POST_LIBRARY,
+            ),
+            user_input,
+        )
 
     async def async_step_library_custom_fields(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for custom fields."""
