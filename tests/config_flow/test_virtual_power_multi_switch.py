@@ -69,7 +69,7 @@ async def test_discovery_flow(
     mock_entity_with_model_information: MockEntityWithModel,
 ) -> None:
     hass.config.config_dir = get_test_config_dir()
-    device_entry = mock_device_with_switches(hass, 2, "tp-link", "HS300")
+    device_entry = mock_device_with_switches(hass, 2)
 
     result = await initialize_device_discovery_flow(hass, device_entry)
 
@@ -93,32 +93,38 @@ async def test_discovery_flow(
         CONF_AVAILABILITY_ENTITY: "switch.test1",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
-        CONF_MANUFACTURER: "tp-link",
-        CONF_MODEL: "HS300",
+        CONF_MANUFACTURER: "test",
+        CONF_MODEL: "multi_switch",
         CONF_NAME: "Test",
         CONF_MULTI_SWITCH: {
             CONF_ENTITIES: ["switch.test1", "switch.test2"],
         },
     }
 
-    assert hass.states.get("sensor.test_device_power")
+    assert hass.states.get("sensor.test_power")
 
     hass.states.async_set("switch.test1", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "0.82"
+    assert hass.states.get("sensor.test_power").state == "1.22"
 
     hass.states.async_set("switch.test2", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "1.64"
+    assert hass.states.get("sensor.test_power").state == "1.95"
 
 
 async def test_switch_entities_automatically_populated_from_device(hass: HomeAssistant) -> None:
     """When setting up multi switch, the switch entities should be automatically populated from the device."""
-    device_entry = mock_device_with_switches(hass, 4, "tp-link", "HS300")
+    hass.config.config_dir = get_test_config_dir()
+    device_entry = mock_device_with_switches(hass, 4)
 
     result = await initialize_device_discovery_flow(hass, device_entry)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_AVAILABILITY_ENTITY: "switch.test1"},
+    )
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MULTI_SWITCH
@@ -135,7 +141,7 @@ async def test_discovery_flow_once_per_unique_device(
 ) -> None:
     hass.config.config_dir = get_test_config_dir()
 
-    mock_device_with_switches(hass, 6, "tp-link", "HS300")
+    mock_device_with_switches(hass, 6)
 
     discovery_manager = DiscoveryManager(hass, {})
     await discovery_manager.start_discovery()
@@ -284,7 +290,7 @@ async def initialize_device_discovery_flow(hass: HomeAssistant, device_entry: De
     )
 
 
-def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufacturer: str = "test", model: str = "test") -> DeviceEntry:
+def mock_device_with_switches(hass: HomeAssistant, num_switches: int = 2, manufacturer: str = "test", model: str = "multi_switch") -> DeviceEntry:
     device_id = "abcdef"
     device_entry = DeviceEntry(
         id=device_id,
