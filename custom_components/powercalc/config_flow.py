@@ -937,7 +937,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             step_id=form_step.step,
             data_schema=self.fill_schema_defaults(
                 schema,
-                self.get_global_powercalc_config(),
+                {**self.sensor_config, **self.get_global_powercalc_config()},
             ),
             errors={"base": str(error)} if error else {},
             last_step=last_step,
@@ -1092,7 +1092,13 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             """Create sub profile schema."""
             library = await ProfileLibrary.factory(self.hass)
             profile = await library.get_profile(model_info, process_variables=False)
-            sub_profiles = [selector.SelectOptionDict(value=sub_profile, label=sub_profile) for sub_profile in await profile.get_sub_profiles()]
+            sub_profiles = [
+                selector.SelectOptionDict(
+                    value=sub_profile[0],
+                    label=sub_profile[1]["name"] if "name" in sub_profile[1] else sub_profile[0],
+                )
+                for sub_profile in await profile.get_sub_profiles()
+            ]
             return vol.Schema(
                 {
                     vol.Required(CONF_SUB_PROFILE): selector.SelectSelector(
@@ -1157,7 +1163,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         """Handle the flow for advanced options."""
 
         if self.is_options_flow:
-            return self.persist_config_entry()
+            return self.persist_config_entry()  # pragma: no cover
 
         if user_input is not None or self.skip_advanced_step:
             self.sensor_config.update(user_input or {})
@@ -1780,7 +1786,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         """Build the options menu."""
         menu = [Step.BASIC_OPTIONS]
         if self.sensor_type == SensorType.VIRTUAL_POWER:
-            if self.strategy and self.strategy != CalculationStrategy.LUT:
+            if self.strategy and self.should_add_strategy_option_to_menu():
                 strategy_step = STRATEGY_STEP_MAPPING[self.strategy]
                 menu.append(strategy_step)
             if self.selected_profile:
@@ -1797,6 +1803,20 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             menu.append(Step.UTILITY_METER_OPTIONS)
 
         return menu
+
+    def should_add_strategy_option_to_menu(self) -> bool:
+        """Check whether the strategy option should be added to the menu."""
+        if not self.strategy or self.strategy == CalculationStrategy.LUT:
+            return False
+
+        if self.selected_profile:
+            if self.strategy == CalculationStrategy.FIXED and not self.selected_profile.needs_fixed_config:
+                return False
+
+            if self.strategy == CalculationStrategy.LINEAR and not self.selected_profile.needs_linear_config:
+                return False
+
+        return True
 
     def build_group_menu(self) -> list[Step]:
         """Build the group options menu."""
@@ -2044,11 +2064,20 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 },
             )
 
+        schema = vol.Schema(
+            {
+                **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
+                **SCHEMA_UTILITY_METER_TOGGLE.schema,
+            },
+        )
+        if not (self.selected_profile and self.selected_profile.only_self_usage):
+            schema.extend({vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)})
+
         if self.source_entity_id == DUMMY_ENTITY_ID:
-            return SCHEMA_POWER_OPTIONS
+            return schema
 
         return vol.Schema(  # type: ignore
             {
                 vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
             },
-        ).extend(SCHEMA_POWER_OPTIONS.schema)
+        ).extend(schema.schema)

@@ -22,6 +22,7 @@ from custom_components.powercalc.const import (
     CONF_MODE,
     CONF_MODEL,
     CONF_SENSOR_TYPE,
+    CONF_SUB_PROFILE,
     CONF_VARIABLES,
     DUMMY_ENTITY_ID,
     CalculationStrategy,
@@ -209,6 +210,53 @@ async def test_change_manufacturer_model_from_options_flow(hass: HomeAssistant) 
     assert entry.data[CONF_MODEL] == "LWB010"
 
 
+async def test_configured_model_populated_in_options_flow(hass: HomeAssistant) -> None:
+    entry = create_mock_entry(
+        hass,
+        {
+            CONF_ENTITY_ID: "light.spots_kitchen",
+            CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
+            CONF_MANUFACTURER: "signify",
+            CONF_MODEL: "LCT010",
+        },
+    )
+
+    result = await initialize_options_flow(hass, entry, Step.LIBRARY_OPTIONS)
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MANUFACTURER
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_MANUFACTURER)].description == {
+        "suggested_value": "signify",
+    }
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MANUFACTURER: "signify"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.MODEL
+    schema_keys: list[vol.Optional] = list(result["data_schema"].schema.keys())
+    assert schema_keys[schema_keys.index(CONF_MODEL)].description == {
+        "suggested_value": "LCT010",
+    }
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        user_input={CONF_MODEL: "LCA001"},
+    )
+
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_MANUFACTURER] == "signify"
+    assert entry.data[CONF_MODEL] == "LCA001"
+
+
 async def test_source_entity_not_visible_in_options_when_discovery_by_device(hass: HomeAssistant) -> None:
     """When discovery mode was by device, source entity should not be visible in options."""
     hass.config.config_dir = get_test_config_dir()
@@ -276,3 +324,30 @@ async def test_profile_with_custom_fields(
     }
 
     assert not caplog.records
+
+
+async def test_sub_profiles_select_options(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
+    result = await select_menu_item(hass, Step.MENU_LIBRARY)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_ENTITY_ID: "sensor.dummy"},
+    )
+    result = await select_manufacturer_and_model(hass, result, "test", "sub_profile")
+    assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.SUB_PROFILE
+
+    data_schema: vol.Schema = result["data_schema"]
+    sub_profile_selector: SelectSelector = data_schema.schema["sub_profile"]
+    options = sub_profile_selector.config["options"]
+    assert options == [{"label": "Name A", "value": "a"}, {"label": "Name B", "value": "b"}]
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_SUB_PROFILE: "a"},
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {},
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY

@@ -99,6 +99,7 @@ async def test_smart_switch_flow(
 
 
 async def test_smart_switch_options(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -107,8 +108,8 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_SELF_USAGE_INCLUDED: False,
             CONF_FIXED: {CONF_POWER: 40},
-            CONF_MANUFACTURER: "shelly",
-            CONF_MODEL: "Shelly Plug S",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "smart_switch_without_pm",
         },
     )
 
@@ -125,6 +126,7 @@ async def test_smart_switch_options(hass: HomeAssistant) -> None:
 
 
 async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> None:
+    hass.config.config_dir = get_test_config_dir()
     entry = create_mock_entry(
         hass,
         {
@@ -134,8 +136,8 @@ async def test_smart_switch_options_correctly_loaded(hass: HomeAssistant) -> Non
             CONF_POWER: 40,
             CONF_FIXED: {CONF_POWER: 40.85},
             CONF_SELF_USAGE_INCLUDED: True,
-            CONF_MANUFACTURER: "shelly",
-            CONF_MODEL: "Shelly Plug S",
+            CONF_MANUFACTURER: "test",
+            CONF_MODEL: "smart_switch_without_pm",
         },
     )
 
