@@ -1,7 +1,7 @@
 {
   "common": {
     "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "Dit profiel biedt alleen stand-by-stroomwaarden. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven."
   },
   "config": {
     "abort": {
@@ -25,13 +25,23 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Selecteer de groep(en)",
+          "new_group": "Nieuwe groep"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Vul een eigen groepsnaam in om een nieuwe groep aan te maken"
         },
-        "title": "Assign to group"
+        "title": "Toewijzen aan groep"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Beschikbaarheid entiteit"
+        },
+        "data_description": {
+          "availability_entity": "Wanneer deze entiteit niet beschikbaar is, zal de stroomsensor ook niet beschikbaar zijn"
+        },
+        "title": "Beschikbaarheid entiteit",
+        "description": "Dit profiel is per apparaat. Selecteer de entiteit die zal worden gebruikt om de beschikbaarheid van de powercalc sensor te bepalen"
       },
       "daily_energy": {
         "data": {
@@ -162,26 +172,26 @@
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Hoofd vermogen sensor (P1)",
+          "group_tracked_auto": "Entiteiten automatisch toegevoegd",
+          "create_energy_sensor": "Creëer energie sensor",
+          "create_utility_meters": "Creëer utiliteit meters"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Selecteer de vermogenssensor die uw totale energieverbruik bevat. Indien leeg wordt alleen een tracked groep gemaakt",
+          "group_tracked_auto": "Powercalc voegt automatisch alle vermogen sensoren toe aan de tracked groep, uitgezonderd powercalc groepen. Schakel deze uit als u handmatig de bijgehouden entiteiten wilt definiëren.",
+          "create_energy_sensor": "Laat Powercalc een kWh meter maken",
+          "create_utility_meters": "Laat powercalc utiliteit meters maken. Deze resetten dagelijks, uurlijks etc."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Maak een groepssensor aan voor alle bijgehouden en niet bijgehouden energie",
+        "title": "Maak een bijgehouden vermogensensor"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Bijgehouden entiteiten"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Selecteer alle stroomsensoren die onderdeel zijn van het bijgehouden verbruik. Het is al automatisch gevuld, maar je kunt het handmatig aanpassen",
+        "title": "Selecteer vermogensentiteiten"
       },
       "library": {
         "data": {
@@ -233,7 +243,7 @@
           "group_custom": "Standaard groep",
           "group_domain": "Domein gebaseerde groep",
           "group_subtract": "Aftrekken",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_tracked_untracked": "Bijgehouden/niet bijgehouden vermogen"
         },
         "title": "Kies het type groep",
         "description": "Selecteer het type groepssensor dat je wilt aanmaken. Kies een domein gebaseerde groep als u alle entiteiten van een specifiek domein wilt groeperen of een sensor opsomming wilt maken van al uw energie sensoren."
@@ -548,9 +558,9 @@
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
+          "main_power_sensor": "Hoofd vermogen sensor (P1)",
+          "group_tracked_auto": "Entiteiten automatisch toegevoegd",
+          "create_energy_sensor": "Creëer energie sensor",
           "create_utility_meters": "Creëer utiliteit meters"
         },
         "data_description": {
