@@ -22,7 +22,7 @@ jobs:
       - name: Read PR number
         id: read-pr-number
         run: |
-          cat /tmp/.pr_number > $PR_NUMBER
+          echo "PR_NUMBER=$(/tmp/.pr_number)" >> $GITHUB_ENV
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
@@ -72,4 +72,3 @@ jobs:
             }
         env:
           PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-          PR_NUMBER: ${{ steps.read-pr-number.outputs.PR_NUMBER }}
