@@ -2,7 +2,7 @@ name: PR comment - Upload and comment
 
 on:
   workflow_run:
-    workflows: ["PR comment - Generate plots"]
+    workflows: [PR comment - Generate plots]
     types:
       - completed
 
