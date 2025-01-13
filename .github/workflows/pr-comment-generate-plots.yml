@@ -49,3 +49,4 @@ jobs:
           path: |
             .pr_number
             ./utils/visualize/*.png
+          include-hidden-files: true
