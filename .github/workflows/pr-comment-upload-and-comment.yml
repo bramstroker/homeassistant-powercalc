@@ -3,6 +3,8 @@ name: PR comment - Upload and comment
 on:
   workflow_run:
     workflows: ["pr-comment-generate-plots"]
+    types:
+      - completed
 
 permissions:
   pull-requests: write
