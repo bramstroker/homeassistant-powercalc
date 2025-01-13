@@ -72,3 +72,4 @@ jobs:
             }
         env:
           PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
+          PR_NUMBER: ${{ env.PR_NUMBER }}
