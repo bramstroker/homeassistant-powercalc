@@ -27,6 +27,6 @@ powercalc:
       group_type: subtract
       entity_id: sensor.a
       subtract_entities:
-        - entity_id: sensor.b
-        - entity_id: sensor.c
+        - sensor.b
+        - sensor.c
 ```
