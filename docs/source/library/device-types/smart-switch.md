@@ -45,6 +45,7 @@ Note the sensor_naming configuration which will make sure the entities are named
 ```json
 {
   "standby_power": 0.3,
+  "standby_power_on": 0.7,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
