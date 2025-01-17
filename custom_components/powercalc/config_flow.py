@@ -1747,8 +1747,17 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
         """Create the config entry."""
         self.sensor_config.update({CONF_SENSOR_TYPE: self.selected_sensor_type})
         self.sensor_config.update({CONF_NAME: self.name})
+
         if self.source_entity_id:
             self.sensor_config.update({CONF_ENTITY_ID: self.source_entity_id})
+
+        if (
+            self.selected_profile
+            and self.source_entity
+            and self.source_entity.device_entry
+            and self.selected_profile.discovery_by == DiscoveryBy.DEVICE
+        ):
+            self.sensor_config.update({CONF_DEVICE: self.source_entity.device_entry.id})
 
         return self.async_create_entry(title=str(self.name), data=self.sensor_config)
 
