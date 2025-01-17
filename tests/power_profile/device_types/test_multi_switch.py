@@ -31,7 +31,7 @@ async def test_multi_switch(hass: HomeAssistant) -> None:
 
     power_state = hass.states.get(power_sensor_id)
     assert power_state
-    assert power_state.state == "unavailable"
+    assert power_state.state == "0.25"
 
     await set_state_and_assert_power(hass, switch1_id, STATE_ON, "0.95")
     await set_state_and_assert_power(hass, switch2_id, STATE_ON, "1.65")
