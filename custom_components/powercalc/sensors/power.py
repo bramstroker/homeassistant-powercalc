@@ -422,10 +422,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 await self._strategy_instance.on_start(hass)
 
             entities = self._track_entities
-            if self._source_entity.entity_id == DUMMY_ENTITY_ID:
+            if self._source_entity.entity_id == DUMMY_ENTITY_ID or not entities:
                 entities.append(DUMMY_ENTITY_ID)
             for entity_id in entities:
-                new_state = self.hass.states.get(entity_id)
+                new_state = self.hass.states.get(entity_id) if entity_id != DUMMY_ENTITY_ID else State(entity_id, STATE_ON)
                 await self._handle_source_entity_state_change(
                     entity_id,
                     new_state,
