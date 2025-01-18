@@ -22,6 +22,7 @@ jobs:
           name: plots
           path: /tmp
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
       - name: Display structure of downloaded files
         run: ls -lash /tmp
       - name: Read PR number
