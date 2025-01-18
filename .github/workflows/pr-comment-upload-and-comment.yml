@@ -28,7 +28,7 @@ jobs:
       - name: Read PR number
         id: read-pr-number
         run: |
-          echo "PR_NUMBER=$(/artifacts/pr_number.txt)" >> $GITHUB_ENV
+          echo "PR_NUMBER=$(artifacts/pr_number.txt)" >> $GITHUB_ENV
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
