@@ -16,13 +16,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/github-script@v7
         with:
-          path: /tmp
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "plots"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            const fs = require('fs');
+            const path = require('path');
+            const temp = '${{ runner.temp }}';
+            if (!fs.existsSync(temp)){
+              fs.mkdirSync(temp);
+            }
+            fs.writeFileSync(path.join(temp, 'plots.zip'), Buffer.from(download.data));
+      - name: Display structure of downloaded files
+        run: ls -lash /tmp
       - name: Read PR number
         id: read-pr-number
         run: |
-          cat /tmp/.pr_number > $PR_NUMBER
+          echo "PR_NUMBER=$(/tmp/.pr_number)" >> $GITHUB_ENV
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
@@ -72,4 +95,4 @@ jobs:
             }
         env:
           PR_MESSAGE: ${{ steps.build-pr-message.outputs.PR_MESSAGE }}
-          PR_NUMBER: ${{ steps.read-pr-number.outputs.PR_NUMBER }}
+          PR_NUMBER: ${{ env.PR_NUMBER }}

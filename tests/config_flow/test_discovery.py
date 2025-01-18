@@ -2,7 +2,7 @@ from selectors import SelectSelector
 
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
@@ -234,6 +234,7 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         CONF_MANUFACTURER: "test",
         CONF_MODEL: "discovery_type_device",
         CONF_NAME: "FooBar",
+        CONF_DEVICE: "youless-device",
     }
 
     assert hass.states.get("sensor.foobar_device_power")

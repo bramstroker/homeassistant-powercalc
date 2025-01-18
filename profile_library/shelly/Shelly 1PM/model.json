@@ -1,0 +1,26 @@
+{
+  "measure_description": "The measured device fw: 1.14.1-rc1, Eco Mode enabled, Wifi Client enabled, LED disabled. The result represents the average value of measurements collected from the measurement device API for the following scenarios: dumb device/baseline consumption (~4.9W), the the relay turned off, and the relay turned on.",
+  "measure_method": "manual",
+  "measure_device": "Shelly PM Mini gen3",
+  "measure_device_firmware": "20241011-114503/1.4.4-g6d2a586",
+  "measure_settings": {
+    "SAMPLE_COUNT": 200,
+    "SLEEP_TIME": 0.5
+  },
+  "name": "Shelly 1PM",
+  "aliases": [
+    "SHSW-PM"
+  ],
+  "discovery_by": "entity",
+  "device_type": "smart_switch",
+  "only_self_usage": true,
+  "calculation_strategy": "fixed",
+  "standby_power": 0.589,
+  "standby_power_on": 0.85,
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  },
+  "created_at": "2024-01-09T20:21:00 CET",
+  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+}

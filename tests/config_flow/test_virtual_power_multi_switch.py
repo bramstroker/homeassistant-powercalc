@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 import voluptuous as vol
 from homeassistant import data_entry_flow
-from homeassistant.const import CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
+from homeassistant.const import CONF_DEVICE, CONF_ENTITIES, CONF_ENTITY_ID, CONF_NAME, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
@@ -92,6 +92,7 @@ async def test_discovery_flow(
     assert result["data"] == {
         CONF_AVAILABILITY_ENTITY: "switch.test1",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
+        CONF_DEVICE: device_entry.id,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "test",
         CONF_MODEL: "multi_switch",

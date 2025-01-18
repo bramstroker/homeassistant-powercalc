@@ -21,17 +21,20 @@ async def attach_entities_to_source_device(
     source_entity: SourceEntity,
 ) -> None:
     """Set the entity to same device as the source entity, if any available."""
-    if not source_entity.entity_entry or not source_entity.device_entry:
+    if config_entry:
+        bind_config_entry_to_device(hass, config_entry)
+
+    device_id = source_entity.device_entry.id if source_entity.device_entry else None
+    if not device_id and config_entry:
+        device_id = config_entry.data.get(CONF_DEVICE)
+    if not device_id:
         return
 
     for entity in (entity for entity in entities_to_add if isinstance(entity, BaseEntity)):
         try:
-            entity.source_device_id = source_entity.device_entry.id  # type: ignore
+            entity.source_device_id = device_id  # type: ignore
         except AttributeError:  # pragma: no cover
             _LOGGER.error("%s: Cannot set device id on entity", entity.entity_id)
-
-    if config_entry:
-        bind_config_entry_to_device(hass, config_entry)
 
 
 def bind_config_entry_to_device(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
