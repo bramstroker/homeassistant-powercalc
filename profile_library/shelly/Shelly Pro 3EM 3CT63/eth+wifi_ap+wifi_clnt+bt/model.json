@@ -1,0 +1,6 @@
+{
+  "measure_description": "The device measured  with all interfaces enabled: Ethernet, Wifi AP, Wifi Client, BlueTooth",
+  "standby_power": 1.379,
+  "created_at": "2024-01-03T20:07:00 CET",
+  "author": "Michal Bartak <maxym.srpl@gmail.com>"
+}
