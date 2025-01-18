@@ -17,10 +17,6 @@
   "calculation_strategy": "fixed",
   "standby_power": 0.598,
   "standby_power_on": 0.923,
-  "sensor_config": {
-    "power_sensor_naming": "{} Device Power",
-    "energy_sensor_naming": "{} Device Energy"
-  },
   "created_at": "2024-01-06T22:34:00 CET",
   "author": "Michal Bartak <maxym.srpl@gmail.com>"
 }
