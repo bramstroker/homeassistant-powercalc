@@ -23,12 +23,10 @@ jobs:
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
-      - name: Display structure of downloaded files
-        run: ls -lash artifacts
       - name: Read PR number
         id: read-pr-number
         run: |
-          echo "PR_NUMBER=$(artifacts/pr_number.txt)" >> $GITHUB_ENV
+          echo "PR_NUMBER=$(cat artifacts/pr_number.txt)" >> $GITHUB_ENV
       - name: Upload the plots to Imgur
         uses: devicons/public-upload-to-imgur@v2
         id: imgur_step
