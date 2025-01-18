@@ -20,11 +20,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: plots
-          path: /artifacts
+          path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
       - name: Display structure of downloaded files
-        run: ls -lash /artifacts
+        run: ls -lash artifacts
       - name: Read PR number
         id: read-pr-number
         run: |
