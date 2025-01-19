@@ -136,7 +136,7 @@
           "device": "Device",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Additional energy entities",
-          "group_energy_start_at_zero": "Energy sensor starts at zero",
+          "group_energy_start_at_zero": "Start at zero",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Hide members",
