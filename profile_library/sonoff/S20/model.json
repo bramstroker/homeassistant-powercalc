@@ -5,15 +5,14 @@
   "measure_device_firmware": "ESPHome 2023.10.3",
   "name": "Sonoff S20",
   "standby_power": 0.29,
+  "standby_power_on": 1.14,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 1.14
-  },
+  "only_self_usage": false,
   "aliases": [
     "S20"
   ],
