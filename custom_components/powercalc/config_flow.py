@@ -1889,7 +1889,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True) else []
             )
 
-        return []
+        return []  # pragma: no cover
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
