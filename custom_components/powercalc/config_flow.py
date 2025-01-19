@@ -414,9 +414,8 @@ SCHEMA_GROUP = vol.Schema(
     },
 )
 
-SCHEMA_GROUP_DOMAIN = vol.Schema(
+SCHEMA_GROUP_DOMAIN_OPTIONS = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=["all"] + [cls.value for cls in Platform],
@@ -430,6 +429,13 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
                 multiple=True,
             ),
         ),
+    },
+)
+
+SCHEMA_GROUP_DOMAIN = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        **SCHEMA_GROUP_DOMAIN_OPTIONS.schema,
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
@@ -1869,6 +1875,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if group_type == GroupType.CUSTOM:
             return [Step.GROUP_CUSTOM]
 
+        if group_type == GroupType.DOMAIN:
+            return [Step.GROUP_DOMAIN]
+
         if group_type == GroupType.SUBTRACT:
             return [Step.GROUP_SUBTRACT]
 
@@ -1942,6 +1951,14 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Step.GROUP_CUSTOM)
+
+    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_DOMAIN_OPTIONS,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_DOMAIN)
 
     async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
