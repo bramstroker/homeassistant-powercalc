@@ -1,4 +1,3 @@
-from selectors import SelectSelector
 from unittest.mock import AsyncMock
 
 import voluptuous as vol
@@ -9,6 +8,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.selector import EntitySelector
 from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc import DiscoveryManager
@@ -130,10 +130,14 @@ async def test_switch_entities_automatically_populated_from_device(hass: HomeAss
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.MULTI_SWITCH
 
+    expected_entities = ["switch.test1", "switch.test2", "switch.test3", "switch.test4"]
+
     data_schema: vol.Schema = result["data_schema"]
-    select: SelectSelector = data_schema.schema[CONF_ENTITIES]
-    include_entities = select.config["include_entities"]
-    assert include_entities == ["switch.test1", "switch.test2", "switch.test3", "switch.test4"]
+    select: EntitySelector = data_schema.schema[CONF_ENTITIES]
+    assert select.config["include_entities"] == expected_entities
+
+    schema_keys = list(data_schema.schema.keys())
+    assert schema_keys[schema_keys.index(CONF_ENTITIES)].default() == expected_entities
 
 
 async def test_discovery_flow_once_per_unique_device(
@@ -256,7 +260,7 @@ async def test_light_switches_selectable(hass: HomeAssistant) -> None:
     )
 
     data_schema: vol.Schema = result["data_schema"]
-    entities_select: SelectSelector = data_schema.schema["entities"]
+    entities_select: EntitySelector = data_schema.schema["entities"]
     options = entities_select.config["include_entities"]
     assert options == ["switch.test1", "light.test2"]
 
