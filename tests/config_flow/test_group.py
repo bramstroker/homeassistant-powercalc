@@ -255,7 +255,6 @@ async def test_can_unset_area(hass: HomeAssistant, area_registry: AreaRegistry) 
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_HIDE_MEMBERS: False,
-        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
 
