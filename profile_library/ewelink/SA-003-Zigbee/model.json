@@ -4,15 +4,14 @@
   "measure_device": "Shelly PM Mini Gen3",
   "name": "SA-003-Zigbee",
   "standby_power": 0.378,
+  "standby_power_on": 1.191,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 1.191
-  },
+  "only_self_usage": false,
   "created_at": "2024-12-01T20:44:00",
   "author": "RubenKelevra <cyrond@gmail.com>"
 }

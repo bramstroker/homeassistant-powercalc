@@ -4,15 +4,14 @@
   "measure_device": "Eve Energy Matter 20EBU4101",
   "name": "TP-Link Kasa KP125M",
   "standby_power": 0.475,
+  "standby_power_on": 0.92,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.92
-  },
+  "only_self_usage": true,
   "aliases": [
     "KP125M"
   ],
