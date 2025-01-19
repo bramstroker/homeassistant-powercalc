@@ -11,9 +11,7 @@
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0
-  },
+  "only_self_usage": true,
   "created_at": "2024-09-06T18:37:40",
   "author": "CV",
   "description": "HomematicIP smart switch with power measurement integrated for outlets. This model is configured only for standby power usage of the smart device itself. The connected device(s) power usage is measured by the smart device."
