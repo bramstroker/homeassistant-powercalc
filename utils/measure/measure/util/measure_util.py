@@ -186,7 +186,9 @@ class MeasureUtil:
                         power -= dummy_power
 
                         if round(power, 2) <= 0:
-                            error = ZeroReadingError("0 watt was read from the power meter, after substracting the dummy load")
+                            error = ZeroReadingError("0 watt was read from the power meter, after subtracting the dummy load")
+
+                measurements.append(power)
 
             if error:
                 # Prevent endless recursion. Throw error when max retries is reached
@@ -203,7 +205,6 @@ class MeasureUtil:
                 time.sleep(self.config.sleep_time)
                 return self.take_measurement(start_timestamp, retry_count)
 
-            measurements.append(power)
             if self.config.sample_count > 1:
                 time.sleep(self.config.sleep_time_sample)
 
@@ -228,8 +229,8 @@ class MeasureUtil:
                 value = float(f.read())
             _LOGGER.info("Dummy load was already measured before, value: %s Ω", value)
 
-            print("You need to preheat the dummy load, so it's consumption can stablize.")
-            print("If you're unsure the dummy load is sufficently preheated or you're using a different one, remeasure.")
+            print("You need to preheat the dummy load, so it's consumption can stabilize.")
+            print("If you're unsure the dummy load is sufficiently preheated or you're using a different one, remeasure.")
             print()
             inquirer = input("Do you want to measure the dummy load again? (y/n): ")
             if inquirer.lower() == "n":
