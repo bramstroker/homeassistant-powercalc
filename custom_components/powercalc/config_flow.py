@@ -68,6 +68,7 @@ from .const import (
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
@@ -737,6 +738,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not is_option_flow:
             schema = schema.extend(
                 {
+                    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
                     **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                     **SCHEMA_UTILITY_METER_TOGGLE.schema,
                 },
