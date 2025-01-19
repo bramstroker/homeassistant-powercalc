@@ -17,6 +17,10 @@ async def test_multi_switch(hass: HomeAssistant) -> None:
     switch1_id = "switch.outlet1"
     switch2_id = "switch.outlet2"
 
+    hass.states.async_set(switch1_id, STATE_OFF)
+    hass.states.async_set(switch2_id, STATE_OFF)
+    await hass.async_block_till_done()
+
     await run_powercalc_setup(
         hass,
         {
