@@ -1,7 +1,7 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_switch": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n Keď máte spotrebič, ktorý po zapnutí spotrebúva pevné množstvo energie, môžete túto hodnotu zadať v ďalšom kroku konfiguračného postupu",
+    "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla"
   },
   "config": {
     "abort": {
@@ -25,23 +25,23 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Zvoliť skupinu(y)",
+          "new_group": "Nová skupina"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Ak chcete vytvoriť novú skupinu, zadajte vlastný názov skupiny"
         },
-        "title": "Assign to group"
+        "title": "Priradiť do skupiny"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Dostupnosť entity"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Keď táto entita nie je k dispozícii, bude nedostupný aj snímač powercalc"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Dostupnosť entity",
+        "description": "Tento profil sa vzťahuje na zariadenie. Vyberte entitu, ktorá sa použije na určenie dostupnosti snímača powercalc"
       },
       "daily_energy": {
         "data": {
@@ -62,13 +62,13 @@
       },
       "group_domain": {
         "data": {
-          "name": "Name",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "domain": "Entity domain",
-          "exclude_entities": "Exclude entities"
+          "name": "Názov",
+          "create_energy_sensor": "Vytvorte energetický snímač",
+          "create_utility_meters": "Vytvorte merače spotreby",
+          "domain": "Entity doména",
+          "exclude_entities": "Vynechať entity"
         },
-        "title": "Create a domain based group sensor"
+        "title": "Vytvorte skupinový senzor založený na doméne"
       },
       "fixed": {
         "data": {
@@ -85,47 +85,47 @@
         "title": "Opravená konfigurácia"
       },
       "global_configuration": {
-        "title": "Global configuration",
-        "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
+        "title": "Globálna konfigurácia",
+        "description": "Nastavte globálnu konfiguráciu pre Powercalc. Ďalšie informácie nájdete v [dokumentácii](https://docs.powercalc.nl/configuration/global-configuration/). Ďalšie možnosti pre snímače energie a elektromery môžu byť poskytnuté v ďalších krokoch.",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_utility_meters": "Vytvorte merače spotreby",
+          "disable_extended_attributes": "Zakázať rozšírené atribúty",
+          "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
+          "force_update_frequency": "Vynútiť frekvenciu aktualizácie",
+          "ignore_unavailable_state": "Ignorovať nedostupný stav",
+          "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
+          "power_sensor_category": "Kategória snímača výkonu",
+          "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
+          "power_sensor_naming": "Vzor názvu snímača výkonu"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
+          "disable_extended_attributes": "Vypnite všetky extra atribúty, ktoré powercalc pridáva k stavu energie, energie a skupiny. To pomôže udržať veľkosť databázy malú",
+          "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
+          "force_update_frequency": "Interval, v ktorom sa aktualizuje stav snímača, aj keď hodnota výkonu zostáva rovnaká. V sekundách",
+          "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
+          "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
+        "title": "Energetické možnosti",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metóda energetickej integrácie",
+          "energy_sensor_category": "Kategória snímača energie",
+          "energy_sensor_friendly_naming": "Vzor názvu priateľského k energetickému senzoru",
+          "energy_sensor_naming": "Vzor názvu snímača energie",
+          "energy_sensor_precision": "Presnosť snímača energie",
+          "energy_sensor_unit_prefix": "Predpona jednotky snímača energie"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
+        "title": "Možnosti elektromera",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Čistá spotreba inžinierskych sietí",
+          "utility_meter_tariffs": "Tarify za elektromery",
+          "utility_meter_types": "Typy úžitkových meračov"
         }
       },
       "group_custom": {
@@ -134,8 +134,9 @@
           "create_energy_sensor": "Vytvoriť snímač energie",
           "create_utility_meters": "Vytvorte merače spotreby",
           "device": "Zariadenie",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďlšie energetické entity",
+          "group_energy_start_at_zero": "Začať v nule",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
           "hide_members": "Skrytý členovania",
@@ -147,8 +148,9 @@
           "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
           "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh snímač",
           "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
           "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
+          "group_energy_start_at_zero": "Keď je aktivovaný, senzor energie sa po vytvorení senzora spustí na nule. V opačnom prípade spočíta všetky aktuálne stavy snímača energie člena",
           "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
           "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
           "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
@@ -158,40 +160,40 @@
       },
       "group_subtract": {
         "data": {
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters",
-          "entity_id": "Base entity",
-          "name": "Name",
-          "subtract_entities": "Subtract entities"
+          "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_utility_meters": "Vytvorte merače spotreby",
+          "entity_id": "Základná entita",
+          "name": "Názov",
+          "subtract_entities": "Odčítajte entity"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Základná entita, od ktorej sa má odčítať výkon",
+          "subtract_entities": "Vyberte všetky entity, ktoré chcete odpočítať od základnej entity"
         },
-        "title": "Subtract group sensor"
+        "title": "Odčítajte snímač skupiny"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Senzor sieťového napájania",
+          "group_tracked_auto": "Automaticky pridané entity",
+          "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_utility_meters": "Vytvorte merače spotreby"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Vyberte snímač výkonu, ktorý obsahuje vašu celkovú spotrebu energie. Keď zostane prázdne, vytvorí sa iba sledovaný snímač výkonu",
+          "group_tracked_auto": "Powercalc automaticky pridá všetky výkonové senzory do sledovanej skupiny, pričom preskočí skupiny powercalc. Túto možnosť vypnite, ak chcete sledované entity definovať manuálne",
+          "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh senzor",
+          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Vytvorte skupinový senzor pre všetku sledovanú a nesledovanú energiu",
+        "title": "Vytvorte sledovaný snímač výkonu"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Sledované entity"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Vyberte všetky snímače výkonu, ktoré sú súčasťou sledovanej spotreby. Už je automaticky vyplnená, ale môžete ju manuálne upraviť",
+        "title": "Vyberte mocenské entity"
       },
       "library": {
         "data": {
@@ -205,10 +207,10 @@
       },
       "library_multi_profile": {
         "data": {
-          "model": "Select model"
+          "model": "Zvoliť model"
         },
-        "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "description": "Výrobca \"{manufacturer}\" a model \"{model}\" boli automaticky zistené pre vaše zariadenie. Pre entitu sa našlo viacero profilov, ktoré možno potenciálne použiť. Vyhľadajte presný model svojho zariadenia [Powercalc library]({library_link}) a vyberte ten správny",
+        "title": "Knižnica"
       },
       "linear": {
         "data": {
@@ -240,39 +242,39 @@
       },
       "menu_group": {
         "menu_options": {
-          "group_custom": "Standard group",
-          "group_domain": "Domain based group",
-          "group_subtract": "Subtract",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_custom": "Štandard skupina",
+          "group_domain": "Doménová skupina",
+          "group_subtract": "Odčítať",
+          "group_tracked_untracked": "Sledovaný/nesledovaný výkon"
         },
-        "title": "Choose the group type",
-        "description": "Select the type of group sensor you want to create. Choose domain based group if you want to group all entities of a specific domain, or create a sensor summing all your energy sensors. Choose standard group otherwise."
+        "title": "Vyberte typ skupiny",
+        "description": "Vyberte typ skupinového senzora, ktorý chcete vytvoriť. Vyberte skupinu založenú na doméne, ak chcete zoskupiť všetky entity špecifickej domény, alebo vytvoriť senzor so súčtom všetkých vašich energetických senzorov. V opačnom prípade vyberte štandardnú skupinu."
       },
       "multi_switch": {
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Prepnúť entity",
+          "power": "Zapnite napájanie",
+          "power_off": "Vypnite napájanie"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Vyberte všetky jednotlivé prepínače, ktoré sú súčasťou multifunkčného prepínača",
+          "power": "Napájanie jedným vypínačom pri zapnutí",
+          "power_off": "Napájanie na jeden vypínač pri vypnutí"
         },
-        "title": "Multi switch config"
+        "title": "Konfigurácia viacerých prepínačov"
       },
       "playbook": {
         "data": {
           "autostart": "Autoštart",
           "playbooks": "Playbooky",
           "repeat": "Opakovať",
-          "states_trigger": "State trigger"
+          "states_trigger": "Stavový trigger"
         },
         "data_description": {
           "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
           "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "states_trigger": "Spustite playbook na základe zmeny stavu. Príklad\n\nprehrávanie: program1"
         },
         "title": "Playbook konfigurácia"
       },
@@ -280,7 +282,7 @@
         "data": {
           "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
           "energy_integration_method": "Metóda energetickej integrácie",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix",
+          "energy_sensor_unit_prefix": "Predpona jednotky snímača energie",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "multiply_factor": "Násobný faktor",
           "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
@@ -322,15 +324,15 @@
       },
       "smart_switch": {
         "data": {
-          "power": "Power",
-          "self_usage_included": "Self usage included"
+          "power": "Výkon",
+          "self_usage_included": "Samostatné použitie v cene"
         },
         "data_description": {
-          "power": "A fixed power value in Watts for the connected appliance",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself. When you omit it Powercalc will add the self usage of the smart switch to the power value, which is {self_usage_power}W"
+          "power": "Pevná hodnota výkonu vo wattoch pre pripojený spotrebič",
+          "self_usage_included": "Či hodnota výkonu zahŕňa výkon spotrebovaný samotným inteligentným prepínačom. Keď to vynecháte, Powercalc pridá vlastnú spotrebu inteligentného prepínača k hodnote výkonu, ktorá je {self_usage_power} W"
         },
-        "description": "Define the power consumption of the connected appliance. When it doesn't use a fixed amount of power you can skip this step. Powercalc will setup a power sensor for the self usage of the smart switch itself",
-        "title": "Smart switch config"
+        "description": "Definujte spotrebu energie pripojeného spotrebiča. Ak nepoužíva pevné množstvo energie, môžete tento krok preskočiť. Powercalc nastaví výkonový senzor na samočinné použitie samotného inteligentného prepínača",
+        "title": "Konfigurácia inteligentných prepínačov"
       },
       "user": {
         "data": {
@@ -339,8 +341,8 @@
         "menu_options": {
           "daily_energy": "Denná energia",
           "group": "Skupiny",
-          "global_configuration": "Global configuration",
-          "menu_group": "Group",
+          "global_configuration": "Globálna konfigurácia",
+          "menu_group": "Skupina",
           "menu_library": "Virtuálny výkon (knižnica)",
           "real_power": "Energia zo snímača skutočného výkonu",
           "virtual_power": "Virtuálne napájanie (manuálne)"
@@ -351,12 +353,12 @@
         "title": "Možnosti elektromera",
         "description": "Tu definujte nastavenia pre vytváranie elektromerov",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
+          "utility_meter_net_consumption": "Čistá spotreba",
           "utility_meter_types": "Cykly",
           "utility_meter_tariffs": "Tarify"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
+          "utility_meter_net_consumption": "Povoľte túto možnosť, ak chcete zdroj považovať za netto meter. To umožní, aby vaše počítadlo bolo pozitívne aj negatívne.",
           "utility_meter_types": "Vytvorte merače spotreby pre špecifikované cykly",
           "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jeden tarif."
         }
@@ -385,7 +387,7 @@
           "power_factor": "Účinník",
           "voltage": "Napätie"
         },
-        "description": "Make sure to enable brightness limiter in WLED software. Also see https://docs.powercalc.nl/strategies/wled/",
+        "description": "Uistite sa, že ste povolili obmedzovač jasu v softvéri WLED. Pozri tiež https://docs.powercalc.nl/strategies/wled/",
         "title": "WLED konfigurácia"
       }
     }
@@ -398,7 +400,7 @@
   },
   "options": {
     "abort": {
-      "model_not_support": "Model not supported"
+      "model_not_support": "Model nie je podporovaný"
     },
     "error": {
       "fixed_mandatory": "Musíte dodať aspoň jednu z možností Power, Power template alebo States power",
@@ -411,10 +413,10 @@
     },
     "step": {
       "advanced_options": {
-        "title": "Advanced options",
+        "title": "Pokročilé možnosti",
         "data": {
           "calculation_enabled_condition": "Podmienka aktivácie výpočtu",
-          "energy_integration_method": "Energy integration method",
+          "energy_integration_method": "Metóda energetickej integrácie",
           "ignore_unavailable_state": "Ignorovať nedostupný stav",
           "multiply_factor": "Násobný faktor",
           "multiply_factor_standby": "Pohotovostný režim s násobným faktorom",
@@ -429,104 +431,104 @@
         }
       },
       "basic_options": {
-        "title": "Basic options",
+        "title": "Základné možnosti",
         "data": {
           "create_energy_sensor": "Vytvoriť snímač energie",
           "create_utility_meters": "Vytvorte merače spotreby",
-          "entity_id": "Source entity",
+          "entity_id": "Zdrojová entita",
           "name": "Názov",
           "standby_power": "Napájanie v pohotovostnom režime"
         },
         "data_description": {
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "name": "Leaving blank will take the name from the source entity",
-          "standby_power": "Define the amount of power the device is consuming when in an OFF state"
+          "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh senzor",
+          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
+          "entity_id": "entita, na ktorej je založená virtuálna sila, bude snímač výkonu počúvať zmeny stavu tejto entity, aby sa aktualizoval",
+          "name": "Ak ponecháte prázdne, názov sa prevezme zo zdrojovej entity",
+          "standby_power": "Definujte množstvo energie, ktoré zariadenie spotrebuje, keď je vo vypnutom stave"
         }
       },
       "daily_energy": {
-        "title": "Daily energy options",
+        "title": "Denné energetické možnosti",
         "data": {
           "name": "Názov",
           "on_time": "V čase",
-          "start_time": "Start time",
+          "start_time": "Čas začiatku",
           "unit_of_measurement": "Jednotka merania",
           "update_frequency": "Frekvencia aktualizácie",
           "value": "Hodnota",
           "value_template": "Šablóna hodnoty"
         },
         "data_description": {
-          "on_time": "When left empty defaults to 1 day. always on",
-          "update_frequency": "time in seconds between state updates of the sensor"
+          "on_time": "Keď ponecháte prázdne, predvolene je 1 deň. vždy zapnuté",
+          "update_frequency": "čas v sekundách medzi aktualizáciami stavu snímača"
         }
       },
       "fixed": {
-        "title": "Fixed options",
+        "title": "Pevné možnosti",
         "data": {
           "power": "Výkon",
           "power_template": "Výkon šablóna",
-          "self_usage_included": "Self usage included",
+          "self_usage_included": "Samostatné použitie v cene",
           "states_power": "Výkonové stavy"
         },
         "data_description": {
-          "power": "A fixed power value in Watts when the entity is ON",
+          "power": "Pevná hodnota výkonu vo wattoch, keď je entita ZAPNUTÁ",
           "power_template": "Šablóna sa vyhodnotí, aby sa získala hodnota výkonu vo W",
-          "self_usage_included": "Whether the power value includes the power consumed by the smart switch itself.",
+          "self_usage_included": "Či hodnota výkonu zahŕňa výkon spotrebovaný samotným inteligentným prepínačom.",
           "states_power": "Jeden pár „stav: výkon“ v každom riadku, pozri príklad vyššie"
         }
       },
       "global_configuration": {
-        "title": "Basic options",
+        "title": "Základné možnosti",
         "data": {
-          "create_energy_sensors": "Create energy sensors",
-          "create_utility_meters": "Create utility meters",
-          "disable_extended_attributes": "Disable extended attributes",
-          "disable_library_download": "Disable remote library download",
-          "force_update_frequency": "Force update frequency",
-          "ignore_unavailable_state": "Ignore unavailable state",
-          "include_non_powercalc_sensors": "Include non powercalc sensors",
-          "power_sensor_category": "Power sensor category",
-          "power_sensor_friendly_naming": "Power sensor friendly name pattern",
-          "power_sensor_naming": "Power sensor name pattern"
+          "create_energy_sensors": "Vytvorte energetické senzory",
+          "create_utility_meters": "Vytvorte merače spotreby",
+          "disable_extended_attributes": "Zakázať rozšírené atribúty",
+          "disable_library_download": "Zakázať sťahovanie vzdialenej knižnice",
+          "force_update_frequency": "Vynútiť frekvenciu aktualizácie",
+          "ignore_unavailable_state": "Ignorovať nedostupný stav",
+          "include_non_powercalc_sensors": "Zahŕňa senzory bez powercalc",
+          "power_sensor_category": "Kategória snímača výkonu",
+          "power_sensor_friendly_naming": "Vzor názvu priateľského snímača výkonu",
+          "power_sensor_naming": "Vzor názvu snímača výkonu"
         },
         "data_description": {
-          "create_energy_sensors": "Whether powercalc needs to create kWh sensors",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
-          "disable_extended_attributes": "Disable all extra attributes powercalc adds to the power, energy and group entity states. This will help keep the database size small",
-          "disable_library_download": "Disable the Powercalc library download feature",
-          "force_update_frequency": "Interval at which the sensor state is updated, even when the power value stays the same. In seconds",
-          "ignore_unavailable_state": "Keep Powercalc sensors available, even when the source entity is unavailable",
-          "include_non_powercalc_sensors": "Control whether you want to include non powercalc sensors in groups"
+          "create_energy_sensors": "Či potrebuje powercalc na vytvorenie kWh senzorov",
+          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď.",
+          "disable_extended_attributes": "Zakážte všetky extra atribúty, ktoré powercalc pridáva k výkonu, energii a stavom entity skupiny. Pomôže to udržať veľkosť databázy malú",
+          "disable_library_download": "Vypnite funkciu sťahovania knižnice Powercalc",
+          "force_update_frequency": "Interval, v ktorom sa aktualizuje stav snímača, aj keď hodnota výkonu zostáva rovnaká. V sekundách",
+          "ignore_unavailable_state": "Udržujte senzory Powercalc dostupné, aj keď zdrojová entita nie je k dispozícii",
+          "include_non_powercalc_sensors": "Ovládajte, či chcete do skupín zahrnúť senzory bez powercalc"
         }
       },
       "global_configuration_energy": {
-        "title": "Energy options",
-        "description": "Define the default settings for energy sensors here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "title": "Energetické možnosti",
+        "description": "Tu definujte predvolené nastavenia pre snímače energie. Pozri [documentation](https://docs.powercalc.nl/configuration/global-configuration/) pre viac informácií",
         "data": {
-          "energy_integration_method": "Energy integration method",
-          "energy_sensor_category": "Energy sensor category",
-          "energy_sensor_friendly_naming": "Energy sensor friendly name pattern",
-          "energy_sensor_naming": "Energy sensor name pattern",
-          "energy_sensor_precision": "Energy sensor precision",
-          "energy_sensor_unit_prefix": "Energy sensor unit prefix"
+          "energy_integration_method": "Metóda energetickej integrácie",
+          "energy_sensor_category": "Kategória snímača energie",
+          "energy_sensor_friendly_naming": "Vzor názvu priateľského k energetickému senzoru",
+          "energy_sensor_naming": "Vzor názvu snímača energie",
+          "energy_sensor_precision": "Presnosť snímača energie",
+          "energy_sensor_unit_prefix": "Predpona jednotky snímača energie"
         }
       },
       "global_configuration_utility_meter": {
-        "title": "Utility meter options",
-        "description": "Define the default settings for utility meters here. See [documentation](https://docs.powercalc.nl/configuration/global-configuration/) for more information",
+        "title": "Možnosti elektromera",
+        "description": "Tu definujte predvolené nastavenia pre elektromery. Pozri [documentation](https://docs.powercalc.nl/configuration/global-configuration/) pre viac informácií",
         "data": {
-          "utility_meter_net_consumption": "Utility meter net consumption",
-          "utility_meter_tariffs": "Utility meter tariffs",
-          "utility_meter_types": "Utility meter types"
+          "utility_meter_net_consumption": "Čistá spotreba inžinierskych sietí",
+          "utility_meter_tariffs": "Tarify za elektromery",
+          "utility_meter_types": "Typy úžitkových meračov"
         }
       },
       "group_custom": {
-        "title": "Group options",
+        "title": "Možnosti skupiny",
         "data": {
           "area": "Oblasť",
           "device": "Zariadenie",
-          "force_calculate_group_energy": "Force calculate energy",
+          "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďalšie energetické entity",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
@@ -537,7 +539,7 @@
         "data_description": {
           "area": "Pridá všetky senzory powercalc zo špecifikovanej oblasti",
           "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
-          "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
+          "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
           "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
           "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
           "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
@@ -547,62 +549,62 @@
       },
       "group_subtract": {
         "data": {
-          "entity_id": "Base entity",
-          "subtract_entities": "Subtract entities"
+          "entity_id": "Základná entita",
+          "subtract_entities": "Odčítajte entity"
         },
         "data_description": {
-          "entity_id": "The base entity to subtract the power from",
-          "subtract_entities": "Select all the entities you want to subtract from the base entity"
+          "entity_id": "Základná entita, od ktorej sa má odčítať výkon",
+          "subtract_entities": "Vyberte všetky entity, ktoré chcete odpočítať od základnej entity"
         },
-        "title": "Group options"
+        "title": "Možnosti skupiny"
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Senzor sieťového napájania",
+          "group_tracked_auto": "Automaticky pridané entity",
+          "create_energy_sensor": "Vytvorte energetický senzor",
+          "create_utility_meters": "Vytvorte merače spotreby"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Vyberte snímač výkonu, ktorý obsahuje vašu celkovú spotrebu energie. Keď zostane prázdne, vytvorí sa iba sledovaný snímač výkonu",
+          "group_tracked_auto": "Powercalc automaticky pridá všetky výkonové senzory do sledovanej skupiny, pričom preskočí skupiny powercalc. Túto možnosť vypnite, ak chcete sledované entity definovať manuálne",
+          "create_energy_sensor": "Či potrebuje powercalc vytvoriť kWh senzor",
+          "create_utility_meters": "Nechajte powercalc vytvoriť merače spotreby, ktoré cyklujú denne, každú hodinu atď."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Vytvorte skupinový senzor pre všetku sledovanú a nesledovanú energiu",
+        "title": "Vytvorte sledovaný snímač výkonu"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Sledované entity"
         },
-        "title": "Select power entities"
+        "title": "Vyberte výkonové entity"
       },
       "init": {
         "menu_options": {
-          "advanced_options": "Advanced options",
-          "basic_options": "Basic options",
-          "daily_energy": "Daily energy options",
-          "fixed": "Fixed options",
-          "group_custom": "Group options",
-          "group_subtract": "Group options",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
-          "library_options": "Library options",
-          "linear": "Linear options",
-          "playbook": "Playbook options",
-          "multi_switch": "Multi switch options",
-          "real_power": "Real power options",
-          "utility_meter_options": "Utility meter options",
-          "wled": "WLED options"
+          "advanced_options": "Pokročilé možnosti",
+          "basic_options": "Základné možnosti",
+          "daily_energy": "Denné energetické možnosti",
+          "fixed": "Pevné možnosti",
+          "group_custom": "Možnosti skupiny",
+          "group_subtract": "Možnosti skupiny",
+          "group_tracked_untracked": "Možnosti skupiny",
+          "group_tracked_untracked_manual": "Sleované entity",
+          "library_options": "Možnosti knižnice",
+          "linear": "Lineárne možnosti",
+          "playbook": "Možnosti playbooku",
+          "multi_switch": "Možnosti viacerých prepínačov",
+          "real_power": "Skutočné možnosti napájania",
+          "utility_meter_options": "Možnosti elektromera",
+          "wled": "WLED možnosti"
         }
       },
       "library_options": {
-        "title": "Library options",
-        "description": "Currently the following library profile is selected: \n manufacturer: {manufacturer}\n model: {model}\n\nIf you want to change the profile, click next."
+        "title": "Možnosti knižnice",
+        "description": "Momentálne je vybratý nasledujúci profil knižnice: \n výrobca: {výrobca}\n model: {model}\n\nAk chcete profil zmeniť, kliknite na tlačidlo Ďalej."
       },
       "linear": {
-        "title": "Linear options",
+        "title": "lineárne možnosti",
         "data": {
           "attribute": "Attribút",
           "calibrate": "Kalibračné hodnoty",
@@ -616,60 +618,60 @@
         }
       },
       "multi_switch": {
-        "title": "Multi switch options",
+        "title": "Možnosti viacerých prepínačov",
         "data": {
-          "entities": "Switch entities",
-          "power": "Power ON",
-          "power_off": "Power OFF"
+          "entities": "Prepnúť entity",
+          "power": "Zapnúť napájanie",
+          "power_off": "Vypnúť napájanie"
         },
         "data_description": {
-          "entities": "Select all the individual switches that are part of the multi switch",
-          "power": "Power for a single switch when turned on",
-          "power_off": "Power for a single switch when turned off"
+          "entities": "Vyberte všetky jednotlivé prepínače, ktoré sú súčasťou multifunkčného prepínača",
+          "power": "Napájanie jedným vypínačom pri zapnutí",
+          "power_off": "Napájanie na jeden vypínač pri vypnutí"
         }
       },
       "playbook": {
-        "title": "Playbook options",
+        "title": "Možnosti playbooku",
         "data": {
           "autostart": "Autoštart",
           "playbooks": "Playbooky",
           "repeat": "Opakovať",
-          "states_trigger": "State trigger"
+          "states_trigger": "Stavový trigger"
         },
         "data_description": {
           "autostart": "Označenie spustenia určitého playbooku pri spustení HA. t.j. 'program1'",
           "playbooks": "Do každého riadku zadajte playbook. Príklad\n\nprogram1: washing_machine/program1.csv",
           "repeat": "Prepínač, keď chcete pokračovať v opakovaní príručky po jej dokončení",
-          "states_trigger": "Trigger a playbook based on a state change. Example\n\nplaying: program1"
+          "states_trigger": "Spustite playbook na základe zmeny stavu. Príklad\n\nprehrávanie: program1"
         }
       },
       "real_power": {
-        "title": "Real power options",
+        "title": "Skutočné možnosti napájania",
         "data": {
           "device": "Zariadenie"
         },
         "data_description": {
-          "device": "Add the created energy sensor to an specific device"
+          "device": "Pridajte vytvorený energetický senzor do konkrétneho zariadenia"
         }
       },
       "utility_meter_options": {
-        "title": "Utility meter options",
+        "title": "Možnosti elektromera",
         "data": {
-          "utility_meter_net_consumption": "Net consumption",
-          "utility_meter_types": "Cycles",
+          "utility_meter_net_consumption": "Čistá spotreba",
+          "utility_meter_types": "Cykly",
           "utility_meter_tariffs": "Tarify za elektromery"
         },
         "data_description": {
-          "utility_meter_net_consumption": "Enable this if you would like to treat the source as a net meter. This will allow your counter to go both positive and negative.",
-          "utility_meter_types": "Create utility meters for specified cycles",
+          "utility_meter_net_consumption": "Povoľte túto možnosť, ak chcete zdroj považovať za netto meter. To umožní, aby vaše počítadlo bolo pozitívne aj negatívne.",
+          "utility_meter_types": "Vytvorte merače spotreby pre špecifikované cykly",
           "utility_meter_tariffs": "Zoznam podporovaných taríf, ponechajte prázdne, ak potrebujete iba jednu tarifu."
         }
       },
       "wled": {
-        "title": "WLED options",
+        "title": "WLED možnosti",
         "data": {
-          "power_factor": "Power factor",
-          "voltage": "Voltage"
+          "power_factor": "Účiník",
+          "voltage": "Napätie"
         }
       }
     }
@@ -724,8 +726,8 @@
       "name": "Získať aktuálny playbook"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "Získajte všetky ID entít skupinového energetického alebo výkonového senzora",
+      "name": "Získajte entity skupiny"
     },
     "increase_daily_energy": {
       "description": "Zväčší snímač o danú hodnotu.",
