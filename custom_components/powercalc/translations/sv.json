@@ -1,7 +1,7 @@
 {
   "common": {
     "remarks_smart_switch": "Denna profil visar endast effekt i standby-läge. \n Har du apparater som förbrukar ett fast effekt-värde när de är påslagna, kan du ange detta värde i nästa steg",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "Den här profilen ger endast standby-effektvärden. \n I nästa steg kan du ange värden för det anslutna ljuset som tillval"
   },
   "config": {
     "abort": {
@@ -25,17 +25,17 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Välj grupp(er)",
+          "new_group": "Ny grupp"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Fyll i ett anpassat gruppnamn för att skapa en ny grupp"
         },
-        "title": "Assign to group"
+        "title": "Tilldela till grupp"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Tillgänglighet entitet"
         },
         "data_description": {
           "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
@@ -85,7 +85,7 @@
         "title": "Fast konfig"
       },
       "global_configuration": {
-        "title": "Global configuration",
+        "title": "Global konfiguration",
         "description": "Setup global configuration for Powercalc. For more information see the [documentation](https://docs.powercalc.nl/configuration/global-configuration/). Additional options for energy sensors and utility meters can be provided in the next steps.",
         "data": {
           "create_energy_sensors": "Create energy sensors",
@@ -136,6 +136,7 @@
           "device": "Enhet",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Medlem energi entiteter",
+          "group_energy_start_at_zero": "Start at zero",
           "group_member_sensors": "Medlem powercalc sensorer",
           "group_power_entities": "Medlem effekt entiteter",
           "hide_members": "Dölj medlemmar",
@@ -149,6 +150,7 @@
           "device": "Lägg till de grupperade entiteterna Powercalc skapar till en existerande enhet.",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Ytterligare energisensorer (kWh) från din HA installation som ska inkluderas",
+          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
           "group_member_sensors": "Powercalc sensorer som ska inkluderas i gruppen",
           "group_power_entities": "Ytterligare effektsensorer (W) från din HA installation som ska inkluderas",
           "include_non_powercalc_sensors": "Ange huruvida icke-powercalc-sensorer ska inkluderas när områdesalternativet används",
@@ -208,7 +210,7 @@
           "model": "Select model"
         },
         "description": "Manufacturer \"{manufacturer}\" and model \"{model}\" were automatically detected for your device. There are multiple profiles found for the entity which can potentially be used. Please look up the exact model of your device in [Powercalc library]({library_link}) and select the correct one",
-        "title": "Library"
+        "title": "Bibliotek"
       },
       "linear": {
         "data": {
