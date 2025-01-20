@@ -11,18 +11,18 @@
   "name": "Ceiling light T1M (CL-L02D)",
   "standby_power": 0,
   "sub_profile_select": {
-        "matchers": [
-          {
-              "type": "entity_id",
-              "pattern": ".*_white$",
-              "profile": "white"
-          },
-          {
-            "type": "entity_id",
-            "pattern": ".*_rgb$",
-            "profile": "rgb"
-          }
-        ],
-        "default": "default"
-    }
+    "matchers": [
+      {
+        "type": "entity_id",
+        "pattern": ".*_white$",
+        "profile": "white"
+      },
+      {
+        "type": "entity_id",
+        "pattern": ".*_rgb$",
+        "profile": "rgb"
+      }
+    ],
+    "default": "default"
+  }
 }
