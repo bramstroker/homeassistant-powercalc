@@ -358,7 +358,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
         self.entity_id = entity_id
         self._sensor_config = sensor_config
-        self._track_entities: list = []
+        self._track_entities: set[str] = set()
         self._sleep_power_timer: CALLBACK_TYPE | None = None
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
@@ -422,8 +422,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 await self._strategy_instance.on_start(hass)
 
             entities = self._track_entities
-            if self._source_entity.entity_id == DUMMY_ENTITY_ID or not entities:
-                entities.append(DUMMY_ENTITY_ID)
+            if (not entities and self._source_entity.entity_id == DUMMY_ENTITY_ID) or not entities:
+                entities.add(DUMMY_ENTITY_ID)
             for entity_id in entities:
                 new_state = self.hass.states.get(entity_id) if entity_id != DUMMY_ENTITY_ID else State(entity_id, STATE_ON)
                 await self._handle_source_entity_state_change(
@@ -435,7 +435,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Add listeners and get initial state."""
         entities_to_track = self._get_tracking_entities()
 
-        self._track_entities = [entity for entity in entities_to_track if isinstance(entity, str)]
+        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str)})
         track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
 
         self.async_on_remove(
@@ -454,6 +454,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 TrackTemplate(self._calculation_enabled_condition, None, None),
             )
         if track_templates:
+            self.remove_source_entity_from_track_templates(track_templates)
             async_track_template_result(
                 self.hass,
                 track_templates=track_templates,
@@ -477,13 +478,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             )
             entities_to_track.extend(self._sub_profile_selector.get_tracking_entities())
 
-        source_entity_included = [
-            entity
-            for entity in entities_to_track
-            if entity == self._source_entity.entity_id
-            or (isinstance(entity, TrackTemplate) and self._source_entity.entity_id in entity.template.template)
-        ]
-        if not source_entity_included and self._source_entity.entity_id != DUMMY_ENTITY_ID:
+        if self._source_entity.entity_id != DUMMY_ENTITY_ID:
             entities_to_track.append(self._source_entity.entity_id)
 
         if self._availability_entity and self._availability_entity not in entities_to_track:
@@ -744,6 +739,20 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._config_entry,
                 data={**self._config_entry.data, CONF_MODEL: new_model},
             )
+
+    def remove_source_entity_from_track_templates(self, track_templates: list[TrackTemplate]) -> None:
+        """
+        Remove the source entity from the track templates, to prevent duplicate tracking.
+        This would cause duplicate updates at the same time, which causes issues.
+        """
+        for index, track_template in enumerate(track_templates):
+            if self._source_entity.entity_id in track_template.template.template:
+                orig_template = track_template.template.template
+                orig_template = orig_template.replace(
+                    self._source_entity.entity_id,
+                    DUMMY_ENTITY_ID,
+                )
+                track_templates[index] = TrackTemplate(Template(orig_template, self.hass), None, None)
 
 
 class RealPowerSensor(PowerSensor):
