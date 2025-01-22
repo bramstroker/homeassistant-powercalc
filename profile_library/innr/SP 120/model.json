@@ -4,15 +4,14 @@
   "measure_device": "Shelly Plug S",
   "name": "Innr Zigbee Smart Plug",
   "standby_power": 0.41,
+  "standby_power_on": 0.61,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.61
-  },
+  "only_self_usage": false,
   "created_at": "2022-10-21T09:32:56",
   "author": "msteenhuiz"
 }

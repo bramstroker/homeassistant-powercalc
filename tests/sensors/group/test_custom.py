@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     CONF_FORCE_UPDATE_FREQUENCY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_HIDE_MEMBERS,
@@ -321,8 +322,8 @@ async def test_reset_service(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
-    assert hass.states.get("sensor.test1_energy").state == "0"
-    assert hass.states.get("sensor.test2_energy").state == "0"
+    assert hass.states.get("sensor.test1_energy").state == "0.0000"
+    assert hass.states.get("sensor.test2_energy").state == "0.0000"
 
     with patch(
         "homeassistant.util.utcnow",
@@ -1686,6 +1687,33 @@ async def test_get_group_entities_action(hass: HomeAssistant) -> None:
     )
     await hass.async_block_till_done()
     assert res["sensor.testgroup_energy"][ATTR_ENTITIES] == {"sensor.test1_energy", "sensor.test2_energy", "sensor.test3_energy"}
+
+
+async def test_start_at_zero(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.a_energy", "2.00")
+    hass.states.async_set("sensor.b_energy", "3.00")
+    await hass.async_block_till_done()
+
+    await setup_config_entry(
+        hass,
+        {
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+            CONF_GROUP_ENERGY_ENTITIES: ["sensor.a_energy", "sensor.b_energy"],
+            CONF_GROUP_ENERGY_START_AT_ZERO: True,
+        },
+    )
+
+    assert hass.states.get("sensor.testgroup_energy").state == "0.0000"
+
+    with patch(
+        "homeassistant.util.utcnow",
+        return_value=dt.utcnow() + timedelta(seconds=60),
+    ):
+        hass.states.async_set("sensor.a_energy", "2.10")
+        await hass.async_block_till_done()
+
+        assert hass.states.get("sensor.testgroup_energy").state == "0.1000"
 
 
 async def _create_energy_group(

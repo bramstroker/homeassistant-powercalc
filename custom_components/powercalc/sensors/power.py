@@ -51,6 +51,7 @@ from custom_components.powercalc.const import (
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
     CALCULATION_STRATEGY_CONF_KEYS,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_DELAY,
@@ -357,7 +358,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._rounding_digits = int(sensor_config.get(CONF_POWER_SENSOR_PRECISION, DEFAULT_POWER_SENSOR_PRECISION))
         self.entity_id = entity_id
         self._sensor_config = sensor_config
-        self._track_entities: list = []
+        self._track_entities: set[str] = set()
         self._sleep_power_timer: CALLBACK_TYPE | None = None
         if entity_category:
             self._attr_entity_category = EntityCategory(entity_category)
@@ -375,6 +376,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         self._standby_sensors: dict = hass.data[DOMAIN][DATA_STANDBY_POWER_SENSORS]
         self.calculation_strategy_factory = calculation_strategy_factory
         self._strategy_instance: PowerCalculationStrategyInterface | None = None
+        self._availability_entity: str | None = sensor_config.get(CONF_AVAILABILITY_ENTITY)
         self._config_entry = config_entry
 
     async def validate(self) -> None:
@@ -420,10 +422,10 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 await self._strategy_instance.on_start(hass)
 
             entities = self._track_entities
-            if self._source_entity.entity_id == DUMMY_ENTITY_ID:
-                entities.append(DUMMY_ENTITY_ID)
+            if (not entities and self._source_entity.entity_id == DUMMY_ENTITY_ID) or not entities:
+                entities.add(DUMMY_ENTITY_ID)
             for entity_id in entities:
-                new_state = self.hass.states.get(entity_id)
+                new_state = self.hass.states.get(entity_id) if entity_id != DUMMY_ENTITY_ID else State(entity_id, STATE_ON)
                 await self._handle_source_entity_state_change(
                     entity_id,
                     new_state,
@@ -433,7 +435,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         """Add listeners and get initial state."""
         entities_to_track = self._get_tracking_entities()
 
-        self._track_entities = [entity for entity in entities_to_track if isinstance(entity, str)]
+        self._track_entities = set({entity for entity in entities_to_track if isinstance(entity, str)})
         track_templates = [template for template in entities_to_track if isinstance(template, TrackTemplate)]
 
         self.async_on_remove(
@@ -452,6 +454,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 TrackTemplate(self._calculation_enabled_condition, None, None),
             )
         if track_templates:
+            self.remove_source_entity_from_track_templates(track_templates)
             async_track_template_result(
                 self.hass,
                 track_templates=track_templates,
@@ -475,14 +478,11 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
             )
             entities_to_track.extend(self._sub_profile_selector.get_tracking_entities())
 
-        source_entity_included = [
-            entity
-            for entity in entities_to_track
-            if entity == self._source_entity.entity_id
-            or (isinstance(entity, TrackTemplate) and self._source_entity.entity_id in entity.template.template)
-        ]
-        if not source_entity_included and self._source_entity.entity_id != DUMMY_ENTITY_ID:
+        if self._source_entity.entity_id != DUMMY_ENTITY_ID:
             entities_to_track.append(self._source_entity.entity_id)
+
+        if self._availability_entity and self._availability_entity not in entities_to_track:
+            entities_to_track.append(self._availability_entity)
 
         return entities_to_track
 
@@ -668,13 +668,17 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         return self._source_entity.entity_id
 
     @property
-    def native_value(self) -> StateType:  # type: ignore[override]
+    def native_value(self) -> StateType:
         """Return the state of the sensor."""
         return cast(StateType, self._power)
 
     @property
-    def available(self) -> bool:  # type: ignore[override]
+    def available(self) -> bool:
         """Return True if entity is available."""
+        if self._availability_entity:
+            state = self.hass.states.get(self._availability_entity)
+            return bool(state and state.state != STATE_UNAVAILABLE)
+
         return self._power is not None
 
     def set_energy_sensor_attribute(self, entity_id: str) -> None:
@@ -717,7 +721,8 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 "This is only supported for sensors having sub profiles, and no automatic profile selection",
             )
 
-        if profile not in await self._power_profile.get_sub_profiles():
+        known_profiles = [profile[0] for profile in await self._power_profile.get_sub_profiles()]
+        if profile not in known_profiles:
             raise HomeAssistantError(f"{profile} is not a possible sub profile")
 
         await self._select_new_sub_profile(profile)
@@ -734,6 +739,20 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
                 self._config_entry,
                 data={**self._config_entry.data, CONF_MODEL: new_model},
             )
+
+    def remove_source_entity_from_track_templates(self, track_templates: list[TrackTemplate]) -> None:
+        """
+        Remove the source entity from the track templates, to prevent duplicate tracking.
+        This would cause duplicate updates at the same time, which causes issues.
+        """
+        for index, track_template in enumerate(track_templates):
+            if self._source_entity.entity_id in track_template.template.template:
+                orig_template = track_template.template.template
+                orig_template = orig_template.replace(
+                    self._source_entity.entity_id,
+                    DUMMY_ENTITY_ID,
+                )
+                track_templates[index] = TrackTemplate(Template(orig_template, self.hass), None, None)
 
 
 class RealPowerSensor(PowerSensor):
@@ -757,6 +776,6 @@ class RealPowerSensor(PowerSensor):
         return self._device_id
 
     @property
-    def unique_id(self) -> str | None:  # type: ignore[override]
+    def unique_id(self) -> str | None:
         """Return the unique_id of the sensor."""
         return self._unique_id

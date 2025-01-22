@@ -10,7 +10,7 @@ import homeassistant.helpers.device_registry as dr
 import homeassistant.helpers.entity_registry as er
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.sensor import DOMAIN as SENSOR_DOMAIN
-from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER
+from homeassistant.config_entries import SOURCE_INTEGRATION_DISCOVERY, SOURCE_USER, ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_PLATFORM, CONF_UNIQUE_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import discovery_flow
@@ -36,7 +36,7 @@ from .group_include.filter import CategoryFilter, CompositeFilter, DomainFilter,
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import DEVICE_TYPE_DOMAIN, DiscoveryBy, PowerProfile
+from .power_profile.power_profile import SUPPORTED_DOMAINS, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -117,6 +117,14 @@ class DiscoveryManager:
             if entity and entity.device_entry:
                 self.initialized_flows.add(f"pc_{entity.device_entry.id}")
             self.initialized_flows.add(entity_id)
+
+    def remove_initialized_flow(self, entry: ConfigEntry) -> None:
+        """Remove a flow from the initialized flows."""
+        if entry.unique_id:
+            self.initialized_flows.discard(entry.unique_id)
+        entity_id = entry.data.get(CONF_ENTITY_ID)
+        if entity_id:
+            self.initialized_flows.discard(entity_id)
 
     async def perform_discovery(
         self,
@@ -280,8 +288,8 @@ class DiscoveryManager:
                 LambdaFilter(_check_already_configured),
                 LambdaFilter(lambda entity: entity.device_id is None),
                 LambdaFilter(lambda entity: entity.platform == "mqtt" and "segment" in entity.entity_id),
-                LambdaFilter(lambda entity: entity.platform == "powercalc"),
-                NotFilter(DomainFilter(DEVICE_TYPE_DOMAIN.values())),
+                LambdaFilter(lambda entity: entity.platform in ["powercalc", "switch_as_x"]),
+                NotFilter(DomainFilter(SUPPORTED_DOMAINS)),
             ],
             FilterOperator.OR,
         )

@@ -194,7 +194,7 @@ class PlaybookStrategy(PowerCalculationStrategyInterface):
                     entries.append(PlaybookEntry(time=float(row[0]), power=Decimal(row[1])))
                 return entries
 
-        playbook_entries = await self._hass.async_add_executor_job(_load_playbook_entries)  # type: ignore
+        playbook_entries = await self._hass.async_add_executor_job(_load_playbook_entries)
 
         self._loaded_playbooks[playbook_id] = Playbook(
             key=playbook_id,

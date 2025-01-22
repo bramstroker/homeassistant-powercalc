@@ -51,11 +51,14 @@ async def test_find_models(hass: HomeAssistant, model_info: ModelInfo, expected_
     assert {model.model for model in models} == expected_models
 
 
-async def test_get_subprofile_listing(hass: HomeAssistant) -> None:
+async def test_get_sub_profile_listing(hass: HomeAssistant) -> None:
     library = await ProfileLibrary.factory(hass)
     profile = await library.get_profile(ModelInfo("yeelight", "YLDL01YL"))
-    sub_profiles = await profile.get_sub_profiles()
-    assert sub_profiles == ["ambilight", "downlight"]
+    sub_profiles = [profile[0] for profile in await profile.get_sub_profiles()]
+    assert sub_profiles == [
+        "ambilight",
+        "downlight",
+    ]
 
 
 async def test_get_subprofile_listing_empty_list(hass: HomeAssistant) -> None:

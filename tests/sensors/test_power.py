@@ -44,6 +44,7 @@ from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_SOURCE_DOMAIN,
     ATTR_SOURCE_ENTITY,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_CREATE_GROUP,
@@ -576,7 +577,7 @@ async def test_multiply_factor_standby_power_on(hass: HomeAssistant) -> None:
     hass.states.async_set("switch.test", STATE_ON)
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.test_device_power").state == "1.64"
+    assert hass.states.get("sensor.test_power").state == "1.64"
 
 
 async def test_multiply_factor_sleep_power(hass: HomeAssistant) -> None:
@@ -775,3 +776,25 @@ async def test_switch_sub_profile_raises_exception_on_invalid_sub_profile(
             },
             blocking=True,
         )
+
+
+async def test_availability_entity(hass: HomeAssistant) -> None:
+    await run_powercalc_setup(
+        hass,
+        {
+            CONF_ENTITY_ID: "sensor.dummy",
+            CONF_NAME: "Test",
+            CONF_AVAILABILITY_ENTITY: "sensor.availability",
+            CONF_FIXED: {CONF_POWER: 10},
+        },
+    )
+
+    hass.states.async_set("sensor.availability", STATE_UNAVAILABLE)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == STATE_UNAVAILABLE
+
+    hass.states.async_set("sensor.availability", STATE_ON)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.test_power").state == "10.00"

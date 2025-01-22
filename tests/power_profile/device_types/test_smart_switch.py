@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult, FlowResultType
 
 from custom_components.powercalc import async_setup_entry
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_CUSTOM_MODEL_DIRECTORY,
     CONF_FIXED,
@@ -16,7 +16,7 @@ from custom_components.powercalc.const import (
     DOMAIN,
 )
 from tests.common import get_test_config_dir, get_test_profile_dir, run_powercalc_setup
-from tests.config_flow.common import initialize_options_flow
+from tests.config_flow.common import confirm_auto_discovered_model, initialize_options_flow
 from tests.conftest import MockEntityWithModel
 
 
@@ -37,7 +37,7 @@ async def test_smart_switch_with_yaml(
         model=model,
     )
 
-    power_sensor_id = "sensor.oven_device_power"
+    power_sensor_id = "sensor.oven_power"
 
     await run_powercalc_setup(
         hass,
@@ -83,7 +83,7 @@ async def test_smart_switch_power_input_yaml(
         model=model,
     )
 
-    power_sensor_id = "sensor.heater_device_power"
+    power_sensor_id = "sensor.heater_power"
 
     await run_powercalc_setup(
         hass,
@@ -243,7 +243,4 @@ async def start_discovery_flow(
     flow = flows[0]
 
     assert flow["step_id"] == Step.LIBRARY
-    return await hass.config_entries.flow.async_configure(
-        flow["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    return await confirm_auto_discovered_model(hass, flow)

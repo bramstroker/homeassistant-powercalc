@@ -1,14 +1,16 @@
-from selectors import SelectSelector
-
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_DEVICE, CONF_ENTITY_ID, CONF_NAME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.entity_registry import RegistryEntry
+from homeassistant.helpers.selector import SelectSelector
+from pytest_homeassistant_custom_component.common import mock_device_registry, mock_registry
 
 from custom_components.powercalc.common import SourceEntity, create_source_entity
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
+    CONF_AVAILABILITY_ENTITY,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_MANUFACTURER,
     CONF_MODEL,
@@ -24,6 +26,7 @@ from tests.common import get_test_config_dir
 from tests.config_flow.common import (
     DEFAULT_ENTITY_ID,
     DEFAULT_UNIQUE_ID,
+    confirm_auto_discovered_model,
     create_mock_entry,
     initialize_discovery_flow,
     initialize_options_flow,
@@ -46,11 +49,7 @@ async def test_discovery_flow(
     result = await initialize_discovery_flow(hass, source_entity)
 
     # Confirm selected manufacturer/model
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
@@ -86,11 +85,7 @@ async def test_discovery_flow_with_subprofile_selection(
 
     result = await initialize_discovery_flow(hass, source_entity, power_profile)
 
-    assert result["type"] == data_entry_flow.FlowResultType.FORM
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
-    )
+    result = await confirm_auto_discovered_model(hass, result)
 
     assert result["type"] == data_entry_flow.FlowResultType.FORM
     assert result["step_id"] == Step.SUB_PROFILE
@@ -192,6 +187,23 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
         manufacturer="test",
         model="discovery_type_device",
     )
+    mock_device_registry(
+        hass,
+        {
+            device_entry.id: device_entry,
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="54543",
+                device_id=device_entry.id,
+                platform="youless",
+            ),
+        },
+    )
     source_entity = SourceEntity(
         object_id=device_entry.name,
         name=device_entry.name,
@@ -204,19 +216,24 @@ async def test_discovery_by_device(hass: HomeAssistant) -> None:
     ]
     result = await initialize_discovery_flow(hass, source_entity, power_profiles)
 
+    result = await confirm_auto_discovered_model(hass, result)
+
     assert result["type"] == data_entry_flow.FlowResultType.FORM
+    assert result["step_id"] == Step.AVAILABILITY_ENTITY
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: True},
+        {CONF_AVAILABILITY_ENTITY: "switch.test"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["data"] == {
+        CONF_AVAILABILITY_ENTITY: "switch.test",
         CONF_ENTITY_ID: DUMMY_ENTITY_ID,
         CONF_SENSOR_TYPE: SensorType.VIRTUAL_POWER,
         CONF_MANUFACTURER: "test",
         CONF_MODEL: "discovery_type_device",
         CONF_NAME: "FooBar",
+        CONF_DEVICE: "youless-device",
     }
 
     assert hass.states.get("sensor.foobar_device_power")

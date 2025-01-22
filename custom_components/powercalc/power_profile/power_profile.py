@@ -5,6 +5,7 @@ import logging
 import os
 import re
 from collections import defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any, NamedTuple, Protocol, cast
@@ -68,32 +69,34 @@ class CustomField:
     description: str | None = None
 
 
-DEVICE_TYPE_DOMAIN = {
+DEVICE_TYPE_DOMAIN: dict[DeviceType, str | set[str]] = {
     DeviceType.CAMERA: CAMERA_DOMAIN,
     DeviceType.COVER: COVER_DOMAIN,
     DeviceType.GENERIC_IOT: SENSOR_DOMAIN,
     DeviceType.LIGHT: LIGHT_DOMAIN,
     DeviceType.POWER_METER: SENSOR_DOMAIN,
     DeviceType.SMART_DIMMER: LIGHT_DOMAIN,
-    DeviceType.SMART_SWITCH: SWITCH_DOMAIN,
+    DeviceType.SMART_SWITCH: {SWITCH_DOMAIN, LIGHT_DOMAIN},
     DeviceType.SMART_SPEAKER: MEDIA_PLAYER_DOMAIN,
     DeviceType.NETWORK: BINARY_SENSOR_DOMAIN,
     DeviceType.PRINTER: SENSOR_DOMAIN,
     DeviceType.VACUUM_ROBOT: VACUUM_DOMAIN,
 }
 
-DOMAIN_TO_DEVICE_TYPES = defaultdict(set)
-for device_type, domain in DEVICE_TYPE_DOMAIN.items():
-    DOMAIN_TO_DEVICE_TYPES[domain].add(device_type)
+SUPPORTED_DOMAINS: set[str] = {domain for domains in DEVICE_TYPE_DOMAIN.values() for domain in (domains if isinstance(domains, set) else {domains})}
 
 
-def get_entity_device_types(entity_domain: str, entity_entry: RegistryEntry | None) -> set[DeviceType]:
+def _build_domain_device_type_mapping() -> Mapping[str, set[DeviceType]]:
     """Get the device types for a given entity domain."""
-    device_types = set(DOMAIN_TO_DEVICE_TYPES.get(entity_domain, {}))
-    # see https://github.com/bramstroker/homeassistant-powercalc/issues/1491
-    if entity_entry and entity_entry.platform in ["hue", "osramlightify"] and entity_domain == LIGHT_DOMAIN:
-        device_types.add(DeviceType.SMART_SWITCH)
-    return device_types
+    domain_to_device_type: defaultdict[str, set[DeviceType]] = defaultdict(set)
+    for device_type, domains in DEVICE_TYPE_DOMAIN.items():
+        domain_set = domains if isinstance(domains, set) else {domains}
+        for domain in domain_set:
+            domain_to_device_type[domain].add(device_type)
+    return domain_to_device_type
+
+
+DOMAIN_DEVICE_TYPE_MAPPING: Mapping[str, set[DeviceType]] = _build_domain_device_type_mapping()
 
 
 class PowerProfile:
@@ -112,7 +115,7 @@ class PowerProfile:
         self._json_data = json_data
         self.sub_profile: str | None = None
         self._sub_profile_dir: str | None = None
-        self._sub_profiles: list[str] | None = None
+        self._sub_profiles: list[tuple[str, dict]] | None = None
 
     def get_model_directory(self, root_only: bool = False) -> str:
         """Get the model directory containing the data files."""
@@ -232,19 +235,21 @@ class PowerProfile:
         """Used for smart switches which only provides standby power values.
         This indicates the user must supply the power values in the config flow.
         """
-        return (
-            self.is_strategy_supported(
-                CalculationStrategy.FIXED,
-            )
-            and not self._json_data.get("fixed_config")
-            and not self.only_self_usage
-        )
+        if self.only_self_usage:
+            return False
+
+        return self.is_strategy_supported(
+            CalculationStrategy.FIXED,
+        ) and not self._json_data.get("fixed_config")
 
     @property
     def needs_linear_config(self) -> bool:
         """
         Used for smart dimmers. This indicates the user must supply the power values in the config flow.
         """
+        if self.only_self_usage:
+            return False
+
         return self.is_strategy_supported(
             CalculationStrategy.LINEAR,
         ) and not self._json_data.get("linear_config")
@@ -284,28 +289,51 @@ class PowerProfile:
     def config_flow_discovery_remarks(self) -> str | None:
         """Get remarks to show at the config flow discovery step."""
         remarks = self._json_data.get("config_flow_discovery_remarks")
-        if not remarks and self.device_type == DeviceType.SMART_SWITCH:
-            translations = translation.async_get_cached_translations(
-                self._hass,
-                self._hass.config.language,
-                "common",
-                DOMAIN,
-            )
-            translation_key = f"component.{DOMAIN}.common.remarks_smart_switch"
-            return translations.get(translation_key)
+        if not remarks:
+            translation_key = self.get_default_discovery_remarks_translation_key()
+            if translation_key:
+                translations = translation.async_get_cached_translations(
+                    self._hass,
+                    self._hass.config.language,
+                    "common",
+                    DOMAIN,
+                )
+                return translations.get(f"component.{DOMAIN}.common.{translation_key}")
 
         return remarks
 
-    async def get_sub_profiles(self) -> list[str]:
-        """Get listing of possible sub profiles."""
+    def get_default_discovery_remarks_translation_key(self) -> str | None:
+        """When no remarks are provided in the profile, see if we need to show a default remark."""
+        if self.device_type == DeviceType.SMART_SWITCH and self.needs_fixed_config:
+            return "remarks_smart_switch"
+        if self.device_type == DeviceType.SMART_DIMMER and self.needs_linear_config:
+            return "remarks_smart_dimmer"
+        return None
+
+    async def get_sub_profiles(self) -> list[tuple[str, dict]]:
+        """Get listing of possible sub profiles and their corresponding JSON data."""
 
         if self._sub_profiles:
             return self._sub_profiles
 
-        def _get_sub_dirs() -> list[str]:
-            return next(os.walk(self.get_model_directory(True)))[1]
+        def _get_sub_dirs_and_json() -> list[tuple[str, dict]]:
+            base_dir = self.get_model_directory(True)
+            sub_dirs = next(os.walk(base_dir))[1]
+            result = []
+            for sub_dir in sub_dirs:
+                json_path = os.path.join(base_dir, sub_dir, "model.json")
+                if os.path.isfile(json_path):
+                    with open(json_path, encoding="utf-8") as f:
+                        json_data = json.load(f)
+                else:
+                    json_data = {}
+                result.append((sub_dir, json_data))
+            return result
 
-        self._sub_profiles = sorted(await self._hass.async_add_executor_job(_get_sub_dirs))  # type: ignore
+        self._sub_profiles = sorted(
+            await self._hass.async_add_executor_job(_get_sub_dirs_and_json),
+            key=lambda x: x[0],  # Sort by directory name
+        )
         return self._sub_profiles
 
     @property
@@ -330,24 +358,22 @@ class PowerProfile:
         if self.sub_profile == sub_profile:
             return
 
-        self._sub_profile_dir = os.path.join(self._directory, sub_profile)
-        _LOGGER.debug("Loading sub profile directory %s", sub_profile)
-        if not os.path.exists(self._sub_profile_dir):
+        sub_profiles = await self.get_sub_profiles()
+        found_profile = None
+        for sub_dir, json_data in sub_profiles:
+            if sub_dir == sub_profile:
+                found_profile = json_data
+                break
+
+        if found_profile is None:
             raise ModelNotSupportedError(
                 f"Sub profile not found (manufacturer: {self._manufacturer}, model: {self._model}, sub_profile: {sub_profile})",
             )
 
-        # When the sub LUT directory also has a model.json (not required),
-        # merge this json into the main model.json data.
-        file_path = os.path.join(self._sub_profile_dir, "model.json")
-        if os.path.exists(file_path):
+        self._sub_profile_dir = os.path.join(self._directory, sub_profile)
+        _LOGGER.debug("Loading sub profile: %s", sub_profile)
 
-            def _load_json() -> None:
-                """Load LUT profile json data."""
-                with open(file_path) as json_file:
-                    self._json_data = {**self._json_data, **json.load(json_file)}
-
-            await self._hass.async_add_executor_job(_load_json)  # type: ignore
+        self._json_data.update(found_profile)
 
         self.sub_profile = sub_profile
 
@@ -376,7 +402,7 @@ class PowerProfile:
         if self.device_type == DeviceType.PRINTER and entity_entry.unit_of_measurement:
             return False
 
-        return self.device_type in get_entity_device_types(domain, entity_entry)
+        return self.device_type in DOMAIN_DEVICE_TYPE_MAPPING[domain]
 
 
 class SubProfileSelector:

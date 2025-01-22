@@ -29,12 +29,14 @@ from custom_components.powercalc.const import (
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_INCLUDE_NON_POWERCALC_SENSORS,
     CONF_MODE,
+    CONF_NEW_GROUP,
     CONF_POWER,
     CONF_STATES_POWER,
     CONF_SUB_GROUPS,
@@ -47,7 +49,7 @@ from custom_components.powercalc.const import (
     CalculationStrategy,
     GroupType,
 )
-from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_group
+from custom_components.powercalc.sensors.group.config_entry_utils import add_to_associated_groups
 from custom_components.test.light import MockLight
 from tests.common import (
     create_mock_light_entity,
@@ -85,6 +87,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     await hass.async_block_till_done()
@@ -112,6 +115,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     await hass.async_block_till_done()
@@ -198,6 +202,7 @@ async def test_group_include_area(
         CONF_UTILITY_METER_NET_CONSUMPTION: False,
         CONF_UTILITY_METER_TARIFFS: [],
         CONF_UTILITY_METER_TYPES: [DAILY],
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     hass.states.async_set("sensor.test_power", 5)
@@ -363,6 +368,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
 
@@ -538,19 +544,30 @@ async def test_migrate_config_entry_from_version_2(hass: HomeAssistant) -> None:
 
 
 async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistant) -> None:
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="abcdefg",
+        data={
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_NAME: "TestGroup",
+        },
+        title="TestGroup",
+    )
+    config_entry.add_to_hass(hass)
+
     result = await goto_virtual_power_strategy_step(
         hass,
         CalculationStrategy.FIXED,
         user_input={
             CONF_MODE: CalculationStrategy.FIXED,
             CONF_NAME: "My power sensor",
-            CONF_GROUP: "New group",
         },
     )
     result = await set_virtual_power_configuration(
         hass,
         result,
         {CONF_POWER: 20},
+        group_options={CONF_NEW_GROUP: "New group"},
     )
 
     assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
@@ -561,9 +578,9 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
     config_entry = hass.config_entries.async_get_entry(result["result"].entry_id)
 
     # Prevent regression by checking if group is not already created and added twice, see #2366
-    await add_to_associated_group(hass, config_entry)
+    await add_to_associated_groups(hass, config_entry)
     entries = hass.config_entries.async_entries(DOMAIN)
-    assert len(entries) == 2
+    assert len(entries) == 3
 
 
 async def test_no_group_created_when_group_null(hass: HomeAssistant) -> None:

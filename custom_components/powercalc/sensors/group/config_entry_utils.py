@@ -3,7 +3,7 @@ import logging
 
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry, ConfigFlow
 from homeassistant.const import CONF_NAME
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
 from custom_components.powercalc.const import CONF_GROUP, CONF_GROUP_MEMBER_SENSORS, CONF_SUB_GROUPS
@@ -50,11 +50,9 @@ async def remove_group_from_power_sensor_entry(
     return entries_to_update
 
 
-async def add_to_associated_group(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-) -> ConfigEntry | None:
-    """When the user has set a group on a virtual power config entry,
+async def add_to_associated_groups(hass: HomeAssistant, config_entry: ConfigEntry) -> ConfigEntry | None:  # type: ignore
+    """
+    When the user has set a group on a virtual power config entry,
     we need to add this config entry to the group members sensors and update the group.
     """
     sensor_type = config_entry.data.get(CONF_SENSOR_TYPE)
@@ -64,7 +62,28 @@ async def add_to_associated_group(
     if CONF_GROUP not in config_entry.data or not config_entry.data.get(CONF_GROUP):
         return None
 
-    group_entry_id = str(config_entry.data.get(CONF_GROUP))
+    groups: list[str] | str = config_entry.data.get(CONF_GROUP)  # type: ignore
+    if not isinstance(groups, list):
+        groups = [groups]
+
+    for group_entry_id in groups:
+        group_entry = await add_to_associated_group(hass, config_entry, group_entry_id)
+        if group_entry:
+            _LOGGER.debug(
+                "ConfigEntry %s: Added to group %s.",
+                config_entry.title,
+                group_entry.title,
+            )
+
+
+async def add_to_associated_group(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    group_entry_id: str,
+) -> ConfigEntry | None:
+    """When the user has set a group on a virtual power config entry,
+    we need to add this config entry to the group members sensors and update the group.
+    """
     group_entry = hass.config_entries.async_get_entry(group_entry_id)
 
     # When we are not dealing with a uuid, the user has set a group name manually
@@ -117,11 +136,7 @@ async def add_to_associated_group(
 
 def get_entries_having_subgroup(hass: HomeAssistant, subgroup_entry: ConfigEntry) -> list[ConfigEntry]:
     """Get all virtual power entries which have the subgroup in their subgroups list."""
-    return [
-        entry
-        for entry in hass.config_entries.async_entries(DOMAIN)
-        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])
-    ]
+    return [entry for entry in get_group_entries(hass) if subgroup_entry.entry_id in (entry.data.get(CONF_SUB_GROUPS) or [])]
 
 
 def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> list[ConfigEntry]:
@@ -131,3 +146,8 @@ def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> 
         for entry in hass.config_entries.async_entries(DOMAIN)
         if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and member_entry.entry_id in (entry.data.get(CONF_GROUP_MEMBER_SENSORS) or [])
     ]
+
+
+@callback
+def get_group_entries(hass: HomeAssistant) -> list[ConfigEntry]:
+    return [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP]

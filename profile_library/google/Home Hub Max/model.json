@@ -1,0 +1,32 @@
+{
+  "calculation_enabled_condition": "{{ is_state('[[entity]]', 'playing') }}",
+  "calculation_strategy": "linear",
+  "created_at": "2025-01-08T16:05:27.364656",
+  "device_type": "smart_speaker",
+  "linear_config": {
+    "calibrate": [
+      "10 -> 3.2",
+      "20 -> 4.0",
+      "30 -> 4.0",
+      "40 -> 4.0",
+      "50 -> 4.4",
+      "60 -> 5.4",
+      "70 -> 5.8",
+      "80 -> 7.0",
+      "90 -> 8.2",
+      "100 -> 10.2",
+      "0 -> 5.0"
+    ]
+  },
+  "measure_description": "Measured with utils/measure script",
+  "measure_device": "Innr SP 242",
+  "measure_method": "script",
+  "measure_settings": {
+    "SAMPLE_COUNT": 2,
+    "SLEEP_TIME": 3,
+    "VERSION": "v1.16.7:docker"
+  },
+  "name": "Google Nest Hub Max",
+  "standby_power": 2.0,
+  "author": "Greg Hesp <greg.hesp@gmail.com>"
+}

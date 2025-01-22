@@ -1,6 +1,7 @@
 {
   "common": {
-    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow"
+    "remarks_smart_switch": "This profile only provides standby power values. \n When you have an appliance which consumes a fixed amount of power when turned on, you can provide that value in next step of the config flow",
+    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
   "config": {
     "abort": {
@@ -22,10 +23,29 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Availability entity"
+        },
+        "data_description": {
+          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+        },
+        "title": "Availability entity",
+        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Creați contoare",
-          "group": "Add to group",
           "name": "Nume",
           "on_time": "Timp pornit",
           "start_time": "Timpul de pornire",
@@ -35,7 +55,6 @@
           "value_template": "Șablon de valoare"
         },
         "data_description": {
-          "group": "Fill in a custom group name to create a new group",
           "on_time": "Când este lăsat gol, valoarea implicită este 1 zi. mereu pornit",
           "update_frequency": "timpul în secunde între actualizările stării senzorului"
         },
@@ -117,6 +136,7 @@
           "device": "Dispozitiv",
           "force_calculate_group_energy": "Force calculate energy",
           "group_energy_entities": "Entități energetice suplimentare",
+          "group_energy_start_at_zero": "Start at zero",
           "group_member_sensors": "Senzori powercalc membri",
           "group_power_entities": "Entități de putere suplimentare",
           "hide_members": "Ascunde members",
@@ -130,6 +150,7 @@
           "device": "Adăugați entitățile de grup pe care powercalc le creează pe un dispozitiv existent",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Senzori suplimentari de energie (kWh) de la instalația dvs. HA de inclus",
+          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
           "group_member_sensors": "Senzori Powercalc de inclus în grup",
           "group_power_entities": "Senzori de putere suplimentari (W) de la instalația dvs. HA pentru a include",
           "include_non_powercalc_sensors": "Controlați dacă includeți senzori non-powercalc atunci când utilizați opțiunea zonă",
@@ -347,7 +368,6 @@
           "create_energy_sensor": "Creați un senzor de energie",
           "create_utility_meters": "Creați contoare",
           "entity_id": "Entitatea sursă",
-          "group": "Adăugați la grup",
           "mode": "Strategia de calcul",
           "name": "Nume",
           "standby_power": "Putere in Standby"
@@ -356,7 +376,6 @@
           "create_energy_sensor": "Dacă powercalc trebuie să creeze un senzor kWh",
           "create_utility_meters": "Lăsați powercalc să creeze contoare, cu ciclu zilnic, pe oră etc.",
           "entity_id": "entitate pe care se bazează puterea virtuală, senzorul de putere va asculta modificările de stare ale acestei entități pentru a fi actualizate",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Dacă lăsați necompletat, numele va fi preluat de la entitatea sursă",
           "standby_power": "Definiți cantitatea de energie pe care o consumă dispozitivul în starea OPRIT"
         },

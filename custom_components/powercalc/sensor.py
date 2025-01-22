@@ -46,6 +46,7 @@ from .common import (
 )
 from .const import (
     CONF_AND,
+    CONF_AVAILABILITY_ENTITY,
     CONF_CALCULATION_ENABLED_CONDITION,
     CONF_CALIBRATE,
     CONF_COMPOSITE,
@@ -141,7 +142,7 @@ from .sensors.daily_energy import (
     create_daily_fixed_energy_sensor,
 )
 from .sensors.energy import EnergySensor, create_energy_sensor
-from .sensors.group.config_entry_utils import add_to_associated_group
+from .sensors.group.config_entry_utils import add_to_associated_groups
 from .sensors.group.custom import GroupedSensor
 from .sensors.group.factory import create_group_sensors
 from .sensors.group.standby import StandbyPowerSensor
@@ -161,6 +162,7 @@ MAX_GROUP_NESTING_LEVEL = 5
 SENSOR_CONFIG = {
     vol.Optional(CONF_NAME): cv.string,
     vol.Optional(CONF_ENTITY_ID): cv.entity_id,
+    vol.Optional(CONF_AVAILABILITY_ENTITY): cv.entity_id,
     vol.Optional(CONF_UNIQUE_ID): cv.string,
     vol.Optional(CONF_MODEL): cv.string,
     vol.Optional(CONF_MANUFACTURER): cv.string,
@@ -324,7 +326,7 @@ async def async_setup_entry(
     )
 
     # Add entry to an existing group
-    await add_to_associated_group(hass, entry)
+    await add_to_associated_groups(hass, entry)
 
 
 async def _async_setup_entities(

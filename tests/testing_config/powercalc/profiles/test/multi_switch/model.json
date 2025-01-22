@@ -1,0 +1,11 @@
+{
+  "name": "Test",
+  "device_type": "smart_switch",
+  "discovery_by": "device",
+  "calculation_strategy": "multi_switch",
+  "standby_power": 0.5,
+  "multi_switch_config": {
+    "power": 0.725
+  },
+  "only_self_usage": true
+}

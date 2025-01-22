@@ -65,6 +65,7 @@ from custom_components.powercalc.const import (
     CONF_EXCLUDE_ENTITIES,
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TYPE,
@@ -480,7 +481,7 @@ class GroupedSensor(BaseEntity, RestoreSensor, SensorEntity):
         domain = self._sensor_config.get(CONF_DOMAIN)
         if domain == "all":
             entity_registry = er.async_get(self.hass)
-            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]  # type: ignore
+            entities = [entity.entity_id for entity in entity_registry.entities.values() if entity.device_class == self.device_class]
         else:
             entities = self.hass.data[DOMAIN].get(DATA_DOMAIN_ENTITIES).get(domain, [])
             entities = filter_entity_list_by_class(
@@ -733,7 +734,9 @@ class GroupedEnergySensor(GroupedSensor, EnergySensor):
             state,
         )
 
-        delta = cur_state_value - prev_state_value
+        start_at_zero = bool(self._sensor_config.get(CONF_GROUP_ENERGY_START_AT_ZERO, False))
+        delta = Decimal(0) if not prev_state and start_at_zero else cur_state_value - prev_state_value
+
         if _LOGGER.isEnabledFor(logging.DEBUG):  # pragma: no cover
             rounded_delta = round(delta, self._rounding_digits)
             rounded_prev = round(prev_state_value, self._rounding_digits)

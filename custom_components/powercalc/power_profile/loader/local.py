@@ -23,7 +23,7 @@ class LocalLoader(Loader):
     async def initialize(self) -> None:
         """Initialize the loader."""
         if not self._is_custom_directory:
-            await self._hass.async_add_executor_job(self._load_custom_library)  # type: ignore
+            await self._hass.async_add_executor_job(self._load_custom_library)
 
     async def get_manufacturer_listing(self, device_types: set[DeviceType] | None) -> set[str]:
         """Get listing of all available manufacturers or filtered by model device_type."""

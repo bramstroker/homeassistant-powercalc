@@ -127,7 +127,7 @@ class TrackedPowerSensorFactory:
         action = event.data["action"]
 
         if action == "update" and "old_entity_id" in event.data:
-            if event.data["old_entity_id"] in self.tracked_entities:
+            if event.data["old_entity_id"] in self.tracked_entities:  # type: ignore
                 return await self.reload()
             return None  # pragma: no cover
 

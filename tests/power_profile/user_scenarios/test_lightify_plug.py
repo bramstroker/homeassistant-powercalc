@@ -4,11 +4,11 @@ from homeassistant import data_entry_flow
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 
-from custom_components.powercalc.config_flow import CONF_CONFIRM_AUTODISCOVERED_MODEL, Step
+from custom_components.powercalc.config_flow import Step
 from custom_components.powercalc.const import (
     CONF_MANUFACTURER,
 )
-from tests.config_flow.common import select_menu_item
+from tests.config_flow.common import confirm_auto_discovered_model, select_menu_item
 from tests.conftest import MockEntityWithModel
 
 
@@ -31,10 +31,7 @@ async def test_lightify_plug_selectable(
         result["flow_id"],
         {CONF_ENTITY_ID: "light.test"},
     )
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_CONFIRM_AUTODISCOVERED_MODEL: False},
-    )
+    result = await confirm_auto_discovered_model(hass, result, confirmed=False)
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {

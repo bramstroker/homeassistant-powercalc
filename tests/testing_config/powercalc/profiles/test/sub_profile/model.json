@@ -1,0 +1,9 @@
+{
+  "name": "Some profile with sub profiles",
+  "discovery_by": "entity",
+  "device_type": "smart_switch",
+  "sensor_config": {
+    "power_sensor_naming": "{} Device Power",
+    "energy_sensor_naming": "{} Device Energy"
+  }
+}

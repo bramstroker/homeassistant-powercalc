@@ -1,6 +1,7 @@
 {
   "common": {
-    "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione"
+    "remarks_smart_switch": "Questo profilo fornisce solo valori di potenza in standby. Quando hai un dispositivo che consuma una quantità fissa di potenza quando è acceso, puoi fornire quel valore nel passaggio successivo del flusso di configurazione",
+    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
   "config": {
     "abort": {
@@ -22,10 +23,29 @@
     },
     "flow_title": "{name} ({manufacturer} {model})",
     "step": {
+      "assign_groups": {
+        "data": {
+          "group": "Select group(s)",
+          "new_group": "New group"
+        },
+        "data_description": {
+          "new_group": "Fill in a custom group name to create a new group"
+        },
+        "title": "Assign to group"
+      },
+      "availability_entity": {
+        "data": {
+          "availability_entity": "Availability entity"
+        },
+        "data_description": {
+          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+        },
+        "title": "Availability entity",
+        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+      },
       "daily_energy": {
         "data": {
           "create_utility_meters": "Crea contatori (utility meters)",
-          "group": "Aggiungi al gruppo",
           "name": "Nome",
           "on_time": "On time",
           "start_time": "Orario d'inizio",
@@ -35,7 +55,6 @@
           "value_template": "Value template"
         },
         "data_description": {
-          "group": "Inserisci un nome personalizzato per creare un nuovo gruppo",
           "on_time": "Quando lasciato vuoto predefinito a 1 giorno. Sempre acceso",
           "update_frequency": "tempo in secondi tra gli aggiornamenti di stato del sensore"
         },
@@ -117,6 +136,7 @@
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forza il calcolo dell'energia",
           "group_energy_entities": "Altre entità energetiche",
+          "group_energy_start_at_zero": "Start at zero",
           "group_member_sensors": "Member powercalc sensors",
           "group_power_entities": "Additional power entities",
           "hide_members": "Nascondi membri",
@@ -130,6 +150,7 @@
           "device": "Add the group entities powercalc creates to an existing device",
           "force_calculate_group_energy": "By default powercalc sums the energy sensors from the member sensors. Toggle this option to force creating a Riemann Sum sensor",
           "group_energy_entities": "Additional energy sensors (kWh) from your HA installation to include",
+          "group_energy_start_at_zero": "When enabled, the energy sensor will start at zero when the sensor is created. Otherwise it will sum all the current member energy sensor states",
           "group_member_sensors": "Sensori di Powercalc da includere nel gruppo",
           "group_power_entities": "Additional power sensors (W) from your HA installation to include",
           "include_non_powercalc_sensors": "Control whether to include non powercalc sensors when using the area option",
@@ -347,7 +368,6 @@
           "create_energy_sensor": "Crea sensore di energia",
           "create_utility_meters": "Crea contatori (utility meters)",
           "entity_id": "Source entity",
-          "group": "Aggiungi al gruppo",
           "mode": "Calculation strategy",
           "name": "Nome",
           "standby_power": "Potenza in standby"
@@ -356,7 +376,6 @@
           "create_energy_sensor": "Indica se powercalc deve creare un sensore kWh",
           "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc.",
           "entity_id": "entity the virtual power is based on, the power sensor will listen to state changes of this entity to be updated",
-          "group": "Fill in a custom group name to create a new group",
           "name": "Lasciando vuoto prenderà il nome dal dispositivo di origine",
           "standby_power": "Definire la quantità di potenza che il dispositivo sta consumando quando è in uno stato OFF"
         },
