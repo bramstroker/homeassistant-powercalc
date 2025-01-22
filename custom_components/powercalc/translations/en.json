@@ -319,7 +319,7 @@
         "data": {
           "sub_profile": "Sub profile"
         },
-        "description": "This model has multiple sub profiles. Select one that suites your device",
+        "description": "This device has a model with multiple sub profiles. Select one that corresponds to the following entity of this device:\n\n\"{entityid}\"",
         "title": "Sub profile config"
       },
       "smart_switch": {
