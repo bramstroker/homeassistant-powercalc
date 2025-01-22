@@ -1,3 +1,7 @@
 {
-  "calculation_strategy": "lut"
+  "calculation_strategy": "lut",
+  "sensor_config": {
+    "power_sensor_naming": "{} RGB Light Power",
+    "energy_sensor_naming": "{} RGB Light Energy"
+  }
 }
