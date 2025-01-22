@@ -1477,13 +1477,13 @@ habluetooth = ">=3.0"
 
 [[package]]
 name = "homeassistant"
-version = "2025.1.2"
+version = "2025.1.3"
 description = "Open-source home automation platform running on Python 3."
 optional = false
 python-versions = ">=3.12.0"
 files = [
-    {file = "homeassistant-2025.1.2-py3-none-any.whl", hash = "sha256:29dddeea1b9140ca741c9f15ffccf56ae279585b2fb67b691b2528dcb66ebf21"},
-    {file = "homeassistant-2025.1.2.tar.gz", hash = "sha256:00eda7dedd90a1b16e37622b958730040e0b471b0cafb07f4f475cd88599adf8"},
+    {file = "homeassistant-2025.1.3-py3-none-any.whl", hash = "sha256:3cdc49c846e2e849d8b604857589ee7fc3fb39425ddebd074b594be4921036ce"},
+    {file = "homeassistant-2025.1.3.tar.gz", hash = "sha256:3d37dd11087c07dd6ea57d793db7306a5869a04a2810ac6163199a6f25811ab9"},
 ]
 
 [package.dependencies]
@@ -1537,17 +1537,17 @@ yarl = "1.18.3"
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2025.1.2"
+version = "2025.1.3"
 description = "PEP 484 typing stubs for Home Assistant Core"
 optional = false
 python-versions = "<3.14,>=3.12"
 files = [
-    {file = "homeassistant_stubs-2025.1.2-py3-none-any.whl", hash = "sha256:78a9bda0f8483625a7ca4fbc12cb11512de968523902680106a60f4574f532cf"},
-    {file = "homeassistant_stubs-2025.1.2.tar.gz", hash = "sha256:38c39e861c44d6d138d3e46de5c2773e2627385c326ae0fb7e071b0c23c3cf2b"},
+    {file = "homeassistant_stubs-2025.1.3-py3-none-any.whl", hash = "sha256:6461db4155abaa2d23cfab588e8697f636498d57b1c155e4c782635365512cd5"},
+    {file = "homeassistant_stubs-2025.1.3.tar.gz", hash = "sha256:a26d32f4c6c68c93eedf77a3a4ed0c5c3cde2063fe7c9256894bf01664505ad1"},
 ]
 
 [package.dependencies]
-homeassistant = "2025.1.2"
+homeassistant = "2025.1.3"
 
 [[package]]
 name = "httpcore"
@@ -2570,13 +2570,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pre-commit"
-version = "4.0.1"
+version = "4.1.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-4.0.1-py2.py3-none-any.whl", hash = "sha256:efde913840816312445dc98787724647c65473daefe420785f885e8ed9a06878"},
-    {file = "pre_commit-4.0.1.tar.gz", hash = "sha256:80905ac375958c0444c65e9cebebd948b3cdb518f335a091a670a89d652139d2"},
+    {file = "pre_commit-4.1.0-py2.py3-none-any.whl", hash = "sha256:d29e7cb346295bcc1cc75fc3e92e343495e3ea0196c9ec6ba53f49f10ab6ae7b"},
+    {file = "pre_commit-4.1.0.tar.gz", hash = "sha256:ae3f018575a588e30dfddfab9a05448bfbd6b73d78709617b5a2b853549716d4"},
 ]
 
 [package.dependencies]
@@ -3255,19 +3255,19 @@ pytest = ">=4.0.0"
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.203"
+version = "0.13.204"
 description = "Experimental package to automatically extract test plugins for Home Assistant custom components"
 optional = false
 python-versions = ">=3.12"
 files = [
-    {file = "pytest_homeassistant_custom_component-0.13.203-py3-none-any.whl", hash = "sha256:1c507b4df3102004f87c3326ecd301762cc296d6588493e86913162d90ad7039"},
-    {file = "pytest_homeassistant_custom_component-0.13.203.tar.gz", hash = "sha256:34e5844b553c0337850935b3a436ec3fcdb4543e5f693629e74102d390ae504d"},
+    {file = "pytest_homeassistant_custom_component-0.13.204-py3-none-any.whl", hash = "sha256:47e341e6fbe3620718b8cd3a026f2bececc12730cea88b9bcf289884c5776cc3"},
+    {file = "pytest_homeassistant_custom_component-0.13.204.tar.gz", hash = "sha256:e80bcebbb4472c7ea5ad40e27181e2aff7111e0e22e1715e5a529ea61381e260"},
 ]
 
 [package.dependencies]
 coverage = "7.6.8"
 freezegun = "1.5.1"
-homeassistant = "2025.1.2"
+homeassistant = "2025.1.3"
 license-expression = "30.4.0"
 mock-open = "1.4.0"
 numpy = "2.2.0"
@@ -4595,4 +4595,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "89ca51c3189a16f4432d86528bb138c7c9ec049b367cc8f3e62d08fef3bc73bf"
+content-hash = "637b072157970e4a0d8679cf34728e444b87442e6eed7d1436bebeaa6113f7d9"
