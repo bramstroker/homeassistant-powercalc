@@ -2129,20 +2129,21 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 },
             )
 
-        schema = vol.Schema(
+        schema = vol.Schema({})
+
+        if self.source_entity_id != DUMMY_ENTITY_ID:
+            schema = schema.extend(
+                {vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector()},
+            )
+
+        if not (self.selected_profile and self.selected_profile.only_self_usage):
+            schema = schema.extend(
+                {vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)},
+            )
+
+        return schema.extend(  # type: ignore
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )
-        if not (self.selected_profile and self.selected_profile.only_self_usage):
-            schema.extend({vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)})
-
-        if self.source_entity_id == DUMMY_ENTITY_ID:
-            return schema
-
-        return vol.Schema(  # type: ignore
-            {
-                vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
-            },
-        ).extend(schema.schema)
