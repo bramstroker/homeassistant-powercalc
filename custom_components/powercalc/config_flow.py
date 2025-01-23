@@ -1166,6 +1166,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
+                form_kwarg={"description_placeholders": {"entity_id": self.source_entity_id}},
             ),
             user_input,
         )
