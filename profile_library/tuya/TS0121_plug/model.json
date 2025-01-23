@@ -4,15 +4,14 @@
   "measure_device": "Shelly PM Mini Gen3",
   "name": "TS0121_plug",
   "standby_power": 0.404,
+  "standby_power_on": 0.866,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.866
-  },
+  "only_self_usage": true,
   "created_at": "2024-12-01T20:12:00",
   "author": "RubenKelevra <cyrond@gmail.com>"
 }

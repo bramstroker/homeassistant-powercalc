@@ -4,15 +4,14 @@
   "measure_device": "Shelly Plug S",
   "name": "Hue smart plug LOM007",
   "standby_power": 0.15,
+  "standby_power_on": 0.85,
   "sensor_config": {
     "power_sensor_naming": "{} Device Power",
     "energy_sensor_naming": "{} Device Energy"
   },
   "device_type": "smart_switch",
   "calculation_strategy": "fixed",
-  "fixed_config": {
-    "power": 0.85
-  },
+  "only_self_usage": false,
   "created_at": "2022-10-21T09:32:56",
   "author": "msteenhuiz"
 }

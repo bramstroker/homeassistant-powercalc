@@ -29,6 +29,7 @@ from custom_components.powercalc.const import (
     CONF_FORCE_CALCULATE_GROUP_ENERGY,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TYPE,
@@ -86,6 +87,7 @@ async def test_create_group_entry(hass: HomeAssistant) -> None:
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     await hass.async_block_till_done()
@@ -113,6 +115,7 @@ async def test_create_group_entry_without_unique_id(hass: HomeAssistant) -> None
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     await hass.async_block_till_done()
@@ -199,6 +202,7 @@ async def test_group_include_area(
         CONF_UTILITY_METER_NET_CONSUMPTION: False,
         CONF_UTILITY_METER_TARIFFS: [],
         CONF_UTILITY_METER_TYPES: [DAILY],
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
     hass.states.async_set("sensor.test_power", 5)
@@ -364,6 +368,7 @@ async def test_can_select_existing_powercalc_entry_as_group_member(
         CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
         CONF_CREATE_ENERGY_SENSOR: True,
         CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
     }
 
 

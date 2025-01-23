@@ -68,6 +68,7 @@ from .const import (
     CONF_GAMMA_CURVE,
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
+    CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
@@ -414,9 +415,8 @@ SCHEMA_GROUP = vol.Schema(
     },
 )
 
-SCHEMA_GROUP_DOMAIN = vol.Schema(
+SCHEMA_GROUP_DOMAIN_OPTIONS = vol.Schema(
     {
-        vol.Required(CONF_NAME): str,
         vol.Required(CONF_DOMAIN): selector.SelectSelector(
             selector.SelectSelectorConfig(
                 options=["all"] + [cls.value for cls in Platform],
@@ -430,6 +430,13 @@ SCHEMA_GROUP_DOMAIN = vol.Schema(
                 multiple=True,
             ),
         ),
+    },
+)
+
+SCHEMA_GROUP_DOMAIN = vol.Schema(
+    {
+        vol.Required(CONF_NAME): str,
+        **SCHEMA_GROUP_DOMAIN_OPTIONS.schema,
         **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
@@ -673,7 +680,8 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
             )
 
-        schema = vol.Schema({vol.Required(CONF_ENTITIES): entity_selector})
+        default_entities = entity_selector.config.get("include_entities", [])
+        schema = vol.Schema({vol.Required(CONF_ENTITIES, default=default_entities): entity_selector})
 
         if not self.is_library_flow:
             schema = schema.extend(SCHEMA_POWER_MULTI_SWITCH_MANUAL.schema)
@@ -730,6 +738,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         if not is_option_flow:
             schema = schema.extend(
                 {
+                    vol.Optional(CONF_GROUP_ENERGY_START_AT_ZERO, default=True): selector.BooleanSelector(),
                     **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                     **SCHEMA_UTILITY_METER_TOGGLE.schema,
                 },
@@ -1157,6 +1166,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 ),
                 next_step=Step.POWER_ADVANCED,
                 validate_user_input=_validate,
+                form_kwarg={"description_placeholders": {"entity_id": self.source_entity_id}},
             ),
             user_input,
         )
@@ -1869,6 +1879,9 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
         if group_type == GroupType.CUSTOM:
             return [Step.GROUP_CUSTOM]
 
+        if group_type == GroupType.DOMAIN:
+            return [Step.GROUP_DOMAIN]
+
         if group_type == GroupType.SUBTRACT:
             return [Step.GROUP_SUBTRACT]
 
@@ -1877,7 +1890,7 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 [Step.GROUP_TRACKED_UNTRACKED_MANUAL] if not self.sensor_config.get(CONF_GROUP_TRACKED_AUTO, True) else []
             )
 
-        return []
+        return []  # pragma: no cover
 
     async def async_step_global_configuration(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the global configuration step."""
@@ -1942,6 +1955,14 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
             self.sensor_config,
         )
         return await self.async_handle_options_step(user_input, schema, Step.GROUP_CUSTOM)
+
+    async def async_step_group_domain(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        """Handle the group options flow."""
+        schema = self.fill_schema_defaults(
+            SCHEMA_GROUP_DOMAIN_OPTIONS,
+            self.sensor_config,
+        )
+        return await self.async_handle_options_step(user_input, schema, Step.GROUP_DOMAIN)
 
     async def async_step_group_subtract(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the group options flow."""
@@ -2109,20 +2130,21 @@ class PowercalcOptionsFlow(PowercalcCommonFlow, OptionsFlow):
                 },
             )
 
-        schema = vol.Schema(
+        schema = vol.Schema({})
+
+        if self.source_entity_id != DUMMY_ENTITY_ID:
+            schema = schema.extend(
+                {vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector()},
+            )
+
+        if not (self.selected_profile and self.selected_profile.only_self_usage):
+            schema = schema.extend(
+                {vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)},
+            )
+
+        return schema.extend(  # type: ignore
             {
                 **SCHEMA_ENERGY_SENSOR_TOGGLE.schema,
                 **SCHEMA_UTILITY_METER_TOGGLE.schema,
             },
         )
-        if not (self.selected_profile and self.selected_profile.only_self_usage):
-            schema.extend({vol.Optional(CONF_STANDBY_POWER): vol.Coerce(float)})
-
-        if self.source_entity_id == DUMMY_ENTITY_ID:
-            return schema
-
-        return vol.Schema(  # type: ignore
-            {
-                vol.Optional(CONF_ENTITY_ID): self.create_source_entity_selector(),
-            },
-        ).extend(schema.schema)

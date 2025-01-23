@@ -1,7 +1,7 @@
 {
   "common": {
     "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
-    "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
+    "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en Standby. \n En el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada"
   },
   "config": {
     "abort": {
@@ -10,7 +10,7 @@
     "error": {
       "daily_energy_mandatory": "Debes proveer al menos un valor o valor en plantilla",
       "entity_mandatory": "El sensor ya está configurado, especifique un identificador único (\"unique_id\")",
-      "fixed_mandatory": "Deber proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
+      "fixed_mandatory": "Debes proveer al menos uno de los siguientes: potencia, potencia en plantilla, o potencia en un estado",
       "fixed_states_power_only": "Esta entidad solamente funciona con \"states_power\" y no con \"power\"",
       "group_mandatory": "Debes definir como mínimo subgrupos o potencia y entidades de energía",
       "linear_mandatory": "Debes proveer al menos potencia máxima (max_power) o calibrar",
@@ -25,23 +25,23 @@
     "step": {
       "assign_groups": {
         "data": {
-          "group": "Select group(s)",
-          "new_group": "New group"
+          "group": "Seleccionar grupo(s)",
+          "new_group": "Nuevo grupo"
         },
         "data_description": {
-          "new_group": "Fill in a custom group name to create a new group"
+          "new_group": "Rellena un nombre de grupo personalizado para crear un nuevo grupo"
         },
-        "title": "Assign to group"
+        "title": "Asignar a grupo"
       },
       "availability_entity": {
         "data": {
-          "availability_entity": "Availability entity"
+          "availability_entity": "Entidad de disponibilidad"
         },
         "data_description": {
-          "availability_entity": "When this entity is unavailable, the powercalc sensor will be unavailable as well"
+          "availability_entity": "Cuando esta entidad no está disponible, el sensor powercalc tampoco estará disponible"
         },
-        "title": "Availability entity",
-        "description": "This profile is per device. Please select the entity which will be used to determine the availability of the powercalc sensor"
+        "title": "Entidad de disponibilidad",
+        "description": "Este perfil es por dispositivo. Por favor, selecciona la entidad que se utilizará para determinar la disponibilidad del sensor powercalc"
       },
       "daily_energy": {
         "data": {
@@ -136,6 +136,7 @@
           "device": "Dispositivo",
           "force_calculate_group_energy": "Forzar cálculo de energía",
           "group_energy_entities": "Entidades de energía adicionales",
+          "group_energy_start_at_zero": "Comenzar en cero",
           "group_member_sensors": "Sensores de powercalc miembros",
           "group_power_entities": "Entidades de potencia adicionales",
           "hide_members": "Ocultar miembros",
@@ -149,6 +150,7 @@
           "device": "Añadir las entidades de grupo que powercalc crea a un dispositivo existente",
           "force_calculate_group_energy": "Por defecto powercalc suma los sensores de energía de los sensores miembros. Cambia esta opción para forzar la creación de un sensor \"Riemann Sum\"",
           "group_energy_entities": "Sensores de energía adicionales (kWh) de la instalación de HA para incluir",
+          "group_energy_start_at_zero": "Cuando está habilitado, el sensor de energía comenzará en cero cuando se cree el sensor. De lo contrario, se sumará todos los estados del sensor de energía actual",
           "group_member_sensors": "Sensores de Powercalc a incluir en el grupo",
           "group_power_entities": "Sensores de potencia adicionales (W) de tu HA para incluir",
           "include_non_powercalc_sensors": "Controlar si incluir sensores no powercalc al usar la opción de área",
@@ -172,26 +174,26 @@
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Sensor de potencia general",
+          "group_tracked_auto": "Entidades añadidas automáticamente",
+          "create_energy_sensor": "Crear sensor de energía",
+          "create_utility_meters": "Crear contadores eléctricos"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Selecciona el sensor de potencia que contiene su consumo total de potencia. Cuando se deja vacío, sólo se creará un sensor de potencia rastreado",
+          "group_tracked_auto": "Powercalc añadirá automáticamente todos los sensores de potencia al grupo rastreado, omitiendo grupos powercalc. Deshabilita esto cuando quieras definir manualmente las entidades rastreadas",
+          "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Crear un sensor de grupo para toda la potencia rastreada y no rastreada",
+        "title": "Crear un sensor de potencia rastreado"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Entidades rastreadas"
         },
-        "description": "Select all the power sensors which are part of the tracked consumption. It is already automatically populated, but you can manually adjust it",
-        "title": "Select power entities"
+        "description": "Selecciona todos los sensores de potencia que son parte del consumo rastreado. Ya está relleno de forma automática, pero puedes ajustarlo manualmente",
+        "title": "Seleccionar entidades de potencia"
       },
       "library": {
         "data": {
@@ -243,7 +245,7 @@
           "group_custom": "Estándar",
           "group_domain": "Dominio basado en",
           "group_subtract": "Restar",
-          "group_tracked_untracked": "Tracked/untracked power"
+          "group_tracked_untracked": "Potencia rastreada/no rastreada"
         },
         "title": "Elija el tipo de grupo",
         "description": "Seleccione el tipo de sensor de grupo que desea crear. Elija un grupo basado en dominios si desea agrupar todas las entidades de un dominio específico, o crea un sensor que sume todo su sensor de energía. Elegir grupo estándar de otro modo"
@@ -558,25 +560,25 @@
       },
       "group_tracked_untracked": {
         "data": {
-          "main_power_sensor": "Mains power sensor",
-          "group_tracked_auto": "Entities auto added",
-          "create_energy_sensor": "Create energy sensor",
-          "create_utility_meters": "Create utility meters"
+          "main_power_sensor": "Sensor de potencia general",
+          "group_tracked_auto": "Entidades añadidas automáticamente",
+          "create_energy_sensor": "Crear sensor de energía",
+          "create_utility_meters": "Crear contadores eléctricos"
         },
         "data_description": {
-          "main_power_sensor": "Select the power sensor containing your total power usage. When left empty, only an tracked power sensor will be created",
-          "group_tracked_auto": "Powercalc will automatically add all power sensors to the tracked group, skipping powercalc groups. Disable this when you'd like to manually define the tracked entities",
-          "create_energy_sensor": "Whether powercalc needs to create a kWh sensor",
-          "create_utility_meters": "Let powercalc create utility meters, which cycle daily, hourly etc."
+          "main_power_sensor": "Selecciona el sensor de potencia que contiene su consumo total de potencia. Cuando se deja vacío, sólo se creará un sensor de potencia rastreado",
+          "group_tracked_auto": "Powercalc añadirá automáticamente todos los sensores de potencia al grupo rastreado, omitiendo grupos powercalc. Deshabilita esto cuando quieras definir manualmente las entidades rastreadas",
+          "create_energy_sensor": "Si powercalc necesita crear un sensor de kWh",
+          "create_utility_meters": "Dejar que powercalc cree contadores eléctricos que cambian cada día, cada hora, etc."
         },
-        "description": "Create a group sensor for all tracked and untracked power",
-        "title": "Create a tracked power sensor"
+        "description": "Crear un sensor de grupo para toda la potencia rastreada y no rastreada",
+        "title": "Crear un sensor de potencia rastreado"
       },
       "group_tracked_untracked_manual": {
         "data": {
-          "group_tracked_entities": "Tracked entities"
+          "group_tracked_entities": "Entidades rastreadas"
         },
-        "title": "Select power entities"
+        "title": "Seleccionar entidades de potencia"
       },
       "init": {
         "menu_options": {
@@ -586,8 +588,8 @@
           "fixed": "Opciones fijadas",
           "group_custom": "Opciones de grupo",
           "group_subtract": "Opciones de grupo",
-          "group_tracked_untracked": "Group options",
-          "group_tracked_untracked_manual": "Tracked entities",
+          "group_tracked_untracked": "Opciones de grupo",
+          "group_tracked_untracked_manual": "Entidades rastreadas",
           "library_options": "Opciones de biblioteca",
           "linear": "Opciones lineales",
           "playbook": "Opciones de Reproducciones",
@@ -724,8 +726,8 @@
       "name": "Obtener reproducción activa"
     },
     "get_group_entities": {
-      "description": "Retrieve all entity id's of a group energy or power sensor",
-      "name": "Get group entities"
+      "description": "Obtener todos los entitiy ids de un grupo de energía o sensor de potencia",
+      "name": "Obtener entidades de grupo"
     },
     "increase_daily_energy": {
       "description": "Incrementa el sensor con una cantidad determinada.",
