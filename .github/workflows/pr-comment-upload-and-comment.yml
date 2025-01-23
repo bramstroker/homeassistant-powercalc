@@ -44,6 +44,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const prNumber = Number(fs.readFileSync('artifacts/pr_number.txt')));
             const repo = context.repo;
             const prMessage = process.env.PR_MESSAGE;
