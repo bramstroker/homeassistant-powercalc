@@ -558,6 +558,7 @@ class VirtualPowerSensor(SensorEntity, PowerSensor):
         entity_state = state
         if (
             self._calculation_strategy != CalculationStrategy.MULTI_SWITCH
+            and self._source_entity.entity_id != DUMMY_ENTITY_ID
             and state.entity_id != self._source_entity.entity_id
             and (entity_state := self.hass.states.get(self._source_entity.entity_id)) is None
         ):
