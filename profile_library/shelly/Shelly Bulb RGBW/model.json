@@ -1,6 +1,6 @@
 {
   "calculation_strategy": "lut",
-  "created_at": "2025-01-19T23:12:30.889271",
+  "created_at": "2025-01-20T23:38:52 CET",
   "measure_description": "Measured with utils/measure script",
   "measure_device": "Shelly PM Mini gen3",
   "measure_method": "script",
@@ -14,6 +14,5 @@
     "SHCB-1"
   ],
   "standby_power": 0.65,
-  "created_at": "2025-01-20T23:38:52 CET",
   "author": "Michal Bartak <maxym.srpl@gmail.com>"
 }
