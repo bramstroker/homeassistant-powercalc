@@ -36,7 +36,7 @@ from .group_include.filter import CategoryFilter, CompositeFilter, DomainFilter,
 from .helpers import get_or_create_unique_id
 from .power_profile.factory import get_power_profile
 from .power_profile.library import ModelInfo, ProfileLibrary
-from .power_profile.power_profile import SUPPORTED_DOMAINS, DiscoveryBy, PowerProfile
+from .power_profile.power_profile import SUPPORTED_DOMAINS, DeviceType, DiscoveryBy, PowerProfile
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,13 +60,19 @@ class DiscoveryManager:
     When entities are found it will dispatch a discovery flow, so the user can add them to their HA instance.
     """
 
-    def __init__(self, hass: HomeAssistant, ha_config: ConfigType) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        ha_config: ConfigType,
+        exclude_device_types: list[DeviceType] | None = None,
+    ) -> None:
         self.hass = hass
         self.ha_config = ha_config
         self.power_profiles: dict[str, PowerProfile | None] = {}
         self.manually_configured_entities: list[str] | None = None
         self.initialized_flows: set[str] = set()
         self.library: ProfileLibrary | None = None
+        self._exclude_device_types = exclude_device_types or []
 
     async def setup(self) -> None:
         """Setup the discovery manager. Start initial discovery and setup interval based rediscovery."""
@@ -228,6 +234,8 @@ class DiscoveryManager:
             if discovery_type == DiscoveryBy.ENTITY and not profile.is_entity_domain_supported(
                 source_entity.entity_entry,  # type: ignore[arg-type]
             ):
+                continue
+            if profile.device_type in self._exclude_device_types:
                 continue
             power_profiles.append(profile)
 

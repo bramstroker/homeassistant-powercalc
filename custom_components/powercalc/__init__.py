@@ -35,6 +35,7 @@ from .const import (
     CONF_CREATE_UTILITY_METERS,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
@@ -92,6 +93,7 @@ from .const import (
     UnitPrefix,
 )
 from .discovery import DiscoveryManager
+from .power_profile.power_profile import DeviceType
 from .sensor import SENSOR_CONFIG
 from .sensors.group.config_entry_utils import (
     get_entries_having_subgroup,
@@ -189,6 +191,10 @@ CONFIG_SCHEMA = vol.Schema(
                         [SENSOR_CONFIG],
                     ),
                     vol.Optional(CONF_INCLUDE_NON_POWERCALC_SENSORS): cv.boolean,
+                    vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES): vol.All(
+                        cv.ensure_list,
+                        [cls.value for cls in DeviceType],
+                    ),
                 },
             ),
         ),
@@ -212,7 +218,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     global_config = get_global_configuration(hass, config)
 
-    discovery_manager = DiscoveryManager(hass, config)
+    discovery_manager = await create_discovery_manager_instance(hass, config, global_config)
     hass.data[DOMAIN] = {
         DATA_DISCOVERY_MANAGER: discovery_manager,
         DOMAIN_CONFIG: global_config,
@@ -225,10 +231,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     }
 
     await hass.async_add_executor_job(register_services, hass)
-
-    if global_config.get(CONF_ENABLE_AUTODISCOVERY):
-        await discovery_manager.setup()
-
     await setup_yaml_sensors(hass, config, global_config)
 
     setup_domain_groups(hass, global_config)
@@ -240,6 +242,19 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         _LOGGER.error("problem while cleaning up None entities", exc_info=e)  # pragma: no cover
 
     return True
+
+
+async def create_discovery_manager_instance(
+    hass: HomeAssistant,
+    ha_config: ConfigType,
+    global_powercalc_config: ConfigType,
+) -> DiscoveryManager:
+    exclude_device_types = [DeviceType(device_type) for device_type in global_powercalc_config.get(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES, [])]
+
+    manager = DiscoveryManager(hass, ha_config, exclude_device_types=exclude_device_types)
+    if global_powercalc_config.get(CONF_ENABLE_AUTODISCOVERY):
+        await manager.setup()
+    return manager
 
 
 def get_global_configuration(hass: HomeAssistant, config: ConfigType) -> ConfigType:
