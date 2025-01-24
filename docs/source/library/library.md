@@ -5,7 +5,7 @@ You can find the list of supported devices on the dedicated [library viewer](htt
 This library will keep extending by the effort of community users.
 
 At startup Powercalc will scan your HA installation and tries to match if any of them are in the library,
-when found it will provide a discovery flow for you to setup. More info about the discovery process can be found [here](#discovery).
+when found it will provide a discovery flow for you to setup. More info about the discovery process can be found [here](discovery.md).
 You can also setup Powercalc sensors for a entity manually, see [Virtual power library](../sensor-types/virtual-power-library.md).
 
 Starting from version 1.12.0 all the power profiles are moved out of the component and are downloaded from the internet on demand.
@@ -60,26 +60,6 @@ powercalc:
 This will prevent the component from downloading the library profiles from the internet.
 
 You will have to manage the library profiles yourself, by downloading them from the GitHub repository and placing them in the `config/powercalc/profiles` directory.
-
-## Discovery
-
-During startup, Powercalc will scan your Home Assistant installation for entities and devices that match the library profiles.
-Only entities which have a device attached will be considered for discovery.
-Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in `config/.storage/core.device_registry`.
-
-Each device in HA has the following properties:
-
-- manufacturer
-- model
-- model_id (optional)
-
-This information is tried to match again the built-in library and your custom model directory.
-When a match in custom models is found, the built-in library loading is skipped.
-
-starting with the manufacturer. Both manufacturer name and aliases are matched.
-If a match is found, the model id is matched. Both the directory_name (model id) and additional aliases (from model.json) are matched.
-
-You can enable [debug logging](../troubleshooting/debug-logging.md) to debug the matching process.
 
 ## Updating the library
 

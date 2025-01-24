@@ -80,6 +80,7 @@ nav:
       - 'misc/naming.md'
   - 'Library':
       - 'library/library.md'
+      - 'library/discovery.md'
       - 'library/structure.md'
       - 'library/sub-profiles.md'
       - 'library/custom-fields.md'
