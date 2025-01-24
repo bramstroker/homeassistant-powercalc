@@ -12,7 +12,7 @@
         <link rel="prev" href="../../misc/naming/">
       
       
-        <link rel="next" href="../structure/">
+        <link rel="next" href="../discovery/">
       
       
       <link rel="icon" href="../../img/logo.svg">
@@ -1354,6 +1354,8 @@
       
         
       
+        
+      
     
     
       
@@ -1461,15 +1463,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#discovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      Discovery
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#updating-the-library" class="md-nav__link">
     <span class="md-ellipsis">
       Updating the library
@@ -1482,6 +1475,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../discovery/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Discovery
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1598,7 +1612,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_6" >
         
           
           
@@ -1614,14 +1628,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_7_5" id="__nav_7_5_label" tabindex="">
+              <label class="md-nav__link " for="__nav_7_6" id="__nav_7_6_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
             <span class="md-nav__icon md-icon"></span>
             Device types
           </label>
@@ -2325,7 +2339,7 @@
 You can find the list of supported devices on the dedicated <a href="https://library.powercalc.nl">library viewer</a>.
 This library will keep extending by the effort of community users.</p>
 <p>At startup Powercalc will scan your HA installation and tries to match if any of them are in the library,
-when found it will provide a discovery flow for you to setup. More info about the discovery process can be found <a href="#discovery">here</a>.
+when found it will provide a discovery flow for you to setup. More info about the discovery process can be found <a href="../discovery/">here</a>.
 You can also setup Powercalc sensors for a entity manually, see <a href="../../sensor-types/virtual-power-library/">Virtual power library</a>.</p>
 <p>Starting from version 1.12.0 all the power profiles are moved out of the component and are downloaded from the internet on demand.
 This way we can roll out updates to the library without the need to update the component.
@@ -2363,21 +2377,6 @@ When it can be useful to share this model with the community, please consider su
 </code></pre></div>
 <p>This will prevent the component from downloading the library profiles from the internet.</p>
 <p>You will have to manage the library profiles yourself, by downloading them from the GitHub repository and placing them in the <code>config/powercalc/profiles</code> directory.</p>
-<h2 id="discovery">Discovery</h2>
-<p>During startup, Powercalc will scan your Home Assistant installation for entities and devices that match the library profiles.
-Only entities which have a device attached will be considered for discovery.
-Device information can be viewed at the top left corner of the device page in the Home Assistant UI, or in <code>config/.storage/core.device_registry</code>.</p>
-<p>Each device in HA has the following properties:</p>
-<ul>
-<li>manufacturer</li>
-<li>model</li>
-<li>model_id (optional)</li>
-</ul>
-<p>This information is tried to match again the built-in library and your custom model directory.
-When a match in custom models is found, the built-in library loading is skipped.</p>
-<p>starting with the manufacturer. Both manufacturer name and aliases are matched.
-If a match is found, the model id is matched. Both the directory_name (model id) and additional aliases (from model.json) are matched.</p>
-<p>You can enable <a href="../../troubleshooting/debug-logging/">debug logging</a> to debug the matching process.</p>
 <h2 id="updating-the-library">Updating the library</h2>
 <p>The library is updated automatically in the background under the following conditions.
 Once the update process is complete, a discovery routine will be initiated to potentially discover new supported entities on your system.</p>
@@ -2409,7 +2408,7 @@ Once the update process is complete, a discovery routine will be initiated to po
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 29, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 24, 2025</span>
   </span>
 
     
@@ -2473,13 +2472,13 @@ Once the update process is complete, a discovery routine will be initiated to po
         
         
           
-          <a href="../structure/" class="md-footer__link md-footer__link--next" aria-label="Next: Library structure">
+          <a href="../discovery/" class="md-footer__link md-footer__link--next" aria-label="Next: Discovery">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Library structure
+                Discovery
               </div>
             </div>
             <div class="md-footer__button md-icon">
