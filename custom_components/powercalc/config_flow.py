@@ -55,6 +55,7 @@ from .const import (
     CONF_DAILY_FIXED_ENERGY,
     CONF_DISABLE_EXTENDED_ATTRIBUTES,
     CONF_DISABLE_LIBRARY_DOWNLOAD,
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
     CONF_ENERGY_INTEGRATION_METHOD,
     CONF_ENERGY_SENSOR_CATEGORY,
     CONF_ENERGY_SENSOR_FRIENDLY_NAMING,
@@ -541,6 +542,13 @@ SCHEMA_GLOBAL_CONFIGURATION = vol.Schema(
         vol.Optional(CONF_DISABLE_EXTENDED_ATTRIBUTES, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_DISABLE_LIBRARY_DOWNLOAD, default=False): selector.BooleanSelector(),
         vol.Optional(CONF_CREATE_ENERGY_SENSORS, default=True): selector.BooleanSelector(),
+        vol.Optional(CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[cls.value for cls in DeviceType],
+                mode=selector.SelectSelectorMode.DROPDOWN,
+                multiple=True,
+            ),
+        ),
         **SCHEMA_UTILITY_METER_TOGGLE.schema,
     },
 )

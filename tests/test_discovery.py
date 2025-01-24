@@ -25,9 +25,10 @@ from pytest_homeassistant_custom_component.common import (
     mock_registry,
 )
 
-from custom_components.powercalc import SERVICE_UPDATE_LIBRARY, DiscoveryManager
+from custom_components.powercalc import SERVICE_UPDATE_LIBRARY, DeviceType, DiscoveryManager
 from custom_components.powercalc.common import create_source_entity
 from custom_components.powercalc.const import (
+    CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES,
     CONF_ENABLE_AUTODISCOVERY,
     CONF_FIXED,
     CONF_MANUFACTURER,
@@ -334,6 +335,71 @@ async def test_autodiscover_continues_when_one_entity_fails(
         mock_find_models.side_effect = [Exception("Test exception"), {ModelInfo("signify", "LCT010")}]
         await run_powercalc_setup(hass, {})
         assert "Error during entity discovery" in caplog.text
+
+
+async def test_exclude_device_types(
+    hass: HomeAssistant,
+    mock_entity_with_model_information: MockEntityWithModel,
+    mock_flow_init: AsyncMock,
+) -> None:
+    """Test that entities with excluded device types are not considered for discovery"""
+
+    mock_device_registry(
+        hass,
+        {
+            "switch-device": DeviceEntry(
+                id="switch-device",
+                manufacturer="shelly",
+                model="SHPLG-S",
+            ),
+            "light-device": DeviceEntry(
+                id="light-device",
+                manufacturer="signify",
+                model="LCT010",
+            ),
+            "cover-device": DeviceEntry(
+                id="cover-device",
+                manufacturer="eq-3",
+                model="HmIP-FROLL",
+            ),
+        },
+    )
+    mock_registry(
+        hass,
+        {
+            "light.test": RegistryEntry(
+                entity_id="light.test",
+                unique_id="1111",
+                platform="hue",
+                device_id="light-device",
+            ),
+            "switch.test": RegistryEntry(
+                entity_id="switch.test",
+                unique_id="2222",
+                platform="shelly",
+                device_id="switch-device",
+            ),
+            "cover.test": RegistryEntry(
+                entity_id="cover.test",
+                unique_id="3333",
+                platform="shelly",
+                device_id="cover-device",
+            ),
+        },
+    )
+
+    await run_powercalc_setup(
+        hass,
+        {},
+        {
+            CONF_DISCOVERY_EXCLUDE_DEVICE_TYPES: [
+                DeviceType.SMART_SWITCH,
+                DeviceType.COVER,
+            ],
+        },
+    )
+
+    assert len(mock_flow_init.mock_calls) == 1
 
 
 async def test_load_model_with_slashes(
