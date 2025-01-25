@@ -48,7 +48,9 @@ async def find_entities(
             resolved_entities.append(powercalc_entities[source_entity.entity_id])
             continue
 
-        if source_entity.domain == sensor.DOMAIN and source_entity.platform != DOMAIN and include_non_powercalc:
+        if source_entity.domain == sensor.DOMAIN:
+            if source_entity.platform != DOMAIN and not include_non_powercalc:
+                continue
             device_class = source_entity.device_class or source_entity.original_device_class
             if device_class == SensorDeviceClass.POWER:
                 resolved_entities.append(RealPowerSensor(source_entity.entity_id, source_entity.unit_of_measurement))
@@ -70,6 +72,8 @@ def _build_filter(entity_filter: EntityFilter | None) -> EntityFilter:
         [
             DomainFilter(SUPPORTED_DOMAINS),
             LambdaFilter(lambda entity: entity.platform != "utility_meter"),
+            LambdaFilter(lambda entity: not entity.unique_id.startswith("powercalc_standby_group")),
+            LambdaFilter(lambda entity: "tracked_" not in entity.unique_id),
         ],
     )
     if not entity_filter:
