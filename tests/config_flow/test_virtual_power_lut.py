@@ -101,6 +101,7 @@ async def test_lut_autodiscover_flow(
         "manufacturer": "ikea",
         "model": "LED1545G12",
         "remarks": None,
+        "source": "None: light.test",
     }
 
     result = await set_virtual_power_configuration(
