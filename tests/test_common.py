@@ -93,6 +93,21 @@ async def test_merge_configuration(
             ),
             "My awesome switchy",
         ),
+        (
+            "switch.livingroom-smartplug-television",
+            RegistryEntry(
+                entity_id="switch.livingroom-smartplug-television",
+                unique_id="abc",
+                platform="switch",
+                has_entity_name=True,
+                name=None,
+                original_name="Television",
+            ),
+            DeviceEntry(
+                name="Livingroom-SmartPlug",
+            ),
+            "Livingroom-SmartPlug Television",
+        ),
     ],
 )
 async def test_get_wrapped_entity_name(

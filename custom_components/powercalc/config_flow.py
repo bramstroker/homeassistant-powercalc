@@ -37,7 +37,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers import selector
+from homeassistant.helpers import selector, translation
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -1730,12 +1730,20 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             remarks = self.selected_profile.config_flow_discovery_remarks
             if remarks:
                 remarks = "\n\n" + remarks
+
+            translations = translation.async_get_cached_translations(self.hass, self.hass.config.language, "common", DOMAIN)
+            if self.selected_profile.discovery_by == DiscoveryBy.DEVICE and self.source_entity and self.source_entity.device_entry:
+                source = f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.source_entity.device_entry.name}"
+            else:
+                source = f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.source_entity_id}"
+
             return self.async_show_form(
                 step_id=Step.LIBRARY,
                 description_placeholders={
                     "remarks": remarks,  # type: ignore
                     "manufacturer": self.selected_profile.manufacturer,
                     "model": self.selected_profile.model,
+                    "source": source,
                 },
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},
