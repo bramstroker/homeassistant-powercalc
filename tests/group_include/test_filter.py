@@ -11,6 +11,7 @@ from custom_components.powercalc.group_include.filter import (
     AreaFilter,
     CategoryFilter,
     CompositeFilter,
+    DeviceFilter,
     DomainFilter,
     FilterOperator,
     LabelFilter,
@@ -83,6 +84,19 @@ async def test_wildcard_filter(pattern: str, expected_result: bool) -> None:
 async def test_label_filter(label: str, expected_result: bool) -> None:
     entry = RegistryEntry(entity_id="sensor.test", unique_id="abc", platform="test", labels=["test"])
     assert LabelFilter(label).is_valid(entry) == expected_result
+
+
+@pytest.mark.parametrize(
+    "device,expected_result",
+    [
+        ("my-device", True),
+        ("other-device", False),
+        ({"my-device", "other-device"}, True),
+        ({"my-device2", "other-device"}, False),
+    ],
+)
+async def test_device_filter(device: str | set[str], expected_result: bool) -> None:
+    assert DeviceFilter(device).is_valid(_create_registry_entry()) == expected_result
 
 
 async def test_null_filter() -> None:
@@ -169,4 +183,4 @@ async def test_create_composite_filter2(hass: HomeAssistant, area_registry: Area
 
 
 def _create_registry_entry(entity_id: str = "switch.test") -> RegistryEntry:
-    return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test")
+    return RegistryEntry(entity_id=entity_id, unique_id="abc", platform="test", device_id="my-device")

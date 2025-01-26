@@ -6,7 +6,7 @@ from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 
 from custom_components.powercalc import CONF_SENSOR_TYPE, DOMAIN, SensorType
-from custom_components.powercalc.const import CONF_GROUP, CONF_GROUP_MEMBER_SENSORS, CONF_SUB_GROUPS
+from custom_components.powercalc.const import CONF_GROUP, CONF_GROUP_MEMBER_SENSORS, CONF_GROUP_TYPE, CONF_SUB_GROUPS, GroupType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -149,5 +149,9 @@ def get_groups_having_member(hass: HomeAssistant, member_entry: ConfigEntry) -> 
 
 
 @callback
-def get_group_entries(hass: HomeAssistant) -> list[ConfigEntry]:
-    return [entry for entry in hass.config_entries.async_entries(DOMAIN) if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP]
+def get_group_entries(hass: HomeAssistant, group_type: GroupType | None = None) -> list[ConfigEntry]:
+    return [
+        entry
+        for entry in hass.config_entries.async_entries(DOMAIN)
+        if entry.data.get(CONF_SENSOR_TYPE) == SensorType.GROUP and (group_type is None or entry.data.get(CONF_GROUP_TYPE) == group_type)
+    ]

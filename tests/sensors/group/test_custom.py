@@ -25,6 +25,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.area_registry import AreaRegistry
 from homeassistant.helpers.device_registry import DeviceRegistry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.util import dt
@@ -38,6 +39,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.powercalc.const import (
     ATTR_ENTITIES,
     ATTR_IS_GROUP,
+    CONF_AREA,
     CONF_CREATE_ENERGY_SENSOR,
     CONF_CREATE_ENERGY_SENSORS,
     CONF_CREATE_GROUP,
@@ -54,6 +56,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP_ENERGY_START_AT_ZERO,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
+    CONF_GROUP_TYPE,
     CONF_HIDE_MEMBERS,
     CONF_IGNORE_UNAVAILABLE_STATE,
     CONF_MODE,
@@ -70,6 +73,7 @@ from custom_components.powercalc.const import (
     SERVICE_GET_GROUP_ENTITIES,
     SERVICE_RESET_ENERGY,
     CalculationStrategy,
+    GroupType,
     SensorType,
     UnitPrefix,
 )
@@ -1714,6 +1718,49 @@ async def test_start_at_zero(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
         assert hass.states.get("sensor.testgroup_energy").state == "0.1000"
+
+
+async def test_area_group(hass: HomeAssistant, area_registry: AreaRegistry) -> None:
+    area = area_registry.async_get_or_create("Bedroom")
+
+    mock_registry(
+        hass,
+        {
+            "sensor.test_power": RegistryEntry(
+                entity_id="sensor.test_power",
+                unique_id="1111",
+                platform="powercalc",
+                device_class=SensorDeviceClass.POWER,
+                area_id=area.id,
+            ),
+            "sensor.test_energy": RegistryEntry(
+                entity_id="sensor.test_energy",
+                unique_id="2222",
+                platform="powercalc",
+                device_class=SensorDeviceClass.ENERGY,
+                area_id=area.id,
+            ),
+        },
+    )
+
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_AREA: "Bedroom",
+            CONF_CREATE_ENERGY_SENSOR: True,
+            CONF_CREATE_UTILITY_METERS: False,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
+            CONF_NAME: "TestArea123",
+            CONF_SENSOR_TYPE: SensorType.GROUP,
+        },
+        unique_id="42343887",
+    )
+    config_entry.add_to_hass(hass)
+
+    await run_powercalc_setup(hass, {})
+
+    power_state = hass.states.get("sensor.testarea123_power")
+    assert power_state
 
 
 async def _create_energy_group(

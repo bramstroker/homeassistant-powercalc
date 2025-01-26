@@ -37,7 +37,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers import selector
+from homeassistant.helpers import selector, translation
 from homeassistant.helpers.schema_config_entry_flow import SchemaFlowError
 from homeassistant.helpers.selector import TextSelector
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -70,6 +70,7 @@ from .const import (
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
@@ -645,6 +646,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             CONF_GROUP_POWER_ENTITIES,
             CONF_GROUP_ENERGY_ENTITIES,
             CONF_GROUP_MEMBER_SENSORS,
+            CONF_GROUP_MEMBER_DEVICES,
             CONF_AREA,
         }
 
@@ -720,6 +722,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         schema = vol.Schema(
             {
                 vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+                vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
+                    selector.DeviceSelectorConfig(
+                        multiple=True,
+                        entity=selector.EntitySelectorConfig(
+                            device_class=[SensorDeviceClass.POWER, SensorDeviceClass.ENERGY],
+                        ),
+                    ),
+                ),
                 vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
                     selector.EntitySelectorConfig(
                         domain=Platform.SENSOR,
@@ -822,7 +832,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 value=config_entry.entry_id,
                 label=str(config_entry.data.get(CONF_NAME)),
             )
-            for config_entry in (group_entries or get_group_entries(self.hass))
+            for config_entry in (group_entries or get_group_entries(self.hass, GroupType.CUSTOM))
             if current_entry is None or config_entry.entry_id != current_entry.entry_id
         ]
 
@@ -1181,7 +1191,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for assigning groups."""
-        group_entries = get_group_entries(self.hass)
+        group_entries = get_group_entries(self.hass, GroupType.CUSTOM)
         if not group_entries:
             return await self.handle_final_steps()
 
@@ -1730,12 +1740,20 @@ class PowercalcConfigFlow(PowercalcCommonFlow, ConfigFlow, domain=DOMAIN):
             remarks = self.selected_profile.config_flow_discovery_remarks
             if remarks:
                 remarks = "\n\n" + remarks
+
+            translations = translation.async_get_cached_translations(self.hass, self.hass.config.language, "common", DOMAIN)
+            if self.selected_profile.discovery_by == DiscoveryBy.DEVICE and self.source_entity and self.source_entity.device_entry:
+                source = f"{translations.get(f'component.{DOMAIN}.common.source_device')}: {self.source_entity.device_entry.name}"
+            else:
+                source = f"{translations.get(f'component.{DOMAIN}.common.source_entity')}: {self.source_entity_id}"
+
             return self.async_show_form(
                 step_id=Step.LIBRARY,
                 description_placeholders={
                     "remarks": remarks,  # type: ignore
                     "manufacturer": self.selected_profile.manufacturer,
                     "model": self.selected_profile.model,
+                    "source": source,
                 },
                 data_schema=SCHEMA_POWER_AUTODISCOVERED,
                 errors={},

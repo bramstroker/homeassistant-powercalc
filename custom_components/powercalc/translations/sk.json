@@ -1,5 +1,7 @@
 {
   "common": {
+    "source_entity": "Source entity",
+    "source_device": "Source device",
     "remarks_smart_switch": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n Keď máte spotrebič, ktorý po zapnutí spotrebúva pevné množstvo energie, môžete túto hodnotu zadať v ďalšom kroku konfiguračného postupu",
     "remarks_smart_dimmer": "Tento profil poskytuje iba hodnoty spotreby energie v pohotovostnom režime. \n V ďalšom kroku môžete voliteľne zadať hodnoty pripojeného svetla"
   },
@@ -139,6 +141,7 @@
           "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďlšie energetické entity",
           "group_energy_start_at_zero": "Začať v nule",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
           "hide_members": "Skrytý členovania",
@@ -153,6 +156,7 @@
           "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
           "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahrnuté",
           "group_energy_start_at_zero": "Keď je aktivovaný, senzor energie sa po vytvorení senzora spustí na nule. V opačnom prípade spočíta všetky aktuálne stavy snímača energie člena",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
           "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
           "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
@@ -204,7 +208,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Ak sa rozhodnete nepotvrdiť, môžete zadať výrobcu a model sami"
         },
-        "description": "Výrobca \"{manufacturer}\" a model \"{model}\" boli automaticky detekované pre vaše zariadenie.{remarks}",
+        "description": "{source}\n\nVýrobca \"{manufacturer}\" a model \"{model}\" boli automaticky detekované pre vaše zariadenie.{remarks}",
         "title": "Knižnica"
       },
       "library_multi_profile": {
@@ -534,6 +538,7 @@
           "device": "Zariadenie",
           "force_calculate_group_energy": "Sila vypočítať energiu",
           "group_energy_entities": "Ďalšie energetické entity",
+          "group_member_devices": "Member devices",
           "group_member_sensors": "Členské snímače powercalc",
           "group_power_entities": "Ďalšie výkonové entity",
           "hide_members": "Skrytí členovia",
@@ -545,6 +550,7 @@
           "device": "Pridajte entity skupiny, ktoré powercalc vytvorí, do existujúceho zariadenia",
           "force_calculate_group_energy": "V predvolenom nastavení powercalc sčítava energetické senzory z členských senzorov. Prepnutím tejto možnosti vynútite vytvorenie snímača Riemann Sum",
           "group_energy_entities": "Dodatočné snímače energie (kWh) z vašej inštalácie HA zahŕňajú",
+          "group_member_devices": "Add power and energy entities from the selected devices to the group",
           "group_member_sensors": "Snímače Powercalc zaradiť do skupiny",
           "group_power_entities": "Vrátane prídavných výkonových snímačov (W) z vašej inštalácie HA",
           "include_non_powercalc_sensors": "Ovládajte, či sa majú pri použití možnosti oblasti zahrnúť snímače bez powercalc",
