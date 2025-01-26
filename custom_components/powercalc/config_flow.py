@@ -70,6 +70,7 @@ from .const import (
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TRACKED_AUTO,
@@ -645,6 +646,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
             CONF_GROUP_POWER_ENTITIES,
             CONF_GROUP_ENERGY_ENTITIES,
             CONF_GROUP_MEMBER_SENSORS,
+            CONF_GROUP_MEMBER_DEVICES,
             CONF_AREA,
         }
 
@@ -720,6 +722,14 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
         schema = vol.Schema(
             {
                 vol.Optional(CONF_GROUP_MEMBER_SENSORS): member_sensor_selector,
+                vol.Optional(CONF_GROUP_MEMBER_DEVICES): selector.DeviceSelector(
+                    selector.DeviceSelectorConfig(
+                        multiple=True,
+                        entity=selector.EntitySelectorConfig(
+                            device_class=[SensorDeviceClass.POWER, SensorDeviceClass.ENERGY],
+                        ),
+                    ),
+                ),
                 vol.Optional(CONF_GROUP_POWER_ENTITIES): selector.EntitySelector(
                     selector.EntitySelectorConfig(
                         domain=Platform.SENSOR,

@@ -13,9 +13,10 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.area_registry import AreaRegistry
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.entity_registry import EntityRegistry, RegistryEntry
 from homeassistant.helpers.selector import SelectSelector
-from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_registry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, mock_device_registry, mock_registry
 
 from custom_components.powercalc import SensorType, async_migrate_entry
 from custom_components.powercalc.config_flow import Step
@@ -30,6 +31,7 @@ from custom_components.powercalc.const import (
     CONF_GROUP,
     CONF_GROUP_ENERGY_ENTITIES,
     CONF_GROUP_ENERGY_START_AT_ZERO,
+    CONF_GROUP_MEMBER_DEVICES,
     CONF_GROUP_MEMBER_SENSORS,
     CONF_GROUP_POWER_ENTITIES,
     CONF_GROUP_TYPE,
@@ -144,6 +146,75 @@ async def test_create_energy_sensor_enabled(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     assert hass.states.get("sensor.my_group_sensor_power")
     assert hass.states.get("sensor.my_group_sensor_energy")
+
+
+async def test_add_device_members_to_group(hass: HomeAssistant) -> None:
+    mock_device_registry(
+        hass,
+        {
+            "my-device": DeviceEntry(
+                id="my-device",
+                name="My device",
+                manufacturer="Mock",
+                model="Device",
+            ),
+        },
+    )
+
+    mock_registry(
+        hass,
+        {
+            "sensor.balcony_power": RegistryEntry(
+                entity_id="sensor.balcony_power",
+                unique_id="1111",
+                platform="sensor",
+                device_class=SensorDeviceClass.POWER,
+                device_id="my-device",
+            ),
+            "sensor.balcony_energy": RegistryEntry(
+                entity_id="sensor.balcony_energy",
+                unique_id="2222",
+                platform="sensor",
+                device_class=SensorDeviceClass.ENERGY,
+                device_id="my-device",
+            ),
+        },
+    )
+
+    result = await select_menu_item(hass, Step.MENU_GROUP, Step.GROUP_CUSTOM)
+    user_input = {
+        CONF_NAME: "My group sensor",
+        CONF_GROUP_MEMBER_DEVICES: ["my-device"],
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input,
+    )
+    assert result["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
+    assert result["data"] == {
+        CONF_SENSOR_TYPE: SensorType.GROUP,
+        CONF_NAME: "My group sensor",
+        CONF_HIDE_MEMBERS: False,
+        CONF_FORCE_CALCULATE_GROUP_ENERGY: False,
+        CONF_GROUP_MEMBER_DEVICES: ["my-device"],
+        CONF_GROUP_TYPE: GroupType.CUSTOM,
+        CONF_INCLUDE_NON_POWERCALC_SENSORS: True,
+        CONF_CREATE_ENERGY_SENSOR: True,
+        CONF_CREATE_UTILITY_METERS: False,
+        CONF_GROUP_ENERGY_START_AT_ZERO: True,
+    }
+
+    hass.states.async_set("sensor.balcony_power", 5)
+    hass.states.async_set("sensor.balcony_energy", 5)
+    await hass.async_block_till_done()
+
+    power_state = hass.states.get("sensor.my_group_sensor_power")
+    assert power_state
+    assert power_state.attributes.get(CONF_ENTITIES) == {"sensor.balcony_power"}
+
+    energy_state = hass.states.get("sensor.my_group_sensor_energy")
+    assert energy_state
+    assert energy_state.attributes.get(CONF_ENTITIES) == {"sensor.balcony_energy"}
 
 
 async def test_group_include_area(

@@ -265,6 +265,14 @@ class AreaFilter(EntityFilter):
         return entity.area_id == self.area.id or entity.device_id in self.area_devices
 
 
+class DeviceFilter(EntityFilter):
+    def __init__(self, device: str | set[str]) -> None:
+        self.device: set[str] = {device} if isinstance(device, str) else device
+
+    def is_valid(self, entity: RegistryEntry) -> bool:
+        return entity.device_id in self.device
+
+
 class CompositeFilter(EntityFilter):
     def __init__(
         self,
