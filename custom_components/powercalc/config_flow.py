@@ -822,7 +822,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
                 value=config_entry.entry_id,
                 label=str(config_entry.data.get(CONF_NAME)),
             )
-            for config_entry in (group_entries or get_group_entries(self.hass))
+            for config_entry in (group_entries or get_group_entries(self.hass, GroupType.CUSTOM))
             if current_entry is None or config_entry.entry_id != current_entry.entry_id
         ]
 
@@ -1181,7 +1181,7 @@ class PowercalcCommonFlow(ABC, ConfigEntryBaseFlow):
 
     async def async_step_assign_groups(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Handle the flow for assigning groups."""
-        group_entries = get_group_entries(self.hass)
+        group_entries = get_group_entries(self.hass, GroupType.CUSTOM)
         if not group_entries:
             return await self.handle_final_steps()
 
