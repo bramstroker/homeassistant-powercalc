@@ -1,5 +1,7 @@
 {
   "common": {
+    "source_entity": "Bron entiteit",
+    "source_device": "Bron apparaat",
     "remarks_smart_switch": "Dit profiel biedt alleen stand-by stroomwaarden. \n Wanneer je een apparaat hebt dat een vaste hoeveelheid stroom verbruikt wanneer het is ingeschakeld, kunt u die waarde opgeven in de volgende stap van de configuratie flow",
     "remarks_smart_dimmer": "Dit profiel biedt alleen stand-by-stroomwaarden. \n In de volgende stap kunt u optioneel de waarden van het aangesloten licht opgeven."
   },
@@ -204,7 +206,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Wanneer je niet bevestigd kan je in het volgende scherm zelf de fabrikant en het model kiezen."
         },
-        "description": "Fabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
+        "description": "{source}\n\nFabrikant \"{manufacturer}\" en model \"{model}\" zijn automatisch gedecteerd voor het apparaat.{remarks}",
         "title": "Bibliotheek"
       },
       "library_multi_profile": {

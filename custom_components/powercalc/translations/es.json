@@ -1,5 +1,7 @@
 {
   "common": {
+    "source_entity": "Source entity",
+    "source_device": "Source device",
     "remarks_smart_switch": "Este perfil solo provee valores de potencia en espera (standby). \nCuando tienes un aparato que encendido consume una cantidad fija de potencia, puedes proveer ese valor en el siguiente paso de la configuración",
     "remarks_smart_dimmer": "Este perfil solo proporciona valores de energía en Standby. \n En el siguiente paso puedes proporcionar opcionalmente los valores de la luz conectada"
   },
@@ -204,7 +206,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Si eliges no confirmar, puedes introducir el fabricante y el modelo tú mismo"
         },
-        "description": "El fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}",
+        "description": "{source}\n\nEl fabricante \"{manufacturer}\" y el modelo \"{model}\" fueron detectados automáticamente en su dispositivo.{remarks}",
         "title": "Biblioteca"
       },
       "library_multi_profile": {

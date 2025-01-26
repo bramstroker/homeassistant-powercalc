@@ -1,5 +1,7 @@
 {
   "common": {
+    "source_entity": "Source entity",
+    "source_device": "Source device",
     "remarks_smart_switch": "Este perfil só fornece valores da potência em standby.\nQuando você tem um aparelho que consome uma quantidade fixa de energia quando ativado, você pode informar esse valor no próximo passo do fluxo de configuração",
     "remarks_smart_dimmer": "This profile only provides standby power values. \n In the next step you can optionally provide the values of the connected light"
   },
@@ -204,7 +206,7 @@
         "data_description": {
           "confirm_autodisovered_model": "Se você optar por não confirmar, você mesmo pode inserir o fabricante e o modelo"
         },
-        "description": "O fabricante \"{manufacturer}\" e o modelo \"{model}\" foram detectados automaticamente para sua luz.{remarks}",
+        "description": "{source}\n\nO fabricante \"{manufacturer}\" e o modelo \"{model}\" foram detectados automaticamente para sua luz.{remarks}",
         "title": "Biblioteca"
       },
       "library_multi_profile": {
