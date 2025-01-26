@@ -444,6 +444,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "Group1",
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
     )
     group2_entry = create_mock_entry(
@@ -451,6 +452,7 @@ async def test_subgroup_selector(hass: HomeAssistant) -> None:
         {
             CONF_NAME: "Group2",
             CONF_SENSOR_TYPE: SensorType.GROUP,
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
     )
 
@@ -550,6 +552,7 @@ async def test_create_group_on_demand_from_virtual_power_flow(hass: HomeAssistan
         data={
             CONF_SENSOR_TYPE: SensorType.GROUP,
             CONF_NAME: "TestGroup",
+            CONF_GROUP_TYPE: GroupType.CUSTOM,
         },
         title="TestGroup",
     )
