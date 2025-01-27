@@ -323,9 +323,9 @@
       },
       "sub_profile": {
         "data": {
-          "sub_profile": "Pod profil"
+          "sub_profile": "Podprofil"
         },
-        "description": "Tento model má viacero podprofilov. Vyberte ten, ktorý vyhovuje vášmu zariadeniu",
+        "description": "Tento model má viacero podprofilov. Vyberte ten, ktorý vyhovuje vášmu zariadeniu:\n\n\"{entity_id}\"",
         "title": "Konfigurácia podprofilu"
       },
       "smart_switch": {
