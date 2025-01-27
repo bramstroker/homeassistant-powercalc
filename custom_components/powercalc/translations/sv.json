@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Underprofil"
         },
-        "description": "Denna modellen har flera underprofiler. Välj en som passar din enhet",
+        "description": "Denna modellen har flera underprofiler. Välj en som passar din enhet\n\n\"{entity_id}\"",
         "title": "Underprofil konfiguration"
       },
       "smart_switch": {

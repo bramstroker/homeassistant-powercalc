@@ -325,7 +325,7 @@
         "data": {
           "sub_profile": "Sub profiel"
         },
-        "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat",
+        "description": "Dit model heeft meerdere profielen. Selecteer de juiste voor je apparaat\n\n\"{entity_id}\"",
         "title": "Sub profiel configuratie"
       },
       "smart_switch": {
