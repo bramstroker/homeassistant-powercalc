@@ -1,7 +1,3 @@
 {
-  "calculation_strategy": "lut",
-  "sensor_config": {
-    "power_sensor_naming": "{} White Light Power",
-    "energy_sensor_naming": "{} White Light Energy"
-  }
+  "calculation_strategy": "lut"
 }
